@@ -1,0 +1,94 @@
+<svg width="400" height="840" viewBox="0 0 400 840" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <style>
+        .font-sans { font-family: 'Roboto', sans-serif; }
+        .fill-bg { fill: #000000; }
+        .fill-surface-container { fill: #252525; }
+        .fill-primary { fill: #D0BCFF; }
+        .fill-on-surface { fill: #E6E1E5; }
+        .fill-outline { fill: #8E8E93; }
+    </style>
+
+    <!-- 背景 -->
+    <rect width="400" height="840" rx="30" class="fill-bg" stroke="#333" stroke-width="8"/>
+
+    <!-- ================= 页面内容 (Tab 6) ================= -->
+    <g transform="translate(20, 40)">
+        
+        <!-- 1. Header & Tabs -->
+        <rect width="360" height="40" class="fill-surface-container"/>
+        <text x="280" y="25" text-anchor="middle" class="font-sans" font-size="11" fill="#D0BCFF" font-weight="bold">分支</text>
+        <rect x="260" y="38" width="40" height="2" class="fill-primary"/>
+        
+        <!-- Context Menu Icon -->
+        <circle cx="340" cy="20" r="2" fill="#E6E1E5"/>
+        <circle cx="340" cy="14" r="2" fill="#E6E1E5"/>
+        <circle cx="340" cy="26" r="2" fill="#E6E1E5"/>
+
+        <!-- 2. Toolbar -->
+        <rect y="40" width="360" height="44" class="fill-surface-container"/>
+        <line x1="0" y1="84" x2="360" y2="84" stroke="#333"/>
+        
+        <!-- Left: Current Context -->
+        <text x="16" y="66" class="font-sans" font-size="12" fill="#8E8E93">All Branches (5)</text>
+        
+        <!-- Right: Actions -->
+        <g transform="translate(280, 48)">
+            <!-- New Branch Icon -->
+            <rect width="28" height="28" rx="4" fill="#383838"/>
+            <text x="14" y="19" text-anchor="middle" fill="#D0BCFF" font-size="16">+</text>
+            
+            <!-- Search Icon -->
+            <rect x="36" width="28" height="28" rx="4" fill="#383838"/>
+            <circle cx="50" cy="14" r="4" stroke="#E6E1E5" stroke-width="1.5" fill="none"/>
+        </g>
+
+        <!-- 3. List Content -->
+        <g transform="translate(0, 84)">
+            
+            <!-- Section: LOCAL -->
+            <g transform="translate(16, 16)">
+                <text class="font-sans" font-size="11" fill="#D0BCFF">LOCAL</text>
+                
+                <!-- Item 1: Current (Active) -->
+                <g transform="translate(0, 12)">
+                    <rect width="328" height="56" rx="8" class="fill-surface-container" stroke="#4F378B"/>
+                    <text x="16" y="24" class="font-sans" font-size="14" fill="#D0BCFF" font-weight="bold">feature/ui-v2</text>
+                    <text x="16" y="42" class="font-sans" font-size="11" fill="#8E8E93">Updated 2m ago</text>
+                    
+                    <rect x="260" y="18" width="56" height="20" rx="10" fill="#4F378B"/>
+                    <text x="288" y="32" text-anchor="middle" class="font-sans" font-size="10" fill="#E6E1E5">Current</text>
+                </g>
+
+                <!-- Item 2: Standard -->
+                <g transform="translate(0, 80)">
+                    <rect width="328" height="56" rx="8" class="fill-surface-container"/>
+                    <text x="16" y="24" class="font-sans" font-size="14" fill="#E6E1E5">main</text>
+                    <text x="16" y="42" class="font-sans" font-size="11" fill="#8E8E93">1 commit behind</text>
+                    
+                    <rect x="250" y="16" width="66" height="24" rx="4" stroke="#555"/>
+                    <text x="283" y="32" text-anchor="middle" class="font-sans" font-size="11" fill="#E6E1E5">Checkout</text>
+                </g>
+                
+                 <!-- Item 3: Standard -->
+                <g transform="translate(0, 144)">
+                    <rect width="328" height="56" rx="8" class="fill-surface-container"/>
+                    <text x="16" y="24" class="font-sans" font-size="14" fill="#E6E1E5">dev</text>
+                </g>
+            </g>
+
+            <!-- Section: REMOTE -->
+            <g transform="translate(16, 230)">
+                <text class="font-sans" font-size="11" fill="#8E8E93">REMOTE</text>
+                
+                <g transform="translate(0, 12)">
+                    <rect width="328" height="48" rx="8" fill="#1E1E1E"/>
+                    <text x="16" y="28" class="font-sans" font-size="14" fill="#CAC4D0">origin/main</text>
+                </g>
+                 <g transform="translate(0, 68)">
+                    <rect width="328" height="48" rx="8" fill="#1E1E1E"/>
+                    <text x="16" y="28" class="font-sans" font-size="14" fill="#CAC4D0">origin/feature/ui-v2</text>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

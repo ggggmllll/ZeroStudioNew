@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~  This file is part of AndroidIDE.
+  ~
+  ~  AndroidIDE is free software: you can redistribute it and/or modify
+  ~  it under the terms of the GNU General Public License as published by
+  ~  the Free Software Foundation, either version 3 of the License, or
+  ~  (at your option) any later version.
+  ~
+  ~  AndroidIDE is distributed in the hope that it will be useful,
+  ~  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~  GNU General Public License for more details.
+  ~
+  ~  You should have received a copy of the GNU General Public License
+  ~   along with AndroidIDE.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+     xmlns:tools="http://schemas.android.com/tools">
+     
+
+     <uses-permission android:name="com.itsaky.androidide.permission.BIND_LOG_SERVICE" />
+     <uses-permission android:name="android.permission.REQUEST_DELETE_PACKAGES" />
+     <uses-permission android:name="android.permission.INTERNET" />
+     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+     <uses-permission
+          android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
+          tools:ignore="ScopedStorage" />
+     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+     <uses-permission
+          android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE"
+          android:minSdkVersion="34" />
+     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+     <uses-permission
+          android:name="android.permission.QUERY_ALL_PACKAGES"
+          tools:ignore="QueryAllPackagesPermission" />
+
+     <permission
+          android:description="@string/permdesc_bind_logger_service"
+          android:label="@string/permlab_bind_logger_service"
+          android:name="com.itsaky.androidide.permission.BIND_LOG_SERVICE"
+          android:protectionLevel="normal"
+          tools:ignore="ManifestOrder" />
+          
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VISUAL_USER_SELECTED" />
+
+    <!-- 通知 -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+
+</manifest>

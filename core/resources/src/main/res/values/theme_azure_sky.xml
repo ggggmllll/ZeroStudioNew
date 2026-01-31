@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~  This file is part of AndroidIDE.
+  ~  Created by @author android_zero
+  ~  Style: Clear Blue Sky 蔚蓝天空 - 纯净蓝与白，清爽
+  -->
+<resources>
+  <!-- Light -->
+  <color name="_azure_sky_light_colorPrimary">#ff0061a4</color>
+  <color name="_azure_sky_light_colorPrimaryContainer">#ffd1e4ff</color>
+  <color name="_azure_sky_light_colorPrimaryDark">#ffffffff</color>
+  <color name="_azure_sky_light_colorPrimaryInverse">#ff9ecaff</color>
+  <color name="_azure_sky_light_colorOnPrimary">#ffffffff</color>
+  <color name="_azure_sky_light_colorOnPrimaryContainer">#ff001d36</color>
+  <color name="_azure_sky_light_colorSecondary">#ff535f70</color>
+  <color name="_azure_sky_light_colorSecondaryContainer">#ffd7e3f7</color>
+  <color name="_azure_sky_light_colorOnSecondary">#ffffffff</color>
+  <color name="_azure_sky_light_colorOnSecondaryContainer">#ff101c2b</color>
+  <color name="_azure_sky_light_colorTertiary">#ff6b5778</color>
+  <color name="_azure_sky_light_colorTertiaryContainer">#fff2daff</color>
+  <color name="_azure_sky_light_colorOnTertiary">#ffffffff</color>
+  <color name="_azure_sky_light_colorOnTertiaryContainer">#ff251431</color>
+  <color name="_azure_sky_light_colorError">#ffba1a1a</color>
+  <color name="_azure_sky_light_colorBackground">#fffdfcff</color>
+  <color name="_azure_sky_light_colorOnBackground">#ff1a1c1e</color>
+  <color name="_azure_sky_light_colorSurface">#fffdfcff</color>
+  <color name="_azure_sky_light_colorSurfaceInverse">#ff2f3033</color>
+  <color name="_azure_sky_light_colorSurfaceVariant">#ffdfe2eb</color>
+  <color name="_azure_sky_light_colorOnSurface">#ff1a1c1e</color>
+  <color name="_azure_sky_light_colorOnSurfaceInverse">#fff0f0f4</color>
+  <color name="_azure_sky_light_colorOnSurfaceVariant">#ff43474e</color>
+  <color name="_azure_sky_light_colorOutline">#ff73777f</color>
+  
+  <color name="_azure_sky_light_ripple">#330061a4</color>
+  <color name="_azure_sky_light_selection">#66d1e4ff</color>
+
+  <style name="Theme.AndroidIDE.AzureSky" parent="Theme.AndroidIDE">
+    <item name="colorPrimary">@color/_azure_sky_light_colorPrimary</item>
+    <item name="colorPrimaryContainer">@color/_azure_sky_light_colorPrimaryContainer</item>
+    <item name="colorPrimaryDark">@color/_azure_sky_light_colorPrimaryDark</item>
+    <item name="colorPrimaryInverse">@color/_azure_sky_light_colorPrimaryInverse</item>
+    <item name="colorOnPrimary">@color/_azure_sky_light_colorOnPrimary</item>
+    <item name="colorOnPrimaryContainer">@color/_azure_sky_light_colorOnPrimaryContainer</item>
+    <item name="colorSecondary">@color/_azure_sky_light_colorSecondary</item>
+    <item name="colorSecondaryContainer">@color/_azure_sky_light_colorSecondaryContainer</item>
+    <item name="colorOnSecondary">@color/_azure_sky_light_colorOnSecondary</item>
+    <item name="colorOnSecondaryContainer">@color/_azure_sky_light_colorOnSecondaryContainer</item>
+    <item name="colorTertiary">@color/_azure_sky_light_colorTertiary</item>
+    <item name="colorTertiaryContainer">@color/_azure_sky_light_colorTertiaryContainer</item>
+    <item name="colorOnTertiary">@color/_azure_sky_light_colorOnTertiary</item>
+    <item name="colorOnTertiaryContainer">@color/_azure_sky_light_colorOnTertiaryContainer</item>
+    <item name="colorError">@color/_azure_sky_light_colorError</item>
+    <item name="android:colorBackground">@color/_azure_sky_light_colorBackground</item>
+    <item name="colorOnBackground">@color/_azure_sky_light_colorOnBackground</item>
+    <item name="colorSurface">@color/_azure_sky_light_colorSurface</item>
+    <item name="colorOnSurface">@color/_azure_sky_light_colorOnSurface</item>
+    <item name="colorSurfaceVariant">@color/_azure_sky_light_colorSurfaceVariant</item>
+    <item name="colorOnSurfaceVariant">@color/_azure_sky_light_colorOnSurfaceVariant</item>
+    <item name="colorOutline">@color/_azure_sky_light_colorOutline</item>
+
+    <item name="colorControlHighlight">@color/_azure_sky_light_ripple</item>
+    <item name="android:colorControlHighlight">@color/_azure_sky_light_ripple</item>
+    <item name="colorControlActivated">@color/_azure_sky_light_colorPrimary</item>
+    <item name="android:colorControlActivated">@color/_azure_sky_light_colorPrimary</item>
+    <item name="android:textColorHighlight">@color/_azure_sky_light_selection</item>
+    
+    <item name="android:statusBarColor">@color/_azure_sky_light_colorBackground</item>
+    <item name="android:navigationBarColor">@color/_azure_sky_light_colorBackground</item>
+    <item name="android:windowLightStatusBar">true</item>
+
+    <item name="terminalTextColor">@color/_azure_sky_light_colorOnBackground</item>
+    <item name="terminalBackgroundColor">@color/_azure_sky_light_colorBackground</item>
+    <item name="terminalCursorStyle">block</item>
+  </style>
+
+  <!-- Dark -->
+  <color name="_azure_sky_dark_colorPrimary">#ff9ecaff</color>
+  <color name="_azure_sky_dark_colorPrimaryContainer">#ff00497d</color>
+  <color name="_azure_sky_dark_colorPrimaryDark">#ff1a1c1e</color>
+  <color name="_azure_sky_dark_colorOnPrimary">#ff003258</color>
+  <color name="_azure_sky_dark_colorOnPrimaryContainer">#ffd1e4ff</color>
+  <color name="_azure_sky_dark_colorSecondary">#ffbbc7db</color>
+  <color name="_azure_sky_dark_colorSecondaryContainer">#ff3b4858</color>
+  <color name="_azure_sky_dark_colorOnSecondary">#ff253140</color>
+  <color name="_azure_sky_dark_colorOnSecondaryContainer">#ffd7e3f7</color>
+  <color name="_azure_sky_dark_colorTertiary">#ffd6bee4</color>
+  <color name="_azure_sky_dark_colorTertiaryContainer">#ff523f5f</color>
+  <color name="_azure_sky_dark_colorOnTertiary">#ff3b2948</color>
+  <color name="_azure_sky_dark_colorOnTertiaryContainer">#fff2daff</color>
+  <color name="_azure_sky_dark_colorError">#ffffb4ab</color>
+  <color name="_azure_sky_dark_colorBackground">#ff1a1c1e</color>
+  <color name="_azure_sky_dark_colorOnBackground">#ffe2e2e6</color>
+  <color name="_azure_sky_dark_colorSurface">#ff1a1c1e</color>
+  <color name="_azure_sky_dark_colorOnSurface">#ffe2e2e6</color>
+  <color name="_azure_sky_dark_colorSurfaceVariant">#ff43474e</color>
+  <color name="_azure_sky_dark_colorOnSurfaceVariant">#ffc3c7d0</color>
+  <color name="_azure_sky_dark_colorOutline">#ff8d9199</color>
+  <color name="_azure_sky_dark_colorOnSurfaceInverse">#ff1a1c1e</color>
+  <color name="_azure_sky_dark_colorSurfaceInverse">#ffe2e2e6</color>
+  <color name="_azure_sky_dark_colorPrimaryInverse">#ff0061a4</color>
+  
+  <color name="_azure_sky_dark_ripple">#449ecaff</color>
+  <color name="_azure_sky_dark_selection">#6600497d</color>
+
+  <style name="Theme.AndroidIDE.AzureSky.Dark" parent="Theme.AndroidIDE.AzureSky">
+    <item name="colorPrimary">@color/_azure_sky_dark_colorPrimary</item>
+    <item name="colorPrimaryDark">@color/_azure_sky_dark_colorPrimaryDark</item>
+    <item name="colorOnPrimary">@color/_azure_sky_dark_colorOnPrimary</item>
+    <item name="colorPrimaryContainer">@color/_azure_sky_dark_colorPrimaryContainer</item>
+    <item name="colorOnPrimaryContainer">@color/_azure_sky_dark_colorOnPrimaryContainer</item>
+    <item name="colorSecondary">@color/_azure_sky_dark_colorSecondary</item>
+    <item name="colorOnSecondary">@color/_azure_sky_dark_colorOnSecondary</item>
+    <item name="colorSecondaryContainer">@color/_azure_sky_dark_colorSecondaryContainer</item>
+    <item name="colorOnSecondaryContainer">@color/_azure_sky_dark_colorOnSecondaryContainer</item>
+    <item name="colorTertiary">@color/_azure_sky_dark_colorTertiary</item>
+    <item name="colorOnTertiary">@color/_azure_sky_dark_colorOnTertiary</item>
+    <item name="colorTertiaryContainer">@color/_azure_sky_dark_colorTertiaryContainer</item>
+    <item name="colorOnTertiaryContainer">@color/_azure_sky_dark_colorOnTertiaryContainer</item>
+    <item name="colorError">@color/_azure_sky_dark_colorError</item>
+    <item name="android:colorBackground">@color/_azure_sky_dark_colorBackground</item>
+    <item name="colorOnBackground">@color/_azure_sky_dark_colorOnBackground</item>
+    <item name="colorSurface">@color/_azure_sky_dark_colorSurface</item>
+    <item name="colorOnSurface">@color/_azure_sky_dark_colorOnSurface</item>
+    <item name="colorSurfaceVariant">@color/_azure_sky_dark_colorSurfaceVariant</item>
+    <item name="colorOnSurfaceVariant">@color/_azure_sky_dark_colorOnSurfaceVariant</item>
+    <item name="colorOutline">@color/_azure_sky_dark_colorOutline</item>
+    <item name="colorOnSurfaceInverse">@color/_azure_sky_dark_colorOnSurfaceInverse</item>
+    <item name="colorSurfaceInverse">@color/_azure_sky_dark_colorSurfaceInverse</item>
+    <item name="colorPrimaryInverse">@color/_azure_sky_dark_colorPrimaryInverse</item>
+
+    <item name="colorControlHighlight">@color/_azure_sky_dark_ripple</item>
+    <item name="android:colorControlHighlight">@color/_azure_sky_dark_ripple</item>
+    <item name="colorControlActivated">@color/_azure_sky_dark_colorPrimary</item>
+    <item name="android:colorControlActivated">@color/_azure_sky_dark_colorPrimary</item>
+    <item name="android:textColorHighlight">@color/_azure_sky_dark_selection</item>
+    
+    <item name="android:statusBarColor">@color/_azure_sky_dark_colorBackground</item>
+    <item name="android:navigationBarColor">@color/_azure_sky_dark_colorBackground</item>
+    <item name="android:windowLightStatusBar">false</item>
+    
+    <item name="terminalTextColor">@color/_azure_sky_dark_colorOnBackground</item>
+    <item name="terminalBackgroundColor">@color/_azure_sky_dark_colorBackground</item>
+    <item name="terminalCursorStyle">block</item>
+  </style>
+</resources>

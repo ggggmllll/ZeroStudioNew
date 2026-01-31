@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~  This file is part of AndroidIDE.
+  ~  Created by @author android_zero
+  ~  Style: High Contrast Cyberpunk - 赛博霓虹 - 高对比度暗色，适合夜间编程
+  -->
+<resources>
+  <!-- Cyber Neon - Light (Cyberpunk usually doesn't have light, but mapped for compatibility) -->
+  <color name="_cyber_neon_light_colorPrimary">#ff006c4c</color>
+  <color name="_cyber_neon_light_colorPrimaryContainer">#ff89f8c7</color>
+  <color name="_cyber_neon_light_colorPrimaryDark">#ffffffff</color>
+  <color name="_cyber_neon_light_colorPrimaryInverse">#ff6bdbac</color>
+  <color name="_cyber_neon_light_colorOnPrimary">#ffffffff</color>
+  <color name="_cyber_neon_light_colorOnPrimaryContainer">#ff002114</color>
+  <color name="_cyber_neon_light_colorSecondary">#ff4c6358</color>
+  <color name="_cyber_neon_light_colorSecondaryContainer">#ffcee9da</color>
+  <color name="_cyber_neon_light_colorOnSecondary">#ffffffff</color>
+  <color name="_cyber_neon_light_colorOnSecondaryContainer">#ff092017</color>
+  <color name="_cyber_neon_light_colorTertiary">#ff3f6374</color>
+  <color name="_cyber_neon_light_colorTertiaryContainer">#ffc3e8fc</color>
+  <color name="_cyber_neon_light_colorOnTertiary">#ffffffff</color>
+  <color name="_cyber_neon_light_colorOnTertiaryContainer">#ff001f2a</color>
+  <color name="_cyber_neon_light_colorError">#ffba1a1a</color>
+  <color name="_cyber_neon_light_colorErrorContainer">#ffffdad6</color>
+  <color name="_cyber_neon_light_colorOnError">#ffffffff</color>
+  <color name="_cyber_neon_light_colorOnErrorContainer">#ff410002</color>
+  <color name="_cyber_neon_light_colorBackground">#fffbfdf9</color>
+  <color name="_cyber_neon_light_colorOnBackground">#ff191c1a</color>
+  <color name="_cyber_neon_light_colorSurface">#fffbfdf9</color>
+  <color name="_cyber_neon_light_colorSurfaceInverse">#ff2e312f</color>
+  <color name="_cyber_neon_light_colorSurfaceVariant">#ffdbe5de</color>
+  <color name="_cyber_neon_light_colorOnSurface">#ff191c1a</color>
+  <color name="_cyber_neon_light_colorOnSurfaceInverse">#fff0f1ee</color>
+  <color name="_cyber_neon_light_colorOnSurfaceVariant">#ff404944</color>
+  <color name="_cyber_neon_light_colorOutline">#ff707973</color>
+  <!-- Interactive Colors Light -->
+  <color name="_cyber_neon_light_ripple">#33006c4c</color>
+  <color name="_cyber_neon_light_selection">#6689f8c7</color>
+
+  <style name="Theme.AndroidIDE.CyberNeon" parent="Theme.AndroidIDE">
+    <!-- Material 3 Base -->
+    <item name="colorPrimary">@color/_cyber_neon_light_colorPrimary</item>
+    <item name="colorPrimaryContainer">@color/_cyber_neon_light_colorPrimaryContainer</item>
+    <item name="colorPrimaryDark">@color/_cyber_neon_light_colorPrimaryDark</item>
+    <item name="colorPrimaryInverse">@color/_cyber_neon_light_colorPrimaryInverse</item>
+    <item name="colorOnPrimary">@color/_cyber_neon_light_colorOnPrimary</item>
+    <item name="colorOnPrimaryContainer">@color/_cyber_neon_light_colorOnPrimaryContainer</item>
+    <item name="colorSecondary">@color/_cyber_neon_light_colorSecondary</item>
+    <item name="colorSecondaryContainer">@color/_cyber_neon_light_colorSecondaryContainer</item>
+    <item name="colorOnSecondary">@color/_cyber_neon_light_colorOnSecondary</item>
+    <item name="colorOnSecondaryContainer">@color/_cyber_neon_light_colorOnSecondaryContainer</item>
+    <item name="colorTertiary">@color/_cyber_neon_light_colorTertiary</item>
+    <item name="colorTertiaryContainer">@color/_cyber_neon_light_colorTertiaryContainer</item>
+    <item name="colorOnTertiary">@color/_cyber_neon_light_colorOnTertiary</item>
+    <item name="colorOnTertiaryContainer">@color/_cyber_neon_light_colorOnTertiaryContainer</item>
+    <item name="colorError">@color/_cyber_neon_light_colorError</item>
+    <item name="android:colorBackground">@color/_cyber_neon_light_colorBackground</item>
+    <item name="colorOnBackground">@color/_cyber_neon_light_colorOnBackground</item>
+    <item name="colorSurface">@color/_cyber_neon_light_colorSurface</item>
+    <item name="colorOnSurface">@color/_cyber_neon_light_colorOnSurface</item>
+    <item name="colorSurfaceVariant">@color/_cyber_neon_light_colorSurfaceVariant</item>
+    <item name="colorOnSurfaceVariant">@color/_cyber_neon_light_colorOnSurfaceVariant</item>
+    <item name="colorOutline">@color/_cyber_neon_light_colorOutline</item>
+
+    <!-- UI Controls & Interactions (Detailed) -->
+    <!-- Ripple Effect Color -->
+    <item name="colorControlHighlight">@color/_cyber_neon_light_ripple</item>
+    <item name="android:colorControlHighlight">@color/_cyber_neon_light_ripple</item>
+    <!-- Checkbox/Radio Active Color -->
+    <item name="colorControlActivated">@color/_cyber_neon_light_colorPrimary</item>
+    <item name="android:colorControlActivated">@color/_cyber_neon_light_colorPrimary</item>
+    <!-- Checkbox/Radio Inactive Color -->
+    <item name="colorControlNormal">@color/_cyber_neon_light_colorOutline</item>
+    <item name="android:colorControlNormal">@color/_cyber_neon_light_colorOutline</item>
+    <!-- Text Selection Background -->
+    <item name="android:textColorHighlight">@color/_cyber_neon_light_selection</item>
+    <!-- Standard Text Colors -->
+    <item name="android:textColorPrimary">@color/_cyber_neon_light_colorOnBackground</item>
+    <item name="android:textColorSecondary">@color/_cyber_neon_light_colorOnSurfaceVariant</item>
+    <!-- Window Bars -->
+    <item name="android:statusBarColor">@color/_cyber_neon_light_colorBackground</item>
+    <item name="android:navigationBarColor">@color/_cyber_neon_light_colorBackground</item>
+    <item name="android:windowLightStatusBar">true</item>
+    <item name="android:windowLightNavigationBar">true</item>
+
+    <!-- Terminal Specific Attributes -->
+    <item name="terminalTextColor">@color/_cyber_neon_light_colorOnBackground</item>
+    <item name="terminalBackgroundColor">@color/_cyber_neon_light_colorBackground</item>
+    <item name="terminalCursorStyle">block</item>
+  </style>
+
+  <!-- Cyber Neon - Dark (The Real Cyberpunk) -->
+  <color name="_cyber_neon_dark_colorPrimary">#ff00ff9d</color> <!-- Neon Green -->
+  <color name="_cyber_neon_dark_colorPrimaryContainer">#ff005138</color>
+  <color name="_cyber_neon_dark_colorPrimaryDark">#ff0d0d0d</color>
+  <color name="_cyber_neon_dark_colorPrimaryInverse">#ff006c4c</color>
+  <color name="_cyber_neon_dark_colorOnPrimary">#ff003826</color>
+  <color name="_cyber_neon_dark_colorOnPrimaryContainer">#ff89f8c7</color>
+  <color name="_cyber_neon_dark_colorSecondary">#ffff00ff</color> <!-- Neon Pink -->
+  <color name="_cyber_neon_dark_colorSecondaryContainer">#ff354b41</color>
+  <color name="_cyber_neon_dark_colorOnSecondary">#ff1e352b</color>
+  <color name="_cyber_neon_dark_colorOnSecondaryContainer">#ffcee9da</color>
+  <color name="_cyber_neon_dark_colorTertiary">#ff00e5ff</color> <!-- Neon Cyan -->
+  <color name="_cyber_neon_dark_colorTertiaryContainer">#ff264b5b</color>
+  <color name="_cyber_neon_dark_colorOnTertiary">#ff083544</color>
+  <color name="_cyber_neon_dark_colorOnTertiaryContainer">#ffc3e8fc</color>
+  <color name="_cyber_neon_dark_colorError">#ffffb4ab</color>
+  <color name="_cyber_neon_dark_colorErrorContainer">#ff93000a</color>
+  <color name="_cyber_neon_dark_colorOnError">#ff690005</color>
+  <color name="_cyber_neon_dark_colorOnErrorContainer">#ffffdad6</color>
+  <color name="_cyber_neon_dark_colorBackground">#ff050505</color> <!-- Deep Black -->
+  <color name="_cyber_neon_dark_colorOnBackground">#ffe2e3e0</color>
+  <color name="_cyber_neon_dark_colorSurface">#ff0d0d0d</color>
+  <color name="_cyber_neon_dark_colorSurfaceInverse">#ffe2e3e0</color>
+  <color name="_cyber_neon_dark_colorSurfaceVariant">#ff404944</color>
+  <color name="_cyber_neon_dark_colorOnSurface">#ffe2e3e0</color>
+  <color name="_cyber_neon_dark_colorOnSurfaceInverse">#ff191c1a</color>
+  <color name="_cyber_neon_dark_colorOnSurfaceVariant">#ffbfc9c2</color>
+  <color name="_cyber_neon_dark_colorOutline">#ff8a938d</color>
+  <!-- Interactive Colors Dark -->
+  <color name="_cyber_neon_dark_ripple">#4400ff9d</color>
+  <color name="_cyber_neon_dark_selection">#66005138</color>
+
+  <style name="Theme.AndroidIDE.CyberNeon.Dark" parent="Theme.AndroidIDE.CyberNeon">
+    <item name="colorPrimary">@color/_cyber_neon_dark_colorPrimary</item>
+    <item name="colorPrimaryDark">@color/_cyber_neon_dark_colorPrimaryDark</item>
+    <item name="colorOnPrimary">@color/_cyber_neon_dark_colorOnPrimary</item>
+    <item name="colorPrimaryContainer">@color/_cyber_neon_dark_colorPrimaryContainer</item>
+    <item name="colorOnPrimaryContainer">@color/_cyber_neon_dark_colorOnPrimaryContainer</item>
+    <item name="colorSecondary">@color/_cyber_neon_dark_colorSecondary</item>
+    <item name="colorOnSecondary">@color/_cyber_neon_dark_colorOnSecondary</item>
+    <item name="colorSecondaryContainer">@color/_cyber_neon_dark_colorSecondaryContainer</item>
+    <item name="colorOnSecondaryContainer">@color/_cyber_neon_dark_colorOnSecondaryContainer</item>
+    <item name="colorTertiary">@color/_cyber_neon_dark_colorTertiary</item>
+    <item name="colorOnTertiary">@color/_cyber_neon_dark_colorOnTertiary</item>
+    <item name="colorTertiaryContainer">@color/_cyber_neon_dark_colorTertiaryContainer</item>
+    <item name="colorOnTertiaryContainer">@color/_cyber_neon_dark_colorOnTertiaryContainer</item>
+    <item name="colorError">@color/_cyber_neon_dark_colorError</item>
+    <item name="colorErrorContainer">@color/_cyber_neon_dark_colorErrorContainer</item>
+    <item name="colorOnError">@color/_cyber_neon_dark_colorOnError</item>
+    <item name="colorOnErrorContainer">@color/_cyber_neon_dark_colorOnErrorContainer</item>
+    <item name="android:colorBackground">@color/_cyber_neon_dark_colorBackground</item>
+    <item name="colorOnBackground">@color/_cyber_neon_dark_colorOnBackground</item>
+    <item name="colorSurface">@color/_cyber_neon_dark_colorSurface</item>
+    <item name="colorOnSurface">@color/_cyber_neon_dark_colorOnSurface</item>
+    <item name="colorSurfaceVariant">@color/_cyber_neon_dark_colorSurfaceVariant</item>
+    <item name="colorOnSurfaceVariant">@color/_cyber_neon_dark_colorOnSurfaceVariant</item>
+    <item name="colorOutline">@color/_cyber_neon_dark_colorOutline</item>
+    <item name="colorOnSurfaceInverse">@color/_cyber_neon_dark_colorOnSurfaceInverse</item>
+    <item name="colorSurfaceInverse">@color/_cyber_neon_dark_colorSurfaceInverse</item>
+    <item name="colorPrimaryInverse">@color/_cyber_neon_dark_colorPrimaryInverse</item>
+
+    <!-- UI Controls & Interactions (Dark) -->
+    <item name="colorControlHighlight">@color/_cyber_neon_dark_ripple</item>
+    <item name="android:colorControlHighlight">@color/_cyber_neon_dark_ripple</item>
+    <item name="colorControlActivated">@color/_cyber_neon_dark_colorPrimary</item>
+    <item name="android:colorControlActivated">@color/_cyber_neon_dark_colorPrimary</item>
+    <item name="colorControlNormal">@color/_cyber_neon_dark_colorOutline</item>
+    <item name="android:colorControlNormal">@color/_cyber_neon_dark_colorOutline</item>
+    <item name="android:textColorHighlight">@color/_cyber_neon_dark_selection</item>
+    <item name="android:textColorPrimary">@color/_cyber_neon_dark_colorOnBackground</item>
+    <item name="android:textColorSecondary">@color/_cyber_neon_dark_colorOnSurfaceVariant</item>
+    
+    <item name="android:statusBarColor">@color/_cyber_neon_dark_colorBackground</item>
+    <item name="android:navigationBarColor">@color/_cyber_neon_dark_colorBackground</item>
+    <item name="android:windowLightStatusBar">false</item>
+    <item name="android:windowLightNavigationBar">false</item>
+
+    <!-- Terminal Specific -->
+    <item name="terminalTextColor">@color/_cyber_neon_dark_colorPrimary</item> <!-- Neon Text -->
+    <item name="terminalBackgroundColor">@color/_cyber_neon_dark_colorBackground</item>
+    <item name="terminalCursorStyle">verticalBar</item> <!-- Bar cursor for code -->
+  </style>
+</resources>

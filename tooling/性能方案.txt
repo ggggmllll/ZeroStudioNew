@@ -1,0 +1,4 @@
+ 待尝试方案："Shared Memory (MMF) + Fury" 方案
+ 
+ 
+ grpc方案需要转换dto/模型，不能一比一转换，不采用这个方法，比如不支持java file类型

@@ -1,0 +1,170 @@
+<svg width="400" height="840" viewBox="0 0 400 840" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <style>
+        .font-sans { font-family: 'Roboto', sans-serif; }
+        .font-mono { font-family: 'Roboto Mono', monospace; }
+        .text-xs { font-size: 11px; font-weight: 500; }
+        .text-sm { font-size: 13px; }
+        .text-base { font-size: 15px; font-weight: 700; }
+        
+        .fill-bg { fill: #000000; }
+        .fill-surface { fill: #1E1E1E; }
+        .fill-surface-container { fill: #252525; }
+        .fill-primary { fill: #D0BCFF; }
+        .fill-on-surface { fill: #E6E1E5; }
+        .fill-outline { fill: #8E8E93; }
+        
+        /* CI Status Colors */
+        .fill-success { fill: #81C784; }
+        .fill-running { fill: #64B5F6; }
+        .fill-error { fill: #F28B82; }
+        .fill-skipped { fill: #49454F; }
+        .stroke-running { stroke: #64B5F6; }
+    </style>
+
+    <!-- 背景 -->
+    <rect width="400" height="840" rx="30" class="fill-bg" stroke="#333" stroke-width="8"/>
+
+    <!-- ================= 页面内容 ================= -->
+    <g transform="translate(20, 40)">
+        
+        <!-- 1. Header -->
+        <rect width="360" height="50" class="fill-surface-container"/>
+        <text x="180" y="30" text-anchor="middle" class="font-sans text-base fill-on-surface">协作 (Remote)</text>
+        
+        <!-- Toolbar Actions (Right) -->
+        <g transform="translate(320, 15)">
+            <rect width="24" height="24" rx="4" fill="#383838"/>
+            <text x="12" y="17" text-anchor="middle" font-size="16" fill="#D0BCFF">▶</text> <!-- Run Pipeline -->
+        </g>
+
+        <!-- 2. Segmented Control (Switched to Pipelines) -->
+        <g transform="translate(16, 66)">
+            <rect width="328" height="36" rx="18" fill="#2B2930" stroke="#444"/>
+            
+            <!-- Inactive Segment: PRs -->
+            <text x="82" y="23" text-anchor="middle" class="font-sans text-sm" fill="#8E8E93">Pull Requests</text>
+            <circle cx="140" cy="10" r="4" fill="#B3261E"/> <!-- Notification Dot -->
+            
+            <!-- Active Segment: Pipelines -->
+            <rect width="160" height="32" rx="16" x="166" y="2" fill="#4F378B"/>
+            <text x="246" y="23" text-anchor="middle" class="font-sans text-sm" fill="#fff" font-weight="bold">Pipelines</text>
+        </g>
+
+        <!-- 3. Filters -->
+        <g transform="translate(16, 116)">
+            <rect width="50" height="24" rx="12" fill="#4F378B" fill-opacity="0.2" stroke="#4F378B"/>
+            <text x="25" y="16" text-anchor="middle" class="font-sans" font-size="11" fill="#D0BCFF">All</text>
+            
+            <rect x="58" y="0" width="70" height="24" rx="12" stroke="#444"/>
+            <text x="93" y="16" text-anchor="middle" class="font-sans" font-size="11" fill="#8E8E93">Running</text>
+            
+            <rect x="136" y="0" width="60" height="24" rx="12" stroke="#444"/>
+            <text x="166" y="16" text-anchor="middle" class="font-sans" font-size="11" fill="#8E8E93">Failed</text>
+        </g>
+
+        <!-- 4. Pipeline List Content -->
+        <g transform="translate(16, 156)">
+            
+            <!-- ITEM 1: RUNNING -->
+            <rect width="328" height="120" rx="8" class="fill-surface-container" stroke="#64B5F6" stroke-width="1"/>
+            <g transform="translate(12, 16)">
+                <!-- Top Row -->
+                <text x="0" y="0" class="font-sans text-base fill-on-surface">Release to Production</text>
+                <text x="304" y="0" text-anchor="end" class="font-mono text-xs fill-running">#1024</text>
+                
+                <!-- Meta Row -->
+                <g transform="translate(0, 20)">
+                    <path d="M0 0 L0 8 M4 4 L-4 4" stroke="#8E8E93" stroke-width="1.5" transform="translate(4,4) scale(0.6)"/> <!-- Branch Icon -->
+                    <text x="12" y="8" class="font-sans text-xs fill-outline">main • a1b2c • 2m ago</text>
+                </g>
+                
+                <!-- Divider -->
+                <line x1="0" y1="36" x2="304" y2="36" stroke="#333"/>
+                
+                <!-- Stage Graph (Running) -->
+                <g transform="translate(0, 60)">
+                    <!-- Stage 1: Build (Done) -->
+                    <circle cx="6" cy="6" r="6" class="fill-success"/>
+                    <path d="M3 6L5 8L9 4" stroke="#000" stroke-width="1.5" fill="none"/>
+                    <text x="6" y="24" text-anchor="middle" class="font-sans" font-size="10" fill="#81C784">Build</text>
+                    
+                    <line x1="12" y1="6" x2="38" y2="6" stroke="#444" stroke-width="2"/>
+                    
+                    <!-- Stage 2: Test (Running) -->
+                    <circle cx="44" cy="6" r="6" fill="none" class="stroke-running" stroke-width="2" stroke-dasharray="3 2"/>
+                    <text x="44" y="24" text-anchor="middle" class="font-sans" font-size="10" fill="#64B5F6">Test</text>
+                    
+                    <line x1="50" y1="6" x2="76" y2="6" stroke="#444" stroke-width="2"/>
+                    
+                    <!-- Stage 3: Deploy (Pending) -->
+                    <circle cx="82" cy="6" r="6" class="fill-skipped"/>
+                    <text x="82" y="24" text-anchor="middle" class="font-sans" font-size="10" fill="#8E8E93">Deploy</text>
+                </g>
+                
+                <!-- Status Text -->
+                <text x="304" y="70" text-anchor="end" class="font-sans text-xs fill-running">Running...</text>
+            </g>
+
+            <!-- ITEM 2: FAILED -->
+            <g transform="translate(0, 132)">
+                <rect width="328" height="120" rx="8" class="fill-surface-container"/>
+                <!-- Error Indicator Bar -->
+                <rect width="4" height="120" rx="2" class="fill-error"/>
+                
+                <g transform="translate(12, 16)">
+                    <text x="0" y="0" class="font-sans text-base fill-on-surface">Update Dependencies</text>
+                    <text x="304" y="0" text-anchor="end" class="font-mono text-xs fill-error">#1023</text>
+                    
+                    <g transform="translate(0, 20)">
+                         <text x="0" y="8" class="font-sans text-xs fill-outline">dev • 9f8e7 • 1h ago</text>
+                    </g>
+                    
+                    <line x1="0" y1="36" x2="304" y2="36" stroke="#333"/>
+                    
+                    <!-- Stage Graph (Failed) -->
+                    <g transform="translate(0, 60)">
+                        <!-- Stage 1: Lint (Done) -->
+                        <circle cx="6" cy="6" r="6" class="fill-success"/>
+                        
+                        <line x1="12" y1="6" x2="38" y2="6" stroke="#444"/>
+                        
+                        <!-- Stage 2: Unit Test (Failed) -->
+                        <circle cx="44" cy="6" r="6" class="fill-error"/>
+                        <path d="M41 3 L47 9 M47 3 L41 9" stroke="#000" stroke-width="1.5"/>
+                        <text x="44" y="24" text-anchor="middle" class="font-sans" font-size="10" fill="#F28B82">Unit Test</text>
+                        
+                        <line x1="50" y1="6" x2="76" y2="6" stroke="#444"/>
+                        
+                        <!-- Stage 3: Integration (Skipped) -->
+                        <circle cx="82" cy="6" r="6" class="fill-skipped"/>
+                    </g>
+                    
+                    <text x="304" y="70" text-anchor="end" class="font-sans text-xs fill-error">Failed</text>
+                </g>
+            </g>
+
+            <!-- ITEM 3: SUCCESS -->
+            <g transform="translate(0, 264)">
+                <rect width="328" height="80" rx="8" class="fill-surface-container"/>
+                
+                <g transform="translate(12, 16)">
+                    <text x="0" y="0" class="font-sans text-base fill-on-surface">Doc Update</text>
+                    <text x="304" y="0" text-anchor="end" class="font-mono text-xs fill-success">#1022</text>
+                    <text x="0" y="20" class="font-sans text-xs fill-outline">main • 3h ago</text>
+                    
+                    <!-- Mini Graph for Success (Simplified) -->
+                    <g transform="translate(0, 40)">
+                         <circle cx="4" cy="4" r="4" class="fill-success"/>
+                         <line x1="8" y1="4" x2="20" y2="4" stroke="#81C784"/>
+                         <circle cx="24" cy="4" r="4" class="fill-success"/>
+                         <line x1="28" y1="4" x2="40" y2="4" stroke="#81C784"/>
+                         <circle cx="44" cy="4" r="4" class="fill-success"/>
+                         
+                         <text x="60" y="8" class="font-sans text-xs fill-success">Passed in 45s</text>
+                    </g>
+                </g>
+            </g>
+
+        </g>
+    </g>
+</svg>

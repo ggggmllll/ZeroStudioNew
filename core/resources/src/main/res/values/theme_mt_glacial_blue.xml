@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~  This file is part of AndroidIDE.
+  ~  Created by @author android_zero
+  ~  Style: Glacial Blue (Material 3 Custom)
+  -->
+<resources>
+  <!-- Light Scheme -->
+  <color name="_glacial_blue_light_primary">#ff31628a</color>
+  <color name="_glacial_blue_light_onPrimary">#ffffffff</color>
+  <color name="_glacial_blue_light_primaryContainer">#ffcde5ff</color>
+  <color name="_glacial_blue_light_onPrimaryContainer">#ff134a71</color>
+  <color name="_glacial_blue_light_secondary">#ff565f6a</color>
+  <color name="_glacial_blue_light_onSecondary">#ffffffff</color>
+  <color name="_glacial_blue_light_secondaryContainer">#ffdae3f0</color>
+  <color name="_glacial_blue_light_onSecondaryContainer">#ff3e4852</color>
+  <color name="_glacial_blue_light_tertiary">#ff655a71</color>
+  <color name="_glacial_blue_light_onTertiary">#ffffffff</color>
+  <color name="_glacial_blue_light_tertiaryContainer">#ffecddf9</color>
+  <color name="_glacial_blue_light_onTertiaryContainer">#ff4d4259</color>
+  <color name="_glacial_blue_light_error">#ffba1a1a</color>
+  <color name="_glacial_blue_light_onError">#ffffffff</color>
+  <color name="_glacial_blue_light_errorContainer">#ffffdad6</color>
+  <color name="_glacial_blue_light_onErrorContainer">#ff93000a</color>
+  <color name="_glacial_blue_light_background">#fffaf9fb</color>
+  <color name="_glacial_blue_light_onBackground">#ff1a1c1d</color>
+  <color name="_glacial_blue_light_surface">#fffaf9fb</color>
+  <color name="_glacial_blue_light_onSurface">#ff1a1c1d</color>
+  <color name="_glacial_blue_light_surfaceVariant">#ffe3e2e4</color>
+  <color name="_glacial_blue_light_onSurfaceVariant">#ff464749</color>
+  <color name="_glacial_blue_light_outline">#ff777779</color>
+  <color name="_glacial_blue_light_outlineVariant">#ffc4c9d0</color>
+  <color name="_glacial_blue_light_scrim">#ff000000</color>
+  <color name="_glacial_blue_light_inverseSurface">#ff2f3032</color>
+  <color name="_glacial_blue_light_inverseOnSurface">#fff2f0f2</color>
+  <color name="_glacial_blue_light_inversePrimary">#ff9dcbf8</color>
+  <color name="_glacial_blue_light_surfaceDim">#ffdbd9dc</color>
+  <color name="_glacial_blue_light_surfaceBright">#fffaf9fb</color>
+  <color name="_glacial_blue_light_surfaceContainerLowest">#ffffffff</color>
+  <color name="_glacial_blue_light_surfaceContainerLow">#fff4f3f5</color>
+  <color name="_glacial_blue_light_surfaceContainer">#ffefedef</color>
+  <color name="_glacial_blue_light_surfaceContainerHigh">#ffe9e8ea</color>
+  <color name="_glacial_blue_light_surfaceContainerHighest">#ffe3e2e4</color>
+
+  <!-- Interactive Colors Light (Derived) -->
+  <color name="_glacial_blue_light_ripple">#3331628a</color>
+  <color name="_glacial_blue_light_selection">#66cde5ff</color>
+
+  <style name="Theme.AndroidIDE.MTGlacialBlue" parent="Theme.AndroidIDE">
+    <item name="colorPrimary">@color/_glacial_blue_light_primary</item>
+    <item name="colorOnPrimary">@color/_glacial_blue_light_onPrimary</item>
+    <item name="colorPrimaryContainer">@color/_glacial_blue_light_primaryContainer</item>
+    <item name="colorOnPrimaryContainer">@color/_glacial_blue_light_onPrimaryContainer</item>
+    <item name="colorSecondary">@color/_glacial_blue_light_secondary</item>
+    <item name="colorOnSecondary">@color/_glacial_blue_light_onSecondary</item>
+    <item name="colorSecondaryContainer">@color/_glacial_blue_light_secondaryContainer</item>
+    <item name="colorOnSecondaryContainer">@color/_glacial_blue_light_onSecondaryContainer</item>
+    <item name="colorTertiary">@color/_glacial_blue_light_tertiary</item>
+    <item name="colorOnTertiary">@color/_glacial_blue_light_onTertiary</item>
+    <item name="colorTertiaryContainer">@color/_glacial_blue_light_tertiaryContainer</item>
+    <item name="colorOnTertiaryContainer">@color/_glacial_blue_light_onTertiaryContainer</item>
+    <item name="colorError">@color/_glacial_blue_light_error</item>
+    <item name="colorOnError">@color/_glacial_blue_light_onError</item>
+    <item name="colorErrorContainer">@color/_glacial_blue_light_errorContainer</item>
+    <item name="colorOnErrorContainer">@color/_glacial_blue_light_onErrorContainer</item>
+    <item name="android:colorBackground">@color/_glacial_blue_light_background</item>
+    <item name="colorOnBackground">@color/_glacial_blue_light_onBackground</item>
+    <item name="colorSurface">@color/_glacial_blue_light_surface</item>
+    <item name="colorOnSurface">@color/_glacial_blue_light_onSurface</item>
+    <item name="colorSurfaceVariant">@color/_glacial_blue_light_surfaceVariant</item>
+    <item name="colorOnSurfaceVariant">@color/_glacial_blue_light_onSurfaceVariant</item>
+    <item name="colorOutline">@color/_glacial_blue_light_outline</item>
+    <item name="colorOutlineVariant">@color/_glacial_blue_light_outlineVariant</item>
+    <item name="colorSurfaceInverse">@color/_glacial_blue_light_inverseSurface</item>
+    <item name="colorOnSurfaceInverse">@color/_glacial_blue_light_inverseOnSurface</item>
+    <item name="colorPrimaryInverse">@color/_glacial_blue_light_inversePrimary</item>
+    <item name="surfaceContainer">@color/_glacial_blue_light_surfaceContainer</item>
+    <item name="surfaceContainerHigh">@color/_glacial_blue_light_surfaceContainerHigh</item>
+    <item name="surfaceContainerHighest">@color/_glacial_blue_light_surfaceContainerHighest</item>
+
+    <!-- UI Interaction -->
+    <item name="colorControlHighlight">@color/_glacial_blue_light_ripple</item>
+    <item name="android:colorControlHighlight">@color/_glacial_blue_light_ripple</item>
+    <item name="colorControlActivated">@color/_glacial_blue_light_primary</item>
+    <item name="android:colorControlActivated">@color/_glacial_blue_light_primary</item>
+    <item name="android:textColorHighlight">@color/_glacial_blue_light_selection</item>
+    
+    <item name="android:statusBarColor">@color/_glacial_blue_light_background</item>
+    <item name="android:navigationBarColor">@color/_glacial_blue_light_background</item>
+    <item name="android:windowLightStatusBar">true</item>
+
+    <!-- Terminal -->
+    <item name="terminalTextColor">@color/_glacial_blue_light_onBackground</item>
+    <item name="terminalBackgroundColor">@color/_glacial_blue_light_background</item>
+    <item name="terminalCursorStyle">block</item>
+  </style>
+
+  <!-- Dark Scheme -->
+  <color name="_glacial_blue_dark_primary">#ff9dcbf8</color>
+  <color name="_glacial_blue_dark_onPrimary">#ff003352</color>
+  <color name="_glacial_blue_dark_primaryContainer">#ff134a71</color>
+  <color name="_glacial_blue_dark_onPrimaryContainer">#ffcde5ff</color>
+  <color name="_glacial_blue_dark_secondary">#ffbec7d4</color>
+  <color name="_glacial_blue_dark_onSecondary">#ff28313b</color>
+  <color name="_glacial_blue_dark_secondaryContainer">#ff3e4852</color>
+  <color name="_glacial_blue_dark_onSecondaryContainer">#ffdae3f0</color>
+  <color name="_glacial_blue_dark_tertiary">#ffd0c1dc</color>
+  <color name="_glacial_blue_dark_onTertiary">#ff362c41</color>
+  <color name="_glacial_blue_dark_tertiaryContainer">#ff4d4259</color>
+  <color name="_glacial_blue_dark_onTertiaryContainer">#ffecddf9</color>
+  <color name="_glacial_blue_dark_error">#ffffb4ab</color>
+  <color name="_glacial_blue_dark_onError">#ff690005</color>
+  <color name="_glacial_blue_dark_errorContainer">#ff93000a</color>
+  <color name="_glacial_blue_dark_onErrorContainer">#ffffdad6</color>
+  <color name="_glacial_blue_dark_background">#ff121315</color>
+  <color name="_glacial_blue_dark_onBackground">#ffe3e2e4</color>
+  <color name="_glacial_blue_dark_surface">#ff121315</color>
+  <color name="_glacial_blue_dark_onSurface">#ffe3e2e4</color>
+  <color name="_glacial_blue_dark_surfaceVariant">#ff464749</color>
+  <color name="_glacial_blue_dark_onSurfaceVariant">#ffc7c6c8</color>
+  <color name="_glacial_blue_dark_outline">#ff909092</color>
+  <color name="_glacial_blue_dark_outlineVariant">#ff464c54</color>
+  <color name="_glacial_blue_dark_scrim">#ff000000</color>
+  <color name="_glacial_blue_dark_inverseSurface">#ffe3e2e4</color>
+  <color name="_glacial_blue_dark_inverseOnSurface">#ff2f3032</color>
+  <color name="_glacial_blue_dark_inversePrimary">#ff31628a</color>
+  <color name="_glacial_blue_dark_surfaceDim">#ff121315</color>
+  <color name="_glacial_blue_dark_surfaceBright">#ff38393b</color>
+  <color name="_glacial_blue_dark_surfaceContainerLowest">#ff0d0e10</color>
+  <color name="_glacial_blue_dark_surfaceContainerLow">#ff1a1c1d</color>
+  <color name="_glacial_blue_dark_surfaceContainer">#ff1f2021</color>
+  <color name="_glacial_blue_dark_surfaceContainerHigh">#ff292a2c</color>
+  <color name="_glacial_blue_dark_surfaceContainerHighest">#ff343537</color>
+
+  <!-- Interactive Colors Dark (Derived) -->
+  <color name="_glacial_blue_dark_ripple">#339dcbf8</color>
+  <color name="_glacial_blue_dark_selection">#66134a71</color>
+
+  <style name="Theme.AndroidIDE.MTGlacialBlue.Dark" parent="Theme.AndroidIDE.MTGlacialBlue">
+    <item name="colorPrimary">@color/_glacial_blue_dark_primary</item>
+    <item name="colorOnPrimary">@color/_glacial_blue_dark_onPrimary</item>
+    <item name="colorPrimaryContainer">@color/_glacial_blue_dark_primaryContainer</item>
+    <item name="colorOnPrimaryContainer">@color/_glacial_blue_dark_onPrimaryContainer</item>
+    <item name="colorSecondary">@color/_glacial_blue_dark_secondary</item>
+    <item name="colorOnSecondary">@color/_glacial_blue_dark_onSecondary</item>
+    <item name="colorSecondaryContainer">@color/_glacial_blue_dark_secondaryContainer</item>
+    <item name="colorOnSecondaryContainer">@color/_glacial_blue_dark_onSecondaryContainer</item>
+    <item name="colorTertiary">@color/_glacial_blue_dark_tertiary</item>
+    <item name="colorOnTertiary">@color/_glacial_blue_dark_onTertiary</item>
+    <item name="colorTertiaryContainer">@color/_glacial_blue_dark_tertiaryContainer</item>
+    <item name="colorOnTertiaryContainer">@color/_glacial_blue_dark_onTertiaryContainer</item>
+    <item name="colorError">@color/_glacial_blue_dark_error</item>
+    <item name="colorOnError">@color/_glacial_blue_dark_onError</item>
+    <item name="colorErrorContainer">@color/_glacial_blue_dark_errorContainer</item>
+    <item name="colorOnErrorContainer">@color/_glacial_blue_dark_onErrorContainer</item>
+    <item name="android:colorBackground">@color/_glacial_blue_dark_background</item>
+    <item name="colorOnBackground">@color/_glacial_blue_dark_onBackground</item>
+    <item name="colorSurface">@color/_glacial_blue_dark_surface</item>
+    <item name="colorOnSurface">@color/_glacial_blue_dark_onSurface</item>
+    <item name="colorSurfaceVariant">@color/_glacial_blue_dark_surfaceVariant</item>
+    <item name="colorOnSurfaceVariant">@color/_glacial_blue_dark_onSurfaceVariant</item>
+    <item name="colorOutline">@color/_glacial_blue_dark_outline</item>
+    <item name="colorOutlineVariant">@color/_glacial_blue_dark_outlineVariant</item>
+    <item name="colorSurfaceInverse">@color/_glacial_blue_dark_inverseSurface</item>
+    <item name="colorOnSurfaceInverse">@color/_glacial_blue_dark_inverseOnSurface</item>
+    <item name="colorPrimaryInverse">@color/_glacial_blue_dark_inversePrimary</item>
+    <item name="surfaceContainer">@color/_glacial_blue_dark_surfaceContainer</item>
+    <item name="surfaceContainerHigh">@color/_glacial_blue_dark_surfaceContainerHigh</item>
+    <item name="surfaceContainerHighest">@color/_glacial_blue_dark_surfaceContainerHighest</item>
+
+    <item name="colorControlHighlight">@color/_glacial_blue_dark_ripple</item>
+    <item name="android:colorControlHighlight">@color/_glacial_blue_dark_ripple</item>
+    <item name="colorControlActivated">@color/_glacial_blue_dark_primary</item>
+    <item name="android:colorControlActivated">@color/_glacial_blue_dark_primary</item>
+    <item name="android:textColorHighlight">@color/_glacial_blue_dark_selection</item>
+    
+    <item name="android:statusBarColor">@color/_glacial_blue_dark_background</item>
+    <item name="android:navigationBarColor">@color/_glacial_blue_dark_background</item>
+    <item name="android:windowLightStatusBar">false</item>
+    
+    <item name="terminalTextColor">@color/_glacial_blue_dark_onBackground</item>
+    <item name="terminalBackgroundColor">@color/_glacial_blue_dark_background</item>
+  </style>
+</resources>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+     xmlns:app="http://schemas.android.com/apk/res-auto"
+     android:id="@+id/preview_container"
+     android:layout_width="match_parent"
+     android:layout_height="match_parent"
+     android:background="@android:color/black">
+
+     <!-- Custom View -->
+     <android.zero.studio.images.preview.ui.ThorVGImageView
+          android:id="@+id/preview_view"
+          android:layout_width="match_parent"
+          android:layout_height="match_parent" />
+
+     <!-- Top Toolbar overlay -->
+     <com.google.android.material.appbar.AppBarLayout
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:background="@android:color/transparent"
+          app:elevation="0dp">
+
+          <com.google.android.material.appbar.MaterialToolbar
+               android:id="@+id/toolbar"
+               android:layout_width="match_parent"
+               android:layout_height="?attr/actionBarSize"
+               app:navigationIcon="@drawable/ic_back"
+               app:titleTextColor="@android:color/white"
+               app:menu="@menu/menu_image_preview" />
+     </com.google.android.material.appbar.AppBarLayout>
+
+     <!-- Bottom Controls -->
+     <LinearLayout
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_gravity="bottom"
+          android:orientation="vertical"
+          android:padding="16dp"
+          android:background="#80000000">
+
+          <LinearLayout
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:orientation="horizontal"
+               android:gravity="center_vertical">
+
+               <ImageButton
+                    android:id="@+id/btn_toggle_bg"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@drawable/ic_color_lens"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    app:tint="@android:color/white" />
+
+               <com.google.android.material.slider.Slider
+                    android:id="@+id/slider_opacity"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:value="1.0"
+                    android:valueFrom="0.0"
+                    android:valueTo="1.0" />
+
+               <ImageButton
+                    android:id="@+id/btn_info"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@drawable/ic_info"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    app:tint="@android:color/white" />
+
+          </LinearLayout>
+     </LinearLayout>
+
+</FrameLayout>

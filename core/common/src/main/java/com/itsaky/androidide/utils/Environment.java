@@ -1,0 +1,258 @@
+/*
+ *  This file is part of AndroidIDE.
+ *
+ *  AndroidIDE is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  AndroidIDE is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *   along with AndroidIDE.  If not, see <https://www.gnu.org/licenses/>.
+ */
+package com.itsaky.androidide.utils;
+
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.os.Build;
+import android.system.ErrnoException;
+import android.system.Os;
+
+import androidx.annotation.NonNull;
+
+import com.blankj.utilcode.util.FileUtils;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
+/**
+ * AndroidIDE Environment configuration.
+ * Configures file paths, system properties, and native environment variables (Os.setenv)
+ * to support global JDK and SDK access.
+ *
+ * @author android_zero
+ */
+@SuppressLint("SdCardPath")
+public final class Environment {
+
+  public static final String PROJECTS_FOLDER = "AndroidIDEProjects";
+  private static final Logger LOG = LoggerFactory.getLogger(Environment.class);
+  public static File ROOT;
+  public static File PREFIX;
+  public static File HOME;
+  public static File ANDROIDIDE_HOME;
+  public static File ANDROIDIDE_UI;
+  public static File JAVA_HOME;
+  public static File ANDROID_HOME;
+  public static File KOTLINC_HOME;
+  public static File KOTLIN_LSP_HOME;
+  public static File TMP_DIR;
+  public static File BIN_DIR;
+  public static File LIB_DIR;
+  public static File PROJECTS_DIR;
+  public static File REALM_DB_DIR;
+  public static File MAVEN_REPOSITORY;
+  public static File PROJETS_JAVA2KOTLIN_BAK;
+  
+    // Lottie 动画目录
+  public static File LOTTIE_ANIMATION_DIR;
+  public static File LOTTIE_EXPORT_DIR;
+
+  /**
+   * Used by Java LSP until the project is initialized.
+   */
+  public static File ANDROID_JAR;
+
+  public static File TOOLING_API_JAR;
+
+  public static File INIT_SCRIPT;
+  public static File GRADLE_USER_HOME;
+  public static File AAPT2;
+  public static File JAVA;
+  public static File SHELL_KOTLIN_LSP;
+  public static File BASH_SHELL;
+  public static File LOGIN_SHELL;
+  
+  // KtLsp specific
+  public static File KOTLIN_LSP_LIBS_JAR_DIR;
+  public static File KOTLIN_LSP_LAUNCHER;
+
+  /**
+   * Initializes the environment paths, system properties, and injects variables into the native OS environment.
+   * This ensures that subprocesses (like Runtime.exec or ProcessBuilder) inherit the JDK environment.
+   *
+   * @param context Application context
+   */
+  public static void init(Context context) {
+    ROOT = context.getFilesDir();
+    PREFIX = mkdirIfNotExits(new File(ROOT, "usr"));
+    HOME = mkdirIfNotExits(new File(ROOT, "home"));
+    ANDROIDIDE_HOME = mkdirIfNotExits(new File(HOME, ".androidide"));
+    TMP_DIR = mkdirIfNotExits(new File(PREFIX, "tmp"));
+    BIN_DIR = mkdirIfNotExits(new File(PREFIX, "bin"));
+    LIB_DIR = mkdirIfNotExits(new File(PREFIX, "lib"));
+    PROJETS_JAVA2KOTLIN_BAK = mkdirIfNotExits(new File(PROJECTS_FOLDER, ".j2k_bak"));
+    PROJECTS_DIR = mkdirIfNotExits(new File(FileUtil.getExternalStorageDir(), PROJECTS_FOLDER));
+    ANDROID_JAR = mkdirIfNotExits(new File(ANDROIDIDE_HOME, "android.jar"));
+    TOOLING_API_JAR = new File(mkdirIfNotExits(new File(ANDROIDIDE_HOME, "tooling-api")),
+      "tooling-api-all.jar");
+    AAPT2 = new File(ANDROIDIDE_HOME, "aapt2");
+    ANDROIDIDE_UI = mkdirIfNotExits(new File(ANDROIDIDE_HOME, "ui"));
+    REALM_DB_DIR = mkdirIfNotExits(new File(ROOT, "realm-dbs"));
+
+    INIT_SCRIPT = new File(mkdirIfNotExits(new File(ANDROIDIDE_HOME, "init")), "init.gradle");
+    GRADLE_USER_HOME = new File(HOME, ".gradle");
+    MAVEN_REPOSITORY = new File(HOME, ".m2");
+    
+     // 初始化Lottie动画目录
+    LOTTIE_ANIMATION_DIR = mkdirIfNotExits(new File(ANDROIDIDE_HOME, "LottieAnimation"));
+    LOTTIE_EXPORT_DIR = mkdirIfNotExits(new File(PROJECTS_DIR, "LottieAnimation"));
+    
+    ANDROID_HOME = new File(HOME, "android-sdk");
+    KOTLINC_HOME = mkdirIfNotExits(new File(HOME, "android-sdk/kotlinc"));
+    
+    File idePluginDir = mkdirIfNotExits(new File(ANDROIDIDE_HOME, "ideplugin"));
+    KOTLIN_LSP_HOME = mkdirIfNotExits(new File(idePluginDir, "kotlinLanguageServices"));
+    KOTLIN_LSP_LAUNCHER = new File(KOTLIN_LSP_HOME, "bin/kotlin-language-server");
+    KOTLIN_LSP_LIBS_JAR_DIR = new File(KOTLIN_LSP_HOME, "lib");
+    
+    JAVA_HOME = new File(PREFIX, "opt/openjdk");
+
+    SHELL_KOTLIN_LSP = new File(KOTLIN_LSP_HOME, "bin/kotlin-language-server");
+    JAVA = new File(JAVA_HOME, "bin/java");
+    BASH_SHELL = new File(BIN_DIR, "bash");
+    LOGIN_SHELL = new File(BIN_DIR, "login");
+
+    setExecutable(JAVA);
+    setExecutable(BASH_SHELL);
+    if(SHELL_KOTLIN_LSP.exists()) {
+        setExecutable(SHELL_KOTLIN_LSP);
+    }
+
+    // 设置 Java System Properties (供 JVM 内部使用)
+    System.setProperty("user.home", HOME.getAbsolutePath());
+    System.setProperty("android.home", ANDROID_HOME.getAbsolutePath());
+    System.setProperty("java.home", JAVA_HOME.getAbsolutePath());
+    System.setProperty("gradle.user.home", GRADLE_USER_HOME.getAbsolutePath());
+    System.setProperty("kotlin.home", KOTLINC_HOME.getAbsolutePath());
+    System.setProperty("kotlin.lsp.home", KOTLIN_LSP_HOME.getAbsolutePath());
+    System.setProperty("java.io.tmpdir", TMP_DIR.getAbsolutePath());
+
+    //  注入 Native 环境变量 (供 ProcessBuilder, Runtime.exec, Terminal 使用)
+    injectNativeEnvironment();
+  }
+
+  /**
+   * Injects environment variables into the native process environment using android.system.Os.setenv.
+   * This is critical for making 'java', 'javac', and other tools available globally to child processes.
+   */
+  private static void injectNativeEnvironment() {
+    try {
+        Map<String, String> env = new HashMap<>();
+        putEnvironment(env, false);
+
+        // 遍历并设置到 OS 层
+        for (Map.Entry<String, String> entry : env.entrySet()) {
+            try {
+                // overwrite = true
+                Os.setenv(entry.getKey(), entry.getValue(), true); 
+            } catch (ErrnoException e) {
+                LOG.error("Failed to setenv: " + entry.getKey(), e);
+            }
+        }
+
+        // 特别处理 PATH，确保 java 和 bin 目录在最前面
+        String currentPath = System.getenv("PATH");
+        if (currentPath == null) currentPath = "";
+        
+        String newPath = BIN_DIR.getAbsolutePath() + ":" + 
+                         new File(JAVA_HOME, "bin").getAbsolutePath() + ":" + 
+                         currentPath;
+        
+        try {
+            Os.setenv("PATH", newPath, true);
+        } catch (ErrnoException e) {
+            LOG.error("Failed to update PATH", e);
+        }
+
+        LOG.info("Global native environment injected successfully. JAVA_HOME={}", JAVA_HOME);
+
+    } catch (Throwable t) {
+        LOG.error("Critical error injecting native environment", t);
+    }
+  }
+
+  public static File mkdirIfNotExits(File in) {
+    if (in != null && !in.exists()) {
+      FileUtils.createOrExistsDir(in);
+    }
+
+    return in;
+  }
+
+  public static void setExecutable(@NonNull final File file) {
+    if (!file.setExecutable(true)) {
+      LOG.error("Unable to set executable permissions to file: {}", file);
+    }
+  }
+
+  public static void setProjectDir(@NonNull File file) {
+    PROJECTS_DIR = new File(file.getAbsolutePath());
+    // 如果项目目录变更，可能需要更新环境变量 PROJECT (虽然 Native 层已经设置了，但如果是动态变更需重新 setenv)
+    try {
+        Os.setenv("PROJECTS", PROJECTS_DIR.getAbsolutePath(), true);
+    } catch (ErrnoException ignored) {}
+  }
+
+  public static void putEnvironment(Map<String, String> env, boolean forFailsafe) {
+
+    env.put("HOME", HOME.getAbsolutePath());
+    env.put("ANDROID_HOME", ANDROID_HOME.getAbsolutePath());
+    env.put("KOTLINC_HOME", KOTLINC_HOME.getAbsolutePath());
+    env.put("KOTLIN_LSP_HOME", KOTLIN_LSP_HOME.getAbsolutePath());
+    env.put("ANDROID_SDK_ROOT", ANDROID_HOME.getAbsolutePath());
+    env.put("ANDROID_USER_HOME", HOME.getAbsolutePath() + "/.android");
+    env.put("JAVA_HOME", JAVA_HOME.getAbsolutePath());
+    env.put("GRADLE_USER_HOME", GRADLE_USER_HOME.getAbsolutePath());
+    env.put("SYSROOT", PREFIX.getAbsolutePath());
+    env.put("PROJECTS", PROJECTS_DIR.getAbsolutePath());
+    env.put("TMPDIR", TMP_DIR.getAbsolutePath());
+    
+    // LD_LIBRARY_PATH is crucial for binaries linked against libs in usr/lib
+    env.put("LD_LIBRARY_PATH", LIB_DIR.getAbsolutePath());
+
+    // add user envs for non-failsafe sessions
+    if (!forFailsafe) {
+      // No mirror select
+      env.put("TERMUX_PKG_NO_MIRROR_SELECT", "true");
+    }
+  }
+
+  public static File getProjectCacheDir(File projectDir) {
+    return new File(projectDir, ".androidide");
+  }
+
+  @NonNull
+  public static File createTempFile() {
+    var file = newTempFile();
+    while (file.exists()) {
+      file = newTempFile();
+    }
+
+    return file;
+  }
+
+  @NonNull
+  private static File newTempFile() {
+    return new File(TMP_DIR, "temp_" + UUID.randomUUID().toString().replace('-', 'X'));
+  }
+}

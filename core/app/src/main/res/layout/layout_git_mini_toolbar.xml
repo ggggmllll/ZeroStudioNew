@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<HorizontalScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/git_mini_toolbar_scroll"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?attr/colorSurface"
+    android:scrollbars="none"
+    android:paddingVertical="4dp">
+
+    <LinearLayout
+        android:id="@+id/git_mini_toolbar_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@android:color/transparent"
+        android:paddingHorizontal="12dp" />
+
+</HorizontalScrollView>

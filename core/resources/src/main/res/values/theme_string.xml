@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~  This file is part of AndroidIDE.
+  ~
+  ~  AndroidIDE is free software: you can redistribute it and/or modify
+  ~  it under the terms of the GNU General Public License as published by
+  ~  the Free Software Foundation, either version 3 of the License, or
+  ~  (at your option) any later version.
+  ~
+  ~  AndroidIDE is distributed in the hope that it will be useful,
+  ~  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~  GNU General Public License for more details.
+  ~
+  ~  You should have received a copy of the GNU General Public License
+  ~   along with AndroidIDE.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+<!-- Theme Names -->
+    <string name="theme_blue_wave">Blue Wave</string>
+    <string name="theme_sunny_glow">Sunny Glow</string>
+    <string name="theme_vscode">VSCode</string>
+    <string name="theme_crimson_red">Crimson Red</string>
+    <string name="theme_royal_amethyst">Royal Amethyst</string>
+    <string name="theme_minty_fresh">Minty Fresh</string>
+    <string name="theme_slate_grey">Slate Grey</string>
+    <string name="theme_sakura_pink">Sakura Pink</string>
+    <string name="theme_material_you">Material You</string>
+    <string name="theme_custom_generated">Custom</string>
+    <string name="theme_toxic_lime">Toxic Lime</string>
+    <string name="theme_lavender_blush">Lavender Blush</string>
+    <string name="theme_coral_reef">Coral Reef</string>
+    <string name="theme_azure_sky">Azure Sky</string>
+    <string name="theme_cyber_neon">Cyber Neon</string>
+    <string name="theme_autumn_breeze">Autumn Breeze</string>
+    <string name="theme_nordic_frost">Nordic Frost</string>
+    <string name="theme_oceanic_abyss">Oceanic Abyss</string>
+    <string name="theme_volcanic_magma">Volcanic Magma</string>
+    <string name="theme_midnight_sun">Midnight Sun</string>
+    <string name="theme_forest_moss">Forest Moss</string>
+    <string name="theme_coffee_roast">Coffee Roast</string>
+    <string name="theme_deep_space">Deep Space</string>
+    <string name="theme_neon_synth">Neon Synth</string>
+    <string name="theme_ink_paper">Ink Paper</string>
+    <string name="theme_golden_hour">Golden Hour</string>
+    <string name="theme_electric_violet">Electric Violet</string>
+    <string name="theme_zen_matcha">Zen Matcha</string>
+    <string name="theme_arctic_ice">Arctic Ice</string>
+    <string name="theme_carbon_red">Carbon Red</string>
+    <string name="theme_mtglacial_blue">MTGlacial Blue</string>
+</resources>

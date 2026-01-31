@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~  This file is part of AndroidIDE.
+  ~  Created by @author android_zero
+  ~  Style: Warm Coffee/Latte/Mocha -醇香咖啡 - 棕色与奶油色，温暖舒适
+  -->
+<resources>
+  <!-- Light (Latte) -->
+  <color name="_coffee_roast_light_colorPrimary">#ff9c4333</color>
+  <color name="_coffee_roast_light_colorPrimaryContainer">#ffffdad3</color>
+  <color name="_coffee_roast_light_colorPrimaryDark">#ffffffff</color>
+  <color name="_coffee_roast_light_colorPrimaryInverse">#ffffb4a5</color>
+  <color name="_coffee_roast_light_colorOnPrimary">#ffffffff</color>
+  <color name="_coffee_roast_light_colorOnPrimaryContainer">#ff3f0300</color>
+  <color name="_coffee_roast_light_colorSecondary">#ff77574d</color>
+  <color name="_coffee_roast_light_colorSecondaryContainer">#ffffdbd0</color>
+  <color name="_coffee_roast_light_colorOnSecondary">#ffffffff</color>
+  <color name="_coffee_roast_light_colorOnSecondaryContainer">#ff2c160e</color>
+  <color name="_coffee_roast_light_colorTertiary">#ff6e5c2e</color>
+  <color name="_coffee_roast_light_colorTertiaryContainer">#fff8dfa6</color>
+  <color name="_coffee_roast_light_colorOnTertiary">#ffffffff</color>
+  <color name="_coffee_roast_light_colorOnTertiaryContainer">#ff241a00</color>
+  <color name="_coffee_roast_light_colorError">#ffba1a1a</color>
+  <color name="_coffee_roast_light_colorBackground">#fffff8f6</color> <!-- Creamy background -->
+  <color name="_coffee_roast_light_colorOnBackground">#ff201a19</color>
+  <color name="_coffee_roast_light_colorSurface">#fffff8f6</color>
+  <color name="_coffee_roast_light_colorSurfaceInverse">#ff362f2e</color>
+  <color name="_coffee_roast_light_colorSurfaceVariant">#fff5deda</color>
+  <color name="_coffee_roast_light_colorOnSurface">#ff201a19</color>
+  <color name="_coffee_roast_light_colorOnSurfaceInverse">#fffbeeec</color>
+  <color name="_coffee_roast_light_colorOnSurfaceVariant">#ff534340</color>
+  <color name="_coffee_roast_light_colorOutline">#ff85736f</color>
+  
+  <color name="_coffee_roast_light_ripple">#339c4333</color>
+  <color name="_coffee_roast_light_selection">#66ffdad3</color>
+
+  <style name="Theme.AndroidIDE.CoffeeRoast" parent="Theme.AndroidIDE">
+    <item name="colorPrimary">@color/_coffee_roast_light_colorPrimary</item>
+    <item name="colorPrimaryContainer">@color/_coffee_roast_light_colorPrimaryContainer</item>
+    <item name="colorPrimaryDark">@color/_coffee_roast_light_colorPrimaryDark</item>
+    <item name="colorPrimaryInverse">@color/_coffee_roast_light_colorPrimaryInverse</item>
+    <item name="colorOnPrimary">@color/_coffee_roast_light_colorOnPrimary</item>
+    <item name="colorOnPrimaryContainer">@color/_coffee_roast_light_colorOnPrimaryContainer</item>
+    <item name="colorSecondary">@color/_coffee_roast_light_colorSecondary</item>
+    <item name="colorSecondaryContainer">@color/_coffee_roast_light_colorSecondaryContainer</item>
+    <item name="colorOnSecondary">@color/_coffee_roast_light_colorOnSecondary</item>
+    <item name="colorOnSecondaryContainer">@color/_coffee_roast_light_colorOnSecondaryContainer</item>
+    <item name="colorTertiary">@color/_coffee_roast_light_colorTertiary</item>
+    <item name="colorTertiaryContainer">@color/_coffee_roast_light_colorTertiaryContainer</item>
+    <item name="colorOnTertiary">@color/_coffee_roast_light_colorOnTertiary</item>
+    <item name="colorOnTertiaryContainer">@color/_coffee_roast_light_colorOnTertiaryContainer</item>
+    <item name="colorError">@color/_coffee_roast_light_colorError</item>
+    <item name="android:colorBackground">@color/_coffee_roast_light_colorBackground</item>
+    <item name="colorOnBackground">@color/_coffee_roast_light_colorOnBackground</item>
+    <item name="colorSurface">@color/_coffee_roast_light_colorSurface</item>
+    <item name="colorOnSurface">@color/_coffee_roast_light_colorOnSurface</item>
+    <item name="colorSurfaceVariant">@color/_coffee_roast_light_colorSurfaceVariant</item>
+    <item name="colorOnSurfaceVariant">@color/_coffee_roast_light_colorOnSurfaceVariant</item>
+    <item name="colorOutline">@color/_coffee_roast_light_colorOutline</item>
+
+    <item name="colorControlHighlight">@color/_coffee_roast_light_ripple</item>
+    <item name="android:colorControlHighlight">@color/_coffee_roast_light_ripple</item>
+    <item name="colorControlActivated">@color/_coffee_roast_light_colorPrimary</item>
+    <item name="android:colorControlActivated">@color/_coffee_roast_light_colorPrimary</item>
+    <item name="android:textColorHighlight">@color/_coffee_roast_light_selection</item>
+    
+    <item name="android:statusBarColor">@color/_coffee_roast_light_colorBackground</item>
+    <item name="android:navigationBarColor">@color/_coffee_roast_light_colorBackground</item>
+    <item name="android:windowLightStatusBar">true</item>
+
+    <item name="terminalTextColor">@color/_coffee_roast_light_colorOnBackground</item>
+    <item name="terminalBackgroundColor">@color/_coffee_roast_light_colorBackground</item>
+    <item name="terminalCursorStyle">underline</item>
+  </style>
+
+  <!-- Dark (Espresso) -->
+  <color name="_coffee_roast_dark_colorPrimary">#ffffb4a5</color>
+  <color name="_coffee_roast_dark_colorPrimaryContainer">#ff7d2d1f</color>
+  <color name="_coffee_roast_dark_colorPrimaryDark">#ff201a19</color>
+  <color name="_coffee_roast_dark_colorOnPrimary">#ff5f160a</color>
+  <color name="_coffee_roast_dark_colorOnPrimaryContainer">#ffffdad3</color>
+  <color name="_coffee_roast_dark_colorSecondary">#ffe7bdb6</color>
+  <color name="_coffee_roast_dark_colorSecondaryContainer">#ff5d3f37</color>
+  <color name="_coffee_roast_dark_colorOnSecondary">#ff442a22</color>
+  <color name="_coffee_roast_dark_colorOnSecondaryContainer">#ffffdbd0</color>
+  <color name="_coffee_roast_dark_colorTertiary">#ffdbc38c</color>
+  <color name="_coffee_roast_dark_colorTertiaryContainer">#ff554519</color>
+  <color name="_coffee_roast_dark_colorOnTertiary">#ff3c2e00</color>
+  <color name="_coffee_roast_dark_colorOnTertiaryContainer">#fff8dfa6</color>
+  <color name="_coffee_roast_dark_colorError">#ffffb4ab</color>
+  <color name="_coffee_roast_dark_colorBackground">#ff201a19</color> <!-- Espresso dark -->
+  <color name="_coffee_roast_dark_colorOnBackground">#ffede0de</color>
+  <color name="_coffee_roast_dark_colorSurface">#ff201a19</color>
+  <color name="_coffee_roast_dark_colorOnSurface">#ffede0de</color>
+  <color name="_coffee_roast_dark_colorSurfaceVariant">#ff534340</color>
+  <color name="_coffee_roast_dark_colorOnSurfaceVariant">#ffd8c2be</color>
+  <color name="_coffee_roast_dark_colorOutline">#ffa08c89</color>
+  <color name="_coffee_roast_dark_colorOnSurfaceInverse">#ff201a19</color>
+  <color name="_coffee_roast_dark_colorSurfaceInverse">#ffede0de</color>
+  <color name="_coffee_roast_dark_colorPrimaryInverse">#ff9c4333</color>
+  
+  <color name="_coffee_roast_dark_ripple">#44ffb4a5</color>
+  <color name="_coffee_roast_dark_selection">#667d2d1f</color>
+
+  <style name="Theme.AndroidIDE.CoffeeRoast.Dark" parent="Theme.AndroidIDE.CoffeeRoast">
+    <item name="colorPrimary">@color/_coffee_roast_dark_colorPrimary</item>
+    <item name="colorPrimaryDark">@color/_coffee_roast_dark_colorPrimaryDark</item>
+    <item name="colorOnPrimary">@color/_coffee_roast_dark_colorOnPrimary</item>
+    <item name="colorPrimaryContainer">@color/_coffee_roast_dark_colorPrimaryContainer</item>
+    <item name="colorOnPrimaryContainer">@color/_coffee_roast_dark_colorOnPrimaryContainer</item>
+    <item name="colorSecondary">@color/_coffee_roast_dark_colorSecondary</item>
+    <item name="colorOnSecondary">@color/_coffee_roast_dark_colorOnSecondary</item>
+    <item name="colorSecondaryContainer">@color/_coffee_roast_dark_colorSecondaryContainer</item>
+    <item name="colorOnSecondaryContainer">@color/_coffee_roast_dark_colorOnSecondaryContainer</item>
+    <item name="colorTertiary">@color/_coffee_roast_dark_colorTertiary</item>
+    <item name="colorOnTertiary">@color/_coffee_roast_dark_colorOnTertiary</item>
+    <item name="colorTertiaryContainer">@color/_coffee_roast_dark_colorTertiaryContainer</item>
+    <item name="colorOnTertiaryContainer">@color/_coffee_roast_dark_colorOnTertiaryContainer</item>
+    <item name="colorError">@color/_coffee_roast_dark_colorError</item>
+    <item name="android:colorBackground">@color/_coffee_roast_dark_colorBackground</item>
+    <item name="colorOnBackground">@color/_coffee_roast_dark_colorOnBackground</item>
+    <item name="colorSurface">@color/_coffee_roast_dark_colorSurface</item>
+    <item name="colorOnSurface">@color/_coffee_roast_dark_colorOnSurface</item>
+    <item name="colorSurfaceVariant">@color/_coffee_roast_dark_colorSurfaceVariant</item>
+    <item name="colorOnSurfaceVariant">@color/_coffee_roast_dark_colorOnSurfaceVariant</item>
+    <item name="colorOutline">@color/_coffee_roast_dark_colorOutline</item>
+    <item name="colorOnSurfaceInverse">@color/_coffee_roast_dark_colorOnSurfaceInverse</item>
+    <item name="colorSurfaceInverse">@color/_coffee_roast_dark_colorSurfaceInverse</item>
+    <item name="colorPrimaryInverse">@color/_coffee_roast_dark_colorPrimaryInverse</item>
+
+    <item name="colorControlHighlight">@color/_coffee_roast_dark_ripple</item>
+    <item name="android:colorControlHighlight">@color/_coffee_roast_dark_ripple</item>
+    <item name="colorControlActivated">@color/_coffee_roast_dark_colorPrimary</item>
+    <item name="android:colorControlActivated">@color/_coffee_roast_dark_colorPrimary</item>
+    <item name="android:textColorHighlight">@color/_coffee_roast_dark_selection</item>
+    
+    <item name="android:statusBarColor">@color/_coffee_roast_dark_colorBackground</item>
+    <item name="android:navigationBarColor">@color/_coffee_roast_dark_colorBackground</item>
+    <item name="android:windowLightStatusBar">false</item>
+    
+    <item name="terminalTextColor">@color/_coffee_roast_dark_colorOnBackground</item>
+    <item name="terminalBackgroundColor">@color/_coffee_roast_dark_colorBackground</item>
+    <item name="terminalCursorStyle">underline</item>
+  </style>
+</resources>

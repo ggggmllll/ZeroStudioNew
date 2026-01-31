@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~  This file is part of AndroidIDE.
+  ~  Created by @author android_zero
+  ~  Style: High Performance Carbon & Red 碳纤维红 - 竞技红与碳黑
+  
+  -设计理念：
+白昼：极致的白与红，运动感强。
+黑夜：碳纤维黑背景搭配亮红色，高性能风格。
+全局覆盖：强烈的对比度，适合喜欢“性能模式”感觉的用户。
+  
+  -->
+<resources>
+  <!-- Light -->
+  <color name="_carbon_red_light_colorPrimary">#ffb3261e</color>
+  <color name="_carbon_red_light_colorPrimaryContainer">#fff9dedc</color>
+  <color name="_carbon_red_light_colorPrimaryDark">#ffffffff</color>
+  <color name="_carbon_red_light_colorPrimaryInverse">#ffec928e</color>
+  <color name="_carbon_red_light_colorOnPrimary">#ffffffff</color>
+  <color name="_carbon_red_light_colorOnPrimaryContainer">#ff410e0b</color>
+  <color name="_carbon_red_light_colorSecondary">#ff775652</color>
+  <color name="_carbon_red_light_colorSecondaryContainer">#ffffdad6</color>
+  <color name="_carbon_red_light_colorOnSecondary">#ffffffff</color>
+  <color name="_carbon_red_light_colorOnSecondaryContainer">#ff2c1512</color>
+  <color name="_carbon_red_light_colorError">#ffba1a1a</color>
+  <color name="_carbon_red_light_colorBackground">#fffbfcfc</color>
+  <color name="_carbon_red_light_colorOnBackground">#ff201a1a</color>
+  <color name="_carbon_red_light_colorSurface">#fffbfcfc</color>
+  <color name="_carbon_red_light_colorSurfaceInverse">#ff362f2f</color>
+  <color name="_carbon_red_light_colorSurfaceVariant">#fff5dedd</color>
+  <color name="_carbon_red_light_colorOnSurface">#ff201a1a</color>
+  <color name="_carbon_red_light_colorOnSurfaceInverse">#fffbeeec</color>
+  <color name="_carbon_red_light_colorOnSurfaceVariant">#ff534342</color>
+  <color name="_carbon_red_light_colorOutline">#ff857371</color>
+  <color name="_carbon_red_light_ripple">#33b3261e</color>
+  <color name="_carbon_red_light_selection">#66f9dedc</color>
+
+  <style name="Theme.AndroidIDE.CarbonRed" parent="Theme.AndroidIDE">
+    <item name="colorPrimary">@color/_carbon_red_light_colorPrimary</item>
+    <item name="colorPrimaryContainer">@color/_carbon_red_light_colorPrimaryContainer</item>
+    <item name="colorPrimaryDark">@color/_carbon_red_light_colorPrimaryDark</item>
+    <item name="colorPrimaryInverse">@color/_carbon_red_light_colorPrimaryInverse</item>
+    <item name="colorOnPrimary">@color/_carbon_red_light_colorOnPrimary</item>
+    <item name="colorOnPrimaryContainer">@color/_carbon_red_light_colorOnPrimaryContainer</item>
+    <item name="colorSecondary">@color/_carbon_red_light_colorSecondary</item>
+    <item name="colorSecondaryContainer">@color/_carbon_red_light_colorSecondaryContainer</item>
+    <item name="colorOnSecondary">@color/_carbon_red_light_colorOnSecondary</item>
+    <item name="colorOnSecondaryContainer">@color/_carbon_red_light_colorOnSecondaryContainer</item>
+    <item name="android:colorBackground">@color/_carbon_red_light_colorBackground</item>
+    <item name="colorOnBackground">@color/_carbon_red_light_colorOnBackground</item>
+    <item name="colorSurface">@color/_carbon_red_light_colorSurface</item>
+    <item name="colorOnSurface">@color/_carbon_red_light_colorOnSurface</item>
+    <item name="colorSurfaceVariant">@color/_carbon_red_light_colorSurfaceVariant</item>
+    <item name="colorOnSurfaceVariant">@color/_carbon_red_light_colorOnSurfaceVariant</item>
+    <item name="colorOutline">@color/_carbon_red_light_colorOutline</item>
+    
+    <item name="colorControlHighlight">@color/_carbon_red_light_ripple</item>
+    <item name="android:colorControlHighlight">@color/_carbon_red_light_ripple</item>
+    <item name="android:textColorHighlight">@color/_carbon_red_light_selection</item>
+    <item name="android:statusBarColor">@color/_carbon_red_light_colorBackground</item>
+    <item name="android:navigationBarColor">@color/_carbon_red_light_colorBackground</item>
+    <item name="android:windowLightStatusBar">true</item>
+
+    <item name="terminalTextColor">@color/_carbon_red_light_colorOnBackground</item>
+    <item name="terminalBackgroundColor">@color/_carbon_red_light_colorBackground</item>
+    <item name="terminalCursorStyle">block</item>
+  </style>
+
+  <!-- Dark -->
+  <color name="_carbon_red_dark_colorPrimary">#ffec928e</color>
+  <color name="_carbon_red_dark_colorPrimaryContainer">#ff8c1d18</color>
+  <color name="_carbon_red_dark_colorPrimaryDark">#ff201a1a</color>
+  <color name="_carbon_red_dark_colorOnPrimary">#ff680005</color>
+  <color name="_carbon_red_dark_colorOnPrimaryContainer">#fff9dedc</color>
+  <color name="_carbon_red_dark_colorSecondary">#ffe7bdb8</color>
+  <color name="_carbon_red_dark_colorSecondaryContainer">#ff5d3f3b</color>
+  <color name="_carbon_red_dark_colorOnSecondary">#ff442927</color>
+  <color name="_carbon_red_dark_colorOnSecondaryContainer">#ffffdad6</color>
+  <color name="_carbon_red_dark_colorError">#ffffb4ab</color>
+  <color name="_carbon_red_dark_colorBackground">#ff151212</color> <!-- Carbon Black -->
+  <color name="_carbon_red_dark_colorOnBackground">#ffece0df</color>
+  <color name="_carbon_red_dark_colorSurface">#ff151212</color>
+  <color name="_carbon_red_dark_colorOnSurface">#ffece0df</color>
+  <color name="_carbon_red_dark_colorSurfaceVariant">#ff534342</color>
+  <color name="_carbon_red_dark_colorOnSurfaceVariant">#ffd8c2c0</color>
+  <color name="_carbon_red_dark_colorOutline">#ffa08c8b</color>
+  <color name="_carbon_red_dark_colorOnSurfaceInverse">#ff201a1a</color>
+  <color name="_carbon_red_dark_colorSurfaceInverse">#ffece0df</color>
+  <color name="_carbon_red_dark_colorPrimaryInverse">#ffb3261e</color>
+  <color name="_carbon_red_dark_ripple">#44ec928e</color>
+  <color name="_carbon_red_dark_selection">#668c1d18</color>
+
+  <style name="Theme.AndroidIDE.CarbonRed.Dark" parent="Theme.AndroidIDE.CarbonRed">
+    <item name="colorPrimary">@color/_carbon_red_dark_colorPrimary</item>
+    <item name="colorPrimaryDark">@color/_carbon_red_dark_colorPrimaryDark</item>
+    <item name="colorOnPrimary">@color/_carbon_red_dark_colorOnPrimary</item>
+    <item name="colorPrimaryContainer">@color/_carbon_red_dark_colorPrimaryContainer</item>
+    <item name="colorOnPrimaryContainer">@color/_carbon_red_dark_colorOnPrimaryContainer</item>
+    <item name="colorSecondary">@color/_carbon_red_dark_colorSecondary</item>
+    <item name="colorOnSecondary">@color/_carbon_red_dark_colorOnSecondary</item>
+    <item name="colorSecondaryContainer">@color/_carbon_red_dark_colorSecondaryContainer</item>
+    <item name="colorOnSecondaryContainer">@color/_carbon_red_dark_colorOnSecondaryContainer</item>
+    <item name="android:colorBackground">@color/_carbon_red_dark_colorBackground</item>
+    <item name="colorOnBackground">@color/_carbon_red_dark_colorOnBackground</item>
+    <item name="colorSurface">@color/_carbon_red_dark_colorSurface</item>
+    <item name="colorOnSurface">@color/_carbon_red_dark_colorOnSurface</item>
+    <item name="colorSurfaceVariant">@color/_carbon_red_dark_colorSurfaceVariant</item>
+    <item name="colorOnSurfaceVariant">@color/_carbon_red_dark_colorOnSurfaceVariant</item>
+    <item name="colorOutline">@color/_carbon_red_dark_colorOutline</item>
+    <item name="colorOnSurfaceInverse">@color/_carbon_red_dark_colorOnSurfaceInverse</item>
+    <item name="colorSurfaceInverse">@color/_carbon_red_dark_colorSurfaceInverse</item>
+    <item name="colorPrimaryInverse">@color/_carbon_red_dark_colorPrimaryInverse</item>
+
+    <item name="colorControlHighlight">@color/_carbon_red_dark_ripple</item>
+    <item name="android:colorControlHighlight">@color/_carbon_red_dark_ripple</item>
+    <item name="android:textColorHighlight">@color/_carbon_red_dark_selection</item>
+    <item name="android:statusBarColor">@color/_carbon_red_dark_colorBackground</item>
+    <item name="android:navigationBarColor">@color/_carbon_red_dark_colorBackground</item>
+    <item name="android:windowLightStatusBar">false</item>
+    
+    <item name="terminalTextColor">@color/_carbon_red_dark_colorOnBackground</item>
+    <item name="terminalBackgroundColor">@color/_carbon_red_dark_colorBackground</item>
+    <item name="terminalCursorStyle">block</item>
+  </style>
+</resources>

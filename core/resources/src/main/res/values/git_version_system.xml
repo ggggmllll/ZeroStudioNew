@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+     <color name="git_bg_app">#000000</color>
+     <color name="git_bg_surface">#121212</color>
+     <color name="git_bg_card">#1E1E1E</color>
+     <color name="git_bg_dialog">#252525</color>
+     <color name="git_bg_input">#2C2C2C</color>
+
+     <color name="git_popup_bg">#252525</color>
+     <color name="git_toolbar_bg">#1E1E1E</color>
+     <color name="git_indicator">#D0BCFF</color>
+     <color name="git_branch_icon_local">#4CAF50</color>
+     <color name="git_branch_icon_remote">#2196F3</color>
+
+     <!-- Accents -->
+     <color name="git_accent_primary">#D0BCFF</color>
+     <color name="git_accent_on_primary">#381E72</color>
+     <color name="git_accent_container">#4F378B</color>
+
+     <!-- Functional Colors (Git specific) -->
+     <color name="git_diff_added">#4CAF50</color>
+     <color name="git_diff_added_dim">#1A4CAF50</color>
+     <color name="git_diff_removed">#F44336</color>
+     <color name="git_diff_removed_dim">#1AF44336</color>
+     <color name="git_diff_modified">#FFB74D</color>
+     <color name="git_diff_conflict_theirs">#E6B34D</color>
+     <color name="git_diff_conflict_yours">#64B5F6</color>
+
+     <!-- Text -->
+     <color name="git_text_h1">#FFFFFF</color>
+     <color name="git_text_h2">#E6E6E6</color>
+     <color name="git_text_body">#C4C4C4</color>
+     <color name="git_text_hint">#757575</color>
+
+     <!-- Borders -->
+     <color name="git_divider">#333333</color>
+     <color name="git_border">#404040</color>
+
+     <!-- Shapes -->
+     <style name="Git.Card">
+          <item name="android:background">@drawable/bg_git_card</item>
+          <item name="android:padding">12dp</item>
+     </style>
+
+     <style
+          name="Git"
+          parent="Theme.Material3.Dark.NoActionBar">
+          <item name="colorPrimary">@color/git_accent_primary</item>
+          <item name="colorOnPrimary">@color/git_accent_on_primary</item>
+          <item name="android:windowBackground">@color/git_bg_app</item>
+          <item name="android:textColor">@color/git_text_body</item>
+     </style>
+
+     <style
+          name="Git.Text"
+          parent="android:Widget.TextView">
+          <item name="android:fontFamily">sans-serif</item>
+          <item name="android:textColor">@color/git_text_body</item>
+          <item name="android:textSize">14sp</item>
+     </style>
+
+     <style
+          name="Git.Text.H1"
+          parent="Git.Text">
+          <item name="android:textSize">18sp</item>
+          <item name="android:textStyle">bold</item>
+          <item name="android:textColor">@color/git_text_h1</item>
+     </style>
+
+     <style
+          name="Git.Text.H2"
+          parent="Git.Text">
+          <item name="android:textSize">16sp</item>
+          <item name="android:textStyle">bold</item>
+          <item name="android:textColor">@color/git_text_h2</item>
+     </style>
+
+     <style
+          name="Git.Text.Label"
+          parent="Git.Text">
+          <item name="android:textSize">12sp</item>
+          <item name="android:textStyle">normal</item>
+          <item name="android:textColor">@color/git_text_hint</item>
+     </style>
+
+     <style
+          name="Git.Text.Code"
+          parent="Git.Text">
+          <item name="android:fontFamily">monospace</item>
+          <item name="android:textSize">13sp</item>
+          <item name="android:textColor">@color/git_text_body</item>
+     </style>
+
+     <style
+          name="Git.Input"
+          parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+          <item name="boxBackgroundColor">@color/git_bg_input</item>
+          <item name="boxStrokeColor">@color/git_accent_primary</item>
+          <item name="hintTextColor">@color/git_text_hint</item>
+          <item name="android:textColorHint">@color/git_text_hint</item>
+     </style>
+
+     <dimen name="git_toolbar_icon_size">40dp</dimen>
+     <dimen name="git_toolbar_icon_padding">8dp</dimen>
+
+</resources>

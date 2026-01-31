@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~  This file is part of AndroidIDE.
+  ~  Created by @author android_zero
+  ~  Style: Hacker/Matrix Lime Green-毒液青柠 - 极客绿，黑客帝国风格
+  -->
+<resources>
+  <!-- Light (Radioactive) -->
+  <color name="_toxic_lime_light_colorPrimary">#ff667e00</color>
+  <color name="_toxic_lime_light_colorPrimaryContainer">#ffd6ff7d</color>
+  <color name="_toxic_lime_light_colorPrimaryDark">#ffffffff</color>
+  <color name="_toxic_lime_light_colorPrimaryInverse">#ffb6ea26</color>
+  <color name="_toxic_lime_light_colorOnPrimary">#ffffffff</color>
+  <color name="_toxic_lime_light_colorOnPrimaryContainer">#ff1d2700</color>
+  <color name="_toxic_lime_light_colorSecondary">#ff5d6246</color>
+  <color name="_toxic_lime_light_colorSecondaryContainer">#ffe1e7c4</color>
+  <color name="_toxic_lime_light_colorOnSecondary">#ffffffff</color>
+  <color name="_toxic_lime_light_colorOnSecondaryContainer">#ff1a1e08</color>
+  <color name="_toxic_lime_light_colorTertiary">#ff3b665c</color>
+  <color name="_toxic_lime_light_colorTertiaryContainer">#ffbeecde</color>
+  <color name="_toxic_lime_light_colorOnTertiary">#ffffffff</color>
+  <color name="_toxic_lime_light_colorOnTertiaryContainer">#ff00201a</color>
+  <color name="_toxic_lime_light_colorError">#ffba1a1a</color>
+  <color name="_toxic_lime_light_colorBackground">#fffcfdf6</color>
+  <color name="_toxic_lime_light_colorOnBackground">#ff1a1c19</color>
+  <color name="_toxic_lime_light_colorSurface">#fffcfdf6</color>
+  <color name="_toxic_lime_light_colorSurfaceInverse">#ff2f312d</color>
+  <color name="_toxic_lime_light_colorSurfaceVariant">#ffe3e4d4</color>
+  <color name="_toxic_lime_light_colorOnSurface">#ff1a1c19</color>
+  <color name="_toxic_lime_light_colorOnSurfaceInverse">#fff0f1eb</color>
+  <color name="_toxic_lime_light_colorOnSurfaceVariant">#ff46483c</color>
+  <color name="_toxic_lime_light_colorOutline">#ff77786b</color>
+  
+  <color name="_toxic_lime_light_ripple">#33667e00</color>
+  <color name="_toxic_lime_light_selection">#66d6ff7d</color>
+
+  <style name="Theme.AndroidIDE.ToxicLime" parent="Theme.AndroidIDE">
+    <item name="colorPrimary">@color/_toxic_lime_light_colorPrimary</item>
+    <item name="colorPrimaryContainer">@color/_toxic_lime_light_colorPrimaryContainer</item>
+    <item name="colorPrimaryDark">@color/_toxic_lime_light_colorPrimaryDark</item>
+    <item name="colorPrimaryInverse">@color/_toxic_lime_light_colorPrimaryInverse</item>
+    <item name="colorOnPrimary">@color/_toxic_lime_light_colorOnPrimary</item>
+    <item name="colorOnPrimaryContainer">@color/_toxic_lime_light_colorOnPrimaryContainer</item>
+    <item name="colorSecondary">@color/_toxic_lime_light_colorSecondary</item>
+    <item name="colorSecondaryContainer">@color/_toxic_lime_light_colorSecondaryContainer</item>
+    <item name="colorOnSecondary">@color/_toxic_lime_light_colorOnSecondary</item>
+    <item name="colorOnSecondaryContainer">@color/_toxic_lime_light_colorOnSecondaryContainer</item>
+    <item name="colorTertiary">@color/_toxic_lime_light_colorTertiary</item>
+    <item name="colorTertiaryContainer">@color/_toxic_lime_light_colorTertiaryContainer</item>
+    <item name="colorOnTertiary">@color/_toxic_lime_light_colorOnTertiary</item>
+    <item name="colorOnTertiaryContainer">@color/_toxic_lime_light_colorOnTertiaryContainer</item>
+    <item name="colorError">@color/_toxic_lime_light_colorError</item>
+    <item name="android:colorBackground">@color/_toxic_lime_light_colorBackground</item>
+    <item name="colorOnBackground">@color/_toxic_lime_light_colorOnBackground</item>
+    <item name="colorSurface">@color/_toxic_lime_light_colorSurface</item>
+    <item name="colorOnSurface">@color/_toxic_lime_light_colorOnSurface</item>
+    <item name="colorSurfaceVariant">@color/_toxic_lime_light_colorSurfaceVariant</item>
+    <item name="colorOnSurfaceVariant">@color/_toxic_lime_light_colorOnSurfaceVariant</item>
+    <item name="colorOutline">@color/_toxic_lime_light_colorOutline</item>
+
+    <item name="colorControlHighlight">@color/_toxic_lime_light_ripple</item>
+    <item name="android:colorControlHighlight">@color/_toxic_lime_light_ripple</item>
+    <item name="colorControlActivated">@color/_toxic_lime_light_colorPrimary</item>
+    <item name="android:colorControlActivated">@color/_toxic_lime_light_colorPrimary</item>
+    <item name="android:textColorHighlight">@color/_toxic_lime_light_selection</item>
+    
+    <item name="android:statusBarColor">@color/_toxic_lime_light_colorBackground</item>
+    <item name="android:navigationBarColor">@color/_toxic_lime_light_colorBackground</item>
+    <item name="android:windowLightStatusBar">true</item>
+
+    <item name="terminalTextColor">@color/_toxic_lime_light_colorOnBackground</item>
+    <item name="terminalBackgroundColor">@color/_toxic_lime_light_colorBackground</item>
+    <item name="terminalCursorStyle">verticalBar</item>
+  </style>
+
+  <!-- Dark (Matrix Mode) -->
+  <color name="_toxic_lime_dark_colorPrimary">#ffb6ea26</color>
+  <color name="_toxic_lime_dark_colorPrimaryContainer">#ff4c6000</color>
+  <color name="_toxic_lime_dark_colorPrimaryDark">#ff1a1c19</color>
+  <color name="_toxic_lime_dark_colorOnPrimary">#ff283500</color>
+  <color name="_toxic_lime_dark_colorOnPrimaryContainer">#ffd6ff7d</color>
+  <color name="_toxic_lime_dark_colorSecondary">#ffc5cba9</color>
+  <color name="_toxic_lime_dark_colorSecondaryContainer">#ff454a30</color>
+  <color name="_toxic_lime_dark_colorOnSecondary">#ff2f331c</color>
+  <color name="_toxic_lime_dark_colorOnSecondaryContainer">#ffe1e7c4</color>
+  <color name="_toxic_lime_dark_colorTertiary">#ffa2d0c2</color>
+  <color name="_toxic_lime_dark_colorTertiaryContainer">#ff214e45</color>
+  <color name="_toxic_lime_dark_colorOnTertiary">#ff05372e</color>
+  <color name="_toxic_lime_dark_colorOnTertiaryContainer">#ffbeecde</color>
+  <color name="_toxic_lime_dark_colorError">#ffffb4ab</color>
+  <color name="_toxic_lime_dark_colorBackground">#ff0a0c00</color> <!-- Deep Matrix Black -->
+  <color name="_toxic_lime_dark_colorOnBackground">#ffe3e3db</color>
+  <color name="_toxic_lime_dark_colorSurface">#ff0a0c00</color>
+  <color name="_toxic_lime_dark_colorOnSurface">#ffe3e3db</color>
+  <color name="_toxic_lime_dark_colorSurfaceVariant">#ff46483c</color>
+  <color name="_toxic_lime_dark_colorOnSurfaceVariant">#ffc7c8b8</color>
+  <color name="_toxic_lime_dark_colorOutline">#ff909284</color>
+  <color name="_toxic_lime_dark_colorOnSurfaceInverse">#ff1a1c19</color>
+  <color name="_toxic_lime_dark_colorSurfaceInverse">#ffe3e3db</color>
+  <color name="_toxic_lime_dark_colorPrimaryInverse">#ff667e00</color>
+  
+  <color name="_toxic_lime_dark_ripple">#44b6ea26</color>
+  <color name="_toxic_lime_dark_selection">#664c6000</color>
+
+  <style name="Theme.AndroidIDE.ToxicLime.Dark" parent="Theme.AndroidIDE.ToxicLime">
+    <item name="colorPrimary">@color/_toxic_lime_dark_colorPrimary</item>
+    <item name="colorPrimaryDark">@color/_toxic_lime_dark_colorPrimaryDark</item>
+    <item name="colorOnPrimary">@color/_toxic_lime_dark_colorOnPrimary</item>
+    <item name="colorPrimaryContainer">@color/_toxic_lime_dark_colorPrimaryContainer</item>
+    <item name="colorOnPrimaryContainer">@color/_toxic_lime_dark_colorOnPrimaryContainer</item>
+    <item name="colorSecondary">@color/_toxic_lime_dark_colorSecondary</item>
+    <item name="colorOnSecondary">@color/_toxic_lime_dark_colorOnSecondary</item>
+    <item name="colorSecondaryContainer">@color/_toxic_lime_dark_colorSecondaryContainer</item>
+    <item name="colorOnSecondaryContainer">@color/_toxic_lime_dark_colorOnSecondaryContainer</item>
+    <item name="colorTertiary">@color/_toxic_lime_dark_colorTertiary</item>
+    <item name="colorOnTertiary">@color/_toxic_lime_dark_colorOnTertiary</item>
+    <item name="colorTertiaryContainer">@color/_toxic_lime_dark_colorTertiaryContainer</item>
+    <item name="colorOnTertiaryContainer">@color/_toxic_lime_dark_colorOnTertiaryContainer</item>
+    <item name="colorError">@color/_toxic_lime_dark_colorError</item>
+    <item name="android:colorBackground">@color/_toxic_lime_dark_colorBackground</item>
+    <item name="colorOnBackground">@color/_toxic_lime_dark_colorOnBackground</item>
+    <item name="colorSurface">@color/_toxic_lime_dark_colorSurface</item>
+    <item name="colorOnSurface">@color/_toxic_lime_dark_colorOnSurface</item>
+    <item name="colorSurfaceVariant">@color/_toxic_lime_dark_colorSurfaceVariant</item>
+    <item name="colorOnSurfaceVariant">@color/_toxic_lime_dark_colorOnSurfaceVariant</item>
+    <item name="colorOutline">@color/_toxic_lime_dark_colorOutline</item>
+    <item name="colorOnSurfaceInverse">@color/_toxic_lime_dark_colorOnSurfaceInverse</item>
+    <item name="colorSurfaceInverse">@color/_toxic_lime_dark_colorSurfaceInverse</item>
+    <item name="colorPrimaryInverse">@color/_toxic_lime_dark_colorPrimaryInverse</item>
+
+    <item name="colorControlHighlight">@color/_toxic_lime_dark_ripple</item>
+    <item name="android:colorControlHighlight">@color/_toxic_lime_dark_ripple</item>
+    <item name="colorControlActivated">@color/_toxic_lime_dark_colorPrimary</item>
+    <item name="android:colorControlActivated">@color/_toxic_lime_dark_colorPrimary</item>
+    <item name="android:textColorHighlight">@color/_toxic_lime_dark_selection</item>
+    
+    <item name="android:statusBarColor">@color/_toxic_lime_dark_colorBackground</item>
+    <item name="android:navigationBarColor">@color/_toxic_lime_dark_colorBackground</item>
+    <item name="android:windowLightStatusBar">false</item>
+    
+    <!-- Matrix Green Text -->
+    <item name="terminalTextColor">@color/_toxic_lime_dark_colorPrimary</item>
+    <item name="terminalBackgroundColor">@color/_toxic_lime_dark_colorBackground</item>
+    <item name="terminalCursorStyle">verticalBar</item>
+  </style>
+</resources>

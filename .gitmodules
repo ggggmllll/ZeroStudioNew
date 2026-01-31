@@ -1,0 +1,7 @@
+[submodule "composite-builds/external/logback-android"]
+        path = composite-builds/external/logback-android
+        url = https://github.com/AndroidIDEOfficial/logback-android
+        
+[submodule "ai/src/main/cpp/mnn"]
+	path = ai/src/main/cpp/mnn
+	url = git@github.com:alibaba/MNN.git

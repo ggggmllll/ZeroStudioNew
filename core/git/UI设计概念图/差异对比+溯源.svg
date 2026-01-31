@@ -1,0 +1,135 @@
+<svg width="800" height="860" viewBox="0 0 800 860" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <style>
+        .font-sans { font-family: 'Roboto', sans-serif; }
+        .font-mono { font-family: 'Roboto Mono', monospace; }
+        .text-xs { font-size: 11px; font-weight: 500; }
+        .text-sm { font-size: 13px; }
+        .text-base { font-size: 15px; font-weight: 700; }
+        
+        .fill-bg { fill: #000000; }
+        .fill-surface { fill: #1E1E1E; }
+        .fill-surface-container { fill: #252525; }
+        .fill-primary { fill: #D0BCFF; }
+        .fill-on-surface { fill: #E6E1E5; }
+        .fill-outline { fill: #8E8E93; }
+        
+        /* Diff Colors */
+        .bg-diff-add { fill: rgba(129, 199, 132, 0.15); }
+        .text-diff-add { fill: #81C784; }
+        .bg-diff-del { fill: rgba(229, 115, 115, 0.15); }
+        .text-diff-del { fill: #E57373; }
+        .bg-gutter { fill: #2C2C2C; }
+    </style>
+    
+    <rect width="800" height="860" fill="#121212"/>
+
+    <!-- ================= SCREEN 1: DIFF VIEWER (Unified) ================= -->
+    <g transform="translate(20, 20)">
+        <text x="20" y="-10" class="font-sans text-base fill-on-surface">1. 差异对比 (Diff Viewer)</text>
+        <rect width="360" height="800" rx="20" class="fill-bg" stroke="#333" stroke-width="4"/>
+        
+        <!-- Header -->
+        <rect width="360" height="60" class="fill-surface-container"/>
+        <text x="20" y="35" class="font-sans text-base fill-on-surface">MainActivity.kt</text>
+        <text x="260" y="35" class="font-mono text-xs fill-outline">Diff: HEAD</text>
+        <line x1="0" y1="60" x2="360" y2="60" stroke="#333"/>
+
+        <!-- Code Content -->
+        <g transform="translate(0, 60)">
+            
+            <!-- Context Line -->
+            <g>
+                <rect width="40" height="24" class="fill-surface-container"/>
+                <text x="35" y="16" text-anchor="end" class="font-mono text-xs fill-outline">10</text>
+                <text x="50" y="16" class="font-mono text-sm fill-outline">class MainActivity : AppCompatActivity() {</text>
+            </g>
+
+            <!-- Deleted Line -->
+            <g transform="translate(0, 24)">
+                <rect width="360" height="24" class="bg-diff-del"/>
+                <rect width="40" height="24" fill="rgba(229, 115, 115, 0.2)"/>
+                <text x="35" y="16" text-anchor="end" class="font-mono text-xs text-diff-del">11</text>
+                <text x="50" y="16" class="font-mono text-sm fill-on-surface">-     private val TAG = "Main"</text>
+            </g>
+
+            <!-- Added Line -->
+            <g transform="translate(0, 48)">
+                <rect width="360" height="24" class="bg-diff-add"/>
+                <rect width="40" height="24" fill="rgba(129, 199, 132, 0.2)"/>
+                <text x="35" y="16" text-anchor="end" class="font-mono text-xs text-diff-add">12</text>
+                <text x="50" y="16" class="font-mono text-sm fill-on-surface">+     private const val TAG = "MainActivity"</text>
+            </g>
+
+            <!-- Added Block -->
+             <g transform="translate(0, 72)">
+                <rect width="360" height="48" class="bg-diff-add"/>
+                <rect width="40" height="48" fill="rgba(129, 199, 132, 0.2)"/>
+                <text x="35" y="16" text-anchor="end" class="font-mono text-xs text-diff-add">13</text>
+                <text x="50" y="16" class="font-mono text-sm fill-on-surface">+     // Fixed tag naming convention</text>
+                <text x="35" y="40" text-anchor="end" class="font-mono text-xs text-diff-add">14</text>
+                <text x="50" y="40" class="font-mono text-sm fill-on-surface">+     private val viewModel: MainViewModel</text>
+            </g>
+
+            <!-- Context Line -->
+            <g transform="translate(0, 120)">
+                <rect width="40" height="24" class="fill-surface-container"/>
+                <text x="35" y="16" text-anchor="end" class="font-mono text-xs fill-outline">15</text>
+                <text x="50" y="16" class="font-mono text-sm fill-outline">    override fun onCreate(savedInstanceState...)</text>
+            </g>
+        </g>
+
+        <!-- Bottom Action Bar -->
+        <g transform="translate(16, 730)">
+            <rect width="328" height="56" rx="28" class="fill-surface-container" stroke="#444"/>
+            
+            <!-- Button: Revert -->
+            <text x="60" y="34" text-anchor="middle" class="font-sans text-sm fill-error" font-weight="bold">DISCARD</text>
+            <line x1="164" y1="16" x2="164" y2="40" stroke="#444"/>
+            <!-- Button: Stage -->
+            <text x="220" y="34" text-anchor="middle" class="font-sans text-sm fill-primary" font-weight="bold">STAGE FILE</text>
+        </g>
+    </g>
+
+    <!-- ================= SCREEN 2: FILE BLAME ================= -->
+    <g transform="translate(420, 20)">
+        <text x="20" y="-10" class="font-sans text-base fill-on-surface">2. 代码追溯 (File Blame)</text>
+        <rect width="360" height="800" rx="20" class="fill-bg" stroke="#333" stroke-width="4"/>
+        
+        <!-- Header -->
+        <rect width="360" height="60" class="fill-surface-container"/>
+        <text x="20" y="35" class="font-sans text-base fill-on-surface">Utils.java</text>
+        <text x="300" y="35" class="font-sans text-xs fill-primary">Blame Mode</text>
+        <line x1="0" y1="60" x2="360" y2="60" stroke="#333"/>
+
+        <!-- Blame Gutter + Code -->
+        <g transform="translate(0, 60)">
+            
+            <!-- Block 1: Recent change -->
+            <g>
+                <rect width="100" height="48" class="bg-gutter"/>
+                <rect width="2" height="48" fill="#D0BCFF"/> <!-- Color Code for Commit A -->
+                <text x="8" y="16" class="font-sans" font-size="10" fill="#E6E1E5" font-weight="bold">AndroidZero</text>
+                <text x="8" y="28" class="font-sans" font-size="9" fill="#8E8E93">2h ago</text>
+                <text x="8" y="40" class="font-mono" font-size="9" fill="#D0BCFF">a1b2c</text>
+                
+                <text x="110" y="18" class="font-mono text-sm fill-on-surface">public static String format(String s) {</text>
+                <text x="110" y="38" class="font-mono text-sm fill-on-surface">    if (s == null) return "";</text>
+            </g>
+
+            <!-- Block 2: Old change -->
+            <g transform="translate(0, 48)">
+                <rect width="100" height="72" class="fill-bg"/>
+                <rect width="2" height="72" fill="#81C784"/> <!-- Color Code for Commit B -->
+                <text x="8" y="16" class="font-sans" font-size="10" fill="#E6E1E5" font-weight="bold">JohnDoe</text>
+                <text x="8" y="28" class="font-sans" font-size="9" fill="#8E8E93">3 months</text>
+                <text x="8" y="40" class="font-mono" font-size="9" fill="#81C784">9f8e7</text>
+                
+                <text x="110" y="18" class="font-mono text-sm fill-on-surface">    // TODO: Improve regex performance</text>
+                <text x="110" y="38" class="font-mono text-sm fill-on-surface">    return s.replaceAll("\\s", "");</text>
+                <text x="110" y="58" class="font-mono text-sm fill-on-surface">}</text>
+            </g>
+            
+            <line x1="100" y1="0" x2="100" y2="400" stroke="#333"/>
+        </g>
+    </g>
+</svg>

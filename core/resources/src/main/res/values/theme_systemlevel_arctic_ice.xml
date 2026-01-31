@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~  This file is part of AndroidIDE.
+  ~  Created by @author android_zero
+  ~  Style: Cold Arctic Ice 极地冰川 - 冰蓝与深海蓝
+  -设计理念：
+白昼：极度干净的冰蓝色，接近纯白的冷色调背景。
+黑夜：深海蓝，给人冷静、理性的感觉。
+全局覆盖：使用了极简的冷色调，非常适合专业开发者。
+  -->
+<resources>
+  <!-- Light -->
+  <color name="_arctic_ice_light_colorPrimary">#ff006689</color>
+  <color name="_arctic_ice_light_colorPrimaryContainer">#ffc3e8ff</color>
+  <color name="_arctic_ice_light_colorPrimaryDark">#ffffffff</color>
+  <color name="_arctic_ice_light_colorPrimaryInverse">#ff7ad0ff</color>
+  <color name="_arctic_ice_light_colorOnPrimary">#ffffffff</color>
+  <color name="_arctic_ice_light_colorOnPrimaryContainer">#ff001e2c</color>
+  <color name="_arctic_ice_light_colorSecondary">#ff4e616d</color>
+  <color name="_arctic_ice_light_colorSecondaryContainer">#ffd1e5f3</color>
+  <color name="_arctic_ice_light_colorOnSecondary">#ffffffff</color>
+  <color name="_arctic_ice_light_colorOnSecondaryContainer">#ff091e28</color>
+  <color name="_arctic_ice_light_colorError">#ffba1a1a</color>
+  <color name="_arctic_ice_light_colorBackground">#fffbfcfe</color>
+  <color name="_arctic_ice_light_colorOnBackground">#ff191c1e</color>
+  <color name="_arctic_ice_light_colorSurface">#fffbfcfe</color>
+  <color name="_arctic_ice_light_colorSurfaceInverse">#ff2e3133</color>
+  <color name="_arctic_ice_light_colorSurfaceVariant">#ffdde3ea</color>
+  <color name="_arctic_ice_light_colorOnSurface">#ff191c1e</color>
+  <color name="_arctic_ice_light_colorOnSurfaceInverse">#fff0f1f3</color>
+  <color name="_arctic_ice_light_colorOnSurfaceVariant">#ff41484d</color>
+  <color name="_arctic_ice_light_colorOutline">#ff71787e</color>
+  <color name="_arctic_ice_light_ripple">#33006689</color>
+  <color name="_arctic_ice_light_selection">#66c3e8ff</color>
+
+  <style name="Theme.AndroidIDE.ArcticIce" parent="Theme.AndroidIDE">
+    <item name="colorPrimary">@color/_arctic_ice_light_colorPrimary</item>
+    <item name="colorPrimaryContainer">@color/_arctic_ice_light_colorPrimaryContainer</item>
+    <item name="colorPrimaryDark">@color/_arctic_ice_light_colorPrimaryDark</item>
+    <item name="colorPrimaryInverse">@color/_arctic_ice_light_colorPrimaryInverse</item>
+    <item name="colorOnPrimary">@color/_arctic_ice_light_colorOnPrimary</item>
+    <item name="colorOnPrimaryContainer">@color/_arctic_ice_light_colorOnPrimaryContainer</item>
+    <item name="colorSecondary">@color/_arctic_ice_light_colorSecondary</item>
+    <item name="colorSecondaryContainer">@color/_arctic_ice_light_colorSecondaryContainer</item>
+    <item name="colorOnSecondary">@color/_arctic_ice_light_colorOnSecondary</item>
+    <item name="colorOnSecondaryContainer">@color/_arctic_ice_light_colorOnSecondaryContainer</item>
+    <item name="android:colorBackground">@color/_arctic_ice_light_colorBackground</item>
+    <item name="colorOnBackground">@color/_arctic_ice_light_colorOnBackground</item>
+    <item name="colorSurface">@color/_arctic_ice_light_colorSurface</item>
+    <item name="colorOnSurface">@color/_arctic_ice_light_colorOnSurface</item>
+    <item name="colorSurfaceVariant">@color/_arctic_ice_light_colorSurfaceVariant</item>
+    <item name="colorOnSurfaceVariant">@color/_arctic_ice_light_colorOnSurfaceVariant</item>
+    <item name="colorOutline">@color/_arctic_ice_light_colorOutline</item>
+    
+    <item name="colorControlHighlight">@color/_arctic_ice_light_ripple</item>
+    <item name="android:colorControlHighlight">@color/_arctic_ice_light_ripple</item>
+    <item name="android:textColorHighlight">@color/_arctic_ice_light_selection</item>
+    <item name="android:statusBarColor">@color/_arctic_ice_light_colorBackground</item>
+    <item name="android:navigationBarColor">@color/_arctic_ice_light_colorBackground</item>
+    <item name="android:windowLightStatusBar">true</item>
+
+    <item name="terminalTextColor">@color/_arctic_ice_light_colorOnBackground</item>
+    <item name="terminalBackgroundColor">@color/_arctic_ice_light_colorBackground</item>
+    <item name="terminalCursorStyle">block</item>
+  </style>
+
+  <!-- Dark -->
+  <color name="_arctic_ice_dark_colorPrimary">#ff7ad0ff</color>
+  <color name="_arctic_ice_dark_colorPrimaryContainer">#ff004b66</color>
+  <color name="_arctic_ice_dark_colorPrimaryDark">#ff191c1e</color>
+  <color name="_arctic_ice_dark_colorOnPrimary">#ff003548</color>
+  <color name="_arctic_ice_dark_colorOnPrimaryContainer">#ffc3e8ff</color>
+  <color name="_arctic_ice_dark_colorSecondary">#ffb5c9d7</color>
+  <color name="_arctic_ice_dark_colorSecondaryContainer">#ff364955</color>
+  <color name="_arctic_ice_dark_colorOnSecondary">#ff1f333e</color>
+  <color name="_arctic_ice_dark_colorOnSecondaryContainer">#ffd1e5f3</color>
+  <color name="_arctic_ice_dark_colorError">#ffffb4ab</color>
+  <color name="_arctic_ice_dark_colorBackground">#ff191c1e</color>
+  <color name="_arctic_ice_dark_colorOnBackground">#ffe1e2e5</color>
+  <color name="_arctic_ice_dark_colorSurface">#ff191c1e</color>
+  <color name="_arctic_ice_dark_colorOnSurface">#ffe1e2e5</color>
+  <color name="_arctic_ice_dark_colorSurfaceVariant">#ff41484d</color>
+  <color name="_arctic_ice_dark_colorOnSurfaceVariant">#ffc1c7ce</color>
+  <color name="_arctic_ice_dark_colorOutline">#ff8b9198</color>
+  <color name="_arctic_ice_dark_colorOnSurfaceInverse">#ff191c1e</color>
+  <color name="_arctic_ice_dark_colorSurfaceInverse">#ffe1e2e5</color>
+  <color name="_arctic_ice_dark_colorPrimaryInverse">#ff006689</color>
+  <color name="_arctic_ice_dark_ripple">#447ad0ff</color>
+  <color name="_arctic_ice_dark_selection">#66004b66</color>
+
+  <style name="Theme.AndroidIDE.ArcticIce.Dark" parent="Theme.AndroidIDE.ArcticIce">
+    <item name="colorPrimary">@color/_arctic_ice_dark_colorPrimary</item>
+    <item name="colorPrimaryDark">@color/_arctic_ice_dark_colorPrimaryDark</item>
+    <item name="colorOnPrimary">@color/_arctic_ice_dark_colorOnPrimary</item>
+    <item name="colorPrimaryContainer">@color/_arctic_ice_dark_colorPrimaryContainer</item>
+    <item name="colorOnPrimaryContainer">@color/_arctic_ice_dark_colorOnPrimaryContainer</item>
+    <item name="colorSecondary">@color/_arctic_ice_dark_colorSecondary</item>
+    <item name="colorOnSecondary">@color/_arctic_ice_dark_colorOnSecondary</item>
+    <item name="colorSecondaryContainer">@color/_arctic_ice_dark_colorSecondaryContainer</item>
+    <item name="colorOnSecondaryContainer">@color/_arctic_ice_dark_colorOnSecondaryContainer</item>
+    <item name="android:colorBackground">@color/_arctic_ice_dark_colorBackground</item>
+    <item name="colorOnBackground">@color/_arctic_ice_dark_colorOnBackground</item>
+    <item name="colorSurface">@color/_arctic_ice_dark_colorSurface</item>
+    <item name="colorOnSurface">@color/_arctic_ice_dark_colorOnSurface</item>
+    <item name="colorSurfaceVariant">@color/_arctic_ice_dark_colorSurfaceVariant</item>
+    <item name="colorOnSurfaceVariant">@color/_arctic_ice_dark_colorOnSurfaceVariant</item>
+    <item name="colorOutline">@color/_arctic_ice_dark_colorOutline</item>
+    <item name="colorOnSurfaceInverse">@color/_arctic_ice_dark_colorOnSurfaceInverse</item>
+    <item name="colorSurfaceInverse">@color/_arctic_ice_dark_colorSurfaceInverse</item>
+    <item name="colorPrimaryInverse">@color/_arctic_ice_dark_colorPrimaryInverse</item>
+
+    <item name="colorControlHighlight">@color/_arctic_ice_dark_ripple</item>
+    <item name="android:colorControlHighlight">@color/_arctic_ice_dark_ripple</item>
+    <item name="android:textColorHighlight">@color/_arctic_ice_dark_selection</item>
+    <item name="android:statusBarColor">@color/_arctic_ice_dark_colorBackground</item>
+    <item name="android:navigationBarColor">@color/_arctic_ice_dark_colorBackground</item>
+    <item name="android:windowLightStatusBar">false</item>
+    
+    <item name="terminalTextColor">@color/_arctic_ice_dark_colorOnBackground</item>
+    <item name="terminalBackgroundColor">@color/_arctic_ice_dark_colorBackground</item>
+    <item name="terminalCursorStyle">block</item>
+  </style>
+</resources>

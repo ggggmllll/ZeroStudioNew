@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:background="?attr/colorSurface">
+
+    <!-- 旧行号 -->
+    <TextView
+        android:id="@+id/tv_line_old"
+        android:layout_width="32dp"
+        android:layout_height="match_parent"
+        android:gravity="end|center_vertical"
+        android:paddingEnd="4dp"
+        android:text="10"
+        android:textColor="?attr/colorOnSurfaceVariant"
+        android:textSize="10sp"
+        android:fontFamily="monospace"
+        android:background="#20FFFFFF"/>
+
+    <!-- 新行号 -->
+    <TextView
+        android:id="@+id/tv_line_new"
+        android:layout_width="32dp"
+        android:layout_height="match_parent"
+        android:gravity="end|center_vertical"
+        android:paddingEnd="4dp"
+        android:text="10"
+        android:textColor="?attr/colorOnSecondary"
+        android:textSize="10sp"
+        android:fontFamily="monospace"
+        android:background="#20FFFFFF"/>
+
+    <!-- 代码内容 -->
+    <TextView
+        android:id="@+id/tv_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="8dp"
+        android:text="val code = 0"
+        android:textColor="?attr/colorTertiary"
+        android:textSize="12sp"
+        android:fontFamily="monospace"
+        android:paddingVertical="2dp"/>
+
+</LinearLayout>

@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~  This file is part of AndroidIDE.
+  ~  Created by @author android_zero
+  ~  Style: Golden Hour / Luxury Warmth 黄金时刻 - 晨曦金与深夜铜
+  -设计理念：
+白昼：清晨的阳光，温暖的金黄色搭配米白背景。
+黑夜：深夜的铜色，低调奢华的深褐色背景。
+全局覆盖：状态栏跟随背景色，高亮色为半透明金色。
+  -->
+<resources>
+  <!-- Light (Sunrise Gold) -->
+  <color name="_golden_hour_light_colorPrimary">#ff7a5900</color>
+  <color name="_golden_hour_light_colorPrimaryContainer">#ffffdea3</color>
+  <color name="_golden_hour_light_colorPrimaryDark">#ffffffff</color>
+  <color name="_golden_hour_light_colorPrimaryInverse">#fffddc76</color>
+  <color name="_golden_hour_light_colorOnPrimary">#ffffffff</color>
+  <color name="_golden_hour_light_colorOnPrimaryContainer">#ff261900</color>
+  <color name="_golden_hour_light_colorSecondary">#ff6d5c3f</color>
+  <color name="_golden_hour_light_colorSecondaryContainer">#fff7dfbb</color>
+  <color name="_golden_hour_light_colorOnSecondary">#ffffffff</color>
+  <color name="_golden_hour_light_colorOnSecondaryContainer">#ff251a04</color>
+  <color name="_golden_hour_light_colorTertiary">#ff4d6546</color>
+  <color name="_golden_hour_light_colorTertiaryContainer">#ffcfebc3</color>
+  <color name="_golden_hour_light_colorOnTertiary">#ffffffff</color>
+  <color name="_golden_hour_light_colorOnTertiaryContainer">#ff0b2008</color>
+  <color name="_golden_hour_light_colorError">#ffba1a1a</color>
+  <color name="_golden_hour_light_colorBackground">#fffdf8f2</color> <!-- Warm White -->
+  <color name="_golden_hour_light_colorOnBackground">#ff1f1b16</color>
+  <color name="_golden_hour_light_colorSurface">#fffdf8f2</color>
+  <color name="_golden_hour_light_colorSurfaceInverse">#ff35302a</color>
+  <color name="_golden_hour_light_colorSurfaceVariant">#ffefe0cf</color>
+  <color name="_golden_hour_light_colorOnSurface">#ff1f1b16</color>
+  <color name="_golden_hour_light_colorOnSurfaceInverse">#fff9efe7</color>
+  <color name="_golden_hour_light_colorOnSurfaceVariant">#ff4f4539</color>
+  <color name="_golden_hour_light_colorOutline">#ff817567</color>
+  <color name="_golden_hour_light_ripple">#337a5900</color>
+  <color name="_golden_hour_light_selection">#66ffdea3</color>
+
+  <style name="Theme.AndroidIDE.GoldenHour" parent="Theme.AndroidIDE">
+    <item name="colorPrimary">@color/_golden_hour_light_colorPrimary</item>
+    <item name="colorPrimaryContainer">@color/_golden_hour_light_colorPrimaryContainer</item>
+    <item name="colorPrimaryDark">@color/_golden_hour_light_colorPrimaryDark</item>
+    <item name="colorPrimaryInverse">@color/_golden_hour_light_colorPrimaryInverse</item>
+    <item name="colorOnPrimary">@color/_golden_hour_light_colorOnPrimary</item>
+    <item name="colorOnPrimaryContainer">@color/_golden_hour_light_colorOnPrimaryContainer</item>
+    <item name="colorSecondary">@color/_golden_hour_light_colorSecondary</item>
+    <item name="colorSecondaryContainer">@color/_golden_hour_light_colorSecondaryContainer</item>
+    <item name="colorOnSecondary">@color/_golden_hour_light_colorOnSecondary</item>
+    <item name="colorOnSecondaryContainer">@color/_golden_hour_light_colorOnSecondaryContainer</item>
+    <item name="android:colorBackground">@color/_golden_hour_light_colorBackground</item>
+    <item name="colorOnBackground">@color/_golden_hour_light_colorOnBackground</item>
+    <item name="colorSurface">@color/_golden_hour_light_colorSurface</item>
+    <item name="colorOnSurface">@color/_golden_hour_light_colorOnSurface</item>
+    <item name="colorSurfaceVariant">@color/_golden_hour_light_colorSurfaceVariant</item>
+    <item name="colorOnSurfaceVariant">@color/_golden_hour_light_colorOnSurfaceVariant</item>
+    <item name="colorOutline">@color/_golden_hour_light_colorOutline</item>
+    
+    <!-- Global UI Coverage -->
+    <item name="colorControlHighlight">@color/_golden_hour_light_ripple</item>
+    <item name="android:colorControlHighlight">@color/_golden_hour_light_ripple</item>
+    <item name="android:textColorHighlight">@color/_golden_hour_light_selection</item>
+    <item name="android:statusBarColor">@color/_golden_hour_light_colorBackground</item>
+    <item name="android:navigationBarColor">@color/_golden_hour_light_colorBackground</item>
+    <item name="android:windowLightStatusBar">true</item>
+
+    <item name="terminalTextColor">@color/_golden_hour_light_colorOnBackground</item>
+    <item name="terminalBackgroundColor">@color/_golden_hour_light_colorBackground</item>
+    <item name="terminalCursorStyle">block</item>
+  </style>
+
+  <!-- Dark (Midnight Bronze) -->
+  <color name="_golden_hour_dark_colorPrimary">#fffddc76</color>
+  <color name="_golden_hour_dark_colorPrimaryContainer">#ff5d4200</color>
+  <color name="_golden_hour_dark_colorPrimaryDark">#ff1f1b16</color>
+  <color name="_golden_hour_dark_colorOnPrimary">#ff412d00</color>
+  <color name="_golden_hour_dark_colorOnPrimaryContainer">#ffffdea3</color>
+  <color name="_golden_hour_dark_colorSecondary">#ffd9c4a0</color>
+  <color name="_golden_hour_dark_colorSecondaryContainer">#ff55452a</color>
+  <color name="_golden_hour_dark_colorOnSecondary">#ff3b2e15</color>
+  <color name="_golden_hour_dark_colorOnSecondaryContainer">#fff7dfbb</color>
+  <color name="_golden_hour_dark_colorTertiary">#ffb3cea8</color>
+  <color name="_golden_hour_dark_colorTertiaryContainer">#ff364d36</color>
+  <color name="_golden_hour_dark_colorOnTertiary">#ff20361b</color>
+  <color name="_golden_hour_dark_colorOnTertiaryContainer">#ffcfebc3</color>
+  <color name="_golden_hour_dark_colorError">#ffffb4ab</color>
+  <color name="_golden_hour_dark_colorBackground">#ff1f1b16</color> <!-- Deep Bronze Black -->
+  <color name="_golden_hour_dark_colorOnBackground">#ffeae1d9</color>
+  <color name="_golden_hour_dark_colorSurface">#ff1f1b16</color>
+  <color name="_golden_hour_dark_colorOnSurface">#ffeae1d9</color>
+  <color name="_golden_hour_dark_colorSurfaceVariant">#ff4f4539</color>
+  <color name="_golden_hour_dark_colorOnSurfaceVariant">#ffd2c4b5</color>
+  <color name="_golden_hour_dark_colorOutline">#ff9b8f80</color>
+  <color name="_golden_hour_dark_colorOnSurfaceInverse">#ff1f1b16</color>
+  <color name="_golden_hour_dark_colorSurfaceInverse">#ffeae1d9</color>
+  <color name="_golden_hour_dark_colorPrimaryInverse">#ff7a5900</color>
+  <color name="_golden_hour_dark_ripple">#44fddc76</color>
+  <color name="_golden_hour_dark_selection">#665d4200</color>
+
+  <style name="Theme.AndroidIDE.GoldenHour.Dark" parent="Theme.AndroidIDE.GoldenHour">
+    <item name="colorPrimary">@color/_golden_hour_dark_colorPrimary</item>
+    <item name="colorPrimaryDark">@color/_golden_hour_dark_colorPrimaryDark</item>
+    <item name="colorOnPrimary">@color/_golden_hour_dark_colorOnPrimary</item>
+    <item name="colorPrimaryContainer">@color/_golden_hour_dark_colorPrimaryContainer</item>
+    <item name="colorOnPrimaryContainer">@color/_golden_hour_dark_colorOnPrimaryContainer</item>
+    <item name="colorSecondary">@color/_golden_hour_dark_colorSecondary</item>
+    <item name="colorOnSecondary">@color/_golden_hour_dark_colorOnSecondary</item>
+    <item name="colorSecondaryContainer">@color/_golden_hour_dark_colorSecondaryContainer</item>
+    <item name="colorOnSecondaryContainer">@color/_golden_hour_dark_colorOnSecondaryContainer</item>
+    <item name="android:colorBackground">@color/_golden_hour_dark_colorBackground</item>
+    <item name="colorOnBackground">@color/_golden_hour_dark_colorOnBackground</item>
+    <item name="colorSurface">@color/_golden_hour_dark_colorSurface</item>
+    <item name="colorOnSurface">@color/_golden_hour_dark_colorOnSurface</item>
+    <item name="colorSurfaceVariant">@color/_golden_hour_dark_colorSurfaceVariant</item>
+    <item name="colorOnSurfaceVariant">@color/_golden_hour_dark_colorOnSurfaceVariant</item>
+    <item name="colorOutline">@color/_golden_hour_dark_colorOutline</item>
+    <item name="colorOnSurfaceInverse">@color/_golden_hour_dark_colorOnSurfaceInverse</item>
+    <item name="colorSurfaceInverse">@color/_golden_hour_dark_colorSurfaceInverse</item>
+    <item name="colorPrimaryInverse">@color/_golden_hour_dark_colorPrimaryInverse</item>
+
+    <!-- Global UI Coverage Dark -->
+    <item name="colorControlHighlight">@color/_golden_hour_dark_ripple</item>
+    <item name="android:colorControlHighlight">@color/_golden_hour_dark_ripple</item>
+    <item name="android:textColorHighlight">@color/_golden_hour_dark_selection</item>
+    <item name="android:statusBarColor">@color/_golden_hour_dark_colorBackground</item>
+    <item name="android:navigationBarColor">@color/_golden_hour_dark_colorBackground</item>
+    <item name="android:windowLightStatusBar">false</item>
+    
+    <item name="terminalTextColor">@color/_golden_hour_dark_colorOnBackground</item>
+    <item name="terminalBackgroundColor">@color/_golden_hour_dark_colorBackground</item>
+    <item name="terminalCursorStyle">block</item>
+  </style>
+</resources>

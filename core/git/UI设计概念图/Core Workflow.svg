@@ -1,0 +1,206 @@
+<svg width="1180" height="860" viewBox="0 0 1180 860" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <style>
+        .font-sans { font-family: 'Roboto', sans-serif; }
+        .font-mono { font-family: 'Roboto Mono', monospace; }
+        .text-xs { font-size: 11px; font-weight: 500; }
+        .text-sm { font-size: 13px; }
+        .text-base { font-size: 15px; font-weight: 700; }
+        .text-lg { font-size: 18px; font-weight: 700; }
+        
+        /* MD3 Dark Theme */
+        .fill-bg { fill: #000000; }
+        .fill-surface { fill: #1E1E1E; }
+        .fill-surface-container { fill: #252525; }
+        .fill-primary { fill: #D0BCFF; }
+        .fill-on-surface { fill: #E6E1E5; }
+        .fill-outline { fill: #8E8E93; }
+        .fill-success { fill: #81C784; }
+        .fill-warning { fill: #FFB74D; }
+        .fill-error { fill: #F28B82; }
+        .fill-info { fill: #64B5F6; }
+        
+        .shadow { filter: drop-shadow(0px 4px 12px rgba(0,0,0,0.6)); }
+    </style>
+    
+    <rect width="1180" height="860" fill="#121212"/>
+
+    <!-- ================= SCREEN 1: PROJECTS ================= -->
+    <g transform="translate(20, 20)">
+        <text x="20" y="-10" class="font-sans text-base fill-on-surface">1. 项目列表 (Projects)</text>
+        <!-- Phone Frame -->
+        <rect width="360" height="800" rx="20" class="fill-bg" stroke="#333" stroke-width="4"/>
+        
+        <!-- Header -->
+        <rect width="360" height="80" class="fill-surface-container"/>
+        <rect x="0" y="38" width="50" height="2" class="fill-primary"/> <!-- Tab Indicator -->
+        <text x="25" y="25" text-anchor="middle" class="font-sans text-xs fill-primary">项目</text>
+        <text x="75" y="25" text-anchor="middle" class="font-sans text-xs fill-outline">变更</text>
+        <text x="125" y="25" text-anchor="middle" class="font-sans text-xs fill-outline">历史</text>
+        <text x="175" y="25" text-anchor="middle" class="font-sans text-xs fill-outline">...</text>
+
+        <!-- Content -->
+        <!-- Item 1 -->
+        <g transform="translate(16, 100)">
+            <rect width="328" height="80" rx="8" class="fill-surface-container"/>
+            <rect x="0" y="10" width="3" height="60" class="fill-primary"/>
+            <rect x="12" y="12" width="40" height="40" rx="6" fill="rgba(208,188,255,0.1)"/>
+            <text x="32" y="38" text-anchor="middle" class="font-sans text-lg fill-primary">A</text>
+            <text x="64" y="28" class="font-sans text-base fill-on-surface">AndroidIDE-Core</text>
+            <text x="64" y="46" class="font-sans text-xs fill-outline">~/Projects/IDE</text>
+            
+            <!-- Tags -->
+            <g transform="translate(64, 58)">
+                <text class="font-sans text-xs fill-success">↑1 Ahead</text>
+                <text x="60" class="font-sans text-xs fill-warning">● 2 Modified</text>
+            </g>
+        </g>
+
+        <!-- Item 2 -->
+        <g transform="translate(16, 192)">
+            <rect width="328" height="80" rx="8" class="fill-surface-container"/>
+            <rect x="12" y="12" width="40" height="40" rx="6" fill="#333"/>
+            <text x="32" y="38" text-anchor="middle" class="font-sans text-lg fill-outline">L</text>
+            <text x="64" y="28" class="font-sans text-base fill-on-surface">lib-utils</text>
+            <text x="64" y="46" class="font-sans text-xs fill-outline">~/Projects/libs</text>
+            <text x="64" y="66" class="font-sans text-xs fill-outline">Clean tree</text>
+        </g>
+    </g>
+
+    <!-- ================= SCREEN 2: CHANGES ================= -->
+    <g transform="translate(410, 20)">
+        <text x="20" y="-10" class="font-sans text-base fill-on-surface">2. 变更状态 (Changes)</text>
+        <!-- Phone Frame -->
+        <rect width="360" height="800" rx="20" class="fill-bg" stroke="#333" stroke-width="4"/>
+        
+        <!-- Header -->
+        <rect width="360" height="80" class="fill-surface-container"/>
+        <rect x="50" y="38" width="50" height="2" class="fill-primary"/>
+        <text x="25" y="25" text-anchor="middle" class="font-sans text-xs fill-outline">项目</text>
+        <text x="75" y="25" text-anchor="middle" class="font-sans text-xs fill-primary">变更</text>
+        <text x="125" y="25" text-anchor="middle" class="font-sans text-xs fill-outline">历史</text>
+
+        <!-- Toolbar Context: Changes -->
+        <g transform="translate(0, 40)">
+            <rect width="360" height="40" class="fill-surface-container" fill-opacity="0.5"/>
+            <!-- Revert Button -->
+            <rect x="250" y="6" width="28" height="28" rx="4" fill="#383838"/>
+            <text x="264" y="24" text-anchor="middle" class="font-sans text-xs fill-on-surface">↺</text>
+            <!-- Push/Pull -->
+            <rect x="286" y="6" width="28" height="28" rx="4" fill="#383838"/>
+             <text x="300" y="24" text-anchor="middle" class="font-sans text-xs fill-on-surface">↑</text>
+        </g>
+
+        <!-- Content -->
+        <g transform="translate(16, 100)">
+            <!-- Staged Section -->
+            <text class="font-sans text-sm fill-outline">▼ Staged (0)</text>
+            <text y="30" class="font-sans text-xs fill-outline" x="20">No staged files</text>
+
+            <!-- Unstaged Section -->
+            <g transform="translate(0, 60)">
+                <text class="font-sans text-sm fill-outline">▼ Unstaged (3)</text>
+                
+                <!-- File 1 -->
+                <g transform="translate(0, 30)">
+                    <rect width="16" height="16" rx="2" stroke="#D0BCFF" fill="none"/>
+                    <text x="24" y="12" class="font-sans text-sm fill-on-surface">MainActivity.kt</text>
+                    <text x="24" y="26" class="font-sans text-xs fill-outline">app/src/main/...</text>
+                    <rect x="300" y="4" width="20" height="16" rx="2" fill="rgba(100,181,246,0.1)"/>
+                    <text x="310" y="15" text-anchor="middle" class="font-sans text-xs fill-info">M</text>
+                </g>
+                <line x1="0" y1="60" x2="328" y2="60" stroke="#333"/>
+
+                <!-- File 2 -->
+                <g transform="translate(0, 70)">
+                    <rect width="16" height="16" rx="2" stroke="#D0BCFF" fill="#D0BCFF"/>
+                    <path d="M4 8L7 11L12 5" stroke="#000" stroke-width="2" fill="none"/>
+                    <text x="24" y="12" class="font-sans text-sm fill-on-surface">colors.xml</text>
+                    <text x="24" y="26" class="font-sans text-xs fill-outline">app/src/res/values...</text>
+                    <rect x="300" y="4" width="20" height="16" rx="2" fill="rgba(100,181,246,0.1)"/>
+                    <text x="310" y="15" text-anchor="middle" class="font-sans text-xs fill-info">M</text>
+                </g>
+                <line x1="0" y1="60" x2="328" y2="60" stroke="#333"/>
+
+                 <!-- File 3 -->
+                <g transform="translate(0, 110)">
+                    <rect width="16" height="16" rx="2" stroke="#D0BCFF" fill="none"/>
+                    <text x="24" y="12" class="font-sans text-sm fill-on-surface">OldUtils.java</text>
+                    <rect x="300" y="4" width="20" height="16" rx="2" fill="rgba(242,139,130,0.1)"/>
+                    <text x="310" y="15" text-anchor="middle" class="font-sans text-xs fill-error">D</text>
+                </g>
+            </g>
+
+            <!-- Commit Input -->
+            <g transform="translate(0, 580)">
+                <rect width="328" height="100" rx="8" fill="#252525" stroke="#444"/>
+                <text x="12" y="24" class="font-sans text-sm fill-outline">Commit message...</text>
+                
+                <rect x="0" y="110" width="328" height="44" rx="22" class="fill-primary"/>
+                <text x="164" y="137" text-anchor="middle" class="font-sans text-base fill-bg">Commit (1)</text>
+            </g>
+        </g>
+    </g>
+
+    <!-- ================= SCREEN 3: HISTORY ================= -->
+    <g transform="translate(800, 20)">
+        <text x="20" y="-10" class="font-sans text-base fill-on-surface">3. 历史记录 (History)</text>
+        <rect width="360" height="800" rx="20" class="fill-bg" stroke="#333" stroke-width="4"/>
+        
+        <!-- Header -->
+        <rect width="360" height="80" class="fill-surface-container"/>
+        <rect x="100" y="38" width="50" height="2" class="fill-primary"/>
+        <text x="25" y="25" text-anchor="middle" class="font-sans text-xs fill-outline">项目</text>
+        <text x="75" y="25" text-anchor="middle" class="font-sans text-xs fill-outline">变更</text>
+        <text x="125" y="25" text-anchor="middle" class="font-sans text-xs fill-primary">历史</text>
+
+        <!-- Graph Content -->
+        <g transform="translate(16, 100)">
+            
+            <!-- Commit 1 -->
+            <g>
+                <!-- Lines -->
+                <line x1="16" y1="20" x2="16" y2="80" stroke="#D0BCFF" stroke-width="2"/>
+                <!-- Dot -->
+                <circle cx="16" cy="20" r="5" class="fill-primary" stroke="#000" stroke-width="2"/>
+                <!-- Text -->
+                <text x="40" y="14" class="font-sans text-base fill-on-surface">Refactor UI components</text>
+                <text x="40" y="32" class="font-mono text-xs fill-primary">a1b2c3d</text>
+                <text x="100" y="32" class="font-sans text-xs fill-outline">2h ago • AndroidZero</text>
+            </g>
+
+            <!-- Commit 2 -->
+            <g transform="translate(0, 60)">
+                <line x1="16" y1="-20" x2="16" y2="80" stroke="#D0BCFF" stroke-width="2"/>
+                <line x1="16" y1="20" x2="30" y2="40" stroke="#81C784" stroke-width="2"/> <!-- Merge line -->
+                
+                <circle cx="16" cy="20" r="5" class="fill-primary" stroke="#000" stroke-width="2"/>
+                
+                <text x="40" y="14" class="font-sans text-base fill-on-surface">Merge branch 'dev'</text>
+                <text x="40" y="32" class="font-mono text-xs fill-primary">8e7f6d5</text>
+            </g>
+
+            <!-- Commit 3 -->
+            <g transform="translate(0, 120)">
+                <line x1="16" y1="-20" x2="16" y2="80" stroke="#D0BCFF" stroke-width="2"/>
+                <line x1="30" y1="-40" x2="30" y2="20" stroke="#81C784" stroke-width="2"/> <!-- Side branch -->
+                
+                <circle cx="30" cy="20" r="5" class="fill-success" stroke="#000" stroke-width="2"/>
+                <text x="50" y="14" class="font-sans text-base fill-on-surface">Update dependencies</text>
+                <text x="50" y="32" class="font-mono text-xs fill-success">4a5b6c</text>
+                <!-- Tag -->
+                <rect x="250" y="4" width="60" height="18" rx="4" stroke="#555"/>
+                <text x="280" y="16" text-anchor="middle" class="font-sans text-xs fill-outline">origin/main</text>
+            </g>
+            
+            <!-- Commit 4 -->
+            <g transform="translate(0, 180)">
+                <line x1="16" y1="-20" x2="16" y2="20" stroke="#D0BCFF" stroke-width="2"/>
+                <line x1="30" y1="-40" x2="16" y2="20" stroke="#81C784" stroke-width="2"/> <!-- Merge back -->
+                
+                <circle cx="16" cy="20" r="5" class="fill-primary" stroke="#000" stroke-width="2"/>
+                <text x="40" y="14" class="font-sans text-base fill-on-surface">Initial Commit</text>
+            </g>
+
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+     android:layout_width="match_parent"
+     android:layout_height="wrap_content"
+     android:fillViewport="true">
+
+     <LinearLayout
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:orientation="vertical"
+          android:padding="24dp">
+
+          <TextView
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:text="File Details"
+               android:textAppearance="?attr/textAppearanceHeadline6"
+               android:layout_marginBottom="16dp" />
+
+          <!-- Details Grid (Simplified as Linear for brevity) -->
+          <TextView
+               android:id="@+id/tv_name"
+               android:textStyle="bold"
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content" />
+          <TextView
+               android:id="@+id/tv_resolution"
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content" />
+          <TextView
+               android:id="@+id/tv_size"
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content" />
+          <TextView
+               android:id="@+id/tv_date"
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content" />
+
+          <TextView
+               android:text="Path"
+               android:layout_marginTop="8dp"
+               android:textStyle="bold"
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content" />
+          <TextView
+               android:id="@+id/tv_path"
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content" />
+
+          <TextView
+               android:text="MD5"
+               android:layout_marginTop="8dp"
+               android:textStyle="bold"
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content" />
+          <TextView
+               android:id="@+id/tv_md5"
+               android:fontFamily="monospace"
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content" />
+
+          <TextView
+               android:text="SHA-256"
+               android:layout_marginTop="8dp"
+               android:textStyle="bold"
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content" />
+          <TextView
+               android:id="@+id/tv_sha256"
+               android:fontFamily="monospace"
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content" />
+
+          <TextView
+               android:id="@+id/tv_histogram_label"
+               android:text="Histogram (RGB/Luma)"
+               android:layout_marginTop="16dp"
+               android:textStyle="bold"
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content" />
+
+          <android.zero.studio.images.preview.ui.HistogramView
+               android:id="@+id/histogram_view"
+               android:layout_width="match_parent"
+               android:layout_height="150dp"
+               android:layout_marginTop="8dp"
+               android:background="#1A000000" />
+
+     </LinearLayout>
+</androidx.core.widget.NestedScrollView>

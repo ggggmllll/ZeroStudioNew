@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+     android:layout_width="match_parent"
+     android:layout_height="match_parent"
+     android:orientation="vertical"
+     android:background="?attr/colorSurface">
+
+     <include layout="@layout/layout_git_mini_toolbar" />
+
+     <EditText
+          android:id="@+id/et_search_branches"
+          android:layout_width="match_parent"
+          android:layout_height="40dp"
+          android:layout_margin="12dp"
+          android:background="@drawable/bg_git_card_item"
+          android:drawableStart="@drawable/ic_search_24"
+          android:drawablePadding="8dp"
+          android:paddingHorizontal="12dp"
+          android:hint="@string/search"
+          android:textColor="?attr/colorOnSurface"
+          android:textColorHint="?attr/colorOnSurfaceVariant"
+          android:textSize="14sp"
+          android:singleLine="true"
+          android:imeOptions="actionSearch" />
+
+     <androidx.recyclerview.widget.RecyclerView
+          android:id="@+id/rv_branches"
+          android:layout_width="match_parent"
+          android:layout_height="match_parent"
+          android:clipToPadding="false"
+          android:paddingBottom="16dp" />
+
+</LinearLayout>

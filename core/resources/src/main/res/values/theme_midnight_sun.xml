@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~  This file is part of AndroidIDE.
+  ~  Created by @author android_zero
+  ~  Style: Yellow/Dark Grey High Contrast -午夜阳光 - 黄色与深灰，经典黑客风格
+  -->
+<resources>
+  <!-- Light (Mustard/Yellowish) -->
+  <color name="_midnight_sun_light_colorPrimary">#ff6b5e00</color>
+  <color name="_midnight_sun_light_colorPrimaryContainer">#ffeec248</color>
+  <color name="_midnight_sun_light_colorPrimaryDark">#ffffffff</color>
+  <color name="_midnight_sun_light_colorPrimaryInverse">#ffeec248</color>
+  <color name="_midnight_sun_light_colorOnPrimary">#ffffffff</color>
+  <color name="_midnight_sun_light_colorOnPrimaryContainer">#ff201b00</color>
+  <color name="_midnight_sun_light_colorSecondary">#ff655f41</color>
+  <color name="_midnight_sun_light_colorSecondaryContainer">#ffece3bd</color>
+  <color name="_midnight_sun_light_colorOnSecondary">#ffffffff</color>
+  <color name="_midnight_sun_light_colorOnSecondaryContainer">#ff201c05</color>
+  <color name="_midnight_sun_light_colorTertiary">#ff416652</color>
+  <color name="_midnight_sun_light_colorTertiaryContainer">#ffc3ecd2</color>
+  <color name="_midnight_sun_light_colorOnTertiary">#ffffffff</color>
+  <color name="_midnight_sun_light_colorOnTertiaryContainer">#ff002113</color>
+  <color name="_midnight_sun_light_colorError">#ffba1a1a</color>
+  <color name="_midnight_sun_light_colorBackground">#fffdfcf5</color>
+  <color name="_midnight_sun_light_colorOnBackground">#ff1b1c18</color>
+  <color name="_midnight_sun_light_colorSurface">#fffdfcf5</color>
+  <color name="_midnight_sun_light_colorSurfaceInverse">#ff30312c</color>
+  <color name="_midnight_sun_light_colorSurfaceVariant">#ffe8e2d0</color>
+  <color name="_midnight_sun_light_colorOnSurface">#ff1b1c18</color>
+  <color name="_midnight_sun_light_colorOnSurfaceInverse">#fff2f0e9</color>
+  <color name="_midnight_sun_light_colorOnSurfaceVariant">#ff4a473a</color>
+  <color name="_midnight_sun_light_colorOutline">#ff7b7768</color>
+  
+  <color name="_midnight_sun_light_ripple">#336b5e00</color>
+  <color name="_midnight_sun_light_selection">#66eec248</color>
+
+  <style name="Theme.AndroidIDE.MidnightSun" parent="Theme.AndroidIDE">
+    <item name="colorPrimary">@color/_midnight_sun_light_colorPrimary</item>
+    <item name="colorPrimaryContainer">@color/_midnight_sun_light_colorPrimaryContainer</item>
+    <item name="colorPrimaryDark">@color/_midnight_sun_light_colorPrimaryDark</item>
+    <item name="colorPrimaryInverse">@color/_midnight_sun_light_colorPrimaryInverse</item>
+    <item name="colorOnPrimary">@color/_midnight_sun_light_colorOnPrimary</item>
+    <item name="colorOnPrimaryContainer">@color/_midnight_sun_light_colorOnPrimaryContainer</item>
+    <item name="colorSecondary">@color/_midnight_sun_light_colorSecondary</item>
+    <item name="colorSecondaryContainer">@color/_midnight_sun_light_colorSecondaryContainer</item>
+    <item name="colorOnSecondary">@color/_midnight_sun_light_colorOnSecondary</item>
+    <item name="colorOnSecondaryContainer">@color/_midnight_sun_light_colorOnSecondaryContainer</item>
+    <item name="colorTertiary">@color/_midnight_sun_light_colorTertiary</item>
+    <item name="colorTertiaryContainer">@color/_midnight_sun_light_colorTertiaryContainer</item>
+    <item name="colorOnTertiary">@color/_midnight_sun_light_colorOnTertiary</item>
+    <item name="colorOnTertiaryContainer">@color/_midnight_sun_light_colorOnTertiaryContainer</item>
+    <item name="colorError">@color/_midnight_sun_light_colorError</item>
+    <item name="android:colorBackground">@color/_midnight_sun_light_colorBackground</item>
+    <item name="colorOnBackground">@color/_midnight_sun_light_colorOnBackground</item>
+    <item name="colorSurface">@color/_midnight_sun_light_colorSurface</item>
+    <item name="colorOnSurface">@color/_midnight_sun_light_colorOnSurface</item>
+    <item name="colorSurfaceVariant">@color/_midnight_sun_light_colorSurfaceVariant</item>
+    <item name="colorOnSurfaceVariant">@color/_midnight_sun_light_colorOnSurfaceVariant</item>
+    <item name="colorOutline">@color/_midnight_sun_light_colorOutline</item>
+
+    <item name="colorControlHighlight">@color/_midnight_sun_light_ripple</item>
+    <item name="android:colorControlHighlight">@color/_midnight_sun_light_ripple</item>
+    <item name="colorControlActivated">@color/_midnight_sun_light_colorPrimary</item>
+    <item name="android:colorControlActivated">@color/_midnight_sun_light_colorPrimary</item>
+    <item name="android:textColorHighlight">@color/_midnight_sun_light_selection</item>
+    
+    <item name="android:statusBarColor">@color/_midnight_sun_light_colorBackground</item>
+    <item name="android:navigationBarColor">@color/_midnight_sun_light_colorBackground</item>
+    <item name="android:windowLightStatusBar">true</item>
+
+    <item name="terminalTextColor">@color/_midnight_sun_light_colorOnBackground</item>
+    <item name="terminalBackgroundColor">@color/_midnight_sun_light_colorBackground</item>
+    <item name="terminalCursorStyle">verticalBar</item>
+  </style>
+
+  <!-- Dark (Bright Yellow on Black) -->
+  <color name="_midnight_sun_dark_colorPrimary">#ffeec248</color>
+  <color name="_midnight_sun_dark_colorPrimaryContainer">#ff524700</color>
+  <color name="_midnight_sun_dark_colorPrimaryDark">#ff1b1c18</color>
+  <color name="_midnight_sun_dark_colorOnPrimary">#ff383000</color>
+  <color name="_midnight_sun_dark_colorOnPrimaryContainer">#ffeec248</color>
+  <color name="_midnight_sun_dark_colorSecondary">#ffd0c7a2</color>
+  <color name="_midnight_sun_dark_colorSecondaryContainer">#ff4d482c</color>
+  <color name="_midnight_sun_dark_colorOnSecondary">#ff353017</color>
+  <color name="_midnight_sun_dark_colorOnSecondaryContainer">#ffece3bd</color>
+  <color name="_midnight_sun_dark_colorTertiary">#ffa8d0b7</color>
+  <color name="_midnight_sun_dark_colorTertiaryContainer">#ff294e3b</color>
+  <color name="_midnight_sun_dark_colorOnTertiary">#ff123726</color>
+  <color name="_midnight_sun_dark_colorOnTertiaryContainer">#ffc3ecd2</color>
+  <color name="_midnight_sun_dark_colorError">#ffffb4ab</color>
+  <color name="_midnight_sun_dark_colorBackground">#ff1b1c18</color>
+  <color name="_midnight_sun_dark_colorOnBackground">#ffe4e2da</color>
+  <color name="_midnight_sun_dark_colorSurface">#ff1b1c18</color>
+  <color name="_midnight_sun_dark_colorOnSurface">#ffe4e2da</color>
+  <color name="_midnight_sun_dark_colorSurfaceVariant">#ff4a473a</color>
+  <color name="_midnight_sun_dark_colorOnSurfaceVariant">#ffcbc6b4</color>
+  <color name="_midnight_sun_dark_colorOutline">#ff959183</color>
+  <color name="_midnight_sun_dark_colorOnSurfaceInverse">#ff1b1c18</color>
+  <color name="_midnight_sun_dark_colorSurfaceInverse">#ffe4e2da</color>
+  <color name="_midnight_sun_dark_colorPrimaryInverse">#ff6b5e00</color>
+  
+  <color name="_midnight_sun_dark_ripple">#44eec248</color>
+  <color name="_midnight_sun_dark_selection">#66524700</color>
+
+  <style name="Theme.AndroidIDE.MidnightSun.Dark" parent="Theme.AndroidIDE.MidnightSun">
+    <item name="colorPrimary">@color/_midnight_sun_dark_colorPrimary</item>
+    <item name="colorPrimaryDark">@color/_midnight_sun_dark_colorPrimaryDark</item>
+    <item name="colorOnPrimary">@color/_midnight_sun_dark_colorOnPrimary</item>
+    <item name="colorPrimaryContainer">@color/_midnight_sun_dark_colorPrimaryContainer</item>
+    <item name="colorOnPrimaryContainer">@color/_midnight_sun_dark_colorOnPrimaryContainer</item>
+    <item name="colorSecondary">@color/_midnight_sun_dark_colorSecondary</item>
+    <item name="colorOnSecondary">@color/_midnight_sun_dark_colorOnSecondary</item>
+    <item name="colorSecondaryContainer">@color/_midnight_sun_dark_colorSecondaryContainer</item>
+    <item name="colorOnSecondaryContainer">@color/_midnight_sun_dark_colorOnSecondaryContainer</item>
+    <item name="colorTertiary">@color/_midnight_sun_dark_colorTertiary</item>
+    <item name="colorOnTertiary">@color/_midnight_sun_dark_colorOnTertiary</item>
+    <item name="colorTertiaryContainer">@color/_midnight_sun_dark_colorTertiaryContainer</item>
+    <item name="colorOnTertiaryContainer">@color/_midnight_sun_dark_colorOnTertiaryContainer</item>
+    <item name="colorError">@color/_midnight_sun_dark_colorError</item>
+    <item name="android:colorBackground">@color/_midnight_sun_dark_colorBackground</item>
+    <item name="colorOnBackground">@color/_midnight_sun_dark_colorOnBackground</item>
+    <item name="colorSurface">@color/_midnight_sun_dark_colorSurface</item>
+    <item name="colorOnSurface">@color/_midnight_sun_dark_colorOnSurface</item>
+    <item name="colorSurfaceVariant">@color/_midnight_sun_dark_colorSurfaceVariant</item>
+    <item name="colorOnSurfaceVariant">@color/_midnight_sun_dark_colorOnSurfaceVariant</item>
+    <item name="colorOutline">@color/_midnight_sun_dark_colorOutline</item>
+    <item name="colorOnSurfaceInverse">@color/_midnight_sun_dark_colorOnSurfaceInverse</item>
+    <item name="colorSurfaceInverse">@color/_midnight_sun_dark_colorSurfaceInverse</item>
+    <item name="colorPrimaryInverse">@color/_midnight_sun_dark_colorPrimaryInverse</item>
+
+    <item name="colorControlHighlight">@color/_midnight_sun_dark_ripple</item>
+    <item name="android:colorControlHighlight">@color/_midnight_sun_dark_ripple</item>
+    <item name="colorControlActivated">@color/_midnight_sun_dark_colorPrimary</item>
+    <item name="android:colorControlActivated">@color/_midnight_sun_dark_colorPrimary</item>
+    <item name="android:textColorHighlight">@color/_midnight_sun_dark_selection</item>
+    
+    <item name="android:statusBarColor">@color/_midnight_sun_dark_colorBackground</item>
+    <item name="android:navigationBarColor">@color/_midnight_sun_dark_colorBackground</item>
+    <item name="android:windowLightStatusBar">false</item>
+    
+    <item name="terminalTextColor">@color/_midnight_sun_dark_colorOnBackground</item>
+    <item name="terminalBackgroundColor">@color/_midnight_sun_dark_colorBackground</item>
+    <item name="terminalCursorStyle">verticalBar</item>
+  </style>
+</resources>

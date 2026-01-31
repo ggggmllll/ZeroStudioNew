@@ -1,0 +1,82 @@
+<svg width="400" height="840" viewBox="0 0 400 840" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <style>
+        .font-sans { font-family: 'Roboto', sans-serif; }
+        .font-mono { font-family: 'Roboto Mono', monospace; }
+        .fill-bg { fill: #000000; }
+        .fill-surface-container { fill: #252525; }
+        .fill-primary { fill: #D0BCFF; }
+        .fill-on-surface { fill: #E6E1E5; }
+        .fill-outline { fill: #8E8E93; }
+        .fill-error { fill: #F28B82; }
+    </style>
+
+    <!-- 背景 -->
+    <rect width="400" height="840" rx="30" class="fill-bg" stroke="#333" stroke-width="8"/>
+
+    <!-- ================= 页面内容 (Tab 7) ================= -->
+    <g transform="translate(20, 40)">
+        
+        <!-- 1. Header & Tabs -->
+        <rect width="360" height="40" class="fill-surface-container"/>
+        <text x="320" y="25" text-anchor="middle" class="font-sans" font-size="11" fill="#D0BCFF" font-weight="bold">暂存</text>
+        <rect x="300" y="38" width="40" height="2" class="fill-primary"/>
+
+        <!-- 2. Toolbar -->
+        <rect y="40" width="360" height="44" class="fill-surface-container"/>
+        <line x1="0" y1="84" x2="360" y2="84" stroke="#333"/>
+        
+        <text x="16" y="66" class="font-sans" font-size="12" fill="#8E8E93">Saved Changes (3)</text>
+        
+        <g transform="translate(260, 48)">
+             <rect width="80" height="28" rx="4" fill="#383838"/>
+             <text x="40" y="19" text-anchor="middle" class="font-sans" font-size="11" fill="#E6E1E5">Clear All</text>
+        </g>
+
+        <!-- 3. Stash List -->
+        <g transform="translate(16, 100)">
+            
+            <!-- Stash Item 0 (Latest) -->
+            <rect width="328" height="110" rx="8" class="fill-surface-container"/>
+            <g transform="translate(12, 16)">
+                <!-- Header -->
+                <text x="0" y="0" class="font-mono" font-size="13" fill="#D0BCFF" font-weight="bold">stash@{0}</text>
+                <text x="304" y="0" text-anchor="end" class="font-sans" font-size="11" fill="#8E8E93">Just now</text>
+                
+                <!-- Message -->
+                <text x="0" y="25" class="font-sans" font-size="14" fill="#E6E1E5">WIP on feature: Login UI crash fix</text>
+                <text x="0" y="42" class="font-sans" font-size="11" fill="#8E8E93">Modified: LoginActivity.kt (+12 -4)</text>
+                
+                <!-- Buttons -->
+                <g transform="translate(160, 58)">
+                    <!-- Apply Button -->
+                    <rect width="60" height="24" rx="4" fill="#383838"/>
+                    <text x="30" y="16" text-anchor="middle" class="font-sans" font-size="11" fill="#D0BCFF">Apply</text>
+                    
+                    <!-- Drop Button -->
+                    <rect x="70" width="60" height="24" rx="4" fill="#383838"/>
+                    <text x="100" y="16" text-anchor="middle" class="font-sans" font-size="11" fill="#F28B82">Drop</text>
+                </g>
+            </g>
+
+            <!-- Stash Item 1 -->
+            <g transform="translate(0, 122)">
+                <rect width="328" height="110" rx="8" class="fill-surface-container"/>
+                <g transform="translate(12, 16)">
+                    <text x="0" y="0" class="font-mono" font-size="13" fill="#E6E1E5">stash@{1}</text>
+                    <text x="304" y="0" text-anchor="end" class="font-sans" font-size="11" fill="#8E8E93">2 days ago</text>
+                    
+                    <text x="0" y="25" class="font-sans" font-size="14" fill="#E6E1E5">On main: Experiment with colors</text>
+                    <text x="0" y="42" class="font-sans" font-size="11" fill="#8E8E93">Modified: colors.xml, themes.xml</text>
+                    
+                    <g transform="translate(160, 58)">
+                        <rect width="60" height="24" rx="4" fill="#383838"/>
+                        <text x="30" y="16" text-anchor="middle" class="font-sans" font-size="11" fill="#D0BCFF">Apply</text>
+                        <rect x="70" width="60" height="24" rx="4" fill="#383838"/>
+                        <text x="100" y="16" text-anchor="middle" class="font-sans" font-size="11" fill="#F28B82">Drop</text>
+                    </g>
+                </g>
+            </g>
+
+        </g>
+    </g>
+</svg>
