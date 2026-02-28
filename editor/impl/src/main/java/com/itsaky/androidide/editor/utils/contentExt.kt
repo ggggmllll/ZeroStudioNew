@@ -17,7 +17,6 @@
 
 package com.itsaky.androidide.editor.utils
 
-import androidx.core.text.trimmedLength
 import com.itsaky.androidide.treesitter.TSNode
 import com.itsaky.androidide.treesitter.TSTree
 import com.itsaky.androidide.treesitter.getNodeAt
@@ -25,17 +24,13 @@ import io.github.rosemoe.sora.text.Content
 import io.github.rosemoe.sora.text.TextUtils
 import io.github.rosemoe.sora.util.IntPair
 
-/**
- * Returns true if the given line is blank.
- */
-fun Content.isBlankLine(line: Int) : Boolean {
+/** Returns true if the given line is blank. */
+fun Content.isBlankLine(line: Int): Boolean {
   return getLine(line).trim { it.isWhitespace() || it == '\r' }.isEmpty()
 }
 
-/**
- * Returns true if the given line is not blank.
- */
-fun Content.isNonBlankLine(line: Int) : Boolean {
+/** Returns true if the given line is not blank. */
+fun Content.isNonBlankLine(line: Int): Boolean {
   return !isBlankLine(line)
 }
 
@@ -44,7 +39,7 @@ fun Content.isNonBlankLine(line: Int) : Boolean {
  *
  * @return The index of the previous non-blank line or -1 if not found.
  */
-fun Content.previousNonBlankLine(line: Int) : Int {
+fun Content.previousNonBlankLine(line: Int): Int {
   for (i in line - 1 downTo 0) {
     if (isNonBlankLine(i)) {
       return i
@@ -59,7 +54,7 @@ fun Content.previousNonBlankLine(line: Int) : Int {
  *
  * @return The index of the next non-blank line or -1 if not found.
  */
-fun Content.nextNonBlankLine(line: Int) : Int {
+fun Content.nextNonBlankLine(line: Int): Int {
   for (i in line + 1 until length) {
     if (isNonBlankLine(i)) {
       return i
@@ -69,34 +64,29 @@ fun Content.nextNonBlankLine(line: Int) : Int {
   return -1
 }
 
-/**
- * Returns the first [TSNode] at the given line number. The leading indentation is ignored.
- */
-fun Content.getFirstNodeAtLine(tree: TSTree, line: Int, col: Int = Int.MIN_VALUE) : TSNode? {
+/** Returns the first [TSNode] at the given line number. The leading indentation is ignored. */
+fun Content.getFirstNodeAtLine(tree: TSTree, line: Int, col: Int = Int.MIN_VALUE): TSNode? {
   return getFirstNodeAtLine(tree.rootNode, line, col)
 }
 
-/**
- * Returns the last [TSNode] at the given line number.
- */
-fun Content.getLastNodeAtLine(tree: TSTree, line: Int, col: Int = Int.MIN_VALUE) : TSNode? {
+/** Returns the last [TSNode] at the given line number. */
+fun Content.getLastNodeAtLine(tree: TSTree, line: Int, col: Int = Int.MIN_VALUE): TSNode? {
   return getLastNodeAtLine(tree.rootNode, line, col)
 }
 
-/**
- * Returns the first [TSNode] at the given line number. The leading indentation is ignored.
- */
-fun Content.getFirstNodeAtLine(node: TSNode, line: Int, col: Int = Int.MIN_VALUE) : TSNode? {
+/** Returns the first [TSNode] at the given line number. The leading indentation is ignored. */
+fun Content.getFirstNodeAtLine(node: TSNode, line: Int, col: Int = Int.MIN_VALUE): TSNode? {
   if (line < 0 || line >= lineCount) {
     return null
   }
 
   var column = col
   if (column == Int.MIN_VALUE) {
-    val contentLine = getLine(line);
-    val (spaces, tabs) = TextUtils.countLeadingSpacesAndTabs(contentLine).let {
-      IntPair.getFirst(it) to IntPair.getSecond(it)
-    }
+    val contentLine = getLine(line)
+    val (spaces, tabs) =
+        TextUtils.countLeadingSpacesAndTabs(contentLine).let {
+          IntPair.getFirst(it) to IntPair.getSecond(it)
+        }
 
     column = (spaces + tabs) shl 1
   }
@@ -110,7 +100,7 @@ fun Content.getFirstNodeAtLine(node: TSNode, line: Int, col: Int = Int.MIN_VALUE
  * Returns the last [TSNode] at the given line number. This function also takes the leading
  * indentation into consideration.
  */
-fun Content.getLastNodeAtLine(node: TSNode, line: Int, col: Int = Int.MIN_VALUE) : TSNode? {
+fun Content.getLastNodeAtLine(node: TSNode, line: Int, col: Int = Int.MIN_VALUE): TSNode? {
   if (line < 0 || line >= lineCount) {
     return null
   }

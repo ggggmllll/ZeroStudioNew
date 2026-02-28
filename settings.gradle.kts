@@ -238,6 +238,7 @@ include(
   ":modules:deviceCompat",
   ":modules:zero-regular-preview",
   ":modules:thinkmap-treeview",
+  ":modules:compose-preview",
 
 
 

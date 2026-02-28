@@ -46,6 +46,7 @@ class EditorSearchLayout(context: Context, val editor: IDEEditor) : FrameLayout(
   private var searchOptions = SearchOptions(true, false)
   private val findInFileBinding: LayoutFindInFileBinding
   private val optionsMenu: PopupMenu
+  private var searchVisibilityListener: ((Boolean) -> Unit)? = null
 
   private var isSearching = false
 
@@ -74,23 +75,23 @@ class EditorSearchLayout(context: Context, val editor: IDEEditor) : FrameLayout(
         val caseInsensitive = searchOptions.caseInsensitive
         val regex = searchOptions.type == SearchOptions.TYPE_REGULAR_EXPRESSION
         searchOptions =
-          when (it.itemId) {
-            0 -> SearchOptions(it.isChecked, regex)
-            1 -> SearchOptions(caseInsensitive, it.isChecked)
-            else -> searchOptions
-          }
+            when (it.itemId) {
+              0 -> SearchOptions(it.isChecked, regex)
+              1 -> SearchOptions(caseInsensitive, it.isChecked)
+              else -> searchOptions
+            }
         editor.searcher.updateSearchOptions(searchOptions)
 
         true
       } else false
     }
 
-    findInFileBinding.root.visibility = GONE
+    findInFileBinding.root.visibility = View.GONE
     findInFileBinding.moreOptions.setOnClickListener { optionsMenu.show() }
 
     addView(
-      findInFileBinding.root,
-      LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
+        findInFileBinding.root,
+        LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT),
     )
   }
 
@@ -103,7 +104,11 @@ class EditorSearchLayout(context: Context, val editor: IDEEditor) : FrameLayout(
       }
       false
     }
-    findInFileBinding.root.visibility = VISIBLE
+    val wasVisible = findInFileBinding.root.visibility == View.VISIBLE
+    findInFileBinding.root.visibility = View.VISIBLE
+    if (!wasVisible) {
+      searchVisibilityListener?.invoke(true)
+    }
   }
 
   private fun onSearchActionClick(v: View) {
@@ -113,9 +118,13 @@ class EditorSearchLayout(context: Context, val editor: IDEEditor) : FrameLayout(
         return
       }
       findInFileBinding.searchInput.removeTextChangedListener(this.searchInputTextWatcher)
-      findInFileBinding.root.visibility = GONE
+      val wasVisible = findInFileBinding.root.visibility == View.VISIBLE
+      findInFileBinding.root.visibility = View.GONE
       this.searchInputTextWatcher = null
       searcher.onClose()
+      if (wasVisible) {
+        searchVisibilityListener?.invoke(false)
+      }
     }
     if (!searcher.hasQuery()) {
       return
@@ -136,10 +145,10 @@ class EditorSearchLayout(context: Context, val editor: IDEEditor) : FrameLayout(
   inner class SearchInputTextChangeListener(val editor: IDEEditor?) : SingleTextWatcher() {
 
     override fun onTextChanged(
-      s: CharSequence,
-      start: Int,
-      before: Int,
-      count: Int,
+        s: CharSequence,
+        start: Int,
+        before: Int,
+        count: Int,
     ) {
       if (editor == null) {
         return
@@ -151,22 +160,27 @@ class EditorSearchLayout(context: Context, val editor: IDEEditor) : FrameLayout(
 
       // Handle bad regexp
       val query =
-        s.toString().let {
-          if (searchOptions.type == SearchOptions.TYPE_REGULAR_EXPRESSION) {
-            try {
-              Pattern.compile(it)
+          s.toString().let {
+            if (searchOptions.type == SearchOptions.TYPE_REGULAR_EXPRESSION) {
+              try {
+                Pattern.compile(it)
+                it
+              } catch (error: Throwable) {
+                ""
+              }
+            } else {
               it
-            } catch (error: Throwable) {
-              ""
             }
-          } else {
-            it
           }
-        }
 
       if (query.isNotBlank()) {
         editor.searcher.search(query, searchOptions)
       }
     }
   }
+
+  fun setOnSearchVisibilityChangeListener(listener: ((Boolean) -> Unit)?) {
+    searchVisibilityListener = listener
+  }
+
 }

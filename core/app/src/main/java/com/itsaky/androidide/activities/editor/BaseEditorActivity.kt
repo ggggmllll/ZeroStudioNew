@@ -17,6 +17,7 @@
 
 package com.itsaky.androidide.activities.editor
 
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageInstaller.SessionCallback
 import android.graphics.Color
@@ -24,28 +25,35 @@ import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.os.Process
 import android.text.SpannableStringBuilder
+import android.widget.FrameLayout
 import android.text.Spanned
 import android.text.TextUtils
+import android.text.TextWatcher
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.activity.viewModels
 import androidx.annotation.GravityInt
 import androidx.annotation.StringRes
+import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.collection.MutableIntIntMap
 import androidx.core.graphics.Insets
 import androidx.core.view.GravityCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
 import androidx.core.view.updatePaddingRelative
+import androidx.lifecycle.lifecycleScope
 import com.blankj.utilcode.constant.MemoryConstants
 import com.blankj.utilcode.util.ConvertUtils.byte2MemorySize
 import com.blankj.utilcode.util.FileUtils
@@ -57,6 +65,7 @@ import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.formatter.IAxisValueFormatter
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayout.Tab
@@ -110,7 +119,7 @@ import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode.MAIN
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-
+import com.itsaky.androidide.projects.internal.ProjectManagerImpl
 
 /**
  * Base class for EditorActivity which handles most of the view related things.

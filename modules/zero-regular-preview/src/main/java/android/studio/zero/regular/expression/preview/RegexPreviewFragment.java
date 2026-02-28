@@ -77,7 +77,7 @@ public class RegexPreviewFragment extends Fragment {
         setupListeners();
         
         etRegexInput.setText("[a-z]([a-zA-Z0-9_.1-])+");
-        etTextInput.setText("test.example-1");
+        etTextInput.setText("androidx-annotation = { module = \"androidx.annotation:annotation\", version.ref = \"androidxCore\" }");
         
         handler.postDelayed(updateRunnable, 300);
     }

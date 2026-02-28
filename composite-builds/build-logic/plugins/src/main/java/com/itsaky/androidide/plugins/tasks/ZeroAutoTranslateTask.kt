@@ -34,16 +34,17 @@ import javax.xml.transform.stream.StreamResult
  
  注意：ZeroAutoTranslateTask是作为Composite builds来使用的，也就是类似全局变量环境一样，具体看官方文章：https://docs.gradle.org/6.8.1/userguide/composite_builds.html
  
- // PS：解决国际化复杂和反复繁琐问题，一定程度上提高效率
+ // PS：解决xml中的字符串国际化复杂和反复繁琐问题，一定程度上提高效率
 
 // 友情提示：
 // 将以下导入你的kts文件，使用命令：./gradlew translateStrings 来批量翻译指定字符串文件。
 // 将什么语言翻译为什么语言这个没有作为tasks.register可选项，所以需要在ZeroAutoTranslateTask里面修改自己需要输出的国际化语言
 
+
+在kts文件添加以下代码以及tasks.register
 import com.itsaky.androidide.plugins.tasks.ZeroAutoTranslateTask
 
 // 运行 ./gradlew translateStrings 来执行翻译
-// @author android_zero  github：android-zeros
 tasks.register<ZeroAutoTranslateTask>("translateStrings") {
     // 设置翻译源文件路径
     sourceXmlPath = "core/resources/src/main/res/values/development_test_resources.xml"

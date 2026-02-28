@@ -86,6 +86,13 @@ dependencies {
     implementation(projects.utilities.shared)
     implementation(projects.xml.lsp)
 
+    implementation(files("libs/tree-sitter-c-release.aar")) // c language
+    implementation(files("libs/tree-sitter-c_sharp-release.aar")) //c# language
+    implementation(files("libs/tree-sitter-cpp-release.aar")) //c++ language
+    implementation(files("libs/tree-sitter-css-release.aar")) //css language
+    implementation(files("libs/tree-sitter-html-release.aar")) //html language
+    implementation(files("libs/tree-sitter-javascript-release.aar")) //javaScript language
+
     testImplementation(libs.tests.junit)
     testImplementation(libs.tests.google.truth)
     testImplementation(libs.tests.robolectric)

@@ -21,6 +21,8 @@ import android.content.Context
 import com.itsaky.androidide.editor.language.treesitter.TreeSitterLanguage.Factory
 import com.itsaky.androidide.treesitter.kotlin.TSLanguageKotlin
 import io.github.rosemoe.sora.lang.Language.INTERRUPTION_LEVEL_STRONG
+import io.github.rosemoe.sora.lang.Language.INTERRUPTION_LEVEL_NONE
+import io.github.rosemoe.sora.util.MyCharacter
 
 /**
  * [TreeSitterLanguage] implementation for Kotlin.
@@ -28,7 +30,7 @@ import io.github.rosemoe.sora.lang.Language.INTERRUPTION_LEVEL_STRONG
  * @author Akash Yadav
  */
 open class KotlinLanguage(context: Context) :
-  TreeSitterLanguage(context, TSLanguageKotlin.getInstance(), TS_TYPE_KT) {
+    TreeSitterLanguage(context, TSLanguageKotlin.getInstance(), TS_TYPE_KT) {
 
   companion object {
 
@@ -38,6 +40,6 @@ open class KotlinLanguage(context: Context) :
   }
 
   override fun getInterruptionLevel(): Int {
-    return INTERRUPTION_LEVEL_STRONG
+    return INTERRUPTION_LEVEL_NONE
   }
 }

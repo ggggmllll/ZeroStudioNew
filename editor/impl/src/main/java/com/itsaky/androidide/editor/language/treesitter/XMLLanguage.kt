@@ -41,8 +41,7 @@ class XMLLanguage(context: Context) :
 
     const val TS_TYPE = "xml"
 
-    @JvmField
-    val FACTORY = Factory { XMLLanguage(it) }
+    @JvmField val FACTORY = Factory { XMLLanguage(it) }
   }
 
   override fun checkIsCompletionChar(c: Char): Boolean {

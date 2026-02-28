@@ -181,6 +181,19 @@ abstract class AbstractModelBuilder<P, R>(
               "Failed to fetch model for type '${modelType.name}'." +
                   " Model not supported by project or Gradle version does not support parameterized models."
           )
+        } catch (err: Exception) {
+          // Handle any other exceptions that might occur, including unsupported methods
+          if (err.message?.contains("Unsupported method") == true) {
+            throw ModelBuilderException(
+                "Failed to fetch model for type '${modelType.name}'." +
+                    " Method not supported by the connected Gradle version: ${err.message}"
+            )
+          } else {
+            throw ModelBuilderException(
+                "Failed to fetch model for type '${modelType.name}'." +
+                    " Unexpected error: ${err.message}"
+            )
+          }
         }
       }
     }

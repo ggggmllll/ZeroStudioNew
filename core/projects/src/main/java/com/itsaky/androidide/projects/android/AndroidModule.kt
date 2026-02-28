@@ -32,6 +32,7 @@ import com.itsaky.androidide.builder.model.UNKNOWN_PACKAGE
 import com.itsaky.androidide.projects.IProjectManager
 import com.itsaky.androidide.projects.IWorkspace
 import com.itsaky.androidide.projects.ModuleProject
+import com.itsaky.androidide.projects.classpath.VersionCatalogClasspathProvider
 import com.itsaky.androidide.tooling.api.ProjectType.Android
 import com.itsaky.androidide.tooling.api.models.BasicAndroidVariantMetadata
 import com.itsaky.androidide.tooling.api.models.GradleTask
@@ -59,35 +60,10 @@ import org.slf4j.LoggerFactory
  * A [GradleProject] model implementation for Android modules which is exposed to other modules and
  * provides additional helper methods.
  *
- * @param name The display name of the project.
- * @param description The project description.
- * @param path The project path (same as Gradle project paths). For example, `:app`,
- *   `:module:submodule`, etc. Root project is always represented by path `:`.
- * @param projectDir The project directory.
- * @param buildDir The build directory of the project.
- * @param buildScript The Gradle buildscript file of the project.
- * @param tasks The tasks of the project.
- * @param resourcePrefix The resource prefix.
- * @param namespace The namespace of this project. As defined in the buildscript.
- * @param androidTestNamespace The androidTestNamespace of this project. As defined in the
- *   buildscript.
- * @param testFixtureNamespace The testFixtureNamespace of this project. As defined in the
- * @param projectType The type of Android project. See [ProjectType].
- * @param mainSourceSet The main source of this module.
- * @param flags The Android Gradle Plugin flags. No-op currently.
- * @param compilerSettings The java compilation options as configured in buildscript.
- * @param viewBindingOptions The view binding options of this module.
- * @param bootClassPaths The boot class paths of the project. Usually contains the path to the
- *   `android.jar` file.
- * @param libraries The list of libraries for the debug variant. Values must be values in the
- *   [libraryMap].
- * @param libraryMap The map of libraries. Keys are the key field obtained from the GraphItem
- *   instance in the Tooling API implementation.
- * @param lintCheckJars The lint check jar files.
- * @param modelSyncFiles The model sync files.
  * @author Akash Yadav
+ * @author android_zero (Contribution: Bug fixes, Refactoring, Compose Preview support)
  */
-open class AndroidModule( // Class must be open because BaseXMLTest mocks this...
+open class AndroidModule(
     name: String,
     description: String,
     path: String,
@@ -122,7 +98,6 @@ open class AndroidModule( // Class must be open because BaseXMLTest mocks this..
     get() = this.projectType == ProjectType.APPLICATION
 
   companion object {
-
     private val log = LoggerFactory.getLogger(AndroidModule::class.java)
   }
 
@@ -165,8 +140,7 @@ open class AndroidModule( // Class must be open because BaseXMLTest mocks this..
   override fun getSourceDirectories(): Set<File> {
     if (mainSourceSet == null) {
       log.warn(
-          "No main source set is available for project {}. Cannot get source directories.",
-          name,
+        "No main source set is available for project {}. Cannot get source directories.", name
       )
       return mutableSetOf()
     }
@@ -178,7 +152,6 @@ open class AndroidModule( // Class must be open because BaseXMLTest mocks this..
     sources.addAll(mainSourceSet.sourceProvider.kotlinDirectories)
 
     // build/generated/**
-    // AIDL, ViewHolder, Renderscript, BuildConfig i.e every generated source sources
     val selectedVariant = getSelectedVariant()
     if (selectedVariant != null) {
       sources.addAll(selectedVariant.mainArtifact.generatedSourceFolders)
@@ -228,6 +201,85 @@ open class AndroidModule( // Class must be open because BaseXMLTest mocks this..
     return result
   }
 
+    /**
+     * @author android_zero
+     * @description [Compose Preview Support]
+     *              Gets intermediate classpaths like compiled .class files and R.jar,
+     *              which are essential for Compose Preview to dynamically load and render
+     *              user-defined Composable functions from the source code.
+     *
+     * @return A set of File objects pointing to directories and JARs containing intermediate build artifacts.
+     */
+    override fun getIntermediateClasspaths(): Set<File> {
+        val result = mutableSetOf<File>()
+        val variant = getSelectedVariant()?.name ?: "debug"
+        val buildDirectory = buildDir // Inherited from ModuleProject
+
+        // Path to compiled Kotlin classes
+        val kotlinClasses = File(buildDirectory, "tmp/kotlin-classes/$variant")
+        if (kotlinClasses.exists()) {
+            result.add(kotlinClasses)
+        }
+
+        // Path to compiled Java classes
+        val javaClassesDir = File(buildDirectory, "intermediates/javac/$variant")
+        if (javaClassesDir.exists()) {
+            javaClassesDir.walkTopDown()
+                .filter { it.name == "classes" && it.isDirectory }
+                .forEach { result.add(it) }
+        }
+
+        // Path to the R class JAR
+        val rClassJar = File(buildDirectory, "intermediates/compile_and_runtime_not_namespaced_r_class_jar/$variant/R.jar")
+        if (rClassJar.exists()) {
+            result.add(rClassJar)
+        }
+
+        return result
+    }
+
+    /**
+     * @author android_zero
+     * @description [Compose Preview & Layout Inspector Support]
+     *              Retrieves the paths to the generated DEX files for the current variant.
+     *              These files are crucial for dynamic class loading mechanisms used by
+     *              tools like Layout Inspector and Compose Preview to render live UI components.
+     *
+     * @return A set of File objects pointing to the .dex files.
+     */
+    override fun getRuntimeDexFiles(): Set<File> {
+        val result = mutableSetOf<File>()
+        val variant = getSelectedVariant()?.name ?: "debug"
+        val buildDirectory = buildDir
+
+        log.info("getRuntimeDexFiles: Searching in buildDir='{}' for variant='{}'", buildDirectory.absolutePath, variant)
+
+        // Standard DEX output directory used by AGP
+        val dexDir = File(buildDirectory, "intermediates/dex/$variant")
+        if (dexDir.exists()) {
+            dexDir.walkTopDown()
+                .filter { it.isFile && it.extension == "dex" }
+                .forEach {
+                    log.debug("Found DEX file: {}", it.absolutePath)
+                    result.add(it)
+                }
+        }
+
+        // Merged project DEX archive directory
+        val mergeProjectDexDir = File(buildDirectory, "intermediates/project_dex_archive/$variant")
+        if (mergeProjectDexDir.exists()) {
+            mergeProjectDexDir.walkTopDown()
+                .filter { it.isFile && it.extension == "dex" }
+                .forEach {
+                    log.debug("Found DEX file in project_dex_archive: {}", it.absolutePath)
+                    result.add(it)
+                }
+        }
+        
+        log.info("Total DEX files found for module '{}': {}", name, result.size)
+        return result
+    }
+
   /**
    * Build a map of existing dependencies from classpath files. Key format: "group:name", Value:
    * File path
@@ -246,13 +298,11 @@ open class AndroidModule( // Class must be open because BaseXMLTest mocks this..
       if (match != null) {
         val group = match.groupValues[1]
         val name = match.groupValues[2]
-        val version = match.groupValues[3]
         val key = "$group:$name"
 
-        // Keep the first occurrence (AGP model takes precedence)
         if (!depMap.containsKey(key)) {
           depMap[key] = file
-          log.trace("Mapped dependency: {} -> version {}", key, version)
+          log.trace("Mapped dependency: {} -> version {}", key, match.groupValues[3])
         }
       }
     }
@@ -261,27 +311,26 @@ open class AndroidModule( // Class must be open because BaseXMLTest mocks this..
   }
 
   /**
-   * Get dependencies from version catalog that don't conflict with existing ones.
-   *
-   * @param existingDeps Map of group:name -> File for already loaded dependencies
+   * [FIXED] Get dependencies from version catalog that don't conflict with existing ones.
    */
   private fun getVersionCatalogDependencies(existingDeps: Map<String, File>): Set<File> {
-    val rootProjectDir = projectDir.parentFile ?: projectDir
+      // The `projectDir` of this AndroidModule is the module's directory.
+      // The new VersionCatalogClasspathProvider handles finding the root project dir itself.
+      return try {
+          log.debug("Resolving version catalog dependencies for module: {}", path)
+          
+          // Directly call the static (companion object) method with the module's `projectDir`.
+          val jars = VersionCatalogClasspathProvider.getClasspathFromCatalog(
+              projectDir, 
+              existingDeps
+          )
 
-    return try {
-      log.debug("Resolving dependencies from version catalog for module: {}", path)
-
-      val catalogProvider = com.itsaky.androidide.projects.classpath.VersionCatalogClasspathProvider()
-
-      // Pass existing dependency map to avoid duplicates
-      val jars = catalogProvider.getClasspathFromCatalog(rootProjectDir, existingDeps)
-
-      log.info("Resolved {} JARs from version catalog for module: {}", jars.size, path)
-      jars
-    } catch (e: Exception) {
-      log.error("Failed to resolve version catalog dependencies", e)
-      emptySet()
-    }
+          log.info("Resolved {} JARs from version catalog for module: {}", jars.size, path)
+          jars
+      } catch (e: Exception) {
+          log.error("Failed to resolve version catalog dependencies for module {}", path, e)
+          emptySet()
+      }
   }
 
   private fun collectLibraries(root: IWorkspace, libraries: Set<String>, result: MutableSet<File>) {
@@ -325,42 +374,12 @@ open class AndroidModule( // Class must be open because BaseXMLTest mocks this..
 
     return result
   }
-
-  /** Extract classes.jar from AAR file */
-  private fun extractClassesFromAAR(aarFile: File): File? {
-    return try {
-      val extractDir = File(aarFile.parentFile, "${aarFile.nameWithoutExtension}-extracted")
-      val classesJar = File(extractDir, "classes.jar")
-
-      if (classesJar.exists()) {
-        return classesJar
-      }
-
-      extractDir.mkdirs()
-
-      java.util.zip.ZipFile(aarFile).use { zip ->
-        val classesEntry = zip.getEntry("classes.jar")
-        if (classesEntry != null) {
-          zip.getInputStream(classesEntry).use { input ->
-            classesJar.outputStream().use { output -> input.copyTo(output) }
-          }
-          log.debug("Extracted classes.jar from: {}", aarFile.name)
-          return classesJar
-        }
-      }
-      null
-    } catch (e: Exception) {
-      log.error("Failed to extract classes.jar from: {}", aarFile.name, e)
-      null
-    }
-  }
-
+  
   /**
    * Reads the resource files are creates the [com.android.aaptcompiler.ResourceTable] instances for
    * the corresponding resource directories.
    */
   suspend fun readResources() {
-    // Read resources in parallel
     withStopWatch("Read resources for module : $path") {
       val resourceReaderScope =
           CoroutineScope(Dispatchers.IO + CoroutineName("ResourceReader($path)"))

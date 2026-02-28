@@ -53,25 +53,25 @@ abstract class TreeSitterPredicate : TsPredicate {
    * @return The result of the predicate check.
    */
   internal abstract fun doPredicateInternal(
-    tsQuery: TSQuery,
-    text: CharSequence,
-    match: TSQueryMatch,
-    predicateSteps: List<TsClientPredicateStep>,
-    syntheticCaptures: TsSyntheticCaptureContainer
+      tsQuery: TSQuery,
+      text: CharSequence,
+      match: TSQueryMatch,
+      predicateSteps: List<TsClientPredicateStep>,
+      syntheticCaptures: TsSyntheticCaptureContainer,
   ): PredicateResult
 
   override fun doPredicate(
-    tsQuery: TSQuery,
-    text: CharSequence,
-    match: TSQueryMatch,
-    predicateSteps: List<TsClientPredicateStep>,
-    syntheticCaptures: TsSyntheticCaptureContainer
+      tsQuery: TSQuery,
+      text: CharSequence,
+      match: TSQueryMatch,
+      predicateSteps: List<TsClientPredicateStep>,
+      syntheticCaptures: TsSyntheticCaptureContainer,
   ): PredicateResult {
 
     if (
-      predicateSteps.isEmpty() ||
-      predicateSteps[0].content != "${name}?" ||
-      !canHandle(predicateSteps)
+        predicateSteps.isEmpty() ||
+            predicateSteps[0].content != "${name}?" ||
+            !canHandle(predicateSteps)
     ) {
       return PredicateResult.UNHANDLED
     }

@@ -27,7 +27,6 @@ apply {
 buildscript {
   dependencies {
     classpath(libs.logging.logback.core)
-    // classpath(libs.composite.desugaringCore)
   }
 }
 
@@ -84,9 +83,11 @@ android {
     "THIRD-PARTY", 
     "META-INF/DEPENDENCIES", 
     "META-INF/NOTICE.md", 
+    "META-INF/plugin.xml", 
     "com/android/builder/model/version.properties", 
     "META-INF/versions/9/OSGI-INF/MANIFEST.MF")
-    packaging { resources { pickFirsts += setOf("messages/KotlinNJ2KServicesBundle.properties",
+    packaging { resources { pickFirsts += setOf(
+                "messages/KotlinNJ2KServicesBundle.properties",
                 "META-INF/io.netty.versions.properties",
                 "META-INF/kotlinx_coroutines_core.version" ) } }
 
@@ -96,11 +97,7 @@ android {
   }
 }
 
-kapt {
-  arguments {
-    arg("eventBusIndex", "${BuildConfig.packageName}.events.AppEventsIndex")
-  }
-}
+kapt {  arguments { arg("eventBusIndex", "${BuildConfig.packageName}.events.AppEventsIndex")  } }
 
 
 configurations.all {
@@ -249,6 +246,7 @@ dependencies {
   // implementation(projects.core.chatai.search)
   // implementation(projects.core.chatai.tts)
   implementation(projects.modules.zeroRegularPreview)
+  implementation(projects.modules.composePreview)
        implementation(libs.common.soraLanguageTextmate)
 
   

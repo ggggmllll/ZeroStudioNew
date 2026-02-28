@@ -43,6 +43,8 @@ import com.itsaky.androidide.editor.language.treesitter.KotlinLanguage
 import com.itsaky.androidide.editor.language.treesitter.LogLanguage
 import com.itsaky.androidide.editor.language.treesitter.TSLanguageRegistry
 import com.itsaky.androidide.editor.language.treesitter.XMLLanguage
+import com.itsaky.androidide.editor.language.treesitter.CppLang
+import com.itsaky.androidide.editor.language.treesitter.CLang
 import com.itsaky.androidide.editor.schemes.IDEColorSchemeProvider
 import com.itsaky.androidide.editor.ui.IDEEditor
 import com.itsaky.androidide.eventbus.events.editor.DocumentChangeEvent
@@ -144,10 +146,30 @@ open class EditorHandlerActivity : ProjectHandlerActivity(), IEditorHandler {
       TSLanguageRegistry.instance.register(LogLanguage.TS_TYPE, LogLanguage.FACTORY)
       TSLanguageRegistry.instance.register(JsonLanguage.TS_TYPE, JsonLanguage.FACTORY)
       TSLanguageRegistry.instance.register(XMLLanguage.TS_TYPE, XMLLanguage.FACTORY)
+      
+      TSLanguageRegistry.instance.register(CppLang.TS_TYPE_CPP, CppLang.FACTORY)
+      TSLanguageRegistry.instance.register(CppLang.TS_TYPE_C, CppLang.FACTORY)
+      TSLanguageRegistry.instance.register(CppLang.TS_TYPE_H_small, CppLang.FACTORY)
+      TSLanguageRegistry.instance.register(CppLang.TS_TYPE_H_CAPITAL_LETTERS, CppLang.FACTORY)
+      TSLanguageRegistry.instance.register(CppLang.TS_TYPE_HPP, CppLang.FACTORY)
+      TSLanguageRegistry.instance.register(CppLang.TS_TYPE_CP, CppLang.FACTORY)
+      TSLanguageRegistry.instance.register(CppLang.TS_TYPE_CC, CppLang.FACTORY)
+      TSLanguageRegistry.instance.register(CppLang.TS_TYPE_HH, CppLang.FACTORY)
+      TSLanguageRegistry.instance.register(CppLang.TS_TYPE_CXX, CppLang.FACTORY)
+      TSLanguageRegistry.instance.register(CppLang.TS_TYPE_CJJ, CppLang.FACTORY)
+      TSLanguageRegistry.instance.register(CppLang.TS_TYPE_HXX, CppLang.FACTORY)
+      TSLanguageRegistry.instance.register(CppLang.TS_TYPE_HJJ, CppLang.FACTORY)
+      TSLanguageRegistry.instance.register(CppLang.TS_TYPE_CPPM, CppLang.FACTORY)
+      TSLanguageRegistry.instance.register(CppLang.TS_TYPE_MPP, CppLang.FACTORY)
+      TSLanguageRegistry.instance.register(CppLang.TS_TYPE_mm, CppLang.FACTORY)
+      
+      TSLanguageRegistry.instance.register(CLang.TS_TYPE_C, CLang.FACTORY)
+      TSLanguageRegistry.instance.register(CLang.TS_TYPE_M_small, CLang.FACTORY)
+      TSLanguageRegistry.instance.register(CLang.TS_TYPE_M_CAPITAL_LETTERS, CLang.FACTORY)
       IDEColorSchemeProvider.initIfNeeded()
     }
   }
-
+        
   override fun onPause() {
     super.onPause()
 
@@ -344,6 +366,7 @@ open class EditorHandlerActivity : ProjectHandlerActivity(), IEditorHandler {
     editorViewModel.setCurrentFile(position, file)
 
     updateTabs()
+    onFileLoaded(editor, file)
 
     return position
   }

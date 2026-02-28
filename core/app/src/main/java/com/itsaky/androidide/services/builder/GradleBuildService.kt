@@ -98,9 +98,10 @@ class GradleBuildService : Service(), BuildService, IToolingApiClient,
   private var notificationManager: NotificationManager? = null
   private var server: IToolingApiServer? = null
   private var eventListener: EventListener? = null
+  private var isReleaseVariant = false
 
-  private val buildServiceScope = CoroutineScope(
-    Dispatchers.Default + CoroutineName("GradleBuildService"))
+  private val buildServiceScope =
+      CoroutineScope(Dispatchers.Default + CoroutineName("GradleBuildService"))
 
   private val isGradleWrapperAvailable: Boolean
     get() {
@@ -138,20 +139,23 @@ class GradleBuildService : Service(), BuildService, IToolingApiClient,
     return isToolingServerStarted && server != null
   }
 
-  private fun showNotification(message: String,
-    @Suppress("SameParameterValue") isProgress: Boolean) {
+  private fun showNotification(
+      message: String,
+      @Suppress("SameParameterValue") isProgress: Boolean,
+  ) {
     log.info("Showing notification to user...")
     createNotificationChannels()
     startForeground(NOTIFICATION_ID, buildNotification(message, isProgress))
   }
 
   private fun createNotificationChannels() {
-    val buildNotificationChannel = NotificationChannel(
-      BaseApplication.NOTIFICATION_GRADLE_BUILD_SERVICE,
-      getString(string.title_gradle_service_notification_channel),
-      NotificationManager.IMPORTANCE_LOW)
-    NotificationManagerCompat.from(this)
-      .createNotificationChannel(buildNotificationChannel)
+    val buildNotificationChannel =
+        NotificationChannel(
+            BaseApplication.NOTIFICATION_GRADLE_BUILD_SERVICE,
+            getString(string.title_gradle_service_notification_channel),
+            NotificationManager.IMPORTANCE_LOW,
+        )
+    NotificationManagerCompat.from(this).createNotificationChannel(buildNotificationChannel)
   }
 
   private fun buildNotification(message: String, isProgress: Boolean): Notification {
@@ -159,10 +163,14 @@ class GradleBuildService : Service(), BuildService, IToolingApiClient,
     val title = getString(R.string.title_gradle_service_notification)
     val launch = packageManager.getLaunchIntentForPackage(BuildConfig.APPLICATION_ID)
     val intent = PendingIntent.getActivity(this, 0, launch, PendingIntent.FLAG_UPDATE_CURRENT)
-    val builder = Notification.Builder(this, BaseApplication.NOTIFICATION_GRADLE_BUILD_SERVICE)
-      .setSmallIcon(R.drawable.ic_launcher_notification).setTicker(ticker)
-      .setWhen(System.currentTimeMillis()).setContentTitle(title).setContentText(message)
-      .setContentIntent(intent)
+    val builder =
+        Notification.Builder(this, BaseApplication.NOTIFICATION_GRADLE_BUILD_SERVICE)
+            .setSmallIcon(R.drawable.ic_launcher_notification)
+            .setTicker(ticker)
+            .setWhen(System.currentTimeMillis())
+            .setContentTitle(title)
+            .setContentText(message)
+            .setContentIntent(intent)
 
     // Checking whether to add a ProgressBar to the notification
     if (isProgress) {
@@ -221,10 +229,94 @@ class GradleBuildService : Service(), BuildService, IToolingApiClient,
     return mBinder
   }
 
+  /** Creates a Gradle init script that injects the logger plugin into user projects. */
+  private fun createLoggerInitScript(): File {
+    val initScript = File(Environment.TMP_DIR, "ide-logger-init.gradle")
+    initScript.writeText(
+        """
+          allprojects {
+              afterEvaluate {
+                  if (plugins.hasPlugin('com.android.application') || 
+                      plugins.hasPlugin('com.android.library')) {
+                      
+                      android {
+                          compileOptions {
+                              coreLibraryDesugaringEnabled = true
+                          }
+                      }
+                      
+                      dependencies {
+                          implementation files('${getLoggerRuntimeAar().absolutePath}')
+                          coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.4'
+                      }
+                  }
+              }
+          }
+      """
+            .trimIndent()
+    )
+    return initScript
+  }
+
+  /** Gets or creates the logger plugin directory. */
+  private fun getLoggerPluginDir(): File {
+    val dir = File(Environment.HOME, "plugins/logger")
+    if (!dir.exists()) {
+      dir.mkdirs()
+    }
+    return dir
+  }
+
+  /** Extracts and returns the logger runtime AAR file. */
+  private fun getLoggerRuntimeAar(): File {
+    val aar = File(getLoggerPluginDir(), "logger-runtime.aar")
+    if (!aar.exists()) {
+      // Extract from assets
+      if (
+          !ResourceUtils.copyFileFromAssets(
+              ToolsManager.getCommonAsset("logger-runtime.aar"),
+              aar.absolutePath,
+          )
+      ) {
+        log.error("Failed to extract logger-runtime.aar from assets")
+      }
+    }
+    return aar
+  }
+
+  /** Check if tasks include debug builds (not release-only). */
+  private fun isDebugBuild(tasks: List<String>): Boolean {
+    // Check if any task contains "Debug" or doesn't contain "Release"
+    val hasDebugTask =
+        tasks.any { task ->
+          task.contains("Debug", ignoreCase = true) ||
+              task.contains("assembleDebug", ignoreCase = true)
+        }
+
+    val hasOnlyRelease =
+        tasks.all { task ->
+          task.contains("Release", ignoreCase = true) ||
+              task.contains("assembleRelease", ignoreCase = true)
+        }
+
+    // If it's explicitly debug, or not explicitly release-only, treat as debug
+    return hasDebugTask || !hasOnlyRelease
+  }
+
+  /**
+   * Inject logger by adding init script to Gradle arguments. This modifies the system property that
+   * will be read by the Tooling API.
+   */
+  private fun injectLoggerForCurrentBuild() {
+    val initScript = createLoggerInitScript()
+    // Set property that will be picked up by Tooling API
+    System.setProperty("ide.logger.init.script", initScript.absolutePath)
+  }
+
   override fun onListenerStarted(
-    server: IToolingApiServer,
-    projectProxy: IProject,
-    errorStream: InputStream
+      server: IToolingApiServer,
+      projectProxy: IProject,
+      errorStream: InputStream,
   ) {
     startServerOutputReader(errorStream)
     this.server = server
@@ -281,8 +373,18 @@ class GradleBuildService : Service(), BuildService, IToolingApiClient,
 
   override fun getBuildArguments(): CompletableFuture<List<String>> {
     val extraArgs = ArrayList<String>()
-    extraArgs.add("--init-script")
-    extraArgs.add(Environment.INIT_SCRIPT.absolutePath)
+    
+    if (DevOpsPreferences.logsenderEnabled) {
+      injectLoggerForCurrentBuild()
+      if (!isReleaseVariant) {
+        val initScriptPath = System.getProperty("ide.logger.init.script")
+        if (initScriptPath != null) {
+          extraArgs.add("--init-script")
+          extraArgs.add(initScriptPath)
+          System.clearProperty("ide.logger.init.script")
+        }
+      }
+    }
 
     // Override AAPT2 binary
     // The one downloaded from Maven is not built for Android
@@ -314,8 +416,9 @@ class GradleBuildService : Service(), BuildService, IToolingApiClient,
   }
 
   override fun checkGradleWrapperAvailability(): CompletableFuture<GradleWrapperCheckResult> {
-    return if (isGradleWrapperAvailable) CompletableFuture.completedFuture(
-      GradleWrapperCheckResult(true)) else installWrapper()
+    return if (isGradleWrapperAvailable)
+        CompletableFuture.completedFuture(GradleWrapperCheckResult(true))
+    else installWrapper()
   }
 
   internal fun setServerListener(listener: OnServerStartListener?) {
@@ -335,8 +438,11 @@ class GradleBuildService : Service(), BuildService, IToolingApiClient,
 
   private fun doInstallWrapper(): GradleWrapperCheckResult {
     val extracted = File(Environment.TMP_DIR, "gradle-wrapper.zip")
-    if (!ResourceUtils.copyFileFromAssets(ToolsManager.getCommonAsset("gradle-wrapper.zip"),
-        extracted.absolutePath)
+    if (
+        !ResourceUtils.copyFileFromAssets(
+            ToolsManager.getCommonAsset("gradle-wrapper.zip"),
+            extracted.absolutePath,
+        )
     ) {
       log.error("Unable to extract gradle-plugin.zip from IDE resources.")
       return GradleWrapperCheckResult(false)
@@ -358,8 +464,10 @@ class GradleBuildService : Service(), BuildService, IToolingApiClient,
   }
 
   private fun doUpdateNotification(message: String, isProgress: Boolean) {
-    (getSystemService(NOTIFICATION_SERVICE) as NotificationManager).notify(NOTIFICATION_ID,
-      buildNotification(message, isProgress))
+    (getSystemService(NOTIFICATION_SERVICE) as NotificationManager).notify(
+        NOTIFICATION_ID,
+        buildNotification(message, isProgress),
+    )
   }
 
   override fun metadata(): CompletableFuture<ToolingServerMetadata> {
@@ -368,31 +476,242 @@ class GradleBuildService : Service(), BuildService, IToolingApiClient,
   }
 
   override fun initializeProject(
-    params: InitializeProjectParams): CompletableFuture<InitializeResult> {
+      params: InitializeProjectParams
+  ): CompletableFuture<InitializeResult> {
     checkServerStarted()
     Objects.requireNonNull(params)
-    return performBuildTasks(server!!.initialize(params))
+    return performBuildTasks(server!!.initialize(params)).thenApply { result ->
+      if (result != null) {
+        buildServiceScope.launch {
+          try {
+            kotlinx.coroutines.delay(5000) // 5 seconds
+            log.info("5 seconds elapsed after initialization, stopping Gradle daemons...")
+            // stopGradleDaemons().get()
+          } catch (e: Exception) {
+            log.error("Error in post-initialization daemon cleanup", e)
+          }
+        }
+      }
+      result
+    }
+  }
+
+  /**
+   * Stops all Gradle daemons by executing gradlew --stop
+   */
+  private fun stopGradleDaemons(): CompletableFuture<Void> {
+    return CompletableFuture.runAsync {
+      try {
+        val projectDir = ProjectManagerImpl.getInstance().projectDir
+        val gradlewPath = File(projectDir, "gradlew").absolutePath
+        
+        log.info("Stopping Gradle daemons...")
+        
+        val command = listOf("sh", gradlewPath, "--stop")
+        val processBuilder = ProcessBuilder(command)
+        processBuilder.directory(projectDir)
+        
+        // Set up environment
+        val termuxEnv = TermuxShellEnvironment().getEnvironment(this@GradleBuildService, false)
+        val customEnv = HashMap<String, String>()
+        Environment.putEnvironment(customEnv, false)
+        
+        val finalEnv = processBuilder.environment()
+        finalEnv.putAll(termuxEnv)
+        finalEnv.putAll(customEnv)
+        
+        val process = processBuilder.start()
+        val exitCode = process.waitFor()
+        
+        if (exitCode == 0) {
+          log.info("Gradle daemons stopped successfully")
+          eventListener?.onOutput("Gradle daemons stopped")
+        } else {
+          log.warn("Failed to stop Gradle daemons, exit code: $exitCode")
+        }
+      } catch (e: Exception) {
+        log.error("Error stopping Gradle daemons", e)
+      }
+    }
   }
 
   override fun executeTasks(vararg tasks: String): CompletableFuture<TaskExecutionResult> {
     checkServerStarted()
-    val message = TaskExecutionMessage(listOf(*tasks))
-    return performBuildTasks(server!!.executeTasks(message))
+    val tasksList = tasks.toList()
+
+    if (isDebugBuild(tasksList)) {
+      log.info("Debug build detected, injecting logger plugin")
+      injectLoggerForCurrentBuild()
+    } else {
+      log.info("Release build detected, skipping logger injection")
+      isReleaseVariant = true
+    }
+
+    /*
+    * @idea Mohammed-Baqer-Null @ https://github.com/Mohammed-baqer-null
+    * ! THIS IS A TEMPORARY FIX ! gradually transforming acs lite compiler in here properly in v..04 or 05
+
+    * - Using the local Gradle wrapper (gradlew) is significantly faster than using the Tooling API.
+    * - Employing the Tooling API for compilation on Android is a poor choice this is a resource-limited Android environment, not a desktop one.
+    * - The Tooling API consumes excessive JVM memory without delivering meaningful benefits.
+    * - The implementation below resolves OutOfMemory exceptions seamlessly.
+    */
+
+    return performBuildTasks(
+        CompletableFuture.supplyAsync {
+          val buildInfo = BuildInfo(tasksList)
+          prepareBuild(buildInfo)
+
+          try {
+            val projectDir = ProjectManagerImpl.getInstance().projectDir
+            val gradlewPath = File(projectDir, "gradlew").absolutePath
+
+            val command = mutableListOf("sh", gradlewPath)
+            command.addAll(tasks)
+
+            val buildArgs = getBuildArguments().get()
+            command.addAll(buildArgs)
+
+            log.info("Executing command: ${command.joinToString(" ")}")
+
+            val processBuilder = ProcessBuilder(command)
+            processBuilder.directory(projectDir)
+
+            // Get Termux environment
+            val termuxEnv = TermuxShellEnvironment().getEnvironment(this@GradleBuildService, false)
+
+            // Add custom environment variables from Environment class
+            val customEnv = HashMap<String, String>()
+            Environment.putEnvironment(customEnv, false)
+
+            // Merge environments
+            val finalEnv = processBuilder.environment()
+            finalEnv.putAll(termuxEnv)
+            finalEnv.putAll(customEnv)
+
+            // Ensure PATH includes BIN_DIR for clang, python, etc.
+            val currentPath = finalEnv["PATH"] ?: ""
+            val binDirPath = Environment.BIN_DIR.absolutePath
+            val prefixBinPath = File(Environment.PREFIX, "bin").absolutePath
+
+            // Add BIN_DIR and PREFIX/bin to PATH if not already present
+            val pathEntries = mutableListOf<String>()
+            if (!currentPath.contains(binDirPath)) {
+              pathEntries.add(binDirPath)
+            }
+            if (!currentPath.contains(prefixBinPath)) {
+              pathEntries.add(prefixBinPath)
+            }
+            pathEntries.add(currentPath)
+
+            finalEnv["PATH"] = pathEntries.filter { it.isNotEmpty() }.joinToString(":")
+
+            // Add LD_LIBRARY_PATH for native libraries
+            val ldLibraryPath = finalEnv["LD_LIBRARY_PATH"] ?: ""
+            val libDirPath = Environment.LIB_DIR.absolutePath
+            finalEnv["LD_LIBRARY_PATH"] =
+                if (ldLibraryPath.isEmpty()) {
+                  libDirPath
+                } else {
+                  "$libDirPath:$ldLibraryPath"
+                }
+
+            // Set TMPDIR
+            finalEnv["TMPDIR"] = Environment.TMP_DIR.absolutePath
+
+            log.info("PATH set to: ${finalEnv["PATH"]}")
+            log.info("LD_LIBRARY_PATH set to: ${finalEnv["LD_LIBRARY_PATH"]}")
+
+            val process = processBuilder.start()
+
+            val outputReader = process.inputStream.bufferedReader()
+            val errorReader = process.errorStream.bufferedReader()
+
+            buildServiceScope.launch { outputReader.forEachLine { line -> logOutput(line) } }
+
+            buildServiceScope.launch { errorReader.forEachLine { line -> logOutput(line) } }
+
+            val exitCode = process.waitFor()
+
+            val result =
+                if (exitCode == 0) {
+                  TaskExecutionResult(true, null)
+                } else {
+                  TaskExecutionResult(false, TaskExecutionResult.Failure.BUILD_FAILED)
+                }
+
+            if (result.isSuccessful) {
+              onBuildSuccessful(BuildResult(tasksList))
+            } else {
+              onBuildFailed(BuildResult(tasksList))
+            }
+
+            result
+          } catch (e: Exception) {
+            log.error("Failed to execute gradlew with sh", e)
+            val result = TaskExecutionResult(false, TaskExecutionResult.Failure.BUILD_FAILED)
+            onBuildFailed(BuildResult(tasksList))
+            result
+          }
+        }
+    )
+    
+  }
+
+  /**
+   * Kills any running gradlew processes forcefully
+   */
+  private fun killGradlewProcesses() {
+    try {
+      log.info("Attempting to kill running gradlew processes...")
+      
+      // Use pkill to kill gradlew processes
+      val command = listOf("pkill", "-f", "gradlew")
+      val processBuilder = ProcessBuilder(command)
+      
+      val process = processBuilder.start()
+      val exitCode = process.waitFor()
+      
+      if (exitCode == 0) {
+        log.info("Gradlew processes killed successfully")
+        eventListener?.onOutput("All Gradle build processes terminated")
+      } else {
+        log.info("No gradlew processes found or already terminated")
+      }
+    } catch (e: Exception) {
+      log.error("Error killing gradlew processes", e)
+    }
   }
 
   override fun cancelCurrentBuild(): CompletableFuture<BuildCancellationRequestResult> {
     checkServerStarted()
-    return server!!.cancelCurrentBuild()
+    
+    val cancellationFuture = server!!.cancelCurrentBuild()
+    
+    buildServiceScope.launch {
+      try {
+        kotlinx.coroutines.delay(1000) // Wait 1 second for graceful cancellation
+        log.info("Force stopping Gradle daemons after build cancellation...")
+        // stopGradleDaemons().get()
+        killGradlewProcesses()
+      } catch (e: Exception) {
+        log.error("Error during forced daemon shutdown", e)
+      }
+    }
+    
+    return cancellationFuture
   }
 
   private fun <T> performBuildTasks(future: CompletableFuture<T>): CompletableFuture<T> {
-    return CompletableFuture.runAsync(this::onPrepareBuildRequest).handleAsync { _, _ ->
-      try {
-        return@handleAsync future.get()
-      } catch (e: Throwable) {
-        throw CompletionException(e)
-      }
-    }.handle(this::markBuildAsFinished)
+    return CompletableFuture.runAsync(this::onPrepareBuildRequest)
+        .handleAsync { _, _ ->
+          try {
+            return@handleAsync future.get()
+          } catch (e: Throwable) {
+            throw CompletionException(e)
+          }
+        }
+        .handle(this::markBuildAsFinished)
   }
 
   private fun onPrepareBuildRequest() {
@@ -452,27 +771,28 @@ class GradleBuildService : Service(), BuildService, IToolingApiClient,
   private fun wrap(listener: EventListener?): EventListener? {
     return if (listener == null) {
       null
-    } else object : EventListener {
-      override fun prepareBuild(buildInfo: BuildInfo) {
-        runOnUiThread { listener.prepareBuild(buildInfo) }
-      }
+    } else
+        object : EventListener {
+          override fun prepareBuild(buildInfo: BuildInfo) {
+            runOnUiThread { listener.prepareBuild(buildInfo) }
+          }
 
-      override fun onBuildSuccessful(tasks: List<String?>) {
-        runOnUiThread { listener.onBuildSuccessful(tasks) }
-      }
+          override fun onBuildSuccessful(tasks: List<String?>) {
+            runOnUiThread { listener.onBuildSuccessful(tasks) }
+          }
 
-      override fun onProgressEvent(event: ProgressEvent) {
-        runOnUiThread { listener.onProgressEvent(event) }
-      }
+          override fun onProgressEvent(event: ProgressEvent) {
+            runOnUiThread { listener.onProgressEvent(event) }
+          }
 
-      override fun onBuildFailed(tasks: List<String?>) {
-        runOnUiThread { listener.onBuildFailed(tasks) }
-      }
+          override fun onBuildFailed(tasks: List<String?>) {
+            runOnUiThread { listener.onBuildFailed(tasks) }
+          }
 
-      override fun onOutput(line: String?) {
-        runOnUiThread { listener.onOutput(line) }
-      }
-    }
+          override fun onOutput(line: String?) {
+            runOnUiThread { listener.onOutput(line) }
+          }
+        }
   }
 
   private fun startServerOutputReader(input: InputStream) {
@@ -480,28 +800,24 @@ class GradleBuildService : Service(), BuildService, IToolingApiClient,
       return
     }
 
-    outputReaderJob = buildServiceScope.launch(
-      Dispatchers.IO + CoroutineName("ToolingServerErrorReader")) {
-      val reader = input.bufferedReader()
-      try {
-        reader.forEachLine { line ->
-          SERVER_System_err.error(line)
-        }
-      } catch (e: Throwable) {
-        e.ifCancelledOrInterrupted(suppress = true) {
-          // will be suppressed
-          return@launch
-        }
+    outputReaderJob =
+        buildServiceScope.launch(Dispatchers.IO + CoroutineName("ToolingServerErrorReader")) {
+          val reader = input.bufferedReader()
+          try {
+            reader.forEachLine { line -> SERVER_System_err.error(line) }
+          } catch (e: Throwable) {
+            e.ifCancelledOrInterrupted(suppress = true) {
+              // will be suppressed
+              return@launch
+            }
 
-        // log the error and fail silently
-        log.error("Failed to read tooling server output", e)
-      }
-    }
+            // log the error and fail silently
+            log.error("Failed to read tooling server output", e)
+          }
+        }
   }
 
-  /**
-   * Handles events received from a Gradle build.
-   */
+  /** Handles events received from a Gradle build. */
   interface EventListener {
 
     /**

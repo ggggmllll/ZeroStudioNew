@@ -24,15 +24,15 @@ import io.github.rosemoe.sora.text.Content
 import io.github.rosemoe.sora.text.TextUtils
 
 internal open class BracketsNewlineHandler(
-  val getIndentAdvance: (String?) -> Int,
-  val useTab: () -> Boolean
+    val getIndentAdvance: (String?) -> Int,
+    val useTab: () -> Boolean,
 ) : CStyleBracketsHandler() {
 
   override fun handleNewline(
-    text: Content,
-    position: CharPosition,
-    style: Styles?,
-    tabSize: Int
+      text: Content,
+      position: CharPosition,
+      style: Styles?,
+      tabSize: Int,
   ): NewlineHandleResult {
     val line = text.getLine(position.line)
     val index = position.column
@@ -42,19 +42,22 @@ internal open class BracketsNewlineHandler(
   }
 
   private fun handleNewline(
-    beforeText: String?,
-    afterText: String?,
-    tabSize: Int
+      beforeText: String?,
+      afterText: String?,
+      tabSize: Int,
   ): NewlineHandleResult {
     val count = TextUtils.countLeadingSpaceCount(beforeText!!, tabSize)
     val advanceBefore: Int = getIndentAdvance(beforeText)
     val advanceAfter: Int = getIndentAdvance(afterText)
     var text: String
     val sb =
-      StringBuilder("\n")
-        .append(TextUtils.createIndent(count + advanceBefore, tabSize, useTab()))
-        .append('\n')
-        .append(TextUtils.createIndent(count + advanceAfter, tabSize, useTab()).also { text = it })
+        StringBuilder("\n")
+            .append(TextUtils.createIndent(count + advanceBefore, tabSize, useTab()))
+            .append('\n')
+            .append(
+                TextUtils.createIndent(count + advanceAfter, tabSize, useTab()).also { text = it }
+            )
+
     val shiftLeft = text.length + 1
     return NewlineHandleResult(sb, shiftLeft)
   }

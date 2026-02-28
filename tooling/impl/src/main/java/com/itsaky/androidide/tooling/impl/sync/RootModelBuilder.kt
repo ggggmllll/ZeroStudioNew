@@ -123,8 +123,9 @@ class RootModelBuilder(initializationParams: InitializeProjectParams) :
     val logger = LoggerFactory.getLogger("RootModelBuilder")
     logger.warn("Starting build. See build output for more details...")
 
-    if (Main.client != null) {
-      Main.client.logOutput("Starting build...")
+    val clientRef = Main.client
+    if (clientRef != null) {
+      clientRef.logOutput("Starting build...")
     }
 
     return executor.run().also { logger.debug("Build action executed. Result: {}", it) }

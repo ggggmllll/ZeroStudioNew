@@ -34,8 +34,7 @@ class JsonLanguage(context: Context) :
 
     const val TS_TYPE = "json"
 
-    @JvmField
-    val FACTORY = Factory { JsonLanguage(it) }
+    @JvmField val FACTORY = Factory { JsonLanguage(it) }
   }
 
   override fun getInterruptionLevel(): Int {

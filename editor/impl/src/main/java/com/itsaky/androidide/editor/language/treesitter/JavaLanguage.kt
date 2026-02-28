@@ -36,14 +36,13 @@ import io.github.rosemoe.sora.widget.SymbolPairMatch
  * @author Akash Yadav
  */
 class JavaLanguage(context: Context) :
-  TreeSitterLanguage(context, TSLanguageJava.getInstance(), TS_TYPE) {
+    TreeSitterLanguage(context, TSLanguageJava.getInstance(), TS_TYPE) {
 
   companion object {
 
     const val TS_TYPE = "java"
 
-    @JvmField
-    val FACTORY = Factory { JavaLanguage(it) }
+    @JvmField val FACTORY = Factory { JavaLanguage(it) }
   }
 
   override val languageServer: ILanguageServer?

@@ -41,6 +41,17 @@ import java.util.concurrent.Future
  * the AndroidIDE process, without requiring external binaries like `taplo`. It uses
  * in-memory piped streams for zero-overhead communication between the LSP client and server threads.
  *
+ ✅ TOML LSP 必做
+ 
+diagnostics、completion、hover、formatting、documentSymbol、definition、rename、foldingRange
+
+ 
+codeAction、documentHighlight、documentLink
+ 
+❌ 完全没用 / 不可能
+ 
+references、implementation、typeDefinition、declaration、callHierarchy、inlayHint、codeLens、monikers、semanticTokens、workspaceSymbol
+ *
  * @author android_zero
  */
 class TomlServer : BaseLspServer() {

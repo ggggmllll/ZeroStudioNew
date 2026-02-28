@@ -25,6 +25,7 @@ import com.android.builder.model.v2.models.VariantDependencies
 import com.itsaky.androidide.tooling.api.IAndroidProject
 import com.itsaky.androidide.tooling.api.messages.InitializeProjectParams
 import com.itsaky.androidide.tooling.impl.internal.AndroidProjectImpl
+import org.gradle.tooling.model.idea.IdeaSingleEntryLibraryDependency
 
 /**
  * Builds model for Android application and library projects.
@@ -64,6 +65,26 @@ class AndroidProjectModelBuilder(initializationParams: InitializeProjectParams) 
 
     log("Selected build variant '$configurationVariant' for project '$projectPath'")
 
+    try {
+      log("Forcing dependency resolution for Android module: $projectPath")
+      var downloadedCount = 0
+      for (dependency in module.dependencies) {
+        if (dependency is IdeaSingleEntryLibraryDependency) {
+          try {
+            val file = dependency.file
+            if (file.exists()) {
+              downloadedCount++
+            }
+          } catch (fileEx: Exception) {
+            log("Failed to access dependency file: ${fileEx.message}")
+          }
+        }
+      }
+      log("Forced resolution of $downloadedCount dependencies for module: $projectPath")
+    } catch (resEx: Exception) {
+      log("Failed to pre-resolve dependencies: ${resEx.message}")
+    }
+
     val variantDependencies =
         controller.getModelAndLog(
             module,
@@ -71,12 +92,15 @@ class AndroidProjectModelBuilder(initializationParams: InitializeProjectParams) 
             ModelBuilderParameter::class.java,
         ) {
           it.variantName = configurationVariant
-          it.dontBuildRuntimeClasspath = false
+          it.additionalArtifactsInModel =
+              true
+          it.dontBuildRuntimeClasspath =
+              false
+          it.dontBuildUnitTestRuntimeClasspath = true
+          it.dontBuildScreenshotTestRuntimeClasspath = true
           it.dontBuildAndroidTestRuntimeClasspath = true
           it.dontBuildTestFixtureRuntimeClasspath = true
-          it.dontBuildUnitTestRuntimeClasspath = true
           it.dontBuildHostTestRuntimeClasspath = emptyMap()
-          it.dontBuildScreenshotTestRuntimeClasspath = true
         }
 
     controller.findModel(module, ProjectSyncIssues::class.java)?.also { syncIssues ->

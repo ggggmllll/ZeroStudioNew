@@ -29,11 +29,11 @@ import java.util.concurrent.ConcurrentHashMap
 class TSLanguageRegistryImpl : TSLanguageRegistry {
 
   private val registry =
-    ConcurrentHashMap<String, TreeSitterLanguage.Factory<out TreeSitterLanguage>>()
+      ConcurrentHashMap<String, TreeSitterLanguage.Factory<out TreeSitterLanguage>>()
 
   override fun <T : TreeSitterLanguage> register(
-    fileType: String,
-    factory: TreeSitterLanguage.Factory<T>
+      fileType: String,
+      factory: TreeSitterLanguage.Factory<T>,
   ) {
     val older = registry.put(fileType, factory)
     if (older != null) {
@@ -48,7 +48,7 @@ class TSLanguageRegistryImpl : TSLanguageRegistry {
 
   @Suppress("UNCHECKED_CAST")
   override fun <T : TreeSitterLanguage> getFactory(
-    fileType: String
+      fileType: String
   ): TreeSitterLanguage.Factory<T> {
     return (registry[fileType] ?: throw TSLanguageRegistry.NotRegisteredException(fileType))
         as TreeSitterLanguage.Factory<T>

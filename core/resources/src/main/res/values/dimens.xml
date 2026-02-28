@@ -6,4 +6,7 @@
     <dimen name="content_padding">8dip</dimen>
     <dimen name="content_padding_double">16dip</dimen>
     <dimen name="content_padding_triple">32dip</dimen>
+    
+   <dimen name="completion_window_corner_radius">8dp</dimen>
+  <dimen name="completion_window_stroke_width">1dp</dimen>
 </resources>

@@ -58,4 +58,5 @@ class DefaultVariant : Variant, Serializable {
    * Added to satisfy Variant interface requirements.
    */
   override val experimentalProperties: Map<String, String> = emptyMap()
+
 }

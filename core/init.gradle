@@ -1,0 +1,34 @@
+initscript {
+    repositories {
+        
+        // Disabled references to external sources to prevent
+        // CoGo from going to the network
+        
+        // // Always specify the snapshots repository first
+        // maven {
+        //     // Add snapshots repository for AndroidIDE CI builds
+        //     url "https://s01.oss.sonatype.org/content/repositories/snapshots/"
+        // }
+        
+        // maven {
+        //     // Add public repository for AndroidIDE release builds
+        //     url "https://s01.oss.sonatype.org/content/groups/public/"
+        // }
+        
+        flatDir {
+              // TODO: issue with dirs requiring two params to work
+              //       when the first one is the only one required,
+              //       second value is just a dummy value
+              dirs "/data/data/com.itsaky.androidide/files/home/.androidide/plugin", "plugin"
+        }
+        
+        // mavenCentral()
+        // google()
+    }
+
+    dependencies {
+        classpath  name: "cogo-plugin"
+    }
+}
+
+apply plugin: com.itsaky.androidide.gradle.AndroidIDEInitScriptPlugin

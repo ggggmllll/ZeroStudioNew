@@ -52,28 +52,28 @@ object EqualPredicate : TreeSitterPredicate() {
   }
 
   override fun doPredicateInternal(
-    tsQuery: TSQuery,
-    text: CharSequence,
-    match: TSQueryMatch,
-    predicateSteps: List<TsClientPredicateStep>,
-    syntheticCaptures: TsSyntheticCaptureContainer
+      tsQuery: TSQuery,
+      text: CharSequence,
+      match: TSQueryMatch,
+      predicateSteps: List<TsClientPredicateStep>,
+      syntheticCaptures: TsSyntheticCaptureContainer,
   ): PredicateResult {
     val first = getCaptureContent(tsQuery, match, predicateSteps[1].content, text)
     val second =
-      predicateSteps[2].let {
-        check(
-          it.predicateType == TSQueryPredicateStep.Type.String ||
-              it.predicateType == TSQueryPredicateStep.Type.Capture
-        ) {
-          "Second predicate step of #eq? predicate must be a string or a capture"
-        }
+        predicateSteps[2].let {
+          check(
+              it.predicateType == TSQueryPredicateStep.Type.String ||
+                  it.predicateType == TSQueryPredicateStep.Type.Capture
+          ) {
+            "Second predicate step of #eq? predicate must be a string or a capture"
+          }
 
-        if (it.predicateType == TSQueryPredicateStep.Type.Capture) {
-          getCaptureContent(tsQuery, match, it.content, text)
-        } else {
-          it.content
+          if (it.predicateType == TSQueryPredicateStep.Type.Capture) {
+            getCaptureContent(tsQuery, match, it.content, text)
+          } else {
+            it.content
+          }
         }
-      }
 
     return if (first == second) {
       PredicateResult.ACCEPT

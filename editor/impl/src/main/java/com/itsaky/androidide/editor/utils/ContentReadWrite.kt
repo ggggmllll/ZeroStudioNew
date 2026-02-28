@@ -60,8 +60,10 @@ object ContentReadWrite {
           consumer(floor(saveProgress).toInt())
         }
       } catch (err: IOException) {
-        throw RuntimeException("Failed to write editor's content to file: ${file.absolutePath}",
-          err)
+        throw RuntimeException(
+            "Failed to write editor's content to file: ${file.absolutePath}",
+            err,
+        )
       } finally {
         ContentLockAccessor.unlock(this, false)
         consumer(100)
@@ -139,16 +141,17 @@ object ContentReadWrite {
 
   @JvmStatic
   private fun discreteProgressConsumer(
-    stepSize: Int = 5,
-    progressConsumer: ((Int) -> Unit)?
-  ) : (Int) -> Unit {
+      stepSize: Int = 5,
+      progressConsumer: ((Int) -> Unit)?,
+  ): (Int) -> Unit {
     var lastProgress = -1
-    val consumer = fun (progress: Int) {
-      if (lastProgress == -1 || progress >= 100 || progress - lastProgress >= stepSize) {
-        progressConsumer?.invoke(progress)
-        lastProgress = progress
-      }
-    }
+    val consumer =
+        fun(progress: Int) {
+          if (lastProgress == -1 || progress >= 100 || progress - lastProgress >= stepSize) {
+            progressConsumer?.invoke(progress)
+            lastProgress = progress
+          }
+        }
 
     return consumer
   }

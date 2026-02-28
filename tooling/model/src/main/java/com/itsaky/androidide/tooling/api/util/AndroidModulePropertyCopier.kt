@@ -38,6 +38,7 @@ import com.itsaky.androidide.builder.model.DefaultAndroidGradlePluginProjectFlag
 import com.itsaky.androidide.builder.model.DefaultAndroidLibraryData
 import com.itsaky.androidide.builder.model.DefaultApiVersion
 import com.itsaky.androidide.builder.model.DefaultArtifactDependencies
+import com.itsaky.androidide.builder.model.DefaultBundleInfo
 import com.itsaky.androidide.builder.model.DefaultCustomSourceDirectory
 import com.itsaky.androidide.builder.model.DefaultGraphItem
 import com.itsaky.androidide.builder.model.DefaultJavaCompileOptions
@@ -60,9 +61,6 @@ import java.io.File
  * This class handles the work of making copy of those properties.
  *
  * @author Akash Yadav
- * @author android_zero
- *
- * Update: Handled potential nullability of SourceProvider.manifestFile to fix type mismatch error.
  */
 object AndroidModulePropertyCopier {
 
@@ -140,17 +138,14 @@ object AndroidModulePropertyCopier {
       javaDirectories = provider.javaDirectories
       jniLibsDirectories = provider.jniLibsDirectories
       kotlinDirectories = provider.kotlinDirectories
-      
-      // Fix: provider.manifestFile is 'File?' but target property is 'File'.
-      // Providing a default fallback to satisfy the type requirement.
-      manifestFile = provider.manifestFile ?: File("AndroidManifest.xml")
-      
+      manifestFile = provider.manifestFile ?: DefaultSourceProvider.NoFile
       mlModelsDirectories = provider.mlModelsDirectories
       name = provider.name
       renderscriptDirectories = provider.renderscriptDirectories
       resDirectories = provider.resDirectories
       resourcesDirectories = provider.resourcesDirectories
       shadersDirectories = provider.shadersDirectories
+      baselineProfileDirectories = provider.baselineProfileDirectories
     }
   }
 
@@ -178,11 +173,26 @@ object AndroidModulePropertyCopier {
     return DefaultLibrary().apply {
       this.androidLibraryData = copy(value.androidLibraryData)
       this.artifact = value.artifact
+      this.srcJar = value.srcJar
+      // this.srcJars = value.srcJars
+      this.docJar = value.docJar
+      this.samplesJar = value.samplesJar
       this.key = value.key
       this.libraryInfo = copy(value.libraryInfo)
       this.lintJar = value.lintJar
       this.projectInfo = copy(value.projectInfo)
       this.type = value.type
+    }
+  }
+
+  fun copy(bundleInfo: com.android.builder.model.v2.ide.BundleInfo?): DefaultBundleInfo? {
+    return if (bundleInfo == null) {
+      null
+    } else {
+      DefaultBundleInfo().apply {
+        apkFromBundleTaskName = bundleInfo.apkFromBundleTaskName
+        bundleTaskName = bundleInfo.bundleTaskName
+      }
     }
   }
 
@@ -235,16 +245,17 @@ object AndroidModulePropertyCopier {
         )
   }
 
-  fun copy(artifact: ArtifactDependencies?): DefaultArtifactDependencies? =
-      DefaultArtifactDependencies().apply {
-        if (artifact == null) {
-          return null
-        }
+  fun copy(artifact: ArtifactDependencies?): DefaultArtifactDependencies? {
+    if (artifact == null) {
+      return null
+    }
 
-        this.compileDependencies = copy(artifact.compileDependencies)
-        this.runtimeDependencies = copy(artifact.runtimeDependencies ?: emptyList())
-        this.unresolvedDependencies = copy(artifact.unresolvedDependencies)
-      }
+    return DefaultArtifactDependencies().apply {
+      this.compileDependencies = copy(artifact.compileDependencies)
+      this.runtimeDependencies = copy(artifact.runtimeDependencies ?: emptyList())
+      this.unresolvedDependencies = copy(artifact.unresolvedDependencies)
+    }
+  }
 
   private fun copy(dependencies: List<UnresolvedDependency>): List<DefaultUnresolvedDependency> {
     return dependencies.map { copy(it) }

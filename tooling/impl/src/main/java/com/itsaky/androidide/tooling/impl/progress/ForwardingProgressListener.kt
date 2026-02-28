@@ -46,7 +46,12 @@ import org.gradle.tooling.events.work.WorkItemStartEvent
 class ForwardingProgressListener : ProgressListener {
 
   override fun statusChanged(event: ProgressEvent?) {
-    if (event == null || Main.client == null) {
+    if (event == null) {
+      return
+    }
+
+    val clientRef = Main.client
+    if (clientRef == null) {
       return
     }
 
@@ -96,6 +101,6 @@ class ForwardingProgressListener : ProgressListener {
               }
         }
 
-    Main.client.onProgressEvent(ideEvent)
+    clientRef.onProgressEvent(ideEvent)
   }
 }

@@ -116,8 +116,7 @@ object FileManager {
 
     document.version = event.version
     document.modified = Instant.now()
-    document.content = event.newText!!
-    event.newText = null
+    document.content = event.newText ?: document.content
   }
 
   fun onDocumentClose(event: DocumentCloseEvent) {
@@ -146,11 +145,12 @@ object FileManager {
   }
 
   private fun createDocument(event: DocumentChangeEvent): ActiveDocument {
+    val initialContent = event.newText ?: getFileContents(event.changedFile)
     return ActiveDocument(
         file = event.changedFile,
         version = event.version,
         modified = Instant.now(),
-        content = event.changedText,
+        content = initialContent,
     )
   }
 

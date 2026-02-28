@@ -42,4 +42,7 @@ class JavaModuleExternalDependency(
 
     /** Whether the dependency is exported. */
     exported: Boolean,
+
+    /** Catalog reference if this dependency comes from version catalog (e.g., "libs.material"). */
+    val catalogReference: String? = null,
 ) : JavaModuleDependency(jar, scope, exported), Serializable

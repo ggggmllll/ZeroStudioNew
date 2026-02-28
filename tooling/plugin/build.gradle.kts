@@ -21,57 +21,42 @@ import com.itsaky.androidide.build.config.BuildConfig
 import com.itsaky.androidide.build.config.ProjectConfig
 
 plugins {
-  id("java-gradle-plugin")
-  id("org.jetbrains.kotlin.jvm")
+    id("java-gradle-plugin")
+    id("org.jetbrains.kotlin.jvm")
+    id("maven-publish")
 }
 
-
-
-description = "Gradle Plugin for projects that are built with AndroidIDE"
-
-configurations {
-  val androidBuildTool = create("androidBuildTool")
-
-  getByName("compileOnly") {
-    extendsFrom(androidBuildTool)
-  }
-}
+description = "Gradle Plugin for projects that are built with AndroidCS"
 
 dependencies {
-  implementation(projects.tooling.pluginConfig)
-  implementation(projects.utilities.buildInfo)
+    implementation(projects.tooling.pluginConfig)
+    implementation(projects.utilities.buildInfo)
 
-  // use the AGP APIs from the minimum supported AGP version
-  add("androidBuildTool", "com.android.tools.build:gradle:${AGP_VERSION_MINIMUM}")
+    // AGP included in output JAR
+    implementation("com.android.tools.build:gradle:${AGP_VERSION_MINIMUM}")
 }
 
 gradlePlugin {
-  website.set(ProjectConfig.REPO_URL)
-  vcsUrl.set(ProjectConfig.REPO_URL)
+    website.set(ProjectConfig.REPO_URL)
+    vcsUrl.set(ProjectConfig.REPO_URL)
 
-  plugins {
-    create("initScriptPlugin") {
-      id = "${BuildConfig.packageName}.init"
-      implementationClass = "${BuildConfig.packageName}.gradle.AndroidIDEInitScriptPlugin"
-      displayName = "AndroidIDE Init Script Gradle Plugin"
-      description = "Init script Gradle plugin for projects that are built with AndroidIDE"
-      tags.set(setOf("androidide", "init"))
+    plugins {
+        create("gradlePlugin") {
+            id = BuildConfig.packageName
+            implementationClass = "${BuildConfig.packageName}.gradle.AndroidIDEGradlePlugin"
+        }
+        create("logsenderPlugin") {
+          id = "${BuildConfig.packageName}.logsender"
+          implementationClass = "${BuildConfig.packageName}.gradle.LogSenderPlugin"
+          displayName = "AndroidIDE LogSender Gradle Plugin"
+          description = "Gradle plugin for applying LogSender-specific configuration to projects that are built with AndroidIDE"
+          tags.set(setOf("androidide", "logsender"))
+        }
     }
+    
+}
 
-    create("gradlePlugin") {
-      id = BuildConfig.packageName
-      implementationClass = "${BuildConfig.packageName}.gradle.AndroidIDEGradlePlugin"
-      displayName = "AndroidIDE Gradle Plugin"
-      description = "Gradle plugin for projects that are built with AndroidIDE"
-      tags.set(setOf("androidide", "gradle"))
-    }
-
-    create("logsenderPlugin") {
-      id = "${BuildConfig.packageName}.logsender"
-      implementationClass = "${BuildConfig.packageName}.gradle.LogSenderPlugin"
-      displayName = "AndroidIDE LogSender Gradle Plugin"
-      description = "Gradle plugin for applying LogSender-specific configuration to projects that are built with AndroidIDE"
-      tags.set(setOf("androidide", "logsender"))
-    }
-  }
+// Ensure normal JAR task runs
+tasks.named<Jar>("jar") {
+    archiveBaseName.set("androidide-plugin")
 }

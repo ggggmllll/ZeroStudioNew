@@ -21,6 +21,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Canvas
+import android.graphics.Paint
 import android.graphics.Rect
 import android.graphics.RectF
 import android.graphics.drawable.GradientDrawable
@@ -377,7 +378,11 @@ open class EditorActionsMenu(val editor: IDEEditor) :
     }
 
     this.list.layoutManager = LinearLayoutManager(editor.context, RecyclerView.HORIZONTAL, false)
-
+    
+    if (this.list.itemDecorationCount == 0) {
+      this.list.addItemDecoration(DividerItemDecoration(editor.context))
+    }
+  
     fillMenu()
         
     measureActionsList()
@@ -424,6 +429,42 @@ open class EditorActionsMenu(val editor: IDEEditor) :
     return widest
   }
 
+  private class DividerItemDecoration(context: Context) : RecyclerView.ItemDecoration() {
+    
+    private val paint = Paint().apply {
+      color = context.resolveAttr(R.attr.colorOutlineVariant)
+      isAntiAlias = true
+    }
+    
+    private val dividerHeight = SizeUtils.dp2px(24f)
+    private val itemSpacing = SizeUtils.dp2px(0f)
+  
+    override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
+      val position = parent.getChildAdapterPosition(view)
+      if (position < parent.adapter!!.itemCount - 1) {
+        outRect.right = itemSpacing
+      }
+      if (position > 0) {
+        outRect.left = itemSpacing
+      }
+    }
+  
+    override fun onDrawOver(c: Canvas, parent: RecyclerView, state: RecyclerView.State) {
+      val childCount = parent.childCount
+      
+      for (i in 0 until childCount - 1) {
+        val child = parent.getChildAt(i)
+        val params = child.layoutParams as RecyclerView.LayoutParams
+        
+        val x = child.right + params.rightMargin + itemSpacing.toFloat()
+        val top = child.top + (child.height - dividerHeight) / 2f
+        val bottom = top + dividerHeight
+        
+        c.drawLine(x, top, x, bottom, paint)
+      }
+    }
+  }
+  
   private class ActionsListAdapter(val menu: Menu?, val forceShowTitle: Boolean = false) :
     RecyclerView.Adapter<VH>() {
 
@@ -442,17 +483,28 @@ open class EditorActionsMenu(val editor: IDEEditor) :
     override fun onBindViewHolder(holder: VH, position: Int) {
       val item = getItem(position) ?: return
       
-
-      holder.binding.root.text = if (forceShowTitle) item.title else ""
-      holder.binding.root.tooltipText = item.title
-      holder.binding.root.icon =
-        item.icon
-          ?: run {
-            holder.binding.root.text = item.title
-            holder.binding.root.layoutParams.apply { width = ViewGroup.LayoutParams.WRAP_CONTENT }
-            null
+      holder.binding.root.apply {
+        text = if (forceShowTitle) item.title else ""
+        tooltipText = item.title
+        icon = item.icon ?: run {
+          text = item.title
+          layoutParams.apply {
+            width = ViewGroup.LayoutParams.WRAP_CONTENT
           }
-      holder.binding.root.setOnClickListener { (item as MenuItemImpl).invoke() }
+          null
+        }
+        
+        setOnClickListener { (item as MenuItemImpl).invoke() }
+        
+        scaleX = 1f
+        scaleY = 1f
+        
+        iconSize = SizeUtils.dp2px(20f)
+        iconTint = ColorStateList.valueOf(context.resolveAttr(R.attr.colorOnSurface))
+        
+        cornerRadius = SizeUtils.dp2px(5f)
+        rippleColor = ColorStateList.valueOf(context.resolveAttr(R.attr.colorControlHighlight))
+      }
     }
 
     inner class VH(val binding: LayoutPopupMenuItemBinding) : ViewHolder(binding.root)

@@ -62,11 +62,12 @@ object BuildConfig {
   const val ABI_X86_64 = "x86_64"
   
     /*SetupAapt2Task.class Android build Platform appt2 tools*/
-  const val SetupAapt2Task = "aapt-35.0.2"
+  const val SetupAapt2Task = "35.0.2"
+  const val elf_file = ".so"
   //中国区域的github加速镜像
   const val GitHub_Acceleration_Mirror = "https://gh.fhjhy.top/"
   /* SetupAapt2Task.class appt2 download url*/ 
-  const val AAPT2_DOWNLOAD_URL = GitHub_Acceleration_Mirror + "https://github.com/android-zeros/ZeroStudio/releases/download/%1\$s/aapt2-%2\$s"
+  const val AAPT2_DOWNLOAD_URL = /** GitHub_Acceleration_Mirror + */ "https://github.com/android-zero0/SDK-tool-for-Android-platform/releases/download/%1\$s/aapt2-%2\$s"
   /** SetupAapt2Task.class appt2 arm64-v8a check sha256 */
   const val ABI_ARM64_V8A_AAPT2_CHECKSUMS = "db737b3bbee99dd8a9e56108cc05d032597874d3f8ac557a69f3c5de5efaf57f"
    /** SetupAapt2Task.class appt2 armeabi-v7a check sha256 */
@@ -107,6 +108,7 @@ object BuildConfig {
   /*arm32 abi*/
   const val ABI_ARM32 = "arm"
   /*arm64 abi*/
+  const val ABI_ARMEABI_AARCH32 = "aarch32"
   const val ABI_ARMEABI_AARCH64 = "aarch64"
   /** terminal bootstrap download file arm64 abi check sha256 hash*/
   const val BOOTSTRAP_PACKAGES_ABI_ARMEABI_AARCH64 =  "d10fa952769b07b3d0babf6e155aacf58e5d441bb0ed87d4f9e8e54b73575180"

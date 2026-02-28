@@ -53,24 +53,15 @@ abstract class GenerateInitScriptTask : DefaultTask() {
         """
       initscript {
           repositories {
-              
-              // maven { url "https://s01.oss.sonatype.org/content/repositories/snapshots/" }
-              maven { url "https://repo1.maven.org/maven2/" }
+             flatDir {
+              dirs "/data/data/com.itsaky.androidide/files/home/.androidide/init", "init"
+        }
+    }
 
-              maven { url "https://maven.aliyun.com/repository/gradle-plugin" }
-              maven { url "https://maven.aliyun.com/repository/public" }
-              maven { url "https://maven.aliyun.com/repository/google" }
-              gradlePluginPortal()
-              mavenCentral()
-              google()
-          }
-
-          dependencies {
-              classpath('com.itsaky.androidide:gradle-plugin:2.7.1-beta') {
-                  setChanging(false)
-              }
-          }
-      }
+    dependencies {
+        classpath  name: "gradle-plugin-2.7.1-beta"
+    }
+}
       
       apply plugin: com.itsaky.androidide.gradle.AndroidIDEInitScriptPlugin
     """

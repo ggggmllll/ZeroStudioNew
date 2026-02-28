@@ -21,7 +21,8 @@ import android.content.Context
 import com.itsaky.androidide.lsp.servers.*
 import com.itsaky.androidide.lsp.util.Logger
 import com.itsaky.androidide.lsp.servers.toml.TomlServer
-
+import com.itsaky.androidide.lsp.servers.lua.*
+import com.itsaky.androidide.lsp.servers.kotlin.*
 /**
  * A bootstrap class responsible for initializing and registering all built-in
  * Language Server Protocol (LSP) servers with the central [LspManager].

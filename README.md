@@ -36,10 +36,11 @@
     - [x] Java
     - [x] XML
     - [ ] Kotlin
-    - [ ] lua 
+    - [x] lua 
+    - [ ] cmake 
     - [ ] c/c++/obj-c/obj-c++
     - [ ] web （html，css...)
-    - [ ] toml
+    - [x] toml
     - [ ] python
     - [ ] shell
     - [ ] more.....

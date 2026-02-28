@@ -28,10 +28,8 @@ import io.github.rosemoe.sora.lang.styling.Styles
  *
  * @author Akash Yadav
  */
-class TreeSitterAnalyzeManager(
-  languageSpec: TsLanguageSpec,
-  theme: TsTheme
-) : TsAnalyzeManager(languageSpec, theme) {
+class TreeSitterAnalyzeManager(languageSpec: TsLanguageSpec, theme: TsTheme) :
+    TsAnalyzeManager(languageSpec, theme) {
 
   override var styles: Styles = Styles()
     set(value) {

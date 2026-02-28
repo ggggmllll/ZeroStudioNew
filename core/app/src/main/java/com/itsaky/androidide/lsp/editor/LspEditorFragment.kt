@@ -8,8 +8,8 @@
  *
  *  AndroidIDE is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *  Lesser General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
  *   along with AndroidIDE.  If not, see <https://www.gnu.org/licenses/>.
@@ -22,18 +22,18 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
-import com.itsaky.androidide.lsp.window.LspEditorTextActionWindow
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.widget.Toolbar
-import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
-import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import androidx.lifecycle.lifecycleScope
 import com.itsaky.androidide.R
+import com.itsaky.androidide.editor.language.treesitter.TreeSitterLanguageProvider
 import com.itsaky.androidide.editor.ui.IDEEditor
 import com.itsaky.androidide.editor.utils.ContentReadWrite
 import com.itsaky.androidide.eventbus.events.filetree.FileClickEvent
@@ -42,43 +42,48 @@ import com.itsaky.androidide.lsp.BaseLspConnector
 import com.itsaky.androidide.lsp.LspActions
 import com.itsaky.androidide.lsp.LspBootstrap
 import com.itsaky.androidide.lsp.LspManager
-import com.itsaky.androidide.lsp.servers.LuaServer
+import com.itsaky.androidide.lsp.events.LspInstallRequestEvent
+import com.itsaky.androidide.lsp.ui.IdeaLspListWindow
+import com.itsaky.androidide.lsp.ui.LspInstallerDialog
 import com.itsaky.androidide.lsp.ui.LspStatusPanel
+import com.itsaky.androidide.lsp.ui.LspWindowItem
 import com.itsaky.androidide.lsp.ui.RenameSymbolDialog
-import com.itsaky.androidide.lsp.util.LspStatusMonitor
+import com.itsaky.androidide.lsp.ui.SymbolIconMapper
+import com.itsaky.androidide.lsp.ui.applyIdeaStyleWindows
 import com.itsaky.androidide.lsp.util.Logger
+import com.itsaky.androidide.lsp.util.LspStatusMonitor
 import com.itsaky.androidide.projects.FileManager
 import com.itsaky.androidide.projects.IProjectManager
 import com.itsaky.androidide.utils.flashError
 import com.itsaky.androidide.utils.flashInfo
 import com.itsaky.androidide.utils.flashSuccess
 import io.github.rosemoe.sora.event.ContentChangeEvent
-import io.github.rosemoe.sora.event.CreateContextMenuEvent
-import io.github.rosemoe.sora.event.SelectionChangeEvent
-import io.github.rosemoe.sora.langs.textmate.TextMateLanguage
-import io.github.rosemoe.sora.langs.textmate.registry.GrammarRegistry
-import io.github.rosemoe.sora.langs.textmate.registry.dsl.languages
-import io.github.rosemoe.sora.widget.CodeEditor
-import io.github.rosemoe.sora.widget.component.EditorAutoCompletion
+import io.github.rosemoe.sora.lang.EmptyLanguage
+import io.github.rosemoe.sora.lang.completion.CompletionItemKind
 import io.github.rosemoe.sora.widget.component.EditorTextActionWindow
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.eclipse.lsp4j.DocumentSymbol
+import org.eclipse.lsp4j.Location
 import org.eclipse.lsp4j.SymbolInformation
+import org.eclipse.lsp4j.SymbolKind
+import org.eclipse.lsp4j.jsonrpc.messages.Either
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import java.io.File
 
 /**
- * 集成了 LSP 核心功能的编辑器 Fragment。
- * 修复了补全、Action 窗口失效以及编译引用的问题。
+ * 专业的 LSP 编辑器 Fragment。
+ *
+ * 该 Fragment 是 AndroidIDE 编辑器功能的核心入口，负责集成和展示 LSP 功能。
+ * 它通过 [BaseLspConnector] 与底层 LSP 服务进行通信，并管理编辑器的生命周期。
  *
  * @author android_zero
  */
-class LspEditorFragment : BaseFragment(R.layout.fragment_lsp_editor), LspActionListener {
+class LspEditorFragment : BaseFragment(R.layout.fragment_lsp_editor) {
 
     private val LOG = Logger.instance("LspEditorFragment")
 
@@ -90,12 +95,10 @@ class LspEditorFragment : BaseFragment(R.layout.fragment_lsp_editor), LspActionL
     private var projectDir: File? = null
 
     private var lspConnector: BaseLspConnector? = null
-    private var lspUiDelegate: LspUIDelegate? = null
-    private var contextMenuHandler: LspContextMenuHandler? = null
-    
-    // 使用新的 Window 类
-    private var lspActionWindow: LspEditorTextActionWindow? = null
     private var loadFileJob: Job? = null
+    
+    // 防止重复弹出安装对话框
+    private var isShowingInstallDialog = false
 
     companion object {
         const val ARG_FILE_PATH = "arg_file_path"
@@ -113,27 +116,53 @@ class LspEditorFragment : BaseFragment(R.layout.fragment_lsp_editor), LspActionL
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // 幂等初始化 LSP 系统
         LspManager.init(requireContext())
         LspBootstrap.init(requireContext())
+        
+        // 尽早注册 EventBus，确保能收到 onCreate 之后的安装请求事件
+        if (!EventBus.getDefault().isRegistered(this)) {
+            EventBus.getDefault().register(this)
+        }
 
         arguments?.let {
             file = it.getString(ARG_FILE_PATH)?.let { path -> File(path) }
-            projectDir = it.getString(ARG_PROJECT_PATH)?.let { path -> File(path) }
-                ?: file?.let { f ->
-                    val globalProjectDir = IProjectManager.getInstance().projectDir
-                    if (f.absolutePath.startsWith(globalProjectDir.absolutePath)) globalProjectDir else f.parentFile
-                }
+            
+            val globalRoot = try {
+                IProjectManager.getInstance().projectDir
+            } catch (e: Exception) {
+                null
+            }
+            
+            val argPath = it.getString(ARG_PROJECT_PATH)?.let { path -> File(path) }
+            
+            // 如果传入的文件在全局项目路径下，强制使用全局项目路径
+            projectDir = if (globalRoot != null && file?.absolutePath?.startsWith(globalRoot.absolutePath) == true) {
+                globalRoot
+            } else {
+                argPath ?: file?.parentFile
+            }
         }
+
+        requireActivity().onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                isEnabled = false
+                requireActivity().onBackPressedDispatcher.onBackPressed()
+            }
+        })
+    }
+    
+    override fun onDestroyView() {
+        super.onDestroyView()
+        viewLifecycleScope.launch { lspConnector?.disconnect() }
+        lspConnector = null
     }
 
-    override fun onStart() {
-        super.onStart()
-        if (!EventBus.getDefault().isRegistered(this)) EventBus.getDefault().register(this)
-    }
-
-    override fun onStop() {
-        super.onStop()
-        if (EventBus.getDefault().isRegistered(this)) EventBus.getDefault().unregister(this)
+    override fun onDestroy() {
+        super.onDestroy()
+        if (EventBus.getDefault().isRegistered(this)) {
+            EventBus.getDefault().unregister(this)
+        }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -143,6 +172,41 @@ class LspEditorFragment : BaseFragment(R.layout.fragment_lsp_editor), LspActionL
             openFile(target)
         }
     }
+    
+    /**
+     * 接收 LSP 服务器发出的安装请求事件。
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onInstallRequest(event: LspInstallRequestEvent) {
+        if (isShowingInstallDialog) return
+        
+        LOG.info("Received install request for ${event.serverName}")
+        isShowingInstallDialog = true
+        
+        val context = requireContext()
+        val composeView = ComposeView(context).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                androidx.compose.material3.MaterialTheme {
+                    LspInstallerDialog(
+                        request = event,
+                        onDismiss = {
+                            isShowingInstallDialog = false
+                            (parent as? ViewGroup)?.removeView(this)
+                            // 安装完成后（或取消后），尝试重新初始化 LSP
+                            // 如果是取消，下次打开文件会再次触发检查
+                            if (file != null) {
+                                viewLifecycleScope.launch {
+                                    initializeLsp(file!!)
+                                }
+                            }
+                        }
+                    )
+                }
+            }
+        }
+        (view as? ViewGroup)?.addView(composeView, ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -151,35 +215,33 @@ class LspEditorFragment : BaseFragment(R.layout.fragment_lsp_editor), LspActionL
         progressBar = view.findViewById(R.id.progressBar)
 
         setupToolbar()
+        setupEditorBasicConfig()
 
         file?.takeIf { it.exists() }?.let { openFile(it) } ?: run {
             toolbar.title = "No File Opened"
         }
+    }
 
-        editor.subscribeEvent(CreateContextMenuEvent::class.java) { event, _ ->
-            contextMenuHandler?.handleContextMenu(event)
+    private fun setupEditorBasicConfig() {
+        try {
+            editor.getComponent(EditorTextActionWindow::class.java).isEnabled = false
+        } catch (e: Exception) {
+            // Ignored
         }
-
-        editor.subscribeEvent(SelectionChangeEvent::class.java) { event, _ ->
-            if (!event.isSelected) {
-                editor.postDelayed({
-                    if (lspConnector?.isConnected() == true && !editor.cursor.isSelected) {
-                        lspUiDelegate?.triggerCodeActions(event.left)
-                    }
-                }, 600)
-            }
-        }
+        editor.isLineNumberEnabled = true
+        editor.isWordwrap = false
     }
 
     private fun setupToolbar() {
-        // 修复：使用 OnBackPressedDispatcher 替代已过时的 onBackPressed()
-        toolbar.setNavigationOnClickListener { activity?.onBackPressedDispatcher?.onBackPressed() }
+        toolbar.setNavigationOnClickListener { requireActivity().onBackPressedDispatcher.onBackPressed() }
         toolbar.inflateMenu(R.menu.menu_lsp_editor)
+        
         if (toolbar.menu.findItem(R.id.action_lsp_status) == null) {
             toolbar.menu.add(0, R.id.action_lsp_status, 999, "LSP Status")
                 .setIcon(android.R.drawable.ic_menu_info_details)
                 .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER)
         }
+        
         toolbar.setOnMenuItemClickListener { onMenuItemClick(it) }
     }
 
@@ -190,136 +252,96 @@ class LspEditorFragment : BaseFragment(R.layout.fragment_lsp_editor), LspActionL
 
     private fun openFile(targetFile: File, line: Int = 0, column: Int = 0) {
         loadFileJob?.cancel()
-        lifecycleScope.launch {
-            lspConnector?.disconnect()
-            lspUiDelegate?.detach()
-            file = targetFile
-            updateToolbarTitle()
-            setupEditor(line, column)
-        }
-    }
-
-    private fun setupEditor(initialLine: Int = 0, initialColumn: Int = 0) {
-        val targetFile = file ?: return
-        loadFileJob = viewLifecycleScope.launch(Dispatchers.IO) {
-            val content = try {
-                FileManager.getDocumentContents(targetFile.toPath())
-            } catch (e: Exception) {
-                try { targetFile.readText() } catch (readErr: Exception) { "" }
+        
+        loadFileJob = viewLifecycleScope.launch {
+            withContext(Dispatchers.Main) {
+                lspConnector?.disconnect()
+                lspConnector = null
+                file = targetFile
+                updateToolbarTitle()
+                progressBar.visibility = View.VISIBLE
+                
+                // 立即应用基础高亮，防止 LSP 加载慢导致黑白
+                try {
+                    val nativeLang = TreeSitterLanguageProvider.forFile(targetFile, requireContext())
+                    editor.setEditorLanguage(nativeLang ?: EmptyLanguage())
+                } catch (e: Exception) {
+                    editor.setEditorLanguage(EmptyLanguage())
+                }
             }
+            
+            val content = withContext(Dispatchers.IO) {
+                try {
+                    FileManager.getDocumentContents(targetFile.toPath())
+                } catch (e: Exception) {
+                    try { targetFile.readText() } catch (readErr: Exception) { "" }
+                }
+            }
+
             withContext(Dispatchers.Main) {
                 editor.setText(content)
                 editor.setFile(targetFile)
-                if (initialLine > 0 || initialColumn > 0) {
-                    editor.setSelectionAround(initialLine, initialColumn)
-                    editor.ensurePositionVisible(initialLine, initialColumn)
+                
+                if (line > 0 || column > 0) {
+                    editor.setSelectionAround(line, column)
+                    editor.ensurePositionVisible(line, column)
                 }
-                editor.getComponent(EditorAutoCompletion::class.java).isEnabled = true
+
                 initializeLsp(targetFile)
+                progressBar.visibility = View.GONE
             }
         }
     }
 
-    private fun getScopeForFile(file: File): String {
-        return when (file.extension.lowercase()) {
-            "kt", "kts" -> "source.kotlin"
-            "java" -> "source.java"
-            "xml" -> "text.xml"
-            "json" -> "source.json"
-            "lua" -> "source.lua"
-            "py", "pyi" -> "source.python"
-            "sh", "bash" -> "source.shell"
-            "js", "ts", "jsx", "tsx" -> "source.ts"
-            "css" -> "source.css"
-            "html" -> "text.html.basic"
-            "toml", "tml" -> "source.toml"
-            else -> "text.plain"
-        }
-    }
-    
-    private fun getGrammarPathForScope(scope: String): String? {
-        return when (scope) {
-            "source.lua" -> "textmate/lua/syntaxes/lua.tmLanguage.json"
-            "source.kotlin" -> "textmate/kotlin/syntaxes/kotlin.tmLanguage.json"
-            "source.toml" -> "textmate/toml/syntaxes/toml.tmLanguage.json"
-            else -> null
-        }
-    }
-
-    private fun initializeLsp(file: File) {
+    private suspend fun initializeLsp(file: File) {
         val servers = LspManager.getServersForFile(file)
-        val scope = getScopeForFile(file)
-        
-        try {
-            getGrammarPathForScope(scope)?.let { grammarPath ->
-                GrammarRegistry.getInstance().loadGrammars(languages {
-                    language(file.extension.lowercase()) {
-                        this.scopeName = scope
-                        this.grammar = grammarPath
-                    }
-                })
-            }
-        } catch (e: Exception) {
-            LOG.error("Failed to load TextMate grammar", e)
-        }
+        val context = requireContext()
 
         if (servers.isEmpty()) {
-            try {
-                editor.setEditorLanguage(TextMateLanguage.create(scope, false))
-            } catch (e: Exception) {
-                // 忽略
+            withContext(Dispatchers.Main) {
+                try {
+                    // 没有LSP时，退回到原生的 TreeSitterLanguage 引擎
+                    val lang = TreeSitterLanguageProvider.forFile(file, context) ?: EmptyLanguage()
+                    editor.setEditorLanguage(lang)
+                    LOG.info("No LSP servers found. Applied native TreeSitter highlighting.")
+                } catch (e: Exception) {
+                    editor.setEditorLanguage(EmptyLanguage())
+                }
             }
             return
         }
 
-        progressBar.visibility = View.VISIBLE
-        val workspaceRoot = projectDir ?: IProjectManager.getInstance().projectDir
+        // 逻辑：find first -> install -> return -> (dialog closes) -> callback -> initializeLsp again
+        val missingServer = servers.firstOrNull { !it.isInstalled(context) }
         
-        servers.forEach { server ->
-            if (server is LuaServer) {
-                val luaProjectPath = "/storage/emulated/0/AndroidIDEProjects/LuaProject/"
-                server.customInitOptions = mapOf("Lua" to mapOf("workspace" to mapOf("library" to listOf(luaProjectPath))))
-            }
+        if (missingServer != null) {
+            LOG.warn("Server ${missingServer.languageName} missing. Requesting install.")
+            // 触发安装事件，onInstallRequest 会处理弹窗
+            missingServer.install(context)
+            return
+        }
+
+        // 所有 Server 均已就绪，开始连接
+        val workspaceRoot = projectDir ?: try {
+             IProjectManager.getInstance().projectDir
+        } catch (e: Exception) {
+            file.parentFile
         }
         
         val connector = BaseLspConnector(workspaceRoot, file, editor, servers)
         this.lspConnector = connector
 
-        val uiDelegate = LspUIDelegate(viewLifecycleScope, connector, this, file).apply {
-            isEnableInlayHint = true
-            isEnableHover = true
-            isEnableSignatureHelp = true
-        }
-        this.lspUiDelegate = uiDelegate
-
-        this.contextMenuHandler = LspContextMenuHandler(viewLifecycleScope, connector) { f, l, c ->
-            navigateTo(f, l, c)
-        }
-        
+        // BaseLspConnector 现在自动处理所有的语言和弹窗代理绑定
         viewLifecycleScope.launch {
-            connector.connect(getScopeForFile(file))
+            connector.connect()
             
             withContext(Dispatchers.Main) {
-                progressBar.visibility = View.GONE
                 if (connector.isConnected()) {
                     LspStatusMonitor.lifecycle("LSP", "${file.name} connected.")
-                    
-                    uiDelegate.attach(editor)
                     editor.subscribeEvent(ContentChangeEvent::class.java, LspDocumentSyncListener(connector, file))
-                    
-                    connector.lspEditor?.let { lspEd ->
-                         val actionWindow = LspEditorTextActionWindow(lspEd, editor)
-                         actionWindow.setOnMoreButtonClickListener { _, _ ->
-                             uiDelegate.triggerCodeActions(editor.cursor.left())
-                         }
-                         this@LspEditorFragment.lspActionWindow = actionWindow
-                         editor.replaceComponent(EditorTextActionWindow::class.java, actionWindow)
-                    }
-                    
-                    editor.getComponent(EditorAutoCompletion::class.java).isEnabled = true
-                    
                 } else {
-                    activity?.flashInfo("LSP Connection failed.")
+                    // 连接失败，BaseLspConnector 会自动回退到 TreeSitter
+                    activity?.flashInfo("LSP connection failed.")
                 }
             }
         }
@@ -330,36 +352,46 @@ class LspEditorFragment : BaseFragment(R.layout.fragment_lsp_editor), LspActionL
             showStatusPanel()
             return true
         }
-        
-        val delegate = lspUiDelegate ?: return handleNonLspMenuActions(item)
+
+        val connector = lspConnector ?: return handleNonLspMenuActions(item)
+
+        // 允许未连接状态下的保存操作
+        if (item.itemId == R.id.action_save) {
+            saveFile()
+            return true
+        }
+
+        if (!connector.isConnected()) {
+            activity?.flashError("LSP not connected.")
+            return true
+        }
 
         return when (item.itemId) {
-            R.id.action_save -> { saveFile(); true }
-            R.id.action_undo -> { editor.undo(); true }
-            R.id.action_redo -> { editor.redo(); true }
-            R.id.action_search -> { editor.beginSearchMode(); true }
-            
-            R.id.action_goto_def -> { delegate.requestGoToDefinition(); true }
-            R.id.action_goto_implementation -> { delegate.requestGoToImplementation(); true }
-            R.id.action_goto_type_def -> { delegate.requestGoToTypeDefinition(); true }
-            R.id.action_find_references -> { delegate.requestShowReferences(); true }
-            R.id.action_document_highlight -> { delegate.requestDocumentHighlight(); true }
-            R.id.action_format -> { delegate.requestFormatDocument(); true }
-            R.id.action_rename -> { delegate.requestRenameSymbol(); true }
-            R.id.action_document_symbols -> { delegate.requestDocumentOutline(); true }
-            R.id.action_diagnostics_list -> { delegate.requestDiagnosticsList(); true }
-            
-            R.id.action_code_actions -> { 
-                delegate.triggerCodeActions(editor.cursor.left())
+            R.id.action_format -> { 
+                viewLifecycleScope.launch { connector.requestFormat() }
                 true 
             }
-            R.id.action_toggle_inlay_hints -> {
-                item.isChecked = !item.isChecked
-                delegate.isEnableInlayHint = item.isChecked
-                editor.invalidate()
+            R.id.action_goto_def -> {
+                handleGoToDefinition(connector)
                 true
             }
-            else -> false
+            R.id.action_rename -> {
+                handleRename(connector)
+                true
+            }
+            R.id.action_document_symbols -> {
+                handleDocumentSymbols(connector)
+                true
+            }
+            R.id.action_find_references -> {
+                handleFindReferences(connector)
+                true
+            }
+            R.id.action_code_actions -> {
+                activity?.flashInfo("Touch underline for quick fixes.")
+                true
+            }
+            else -> handleNonLspMenuActions(item)
         }
     }
 
@@ -377,9 +409,11 @@ class LspEditorFragment : BaseFragment(R.layout.fragment_lsp_editor), LspActionL
         val targetFile = file ?: return
         viewLifecycleScope.launch(Dispatchers.IO) {
             try {
-                with(ContentReadWrite) { editor.text.writeTo(targetFile) }
+                // 使用 ContentReadWrite 工具类安全写入
+                ContentReadWrite.run { editor.text.writeTo(targetFile) }
                 withContext(Dispatchers.Main) { editor.markUnmodified() }
-                lspConnector?.notifySave()
+                // 通知 LSP 文件已保存
+                lspConnector?.saveDocument()
                 withContext(Dispatchers.Main) { activity?.flashSuccess("Saved.") }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) { activity?.flashError("Save failed: ${e.message}") }
@@ -387,38 +421,198 @@ class LspEditorFragment : BaseFragment(R.layout.fragment_lsp_editor), LspActionL
         }
     }
 
-    private fun showStatusPanel() {
-        val dialog = BottomSheetDialog(requireContext())
-        dialog.setContentView(ComposeView(requireContext()).apply {
-            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-            setContent { androidx.compose.material3.MaterialTheme { LspStatusPanel { dialog.dismiss() } } }
-        })
-        dialog.show()
-    }
-    
-    // --- LspActionListener Implementation ---
-
-    override fun navigateTo(file: File, line: Int, column: Int) {
-        lifecycleScope.launch {
-            if (file.absolutePath == this@LspEditorFragment.file?.absolutePath) {
-                editor.setSelectionAround(line, column)
-                editor.ensurePositionVisible(line, column)
+    private fun handleGoToDefinition(connector: BaseLspConnector) {
+        viewLifecycleScope.launch(Dispatchers.Default) {
+            val eitherResult = connector.requestDefinition()
+            
+           // val locs = if (eitherResult.isLeft) eitherResult.left else eitherResult.right.map {
+                // Location(it.targetUri, it.targetSelectionRange)
+            // }
+            
+            val locs: List<Location> = if (eitherResult.isLeft) {
+                eitherResult.left ?: emptyList()
             } else {
-                openFile(file, line, column)
+                eitherResult.right?.map { link ->
+                    Location(link.targetUri, link.targetSelectionRange)
+                } ?: emptyList()
+            }
+
+            withContext(Dispatchers.Main) {
+                if (locs.isNotEmpty()) {
+                    val loc = locs[0]
+                    val path = LspActions.fixUriPath(loc.uri)
+                    val startPos = loc.range.start
+                    
+                    if (File(path).exists()) {
+                        navigateTo(File(path), startPos.line, startPos.character)
+                    } else {
+                        activity?.flashError("Definition file not found: $path")
+                    }
+                } else {
+                    activity?.flashInfo("No definition found.")
+                }
             }
         }
     }
 
-    override fun showRenameDialog(currentName: String) {
+    private fun handleRename(connector: BaseLspConnector) {
+        val cursor = editor.cursor
+        // 获取当前光标下的单词范围，用于提取旧名字
+        val range = editor.getWordRange(cursor.leftLine, cursor.leftColumn)
+        val currentName = if (range != null && range.start.index < range.end.index) {
+            editor.text.substring(range.start.index, range.end.index)
+        } else ""
+
+        showRenameDialog(currentName, connector)
+    }
+
+    /**
+     * 将 LSP 的 SymbolKind 映射为 CompletionItemKind 从而借用 IconMapper 获取图标
+     */
+    private fun mapSymbolKindToCompletionKind(kind: SymbolKind): CompletionItemKind {
+        return when (kind) {
+            SymbolKind.File -> CompletionItemKind.File
+            SymbolKind.Module, SymbolKind.Namespace, SymbolKind.Package -> CompletionItemKind.Module
+            SymbolKind.Class, SymbolKind.Object -> CompletionItemKind.Class
+            SymbolKind.Method, SymbolKind.Constructor -> CompletionItemKind.Method
+            SymbolKind.Property -> CompletionItemKind.Property
+            SymbolKind.Field -> CompletionItemKind.Field
+            SymbolKind.Enum -> CompletionItemKind.Enum
+            SymbolKind.Interface -> CompletionItemKind.Interface
+            SymbolKind.Function -> CompletionItemKind.Function
+            SymbolKind.Variable -> CompletionItemKind.Variable
+            SymbolKind.Constant -> CompletionItemKind.Constant
+            SymbolKind.String -> CompletionItemKind.Text
+            SymbolKind.Number, SymbolKind.Boolean, SymbolKind.Array, SymbolKind.Null -> CompletionItemKind.Value
+            SymbolKind.Key -> CompletionItemKind.Keyword
+            SymbolKind.EnumMember -> CompletionItemKind.EnumMember
+            SymbolKind.Struct -> CompletionItemKind.Struct
+            SymbolKind.Event -> CompletionItemKind.Event
+            SymbolKind.Operator -> CompletionItemKind.Operator
+            SymbolKind.TypeParameter -> CompletionItemKind.TypeParameter
+            else -> CompletionItemKind.Text
+        }
+    }
+
+    private fun handleDocumentSymbols(connector: BaseLspConnector) {
+        viewLifecycleScope.launch(Dispatchers.Default) {
+            val symbols = connector.requestDocumentSymbols()
+            if (symbols.isEmpty()) {
+                withContext(Dispatchers.Main) { activity?.flashInfo("No symbols found.") }
+                return@launch
+            }
+            
+            val flatList = mutableListOf<LspWindowItem>()
+            
+            @Suppress("DEPRECATION")
+            fun extract(item: Any, depth: Int) {
+                if (item is Either<*, *>) {
+                    val leftObj = item.left
+                    val rightObj = item.right
+                    if (leftObj != null) extract(leftObj, depth)
+                    else if (rightObj != null) extract(rightObj, depth)
+                    return
+                }
+
+                when (item) {
+                    is SymbolInformation -> {
+                        val kind = mapSymbolKindToCompletionKind(item.kind)
+                        flatList.add(LspWindowItem(
+                            label = item.name,
+                            detail = item.kind.name,
+                            iconResId = SymbolIconMapper.getIconResId(kind),
+                            indentLevel = depth,
+                            payload = item.location.range
+                        ))
+                    }
+                    is DocumentSymbol -> {
+                        val kind = mapSymbolKindToCompletionKind(item.kind)
+                        flatList.add(LspWindowItem(
+                            label = item.name,
+                            detail = item.detail ?: item.kind.name,
+                            iconResId = SymbolIconMapper.refineIcon(kind, item.detail),
+                            indentLevel = depth,
+                            payload = item.range
+                        ))
+                        item.children?.forEach { extract(it, depth + 1) }
+                    }
+                }
+            }
+            
+            symbols.forEach { extract(it, 0) }
+            
+            withContext(Dispatchers.Main) {
+                // 【核心集成】使用定制的悬浮 ListWindow 代替底部弹出
+                val listWindow = IdeaLspListWindow(editor)
+                listWindow.showList(flatList) { selectedItem ->
+                    val range = selectedItem.payload as? org.eclipse.lsp4j.Range
+                    if (range != null) {
+                        val startPos = range.start
+                        editor.setSelectionAround(startPos.line, startPos.character)
+                        editor.ensurePositionVisible(startPos.line, startPos.character)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun handleFindReferences(connector: BaseLspConnector) {
+        viewLifecycleScope.launch(Dispatchers.Default) {
+            val refs: List<Location> = connector.requestReferences()
+            
+            withContext(Dispatchers.Main) {
+                if (refs.isEmpty()) {
+                    activity?.flashInfo("No references found.")
+                    return@withContext
+                }
+                
+                val displayItems = refs.map { loc ->
+                    val path = LspActions.fixUriPath(loc.uri)
+                    val start = loc.range.start
+                    LspWindowItem(
+                        label = File(path).name,
+                        detail = "Line ${start.line + 1}",
+                        iconResId = SymbolIconMapper.getIconResId(CompletionItemKind.Reference),
+                        indentLevel = 0,
+                        payload = loc
+                    )
+                }
+                
+                // 【核心集成】使用定制的悬浮 ListWindow 代替底部弹出
+                val listWindow = IdeaLspListWindow(editor)
+                listWindow.showList(displayItems) { selectedItem ->
+                    val loc = selectedItem.payload as? Location
+                    if (loc != null) {
+                        val startPos = loc.range.start
+                        val targetFile = File(LspActions.fixUriPath(loc.uri))
+                        navigateTo(targetFile, startPos.line, startPos.character)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun navigateTo(file: File, line: Int, column: Int) {
+        if (file.absolutePath == this.file?.absolutePath) {
+            editor.setSelectionAround(line, column)
+            editor.ensurePositionVisible(line, column)
+        } else {
+            openFile(file, line, column)
+        }
+    }
+
+    private fun showRenameDialog(currentName: String, connector: BaseLspConnector) {
         (view as? ViewGroup)?.let { container ->
-            container.addView(ComposeView(requireContext()).apply {
+            val composeWrap = ComposeView(requireContext()).apply {
                 setContent {
                     var show by remember { mutableStateOf(true) }
-                    if(show) {
+                    if (show) {
                         RenameSymbolDialog(
                             oldName = currentName,
                             onConfirm = { newName ->
-                                lspUiDelegate?.performRename(newName)
+                                viewLifecycleScope.launch {
+                                    LspActions.renameSymbol(this, connector, newName)
+                                }
                                 show = false
                                 container.removeView(this)
                             },
@@ -429,102 +623,21 @@ class LspEditorFragment : BaseFragment(R.layout.fragment_lsp_editor), LspActionL
                         )
                     }
                 }
-            })
+            }
+            container.addView(composeWrap)
         }
     }
 
-    override fun showDocumentOutline(connector: BaseLspConnector) {
-        lifecycleScope.launch(Dispatchers.Default) {
-            val symbols = connector.requestDocumentSymbols()
-            if (symbols.isEmpty()) {
-                withContext(Dispatchers.Main) { activity?.flashInfo("No symbols found") }
-                return@launch
-            }
-            val flatList = mutableListOf<SymbolDisplayItem>()
-            
-            // 修复：抑制 SymbolInformation 字段过时警告
-            @Suppress("DEPRECATION")
-            fun process(item: Any, depth: Int) {
-                when (item) {
-                    is SymbolInformation -> flatList.add(SymbolDisplayItem(item.name, item.kind.name, item.location.range, depth))
-                    is DocumentSymbol -> {
-                        flatList.add(SymbolDisplayItem(item.name, item.kind.name, item.range, depth))
-                        item.children?.forEach { process(it, depth + 1) }
-                    }
-                }
-            }
-            symbols.forEach { if (it.isLeft) process(it.left, 0) else process(it.right, 0) }
-            withContext(Dispatchers.Main) {
-                showBottomSheetList("Outline", flatList) { item ->
-                    editor.setSelectionAround(item.range.start.line, item.range.start.character)
-                    editor.ensurePositionVisible(item.range.start.line, item.range.start.character)
-                }
-            }
-        }
-    }
-    
-    override fun showReferencesList(connector: BaseLspConnector) {
-        lifecycleScope.launch(Dispatchers.Default) {
-            val refs = connector.requestReferences()
-            if (refs.isEmpty()) {
-                withContext(Dispatchers.Main) { activity?.flashInfo("No references found") }
-                return@launch
-            }
-            val displayItems = refs.map { loc ->
-                val path = LspActions.fixUriPath(loc.uri)
-                SymbolDisplayItem(File(path).name, "${loc.range.start.line + 1}:${loc.range.start.character + 1}", loc.range, 0, path)
-            }
-            withContext(Dispatchers.Main) {
-                showBottomSheetList("References", displayItems) { item ->
-                    navigateTo(File(item.filePath!!), item.range.start.line, item.range.start.character)
-                }
-            }
-        }
-    }
-    
-    override fun showDiagnosticsList(connector: BaseLspConnector) {
-        val diagnostics = connector.getDiagnostics()
-        if (diagnostics.isEmpty()) {
-            activity?.flashInfo("No problems found")
-            return
-        }
-        val displayItems = diagnostics.map { SymbolDisplayItem(it.message, it.severity?.name ?: "INFO", it.range, 0) }
-        showBottomSheetList("Diagnostics", displayItems) { item ->
-            editor.setSelectionAround(item.range.start.line, item.range.start.character)
-            editor.ensurePositionVisible(item.range.start.line, item.range.start.character)
-        }
-    }
-    
-    data class SymbolDisplayItem(val name: String, val detail: String, val range: org.eclipse.lsp4j.Range, val depth: Int, val filePath: String? = null)
-
-    private fun showBottomSheetList(title: String, items: List<SymbolDisplayItem>, onClick: (SymbolDisplayItem) -> Unit) {
+    private fun showStatusPanel() {
         val dialog = BottomSheetDialog(requireContext())
-        val view = LayoutInflater.from(requireContext()).inflate(R.layout.layout_simple_list_sheet, null)
-        view.findViewById<TextView>(R.id.sheet_title).text = title
-        val recycler = view.findViewById<RecyclerView>(R.id.sheet_recycler)
-        recycler.layoutManager = LinearLayoutManager(requireContext())
-        recycler.adapter = object : RecyclerView.Adapter<ViewHolder>() {
-            override fun onCreateViewHolder(parent: ViewGroup, vt: Int) = object : ViewHolder(LayoutInflater.from(parent.context).inflate(android.R.layout.simple_list_item_2, parent, false)) {}
-            override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-                val item = items[position]
-                holder.itemView.findViewById<TextView>(android.R.id.text1).text = "${"  ".repeat(item.depth)}${item.name}"
-                holder.itemView.findViewById<TextView>(android.R.id.text2).text = item.detail
-                holder.itemView.setOnClickListener { onClick(item); dialog.dismiss() }
+        dialog.setContentView(ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent { 
+                androidx.compose.material3.MaterialTheme { 
+                    LspStatusPanel { dialog.dismiss() } 
+                } 
             }
-            override fun getItemCount() = items.size
-        }
-        dialog.setContentView(view)
+        })
         dialog.show()
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        viewLifecycleScope.launch { lspConnector?.disconnect() }
-        lspUiDelegate?.detach()
-        lspActionWindow?.dismiss()
-        lspActionWindow = null
-        lspConnector = null
-        lspUiDelegate = null
-        contextMenuHandler = null
     }
 }

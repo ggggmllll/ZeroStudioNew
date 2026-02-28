@@ -41,9 +41,9 @@ import org.slf4j.LoggerFactory
  * @author Akash Yadav
  */
 abstract class TreeSitterLanguage(
-  context: Context,
-  lang: TSLanguage,
-  private val langType: String
+    context: Context,
+    lang: TSLanguage,
+    private val langType: String,
 ) : IDELanguage() {
 
   private lateinit var tsTheme: TsTheme
@@ -57,11 +57,8 @@ abstract class TreeSitterLanguage(
   private val indentProvider: TreeSitterIndentProvider
     get() {
       if (!this::_indentProvider.isInitialized) {
-        this._indentProvider = TreeSitterIndentProvider(
-          languageSpec,
-          analyzer.analyzeWorker!!,
-          getTabSize()
-        )
+        this._indentProvider =
+            TreeSitterIndentProvider(languageSpec, analyzer.analyzeWorker!!, getTabSize())
       }
 
       return _indentProvider
@@ -106,11 +103,11 @@ abstract class TreeSitterLanguage(
   }
 
   override fun getIndentAdvance(
-    content: ContentReference,
-    line: Int,
-    column: Int,
-    spaceCountOnLine: Int,
-    tabCountOnLine: Int
+      content: ContentReference,
+      line: Int,
+      column: Int,
+      spaceCountOnLine: Int,
+      tabCountOnLine: Int,
   ): Int {
     return try {
       if (line == content.reference.lineCount - 1) {
@@ -127,10 +124,11 @@ abstract class TreeSitterLanguage(
         linesToReq += IntPair.pack(line + 1, 0)
       }
 
-      val indents = this.indentProvider.getIndentsForLines(
-        content = content.reference,
-        positions = linesToReq,
-      )
+      val indents =
+          this.indentProvider.getIndentsForLines(
+              content = content.reference,
+              positions = linesToReq,
+          )
 
       if (indents.size == 1) {
         val indent = indents[0]
@@ -138,15 +136,40 @@ abstract class TreeSitterLanguage(
           return DEF_IDENT_ADV
         }
 
+        if (indent == TreeSitterIndentProvider.INDENT_AUTO) {
+          return DEF_IDENT_ADV
+        }
+
         return indent - (spaceCountOnLine + (tabCountOnLine * getTabSize()))
       }
 
       val (indentLine, indentNxtLine) = indents
-      if (indentLine == TreeSitterIndentProvider.INDENTATION_ERR
-        || indentNxtLine == TreeSitterIndentProvider.INDENTATION_ERR) {
+
+      if (
+          indentLine == TreeSitterIndentProvider.INDENTATION_ERR ||
+              indentNxtLine == TreeSitterIndentProvider.INDENTATION_ERR
+      ) {
         log.debug(
-          "expectedIndent[{}]={}, expectedIndentNextLine[{}]={}, returning default indent advance",
-          line, indentLine, line + 1, indentNxtLine)
+            "expectedIndent[{}]={}, expectedIndentNextLine[{}]={}, returning default indent advance",
+            line,
+            indentLine,
+            line + 1,
+            indentNxtLine,
+        )
+        return DEF_IDENT_ADV
+      }
+
+      if (
+          indentLine == TreeSitterIndentProvider.INDENT_AUTO ||
+              indentNxtLine == TreeSitterIndentProvider.INDENT_AUTO
+      ) {
+        log.debug(
+            "expectedIndent[{}]={}, expectedIndentNextLine[{}]={}, returning default indent advance",
+            line,
+            indentLine,
+            line + 1,
+            indentNxtLine,
+        )
         return DEF_IDENT_ADV
       }
 
@@ -155,7 +178,6 @@ abstract class TreeSitterLanguage(
       log.error("An error occurred computing indentation at line:column::{}:{}", line, column, e)
       DEF_IDENT_ADV
     }
-
   }
 
   override fun destroy() {

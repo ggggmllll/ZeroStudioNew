@@ -263,35 +263,79 @@ class EditorViewModel : ViewModel() {
 
   fun writeOpenedFiles(cache: OpenedFilesCache?) {
     viewModelScope.launch(Dispatchers.IO) {
-      val file = getOpenedFilesCache(true)
+      try {
+        val file = getOpenedFilesCache(true)
 
-      if (cache == null) {
-        file.delete()
-        return@launch
+        if (cache == null) {
+          // Only delete if file exists
+          if (file.exists()) {
+            file.delete()
+          }
+          return@launch
+        }
+
+        // Ensure parent directory exists before writing
+        file.parentFile?.let { parentDir ->
+          if (!parentDir.exists()) {
+            val created = parentDir.mkdirs()
+            if (!created && !parentDir.exists()) {
+              ILogger.ROOT.error("Failed to create parent directory: ${parentDir.absolutePath}")
+              return@launch
+            }
+          }
+        }
+
+        // Create the file if it doesn't exist
+        if (!file.exists()) {
+          val created = file.createNewFile()
+          if (!created) {
+            ILogger.ROOT.error("Failed to create cache file: ${file.absolutePath}")
+            return@launch
+          }
+        }
+
+        val gson = GsonBuilder().setPrettyPrinting().create()
+        val string = gson.toJson(cache)
+
+        // Use try-catch for the actual file writing
+        try {
+          file.writeText(string)
+          ILogger.ROOT.debug("Successfully wrote opened files cache to: ${file.absolutePath}")
+        } catch (e: Exception) {
+          ILogger.ROOT.error("Failed to write opened files cache", e)
+          // If writing fails, clean up the empty file
+          if (file.exists() && file.length() == 0L) {
+            file.delete()
+          }
+        }
+      } catch (e: Exception) {
+        ILogger.ROOT.error("Error in writeOpenedFiles", e)
       }
-
-      val gson = GsonBuilder().setPrettyPrinting().create()
-      val string = gson.toJson(cache)
-      file.createNewFile()
-      file.writeText(string)
-    }.also { job ->
-      handleOpenedFilesCacheJobCompletion(job, "write")
-    }
+    }.also { job -> handleOpenedFilesCacheJobCompletion(job, "write") }
   }
 
   @PublishedApi
   internal fun getOpenedFilesCache(forWrite: Boolean = false): File {
     var file = Environment.getProjectCacheDir(IProjectManager.getInstance().projectDir)
     file = File(file, "editor/openedFiles.json")
+
     if (file.exists() && forWrite) {
-      FileUtils.rename(file, "${file.name}.bak")
+      try {
+        FileUtils.rename(file, "${file.name}.bak")
+      } catch (e: Exception) {
+        ILogger.ROOT.warn("Failed to create backup of cache file", e)
+      }
     }
 
-    if (file.parentFile?.exists() == false) {
-      file.parentFile?.mkdirs()
+    // Ensure parent directory exists
+    file.parentFile?.let { parentDir ->
+      if (!parentDir.exists()) {
+        val created = parentDir.mkdirs()
+        if (!created && !parentDir.exists()) {
+          ILogger.ROOT.error("Failed to create parent directory: ${parentDir.absolutePath}")
+        }
+      }
     }
-
-    file.createNewFile()
 
     return file
   }

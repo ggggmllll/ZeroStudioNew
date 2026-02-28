@@ -45,4 +45,6 @@ dependencies {
     api(projects.core.common)
     api(projects.editor.api)
     api(projects.logging.logger)
+    
 }
+

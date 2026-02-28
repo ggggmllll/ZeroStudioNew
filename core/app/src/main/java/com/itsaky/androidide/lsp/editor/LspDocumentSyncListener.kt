@@ -18,29 +18,26 @@
 package com.itsaky.androidide.lsp.editor
 
 import com.itsaky.androidide.lsp.BaseLspConnector
-import com.itsaky.androidide.lsp.util.DocumentVersionProvider
 import io.github.rosemoe.sora.event.ContentChangeEvent
 import io.github.rosemoe.sora.event.EventReceiver
 import io.github.rosemoe.sora.event.Unsubscribe
 import io.github.rosemoe.sora.lsp.events.EventType
 import io.github.rosemoe.sora.lsp.events.document.documentChange
-import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.io.File
 
 /**
- * An [EventReceiver] that listens for content changes in the editor and forwards them to the
- * Language Server Protocol (LSP) server via `textDocument/didChange` notifications.
- *
- * ## Key Functions
- * - It translates Sora-Editor's [ContentChangeEvent] into LSP-compliant change events.
- * - It uses [DocumentVersionProvider] to ensure that each change notification is sent with the correct,
- *   incremented document version, which is crucial for servers that support incremental sync.
- *
- * @property connector The active [BaseLspConnector] instance for the current editor.
- * @property file The [File] object representing the document being edited.
+ * LSP 文档同步监听器。
+ * 负责捕获 Sora 编辑器的文本变更事件并转发给 LSP 服务器（didChange）。
+ * 
+ * 工作流程：
+ * [Editor ContentChangeEvent] -> [Check Connection] -> [Launch IO Scope] 
+ * -> [Emit lsp.documentChange Event] -> [Language Server Update]
  *
  * @author android_zero
+ * @param connector LSP 连接器实例
+ * @param file 当前编辑的文件
  */
 class LspDocumentSyncListener(
     private val connector: BaseLspConnector,
@@ -49,18 +46,17 @@ class LspDocumentSyncListener(
 
     override fun onReceive(event: ContentChangeEvent, unsubscribe: Unsubscribe) {
         val lspEditor = connector.lspEditor ?: return
-        if (!lspEditor.isConnected) return
-
-        // We only need to sync actual text modifications (insertions/deletions).
-        if (event.action == ContentChangeEvent.ACTION_INSERT || event.action == ContentChangeEvent.ACTION_DELETE) {
+        
+        // 仅在已连接且是实际内容变更时同步
+        if (lspEditor.isConnected && 
+            (event.action == ContentChangeEvent.ACTION_INSERT || event.action == ContentChangeEvent.ACTION_DELETE)) {
             
-            // The actual logic for creating DidChangeTextDocumentParams is now handled inside
-            // sora-editor's DocumentChangeEvent listener, which correctly handles versioning
-            // and sync kinds (Full vs Incremental). We just need to trigger it.
+            // 使用 LSP 编辑器的协程作用域在 IO 线程处理同步
             lspEditor.coroutineScope.launch(Dispatchers.IO) {
-                // By emitting this event, we delegate the complex task of creating the correct
-                // TextDocumentContentChangeEvent (full or incremental) to the sora-editor-lsp framework.
-                lspEditor.eventManager.emitAsync(EventType.documentChange, event)
+                runCatching {
+                    // 发送变更到 sora-editor-lsp 框架，由其处理 Full/Incremental 同步
+                    lspEditor.eventManager.emitAsync(EventType.documentChange, event)
+                }
             }
         }
     }

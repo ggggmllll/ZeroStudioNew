@@ -23,11 +23,7 @@ import com.android.builder.model.v2.ide.PrivacySandboxSdkInfo
 import java.io.File
 import java.io.Serializable
 
-/**
- * @author Akash Yadav
- * @author android_zero
- *
- */
+/** @author Akash Yadav */
 class DefaultAndroidArtifact : AndroidArtifact, Serializable {
 
   private val serialVersionUID = 1L
@@ -38,6 +34,7 @@ class DefaultAndroidArtifact : AndroidArtifact, Serializable {
   override var bundleInfo: DefaultBundleInfo? = null
   override var codeShrinker: CodeShrinker? = null
   override var generatedResourceFolders: Collection<File> = emptyList()
+  override var generatedAssetsFolders: Collection<File> = emptyList()
   override var isSigned: Boolean = false
   override var maxSdkVersion: Int? = null
   override var minSdkVersion: DefaultApiVersion = DefaultApiVersion()
@@ -55,19 +52,7 @@ class DefaultAndroidArtifact : AndroidArtifact, Serializable {
   override var desugaredMethodsFiles: Collection<File> = emptyList()
   override val generatedClassPaths: Map<String, File> = emptyMap()
   override val bytecodeTransformations: Collection<BytecodeTransformation> = emptyList()
-
-  /**
-   * The list of generated assets folders.
-   */
-  override var generatedAssetsFolders: Collection<File> = emptyList()
-
-  /**
-   * The R8 mapping file text.
-   */
   override var mappingR8TextFile: File? = null
-
-  /**
-   * The R8 partition mapping file.
-   */
   override var mappingR8PartitionFile: File? = null
+
 }

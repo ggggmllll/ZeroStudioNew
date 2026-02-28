@@ -32,20 +32,18 @@ import io.github.rosemoe.sora.text.TextUtils
 abstract class TSBracketsHandler(private val language: TreeSitterLanguage) : BaseNewlineHandler() {
 
   override fun handleNewline(
-    text: Content,
-    position: CharPosition,
-    style: Styles?,
-    tabSize: Int
+      text: Content,
+      position: CharPosition,
+      style: Styles?,
+      tabSize: Int,
   ): NewlineHandleResult {
     val count = TextUtils.countLeadingSpaceCount(text.getLine(position.line), tabSize)
     var txt: String
     val sb =
-      StringBuilder("\n")
-        .append(TextUtils.createIndent(count + tabSize, tabSize, language.useTab()))
-        .append("\n")
-        .append(
-          TextUtils.createIndent(count, tabSize, language.useTab()).also { txt = it }
-        )
+        StringBuilder("\n")
+            .append(TextUtils.createIndent(count + tabSize, tabSize, language.useTab()))
+            .append("\n")
+            .append(TextUtils.createIndent(count, tabSize, language.useTab()).also { txt = it })
     return NewlineHandleResult(sb, txt.length + 1)
   }
 }

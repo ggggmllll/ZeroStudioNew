@@ -48,6 +48,7 @@ import io.github.rosemoe.sora.lsp.events.workspace.WorkSpaceApplyEditEvent
 import io.github.rosemoe.sora.lsp.events.workspace.WorkSpaceExecuteCommand
 import io.github.rosemoe.sora.lsp.utils.FileUri
 import io.github.rosemoe.sora.lsp.utils.toFileUri
+import io.github.rosemoe.sora.util.Logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.asCoroutineDispatcher
@@ -55,9 +56,13 @@ import kotlinx.coroutines.cancelChildren
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ForkJoinPool
 
+/**
+ * 管理 LSP 会话、编辑器实例和服务器包装器的核心类。
+ */
 class LspProject(
     projectPath: String,
 ) {
+    private val TAG = "LspProject"
 
     val projectUri = FileUri(projectPath)
 
@@ -78,11 +83,15 @@ class LspProject(
     val coroutineScope =
         CoroutineScope(ForkJoinPool.commonPool().asCoroutineDispatcher() + SupervisorJob())
 
+    /**
+     * 注册一个语言服务器定义。
+     */
     fun addServerDefinition(definition: LanguageServerDefinition) {
         for (ext in definition.exts) {
             val key = ServerKey(ext, definition.name)
             if (definitions.containsKey(key)) {
-                throw IllegalArgumentException("Server definition already exists for ext $ext with name ${definition.name}")
+                Logger.instance(TAG).w("Server definition already exists for ext $ext with name ${definition.name}. Skipping.")
+                continue
             }
             definitions[key] = definition
         }
@@ -94,14 +103,24 @@ class LspProject(
 
     fun removeServerDefinition(ext: String, name: String? = null) {
         if (name == null) {
-            definitions.keys.removeIf { it.ext == ext }
+            val iterator = definitions.keys.iterator()
+            while (iterator.hasNext()) {
+                if (iterator.next().ext == ext) {
+                    iterator.remove()
+                }
+            }
         } else {
             definitions.remove(ServerKey(ext, name))
         }
     }
 
     fun getServerDefinition(ext: String, name: String? = null): LanguageServerDefinition? {
-        return definitions[ServerKey(ext, name ?: ext)]
+        // 如果未指定 name，尝试查找该扩展名的任意一个定义
+        return if (name == null) {
+            definitions.entries.firstOrNull { it.key.ext == ext }?.value
+        } else {
+            definitions[ServerKey(ext, name)]
+        }
     }
 
     fun getServerDefinitions(ext: String): Collection<LanguageServerDefinition> {
@@ -111,6 +130,9 @@ class LspProject(
             .distinctBy { it.name }
     }
 
+    /**
+     * 创建一个新的 LSP 编辑器实例。
+     */
     fun createEditor(path: String): LspEditor {
         val uri = FileUri(path)
         val editor = LspEditor(this, uri)
@@ -130,8 +152,15 @@ class LspProject(
         return editors[uri]
     }
 
+    /**
+     * 获取或创建编辑器实例。
+     * 修复：确保 URI 标准化，防止因路径格式不同导致创建多个实例。
+     */
     fun getOrCreateEditor(path: String): LspEditor {
-        return getEditor(path) ?: createEditor(path)
+        val uri = path.toFileUri()
+        return editors.computeIfAbsent(uri) {
+            LspEditor(this, it)
+        }
     }
 
     fun closeAllEditors() {
@@ -148,14 +177,16 @@ class LspProject(
 
     internal fun getOrCreateLanguageServerWrapper(ext: String, name: String = ext): LanguageServerWrapper {
         val key = ServerKey(ext, name)
-        return wrappers[key] ?: createLanguageServerWrapper(ext, name)
+        return wrappers.computeIfAbsent(key) {
+            createLanguageServerWrapper(ext, name)
+        }
     }
 
     internal fun createLanguageServerWrapper(ext: String, name: String): LanguageServerWrapper {
         val definition = getServerDefinition(ext, name)
-            ?: throw IllegalArgumentException("No server definition for extension $ext with name $name")
+            ?: throw IllegalArgumentException("No server definition found for extension '$ext' with name '$name'. definitions: ${definitions.keys}")
+        
         val wrapper = LanguageServerWrapper(definition, this)
-        wrappers[ServerKey(ext, name)] = wrapper
         return wrapper
     }
 

@@ -8,8 +8,8 @@
  *
  *  AndroidIDE is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *  Lesser General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
  *   along with AndroidIDE.  If not, see <https://www.gnu.org/licenses/>.
@@ -42,8 +42,10 @@ import com.itsaky.androidide.tooling.api.IProject
 import com.itsaky.androidide.tooling.api.messages.result.InitializeResult
 import com.itsaky.androidide.tooling.api.models.BuildVariantInfo
 import com.itsaky.androidide.utils.DocumentUtils
+import com.itsaky.androidide.utils.Environment
 import com.itsaky.androidide.utils.flashError
 import com.itsaky.androidide.utils.withStopWatch
+import com.itsaky.androidide.utils.GradleFileParser
 import java.io.File
 import java.util.Locale
 import kotlin.io.path.extension
@@ -62,10 +64,10 @@ import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import org.slf4j.LoggerFactory
 
-
-
 /**
- * Internal implementation of [IProjectManager].
+ * 项目管理器内部实现类 ([IProjectManager])。
+ * 
+ * <p>该类负责真正执行项目配置的初始化（Setup），协调事件总线，执行代码生成（如 AGP DataBinding/AIDL 生成），并管理文件系统的变更通知。</p>
  *
  * @author Akash Yadav
  */
@@ -75,6 +77,12 @@ class ProjectManagerImpl : IProjectManager, EventReceiver {
 
   private var _workspace: WorkspaceImpl? = null
   private var _projectDir: File? = null
+
+  /**
+   * 用于缓存判断当前项目是否为插件项目。
+   */
+  @Volatile
+  internal var pluginProjectCached: Boolean? = null
 
   var projectInitialized: Boolean = false
   var cachedInitResult: InitializeResult? = null
@@ -92,9 +100,27 @@ class ProjectManagerImpl : IProjectManager, EventReceiver {
   override fun openProject(directory: File) {
     // IMP: Always use canonical path
     this._projectDir = directory.canonicalFile
+    // 清除上一个项目的缓存状态
+    this.pluginProjectCached = null
+  }
+
+  /**
+   * 提供给 UI 或其他服务判断是否需要进行 Gradle 同步。（来自 `b` 分支）
+   */
+  override suspend fun isGradleSyncNeeded(projectDir: File): Boolean {
+      // 兼容 a 分支现有逻辑，因为 a 分支中没有 ProjectSyncHelper，如果这里没有 ProjectSyncHelper 的引用，
+      // 我们暂以检查 build 目录和 .gradle 目录的基础手段作为平替（或者如果你有 ProjectSyncHelper，可以直接调用）。
+      return withContext(Dispatchers.IO) {
+          !File(projectDir, ".gradle").exists() || !File(projectDir, "build").exists()
+      }
   }
 
   override suspend fun setupProject(project: IProject) {
+    // 缓存插件项目标志
+    pluginProjectCached = withContext(Dispatchers.IO) {
+        File(projectDir, Environment.PLUGIN_API_JAR_RELATIVE_PATH).exists()
+    }
+
     this._workspace =
         withStopWatch("Transform project proxy") {
           withContext(Dispatchers.IO) {
@@ -134,6 +160,30 @@ class ProjectManagerImpl : IProjectManager, EventReceiver {
     }
   }
 
+  // ==============================================================================
+  // 从 b 分支引入的过滤模块实现
+  // ==============================================================================
+
+  override fun getAndroidModules(): List<AndroidModule> {
+    val workspace = this.getWorkspace() ?: return emptyList()
+    return workspace.androidProjects().toList()
+  }
+
+  override fun getAndroidAppModules(): List<AndroidModule> {
+    return getAndroidModules().filter { it.isApplication }
+  }
+
+  override fun getAndroidLibraryModules(): List<AndroidModule> {
+    return getAndroidModules().filter { it.isLibrary }
+  }
+
+  override fun findModuleForFile(file: File, checkExistence: Boolean): ModuleProject? {
+    val ws = this.getWorkspace() ?: return null
+    return ws.findModuleForFile(file, checkExistence)
+  }
+
+  // ==============================================================================
+
   override fun destroy() {
     log.info("Destroying project manager")
 
@@ -143,6 +193,7 @@ class ProjectManagerImpl : IProjectManager, EventReceiver {
     this._projectDir = null
     this.cachedInitResult = null
     this.projectInitialized = false
+    this.pluginProjectCached = null
   }
 
   @JvmOverloads
@@ -235,8 +286,20 @@ class ProjectManagerImpl : IProjectManager, EventReceiver {
 
         val variantName = subproject.configuredVariant?.name ?: IAndroidProject.DEFAULT_VARIANT
 
+        val moduleDir = File(projectDir, subproject.path.replace(":", File.separator))
+        val gradleInfo = GradleFileParser.parseModuleBuildGradle(moduleDir)
+
         buildVariants[subproject.path] =
-            BuildVariantInfo(subproject.path, variantNames, variantName)
+            BuildVariantInfo(
+                projectPath = subproject.path,
+                buildVariants = variantNames,
+                selectedVariant = variantName,
+                versionName = gradleInfo?.versionName,
+                versionCode = gradleInfo?.versionCode,
+                minSdk = gradleInfo?.minSdk,
+                targetSdk = gradleInfo?.targetSdk,
+                compileSdk = gradleInfo?.compileSdk
+            )
       }
     }
 

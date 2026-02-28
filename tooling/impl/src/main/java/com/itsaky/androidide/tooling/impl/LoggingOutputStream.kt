@@ -32,9 +32,12 @@ class LoggingOutputStream : OutputStream() {
     val c = b.toChar()
     lineBuilder.append(c)
 
-    if (c == '\n' && Main.client != null) {
-      Main.client.logOutput(lineBuilder.toString())
-      lineBuilder.clear()
+    if (c == '\n') {
+      val clientRef = Main.client
+      if (clientRef != null) {
+        clientRef.logOutput(lineBuilder.toString())
+        lineBuilder.clear()
+      }
     }
   }
 }

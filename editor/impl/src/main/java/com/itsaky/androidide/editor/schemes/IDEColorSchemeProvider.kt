@@ -60,10 +60,11 @@ object IDEColorSchemeProvider {
    */
   private var defaultScheme: IDEColorScheme? = null
     get() {
-      return field ?: getColorScheme(EditorPreferences.DEFAULT_COLOR_SCHEME).also { scheme ->
-        field = scheme
-        isDefaultSchemeLoaded = scheme != null
-      }
+      return field
+          ?: getColorScheme(EditorPreferences.DEFAULT_COLOR_SCHEME).also { scheme ->
+            field = scheme
+            isDefaultSchemeLoaded = scheme != null
+          }
     }
 
   /**
@@ -74,10 +75,11 @@ object IDEColorSchemeProvider {
    */
   private var currentScheme: IDEColorScheme? = null
     get() {
-      return field ?: getColorScheme(EditorPreferences.colorScheme).also { scheme ->
-        field = scheme
-        isCurrentSchemeLoaded = scheme != null
-      }
+      return field
+          ?: getColorScheme(EditorPreferences.colorScheme).also { scheme ->
+            field = scheme
+            isCurrentSchemeLoaded = scheme != null
+          }
     }
 
   /**
@@ -86,7 +88,11 @@ object IDEColorSchemeProvider {
    */
   @WorkerThread
   private fun getColorScheme(name: String): IDEColorScheme? {
-    return schemes[name]?.also(this::loadColorScheme)
+    val scheme = schemes[name] ?: run {
+      log.error("Color scheme '{}' not found in loaded schemes", name)
+      return null
+    }
+    return loadColorScheme(scheme)
   }
 
   /**
@@ -98,8 +104,12 @@ object IDEColorSchemeProvider {
       scheme.darkVariant?.load()
       scheme
     } catch (err: Exception) {
-      log.error("An error occurred while loading color scheme '{}'", EditorPreferences.colorScheme,
-        err)
+      log.error(
+          "An error occurred while loading color scheme '{}' from file '{}'",
+          scheme.name,
+          scheme.file.absolutePath,
+          err,
+      )
       null
     }
   }
@@ -112,35 +122,37 @@ object IDEColorSchemeProvider {
   @WorkerThread
   fun init() {
     val schemeDirs =
-      schemesDir.listFiles(FileFilter { it.isDirectory && File(it, "scheme.prop").exists() })
-        ?: run {
-          log.error("No color schemes found")
-          return
-        }
+        schemesDir.listFiles(FileFilter { it.isDirectory && File(it, "scheme.prop").exists() })
+            ?: run {
+              log.error("No color schemes found in directory: {}", schemesDir.absolutePath)
+              return
+            }
+
+    log.debug("Found {} scheme directories in {}", schemeDirs.size, schemesDir.absolutePath)
 
     for (schemeDir in schemeDirs) {
       val prop = File(schemeDir, "scheme.prop")
       val props =
-        try {
-          prop.reader().use { reader ->
-            Properties().apply { load(reader) }
+          try {
+            prop.reader().use { reader -> Properties().apply { load(reader) } }
+          } catch (err: Exception) {
+            log.error("Failed to read properties for scheme '{}' at '{}'", schemeDir.name, prop.absolutePath, err)
+            continue
           }
-        } catch (err: Exception) {
-          log.error("Failed to read properties for scheme '{}'", schemeDir.name)
-          continue
-        }
 
       val name = props.getProperty(SCHEME_NAME, "Unknown")
       val version = props.getProperty(SCHEME_VERSION, "0").toInt()
       val isDark = props.getProperty(SCHEME_IS_DARK, "false").toBoolean()
       val file =
-        props.getProperty(SCHEME_FILE)
-          ?: run {
-            log.error(
-              "Scheme '${schemeDir.name}' does not specify 'scheme.file' in scheme.prop file"
-            )
-            ""
-          }
+          props.getProperty(SCHEME_FILE)
+              ?: run {
+                log.error(
+                    "Scheme '{}' does not specify 'scheme.file' in scheme.prop file at '{}'",
+                    schemeDir.name,
+                    prop.absolutePath
+                )
+                ""
+              }
 
       if (version <= 0) {
         log.warn("Version code of color scheme '{}' must be set to >= 1", schemeDir)
@@ -150,16 +162,24 @@ object IDEColorSchemeProvider {
         continue
       }
 
-      val scheme = IDEColorScheme(File(schemeDir, file), schemeDir.name)
+      val schemeFile = File(schemeDir, file)
+      if (!schemeFile.exists()) {
+        log.error("Scheme file '{}' does not exist for scheme '{}'", schemeFile.absolutePath, schemeDir.name)
+        continue
+      }
+
+      log.debug("Registered color scheme: name='{}', key='{}', file='{}'", name, schemeDir.name, schemeFile.absolutePath)
+
+      val scheme = IDEColorScheme(schemeFile, schemeDir.name)
       scheme.name = name
       scheme.version = version
       scheme.isDarkScheme = isDark
       schemes[schemeDir.name] = scheme
     }
 
-    schemes.values.forEach {
-      it.darkVariant = schemes["${it.key}-dark"]
-    }
+    schemes.values.forEach { it.darkVariant = schemes["${it.key}-dark"] }
+    
+    log.info("Initialized {} color schemes", schemes.size)
   }
 
   /**
@@ -185,29 +205,27 @@ object IDEColorSchemeProvider {
    */
   @JvmOverloads
   fun readSchemeAsync(
-    context: Context,
-    coroutineScope: CoroutineScope,
-    type: String? = null,
-    callbackContext: CoroutineContext = Dispatchers.Main.immediate,
-    callback: (SchemeAndroidIDE?) -> Unit
+      context: Context,
+      coroutineScope: CoroutineScope,
+      type: String? = null,
+      callbackContext: CoroutineContext = Dispatchers.Main.immediate,
+      callback: (SchemeAndroidIDE?) -> Unit,
   ) {
 
-    // If the scheme has already been loaded, do not bother to dispatch an IO coroutine
-    // simply invoke the callback on the requested context providing the already loaded scheme
-    val loadedScheme = if (isCurrentSchemeLoaded && (type == null || currentScheme?.getLanguageScheme(
-        type) != null)
-    ) {
-      currentScheme
-    } else if (isDefaultSchemeLoaded) {
-      defaultScheme
-    } else {
-      null
-    }
+    val loadedScheme =
+        if (
+            isCurrentSchemeLoaded &&
+                (type == null || currentScheme?.getLanguageScheme(type) != null)
+        ) {
+          currentScheme
+        } else if (isDefaultSchemeLoaded) {
+          defaultScheme
+        } else {
+          null
+        }
 
     if (loadedScheme != null) {
-      coroutineScope.launch(callbackContext) {
-        callback(readScheme(context, type))
-      }
+      coroutineScope.launch(callbackContext) { callback(readScheme(context, type)) }
       return
     }
 
@@ -215,9 +233,7 @@ object IDEColorSchemeProvider {
     // load the scheme using the IO dispatcher
     coroutineScope.launch(Dispatchers.IO) {
       val scheme = readScheme(context, type)
-      withContext(callbackContext) {
-        callback(scheme)
-      }
+      withContext(callbackContext) { callback(scheme) }
     }
   }
 
@@ -228,13 +244,10 @@ object IDEColorSchemeProvider {
    */
   @JvmOverloads
   @WorkerThread
-  fun readScheme(
-    context: Context,
-    type: String? = null
-  ): SchemeAndroidIDE? {
+  fun readScheme(context: Context, type: String? = null): SchemeAndroidIDE? {
     val scheme = getColorSchemeForType(type)
     if (scheme == null) {
-      log.error("Failed to read color scheme")
+      log.error("Failed to read color scheme for type '{}'", type)
       return null
     }
 
@@ -256,21 +269,30 @@ object IDEColorSchemeProvider {
       return currentScheme
     }
 
-    return currentScheme?.let { scheme ->
-      return@let if (scheme.getLanguageScheme(type) == null) {
-        log.warn("Color scheme '{}' does not support '{}'", scheme.name, type)
-        log.warn("Falling back to default color scheme")
-        null
-      } else {
-        scheme
-      }
-    } ?: defaultScheme
+    val current = currentScheme
+    if (current != null && current.getLanguageScheme(type) != null) {
+      return current
+    }
+
+    if (current != null) {
+      log.warn("Color scheme '{}' does not support '{}'. Available languages: {}", 
+        current.name, type, current.languages.keys.joinToString(", "))
+      log.warn("Falling back to default color scheme")
+    }
+
+    val default = defaultScheme
+    if (default != null && default.getLanguageScheme(type) != null) {
+      return default
+    }
+
+    if (default != null) {
+      log.error("Default color scheme '{}' does not support '{}'. Available languages: {}", 
+        default.name, type, default.languages.keys.joinToString(", "))
+    }
+
+    return default
   }
 
-  /**
-   * Get all available color schemes. The returned list does not include the `-dark` variant of
-   * the color schemes.
-   */
   fun list(): List<IDEColorScheme> {
     // filter out schemes that are dark variants of other schemes
     // schemes with both light and dark variant will be used according to system's dark mode
@@ -293,7 +315,6 @@ object IDEColorSchemeProvider {
   fun reload() {
     destroy()
     init()
-    // notify editors
     EventBus.getDefault().post(ColorSchemeInvalidatedEvent())
   }
 }

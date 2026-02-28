@@ -22,6 +22,7 @@
  *     additional information or have any questions
  ******************************************************************************/
 
+
 package io.github.rosemoe.sora.lsp.editor
 
 import android.os.Bundle
@@ -58,6 +59,7 @@ class LspLanguage(var editor: LspEditor) : Language {
     private var _formatter: Formatter? = null
 
     var wrapperLanguage: Language? = null
+    
     var completionItemProvider: CompletionItemProvider<*>
 
     init {
@@ -72,12 +74,13 @@ class LspLanguage(var editor: LspEditor) : Language {
             }
     }
 
+    // 委托给底层语言处理语法高亮 (AnalyzeManager)
     override fun getAnalyzeManager(): AnalyzeManager {
         return wrapperLanguage?.analyzeManager ?: EmptyLanguage.EmptyAnalyzeManager.INSTANCE
     }
 
     override fun getInterruptionLevel(): Int {
-        return wrapperLanguage?.interruptionLevel ?: 0
+        return wrapperLanguage?.interruptionLevel ?: Language.INTERRUPTION_LEVEL_SLIGHT
     }
 
     @Throws(CompletionCancelledException::class)
@@ -87,73 +90,70 @@ class LspLanguage(var editor: LspEditor) : Language {
         publisher: CompletionPublisher,
         extraArguments: Bundle
     ) {
-
-        /* if (getEditor().hitTrigger(line)) {
-            publisher.cancel();
-            return;
-        }*/
-
         if (!editor.isConnected) {
             return
         }
 
+        // 计算前缀 (Prefix)
         val prefix = computePrefix(content, position)
-
         val prefixLength = prefix.length
 
-        val documentChangeEvent =
-            editor.eventManager.getEventListener<DocumentChangeEvent>() ?: return
+        // 确保之前的文档变更已发送完毕 (WillSave)
+        val documentChangeEvent = editor.eventManager.getEventListener<DocumentChangeEvent>()
+        val documentChangeFuture = documentChangeEvent?.future
 
-        val documentChangeFuture =
-            documentChangeEvent.future
-
-        if (documentChangeFuture?.isDone == false || documentChangeFuture?.isCompletedExceptionally == false || documentChangeFuture?.isCancelled == false) {
-            runCatching {
+        if (documentChangeFuture != null && !documentChangeFuture.isDone && !documentChangeFuture.isCancelled) {
+            try {
                 documentChangeFuture.get(Timeout[Timeouts.WILLSAVE].toLong(), TimeUnit.MILLISECONDS)
+            } catch (e: Exception) {
+                // Ignore
             }
         }
 
+        // 异步请求补全列表 (阻塞当前 worker 线程等待结果)
         val completionList = ArrayList<CompletionItem>()
-
-        val serverResultCompletionItems =
-            editor.coroutineScope.future {
-                editor.eventManager.emitAsync(EventType.completion, position)
-                    .getOrNull<List<org.eclipse.lsp4j.CompletionItem>>("completion-items")
-                    ?: emptyList()
-            }
+        val serverResultFuture = editor.coroutineScope.future {
+            editor.eventManager.emitAsync(EventType.completion, position)
+                .getOrNull<List<org.eclipse.lsp4j.CompletionItem>>("completion-items")
+                ?: emptyList()
+        }
 
         try {
-            serverResultCompletionItems
-                .thenAccept { completions ->
-                    completions.forEach { completionItem: org.eclipse.lsp4j.CompletionItem ->
-                        completionList.add(
-                            completionItemProvider.createCompletionItem(
-                                completionItem,
-                                editor.eventManager,
-                                prefixLength
-                            )
-                        )
-                    }
-                }.exceptionally { throwable: Throwable ->
-                    publisher.cancel()
-                    throw CompletionCancelledException(throwable.message)
-                }.get(Timeout[Timeouts.COMPLETION].toLong(), TimeUnit.MILLISECONDS)
-        } catch (e: InterruptedException) {
+            // 设置超时，防止卡死 UI
+            val completions = serverResultFuture.get(Timeout[Timeouts.COMPLETION].toLong(), TimeUnit.MILLISECONDS)
+            
+            // 转换结果
+            completions.forEach { lspItem ->
+                completionList.add(
+                    completionItemProvider.createCompletionItem(
+                        lspItem,
+                        editor.eventManager,
+                        prefixLength
+                    )
+                )
+            }
+        } catch (e: Exception) {
+            // 如果被取消或超时，终止补全
+            publisher.cancel()
             return
         }
 
-        filterCompletionItems(content, position, completionList).let { filteredList ->
-            publisher.setComparator(createCompletionItemComparator(filteredList))
-            publisher.addItems(filteredList)
+        // filterCompletionItems 会根据输入的 prefix 对列表进行模糊匹配过滤
+        val filteredList = filterCompletionItems(content, position, completionList)
+        
+        publisher.setComparator(createCompletionItemComparator(filteredList))
+        publisher.addItems(filteredList)
+        
+        if (publisher.items.isNotEmpty()) {
+            publisher.updateList(true)
         }
-
-        publisher.updateList()
     }
 
     private fun computePrefix(text: ContentReference, position: CharPosition): String {
         val triggers = editor.completionTriggers.filterNot { trigger ->
             trigger.length == 1 && trigger[0].isLetterOrDigit()
         }
+        
         if (triggers.isEmpty()) {
             return CompletionHelper.computePrefix(text, position) { key: Char ->
                 MyCharacter.isJavaIdentifierPart(key)
@@ -165,8 +165,8 @@ class LspLanguage(var editor: LspEditor) : Language {
         }
 
         val s = StringBuilder()
-
         val line = text.getLine(position.line)
+        
         for (i in min(line.lastIndex, position.column - 1) downTo 0) {
             val char = line[i]
             if (delimiters.contains(char.toString())) {
@@ -174,15 +174,15 @@ class LspLanguage(var editor: LspEditor) : Language {
             }
             s.append(char)
         }
-        return s.toString()
+        return s.reverse().toString()
     }
 
     override fun getIndentAdvance(content: ContentReference, line: Int, column: Int): Int {
-        return wrapperLanguage?.interruptionLevel ?: 0
+        return wrapperLanguage?.getIndentAdvance(content, line, column) ?: 0
     }
 
     override fun useTab(): Boolean {
-        return wrapperLanguage?.useTab() == true
+        return wrapperLanguage?.useTab() ?: false
     }
 
     override fun getFormatter(): Formatter {
@@ -202,10 +202,7 @@ class LspLanguage(var editor: LspEditor) : Language {
     }
 
     override fun destroy() {
-        formatter.destroy()
+        _formatter?.destroy()
         wrapperLanguage?.destroy()
     }
-
-
 }
-

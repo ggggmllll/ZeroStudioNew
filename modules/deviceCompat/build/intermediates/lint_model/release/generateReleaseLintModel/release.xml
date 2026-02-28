@@ -27,6 +27,6 @@
       applicationId="com.itsaky.androidide.DeviceCompat"
       generatedSourceFolders="build/generated/ap_generated_sources/release/out:build/generated/source/buildConfig/release:build/generated/data_binding_base_class_source_out/release/out"
       generatedResourceFolders="build/generated/res/resValues/release"
-      desugaredMethodsFiles="/root/.gradle/caches/8.13/transforms/acee262943018afbdc87a54702ec934d/transformed/D8BackportedDesugaredMethods.txt">
+      desugaredMethodsFiles="/root/.gradle/caches/8.13/transforms/5ee95dfb42aa39f50c765cd635c5094d/transformed/D8BackportedDesugaredMethods.txt">
   </artifact>
 </variant>

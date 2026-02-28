@@ -34,12 +34,12 @@ abstract class BaseNewlineHandler : NewlineHandler {
   
   protected val openingBrackets = mutableListOf<String>()
   protected val closingBrackets = mutableListOf<String>()
-  
+
   override fun matchesRequirement(text: Content, position: CharPosition, style: Styles?): Boolean {
     val line = text.getLine(position.line)
     return !StylesUtils.checkNoCompletion(style, position) &&
-      (getNonEmptyTextBefore(line, position.column, 1) in openingBrackets) &&
-      (getNonEmptyTextAfter(line, position.column, 1) in closingBrackets)
+        (getNonEmptyTextBefore(line, position.column, 1) in openingBrackets) &&
+        (getNonEmptyTextAfter(line, position.column, 1) in closingBrackets)
   }
   
   @Suppress("SameParameterValue")

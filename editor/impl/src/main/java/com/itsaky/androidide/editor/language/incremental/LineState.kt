@@ -29,9 +29,9 @@ import org.antlr.v4.runtime.Lexer
  * @author Akash Yadav
  */
 data class LineState(
-  @JvmField var state: Int = NORMAL,
-  @JvmField var hasBraces: Boolean = false,
-  @JvmField var lexerMode: Int = Lexer.DEFAULT_MODE
+    @JvmField var state: Int = NORMAL,
+    @JvmField var hasBraces: Boolean = false,
+    @JvmField var lexerMode: Int = Lexer.DEFAULT_MODE,
 ) {
   companion object {
     const val NORMAL = 0

@@ -309,6 +309,8 @@ androidx-compose-runtime-livedata = { module = "androidx.compose.runtime:runtime
 androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-compose-compiler = { group = "androidx.compose.compiler", name = "compiler", version.ref = "compose-compiler" }
+androidx-compose-runtime = { module = "androidx.compose.runtime:runtime" }
+androidx-compose-foundation = { module = "androidx.compose.foundation:foundation" }
 
 ######  Google sdk #####
 google-material = { module = "com.google.android.material:material", version.ref = "googleMaterial" }

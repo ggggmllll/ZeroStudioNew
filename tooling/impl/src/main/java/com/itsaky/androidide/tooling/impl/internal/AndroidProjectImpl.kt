@@ -48,12 +48,7 @@ import java.io.Serializable
 import java.util.concurrent.CompletableFuture
 import org.gradle.tooling.model.GradleProject
 
-/**
- * @author Akash Yadav
- * @author android_zero
- *
- * Update: Fixed all String? vs String type mismatch errors by handling nullable task names (sourceGenTaskName, assembleTaskName, compileTaskName) with default values.
- */
+/** @author Akash Yadav */
 internal class AndroidProjectImpl(
     gradleProject: GradleProject,
     private val configuredVariant: String,
@@ -82,24 +77,17 @@ internal class AndroidProjectImpl(
     return AndroidArtifactMetadata(
         name = variantName,
         applicationId = computeApplicationId(variantName),
-        // Fix: Handle nullable String? with default empty string
         resGenTaskName = resGenTaskName ?: "",
-        // Fix: Handle nullable File? with default file object
-        assembleTaskOutputListingFile = assembleTaskOutputListingFile ?: File(""),
+        assembleTaskOutputListingFile = assembleTaskOutputListingFile,
         generatedResourceFolders = generatedResourceFolders,
         generatedSourceFolders = generatedSourceFolders,
-        // Fix: Handle nullable Int? with default -1
-        maxSdkVersion = maxSdkVersion ?: -1,
+        maxSdkVersion = maxSdkVersion,
         minSdkVersion = minSdkVersion.apiLevel,
-        // Fix: Handle nullable String? with default empty string
         signingConfigName = signingConfigName ?: "",
-        // Fix: Handle nullable String? with default empty string
         sourceGenTaskName = sourceGenTaskName ?: "",
-        // Fix: Handle nullable String? with default empty string
-        assembleTaskName = assembleTaskName ?: "",
+        assembleTaskName = assembleTaskName ?: "", // Line 88 - ADD ?: ""
         classJars = classesFolders.filter { it.name.endsWith(".jar") },
-        // Fix: Handle nullable String? with default empty string
-        compileTaskName = compileTaskName ?: "",
+        compileTaskName = compileTaskName ?: "", // Line 90 - ADD ?: ""
         targetSdkVersionOverride = targetSdkVersionOverride?.apiLevel ?: -1,
     )
   }
@@ -196,8 +184,8 @@ internal class AndroidProjectImpl(
           gradleMetadata,
           basicAndroidProject.projectType,
           copy(androidProject.flags),
-          // Fix: Handle nullable JavaCompileOptions with default object
-          copy(androidProject.javaCompileOptions ?: DefaultJavaCompileOptions()),
+          androidProject.javaCompileOptions?.let { copy(it) }
+              ?: DefaultJavaCompileOptions(), // Line 174 - ADD ?: DefaultJavaCompileOptions()
           viewBindingOptions,
           androidProject.resourcePrefix,
           androidProject.namespace,

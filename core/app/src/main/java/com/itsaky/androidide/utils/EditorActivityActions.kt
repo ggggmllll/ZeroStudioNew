@@ -34,6 +34,7 @@ import com.itsaky.androidide.actions.etc.DisconnectLogSendersAction
 import com.itsaky.androidide.actions.etc.FindActionMenu
 import com.itsaky.androidide.actions.etc.LaunchAppAction
 import com.itsaky.androidide.actions.etc.PreviewLayoutAction
+import com.itsaky.androidide.actions.etc.PreviewComposeAction
 import com.itsaky.androidide.actions.etc.ReloadColorSchemesAction
 import com.itsaky.androidide.actions.file.CloseAllFilesAction
 import com.itsaky.androidide.actions.file.CloseFileAction
@@ -82,6 +83,7 @@ class EditorActivityActions {
       registry.registerAction(CodeActionsMenu(context, order++))
       registry.registerAction(CursorActionsMenu(context, order++))
       registry.registerAction(PreviewLayoutAction(context, order++))
+      registry.registerAction(PreviewComposeAction(context, order++))
       registry.registerAction(FindActionMenu(context, order++))
       registry.registerAction(ProjectSyncAction(context, order++))
       registry.registerAction(ReloadColorSchemesAction(context, order++))

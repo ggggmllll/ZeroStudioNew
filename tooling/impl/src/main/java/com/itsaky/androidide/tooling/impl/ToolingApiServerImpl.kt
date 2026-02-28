@@ -49,6 +49,7 @@ import com.itsaky.androidide.tooling.impl.sync.ModelBuilderException
 import com.itsaky.androidide.tooling.impl.sync.RootModelBuilder
 import com.itsaky.androidide.tooling.impl.sync.RootProjectModelBuilderParams
 import com.itsaky.androidide.utils.StopWatch
+import com.itsaky.androidide.tooling.impl.net.SimpleHttpProxy
 import java.io.File
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CompletionException
@@ -78,6 +79,7 @@ internal class ToolingApiServerImpl(private val project: ProjectImpl) : ITooling
   private var connection: ProjectConnection? = null
   private var lastInitParams: InitializeProjectParams? = null
   private var _buildCancellationToken: CancellationTokenSource? = null
+  private var httpProxy: SimpleHttpProxy? = null
 
   private val cancellationTokenAccessLock = ReentrantLock(/* fair= */ true)
   private var buildCancellationToken: CancellationTokenSource?
@@ -134,6 +136,9 @@ internal class ToolingApiServerImpl(private val project: ProjectImpl) : ITooling
           return@runBuild InitializeResult(false, failureReason)
         }
 
+        // Ensure Gradle sees UTF-8/locale early via project gradle.properties
+        ensureProjectGradleProperties(projectDirectory)
+
         val stopWatch = StopWatch("Connection to project")
         val isReinitializing = connector != null && connection != null && params == lastInitParams
 
@@ -174,6 +179,18 @@ internal class ToolingApiServerImpl(private val project: ProjectImpl) : ITooling
 
         this.buildCancellationToken = GradleConnector.newCancellationTokenSource()
 
+        // start local HTTP proxy for Gradle network (before exposing port)
+        if (httpProxy == null) {
+          httpProxy = SimpleHttpProxy(0).also { it.start() }
+        }
+        // Expose proxy port to child process via system property
+        val proxyPort = httpProxy?.port ?: -1
+        if (proxyPort > 0) {
+          try {
+            System.setProperty("ANDROIDIDE_PROXY_PORT", proxyPort.toString())
+          } catch (_: Throwable) {}
+        }
+
         val project =
             try {
               val modelBuilderParams =
@@ -199,6 +216,32 @@ internal class ToolingApiServerImpl(private val project: ProjectImpl) : ITooling
         notifyBuildFailure(emptyList())
         return@runBuild InitializeResult(false, getTaskFailureType(err))
       }
+    }
+  }
+
+  private fun ensureProjectGradleProperties(projectDir: File) {
+    try {
+      val propsFile = File(projectDir, "gradle.properties")
+      val props = java.util.Properties()
+      if (propsFile.exists()) propsFile.inputStream().use { props.load(it) }
+
+      val jvmArgsKey = "org.gradle.jvmargs"
+      val enforced =
+          "-Dfile.encoding=UTF-8 -Dsun.jnu.encoding=UTF-8 -Duser.language=en -Duser.country=US"
+      val current = props.getProperty(jvmArgsKey)?.trim().orEmpty()
+      if (!current.contains("file.encoding")) {
+        props.setProperty(jvmArgsKey, if (current.isBlank()) enforced else "$current $enforced")
+      }
+      props.setProperty("systemProp.file.encoding", "UTF-8")
+      props.setProperty("systemProp.sun.jnu.encoding", "UTF-8")
+      props.setProperty("systemProp.user.language", "en")
+      props.setProperty("systemProp.user.country", "US")
+
+      propsFile.outputStream().use { out ->
+        props.store(out, "AndroidIDE: enforce UTF-8 & locale for Gradle daemon")
+      }
+    } catch (_: Throwable) {
+      // best-effort; ignore
     }
   }
 
@@ -348,6 +391,12 @@ internal class ToolingApiServerImpl(private val project: ProjectImpl) : ITooling
       // Stop all daemons
       log.info("Stopping all Gradle Daemons...")
       DefaultGradleConnector.close()
+
+      // stop proxy
+      try {
+        httpProxy?.stop()
+      } catch (_: Throwable) {}
+      httpProxy = null
 
       // update the initialization flag before cancelling future
       this.isInitialized = false

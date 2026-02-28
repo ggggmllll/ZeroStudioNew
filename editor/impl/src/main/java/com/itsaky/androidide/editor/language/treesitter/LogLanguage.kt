@@ -33,7 +33,6 @@ class LogLanguage(context: Context) :
 
     const val TS_TYPE = "log"
 
-    @JvmField
-    val FACTORY = Factory { LogLanguage(it) }
+    @JvmField val FACTORY = Factory { LogLanguage(it) }
   }
 }

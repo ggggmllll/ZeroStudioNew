@@ -59,7 +59,7 @@ class RefactorRenameAction(context: Context, override val order: Int) : ActionIt
 
     override val id: String = "filetree.refactor.rename"
     override var label: String = "Refactor > Rename"
-    override var visible: Boolean = false // Default to hidden
+    override var visible: Boolean = true // Default to hidden
     override var enabled: Boolean = false
     override var icon: Drawable? = null
     override var requiresUIThread: Boolean = true
@@ -71,47 +71,39 @@ class RefactorRenameAction(context: Context, override val order: Int) : ActionIt
     private val LOG = Logger.instance("RefactorRenameAction")
 
     /**
-     * @author android_zero
      * @see ActionItem.prepare
      */
     override fun prepare(data: ActionData) {
-        // Reset state
-        visible = false
-        enabled = false
-        
-        val file = data.requireFile()
-        projectRoot = IProjectManager.getInstance().projectDir
-        
-        if (projectRoot == null) {
-            LOG.warn("Project root not available, cannot perform refactor.")
-            return
-        }
+     visible = true //默认隐藏，需知道isSourceDir
+     enabled = true
+     
+     val file = data.requireFile()
+     projectRoot = IProjectManager.getInstance().projectDir ?: return
+     
+     val sourceRoots = listOf("src/main/java", "src/main/kotlin")
+     val sourceRootPaths = sourceRoots.mapNotNull { root ->
+         val sourceRootFile = File(projectRoot, root)
+         if (sourceRootFile.exists()) sourceRootFile.absolutePath else null
+     }
+     
+     val isSourceDir = sourceRootPaths.any { rootPath ->
+        val sourceRootFile = File(projectRoot, rootPath)
+         file.absolutePath.startsWith(rootPath)
+     }
+     if (isSourceDir) {
+         visible = true
+         enabled = true
+         oldFile = file
+     }
+     
+     LOG.debug("Project root: ${projectRoot?.absolutePath}")
+     LOG.debug("File path: ${file.absolutePath}")
+     LOG.debug("Source roots: $sourceRootPaths")
+     LOG.debug("Is source dir: $isSourceDir")
 
-        val sourceRoots = listOf("src/main/java", "src/main/kotlin")
-        
-        // This action is only visible inside Java/Kotlin source directories.
-        val isSourceDir = sourceRoots.any { root ->
-            val sourceRootFile = File(projectRoot, root)
-            // Ensure we are comparing canonical paths to avoid issues with symlinks etc.
-            try {
-                 file.canonicalPath.startsWith(sourceRootFile.canonicalPath)
-            } catch (e: Exception) {
-                false
-            }
-        }
-
-        if (isSourceDir) {
-            LOG.debug("File '${file.name}' is in a source directory. Action will be visible.")
-            visible = true
-            enabled = true
-            oldFile = file
-        } else {
-             LOG.debug("File '${file.name}' is NOT in a source directory. Action will be hidden.")
-        }
-    }
+ }
 
     /**
-     * @author android_zero
      * @see ActionItem.execAction
      */
     override suspend fun execAction(data: ActionData): Any {

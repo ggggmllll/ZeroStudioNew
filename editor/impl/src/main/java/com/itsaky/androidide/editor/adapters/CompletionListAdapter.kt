@@ -57,22 +57,22 @@ class CompletionListAdapter : EditorCompletionAdapter() {
 
   override fun getItemHeight(): Int {
     return TypedValue.applyDimension(
-      TypedValue.COMPLEX_UNIT_DIP,
-      40f,
-      Resources.getSystem().displayMetrics
-    )
-      .toInt()
+            TypedValue.COMPLEX_UNIT_DIP,
+            40f,
+            Resources.getSystem().displayMetrics,
+        )
+        .toInt()
   }
 
   override fun getView(
-    position: Int,
-    convertView: View?,
-    parent: ViewGroup?,
-    isCurrentCursorPosition: Boolean,
+      position: Int,
+      convertView: View?,
+      parent: ViewGroup?,
+      isCurrentCursorPosition: Boolean,
   ): View {
     val binding =
-      convertView?.let { LayoutCompletionItemBinding.bind(it) }
-        ?: LayoutCompletionItemBinding.inflate(LayoutInflater.from(context), parent, false)
+        convertView?.let { LayoutCompletionItemBinding.bind(it) }
+            ?: LayoutCompletionItemBinding.inflate(LayoutInflater.from(context), parent, false)
     val item = getItem(position) as LspCompletionItem
     val label = item.ideLabel
     val desc = item.detail
@@ -86,8 +86,8 @@ class CompletionListAdapter : EditorCompletionAdapter() {
     binding.completionType.text = type
     binding.completionDetail.text = desc
     binding.completionIconText.setTypeface(
-      customOrJBMono(EditorPreferences.useCustomFont),
-      Typeface.BOLD
+        customOrJBMono(EditorPreferences.useCustomFont),
+        Typeface.BOLD,
     )
     if (desc.isEmpty()) {
       binding.completionDetail.visibility = View.GONE
@@ -125,17 +125,18 @@ class CompletionListAdapter : EditorCompletionAdapter() {
   }
 
   private fun setItemBackground(binding: LayoutCompletionItemBinding, isCurrent: Boolean) {
-    val color =
-      if (isCurrent) getThemeColor(SchemeAndroidIDE.COMPLETION_WND_BG_CURRENT_ITEM)
-      else 0
+    val color = if (isCurrent) getThemeColor(SchemeAndroidIDE.COMPLETION_WND_BG_CURRENT_ITEM) else 0
 
-    val cornerRadius = binding.root.context.resources
-      .getDimensionPixelSize(R.dimen.completion_window_corner_radius).toFloat()
+    val cornerRadius =
+        binding.root.context.resources
+            .getDimensionPixelSize(R.dimen.completion_window_corner_radius)
+            .toFloat()
 
-    val gd = GradientDrawable().apply {
-      setColor(color)
-      setCornerRadius(cornerRadius)
-    }
+    val gd =
+        GradientDrawable().apply {
+          setColor(color)
+          setCornerRadius(cornerRadius)
+        }
 
     binding.root.background = gd
   }
@@ -148,27 +149,28 @@ class CompletionListAdapter : EditorCompletionAdapter() {
 
       val data = item.data
       val versions =
-        Lookup.getDefault().lookup(ApiVersions.COMPLETION_LOOKUP_KEY) ?: return@executeAsync null
+          Lookup.getDefault().lookup(ApiVersions.COMPLETION_LOOKUP_KEY) ?: return@executeAsync null
       val info =
-        when (data) {
-          is ClassCompletionData -> versions.classInfo(data.className)
-          is MemberCompletionData -> {
-            if (data is MethodCompletionData) {
-              // if the member is a method
-              // build the method identifier by joining the method name and the erased parameter types
-              // for method 'int some(String)', the identifier becomes 'some(Ljava/lang/String;)'
-              // return type of the method is ignored
-              versions.memberInfo(
-                data.classInfo.flatName,
-                methodIdentifier(data.memberName, data.erasedParameterTypes)
-              )
-            } else {
-              versions.memberInfo(data.classInfo.flatName, data.memberName)
+          when (data) {
+            is ClassCompletionData -> versions.classInfo(data.className)
+            is MemberCompletionData -> {
+              if (data is MethodCompletionData) {
+                // if the member is a method
+                // build the method identifier by joining the method name and the erased parameter
+                // types
+                // for method 'int some(String)', the identifier becomes 'some(Ljava/lang/String;)'
+                // return type of the method is ignored
+                versions.memberInfo(
+                    data.classInfo.flatName,
+                    methodIdentifier(data.memberName, data.erasedParameterTypes),
+                )
+              } else {
+                versions.memberInfo(data.classInfo.flatName, data.memberName)
+              }
             }
-          }
 
-          else -> return@executeAsync null
-        }
+            else -> return@executeAsync null
+          }
 
       val sb = StringBuilder()
       if (info!!.since > 1) {
@@ -220,23 +222,24 @@ class CompletionListAdapter : EditorCompletionAdapter() {
     val type = item.completionKind
     val data = item.data
     return if ( // These represent a class type
-      (type === CLASS ||
-        type === INTERFACE ||
-        type === ENUM ||
+        (type === CLASS ||
+            type === INTERFACE ||
+            type === ENUM ||
 
-        // These represent a method type
-        type === METHOD ||
-        type === CONSTRUCTOR ||
+            // These represent a method type
+            type === METHOD ||
+            type === CONSTRUCTOR ||
 
-        // A field type
-        type === FIELD) && data != null
+            // A field type
+            type === FIELD) && data != null
     ) {
       val className =
-        when (data) {
-          is ClassCompletionData -> data.className
-          is MemberCompletionData -> data.classInfo.className
-          else -> null
-        }
+          when (data) {
+            is ClassCompletionData -> data.className
+            is MemberCompletionData -> data.classInfo.className
+            else -> null
+          }
+
       !className.isNullOrBlank()
     } else false
   }

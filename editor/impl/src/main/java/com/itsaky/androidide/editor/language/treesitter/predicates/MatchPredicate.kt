@@ -41,21 +41,21 @@ object MatchPredicate : TreeSitterPredicate() {
 
   @JvmField
   val PARAMETERS =
-    arrayOf(
-      TSQueryPredicateStep.Type.String,
-      TSQueryPredicateStep.Type.Capture,
-      TSQueryPredicateStep.Type.String,
-      TSQueryPredicateStep.Type.Done
-    )
+      arrayOf(
+          TSQueryPredicateStep.Type.String,
+          TSQueryPredicateStep.Type.Capture,
+          TSQueryPredicateStep.Type.String,
+          TSQueryPredicateStep.Type.Done,
+      )
 
   private val cache = ConcurrentHashMap<String, Regex>()
 
   override fun doPredicateInternal(
-    tsQuery: TSQuery,
-    text: CharSequence,
-    match: TSQueryMatch,
-    predicateSteps: List<TsClientPredicateStep>,
-    syntheticCaptures: TsSyntheticCaptureContainer
+      tsQuery: TSQuery,
+      text: CharSequence,
+      match: TSQueryMatch,
+      predicateSteps: List<TsClientPredicateStep>,
+      syntheticCaptures: TsSyntheticCaptureContainer,
   ): PredicateResult {
     val captured = getCaptureContent(tsQuery, match, predicateSteps[1].content, text)
     try {

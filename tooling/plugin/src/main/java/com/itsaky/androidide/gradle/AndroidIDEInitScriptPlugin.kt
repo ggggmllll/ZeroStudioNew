@@ -44,6 +44,8 @@ class AndroidIDEInitScriptPlugin : Plugin<Gradle> {
   }
 
   override fun apply(target: Gradle) {
+    initializeEncoding()
+
     target.settingsEvaluated { settings -> settings.addDependencyRepositories() }
 
     target.rootProject { rootProject ->
@@ -51,13 +53,10 @@ class AndroidIDEInitScriptPlugin : Plugin<Gradle> {
         dependencies.apply {
           val gradlePluginDep = rootProject.ideDependency(LIB_GROUP_TOOLING, "plugin")
           if (gradlePluginDep is ExternalModuleDependency) {
-            // SNAPSHOT versions of gradle-plugin do not change
             gradlePluginDep.isChanging = false
           }
-
           add("classpath", gradlePluginDep)
         }
-
         repositories.addDependencyRepositories(rootProject.gradle.startParameter)
       }
     }
@@ -65,17 +64,28 @@ class AndroidIDEInitScriptPlugin : Plugin<Gradle> {
     target.projectsLoaded { gradle ->
       gradle.rootProject.subprojects { sub ->
         if (!sub.buildFile.exists()) {
-          // For subproject ':nested:module',
-          // ':nested' represented as a 'Project', but it may or may not have a buildscript file
-          // if the project doesn't have a buildscript, then the plugins should not be applied
           return@subprojects
         }
 
         sub.afterEvaluate {
-          logger.info("Trying to apply plugin '${BuildInfo.PACKAGE_NAME}' to project '${sub.path}'")
+          logger.info("Applying plugin '${BuildInfo.PACKAGE_NAME}' to project '${sub.path}'")
           sub.pluginManager.apply(BuildInfo.PACKAGE_NAME)
         }
       }
+    }
+  }
+
+  private fun initializeEncoding() {
+    try {
+      // Set system properties for encoding
+      System.setProperty("file.encoding", "UTF-8")
+      System.setProperty("sun.jnu.encoding", "UTF-8")
+      System.setProperty("user.country", "US")
+      System.setProperty("user.language", "en")
+
+      logger.info("Platform encoding initialized to UTF-8")
+    } catch (e: Exception) {
+      logger.warn("Could not set encoding properties: ${e.message}")
     }
   }
 
@@ -108,7 +118,8 @@ class AndroidIDEInitScriptPlugin : Plugin<Gradle> {
       val isTestEnv =
           projectProperties.containsKey(_PROPERTY_IS_TEST_ENV) &&
               projectProperties[_PROPERTY_IS_TEST_ENV].toString().toBoolean()
-      val mavenLocalRepos = projectProperties.getOrDefault(_PROPERTY_MAVEN_LOCAL_REPOSITORY, "")
+      val mavenLocalRepos =
+          projectProperties.getOrDefault(_PROPERTY_MAVEN_LOCAL_REPOSITORY, "").toString()
 
       isTestEnv to mavenLocalRepos
     }
@@ -118,36 +129,66 @@ class AndroidIDEInitScriptPlugin : Plugin<Gradle> {
       isMavenLocalEnabled: Boolean,
       mavenLocalRepos: String,
   ) {
+    // Always add standard repositories first
+    google()
+    mavenCentral()
+    gradlePluginPortal()
 
-    if (!isMavenLocalEnabled) {
-
-      // For AndroidIDE CI builds
-      maven { repository -> repository.url = URI.create(BuildInfo.SNAPSHOTS_REPOSITORY) }
-    } else {
+    if (isMavenLocalEnabled && mavenLocalRepos.isNotBlank()) {
       logger.info("Using local maven repository for classpath resolution...")
 
-      for (mavenLocalRepo in mavenLocalRepos.split(':')) {
+      mavenLocalRepos.split(':').forEach { mavenLocalRepo ->
         if (mavenLocalRepo.isBlank()) {
           mavenLocal()
         } else {
           logger.info("Local repository path: $mavenLocalRepo")
-
           val repo = File(mavenLocalRepo)
-          if (!repo.exists() || !repo.isDirectory) {
-            throw FileNotFoundException("Maven local repository '$mavenLocalRepo' not found")
+          if (repo.exists() && repo.isDirectory) {
+            maven { repository -> repository.url = repo.toURI() }
           }
-
-          maven { repository -> repository.url = repo.toURI() }
         }
+      }
+    } else {
+      // Add JitPack for GitHub packages
+      maven { repository ->
+        repository.name = "JitPack"
+        repository.setUrl("https://jitpack.io")
       }
     }
 
-    // for AGP API dependency
-    google()
+    // Add custom repositories if configured
+    addCustomRepositories()
+  }
 
-    maven { repository -> repository.setUrl(BuildInfo.PUBLIC_REPOSITORY) }
+  private fun RepositoryHandler.addCustomRepositories() {
+    try {
+      val snapshotsRepo = BuildInfo.SNAPSHOTS_REPOSITORY
+      if (isValidRepository(snapshotsRepo)) {
+        logger.info("Adding snapshots repository: $snapshotsRepo")
+        maven { repository ->
+          repository.name = "AndroidIDE Snapshots"
+          repository.url = URI.create(snapshotsRepo)
+        }
+      }
 
-    mavenCentral()
-    gradlePluginPortal()
+      val publicRepo = BuildInfo.PUBLIC_REPOSITORY
+      if (isValidRepository(publicRepo)) {
+        logger.info("Adding public repository: $publicRepo")
+        maven { repository ->
+          repository.name = "AndroidIDE Public"
+          repository.setUrl(publicRepo)
+        }
+      }
+    } catch (e: Exception) {
+      logger.warn("Error configuring custom repositories: ${e.message}")
+    }
+  }
+
+  private fun isValidRepository(repoUrl: String?): Boolean {
+    return !repoUrl.isNullOrBlank() &&
+        repoUrl != "null" &&
+        !repoUrl.startsWith("@@") &&
+        !repoUrl.endsWith("@@") &&
+        (repoUrl.startsWith("http://") || repoUrl.startsWith("https://"))
   }
 }

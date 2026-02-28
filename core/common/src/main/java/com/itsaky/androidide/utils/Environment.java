@@ -55,6 +55,7 @@ public final class Environment {
   public static File ANDROID_HOME;
   public static File KOTLINC_HOME;
   public static File KOTLIN_LSP_HOME;
+  public static File COMPOSE_HOME;
   public static File TMP_DIR;
   public static File BIN_DIR;
   public static File LIB_DIR;
@@ -63,6 +64,8 @@ public final class Environment {
   public static File MAVEN_REPOSITORY;
   public static File PROJETS_JAVA2KOTLIN_BAK;
   
+  public static final String PLUGIN_API_JAR_RELATIVE_PATH = "libs/plugin-api.jar";
+
     // Lottie 动画目录
   public static File LOTTIE_ANIMATION_DIR;
   public static File LOTTIE_EXPORT_DIR;
@@ -78,7 +81,7 @@ public final class Environment {
   public static File GRADLE_USER_HOME;
   public static File AAPT2;
   public static File JAVA;
-  public static File SHELL_KOTLIN_LSP;
+  // public static File SHELL_KOTLIN_LSP;
   public static File BASH_SHELL;
   public static File LOGIN_SHELL;
   
@@ -108,6 +111,7 @@ public final class Environment {
     AAPT2 = new File(ANDROIDIDE_HOME, "aapt2");
     ANDROIDIDE_UI = mkdirIfNotExits(new File(ANDROIDIDE_HOME, "ui"));
     REALM_DB_DIR = mkdirIfNotExits(new File(ROOT, "realm-dbs"));
+    COMPOSE_HOME = mkdirIfNotExits(new File(ANDROIDIDE_HOME, "compose"));
 
     INIT_SCRIPT = new File(mkdirIfNotExits(new File(ANDROIDIDE_HOME, "init")), "init.gradle");
     GRADLE_USER_HOME = new File(HOME, ".gradle");
@@ -126,17 +130,17 @@ public final class Environment {
     KOTLIN_LSP_LIBS_JAR_DIR = new File(KOTLIN_LSP_HOME, "lib");
     
     JAVA_HOME = new File(PREFIX, "opt/openjdk");
-
-    SHELL_KOTLIN_LSP = new File(KOTLIN_LSP_HOME, "bin/kotlin-language-server");
+    
+         // SHELL_KOTLIN_LSP = new File(KOTLIN_LSP_HOME, "bin/kotlin-language-server");
     JAVA = new File(JAVA_HOME, "bin/java");
     BASH_SHELL = new File(BIN_DIR, "bash");
     LOGIN_SHELL = new File(BIN_DIR, "login");
 
     setExecutable(JAVA);
     setExecutable(BASH_SHELL);
-    if(SHELL_KOTLIN_LSP.exists()) {
-        setExecutable(SHELL_KOTLIN_LSP);
-    }
+    // if(SHELL_KOTLIN_LSP.exists()) {
+        // setExecutable(SHELL_KOTLIN_LSP);
+    // }
 
     // 设置 Java System Properties (供 JVM 内部使用)
     System.setProperty("user.home", HOME.getAbsolutePath());
