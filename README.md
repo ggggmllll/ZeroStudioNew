@@ -35,7 +35,7 @@
 - [ ] Language servers
     - [x] Java
     - [x] XML
-    - [x ] Kotlin
+    - [x] Kotlin
     - [x] lua 
     - [ ] cmake 
     - [ ] c/c++/obj-c/obj-c++
@@ -43,7 +43,7 @@
     - [x] toml
     - [ ] python
     - [ ] shell
-    - [ ] more.....
+    - [o] more.....
 - [ ] UI Designer
     - [x] Layout inflater
     - [x] Resolve resource references
@@ -57,6 +57,18 @@
 - [ ] advanced images Preview
 - [x] compose Preview
 - [x] Regular expression preview
+
+## about Android tree sitter 
+- Supported languages:
++ aidl, bash, c, cmake, cpp, css, dart, go, googleSqlBigquery, groovy, java, javascript, json, kotlin, log, lua, markdown, objectiveC, objectiveCpp, php, plsql, properties, proto, python, reStructuredText, rust, smali, sql, sqlite, swift, toml, typeScript, vue, xml, yaml
++ assembly language：arm, arm64, asm, masm（x86）, nasm
+
+Introduction:The transplanted Android tree sitter does not require the installation of npm, python, java, ndk, rust, etc. like the official project.
+It doesn't require a complex construction method or a complicated installation method either.
+You can easily build the tree-sitter language you need into your Android project with just Gradle+cmake+ndk.
+
+relevant documents：[Operation Document](./editor/tree-sitter-ndk/docs.md)
+
 ## Installation
 [<img src="https://github.com/Kunzisoft/Github-badge/raw/main/get-it-on-github.svg"
     alt="Get it on F-Droid"
