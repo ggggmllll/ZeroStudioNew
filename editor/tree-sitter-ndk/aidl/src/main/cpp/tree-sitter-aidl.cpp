@@ -37,7 +37,7 @@ static jlong TSLanguageAidl_getInstance(JNIEnv *env, jclass clazz) {
     return (jlong) tree_sitter_aidl();
 }
 
-void TSLanguageAidl_Native__SetJniMethods(JNINativeMethod *methods, int count) {
+void TSLanguageAidl_Native_SetJniMethods(JNINativeMethod *methods, int count) {
   SET_JNI_METHOD(methods, TSLanguageAidl_Native_getInstance, TSLanguageAidl_getInstance);
 }
 

@@ -174,15 +174,9 @@ androidide-ts-json = { module = "com.itsaky.androidide.treesitter:tree-sitter-js
 androidide-ts-kotlin = { module = "com.itsaky.androidide.treesitter:tree-sitter-kotlin", version.ref = "tree-sitter" }
 androidide-ts-log = { module = "com.itsaky.androidide.treesitter:tree-sitter-log", version.ref = "tree-sitter" }
 androidide-ts-xml = { module = "com.itsaky.androidide.treesitter:tree-sitter-xml", version.ref = "tree-sitter" }
-
 androidide-ts-c = { module = "com.itsaky.androidide.treesitter:tree-sitter-c", version.ref = "tree-sitter" }
 androidide-ts-cpp = { module = "com.itsaky.androidide.treesitter:tree-sitter-cpp", version.ref = "tree-sitter" }
 androidide-ts-python = { module = "com.itsaky.androidide.treesitter:tree-sitter-python", version.ref = "tree-sitter" }
-# androidide-ts-csharp = { module = "com.itsaky.androidide.treesitter:csharp", version = "1.0" }
-# androidide-ts-css = { module = "com.itsaky.androidide.treesitter:css", version = "1.0" }
-# androidide-ts-html = { module = "com.itsaky.androidide.treesitter:html", version = "1.0" }
-# androidide-ts-javascript = { module = "com.itsaky.androidide.treesitter:javascript", version = "1.0" }
-# androidide-ts-toml = { module = "com.itsaky.androidide.treesitter:toml", version = "1.0" }
 
 # Common
 common-bcrypt = { group = "at.favre.lib", name = "bcrypt", version.ref = "bcrypt" }

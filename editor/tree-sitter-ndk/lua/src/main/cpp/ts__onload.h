@@ -16,7 +16,7 @@
 #endif
 #endif
 
-// Include generated headers for all grammars (Currently only TOML)
+// Include generated headers for all grammars (Currently only lua)
 #include "ts_lua.h"
 
 

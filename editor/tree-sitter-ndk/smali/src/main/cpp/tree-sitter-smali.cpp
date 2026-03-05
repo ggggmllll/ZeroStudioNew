@@ -37,7 +37,7 @@ static jlong TSLanguageSmali_getInstance(JNIEnv *env, jclass clazz) {
     return (jlong) tree_sitter_smali();
 }
 
-void TSLanguageSmali_Native__SetJniMethods(JNINativeMethod *methods, int count) {
+void TSLanguageSmali_Native_SetJniMethods(JNINativeMethod *methods, int count) {
   SET_JNI_METHOD(methods, TSLanguageSmali_Native_getInstance, TSLanguageSmali_getInstance);
 }
 

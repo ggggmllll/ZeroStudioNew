@@ -37,7 +37,7 @@ static jlong TSLanguageCss_getInstance(JNIEnv *env, jclass clazz) {
     return (jlong) tree_sitter_css();
 }
 
-void TSLanguageCss_Native__SetJniMethods(JNINativeMethod *methods, int count) {
+void TSLanguageCss_Native_SetJniMethods(JNINativeMethod *methods, int count) {
   SET_JNI_METHOD(methods, TSLanguageCss_Native_getInstance, TSLanguageCss_getInstance);
 }
 

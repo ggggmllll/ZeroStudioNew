@@ -14,7 +14,7 @@
 #define ATS_TS_LOG_H
 
 // 定义日志 TAG，通常跟随项目名称
-#define LOG_TAG "tree-sitter-toml"
+#define LOG_TAG "tree-sitter-smali"
 
 #ifdef __ANDROID__
 #include <android/log.h>

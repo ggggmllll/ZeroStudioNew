@@ -22,6 +22,9 @@ import com.itsaky.androidide.editor.language.treesitter.TreeSitterLanguage.Facto
 import com.itsaky.androidide.treesitter.c.TSLanguageC
 import io.github.rosemoe.sora.widget.SymbolPairMatch
 
+/**
+ * @author android_zero
+ */
 open class CLang(context: Context) :
     TreeSitterLanguage(context, TSLanguageC.getInstance(), TS_TYPE_C) {
 

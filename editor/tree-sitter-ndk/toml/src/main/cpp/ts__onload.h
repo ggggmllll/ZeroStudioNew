@@ -16,7 +16,6 @@
 #endif
 #endif
 
-// Include generated headers for all grammars (Currently only TOML)
 #include "ts_toml.h"
 
 

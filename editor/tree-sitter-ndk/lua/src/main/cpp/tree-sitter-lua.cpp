@@ -37,7 +37,7 @@ static jlong TSLanguageLua_getInstance(JNIEnv *env, jclass clazz) {
     return (jlong) tree_sitter_lua();
 }
 
-void TSLanguageLua_Native__SetJniMethods(JNINativeMethod *methods, int count) {
+void TSLanguageLua_Native_SetJniMethods(JNINativeMethod *methods, int count) {
   SET_JNI_METHOD(methods, TSLanguageLua_Native_getInstance, TSLanguageLua_getInstance);
 }
 

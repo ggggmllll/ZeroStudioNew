@@ -16,7 +16,7 @@
 #endif
 #endif
 
-// Include generated headers for all grammars (Currently only TOML)
+// Include generated headers for all grammars (Currently only javascript)
 #include "ts_javascript.h"
 
 

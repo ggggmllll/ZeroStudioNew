@@ -40,6 +40,9 @@ class XMLLanguage(context: Context) :
   companion object {
 
     const val TS_TYPE = "xml"
+    const val TS_TYPE_POML = "poml"
+    const val TS_TYPE_UI = "ui"
+    const val TS_TYPE_QRC = "qrc"
 
     @JvmField val FACTORY = Factory { XMLLanguage(it) }
   }

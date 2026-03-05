@@ -37,7 +37,7 @@ static jlong TSLanguageKotlin_getInstance(JNIEnv *env, jclass clazz) {
     return (jlong) tree_sitter_kotlin();
 }
 
-void TSLanguageKotlin_Native__SetJniMethods(JNINativeMethod *methods, int count) {
+void TSLanguageKotlin_Native_SetJniMethods(JNINativeMethod *methods, int count) {
   SET_JNI_METHOD(methods, TSLanguageKotlin_Native_getInstance, TSLanguageKotlin_getInstance);
 }
 

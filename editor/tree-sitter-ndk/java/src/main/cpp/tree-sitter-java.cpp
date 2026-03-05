@@ -37,7 +37,7 @@ static jlong TSLanguageJava_getInstance(JNIEnv *env, jclass clazz) {
     return (jlong) tree_sitter_java();
 }
 
-void TSLanguageJava_Native__SetJniMethods(JNINativeMethod *methods, int count) {
+void TSLanguageJava_Native_SetJniMethods(JNINativeMethod *methods, int count) {
   SET_JNI_METHOD(methods, TSLanguageJava_Native_getInstance, TSLanguageJava_getInstance);
 }
 

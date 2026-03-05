@@ -37,7 +37,7 @@ static jlong TSLanguageBash_getInstance(JNIEnv *env, jclass clazz) {
     return (jlong) tree_sitter_bash();
 }
 
-void TSLanguageBash_Native__SetJniMethods(JNINativeMethod *methods, int count) {
+void TSLanguageBash_Native_SetJniMethods(JNINativeMethod *methods, int count) {
   SET_JNI_METHOD(methods, TSLanguageBash_Native_getInstance, TSLanguageBash_getInstance);
 }
 

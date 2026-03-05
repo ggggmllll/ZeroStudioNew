@@ -22,6 +22,9 @@ import com.itsaky.androidide.editor.language.treesitter.TreeSitterLanguage.Facto
 import com.itsaky.androidide.treesitter.cpp.TSLanguageCpp
 import io.github.rosemoe.sora.widget.SymbolPairMatch
 
+/**
+ * @author android_zero
+ */
 open class CppLang(context: Context) :
     TreeSitterLanguage(context, TSLanguageCpp.getInstance(), TS_TYPE_CPP) {
 
@@ -44,6 +47,10 @@ open class CppLang(context: Context) :
         const val TS_TYPE_CPPM = "cppm"
         const val TS_TYPE_MPP = "mpp"
         const val TS_TYPE_mm = "mm"
+        
+        const val TS_TYPE_HIN = "h.in"
+        const val TS_TYPE_HXXIN = "hxx.in"
+        const val TS_TYPE_CXXIN = "cxx.in"
     }
 
 

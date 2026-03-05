@@ -37,7 +37,7 @@ static jlong TSLanguageObjectiveCpp_getInstance(JNIEnv *env, jclass clazz) {
     return (jlong) tree_sitter_objectiveCpp();
 }
 
-void TSLanguageObjectiveCpp_Native__SetJniMethods(JNINativeMethod *methods, int count) {
+void TSLanguageObjectiveCpp_Native_SetJniMethods(JNINativeMethod *methods, int count) {
   SET_JNI_METHOD(methods, TSLanguageObjectiveCpp_Native_getInstance, TSLanguageObjectiveCpp_getInstance);
 }
 

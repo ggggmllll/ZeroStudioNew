@@ -91,7 +91,18 @@ dependencies {
     implementation(projects.xml.lsp)
     implementation(projects.editor.treeSitterNdk.toml)
     implementation(projects.editor.treeSitterNdk.cmake)
-    
+    implementation(projects.editor.treeSitterNdk.reStructuredText)
+    implementation(projects.editor.treeSitterNdk.markdown)
+    implementation(projects.editor.treeSitterNdk.yaml)
+    implementation(projects.editor.treeSitterNdk.sqlite)
+    implementation(projects.editor.treeSitterNdk.sql)
+    implementation(projects.editor.treeSitterNdk.plsql)
+    implementation(projects.editor.treeSitterNdk.googleSqlBigquery)
+    implementation(projects.editor.treeSitterNdk.bash)
+    implementation(projects.editor.treeSitterNdk.aidl)
+    implementation(projects.editor.treeSitterNdk.proto)
+    implementation(projects.editor.treeSitterNdk.smali)
+
     implementation(projects.editor.treeSitterNdk.treeSitterJnilibs)
     implementation(files("libs/tree-sitter-xxx.jar"))
     

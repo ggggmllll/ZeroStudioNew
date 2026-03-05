@@ -47,6 +47,10 @@ import com.itsaky.androidide.editor.language.treesitter.TomlLanguage
 import com.itsaky.androidide.editor.language.treesitter.CppLang
 import com.itsaky.androidide.editor.language.treesitter.CLang
 import com.itsaky.androidide.editor.language.treesitter.CmakeLanguage
+import com.itsaky.androidide.editor.language.treesitter.PythonLanguage
+import com.itsaky.androidide.editor.language.treesitter.MarkdownLanguage
+import com.itsaky.androidide.editor.language.treesitter.reStructuredTextLanguage
+import com.itsaky.androidide.editor.language.treesitter.YamlLanguage
 import com.itsaky.androidide.editor.schemes.IDEColorSchemeProvider
 import com.itsaky.androidide.editor.ui.IDEEditor
 import com.itsaky.androidide.eventbus.events.editor.DocumentChangeEvent
@@ -147,9 +151,33 @@ open class EditorHandlerActivity : ProjectHandlerActivity(), IEditorHandler {
       TSLanguageRegistry.instance.register(KotlinLanguage.TS_TYPE_KTS, KotlinLanguage.FACTORY)
       TSLanguageRegistry.instance.register(LogLanguage.TS_TYPE, LogLanguage.FACTORY)
       TSLanguageRegistry.instance.register(JsonLanguage.TS_TYPE, JsonLanguage.FACTORY)
-      TSLanguageRegistry.instance.register(XMLLanguage.TS_TYPE, XMLLanguage.FACTORY)
       TSLanguageRegistry.instance.register(TomlLanguage.TOML_TYPE, TomlLanguage.FACTORY)
-      
+
+
+      //reStructuredText Language
+      TSLanguageRegistry.instance.register(reStructuredTextLanguage.TS_TYPE, reStructuredTextLanguage.FACTORY)
+      TSLanguageRegistry.instance.register(reStructuredTextLanguage.TS_TYPE_REST, reStructuredTextLanguage.FACTORY)
+      //Markdown Language
+      TSLanguageRegistry.instance.register(MarkdownLanguage.TS_TYPE, MarkdownLanguage.FACTORY)
+      TSLanguageRegistry.instance.register(MarkdownLanguage.TS_TYPE_MARKDOWN, MarkdownLanguage.FACTORY)
+      TSLanguageRegistry.instance.register(MarkdownLanguage.TS_TYPE_MKD, MarkdownLanguage.FACTORY)
+      TSLanguageRegistry.instance.register(MarkdownLanguage.TS_TYPE_MKDN, MarkdownLanguage.FACTORY)
+      TSLanguageRegistry.instance.register(MarkdownLanguage.TS_TYPE_MDOWN, MarkdownLanguage.FACTORY)
+      TSLanguageRegistry.instance.register(MarkdownLanguage.TS_TYPE_MDWN, MarkdownLanguage.FACTORY)
+      TSLanguageRegistry.instance.register(MarkdownLanguage.TS_TYPE_MDTXT, MarkdownLanguage.FACTORY)
+      //Yaml Language
+      TSLanguageRegistry.instance.register(YamlLanguage.TS_TYPE, YamlLanguage.FACTORY)
+      TSLanguageRegistry.instance.register(YamlLanguage.TS_TYPE_YML, YamlLanguage.FACTORY)
+      //Python Language
+      TSLanguageRegistry.instance.register(PythonLanguage.TS_TYPE, PythonLanguage.FACTORY)
+      TSLanguageRegistry.instance.register(PythonLanguage.TS_TYPE_PYW, PythonLanguage.FACTORY)
+      TSLanguageRegistry.instance.register(PythonLanguage.TS_TYPE_PYI, PythonLanguage.FACTORY)
+      TSLanguageRegistry.instance.register(PythonLanguage.TS_TYPE_PYS, PythonLanguage.FACTORY)
+      //xml language tree sitter
+      TSLanguageRegistry.instance.register(XMLLanguage.TS_TYPE, XMLLanguage.FACTORY)
+      TSLanguageRegistry.instance.register(XMLLanguage.TS_TYPE_QRC, XMLLanguage.FACTORY)
+      TSLanguageRegistry.instance.register(XMLLanguage.TS_TYPE_UI, XMLLanguage.FACTORY)
+      TSLanguageRegistry.instance.register(XMLLanguage.TS_TYPE_POML, XMLLanguage.FACTORY)
        //C++ language tree sitter
       TSLanguageRegistry.instance.register(CppLang.TS_TYPE_CPP, CppLang.FACTORY)
       TSLanguageRegistry.instance.register(CppLang.TS_TYPE_C, CppLang.FACTORY)
@@ -166,6 +194,9 @@ open class EditorHandlerActivity : ProjectHandlerActivity(), IEditorHandler {
       TSLanguageRegistry.instance.register(CppLang.TS_TYPE_CPPM, CppLang.FACTORY)
       TSLanguageRegistry.instance.register(CppLang.TS_TYPE_MPP, CppLang.FACTORY)
       TSLanguageRegistry.instance.register(CppLang.TS_TYPE_mm, CppLang.FACTORY)
+      TSLanguageRegistry.instance.register(CppLang.TS_TYPE_HIN, CppLang.FACTORY)
+      TSLanguageRegistry.instance.register(CppLang.TS_TYPE_HXXIN, CppLang.FACTORY)
+      TSLanguageRegistry.instance.register(CppLang.TS_TYPE_CXXIN, CppLang.FACTORY)
        //C language tree sitter
       TSLanguageRegistry.instance.register(CLang.TS_TYPE_C, CLang.FACTORY)
       TSLanguageRegistry.instance.register(CLang.TS_TYPE_M_small, CLang.FACTORY)
@@ -173,23 +204,11 @@ open class EditorHandlerActivity : ProjectHandlerActivity(), IEditorHandler {
       //cmake language tree sitter
       TSLanguageRegistry.instance.register(CmakeLanguage.TS_TYPE, CmakeLanguage.FACTORY)
       TSLanguageRegistry.instance.register(CmakeLanguage.TS_TYPE_CMAKE_IN, CmakeLanguage.FACTORY)
-      TSLanguageRegistry.instance.register(CmakeLanguage.TS_TYPE_CMAKE_H_IN, CmakeLanguage.FACTORY)
       TSLanguageRegistry.instance.register(CmakeLanguage.TS_TYPE_CMAKE_CTEST, CmakeLanguage.FACTORY)
       TSLanguageRegistry.instance.register(CmakeLanguage.TS_TYPE_CMAKE_CPACK, CmakeLanguage.FACTORY)
-      TSLanguageRegistry.instance.register(CmakeLanguage.TS_TYPE_CMAKE_PRESETS, CmakeLanguage.FACTORY)
-      TSLanguageRegistry.instance.register(CmakeLanguage.TS_TYPE_CMAKE_USER_PRESETS, CmakeLanguage.FACTORY)
-      TSLanguageRegistry.instance.register(CmakeLanguage.TS_TYPE_CMAKE_TOOLCHAIN_CMAKE, CmakeLanguage.FACTORY)
-      TSLanguageRegistry.instance.register(CmakeLanguage.TS_TYPE_CMAKE_PATCHS, CmakeLanguage.FACTORY)
       TSLanguageRegistry.instance.register(CmakeLanguage.TS_TYPE_CMAKE_CBPS, CmakeLanguage.FACTORY)
-      TSLanguageRegistry.instance.register(CmakeLanguage.TS_TYPE_CMAKE_CMKDARTFUIONJSON, CmakeLanguage.FACTORY)
-      TSLanguageRegistry.instance.register(CmakeLanguage.TS_TYPE_CMAKE_CMKVCPKG, CmakeLanguage.FACTORY)
-      TSLanguageRegistry.instance.register(CmakeLanguage.TS_TYPE_CMAKE_CMKCONANFILE, CmakeLanguage.FACTORY)
-      TSLanguageRegistry.instance.register(CmakeLanguage.TS_TYPE_CMAKE_CMKSETTINGS, CmakeLanguage.FACTORY)
-      TSLanguageRegistry.instance.register(CmakeLanguage.TS_TYPE_CMAKE_CMKUSERPRESETS, CmakeLanguage.FACTORY)
-      TSLanguageRegistry.instance.register(CmakeLanguage.TS_TYPE_CMAKE_CMKPRESETS, CmakeLanguage.FACTORY)
-      TSLanguageRegistry.instance.register(CmakeLanguage.TS_TYPE_CMAKE_CMCACHE, CmakeLanguage.FACTORY)
       TSLanguageRegistry.instance.register(CmakeLanguage.TS_TYPE_CMAKE_CMLISTSTXT, CmakeLanguage.FACTORY)
-      
+      TSLanguageRegistry.instance.register(CmakeLanguage.TS_TYPE_CMAKE_CMCACHE, CmakeLanguage.FACTORY)
       
       IDEColorSchemeProvider.initIfNeeded()
     }

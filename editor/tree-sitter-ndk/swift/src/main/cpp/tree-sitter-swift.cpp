@@ -37,7 +37,7 @@ static jlong TSLanguageSwift_getInstance(JNIEnv *env, jclass clazz) {
     return (jlong) tree_sitter_swift();
 }
 
-void TSLanguageSwift_Native__SetJniMethods(JNINativeMethod *methods, int count) {
+void TSLanguageSwift_Native_SetJniMethods(JNINativeMethod *methods, int count) {
   SET_JNI_METHOD(methods, TSLanguageSwift_Native_getInstance, TSLanguageSwift_getInstance);
 }
 

@@ -1,22 +1,13 @@
 {
   "types":[
   "cmake",
-  "cbp",
-  "cmake.patch",
-  "toolchain.cmake",
-  "cmake.user.presets",
-  "cmake.presets",
+  // "cmake.patch",
+  // "cmake.user.presets",
+  // "cmake.presets",
   "cpack",
+  "cbp",
   "ctest",
-  "h.in",
   "cmake.in",
-  
-  "DartConfiguration.tcl",
-  "vcpkg.json",
-  "conanfile.txt",
-  "CMakeSettings.json",
-  "CMakeUserPresets.json",
-  "CMakePresets.json",
   "CMakeCache.txt",
   "CMakeLists.txt"
   ],

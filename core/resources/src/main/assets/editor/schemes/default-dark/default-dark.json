@@ -70,6 +70,10 @@
     "@cmake.json",
     "@cpplang.json",
     "@clang.json",
+    "@markdown.json",
+    "@Python.json",
+    "@yaml.json",
+    "@properties.json",
     "@log.json"
   ]
 }

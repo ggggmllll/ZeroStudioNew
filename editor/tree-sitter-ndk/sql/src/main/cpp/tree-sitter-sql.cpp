@@ -37,7 +37,7 @@ static jlong TSLanguageSql_getInstance(JNIEnv *env, jclass clazz) {
     return (jlong) tree_sitter_sql();
 }
 
-void TSLanguageSql_Native__SetJniMethods(JNINativeMethod *methods, int count) {
+void TSLanguageSql_Native_SetJniMethods(JNINativeMethod *methods, int count) {
   SET_JNI_METHOD(methods, TSLanguageSql_Native_getInstance, TSLanguageSql_getInstance);
 }
 

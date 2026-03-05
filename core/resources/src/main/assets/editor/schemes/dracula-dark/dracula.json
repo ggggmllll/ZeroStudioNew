@@ -74,8 +74,12 @@
     "@log.json",
     "@toml.json",
     "@cmake.json",
-     "@cpplang.json",
+    "@cpplang.json",
     "@clang.json",
+    "@markdown.json",
+    "@Python.json",
+    "@yaml.json",
+    "@properties.json",
     "@toml.json"
   ]
 }

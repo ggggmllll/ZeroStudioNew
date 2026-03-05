@@ -37,7 +37,7 @@ static jlong TSLanguageXml_getInstance(JNIEnv *env, jclass clazz) {
     return (jlong) tree_sitter_xml();
 }
 
-void TSLanguageXml_Native__SetJniMethods(JNINativeMethod *methods, int count) {
+void TSLanguageXml_Native_SetJniMethods(JNINativeMethod *methods, int count) {
   SET_JNI_METHOD(methods, TSLanguageXml_Native_getInstance, TSLanguageXml_getInstance);
 }
 

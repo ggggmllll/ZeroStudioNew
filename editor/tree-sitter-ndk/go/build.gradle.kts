@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    namespace = "com.itsaky.androidide.treesitter.toml"
+    namespace = "com.itsaky.androidide.treesitter.go"
     ndkVersion = "27.1.12297006"
 
     defaultConfig {
@@ -19,12 +19,6 @@ android {
         
     }
 
-    sourceSets {
-        named("main") {
-            jniLibs.srcDirs("src/main/jniLibs")
-        }
-    }
-
     externalNativeBuild {
         cmake {
             path = file("src/main/cpp/CMakeLists.txt")
@@ -36,6 +30,5 @@ android {
 dependencies {
     implementation(libs.androidide.ts)
     implementation("com.itsaky.androidide.treesitter:annotations:4.3.2")
-    // implementation(projects.editor.treeSitterNdk.annotations)
     annotationProcessor(projects.editor.treeSitterNdk.annotationProcessors)
 }

@@ -37,7 +37,7 @@ static jlong TSLanguageMarkdown_getInstance(JNIEnv *env, jclass clazz) {
     return (jlong) tree_sitter_markdown();
 }
 
-void TSLanguageMarkdown_Native__SetJniMethods(JNINativeMethod *methods, int count) {
+void TSLanguageMarkdown_Native_SetJniMethods(JNINativeMethod *methods, int count) {
   SET_JNI_METHOD(methods, TSLanguageMarkdown_Native_getInstance, TSLanguageMarkdown_getInstance);
 }
 

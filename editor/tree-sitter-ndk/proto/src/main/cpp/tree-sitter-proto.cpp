@@ -37,7 +37,7 @@ static jlong TSLanguageProto_getInstance(JNIEnv *env, jclass clazz) {
     return (jlong) tree_sitter_proto();
 }
 
-void TSLanguageProto_Native__SetJniMethods(JNINativeMethod *methods, int count) {
+void TSLanguageProto_Native_SetJniMethods(JNINativeMethod *methods, int count) {
   SET_JNI_METHOD(methods, TSLanguageProto_Native_getInstance, TSLanguageProto_getInstance);
 }
 

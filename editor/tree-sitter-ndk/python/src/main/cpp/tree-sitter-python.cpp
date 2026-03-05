@@ -37,7 +37,7 @@ static jlong TSLanguagePython_getInstance(JNIEnv *env, jclass clazz) {
     return (jlong) tree_sitter_python();
 }
 
-void TSLanguagePython_Native__SetJniMethods(JNINativeMethod *methods, int count) {
+void TSLanguagePython_Native_SetJniMethods(JNINativeMethod *methods, int count) {
   SET_JNI_METHOD(methods, TSLanguagePython_Native_getInstance, TSLanguagePython_getInstance);
 }
 

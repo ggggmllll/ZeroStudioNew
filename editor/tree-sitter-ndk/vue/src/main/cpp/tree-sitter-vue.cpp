@@ -37,7 +37,7 @@ static jlong TSLanguageVue_getInstance(JNIEnv *env, jclass clazz) {
     return (jlong) tree_sitter_vue();
 }
 
-void TSLanguageVue_Native__SetJniMethods(JNINativeMethod *methods, int count) {
+void TSLanguageVue_Native_SetJniMethods(JNINativeMethod *methods, int count) {
   SET_JNI_METHOD(methods, TSLanguageVue_Native_getInstance, TSLanguageVue_getInstance);
 }
 

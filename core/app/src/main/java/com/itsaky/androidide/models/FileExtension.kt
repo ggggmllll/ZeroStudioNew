@@ -391,6 +391,9 @@ enum class FileExtension(
     CFG("cfg", R.drawable.ic_file_type_code),
     REG("reg", R.drawable.ic_file_type_code),
     tem_ft("ft", R.drawable.ic_file_type_code), //模板
+    QTSCRIPT_QS("qs", R.drawable.ic_file_type_code),
+    QAT_QS_IN("qs.in", R.drawable.ic_file_type_code), 
+    QAT_QA_IN("qa.in", R.drawable.ic_file_type_code),  //Quality Assurance Template
     ENTITLEMENTS("entitlements", R.drawable.ic_file_type_xml),
     MOBILEPROVISION("mobileprovision", R.drawable.ic_file_type_binary),
     KEYSTORE("keystore", R.drawable.ic_file_type_keystore),
@@ -425,9 +428,14 @@ enum class FileExtension(
     CLANGJJHPP("hpp", R.drawable.ic_file_type_clang_class), //clang++ 头文件
     CLANGJJHH("hh", R.drawable.ic_file_type_clang_class), //clang++ 头文件
     CLANGJJH("h", R.drawable.ic_file_type_clang_h), //clang/++头文件
+    CLANGJJ_H_IN("h.in", R.drawable.ic_file_type_clang_h), //clang/++头文件
+    CLANGJJ_HXX_IN("hxx.in", R.drawable.ic_file_type_clang_h), //clang/++头文件
+    CLANGJJ_CXX_IN("cxx.in", R.drawable.ic_file_type_clang_h), //clang/++头文件
+    
+    
     CLANGC("c", R.drawable.ic_file_type_clang_c), //clang 源码文件
     CLANGT("t", R.drawable.ic_file_type_clang_t), //clang 源码文件  TEMPLATE
-
+    RE_STRUCTURED_TEXT("rst", R.drawable.ic_file_type_code),
     // Assembly
     ASM("asm", R.drawable.ic_file_type_clang_asm),
     ASM_S("s", R.drawable.ic_file_type_clang_asm),
@@ -447,6 +455,7 @@ enum class FileExtension(
 
     CMAKE_CONFIGURATION("", R.drawable.ic_file_type_cmake), //cmake 配置文件
     CMAKE("cmake", R.drawable.ic_file_type_cmake), //cmake源码文件
+    CMAKE_IN("cmake.in", R.drawable.ic_file_type_cmake), //cmake源码文件
 
     RUSTLANG("rs", R.drawable.ic_file_type_language_rust), //rust
     RLIB("rlib", R.drawable.ic_file_type_language_rust),

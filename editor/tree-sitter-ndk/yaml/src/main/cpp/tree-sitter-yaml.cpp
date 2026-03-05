@@ -37,7 +37,7 @@ static jlong TSLanguageYaml_getInstance(JNIEnv *env, jclass clazz) {
     return (jlong) tree_sitter_yaml();
 }
 
-void TSLanguageYaml_Native__SetJniMethods(JNINativeMethod *methods, int count) {
+void TSLanguageYaml_Native_SetJniMethods(JNINativeMethod *methods, int count) {
   SET_JNI_METHOD(methods, TSLanguageYaml_Native_getInstance, TSLanguageYaml_getInstance);
 }
 

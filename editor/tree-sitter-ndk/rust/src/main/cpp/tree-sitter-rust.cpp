@@ -37,7 +37,7 @@ static jlong TSLanguageRust_getInstance(JNIEnv *env, jclass clazz) {
     return (jlong) tree_sitter_rust();
 }
 
-void TSLanguageRust_Native__SetJniMethods(JNINativeMethod *methods, int count) {
+void TSLanguageRust_Native_SetJniMethods(JNINativeMethod *methods, int count) {
   SET_JNI_METHOD(methods, TSLanguageRust_Native_getInstance, TSLanguageRust_getInstance);
 }
 

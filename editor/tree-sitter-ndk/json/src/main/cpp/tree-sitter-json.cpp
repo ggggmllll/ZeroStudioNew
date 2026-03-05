@@ -37,7 +37,7 @@ static jlong TSLanguageJson_getInstance(JNIEnv *env, jclass clazz) {
     return (jlong) tree_sitter_json();
 }
 
-void TSLanguageJson_Native__SetJniMethods(JNINativeMethod *methods, int count) {
+void TSLanguageJson_Native_SetJniMethods(JNINativeMethod *methods, int count) {
   SET_JNI_METHOD(methods, TSLanguageJson_Native_getInstance, TSLanguageJson_getInstance);
 }
 

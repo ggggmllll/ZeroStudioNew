@@ -37,7 +37,7 @@ static jlong TSLanguageJavascript_getInstance(JNIEnv *env, jclass clazz) {
     return (jlong) tree_sitter_javascript();
 }
 
-void TSLanguageJavascript_Native__SetJniMethods(JNINativeMethod *methods, int count) {
+void TSLanguageJavascript_Native_SetJniMethods(JNINativeMethod *methods, int count) {
   SET_JNI_METHOD(methods, TSLanguageJavascript_Native_getInstance, TSLanguageJavascript_getInstance);
 }
 

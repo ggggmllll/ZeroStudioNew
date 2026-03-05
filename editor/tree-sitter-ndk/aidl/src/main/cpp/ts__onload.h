@@ -16,7 +16,7 @@
 #endif
 #endif
 
-// Include generated headers for all grammars (Currently only TOML)
+// Include generated headers for all grammars (Currently only aidl)
 #include "ts_aidl.h"
 
 

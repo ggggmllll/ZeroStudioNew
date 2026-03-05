@@ -39,41 +39,16 @@ class CmakeLanguage(context: Context) :
 
         const val TS_TYPE = "cmake"
         const val TS_TYPE_CMAKE_IN = "cmake.in"     // configure_file() 的输入模板
-        const val TS_TYPE_CMAKE_H_IN = "h.in"       // configure_file() 的输入模板
         const val TS_TYPE_CMAKE_CTEST =  "ctest"    // CTest 专项脚本
         const val TS_TYPE_CMAKE_CPACK =   "cpack"   // CPack 专项脚本
-        const val TS_TYPE_CMAKE_PRESETS = "cmake.presets"
-        const val TS_TYPE_CMAKE_USER_PRESETS = "cmake.user.presets"
-        const val TS_TYPE_CMAKE_TOOLCHAIN_CMAKE =  "toolchain.cmake" // 交叉编译工具链定义文件
-        const val TS_TYPE_CMAKE_PATCHS = "cmake.patch"    // 社区常见的 CMake 补丁文件
+        // const val TS_TYPE_CMAKE_PRESETS = "cmake.presets"
+        // const val TS_TYPE_CMAKE_USER_PRESETS = "cmake.user.presets"
+        // const val TS_TYPE_CMAKE_PATCHS = "cmake.patch"    // 社区常见的 CMake 补丁文件
         const val TS_TYPE_CMAKE_CBPS = "cbp"
         
         const val TS_TYPE_CMAKE_CMLISTSTXT = "CMakeLists.txt"
         const val TS_TYPE_CMAKE_CMCACHE = "CMakeCache.txt"
-        const val TS_TYPE_CMAKE_CMKPRESETS = "CMakePresets.json"
-        const val TS_TYPE_CMAKE_CMKUSERPRESETS = "CMakeUserPresets.json"
-        const val TS_TYPE_CMAKE_CMKSETTINGS = "CMakeSettings.json"
-        const val TS_TYPE_CMAKE_CMKCONANFILE = "conanfile.txt"
-        const val TS_TYPE_CMAKE_CMKVCPKG = "vcpkg.json"
-        const val TS_TYPE_CMAKE_CMKDARTFUIONJSON = "DartConfiguration.tcl"
             
-      // const val CMAKE_EXACT_FILE_NAMES = arrayOf(
-            // "CMakeLists.txt",          // 项目核心配置入口
-            // "CMakeCache.txt",          // 构建缓存明文文件
-            // "CMakePresets.json",       // 现代构建预设
-            // "CMakeUserPresets.json",   // 用户本地预设
-            // "CMakeSettings.json",      // Visual Studio 专用配置
-            // "CPackConfig.cmake",       // CPack 打包配置
-            // "CPackSourceConfig.cmake", // CPack 源码打包配置
-            // "CTestTestfile.cmake",     // CTest 测试定义
-            // "cmake_install.cmake",     // 自动生成的安装脚本
-            // "cmake_uninstall.cmake",   // 社区惯用的卸载脚本
-            // "conanfile.txt",           // 常见配合使用的 Conan 包管理
-            // "vcpkg.json",              // 常见配合使用的 vcpkg 包管理
-            // "DartConfiguration.tcl"    // CTest/CDash 早期配置文件
-        // )
-
-
         @JvmField
         val FACTORY = Factory { CmakeLanguage(it) }
     }

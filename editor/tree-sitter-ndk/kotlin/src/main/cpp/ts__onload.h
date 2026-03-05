@@ -16,7 +16,7 @@
 #endif
 #endif
 
-// Include generated headers for all grammars (Currently only TOML)
+// Include generated headers for all grammars (Currently only kotlin)
 #include "ts_kotlin.h"
 
 

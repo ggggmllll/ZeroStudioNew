@@ -37,7 +37,7 @@ static jlong TSLanguageProperties_getInstance(JNIEnv *env, jclass clazz) {
     return (jlong) tree_sitter_properties();
 }
 
-void TSLanguageProperties_Native__SetJniMethods(JNINativeMethod *methods, int count) {
+void TSLanguageProperties_Native_SetJniMethods(JNINativeMethod *methods, int count) {
   SET_JNI_METHOD(methods, TSLanguageProperties_Native_getInstance, TSLanguageProperties_getInstance);
 }
 

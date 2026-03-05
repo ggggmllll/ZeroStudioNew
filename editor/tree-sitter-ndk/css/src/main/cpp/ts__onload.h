@@ -16,7 +16,7 @@
 #endif
 #endif
 
-// Include generated headers for all grammars (Currently only TOML)
+// Include generated headers for all grammars (Currently only css)
 #include "ts_css.h"
 
 

@@ -17,7 +17,7 @@
 #endif
 
 // Include generated headers for all grammars (Currently only TOML)
-#include "ts_toml.h"
+#include "ts_proto.h"
 
 
 #ifndef _Included__TS_JNI_ONLOAD_
@@ -25,10 +25,10 @@
 
 // 自动注册宏：在 JNI_OnLoad 中调用，注册所有包含的语言
 #define TS_JNI_ONLOAD__AUTO_REGISTER(env) \
-    TSLanguageToml_Native_AutoRegisterNatives(env); \
+    TSLanguageProto_Native_AutoRegisterNatives(env); \
 
 // 定义方法数组宏：实例化 JNINativeMethod 数组
 #define TS_JNI_ONLOAD__DEFINE_METHODS_ARR \
-    TSLanguageToml_Native_DefMethodsArray; \
+    TSLanguageProto_Native_DefMethodsArray; \
 
 #endif

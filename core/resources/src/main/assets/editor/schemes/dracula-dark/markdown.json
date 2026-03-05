@@ -1,0 +1,14 @@
+{
+  "types":["md", "markdown", "mkd", "mdown"],
+  "styles": {
+    "text.title": { "fg": "@type", "bold": true },
+    "text.literal": { "fg": "@string" },
+    "text.uri": { "fg": "@func.call", "italic": true },
+    "text.reference": { "fg": "@field", "bold": true },
+    
+    "punctuation.special": { "fg": "@operator", "bold": true },
+    "punctuation.delimiter": { "fg": "@outline" },
+    
+    "string.escape": { "fg": "@func.decl", "bold": true }
+  }
+}

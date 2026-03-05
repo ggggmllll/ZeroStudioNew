@@ -37,7 +37,7 @@ static jlong TSLanguageLog_getInstance(JNIEnv *env, jclass clazz) {
     return (jlong) tree_sitter_log();
 }
 
-void TSLanguageLog_Native__SetJniMethods(JNINativeMethod *methods, int count) {
+void TSLanguageLog_Native_SetJniMethods(JNINativeMethod *methods, int count) {
   SET_JNI_METHOD(methods, TSLanguageLog_Native_getInstance, TSLanguageLog_getInstance);
 }
 
