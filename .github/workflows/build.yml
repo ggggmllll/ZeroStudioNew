@@ -2,18 +2,18 @@ name: Build and test
 
 on:
   push:
-    branches: [ "dev", "ZeroStudio-devs", "indexing", "release/**" ]
+    branches: [ "main", "ZeroStudio-main", "indexing", "release/**" ]
     paths-ignore:
       - '**.md'
       - 'fastlane/**'
       - '.github/workflows/crowdin_contributors.yml'
   pull_request:
-    branches: [ "dev" ]
+    branches: [ "main" ]
     paths-ignore:
       - '**.md'
       - 'fastlane/**'
       - '.github/workflows/crowdin_contributors.yml'
-  workflow_dispatch: { }
+  workflow_dispatch: {}
 
 env:
   # Misc
@@ -38,14 +38,14 @@ env:
   # Build configuration
   BUILD_JAVA_VERSION: '21'
   BUILD_JAVA_DIST: 'adopt'
-  BUILD_IS_RELEASE: ${{ github.ref == 'refs/heads/ZeroStudio-devs' || github.ref == 'refs/heads/release/**' }}
-  ReleaseAndroidIDE: ${{ github.ref == 'refs/heads/ZeroStudio-devs' }}
+  BUILD_IS_RELEASE: ${{ github.ref == 'refs/heads/ZeroStudio-main' || github.ref == 'refs/heads/release/**' }}
+  ReleaseAndroidIDE: ${{ github.ref == 'refs/heads/ZeroStudio-main' }}
 
 jobs:
   build_apk:
     strategy:
       matrix:
-        build_type: ['debug', 'release']
+        build_type: ['debug', 'dev' , 'release']
     name: Build APK
     runs-on: ubuntu-latest
     steps:
@@ -235,7 +235,7 @@ jobs:
     needs: [ build_apk, run_unit_tests, run_tooling_api_tests ]
     if: |
       always()
-      && github.ref == 'refs/heads/ZeroStudio-devs'
+      && github.ref == 'refs/heads/ZeroStudio-main'
       && github.event_name != 'pull_request'
       && needs.build_apk.result == 'success'
       && needs.run_unit_tests.result == 'success'
@@ -296,7 +296,7 @@ jobs:
     name: Publish package snapshots
     runs-on: ubuntu-latest
     needs: [ build_apk ]
-    if: ${{ always() && github.ref != 'refs/heads/ZeroStudio-devs' && github.event_name != 'pull_request' && needs.build_apk.result == 'success' }}
+    if: ${{ always() && github.ref != 'refs/heads/ZeroStudio-main' && github.event_name != 'pull_request' && needs.build_apk.result == 'success' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
