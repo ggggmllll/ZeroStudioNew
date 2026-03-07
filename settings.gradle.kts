@@ -216,7 +216,7 @@ include(
   ":editor:tree-sitter-ndk:assembly-language:nasm",
   // ":editor:tree-sitter-ndk:java",
   // ":editor:tree-sitter-ndk:c",
-  // ":editor:tree-sitter-ndk:cpp",
+  ":editor:tree-sitter-ndk:cpp",
   // ":editor:tree-sitter-ndk:json",
   // ":editor:tree-sitter-ndk:kotlin",
   // ":editor:tree-sitter-ndk:log",

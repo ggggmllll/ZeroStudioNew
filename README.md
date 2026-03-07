@@ -58,23 +58,68 @@
 - [x] compose Preview
 - [x] Regular expression preview
 
-## about Android tree sitter 
-- Supported languages:
-+ aidl, bash, c, cmake, cpp, css, dart, go, googleSqlBigquery, groovy, java, javascript, json, kotlin, log, lua, markdown, objectiveC, objectiveCpp, php, plsql, properties, proto, python, reStructuredText, rust, smali, sql, sqlite, swift, toml, typeScript, vue, xml, yaml
-+ assembly language：arm, arm64, asm, masm（x86）, nasm
+To make your Markdown document look more professional and user-friendly (perfect for a GitHub README), I have added formatting elements like tables, blockquotes, and code blocks.
 
-+ Introduction:The transplanted Android tree sitter does not require the installation of npm, python, java, ndk, rust, etc. like the official project.
-It doesn't require a complex construction method or a complicated installation method either.
-You can easily build the tree-sitter language you need into your Android project with just Gradle+cmake+ndk.
+Here is the decorated version:
 
-+ relevant documents：[Operation Document](./editor/tree-sitter-ndk/docs.md)
-+ Regarding SCM central radio query files and how to create related language highlighting configuration JSON files:
-- [中文](./docs/Highlight_JSON_docs/docs-cn.md) || [English](./docs/Highlight_JSON_docs/docs-en.md)
--' python：
-1.[Extract scm@xxx and generate a highlighted configuration JSON file using Python](./docs/Highlight_JSON_docs/generate_highlight_json2.py) or [generate_highlight_json.py](./docs/Highlight_JSON_docs/generate_highlight_json.py)
-run py：python3 generate_ts_theme.py -i typeScript/queries/highlights.scm -o TypeScript.json -l TypeScript -e ts tsx mts cts
-2.[Creating *.scm mapping files using Python](./docs/Highlight_JSON_docs/generate_ast_scm.py) 
-run python：python3 generate_scm.py -i typeScript/src/main/cpp/typescript/src/node-types.json -o highlights.scm
+---
+
+# 🌿 About Android Tree-Sitter
+
+A streamlined port of the Tree-Sitter parser generator, specifically optimized for the Android NDK environment.
+
+## 🚀 Key Features
+Unlike the official project, this Android-native port is designed for simplicity:
+*   **Zero External Dependencies:** No need to install `npm`, `Python`, `Rust`, or system-level `Java` on your host machine.
+*   **Simplified Build:** Forget complex configurations. Build the languages you need using only **Gradle + CMake + NDK**.
+*   **Direct Integration:** Easily bake Tree-Sitter language support directly into your Android apps.
+*   **Standardized template:** A unified Java+JNI template and standardized pipeline are implemented across all languages, allowing for the rapid expansion of support for any language.
+
+---
+
+## 🌍The following languages ​​are built-in
+
+### 1. Standard Languages
+`aidl`, `bash`, `c`, `cmake`, `cpp`, `css`, `dart`, `go`, `googleSqlBigquery`, `groovy`, `java`, `javascript`, `json`, `kotlin`, `log`, `lua`, `markdown`, `objectiveC`, `objectiveCpp`, `php`, `plsql`, `properties`, `proto`, `python`, `reStructuredText`, `rust`, `smali`, `sql`, `sqlite`, `swift`, `toml`, `typeScript`, `vue`, `xml`, `yaml`
+
+### 2. Assembly Languages
+`arm`, `arm64`, `asm`, `masm (x86)`, `nasm`
+
+---
+
+## 📚 Documentation
+*   📖 [**Core Operation Document**](./editor/tree-sitter-ndk/docs.md)
+*   🎨 **Highlighting Configuration (SCM & JSON):**
+    *   How to create SCM query files and language highlighting JSON files: 
+        [English](./docs/Highlight_JSON_docs/docs-en.md) | [中文](./docs/Highlight_JSON_docs/docs-cn.md)
+
+---
+
+## 🛠 Python Utility Tools
+
+We provide scripts to automate the creation of highlighting and mapping files.
+
+### 1. Highlight Generator
+Extract `@capture` groups from `.scm` files and generate compatible configuration JSON files.
+*   **Scripts:** [`generate_highlight_json2.py`](./docs/Highlight_JSON_docs/generate_highlight_json2.py) or [`generate_highlight_json.py`](./docs/Highlight_JSON_docs/generate_highlight_json.py)
+*   **Usage:**
+```bash
+python3 generate_highlight_json2.py \
+  -i typeScript/queries/highlights.scm \
+  -o TypeScript.json \
+  -l TypeScript \
+  -e ts tsx mts cts
+```
+
+### 2. SCM Mapping Generator
+Create `*.scm` mapping files based on the language's AST node types.
+*   **Script:** [`generate_ast_scm.py`](./docs/Highlight_JSON_docs/generate_ast_scm.py)
+*   **Usage:**
+```bash
+python3 generate_structured_scm.py \
+  -i typeScript/src/main/cpp/typescript/src/node-types.json \
+  -o highlights.scm
+```
 
 ## Installation
 [<img src="https://github.com/Kunzisoft/Github-badge/raw/main/get-it-on-github.svg"

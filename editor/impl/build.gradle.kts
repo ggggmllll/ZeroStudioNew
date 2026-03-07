@@ -49,7 +49,7 @@ dependencies {
     api(libs.androidide.ts.log)
     api(libs.androidide.ts.xml)
     api(libs.androidide.ts.c)
-    api(libs.androidide.ts.cpp)
+    // api(libs.androidide.ts.cpp)
     api(libs.androidide.ts.python)
     
     api(libs.androidx.collection)
@@ -104,6 +104,7 @@ dependencies {
     implementation(projects.editor.treeSitterNdk.smali)
     implementation(projects.editor.treeSitterNdk.php)
     implementation(projects.editor.treeSitterNdk.typeScript)
+    implementation(projects.editor.treeSitterNdk.cpp)
     
     implementation(projects.editor.treeSitterNdk.css)
     implementation(projects.editor.treeSitterNdk.go)

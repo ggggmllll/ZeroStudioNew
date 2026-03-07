@@ -1,9 +1,9 @@
 <libraries>
   <library
       name="androidx.databinding:viewbinding:8.13.0@aar"
-      jars="/root/.gradle/caches/8.13/transforms/11e2c96c8b1e818e22a7127e4aa100cb/transformed/jetified-viewbinding-8.13.0/jars/classes.jar"
+      jars="/root/.gradle/caches/8.13/transforms/9771b32f58d29c59e0a0eeaed252dde3/transformed/jetified-viewbinding-8.13.0/jars/classes.jar"
       resolved="androidx.databinding:viewbinding:8.13.0"
-      folder="/root/.gradle/caches/8.13/transforms/11e2c96c8b1e818e22a7127e4aa100cb/transformed/jetified-viewbinding-8.13.0"
+      folder="/root/.gradle/caches/8.13/transforms/9771b32f58d29c59e0a0eeaed252dde3/transformed/jetified-viewbinding-8.13.0"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -14,9 +14,9 @@
       proguardRules="proguard.txt"/>
   <library
       name="com.itsaky.androidide.treesitter:android-tree-sitter:4.3.2@aar"
-      jars="/root/.gradle/caches/8.13/transforms/c1edcbf92665df66e3cf46a48a6d0ed3/transformed/jetified-android-tree-sitter-4.3.2/jars/classes.jar"
+      jars="/root/.gradle/caches/8.13/transforms/02fb89d40f449d6bc35bef6bd977d11b/transformed/jetified-android-tree-sitter-4.3.2/jars/classes.jar"
       resolved="com.itsaky.androidide.treesitter:android-tree-sitter:4.3.2"
-      folder="/root/.gradle/caches/8.13/transforms/c1edcbf92665df66e3cf46a48a6d0ed3/transformed/jetified-android-tree-sitter-4.3.2"
+      folder="/root/.gradle/caches/8.13/transforms/02fb89d40f449d6bc35bef6bd977d11b/transformed/jetified-android-tree-sitter-4.3.2"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"

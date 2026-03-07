@@ -1,0 +1,37 @@
+{
+  "types": [
+    "ts",
+    "tsx",
+    "mts",
+    "cts"
+  ],
+  "styles": {
+    "constant": {
+      "fg": "@constant",
+      "bold": true
+    },
+    "function": {
+      "fg": "@func.decl",
+      "bold": true
+    },
+    "keyword": {
+      "fg": "@keyword",
+      "bold": true
+    },
+    "module": {
+      "fg": "@java.package"
+    },
+    "string": {
+      "fg": "@string",
+      "maybeHexColor": true
+    },
+    "type": {
+      "fg": "@type",
+      "bold": true
+    },
+    "variable.builtin": {
+      "fg": "@keyword",
+      "bold": true
+    }
+  }
+}

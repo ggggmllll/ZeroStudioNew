@@ -1,11 +1,14 @@
-(normal_command)
+[
+  (normal_command)
   (if_condition)
   (foreach_loop)
   (while_loop)
   (function_def)
   (macro_def)
   (block_def)
-] @indent.begin[
+] @indent.begin
+
+[
   (elseif_command)
   (else_command)
   (endif_command)
