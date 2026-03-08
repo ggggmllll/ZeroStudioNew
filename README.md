@@ -116,8 +116,8 @@ Create `*.scm` mapping files based on the language's AST node types.
 *   **Script:** [`generate_ast_scm.py`](./docs/Highlight_JSON_docs/generate_ast_scm.py)
 *   **Usage:**
 ```bash
-English：python3 generate_scm_from_c.py -c "Your parser.c path" -o "Output folder path"
-中文：python3 generate_scm_from_c.py -c "你的parser.c路径" -o "输出文件夹路径"
+English：python3 ./generate_structured_scm.py -c "Your parser.c path" -o "Output folder path"
+中文：python3 ./generate_structured_scm.py -c "你的parser.c路径" -o "输出文件夹路径"
 ```
 </details>
 
@@ -196,10 +196,10 @@ Thanks to all the developers who have contributed to this project.
 #### 2. Strict Prohibition of Malicious Use (严禁恶意用途)
 *   **CN:** 严禁使用 `ZeroStudio` 编写、构建或传播任何**恶意代码（Malware）**或用于**非法用途**。
     *   **禁止范围包括但不限于**：勒索软件（Ransomware）、特洛伊木马（Trojans）、计算机病毒、网络蠕虫、间谍软件、僵尸网络控制端、DDOS 攻击工具、非法渗透/入侵工具、流量劫持软件、以及任何旨在窃取数据、破坏计算机系统、损坏硬件设备或干扰网络正常运行的程序。
-    *   **后果**：任何利用本工具进行上述违规开发的行为，其后果完全由使用者自行承担，与本项目无关。
+    *   **后果**：任何利用本工具进行上述违规开发的行为，其后果完全由使用者自行承担，与本项目及开发者无关。
 *   **EN:** It is strictly prohibited to use `ZeroStudio` to write, build, or distribute any **Malicious Code** or for any **Illegal Purposes**.
     *   **Prohibited acts include but are not limited to**: Ransomware, Trojans, Computer Viruses, Worms, Spyware, Botnet controllers, DDoS attack tools, Illegal Penetration/Hacking tools, Traffic Hijacking software, and any program intended to steal data, damage computer systems, brick hardware devices, or disrupt network operations.
-    *   **Consequences**: The consequences of any such non-compliant development using this tool shall be borne solely by the user and have no relation to this Project.
+    *   **Consequences**: The consequences of any such non-compliant development using this tool shall be borne solely by the user This has nothing to do with this project or its developers.。
 
 #### 3. Legal Compliance & Indemnification (法律合规与赔偿)
 *   **CN:** 用户必须承诺在**遵守当地国家/地区法律法规**（包括但不限于《中华人民共和国网络安全法》、《计算机信息系统安全保护条例》等）的前提下使用本工具。
