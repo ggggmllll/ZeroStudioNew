@@ -65,7 +65,7 @@ Here is the decorated version:
 ---
 
 <details close>
-# 🌿 About Android Tree-Sitter
+<summary>⚖️ <strong>🌿 About Android Tree-Sitter</strong></summary>
 
 A streamlined port of the Tree-Sitter parser generator, specifically optimized for the Android NDK environment.
 
@@ -116,9 +116,8 @@ Create `*.scm` mapping files based on the language's AST node types.
 *   **Script:** [`generate_ast_scm.py`](./docs/Highlight_JSON_docs/generate_ast_scm.py)
 *   **Usage:**
 ```bash
-python3 generate_structured_scm.py \
-  -i typeScript/src/main/cpp/typescript/src/node-types.json \
-  -o highlights.scm
+English：python3 generate_scm_from_c.py -c "Your parser.c path" -o "Output folder path"
+中文：python3 generate_scm_from_c.py -c "你的parser.c路径" -o "输出文件夹路径"
 ```
 </details>
 
