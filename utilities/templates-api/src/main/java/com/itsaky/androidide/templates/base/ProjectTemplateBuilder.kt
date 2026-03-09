@@ -40,22 +40,25 @@ import java.util.zip.ZipInputStream
  * @author android_zero
  */
 class ProjectTemplateBuilder :
-  ExecutorDataTemplateBuilder<ProjectTemplateRecipeResult, ProjectTemplateData>() {
+    ExecutorDataTemplateBuilder<ProjectTemplateRecipeResult, ProjectTemplateData>() {
 
   private var _defModule: ModuleTemplateData? = null
 
-  @PublishedApi
-  internal val defModuleTemplate: ModuleTemplate? = null
+  // Add flag to track if any modules use Compose
+  var hasComposeModules = false
+    private set
 
-  @PublishedApi
-  internal val modules = mutableListOf<ModuleTemplate>()
+  @PublishedApi internal val defModuleTemplate: ModuleTemplate? = null
+
+  @PublishedApi internal val modules = mutableListOf<ModuleTemplate>()
 
   @PublishedApi
   internal val defModule: ModuleTemplateData
     get() = checkNotNull(_defModule) { "Module template data not set" }
 
   /**
-   * Set the template data that will be used to create the default application module in the project.
+   * Set the template data that will be used to create the default application module in the
+   * project.
    *
    * @param data The module template data to use.
    */
@@ -64,122 +67,128 @@ class ProjectTemplateBuilder :
   }
 
   /**
+   * Enable Compose support for the project. This will add the Compose Compiler plugin to the root
+   * build.gradle
+   */
+  fun enableComposeSupport() {
+    hasComposeModules = true
+  }
+
+  /**
    * Get the asset path for base root project template.
    *
    * @param path The path to the asset.
    * @see com.itsaky.androidide.templates.base.baseAsset
    */
-  fun baseAsset(path: String) =
-    com.itsaky.androidide.templates.base.util.baseAsset("root", path)
+  fun baseAsset(path: String) = com.itsaky.androidide.templates.base.util.baseAsset("root", path)
 
-  /**
-   * Get the `build.gradle[.kts] file for the project.
-   */
+  /** Get the `build.gradle[.kts] file for the project. */
   fun buildGradleFile(): File {
     return data.buildGradleFile()
   }
 
-  /**
-   * Writes the `build.gradle[.kts]` file in the project root directory.
-   */
+  /** Writes the `build.gradle[.kts]` file in the project root directory. */
   fun buildGradle() {
     executor.save(buildGradleSrc(), buildGradleFile())
   }
 
-  /**
-   * Get the source for `build.gradle[.kts]` files.
-   */
+  /** Get the source for `build.gradle[.kts]` files. */
+  // In ProjectTemplateBuilder.kt
+
+  /** Get the source for `build.gradle[.kts]` files. */
   fun buildGradleSrc(): String {
-    return if (data.useKts) buildGradleSrcKts() else buildGradleSrcGroovy()
+    // Check multiple signals to robustly detect if any module uses Compose
+    val composeMarkerFile = File(data.projectDir, ".compose_enabled")
+    val composeDetectedByScan = checkForComposeInProject()
+    val shouldIncludeCompose =
+        hasComposeModules || composeMarkerFile.exists() || composeDetectedByScan
+    return if (data.useKts) buildGradleSrcKts(shouldIncludeCompose)
+    else buildGradleSrcGroovy(shouldIncludeCompose)
   }
 
-  /**
-   * Writes the `settings.gradle[.kts]` file in the project root directory.
-   */
+  /** Check if any modules in the project use Compose by scanning the project structure */
+  private fun checkForComposeInProject(): Boolean {
+    // Check if the default module uses Compose
+    _defModule?.let { moduleData ->
+      // Look for Compose-related files or settings
+      val buildGradleFile = moduleData.buildGradleFile()
+      if (buildGradleFile.exists()) {
+        val content = buildGradleFile.readText()
+        if (content.contains("compose") || content.contains("androidx.compose")) {
+          return true
+        }
+      }
+    }
+
+    // Alternative: Check for a flag file or other indicator
+    val composeMarkerFile = File(data.projectDir, ".compose_enabled")
+    return composeMarkerFile.exists()
+  }
+
+  /** Writes the `settings.gradle[.kts]` file in the project root directory. */
   fun settingsGradle() {
     executor.save(settingsGradleSrc(), settingsGradleFile())
   }
 
-  /**
-   * Get the `settings.gradle[.kts]` file for this project.
-   */
+  /** Get the `settings.gradle[.kts]` file for this project. */
   fun settingsGradleFile(): File {
     return File(data.projectDir, data.optonallyKts("settings.gradle"))
   }
 
-  /**
-   * Get the source for `settings.gradle[.kts]`.
-   */
+  /** Get the source for `settings.gradle[.kts]`. */
   fun settingsGradleSrc(): String {
     return settingsGradleSrcStr()
   }
 
-  /**
-   * Writes the `gradle.properties` file in the root project.
-   */
+  /** Writes the `gradle.properties` file in the root project. */
   fun gradleProps() {
     val name = "gradle.properties"
     val gradleProps = File(data.projectDir, name)
     executor.copyAsset(baseAsset(name), gradleProps)
   }
 
-  /**
-   * Writes/copies the Gradle Wrapper related files in the project directory.
-   */
+  /** Writes/copies the Gradle Wrapper related files in the project directory. */
   fun gradleWrapper() {
 
-    ZipInputStream(
-      executor.openAsset(ToolsManager.getCommonAsset("gradle-wrapper.zip")).buffered()
-    ).use { zipIn ->
-      val entriesToCopy = arrayOf("gradlew", "gradlew.bat", "gradle/wrapper/gradle-wrapper.jar")
+    ZipInputStream(executor.openAsset(ToolsManager.getCommonAsset("gradle-wrapper.zip")).buffered())
+        .use { zipIn ->
+          val entriesToCopy = arrayOf("gradlew", "gradlew.bat", "gradle/wrapper/gradle-wrapper.jar")
 
-      var zipEntry: ZipEntry? = zipIn.nextEntry
-      while (zipEntry != null) {
-        if (zipEntry.name in entriesToCopy) {
-          val fileOut = File(data.projectDir, zipEntry.name)
-          fileOut.parentFile!!.mkdirs()
+          var zipEntry: ZipEntry? = zipIn.nextEntry
+          while (zipEntry != null) {
+            if (zipEntry.name in entriesToCopy) {
+              val fileOut = File(data.projectDir, zipEntry.name)
+              fileOut.parentFile!!.mkdirs()
 
-          fileOut.outputStream().buffered().use { outStream ->
-            zipIn.transferToStream(outStream)
-            outStream.flush()
+              fileOut.outputStream().buffered().use { outStream ->
+                zipIn.transferToStream(outStream)
+                outStream.flush()
+              }
+            }
+
+            zipEntry = zipIn.nextEntry
           }
+
+          val gradlew = File(data.projectDir, "gradlew")
+          val gradlewBat = File(data.projectDir, "${gradlew.name}.bat")
+
+          check(gradlew.exists()) { "'$gradlew' does not exist!" }
+          check(gradlewBat.exists()) { "'$gradlew' does not exist!" }
+
+          gradlew.setExecutable(true)
+          gradlewBat.setExecutable(true)
         }
-
-        zipEntry = zipIn.nextEntry
-      }
-
-
-      val gradlew = File(data.projectDir, "gradlew")
-      val gradlewBat = File(data.projectDir, "${gradlew.name}.bat")
-
-      check(gradlew.exists()) {
-        "'$gradlew' does not exist!"
-      }
-      check(gradlewBat.exists()) {
-        "'$gradlew' does not exist!"
-      }
-
-      gradlew.setExecutable(true)
-      gradlewBat.setExecutable(true)
-    }
 
     gradleWrapperProps()
   }
 
-  /**
-   * Writes the `.gitignore` file in the project directory.
-   */
+  /** Writes the `.gitignore` file in the project directory. */
   fun gitignore() {
     val gitignore = File(data.projectDir, ".gitignore")
     executor.copyAsset(baseAsset("gitignore"), gitignore)
   }
 
-  /**
-   * @author android_zero
-   *
-   * Updated to pass the 'description' to the ProjectTemplate constructor.
-   */
   override fun buildInternal(): ProjectTemplate {
-    return ProjectTemplate(modules, templateName!!, thumb!!, description, widgets!!, recipe!!)
+    return ProjectTemplate(modules, templateName!!, thumb!!, widgets!!, recipe!!)
   }
 }

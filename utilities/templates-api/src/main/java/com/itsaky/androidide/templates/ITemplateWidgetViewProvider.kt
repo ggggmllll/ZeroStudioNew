@@ -38,10 +38,10 @@ interface ITemplateWidgetViewProvider {
       if (reload) {
         service = null
       }
-      return service ?: ServiceLoader.load(
-        ITemplateWidgetViewProvider::class.java)
-        .findFirstOrThrow()
-        .also { service = it }
+      return service
+          ?: ServiceLoader.load(ITemplateWidgetViewProvider::class.java).findFirstOrThrow().also {
+            service = it
+          }
     }
   }
 

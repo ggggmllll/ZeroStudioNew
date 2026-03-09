@@ -119,6 +119,8 @@ Create `*.scm` mapping files based on the language's AST node types.
 English：python3 ./generate_structured_scm.py -c "Your parser.c path" -o "Output folder path"
 中文：python3 ./generate_structured_scm.py -c "你的parser.c路径" -o "输出文件夹路径"
 ```
+#tree-sitter Syntax Tree Playground（SCM verification）：[Syntax Tree Playground](https://tree-sitter.github.io/tree-sitter/7-playground.html?ref=journal.hexmos.com)
+
 </details>
 
 ## Installation

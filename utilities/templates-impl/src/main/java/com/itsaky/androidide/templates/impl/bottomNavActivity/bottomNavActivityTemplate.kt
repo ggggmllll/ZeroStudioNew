@@ -37,8 +37,11 @@ fun bottomNavActivityProject() = baseProjectImpl {
   defaultAppModule {
     recipe = createRecipe {
       sources {
-        writeMainActivity(this, ktSrc = ::bottomNavActivitySrcKt,
-          javaSrc = ::bottomNavActivitySrcJava)
+        writeMainActivity(
+            this,
+            ktSrc = ::bottomNavActivitySrcKt,
+            javaSrc = ::bottomNavActivitySrcJava,
+        )
       }
 
       res {
@@ -71,21 +74,34 @@ fun AndroidModuleTemplateBuilder.bottomNavActivityProjectKt() {
     addDependency(Dependency.AndroidX.LifeCycle_ViewModel_Ktx)
 
     sources {
-      writeKtSrc("${data.packageName}.ui.dashboard", "DashboardFragment",
-        source = ::bottomNavFragmentDashSrcKt)
-      writeKtSrc("${data.packageName}.ui.dashboard", "DashboardViewModel",
-        source = ::bottomNavModelDashSrcKt)
+      writeKtSrc(
+          "${data.packageName}.ui.dashboard",
+          "DashboardFragment",
+          source = ::bottomNavFragmentDashSrcKt,
+      )
+      writeKtSrc(
+          "${data.packageName}.ui.dashboard",
+          "DashboardViewModel",
+          source = ::bottomNavModelDashSrcKt,
+      )
 
-      writeKtSrc("${data.packageName}.ui.home", "HomeFragment",
-        source = ::bottomNavFragmentHomeSrcKt)
-      writeKtSrc("${data.packageName}.ui.home", "HomeViewModel",
-        source = ::bottomNavModelHomeSrcKt)
+      writeKtSrc(
+          "${data.packageName}.ui.home",
+          "HomeFragment",
+          source = ::bottomNavFragmentHomeSrcKt,
+      )
+      writeKtSrc("${data.packageName}.ui.home", "HomeViewModel", source = ::bottomNavModelHomeSrcKt)
 
-      writeKtSrc("${data.packageName}.ui.notifications",
-        "NotificationsFragment", source = ::bottomNavFragmentNotificationsSrcKt)
-      writeKtSrc("${data.packageName}.ui.notifications",
-        "NotificationsViewModel", source = ::bottomNavModelNotificationsSrcKt)
-
+      writeKtSrc(
+          "${data.packageName}.ui.notifications",
+          "NotificationsFragment",
+          source = ::bottomNavFragmentNotificationsSrcKt,
+      )
+      writeKtSrc(
+          "${data.packageName}.ui.notifications",
+          "NotificationsViewModel",
+          source = ::bottomNavModelNotificationsSrcKt,
+      )
     }
   }
 }
@@ -98,22 +114,38 @@ private fun AndroidModuleTemplateBuilder.bottomNavActivityProjectJava() {
     addDependency(Dependency.AndroidX.LifeCycle_ViewModel)
 
     sources {
-      writeJavaSrc("${data.packageName}.ui.dashboard", "DashboardFragment",
-        source = ::bottomNavFragmentDashSrcJava)
-      writeJavaSrc("${data.packageName}.ui.dashboard", "DashboardViewModel",
-        source = ::bottomNavModelDashSrcJava)
+      writeJavaSrc(
+          "${data.packageName}.ui.dashboard",
+          "DashboardFragment",
+          source = ::bottomNavFragmentDashSrcJava,
+      )
+      writeJavaSrc(
+          "${data.packageName}.ui.dashboard",
+          "DashboardViewModel",
+          source = ::bottomNavModelDashSrcJava,
+      )
 
-      writeJavaSrc("${data.packageName}.ui.home", "HomeFragment",
-        source = ::bottomNavFragmentHomeSrcJava)
-      writeJavaSrc("${data.packageName}.ui.home", "HomeViewModel",
-        source = ::bottomNavModelHomeSrcJava)
+      writeJavaSrc(
+          "${data.packageName}.ui.home",
+          "HomeFragment",
+          source = ::bottomNavFragmentHomeSrcJava,
+      )
+      writeJavaSrc(
+          "${data.packageName}.ui.home",
+          "HomeViewModel",
+          source = ::bottomNavModelHomeSrcJava,
+      )
 
-      writeJavaSrc("${data.packageName}.ui.notifications",
-        "NotificationsFragment",
-        source = ::bottomNavFragmentNotificationsSrcJava)
-      writeJavaSrc("${data.packageName}.ui.notifications",
-        "NotificationsViewModel", source = ::bottomNavModelNotificationsSrcJava)
-
+      writeJavaSrc(
+          "${data.packageName}.ui.notifications",
+          "NotificationsFragment",
+          source = ::bottomNavFragmentNotificationsSrcJava,
+      )
+      writeJavaSrc(
+          "${data.packageName}.ui.notifications",
+          "NotificationsViewModel",
+          source = ::bottomNavModelNotificationsSrcJava,
+      )
     }
   }
 }

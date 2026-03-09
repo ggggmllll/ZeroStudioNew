@@ -44,13 +44,12 @@ fun navDrawerActivityProject() = baseProjectImpl {
       res {
         copyAssetsRecursively(templateAsset("navDrawer", "res"), mainResDir())
 
-        writeXmlResource("mobile_navigation", NAVIGATION,
-          source = ::navDrawerNavigationXmlSrc)
+        writeXmlResource("mobile_navigation", NAVIGATION, source = ::navDrawerNavigationXmlSrc)
 
         putStringRes("navigation_drawer_open", "Open navigation drawer")
         putStringRes("navigation_drawer_close", "Close navigation drawer")
-        putStringRes("nav_header_title", "AndroidIDE")
-        putStringRes("nav_header_subtitle", "contact@androidide.com")
+        putStringRes("nav_header_title", "IDE Demo")
+        putStringRes("nav_header_subtitle", "msmt8382@gmail.com")
         putStringRes("nav_header_desc", "Navigation header")
         putStringRes("action_settings", "Settings")
         putStringRes("menu_home", "Home")
@@ -77,20 +76,30 @@ private fun AndroidModuleTemplateBuilder.navDrawerActivityProjectJava() {
     addDependency(Dependency.AndroidX.LifeCycle_ViewModel)
 
     sources {
-      writeJavaSrc("${data.packageName}.ui.gallery", "GalleryFragment",
-        source = ::galleryFragmentSrcJava)
-      writeJavaSrc("${data.packageName}.ui.gallery", "GalleryViewModel",
-        source = ::galleryModelSrcJava)
+      writeJavaSrc(
+          "${data.packageName}.ui.gallery",
+          "GalleryFragment",
+          source = ::galleryFragmentSrcJava,
+      )
+      writeJavaSrc(
+          "${data.packageName}.ui.gallery",
+          "GalleryViewModel",
+          source = ::galleryModelSrcJava,
+      )
 
-      writeJavaSrc("${data.packageName}.ui.home", "HomeFragment",
-        source = ::homeFragmentSrcJava)
-      writeJavaSrc("${data.packageName}.ui.home", "HomeViewModel",
-        source = ::homeModelSrcJava)
+      writeJavaSrc("${data.packageName}.ui.home", "HomeFragment", source = ::homeFragmentSrcJava)
+      writeJavaSrc("${data.packageName}.ui.home", "HomeViewModel", source = ::homeModelSrcJava)
 
-      writeJavaSrc("${data.packageName}.ui.slideshow", "SlideshowFragment",
-        source = ::slideshowFragmentSrcJava)
-      writeJavaSrc("${data.packageName}.ui.slideshow", "SlideshowViewModel",
-        source = ::slideshowModelSrcJava)
+      writeJavaSrc(
+          "${data.packageName}.ui.slideshow",
+          "SlideshowFragment",
+          source = ::slideshowFragmentSrcJava,
+      )
+      writeJavaSrc(
+          "${data.packageName}.ui.slideshow",
+          "SlideshowViewModel",
+          source = ::slideshowModelSrcJava,
+      )
     }
   }
 }
@@ -103,20 +112,26 @@ private fun AndroidModuleTemplateBuilder.navDrawerActivityProjectKt() {
     addDependency(Dependency.AndroidX.LifeCycle_ViewModel_Ktx)
 
     sources {
-      writeKtSrc("${data.packageName}.ui.gallery", "GalleryFragment",
-        source = ::galleryFragmentSrcKt)
-      writeKtSrc("${data.packageName}.ui.gallery", "GalleryViewModel",
-        source = ::galleryModelSrcKt)
+      writeKtSrc(
+          "${data.packageName}.ui.gallery",
+          "GalleryFragment",
+          source = ::galleryFragmentSrcKt,
+      )
+      writeKtSrc("${data.packageName}.ui.gallery", "GalleryViewModel", source = ::galleryModelSrcKt)
 
-      writeKtSrc("${data.packageName}.ui.home", "HomeFragment",
-        source = ::homeFragmentSrcKt)
-      writeKtSrc("${data.packageName}.ui.home", "HomeViewModel",
-        source = ::homeModelSrcKt)
+      writeKtSrc("${data.packageName}.ui.home", "HomeFragment", source = ::homeFragmentSrcKt)
+      writeKtSrc("${data.packageName}.ui.home", "HomeViewModel", source = ::homeModelSrcKt)
 
-      writeKtSrc("${data.packageName}.ui.slideshow", "SlideshowFragment",
-        source = ::slideshowFragmentSrcKt)
-      writeKtSrc("${data.packageName}.ui.slideshow", "SlideshowViewModel",
-        source = ::slideshowModelSrcKt)
+      writeKtSrc(
+          "${data.packageName}.ui.slideshow",
+          "SlideshowFragment",
+          source = ::slideshowFragmentSrcKt,
+      )
+      writeKtSrc(
+          "${data.packageName}.ui.slideshow",
+          "SlideshowViewModel",
+          source = ::slideshowModelSrcKt,
+      )
     }
   }
 }

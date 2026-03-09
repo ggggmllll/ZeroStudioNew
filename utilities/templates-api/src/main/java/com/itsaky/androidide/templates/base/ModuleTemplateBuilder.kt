@@ -39,21 +39,20 @@ import java.io.File
  * @author android_zero
  */
 abstract class ModuleTemplateBuilder :
-  ExecutorDataTemplateBuilder<ModuleTemplateRecipeResult, ModuleTemplateData>() {
+    ExecutorDataTemplateBuilder<ModuleTemplateRecipeResult, ModuleTemplateData>() {
 
   internal val platforms = hashSetOf<Dependency>()
   internal val dependencies = hashSetOf<Dependency>()
 
-  @PublishedApi
-  internal val sourceWriter = SourceWriter()
+  @PublishedApi internal val sourceWriter = SourceWriter()
 
-  @PublishedApi
-  internal var _name: String? = null
+  @PublishedApi internal var _name: String? = null
 
   val name: String
     get() = checkNotNull(_name) { "Name not set to module template" }
 
   open fun RecipeExecutor.preConfig() {}
+
   open fun RecipeExecutor.postConfig() {}
 
   /**
@@ -62,23 +61,18 @@ abstract class ModuleTemplateBuilder :
    * @param path The path for the asset.
    * @see com.itsaky.androidide.templates.base.baseAsset
    */
-  open fun baseAsset(path: String) =
-    com.itsaky.androidide.templates.base.util.baseAsset("module", path)
+  open fun baseAsset(path: String) = com.itsaky.androidide.templates.base.util.baseAsset("module", path)
 
-  /**
-   * Get the `build.gradle[.kts]` file for this module.l
-   */
+  /** Get the `build.gradle[.kts]` file for this module.l */
   fun buildGradleFile(): File {
     return data.buildGradleFile()
   }
 
   /**
-   * Get the path to the Java source file in the given [source set][srcSet] with the
-   * given [packageName] and the [simple name][name].
+   * Get the path to the Java source file in the given [source set][srcSet] with the given
+   * [packageName] and the [simple name][name].
    */
-  fun srcFilePath(srcSet: SrcSet, packageName: String, name: String,
-                  language: Language
-  ): File {
+  fun srcFilePath(srcSet: SrcSet, packageName: String, name: String, language: Language): File {
     var path = packageName.replace('.', '/')
     path += "/${name}"
     path += ".${language.ext}"
@@ -86,30 +80,22 @@ abstract class ModuleTemplateBuilder :
     return File(javaSrc(srcSet), path)
   }
 
-  /**
-   * Get the `java` sources directory for the [SrcSet.Main] source set.
-   */
+  /** Get the `java` sources directory for the [SrcSet.Main] source set. */
   fun mainJavaSrc(): File {
     return javaSrc(SrcSet.Main)
   }
 
-  /**
-   * Get the `resources` directory for the [SrcSet.Main] source set.
-   */
+  /** Get the `resources` directory for the [SrcSet.Main] source set. */
   fun mainResourcesDir(): File {
     return javaSrc(SrcSet.Main)
   }
 
-  /**
-   * Get the `resources` directory for the given [source set][srcSet].
-   */
+  /** Get the `resources` directory for the given [source set][srcSet]. */
   fun resourcesDir(srcSet: SrcSet): File {
     return File(srcFolder(srcSet), "resources").also { it.mkdirs() }
   }
 
-  /**
-   * Get the `java` source directory for the given [srcSet].
-   */
+  /** Get the `java` source directory for the given [srcSet]. */
   fun javaSrc(srcSet: SrcSet): File {
     return File(srcFolder(srcSet), "java").also { it.mkdirs() }
   }
@@ -135,11 +121,13 @@ abstract class ModuleTemplateBuilder :
   /**
    * Common pre-recipe configuration.
    *
-   * @param moduleData  Called after the base configuration is setup and before the [recipe] is executed. Caller can perform its own
-   * pre-recipe configuration here. Returns the [ModuleTemplateData] instance.
+   * @param moduleData Called after the base configuration is setup and before the [recipe] is
+   *   executed. Caller can perform its own pre-recipe configuration here. Returns the
+   *   [ModuleTemplateData] instance.
    */
-  inline fun commonPreRecipe(crossinline extraConfig: TemplateRecipeConfigurator = {},
-                      crossinline moduleData: RecipeExecutor.() -> ModuleTemplateData
+  inline fun commonPreRecipe(
+      crossinline extraConfig: TemplateRecipeConfigurator = {},
+      crossinline moduleData: RecipeExecutor.() -> ModuleTemplateData,
   ): TemplateRecipeConfigurator = {
     val data = moduleData()
 
@@ -160,10 +148,9 @@ abstract class ModuleTemplateBuilder :
    * Common post-recipe configuration.
    *
    * @param extraConfig Called after the [recipe] is executed. Caller can perform its own
-   * post-recipe configuration here.
+   *   post-recipe configuration here.
    */
-  fun commonPostRecipe(extraConfig: TemplateRecipeFinalizer = {}
-  ): TemplateRecipeFinalizer = {
+  fun commonPostRecipe(extraConfig: TemplateRecipeFinalizer = {}): TemplateRecipeFinalizer = {
 
     // Write build.gradle[.kts]
     buildGradle()
@@ -183,9 +170,7 @@ abstract class ModuleTemplateBuilder :
    * @param isPlatform Whether this dependency declares a BOM.
    */
   @JvmOverloads
-  fun addDependency(group: String, artifact: String, version: String,
-                    isPlatform: Boolean = false
-  ) {
+  fun addDependency(group: String, artifact: String, version: String, isPlatform: Boolean = false) {
     addDependency(defaultDependency(group, artifact, version), isPlatform)
   }
 
@@ -204,17 +189,10 @@ abstract class ModuleTemplateBuilder :
     }
   }
 
-  /**
-   * Writes the `build.gradle[.kts]` file for this module.
-   */
+  /** Writes the `build.gradle[.kts]` file for this module. */
   abstract fun RecipeExecutor.buildGradle()
 
-  /**
-   * @author android_zero
-   *
-   * Updated to pass the 'description' to the ModuleTemplate constructor.
-   */
   override fun buildInternal(): ModuleTemplate {
-    return ModuleTemplate(name, templateName!!, thumb!!, description, widgets!!, recipe!!)
+    return ModuleTemplate(name, templateName!!, thumb!!, widgets!!, recipe!!)
   }
 }

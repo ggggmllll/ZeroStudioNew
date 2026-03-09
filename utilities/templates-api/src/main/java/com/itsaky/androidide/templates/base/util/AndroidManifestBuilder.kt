@@ -63,16 +63,19 @@ class AndroidManifestBuilder {
      */
     APPLICATION_ATTR,
 
-    /**
-     * For configuring elements inside the `<application>` tag.
-     */
-    APPLICATION_CONTENT
+    /** For configuring elements inside the `<application>` tag. */
+    APPLICATION_CONTENT,
   }
 
-  private val configurators =
-    hashMapOf<ConfigurationType, HashSet<IndentedXmlConfigurator>>()
+  private val configurators = hashMapOf<ConfigurationType, HashSet<IndentedXmlConfigurator>>()
   private val permissions = hashSetOf<Permission>()
+  private val stringPermissions = hashSetOf<String>()
   private val activities = hashSetOf<ManifestActivity>()
+
+  init {
+    // Automatically add FOREGROUND_SERVICE_DATA_SYNC permission to all manifests
+    stringPermissions.add("android.permission.FOREGROUND_SERVICE_DATA_SYNC")
+  }
 
   /**
    * The name of the string resource to use in the `android:label` attribute of `<application>` tag.
@@ -117,15 +120,17 @@ class AndroidManifestBuilder {
     permissions.add(permission)
   }
 
-  /**
-   * Adds the given activity to the manifest.
-   */
+  /** Adds the given permission string to the manifest. */
+  fun addPermission(permissionName: String) {
+    stringPermissions.add(permissionName)
+  }
+
+  /** Adds the given activity to the manifest. */
   fun addActivity(activity: ManifestActivity) {
     activities.add(activity)
   }
 
-  fun configure(type: ConfigurationType, configurator: IndentedXmlConfigurator
-  ) {
+  fun configure(type: ConfigurationType, configurator: IndentedXmlConfigurator) {
     configurators.computeIfAbsent(type) { hashSetOf() }.add(configurator)
   }
 
@@ -157,7 +162,7 @@ class AndroidManifestBuilder {
   }
 
   private fun IndentedXmlBuilder.permissions() {
-    if (permissions.isEmpty()) {
+    if (permissions.isEmpty() && stringPermissions.isEmpty()) {
       return
     }
 
@@ -165,6 +170,10 @@ class AndroidManifestBuilder {
       createElement(TAG_USES_PERMISSION, selfClose = true) {
         androidAttr("name", permission.constant)
       }
+    }
+
+    for (permissionName in stringPermissions) {
+      createElement(TAG_USES_PERMISSION, selfClose = true) { androidAttr("name", permissionName) }
     }
   }
 
@@ -234,9 +243,7 @@ class AndroidManifestBuilder {
     androidAttribute(name, value)
   }
 
-  private fun IndentedXmlBuilder.attr(name: String, value: String,
-                                      ns: String = ""
-  ) {
+  private fun IndentedXmlBuilder.attr(name: String, value: String, ns: String = "") {
     if (ns.isNotEmpty()) {
       addSingleAttribute("${ns}:${name}", value)
     } else {

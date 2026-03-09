@@ -97,8 +97,13 @@ typealias TemplateRecipeFinalizer = RecipeExecutor.() -> Unit
  * @property language The source language for the module.
  * @property useKts Whether to use Kotlin DSL for Gradle build scripts.
  */
-abstract class BaseTemplateData(val name: String, val projectDir: File, val language: Language,
-  val useKts: Boolean) : TemplateData() {
+abstract class BaseTemplateData(
+    val name: String,
+    val projectDir: File,
+    val language: Language,
+    val useKts: Boolean,
+    val useNdk: Boolean,
+) : TemplateData() {
 
   /**
    * Get the `build.gradle[.kts]` file for the project.
@@ -113,7 +118,8 @@ abstract class BaseTemplateData(val name: String, val projectDir: File, val lang
  */
 enum class Language(val lang: String, val ext: String) {
 
-  Java("Java", "java"), Kotlin("Kotlin", "kt");
+  Java("Java", "java"),
+  Kotlin("Kotlin", "kt"),
 }
 
 /**
@@ -123,7 +129,9 @@ enum class Language(val lang: String, val ext: String) {
  */
 enum class ModuleType(val typeName: String) {
 
-  AndroidApp("Android Application"), AndroidLibrary("Android Library"), JavaLibrary("Java library")
+  AndroidApp("Android Application"),
+  AndroidLibrary("Android Library"),
+  JavaLibrary("Java library"),
 }
 
 /**
@@ -143,10 +151,8 @@ enum class SrcSet(val folder: String) {
    */
   Test("test"),
 
-  /**
-   * `src/androidTest`.
-   */
-  AndroidTest("androidTest")
+  /** `src/androidTest`. */
+  AndroidTest("androidTest"),
 }
 
 /**
@@ -156,8 +162,11 @@ enum class SrcSet(val folder: String) {
  * @property gradle The Gradle version.
  * @property kotlin The Kotlin Plugin version.
  */
-data class ProjectVersionData(val gradlePlugin: String = ANDROID_GRADLE_PLUGIN_VERSION,
-  val gradle: String = GRADLE_DISTRIBUTION_VERSION, val kotlin: String = KOTLIN_VERSION)
+data class ProjectVersionData(
+    val gradlePlugin: String = ANDROID_GRADLE_PLUGIN_VERSION,
+    val gradle: String = GRADLE_DISTRIBUTION_VERSION,
+    val kotlin: String = KOTLIN_VERSION,
+)
 
 /**
  * Version information about a module.
@@ -165,9 +174,13 @@ data class ProjectVersionData(val gradlePlugin: String = ANDROID_GRADLE_PLUGIN_V
  * @property targetSdk The target SDK version for modules.
  * @property buildTools The build tools version for modules.
  */
-data class ModuleVersionData(val minSdk: Sdk, val targetSdk: Sdk = TARGET_SDK_VERSION,
-  val compileSdk: Sdk = COMPILE_SDK_VERSION, val javaSource: String = JAVA_SOURCE_VERSION,
-  val javaTarget: String = JAVA_TARGET_VERSION) {
+data class ModuleVersionData(
+    val minSdk: Sdk,
+    val targetSdk: Sdk = TARGET_SDK_VERSION,
+    val compileSdk: Sdk = COMPILE_SDK_VERSION,
+    val javaSource: String = JAVA_SOURCE_VERSION,
+    val javaTarget: String = JAVA_TARGET_VERSION,
+) {
 
   /**
    * Get the Java source version string representation in the `JavaVersion.VERSION_${version}` format.
@@ -187,8 +200,14 @@ data class ModuleVersionData(val minSdk: Sdk, val targetSdk: Sdk = TARGET_SDK_VE
  *
  * @property version The version information for this project.
  */
-class ProjectTemplateData(name: String, projectDir: File, val version: ProjectVersionData,
-  language: Language, useKts: Boolean) : BaseTemplateData(name, projectDir, language, useKts)
+class ProjectTemplateData(
+    name: String,
+    projectDir: File,
+    val version: ProjectVersionData,
+    language: Language,
+    useKts: Boolean,
+    useNdk: Boolean,
+) : BaseTemplateData(name, projectDir, language, useKts, useNdk)
 
 /**
  * Data for creating module projects.
@@ -197,17 +216,25 @@ class ProjectTemplateData(name: String, projectDir: File, val version: ProjectVe
  * @property type The type of module.
  * @property versions Version information for the module.
  */
-open class ModuleTemplateData(name: String, val appName: String?, val packageName: String,
-  projectDir: File, val type: ModuleType, language: Language, useKts: Boolean = true, minSdk: Sdk,
-  val versions: ModuleVersionData = ModuleVersionData(minSdk)) :
-  BaseTemplateData(name, projectDir, language, useKts) {
+open class ModuleTemplateData(
+    name: String,
+    val appName: String?,
+    val packageName: String,
+    projectDir: File,
+    val type: ModuleType,
+    language: Language,
+    useKts: Boolean = true,
+    useNdk: Boolean = false,
+    minSdk: Sdk,
+    val versions: ModuleVersionData = ModuleVersionData(minSdk),
+) : BaseTemplateData(name, projectDir, language, useKts, useNdk) {
 
   private val srcDirs = mutableMapOf<SrcSet, File>()
 
   fun srcFolder(srcSet: SrcSet): File {
-    return srcDirs.computeIfAbsent(srcSet) {
-      File(projectDir, "src/${it.folder}")
-    }.also { it.mkdirs() }
+    return srcDirs
+        .computeIfAbsent(srcSet) { File(projectDir, "src/${it.folder}") }
+        .also { it.mkdirs() }
   }
 }
 
@@ -224,7 +251,7 @@ open class Template<R : TemplateRecipeResult>(
   @DrawableRes open val thumb: Int,
   @StringRes open val description: Int? = null,
   open val widgets: List<Widget<*>>,
-  open val recipe: TemplateRecipe<R>
+  open val recipe: TemplateRecipe<R>,
 ) {
 
   /**
@@ -255,7 +282,7 @@ open class ProjectTemplate(
   @DrawableRes thumb: Int,
   @StringRes description: Int? = null,
   widgets: List<Widget<*>>,
-  recipe: TemplateRecipe<ProjectTemplateRecipeResult>
+  recipe: TemplateRecipe<ProjectTemplateRecipeResult>,
 ) : Template<ProjectTemplateRecipeResult>(templateName, thumb, description, widgets, recipe) {
 
   override val parameters: Collection<Parameter<*>>
@@ -295,7 +322,7 @@ open class ModuleTemplate(
   @DrawableRes thumb: Int,
   @StringRes description: Int? = null,
   widgets: List<Widget<*>>,
-  recipe: TemplateRecipe<ModuleTemplateRecipeResult>
+  recipe: TemplateRecipe<ModuleTemplateRecipeResult>,
 ) : Template<ModuleTemplateRecipeResult>(templateName, thumb, description, widgets, recipe)
 
 /**
@@ -306,7 +333,7 @@ open class FileTemplate<R : FileTemplateRecipeResult>(
   @DrawableRes thumb: Int,
   @StringRes description: Int? = null,
   widgets: List<Widget<*>>,
-  recipe: TemplateRecipe<R>
+  recipe: TemplateRecipe<R>,
 ) : Template<R>(name, thumb, description, widgets, recipe)
 
 
@@ -325,7 +352,7 @@ abstract class TemplateBuilder<R : TemplateRecipeResult>(
   @DrawableRes open var thumb: Int? = null,
   @StringRes open var description: Int? = null,
   open var widgets: List<Widget<*>>? = null,
-  open var recipe: TemplateRecipe<R>? = null
+  open var recipe: TemplateRecipe<R>? = null,
 ) {
 
   /**

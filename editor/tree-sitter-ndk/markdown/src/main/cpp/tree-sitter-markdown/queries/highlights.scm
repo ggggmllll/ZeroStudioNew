@@ -1,9 +1,6 @@
 ;From nvim-treesitter/nvim-treesitter
-(atx_heading
-  (inline) @text.title)
-
-(setext_heading
-  (paragraph) @text.title)
+(atx_heading (inline) @text.title)
+(setext_heading (paragraph) @text.title)
 
 [
   (atx_h1_marker)
@@ -22,13 +19,19 @@
   (fenced_code_block)
 ] @text.literal
 
-(fenced_code_block_delimiter) @punctuation.delimiter
+[
+  (fenced_code_block_delimiter)
+] @punctuation.delimiter
 
 (code_fence_content) @none
 
-(link_destination) @text.uri
+[
+  (link_destination)
+] @text.uri
 
-(link_label) @text.reference
+[
+  (link_label)
+] @text.reference
 
 [
   (list_marker_plus)
@@ -44,4 +47,6 @@
   (block_quote_marker)
 ] @punctuation.special
 
-(backslash_escape) @string.escape
+[
+  (backslash_escape)
+] @string.escape

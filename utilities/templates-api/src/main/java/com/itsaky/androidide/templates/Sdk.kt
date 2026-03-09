@@ -47,8 +47,8 @@ enum class Sdk(val codename: String, val version: String, val api: Int) {
   Lollipop("Lollipop", "5.0", 21),
   LollipopMR1("Lollipop", "5.1", 22),
   Marshmallow("Marshmallow", "6.0", 23),
-  Naughat("Naughat", "7.0", 24),
-  NaughtMR1("Naughat", "7.1", 25),
+  Nougat("Nougat", "7.0", 24),
+  NougatMR1("Nougat", "7.1", 25),
   Oreo("Oreo", "8.0", 26),
   OreoMR1("Oreo", "8.1", 27),
   Pie("Pie", "9.0", 28),
@@ -58,14 +58,20 @@ enum class Sdk(val codename: String, val version: String, val api: Int) {
   SnowCodeV2("SnowCone", "12L", 32),
   Tiramisu("Tiramisu", "13", 33),
   UpsideDownCake("UpsideDownCake", "14", 34),
-  VANILLA_ICE_CREAM("VanillaIceCream", "15" , 35),
-  BAKLAVA("BAKLAVA", "16", 36);
-  // CinnamonBun("CinnamonBun", "17", 37); // will be launched around June 2026
+  VanillaIceCream("VanillaIceCream", "15", 35),
+  BakLava("BakLava", "16", 36);
 
   /**
    * Get the display name for this Sdk version.
    *
    * @return The display name.
    */
-  fun displayName() : String = "API ${api}: Android $version (${codename})"
+  fun displayName(): String = "API ${api}: Android $version (${codename})"
+
+  /**
+   * Get the number for this Sdk version.
+   *
+   * @return The API level.
+   */
+  fun apiLevel(): Int = api
 }

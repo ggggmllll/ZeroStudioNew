@@ -1,9 +1,6 @@
 {
   "types":[
   "cmake",
-  // "cmake.patch",
-  // "cmake.user.presets",
-  // "cmake.presets",
   "cpack",
   "cbp",
   "ctest",

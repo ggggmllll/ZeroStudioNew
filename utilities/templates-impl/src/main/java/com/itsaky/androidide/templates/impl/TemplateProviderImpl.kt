@@ -31,6 +31,7 @@ import com.itsaky.androidide.templates.impl.noAndroidXActivity.noAndroidXActivit
 import com.itsaky.androidide.templates.impl.tabbedActivity.tabbedActivityProject
 import java.util.Collections
 import java.util.concurrent.ConcurrentHashMap
+import com.itsaky.androidide.templates.impl.cppDemo.cppDemoProject
 
 /**
  * Default implementation of the [ITemplateProvider]. This class is responsible for discovering,
@@ -96,10 +97,10 @@ class TemplateProviderImpl : ITemplateProvider {
         registerTemplate(TemplateCategory.Mobile, bottomNavActivityProject())
         registerTemplate(TemplateCategory.Mobile, tabbedActivityProject())
         registerTemplate(TemplateCategory.Mobile, noAndroidXActivityProject())
-        // registerTemplate(TemplateCategory.Mobile, composeActivityProject())
-      
+        registerTemplate(TemplateCategory.Mobile, composeActivityProject())
+
           registerTemplate(TemplateCategory.Generic, composeActivityProject())
-        
+
     }
 
     /**

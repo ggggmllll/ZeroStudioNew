@@ -71,6 +71,8 @@
     "@clang.json",
     "@cmake.json",
     "@yaml.json",
+    "@cpplang.json",
+    "@aidl.json",
     "@log.json"
   ]
 }

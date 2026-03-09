@@ -255,7 +255,6 @@
   {
     "type": "inline",
     "named": true,
-    "root": true,
     "fields": {},
     "children": {
       "multiple": true,
@@ -363,10 +362,6 @@
       "multiple": true,
       "required": true,
       "types": [
-        {
-          "type": "backslash_escape",
-          "named": true
-        },
         {
           "type": "latex_span_delimiter",
           "named": true

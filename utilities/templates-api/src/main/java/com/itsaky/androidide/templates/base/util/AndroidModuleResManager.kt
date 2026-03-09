@@ -33,7 +33,8 @@ import java.io.File
  */
 class AndroidModuleResManager {
 
-  enum class ResourceType(val dirName: String) { ANIM("anim"),
+  enum class ResourceType(val dirName: String) {
+    ANIM("anim"),
     ANIMATOR("animator"),
     COLOR("color"),
     DRAWABLE("drawable"),
@@ -64,8 +65,10 @@ class AndroidModuleResManager {
    * @param srcSet The source set.
    * @param config The configuration for the resource type.
    */
-  fun AndroidModuleTemplateBuilder.resDir(type: ResourceType, srcSet: SrcSet,
-                                          config: ConfigDescription = ConfigDescription()
+  fun AndroidModuleTemplateBuilder.resDir(
+      type: ResourceType,
+      srcSet: SrcSet,
+      config: ConfigDescription = ConfigDescription(),
   ): File {
     var name = type.dirName
     config.toString().also {
@@ -86,16 +89,21 @@ class AndroidModuleResManager {
    * @param srcSet The source set.
    * @param config The configuration for the resource type.
    */
-  inline fun AndroidModuleTemplateBuilder.createValuesResource(name: String,
-                                                        type: ResourceType = VALUES,
-                                                        srcSet: SrcSet = Main,
-                                                        config: ConfigDescription = ConfigDescription(),
-                                                        selfClose: Boolean = false,
-                                                        crossinline configure: XmlBuilder.() -> Unit
+  inline fun AndroidModuleTemplateBuilder.createValuesResource(
+      name: String,
+      type: ResourceType = VALUES,
+      srcSet: SrcSet = Main,
+      config: ConfigDescription = ConfigDescription(),
+      selfClose: Boolean = false,
+      crossinline configure: XmlBuilder.() -> Unit,
   ) {
     return createXmlResource(name, type, srcSet, config) {
-      createElement(name = "resources", closeStartTag = true,
-        selfClose = selfClose, configure = configure)
+      createElement(
+          name = "resources",
+          closeStartTag = true,
+          selfClose = selfClose,
+          configure = configure,
+      )
     }
   }
 
@@ -107,11 +115,12 @@ class AndroidModuleResManager {
    * @param srcSet The source set.
    * @param config The configuration for the resource type.
    */
-  inline fun AndroidModuleTemplateBuilder.createXmlResource(name: String,
-                                                     type: ResourceType,
-                                                     srcSet: SrcSet = SrcSet.Main,
-                                                     config: ConfigDescription = ConfigDescription(),
-                                                     crossinline configure: XmlBuilder.() -> Unit = {}
+  inline fun AndroidModuleTemplateBuilder.createXmlResource(
+      name: String,
+      type: ResourceType,
+      srcSet: SrcSet = SrcSet.Main,
+      config: ConfigDescription = ConfigDescription(),
+      crossinline configure: XmlBuilder.() -> Unit = {},
   ) {
     val file = File(resDir(type, srcSet, config), "${name}.xml")
     val builder = IndentedXmlBuilder().apply(configure)
@@ -127,18 +136,20 @@ class AndroidModuleResManager {
    * @param config The configuration for the resource type.
    * @param source The source code for the resource.
    */
-  fun AndroidModuleTemplateBuilder.writeXmlResource(name: String,
-                                                    type: ResourceType,
-                                                    srcSet: SrcSet = SrcSet.Main,
-                                                    config: ConfigDescription = ConfigDescription(),
-                                                    source: String
+  fun AndroidModuleTemplateBuilder.writeXmlResource(
+      name: String,
+      type: ResourceType,
+      srcSet: SrcSet = SrcSet.Main,
+      config: ConfigDescription = ConfigDescription(),
+      source: String,
   ) {
     val file = File(resDir(type, srcSet, config), "${name}.xml")
     executor.save(source, file)
   }
 
   /**
-   * Create a new XML resource file for the given [resource type][ResourceType] and the [configuration][ConfigDescription] with the given [source].
+   * Create a new XML resource file for the given [resource type][ResourceType] and the
+   * [configuration][ConfigDescription] with the given [source].
    *
    * @param name The name of the resource without the `.xml` extension.
    * @param type The resource type.
@@ -146,11 +157,12 @@ class AndroidModuleResManager {
    * @param config The configuration for the resource type.
    * @param source Function which returns the source code for the resource.
    */
-  inline fun AndroidModuleTemplateBuilder.writeXmlResource(name: String,
-                                                    type: ResourceType,
-                                                    srcSet: SrcSet = SrcSet.Main,
-                                                    config: ConfigDescription = ConfigDescription(),
-                                                    crossinline source: () -> String = { "" }
+  inline fun AndroidModuleTemplateBuilder.writeXmlResource(
+      name: String,
+      type: ResourceType,
+      srcSet: SrcSet = SrcSet.Main,
+      config: ConfigDescription = ConfigDescription(),
+      crossinline source: () -> String = { "" },
   ) {
     writeXmlResource(name, type, srcSet, config, source())
   }

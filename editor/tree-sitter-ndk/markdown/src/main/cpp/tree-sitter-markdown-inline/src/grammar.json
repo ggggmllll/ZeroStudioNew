@@ -1,5 +1,4 @@
 {
-  "$schema": "https://tree-sitter.github.io/tree-sitter/assets/schemas/grammar.schema.json",
   "name": "markdown_inline",
   "rules": {
     "inline": {
@@ -1545,10 +1544,6 @@
               {
                 "type": "SYMBOL",
                 "name": "_html_tag"
-              },
-              {
-                "type": "SYMBOL",
-                "name": "backslash_escape"
               }
             ]
           }
@@ -6264,6 +6259,5 @@
     }
   ],
   "inline": [],
-  "supertypes": [],
-  "reserved": {}
+  "supertypes": []
 }

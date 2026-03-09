@@ -25,7 +25,12 @@ import org.eclipse.lemminx.dom.builder.XmlBuilder
  * The [configure] function is used to configure everything inside the element and then
  * the element is automatically closed.
  */
-inline fun XmlBuilder.createElement(name: String, closeStartTag: Boolean = false, selfClose: Boolean = false, crossinline configure: XmlBuilder.() -> Unit) {
+inline fun XmlBuilder.createElement(
+    name: String,
+    closeStartTag: Boolean = false,
+    selfClose: Boolean = false,
+    crossinline configure: XmlBuilder.() -> Unit,
+) {
   startElement(name, closeStartTag)
   configure()
   if (selfClose) {
@@ -54,13 +59,10 @@ fun XmlBuilder.stringRes(name: String, value: String, indent: Boolean = true) {
 /**
  * Get the generated XML string from the [XmlBuilder] with XML declaration prepended.
  */
-fun XmlBuilder.withXmlDecl(): String {
-  return toString().withXmlDecl()
+fun XmlBuilder.withXmlDecl(): String {  return toString().withXmlDecl()
 }
 
-/**
- * Prepends XML declaration to this string.
- */
+/** Prepends XML declaration to this string. */
 fun String.withXmlDecl(): String {
   return "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n${this}"
 }

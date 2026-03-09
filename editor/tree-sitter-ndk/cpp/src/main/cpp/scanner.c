@@ -1,9 +1,12 @@
-#include "tree_sitter/alloc.h"
 #include "tree_sitter/parser.h"
 
 #include <assert.h>
 #include <string.h>
 #include <wctype.h>
+
+#if __STDC_VERSION__ < 201112L
+#define static_assert(cnd, msg) assert(cnd && msg)
+#endif // __STDC_VERSION__ < 201112L
 
 enum TokenType { RAW_STRING_DELIMITER, RAW_STRING_CONTENT };
 
@@ -41,8 +44,8 @@ static bool scan_raw_string_delimiter(Scanner *scanner, TSLexer *lexer) {
     // Opening delimiter: record the d-char-sequence up to (.
     // d-char is any basic character except parens, backslashes, and spaces.
     for (;;) {
-        if (scanner->delimiter_length >= MAX_DELIMITER_LENGTH || lexer->eof(lexer) || lexer->lookahead == '\\' ||
-            iswspace(lexer->lookahead)) {
+        if (scanner->delimiter_length >= MAX_DELIMITER_LENGTH || lexer->eof(lexer) ||
+            lexer->lookahead == '\\' || iswspace(lexer->lookahead)) {
             return false;
         }
         if (lexer->lookahead == '(') {
@@ -95,7 +98,7 @@ static bool scan_raw_string_content(Scanner *scanner, TSLexer *lexer) {
 }
 
 void *tree_sitter_cpp_external_scanner_create() {
-    Scanner *scanner = (Scanner *)ts_calloc(1, sizeof(Scanner));
+    Scanner *scanner = (Scanner *)calloc(1, sizeof(Scanner));
     memset(scanner, 0, sizeof(Scanner));
     return scanner;
 }
@@ -137,12 +140,10 @@ void tree_sitter_cpp_external_scanner_deserialize(void *payload, const char *buf
 
     Scanner *scanner = (Scanner *)payload;
     scanner->delimiter_length = length / sizeof(wchar_t);
-    if (length > 0) {
-        memcpy(&scanner->delimiter[0], buffer, length);
-    }
+    memcpy(&scanner->delimiter[0], buffer, length);
 }
 
 void tree_sitter_cpp_external_scanner_destroy(void *payload) {
     Scanner *scanner = (Scanner *)payload;
-    ts_free(scanner);
+    free(scanner);
 }

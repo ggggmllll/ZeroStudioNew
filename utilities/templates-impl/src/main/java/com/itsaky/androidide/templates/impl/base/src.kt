@@ -24,7 +24,9 @@ import com.itsaky.androidide.templates.base.util.SourceWriter
 import com.itsaky.androidide.templates.base.util.withXmlDecl
 
 internal inline fun AndroidModuleTemplateBuilder.writeMainActivity(
-  writer: SourceWriter, crossinline ktSrc: () -> String, crossinline javaSrc: () -> String
+    writer: SourceWriter,
+    crossinline ktSrc: () -> String,
+    crossinline javaSrc: () -> String,
 ) {
   val className = "MainActivity"
   writer.apply {
@@ -51,5 +53,7 @@ internal inline fun AndroidModuleTemplateBuilder.writeMainActivity(
 internal fun emptyValuesFile(): String {
   return """
 <resources></resources>
-  """.trim().withXmlDecl()
+  """
+      .trim()
+      .withXmlDecl()
 }

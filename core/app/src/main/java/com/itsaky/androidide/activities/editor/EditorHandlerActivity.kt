@@ -157,33 +157,33 @@ open class EditorHandlerActivity : ProjectHandlerActivity(), IEditorHandler {
       TSLanguageRegistry.instance.register(TomlLanguage.TOML_TYPE, TomlLanguage.FACTORY)
       
       TSLanguageRegistry.instance.register(AidlLanguage.TS_TYPE, AidlLanguage.FACTORY)
-      TSLanguageRegistry.instance.register(SqliteLanguage.TS_TYPE, SqliteLanguage.FACTORY)
+      // TSLanguageRegistry.instance.register(SqliteLanguage.TS_TYPE, SqliteLanguage.FACTORY)
 
 
       //TypeScript Language
-      TSLanguageRegistry.instance.register(TypeScriptLanguage.TS_TYPE, TypeScriptLanguage.FACTORY)
-      TSLanguageRegistry.instance.register(TypeScriptLanguage.TSX_TYPE, TypeScriptLanguage.TSX_FACTORY)
-      //reStructuredText Language
-      TSLanguageRegistry.instance.register(reStructuredTextLanguage.TS_TYPE, reStructuredTextLanguage.FACTORY)
-      TSLanguageRegistry.instance.register(reStructuredTextLanguage.TS_TYPE_REST, reStructuredTextLanguage.FACTORY)
+      // TSLanguageRegistry.instance.register(TypeScriptLanguage.TS_TYPE, TypeScriptLanguage.FACTORY)
+      // TSLanguageRegistry.instance.register(TypeScriptLanguage.TSX_TYPE, TypeScriptLanguage.TSX_FACTORY)
+      // //reStructuredText Language
+      // TSLanguageRegistry.instance.register(reStructuredTextLanguage.TS_TYPE, reStructuredTextLanguage.FACTORY)
+      // TSLanguageRegistry.instance.register(reStructuredTextLanguage.TS_TYPE_REST, reStructuredTextLanguage.FACTORY)
       //Markdown Language
-      TSLanguageRegistry.instance.register(MarkdownLanguage.TS_TYPE_MD, MarkdownLanguage.FACTORY_BLOCK)
-      TSLanguageRegistry.instance.register(MarkdownLanguage.EXT_MARKDOWN, MarkdownLanguage.FACTORY_BLOCK)
-      TSLanguageRegistry.instance.register(MarkdownLanguage.EXT_MKD, MarkdownLanguage.FACTORY_BLOCK)
-      TSLanguageRegistry.instance.register(MarkdownLanguage.EXT_MKDN, MarkdownLanguage.FACTORY_BLOCK)
-      TSLanguageRegistry.instance.register(MarkdownLanguage.EXT_MDOWN, MarkdownLanguage.FACTORY_BLOCK)
-      TSLanguageRegistry.instance.register(MarkdownLanguage.EXT_MDWN, MarkdownLanguage.FACTORY_BLOCK)
-      TSLanguageRegistry.instance.register(MarkdownLanguage.EXT_MDTXT, MarkdownLanguage.FACTORY_BLOCK)
-      TSLanguageRegistry.instance.register(MarkdownLanguage.TS_TYPE_INLINE, MarkdownLanguage.FACTORY_INLINE) //内联解析器 (Inline Parser)
+      // TSLanguageRegistry.instance.register(MarkdownLanguage.TS_TYPE_MD, MarkdownLanguage.FACTORY_BLOCK)
+      // TSLanguageRegistry.instance.register(MarkdownLanguage.EXT_MARKDOWN, MarkdownLanguage.FACTORY_BLOCK)
+      // TSLanguageRegistry.instance.register(MarkdownLanguage.EXT_MKD, MarkdownLanguage.FACTORY_BLOCK)
+      // TSLanguageRegistry.instance.register(MarkdownLanguage.EXT_MKDN, MarkdownLanguage.FACTORY_BLOCK)
+      // TSLanguageRegistry.instance.register(MarkdownLanguage.EXT_MDOWN, MarkdownLanguage.FACTORY_BLOCK)
+      // TSLanguageRegistry.instance.register(MarkdownLanguage.EXT_MDWN, MarkdownLanguage.FACTORY_BLOCK)
+      // TSLanguageRegistry.instance.register(MarkdownLanguage.EXT_MDTXT, MarkdownLanguage.FACTORY_BLOCK)
+      // TSLanguageRegistry.instance.register(MarkdownLanguage.TS_TYPE_INLINE, MarkdownLanguage.FACTORY_INLINE) //内联解析器 (Inline Parser)
       
       //Yaml Language
       TSLanguageRegistry.instance.register(YamlLanguage.TS_TYPE, YamlLanguage.FACTORY)
       TSLanguageRegistry.instance.register(YamlLanguage.TS_TYPE_YML, YamlLanguage.FACTORY)
       //Python Language
-      TSLanguageRegistry.instance.register(PythonLanguage.TS_TYPE, PythonLanguage.FACTORY)
-      TSLanguageRegistry.instance.register(PythonLanguage.TS_TYPE_PYW, PythonLanguage.FACTORY)
-      TSLanguageRegistry.instance.register(PythonLanguage.TS_TYPE_PYI, PythonLanguage.FACTORY)
-      TSLanguageRegistry.instance.register(PythonLanguage.TS_TYPE_PYS, PythonLanguage.FACTORY)
+      // TSLanguageRegistry.instance.register(PythonLanguage.TS_TYPE, PythonLanguage.FACTORY)
+      // TSLanguageRegistry.instance.register(PythonLanguage.TS_TYPE_PYW, PythonLanguage.FACTORY)
+      // TSLanguageRegistry.instance.register(PythonLanguage.TS_TYPE_PYI, PythonLanguage.FACTORY)
+      // TSLanguageRegistry.instance.register(PythonLanguage.TS_TYPE_PYS, PythonLanguage.FACTORY)
       //xml language tree sitter
       TSLanguageRegistry.instance.register(XMLLanguage.TS_TYPE, XMLLanguage.FACTORY)
       TSLanguageRegistry.instance.register(XMLLanguage.TS_TYPE_QRC, XMLLanguage.FACTORY)
