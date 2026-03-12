@@ -4,14 +4,14 @@ on:
   workflow_dispatch:
     inputs:
       build_type:
-        description: 'Choose the compilation type'
+        description: 'Choose the compilation type (assembleDebug or assembleRelease)'
         required: true
-        default: 'assembleRelease --build-cache'
+        default: 'assembleRelease'
         type: choice
         options:
-          - assemble --build-cache
-          - assembleDebug --build-cache
-          - assembleRelease --build-cache
+          - assemble
+          - assembleDebug
+          - assembleRelease
 
 jobs:
   build:
@@ -39,11 +39,11 @@ jobs:
         with:
           gradle-version: '8.13'
 
-      - name: Install the specified NDK and Android SDK CMake
+      - name: Install the specified NDK and Android SDK CMake (3.22.1)
         run: |
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses
           $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "ndk;27.1.12297006" "cmake;3.22.1"
-          
+
       - name: Install higher CMake version (3.31.1) via pip
         run: |
           sudo pip3 install cmake==3.31.1 --break-system-packages
@@ -57,13 +57,15 @@ jobs:
       - name: Grant execution permissions to the Gradle wrapper
         run: chmod +x ./gradlew
 
-      #Limiting Gradle JVM memory and CMake concurrency
       - name: Compile APK
         env:
+          # 限制 Gradle JVM 最大使用 5GB 内存，不开启守护进程以免内存驻留
           GRADLE_OPTS: "-Dorg.gradle.jvmargs='-Xmx5g -XX:MaxMetaspaceSize=1g' -Dorg.gradle.daemon=false"
+          # 限制 CMake 底层的 Ninja 并发数为 2，防止 C++ 编译器吃光内存
           CMAKE_BUILD_PARALLEL_LEVEL: "2"
         run: |
-          gradle ${{ github.event.inputs.build_type }} --stacktrace --max-workers=2
+          # 使用 --max-workers=2 限制模块并发
+          gradle ${{ github.event.inputs.build_type }} --stacktrace --build-cache --max-workers=2
 
       - name: Find and centralize APKs
         run: |
