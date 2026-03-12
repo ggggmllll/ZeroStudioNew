@@ -6,12 +6,12 @@ on:
       build_type:
         description: 'Choose the compilation type (assembleDebug or assembleRelease)'
         required: true
-        default: 'assemble --build-cache'
+        default: 'assembleRelease'
         type: choice
         options:
-          - assemble --build-cache
-          - assembleDebug --build-cache
-          - assembleRelease --build-cache
+          - assemble
+          - assembleDebug
+          - assembleRelease
 
 jobs:
   build:
@@ -22,6 +22,16 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: recursive
+
+      # 【防崩溃核心 1】清理磁盘并创建 16GB 交换空间 (Swap) 当作内存使用
+      - name: Create Swap Space to prevent OOM
+        run: |
+          sudo fallocate -l 16G /swapfile
+          sudo chmod 600 /swapfile
+          sudo mkswap /swapfile
+          sudo swapon /swapfile
+          echo "==== 当前系统内存状态 ===="
+          free -h
 
       - name: Install basic system dependency packages
         run: |
@@ -39,11 +49,16 @@ jobs:
         with:
           gradle-version: '8.13'
 
-      - name: Install the specified NDK and Android SDK CMake
+      - name: Install the specified NDK and Android SDK CMake (3.22.1)
         run: |
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses
-          
-          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "ndk;27.1.12297006" "cmake;3.31.1" "cmake;3.22.1"
+          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "ndk;27.1.12297006" "cmake;3.22.1"
+
+      - name: Install higher CMake version (3.31.1) via pip
+        run: |
+          sudo pip3 install cmake==3.31.1 --break-system-packages
+          CMAKE_DATA_DIR=$(python3 -c "import cmake, os; print(os.path.join(os.path.dirname(cmake.__file__), 'data'))")
+          echo "cmake.dir=$CMAKE_DATA_DIR" >> local.properties
           
           cmake --version
           protoc --version
@@ -53,8 +68,14 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Compile APK
+        env:
+          # 限制 Gradle JVM 最大使用 5GB 内存，不开启守护进程以免内存驻留
+          GRADLE_OPTS: "-Dorg.gradle.jvmargs='-Xmx5g -XX:MaxMetaspaceSize=1g' -Dorg.gradle.daemon=false"
+          # 限制 CMake 底层的 Ninja 并发数为 2，防止 C++ 编译器吃光内存
+          CMAKE_BUILD_PARALLEL_LEVEL: "2"
         run: |
-          gradle ${{ github.event.inputs.build_type }} --build-cache
+          # 使用 --max-workers=2 限制模块并发
+          gradle ${{ github.event.inputs.build_type }} --stacktrace --build-cache --max-workers=2
 
       - name: Find and rename APK
         run: |
