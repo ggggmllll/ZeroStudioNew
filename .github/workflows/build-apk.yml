@@ -67,55 +67,50 @@ jobs:
           # 使用 --max-workers=2 限制模块并发
           gradle ${{ github.event.inputs.build_type }} --stacktrace --build-cache --max-workers=2
 
-      - name: Find and centralize APKs
-        run: |
-          mkdir -p output_apks
-          find core/app/build/outputs/apk/ -name "*.apk" -exec cp {} output_apks/ \;
-
-      - name: Upload arm64-v8a Release APK
+      - name: Upload app-arm64-v8a-release.apk
+        if: github.event.inputs.build_type == 'assembleRelease' || github.event.inputs.build_type == 'assemble'
         uses: actions/upload-artifact@v4
         with:
-          name: app-arm64-v8a-release
-          path: output_apks/*arm64-v8a*release*.apk
+          name: app-arm64-v8a-release.apk
+          path: core/app/build/outputs/apk/release/app-arm64-v8a-release.apk
           compression-level: 0
-          if-no-files-found: ignore
 
-      - name: Upload armeabi-v7a Release APK
+      - name: Upload app-armeabi-v7a-release.apk
+        if: github.event.inputs.build_type == 'assembleRelease' || github.event.inputs.build_type == 'assemble'
         uses: actions/upload-artifact@v4
         with:
-          name: app-armeabi-v7a-release
-          path: output_apks/*armeabi-v7a*release*.apk
+          name: app-armeabi-v7a-release.apk
+          path: core/app/build/outputs/apk/release/app-armeabi-v7a-release.apk
           compression-level: 0
-          if-no-files-found: ignore
 
-      - name: Upload x86_64 Release APK
+      - name: Upload app-x86_64-release.apk
+        if: github.event.inputs.build_type == 'assembleRelease' || github.event.inputs.build_type == 'assemble'
         uses: actions/upload-artifact@v4
         with:
-          name: app-x86_64-release
-          path: output_apks/*x86_64*release*.apk
+          name: app-x86_64-release.apk
+          path: core/app/build/outputs/apk/release/app-x86_64-release.apk
           compression-level: 0
-          if-no-files-found: ignore
 
-      - name: Upload arm64-v8a Debug APK
+      - name: Upload app-arm64-v8a-debug.apk
+        if: github.event.inputs.build_type == 'assembleDebug' || github.event.inputs.build_type == 'assemble'
         uses: actions/upload-artifact@v4
         with:
-          name: app-arm64-v8a-debug
-          path: output_apks/*arm64-v8a*debug*.apk
+          name: app-arm64-v8a-debug.apk
+          path: core/app/build/outputs/apk/debug/app-arm64-v8a-debug.apk
           compression-level: 0
-          if-no-files-found: ignore
 
-      - name: Upload armeabi-v7a Debug APK
+      - name: Upload app-armeabi-v7a-debug.apk
+        if: github.event.inputs.build_type == 'assembleDebug' || github.event.inputs.build_type == 'assemble'
         uses: actions/upload-artifact@v4
         with:
-          name: app-armeabi-v7a-debug
-          path: output_apks/*armeabi-v7a*debug*.apk
+          name: app-armeabi-v7a-debug.apk
+          path: core/app/build/outputs/apk/debug/app-armeabi-v7a-debug.apk
           compression-level: 0
-          if-no-files-found: ignore
 
-      - name: Upload x86_64 Debug APK
+      - name: Upload app-x86_64-debug.apk
+        if: github.event.inputs.build_type == 'assembleDebug' || github.event.inputs.build_type == 'assemble'
         uses: actions/upload-artifact@v4
         with:
-          name: app-x86_64-debug
-          path: output_apks/*x86_64*debug*.apk
+          name: app-x86_64-debug.apk
+          path: core/app/build/outputs/apk/debug/app-x86_64-debug.apk
           compression-level: 0
-          if-no-files-found: ignore
