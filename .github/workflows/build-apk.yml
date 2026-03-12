@@ -4,14 +4,14 @@ on:
   workflow_dispatch:
     inputs:
       build_type:
-        description: 'Choose the compilation type (assembleDebug or assembleRelease)'
+        description: 'Choose the compilation type'
         required: true
-        default: 'assembleRelease'
+        default: 'assembleRelease --build-cache'
         type: choice
         options:
-          - assemble
-          - assembleDebug
-          - assembleRelease
+          - assemble --build-cache
+          - assembleDebug --build-cache
+          - assembleRelease --build-cache
 
 jobs:
   build:
@@ -39,11 +39,11 @@ jobs:
         with:
           gradle-version: '8.13'
 
-      - name: Install the specified NDK and Android SDK CMake (3.22.1)
+      - name: Install the specified NDK and Android SDK CMake
         run: |
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses
           $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "ndk;27.1.12297006" "cmake;3.22.1"
-
+          
       - name: Install higher CMake version (3.31.1) via pip
         run: |
           sudo pip3 install cmake==3.31.1 --break-system-packages
@@ -57,24 +57,63 @@ jobs:
       - name: Grant execution permissions to the Gradle wrapper
         run: chmod +x ./gradlew
 
+      #Limiting Gradle JVM memory and CMake concurrency
       - name: Compile APK
         env:
-          # 限制 Gradle JVM 最大使用 5GB 内存，不开启守护进程以免内存驻留
           GRADLE_OPTS: "-Dorg.gradle.jvmargs='-Xmx5g -XX:MaxMetaspaceSize=1g' -Dorg.gradle.daemon=false"
-          # 限制 CMake 底层的 Ninja 并发数为 2，防止 C++ 编译器吃光内存
           CMAKE_BUILD_PARALLEL_LEVEL: "2"
         run: |
-          # 使用 --max-workers=2 限制模块并发
-          gradle ${{ github.event.inputs.build_type }} --stacktrace --build-cache --max-workers=2
+          gradle ${{ github.event.inputs.build_type }} --stacktrace --max-workers=2
 
-      - name: Find and rename APK
+      - name: Find and centralize APKs
         run: |
           mkdir -p output_apks
           find core/app/build/outputs/apk/ -name "*.apk" -exec cp {} output_apks/ \;
 
-      - name: Upload APK
+      - name: Upload arm64-v8a Release APK
         uses: actions/upload-artifact@v4
         with:
-          name: Android-APK-${{ github.event.inputs.build_type }}
-          path: output_apks/*.apk
+          name: app-arm64-v8a-release
+          path: output_apks/*arm64-v8a*release*.apk
           compression-level: 0
+          if-no-files-found: ignore
+
+      - name: Upload armeabi-v7a Release APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-armeabi-v7a-release
+          path: output_apks/*armeabi-v7a*release*.apk
+          compression-level: 0
+          if-no-files-found: ignore
+
+      - name: Upload x86_64 Release APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-x86_64-release
+          path: output_apks/*x86_64*release*.apk
+          compression-level: 0
+          if-no-files-found: ignore
+
+      - name: Upload arm64-v8a Debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-arm64-v8a-debug
+          path: output_apks/*arm64-v8a*debug*.apk
+          compression-level: 0
+          if-no-files-found: ignore
+
+      - name: Upload armeabi-v7a Debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-armeabi-v7a-debug
+          path: output_apks/*armeabi-v7a*debug*.apk
+          compression-level: 0
+          if-no-files-found: ignore
+
+      - name: Upload x86_64 Debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-x86_64-debug
+          path: output_apks/*x86_64*debug*.apk
+          compression-level: 0
+          if-no-files-found: ignore
