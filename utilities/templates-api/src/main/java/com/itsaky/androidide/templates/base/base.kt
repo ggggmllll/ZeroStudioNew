@@ -30,7 +30,7 @@ import com.itsaky.androidide.templates.ModuleTemplateData
 import com.itsaky.androidide.templates.ModuleType
 import com.itsaky.androidide.templates.ModuleType.AndroidApp
 import com.itsaky.androidide.templates.ModuleType.AndroidLibrary
-import com.itsaky.androidide.templates.NdkVersion
+import com.itsaky.androidide.templates.*
 import com.itsaky.androidide.templates.ParameterConstraint.DIRECTORY
 import com.itsaky.androidide.templates.ParameterConstraint.EXISTS
 import com.itsaky.androidide.templates.ParameterConstraint.MODULE_NAME
@@ -51,6 +51,7 @@ import com.itsaky.androidide.templates.packageNameParameter
 import com.itsaky.androidide.templates.projectLanguageParameter
 import com.itsaky.androidide.templates.projectNameParameter
 import com.itsaky.androidide.templates.projectNdkVersionParameter
+import com.itsaky.androidide.templates.projectCmakeVersionParameter
 import com.itsaky.androidide.templates.stringParameter
 import com.itsaky.androidide.templates.useKtsParameter
 import com.itsaky.androidide.templates.useNdkParameter
@@ -303,7 +304,7 @@ inline fun baseAndroidModule(
         val appName = if (isLibrary) null else projectNameParameter()
         val language = projectLanguageParameter()
         val ndkVersion = projectNdkVersionParameter()
-            val cmakeVersion = projectCmakeVersionParameter()
+        val cmakeVersion = projectCmakeVersionParameter()
         val minSdk = minSdkParameter()
         val packageName = packageNameParameter()
         val useKts = useKtsParameter()

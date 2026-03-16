@@ -225,46 +225,6 @@ private fun AndroidModuleTemplateBuilder.showNdkNotInstalledDialog(context: Cont
       .show()
 }
 
-private fun toTomlAccessor(dep: Dependency): String {
-    val key = "${dep.group}:${dep.artifact}"
-    val alias = (dep.group.replace("com.google.android", "google")
-                         .replace("androidx", "")
-                         .replace(".", "-")
-                 + "-" + dep.artifact)
-                .replace(Regex("-+"), "-")
-                .removePrefix("-")
-    return "libs.$alias".replace("-", ".")
-}
-
-
-internal fun AndroidModuleTemplateBuilder.dependenciesBlock(isKts: Boolean): String {
-    val sb = StringBuilder()
-    sb.append("dependencies {\n")
-    val quote = if (isKts) "\"" else "'"
-    
-    // Write platform dependencies (BOMs)
-    for (dep in platforms) {
-        if (data.useToml) {
-            sb.append("    ${dep.configuration.configName}(platform(${toTomlAccessor(dep)}))\n")
-        } else {
-            sb.append("    ${dep.configuration.configName}(platform($quote${dep.group}:${dep.artifact}${dep.version?.let { ":$it" } ?: ""}$quote))\n")
-        }
-    }
-    
-    // Write standard dependencies
-    for (dep in dependencies) {
-        if (data.useToml) {
-            sb.append("    ${dep.configuration.configName}(${toTomlAccessor(dep)})\n")
-        } else {
-            val versionSuffix = if (dep.version != null) ":${dep.version}" else ""
-            sb.append("    ${dep.configuration.configName}($quote${dep.group}:${dep.artifact}$versionSuffix$quote)\n")
-        }
-    }
-    
-    sb.append("}\n")
-    return sb.toString()
-}
-
 private fun AndroidModuleTemplateBuilder.buildGradleSrcKts(isComposeModule: Boolean): String {
   val shouldUseNdk = data.useNdk
   val hasNative = hasNativeFiles() || shouldUseNdk
@@ -285,7 +245,7 @@ android {
     namespace = "${data.packageName}"
     compileSdk = $compileSdkValue
     ${if (hasNative && ndkInstalled) """ndkVersion = "28.2.13676358"""" else ""}
-
+    
     defaultConfig {
         applicationId = "${data.packageName}"
         minSdk = ${data.versions.minSdk.api}

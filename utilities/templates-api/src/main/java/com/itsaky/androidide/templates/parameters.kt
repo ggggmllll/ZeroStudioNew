@@ -415,30 +415,46 @@ inline fun projectLanguageParameter(
     }
 
 enum class NdkVersion(val version: String) {
-    R29("29.0.14206865"),
-    R29_BETA4("29.0.14033849-beta4"),
-    R28C("28.2.13676358"),
-    R27D("27.3.13750724"),
-    R26D("26.3.11579264"),
-    // R25C("25.2.9519653"),
+    R29C("29.0.14206865"),
+    R29B("29.0.14033849"),
+    R29A("29.0.13113456"),
+    R28A1("28.2.13676358.R1"),
+    R28A2("28.2.13676358.R2"),
+    R27B("27.3.13750724"),
+    R27A("27.1.12297006"),
+    R26("26.3.11579264"),
+    R25("25.2.9519653"),
     R24("24.0.8215888"),
-    R23B("23.2.8568313"),
-    R22B("22.1.7171670"),
-    R21E("21.4.7075529");
+    R23("23.2.8568313"),
+    R22("22.1.7171670"),
+    R21("21.4.7075529"),
+    R20("20.1.5948944"),
+    R19("19.2.5345600"),
+    R18("18.1.50630455529"),
+    R17("17.2.4988734");
     fun displayName(): String = version
 }
 
 enum class CmakeVersion(val version: String) {
-    V3_10_2("3.10.2"), 
-    V3_18_1("3.18.1"), 
-    V3_22_1("3.22.1"), 
+    V4_1_2("4.1.2"), 
+    V4_1_1("4.1.1"), 
+    V4_1_0("4.1.0"), 
+    V4_0_3("4.0.3"), 
+    V4_0_2("4.0.2"), 
+    V3_31_6("3.31.6"), 
+    V3_31_5("3.31.5"), 
+    V3_31_4("3.31.4"), 
+    V3_31_1("3.31.1"), 
+    V3_31_0("3.31.0"), 
+    V3_30_5("3.30.5"), 
+    V3_30_4("3.30.4"), 
+    V3_30_3("3.30.3"), 
     V3_25_1("3.25.1"), 
-    V3_30("3.30.0"), 
-    V3_31_1("3.31.1");
+    V3_22_1("3.22.1"), 
+    V3_18_1("3.18.1"), 
+    V3_10_2("3.10.2");
     fun displayName(): String = version
 }
-
-
 
 inline fun minSdkParameter(crossinline configure: EnumParameterBuilder<Sdk>.() -> Unit = {}) =
     enumParameter<Sdk> {
@@ -463,7 +479,7 @@ inline fun projectNdkVersionParameter(
 ) =
     enumParameter<NdkVersion> {
         name = R.string.wizard_ndk_version
-        default = NdkVersion.R29
+        default = NdkVersion.R29C
       displayName = NdkVersion::displayName
       startIcon = { R.drawable.ic_min_sdk }
 
@@ -483,12 +499,5 @@ inline fun projectCmakeVersionParameter(crossinline configure: EnumParameterBuil
         name = R.string.wizard_cmake_version
         default = CmakeVersion.V3_22_1
         displayName = CmakeVersion::displayName
-        configure()
-    }
-
-inline fun useTomlParameter(crossinline configure: BooleanParameterBuilder.() -> Unit = {}) =
-    booleanParameter {
-        name = R.string.msg_use_toml 
-        default = true 
         configure()
     }
