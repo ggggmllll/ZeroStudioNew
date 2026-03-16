@@ -97,3 +97,5 @@ lint/tmp/
 
 # Proguard files
 dictionary.txt
+
+google-services.json

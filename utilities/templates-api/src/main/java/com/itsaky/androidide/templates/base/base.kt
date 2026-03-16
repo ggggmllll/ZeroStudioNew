@@ -19,6 +19,7 @@ package com.itsaky.androidide.templates.base
 
 import android.content.Context
 import android.view.View
+import androidx.annotation.StringRes
 import com.itsaky.androidide.templates.BooleanParameter
 import com.itsaky.androidide.templates.CheckBoxWidget
 import com.itsaky.androidide.templates.EnumParameter
@@ -153,11 +154,14 @@ inline fun baseProject(
     ndkVersion: EnumParameter<NdkVersion> = projectNdkVersionParameter(),
     cmakeVersion: EnumParameter<CmakeVersion> = projectCmakeVersionParameter(),
     projectVersionData: ProjectVersionData = ProjectVersionData(),
+    @StringRes description: Int? = null,
     context: Context? = null,
     crossinline block: ProjectTemplateBuilder.() -> Unit,
 ): ProjectTemplate {
   return ProjectTemplateBuilder()
       .apply {
+        // Assign the passed description to the builder
+        this.description = description
 
         // When project name is changed, change the package name accordingly
         projectName.observe { name ->

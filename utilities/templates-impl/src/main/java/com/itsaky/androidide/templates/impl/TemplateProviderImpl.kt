@@ -29,6 +29,7 @@ import com.itsaky.androidide.templates.impl.navDrawerActivity.navDrawerActivityP
 import com.itsaky.androidide.templates.impl.noActivity.noActivityProjectTemplate
 import com.itsaky.androidide.templates.impl.noAndroidXActivity.noAndroidXActivityProject
 import com.itsaky.androidide.templates.impl.tabbedActivity.tabbedActivityProject
+import com.itsaky.androidide.templates.impl.basicCpp.basicCppProject
 import java.util.Collections
 import java.util.concurrent.ConcurrentHashMap
 
