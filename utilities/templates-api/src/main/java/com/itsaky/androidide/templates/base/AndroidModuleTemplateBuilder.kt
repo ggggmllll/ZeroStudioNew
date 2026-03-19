@@ -154,11 +154,11 @@ open class AndroidModuleTemplateBuilder : ModuleTemplateBuilder() {
 
     save(buildGradleSrc(isComposeModule, context), buildGradleFile())
 
-    Create marker file if this is a compose module
-    if (isComposeModule) {
-      val markerFile = File(data.projectDir.parentFile, ".compose_enabled")
-      markerFile.createNewFile()
-    }
+    // Create marker file if this is a compose module
+    // if (isComposeModule) {
+      // val markerFile = File(data.projectDir.parentFile, ".compose_enabled")
+      // markerFile.createNewFile()
+    // }
   }
 
   /** Writes the `.gitignore` file in the mdoule directory. */
