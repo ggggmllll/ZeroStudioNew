@@ -54,7 +54,8 @@
     - [ ] Implement a gripper constraint layout similar to Android studio
 - [ ] String Translator
 - [ ] Asset Studio (Drawable & Icon Maker)
-- [x] (Git)[https://github.com/catpuppyapp/PuppyGit] and CD/CI
+- [x] (Git)[https://github.com/catpuppyapp/PuppyGit] 
+- [ ] git CD/CI/PR/workflow container
 - [x] (Chat ai)[https://github.com/rikkahub/rikkahub] Support assistant skills, mcp， Numerous common provider models etc...
 - [ ] Preview function
     - [ ] advanced images Preview
@@ -80,8 +81,8 @@ Here is the decorated version:
 -> The order of arrangement is not important.
 
  - [x] (sora editor)[https://github.com/Rosemoe/sora-editor]
- - [x] (Git)[https://github.com/catpuppyapp/PuppyGit]
- - [x] (Chat ai)[https://github.com/rikkahub/rikkahub] 
+ - [x] (PuppyGit)[https://github.com/catpuppyapp/PuppyGit]
+ - [x] (rikkahub)[https://github.com/rikkahub/rikkahub] 
  - [x] (termux)[https://github.com/termux/termux-app]
 
 </details>
