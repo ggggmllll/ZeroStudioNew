@@ -33,7 +33,7 @@ import com.itsaky.androidide.templates.impl.templateAsset
 fun bottomNavActivityProject() = baseProjectImpl {
   templateName = R.string.template_navigation_tabs
   thumb = R.drawable.template_bottom_navigation_activity
-  description = string.title_test
+  description = string.title_template_description_bottomnavactivity
   defaultAppModule {
     recipe = createRecipe {
       sources {

@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
+    <string name="title_template_description_tablayout_tabactivity">TabLayout 活動：多頁面管理元件</string>
+    <string name="title_template_description_basicactivity">基本活動示範</string>
+    <string name="title_menus_editor_lines_swapUp">與上一行交換</string>
+    <string name="title_menus_editor_lines_swapDown">與下一行交換</string>
+    <string name="title_menus_editor_selection_moveUp">選中文本上移</string>
+    <string name="title_menus_editor_selection_moveRight">選中文本右移</string>
+    <string name="title_menus_editor_selection_moveLeft">選中文本左移</string>
+    <string name="title_menus_editor_selection_moveDown">選中文本下移</string>
+    <string name="title_menus_editor_cursor_nextLocation">重做光標位置</string>
+    <string name="title_menus_editor_cursor_prevLocation">撤回光標位置</string>
+
     <string name="title_test">測試</string>
     <string name="permission_title_notifications">通知權限</string>
     <string name="permission_desc_notifications">需要此權限以在後台任務（如終端會話）運行時顯示持續的通知。</string>

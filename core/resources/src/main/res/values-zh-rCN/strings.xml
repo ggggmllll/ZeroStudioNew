@@ -2,6 +2,17 @@
 <resources xmlns:tools="http://schemas.android.com/tools"
      tools:ignore="MissingTranslation">
      
+    <string name="title_template_description_tablayout_tabactivity">TabLayout 活动：多页面管理组件</string>
+    <string name="title_template_description_basicactivity">基本活动演示</string>
+    <string name="title_menus_editor_lines_swapUp">与上一行交换</string>
+    <string name="title_menus_editor_lines_swapDown">与下一行交换</string>
+    <string name="title_menus_editor_selection_moveUp">选中文本上移</string>
+    <string name="title_menus_editor_selection_moveRight">选中文本右移</string>
+    <string name="title_menus_editor_selection_moveLeft">选中文本左移</string>
+    <string name="title_menus_editor_selection_moveDown">选中文本下移</string>
+    <string name="title_menus_editor_cursor_nextLocation">重做光标位置</string>
+    <string name="title_menus_editor_cursor_prevLocation">撤回光标位置</string>
+
      <string name="title_test">测试</string>
      <string name="permission_title_notifications">通知权限</string>
      <string name="permission_desc_notifications">需要此权限以在后台任务（如终端会话）运行时显示持续的通知。</string>

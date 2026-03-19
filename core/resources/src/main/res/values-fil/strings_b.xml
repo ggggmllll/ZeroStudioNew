@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
+    <string name="title_template_description_tablayout_tabactivity">Aktibidad ng TabLayout: Mga sangkap para sa pamamahala ng maramihang pahina</string>
+    <string name="title_template_description_basicactivity">Pangunahing Pagpapakita ng Aktibidad</string>
+    <string name="title_menus_editor_lines_swapUp">Palitan ng nakaraang linya</string>
+    <string name="title_menus_editor_lines_swapDown">Palitan ng linya sa susunod</string>
+    <string name="title_menus_editor_selection_moveUp">Ilipat pataas ang napiling teksto</string>
+    <string name="title_menus_editor_selection_moveRight">Igalaw ang napiling teksto pakanan</string>
+    <string name="title_menus_editor_selection_moveLeft">Ilipat pakaliwa ang napiling teksto</string>
+    <string name="title_menus_editor_selection_moveDown">Ilipat pababa ang napiling teksto</string>
+    <string name="title_menus_editor_cursor_nextLocation">I-reload ang posisyon ng cursor</string>
+    <string name="title_menus_editor_cursor_prevLocation">Ibalik ang posisyon ng cursor</string>
+
     <string name="title_test">pagsubok</string>
     <string name="permission_title_notifications">Pahintulot sa abiso</string>
     <string name="permission_desc_notifications">Kailangan ang pahintulot na ito upang ipakita ang patuloy na notification habang tumatakbo ang mga background na gawain (tulad ng terminal session).</string>

@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
+    <string name="title_template_description_tablayout_tabactivity">TabLayout Aktivitesi: Çok sayfalı yönetim bileşenleri</string>
+    <string name="title_template_description_basicactivity">Temel Aktivite Gösterimi</string>
+    <string name="title_menus_editor_lines_swapUp">Önceki satır ile değiştir</string>
+    <string name="title_menus_editor_lines_swapDown">Bir sonraki satır ile değiştir</string>
+    <string name="title_menus_editor_selection_moveUp">Seçili metni yukarı taşı</string>
+    <string name="title_menus_editor_selection_moveRight">Seçili metni sağa kaydır</string>
+    <string name="title_menus_editor_selection_moveLeft">Seçili metni sola kaydır</string>
+    <string name="title_menus_editor_selection_moveDown">Seçili metni aşağı taşı</string>
+    <string name="title_menus_editor_cursor_nextLocation">İmleç konumunu yeniden yap</string>
+    <string name="title_menus_editor_cursor_prevLocation">İmleç konumunu geri al</string>
+
     <string name="permission_title_notifications">Bildirim izni</string>
     <string name="permission_desc_notifications">Bu izin, arka planda görevler (örneğin terminal oturumları) çalışırken sürekli bildirim gösterebilmek için gereklidir.</string>
     <string name="permission_title_storage_all_files">Tüm dosya erişim izinleri</string>

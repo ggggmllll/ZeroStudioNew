@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
+    <string name="title_template_description_tablayout_tabactivity">TabLayout アクティビティ：複数ページ管理コンポーネント</string>
+    <string name="title_template_description_basicactivity">基本的な活動の実演</string>
+    <string name="title_menus_editor_lines_swapUp">前の行と交換する</string>
+    <string name="title_menus_editor_lines_swapDown">次の行と交換する</string>
+    <string name="title_menus_editor_selection_moveUp">選択したテキストを上に移動</string>
+    <string name="title_menus_editor_selection_moveRight">選択したテキストを右に移動</string>
+    <string name="title_menus_editor_selection_moveLeft">選択したテキストを左に移動</string>
+    <string name="title_menus_editor_selection_moveDown">選択したテキストを下に移動</string>
+    <string name="title_menus_editor_cursor_nextLocation">カーソル位置をやり直す</string>
+    <string name="title_menus_editor_cursor_prevLocation">カーソル位置を元に戻す</string>
+
     <string name="title_test">テスト</string>
     <string name="permission_title_notifications">通知権限</string>
     <string name="permission_desc_notifications">この権限は、バックグラウンドタスク（端末セッションなど）実行中に持続的な通知を表示するために必要です。</string>

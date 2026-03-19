@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
+    <string name="title_template_description_tablayout_tabactivity">ടാബ്‌ലേയൗട്ട് പ്രവർത്തനം: ബഹുസ്വര പേജ് മാനേജ്മെന്റ് ഘടകങ്ങൾ</string>
+    <string name="title_template_description_basicactivity">മൂലിക പ്രവർത്തന പ്രതിബിംബനം</string>
+    <string name="title_menus_editor_lines_swapUp">മുൻവരി മാറ്റുക</string>
+    <string name="title_menus_editor_lines_swapDown">അടുത്ത വരിയുമായി മാറുക</string>
+    <string name="title_menus_editor_selection_moveUp">തിരഞ്ഞെടുത്ത എഴുത്ത് മുകളിലേക്ക് നീക്കുക</string>
+    <string name="title_menus_editor_selection_moveRight">തിരഞ്ഞെടുത്ത എഴുത്ത് വലത്തേക്ക് നീക്കുക</string>
+    <string name="title_menus_editor_selection_moveLeft">തിരഞ്ഞെടുത്ത എഴുത്ത് ഇടത്തേക്ക് നീക്കുക</string>
+    <string name="title_menus_editor_selection_moveDown">തിരഞ്ഞെടുത്ത എഴുത്ത് താഴേക്ക് നീക്കുക</string>
+    <string name="title_menus_editor_cursor_nextLocation">കൂർസർ സ്ഥാനം വീണ്ടും നിർദ്ദേശിക്കുക</string>
+    <string name="title_menus_editor_cursor_prevLocation">കൂർസർ സ്ഥാനം പിൻവലിക്കുക</string>
+
     <string name="title_test">ടെസ്റ്റ്</string>
     <string name="permission_title_notifications">അറിയിപ്പ് അനുമതികള്‍</string>
     <string name="permission_desc_notifications">പശ്ചാത്തല പ്രവർത്തനങ്ങൾ (ഉദാഹരണത്തിന്, ടെർമിനൽ സെഷനുകൾ) നടക്കുമ്പോൾ സ്ഥിരമായ അറിയിപ്പുകൾ دکھിക്കാൻ ഈ അനുവാദം ആവശ്യമാണ്.</string>

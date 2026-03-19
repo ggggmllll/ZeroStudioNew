@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
+    <string name="title_template_description_tablayout_tabactivity">Активность TabLayout: Компоненты управления многостраничными элементами</string>
+    <string name="title_template_description_basicactivity">Демонстрация базовой активности</string>
+    <string name="title_menus_editor_lines_swapUp">Поменять местами с предыдущей строкой</string>
+    <string name="title_menus_editor_lines_swapDown">Поменять с следующей строкой</string>
+    <string name="title_menus_editor_selection_moveUp">Переместить выбранный текст вверх</string>
+    <string name="title_menus_editor_selection_moveRight">Выделенный текст сдвинуть вправо</string>
+    <string name="title_menus_editor_selection_moveLeft">Выравнивание выбранного текста по левому краю</string>
+    <string name="title_menus_editor_selection_moveDown">Переместить выделенный текст вниз</string>
+    <string name="title_menus_editor_cursor_nextLocation">Переместить курсор</string>
+    <string name="title_menus_editor_cursor_prevLocation">Отменить положение курсора</string>
+
     <string name="title_test">тест</string>
     <string name="permission_title_notifications">Разрешение на уведомления</string>
     <string name="permission_desc_notifications">Требуется это разрешение для отображения постоянных уведомлений при выполнении фоновых задач (например, сеансов терминала).</string>

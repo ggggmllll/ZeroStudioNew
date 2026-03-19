@@ -90,9 +90,9 @@ open class ZeroAutoTranslateTask : DefaultTask() {
 
     // 语言代码映射：Map<Google/通用Code, Android文件夹后缀>
      private val targetLanguages = mapOf(
-          // "en" to "values",
-          // "ar" to "values-ar-rSA",
-          // "bn" to "values-bn-rIN",
+          "en" to "values", //
+          "ar" to "values-ar-rSA", //
+          "bn" to "values-bn-rIN", //
           "de" to "values-de-rDE",
           "es" to "values-es-rES",
           "fa" to "values-fa",
@@ -107,14 +107,14 @@ open class ZeroAutoTranslateTask : DefaultTask() {
           "pl" to "values-pl",
           "pt" to "values-pt-rBR",
           "ro" to "values-ro-rRO",
-          // "ru" to "values-ru-rRU",
+          "ru" to "values-ru-rRU", //
           "ta" to "values-ta",
           "th" to "values-th",
-          // "tr" to "values-tr-rTR",
+          "tr" to "values-tr-rTR", //
           "tk" to "values-tm-rTM",
           "vi" to "values-vi",
           "uk" to "values-uk",
-          // "zh-CN" to "values-zh-rCN",
+          "zh-CN" to "values-zh-rCN", //
           "zh-TW" to "values-zh-rTW"
 )
 

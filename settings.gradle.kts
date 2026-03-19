@@ -169,6 +169,7 @@ include(
   // ":core:chatai:locale-tui",
   // ":core:chatai:search",
   // ":core:chatai:tts",
+  // ":core:chatai:web",
   
   ":editor:api",
   ":editor:impl",

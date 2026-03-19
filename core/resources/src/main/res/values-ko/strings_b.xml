@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
+    <string name="title_template_description_tablayout_tabactivity">탭레이아웃 액티비티: 다중 페이지 관리 구성 요소</string>
+    <string name="title_template_description_basicactivity">기본 활동 시연</string>
+    <string name="title_menus_editor_lines_swapUp">이전 줄과 교환</string>
+    <string name="title_menus_editor_lines_swapDown">다음 줄과 교환</string>
+    <string name="title_menus_editor_selection_moveUp">선택한 텍스트 위로 이동</string>
+    <string name="title_menus_editor_selection_moveRight">선택한 텍스트를 오른쪽으로 이동</string>
+    <string name="title_menus_editor_selection_moveLeft">선택한 텍스트 왼쪽으로 이동</string>
+    <string name="title_menus_editor_selection_moveDown">선택한 텍스트 아래로 이동</string>
+    <string name="title_menus_editor_cursor_nextLocation">커서 위치 다시 설정</string>
+    <string name="title_menus_editor_cursor_prevLocation">커서 위치 되돌리기</string>
+
     <string name="title_test">테스트</string>
     <string name="permission_title_notifications">알림 권한</string>
     <string name="permission_desc_notifications">이 권한은 백그라운드 작업(예: 터미널 세션) 실행 중에 지속적인 알림을 표시하는 데 필요합니다.</string>

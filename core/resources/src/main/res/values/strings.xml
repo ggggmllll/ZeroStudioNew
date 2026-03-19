@@ -28,7 +28,16 @@
      <!-- zh-rCN (简体中文) -->
      <!-- zh-rTW (繁體中文) -->
 
-
+    <string name="title_template_description_tablayout_tabactivity">TabLayout Activity: Multi-page management components</string>
+    <string name="title_template_description_basicactivity">Basic Activity Demonstration</string>
+    <string name="title_menus_editor_lines_swapUp">Swap with the previous line</string>
+    <string name="title_menus_editor_lines_swapDown">Swap with the next line</string>
+    <string name="title_menus_editor_selection_moveUp">Move selected text up</string>
+    <string name="title_menus_editor_selection_moveRight">Move the selected text to the right</string>
+    <string name="title_menus_editor_selection_moveLeft">Move selected text to the left</string>
+    <string name="title_menus_editor_selection_moveDown">Move the selected text down</string>
+    <string name="title_menus_editor_cursor_nextLocation">Redo cursor position</string>
+    <string name="title_menus_editor_cursor_prevLocation">Retract cursor position</string>
 
      <!-- Data file tree fragment string -->
      <string name="msg_data_file_tree">Data file tree</string>

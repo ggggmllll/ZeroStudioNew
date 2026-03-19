@@ -148,7 +148,6 @@ espressoCore = "3.6.1"
 junit-jupiter = "5.10.2"
 
 
-
 [libraries]
 # Dependencies in composite build
 composite-appintro = { module = "com.itsaky.androidide.build:appintro" }
@@ -389,6 +388,7 @@ tests-mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version =
 tests-mockk = { module = "io.mockk:mockk", version = "1.13.10" }
 tests-barista = { module = "com.adevinta.android:barista", version = "4.3.0" }
 tests-conscrypt-openjdk = { module = "org.conscrypt:conscrypt-openjdk", version = "2.5.2" }
+androidx-benchmark-macro-junit4 = { group = "androidx.benchmark", name = "benchmark-macro-junit4", version.ref = "benchmarkMacroJunit4" }
 
 
 # root/build.gradle.kts > Classpaths
@@ -472,8 +472,6 @@ grpc-protobuf = { module = "io.grpc:grpc-protobuf", version.ref = "ioGrpcVersion
 grpc-stub = { module = "io.grpc:grpc-stub", version.ref = "ioGrpcVersion" }
 grpc-netty-shaded = { module = "io.grpc:grpc-netty-shaded", version.ref = "ioGrpcVersion" }
 grpc-kotlin-stub = { module = "io.grpc:grpc-kotlin-stub", version.ref = "ioGrpcStubVersion" }
-
-
 
 # 其它sdk
 com-h2database-h2 = { module = "com.h2database:h2", version = "1.4.200" }

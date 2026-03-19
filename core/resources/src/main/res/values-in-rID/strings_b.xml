@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
+    <string name="title_template_description_tablayout_tabactivity">Aktivitas TabLayout: Komponen manajemen multi-halaman</string>
+    <string name="title_template_description_basicactivity">Demonstrasi Aktivitas Dasar</string>
+    <string name="title_menus_editor_lines_swapUp">Tukar dengan baris sebelumnya</string>
+    <string name="title_menus_editor_lines_swapDown">Tukar dengan baris berikutnya</string>
+    <string name="title_menus_editor_selection_moveUp">Pindahkan teks yang dipilih ke atas</string>
+    <string name="title_menus_editor_selection_moveRight">Memindahkan teks yang dipilih ke kanan</string>
+    <string name="title_menus_editor_selection_moveLeft">Memindahkan teks yang dipilih ke kiri</string>
+    <string name="title_menus_editor_selection_moveDown">Pindahkan teks yang dipilih ke bawah</string>
+    <string name="title_menus_editor_cursor_nextLocation">Atur ulang posisi kursor</string>
+    <string name="title_menus_editor_cursor_prevLocation">Tarik kembali posisi kursor</string>
+
     <string name="title_test">tes</string>
     <string name="permission_title_notifications">Izin notifikasi</string>
     <string name="permission_desc_notifications">Memerlukan izin ini untuk menampilkan notifikasi terus-menerus saat menjalankan tugas latar belakang (seperti sesi terminal).</string>

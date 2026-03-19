@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
+    <string name="title_template_description_tablayout_tabactivity">Activitate TabLayout: Componente pentru gestionarea mai multor pagini</string>
+    <string name="title_template_description_basicactivity">Demonstrație de activitate de bază</string>
+    <string name="title_menus_editor_lines_swapUp">Schimbă cu rândul de sus</string>
+    <string name="title_menus_editor_lines_swapDown">Schimbă cu rândul următor</string>
+    <string name="title_menus_editor_selection_moveUp">Mută textul selectat în sus</string>
+    <string name="title_menus_editor_selection_moveRight">Mută textul selectat la dreapta</string>
+    <string name="title_menus_editor_selection_moveLeft">Mută textul selectat la stânga</string>
+    <string name="title_menus_editor_selection_moveDown">Mută textul selectat în jos</string>
+    <string name="title_menus_editor_cursor_nextLocation">Refă poziția cursorului</string>
+    <string name="title_menus_editor_cursor_prevLocation">Retrage poziția cursorului</string>
+
     <string name="title_test">test</string>
     <string name="permission_title_notifications">Permisiuni de notificare</string>
     <string name="permission_desc_notifications">Această permisiune este necesară pentru a afișa notificări persistente atunci când rulează sarcini în fundal (cum ar fi sesiuni terminal).</string>

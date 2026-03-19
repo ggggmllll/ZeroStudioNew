@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
+    <string name="title_template_description_tablayout_tabactivity">Hoạt động TabLayout: Thành phần quản lý nhiều trang</string>
+    <string name="title_template_description_basicactivity">Trình diễn Hoạt động Cơ bản</string>
+    <string name="title_menus_editor_lines_swapUp">Đổi chỗ với dòng trước</string>
+    <string name="title_menus_editor_lines_swapDown">Đổi với dòng tiếp theo</string>
+    <string name="title_menus_editor_selection_moveUp">Di chuyển văn bản đã chọn lên</string>
+    <string name="title_menus_editor_selection_moveRight">Dịch văn bản đã chọn sang bên phải</string>
+    <string name="title_menus_editor_selection_moveLeft">Dịch văn bản đã chọn sang bên trái</string>
+    <string name="title_menus_editor_selection_moveDown">Di chuyển văn bản đã chọn xuống</string>
+    <string name="title_menus_editor_cursor_nextLocation">Đặt lại vị trí con trỏ</string>
+    <string name="title_menus_editor_cursor_prevLocation">Hoàn tác vị trí con trỏ</string>
+
     <string name="title_test">kiểm tra</string>
     <string name="permission_title_notifications">Quyền thông báo</string>
     <string name="permission_desc_notifications">Cần quyền này để hiển thị thông báo liên tục khi chạy các nhiệm vụ nền (như phiên đầu cuối).</string>

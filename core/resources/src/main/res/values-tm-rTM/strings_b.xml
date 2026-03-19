@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
+    <string name="title_template_description_tablayout_tabactivity">TabLayout Herekete: Köp sahypaly dolandyryş komponentleri</string>
+    <string name="title_template_description_basicactivity">Esasy Hereketiň Çykyşlygy</string>
+    <string name="title_menus_editor_lines_swapUp">Öňki setir bilen çalyş</string>
+    <string name="title_menus_editor_lines_swapDown">Indiki setir bilen ayyrmak</string>
+    <string name="title_menus_editor_selection_moveUp">Saýlanan teksti ýokarlandyrmak</string>
+    <string name="title_menus_editor_selection_moveRight">Saýlanan teksti sag tarapa süýşürmek</string>
+    <string name="title_menus_editor_selection_moveLeft">Saýlanan teksti çep tarap süýşürmek</string>
+    <string name="title_menus_editor_selection_moveDown">Saýlanan teksti aşak göçür</string>
+    <string name="title_menus_editor_cursor_nextLocation">Formatting kursor ýerleşişi</string>
+    <string name="title_menus_editor_cursor_prevLocation">Formatting görkezijini yzyna çekmek</string>
+
     <string name="title_test">synag</string>
     <string name="permission_title_notifications">Bildiriş rugsady</string>
     <string name="permission_desc_notifications">Bu rugsaty yzygiderli bildirişleri fon wezipelerinde (mysal üçin terminal sessiýalary) işleýän wagty görkezmek üçin gerek.</string>

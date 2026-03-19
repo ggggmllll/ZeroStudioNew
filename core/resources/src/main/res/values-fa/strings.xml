@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
+    <string name="title_template_description_tablayout_tabactivity">فعالیت TabLayout: اجزای مدیریت چندصفحه‌ای</string>
+    <string name="title_template_description_basicactivity">نمایش فعالیت پایه</string>
+    <string name="title_menus_editor_lines_swapUp">با خط قبلی جابجا شود</string>
+    <string name="title_menus_editor_lines_swapDown">با خط بعدی جابجا کن</string>
+    <string name="title_menus_editor_selection_moveUp">انتقال متن انتخاب شده به بالا</string>
+    <string name="title_menus_editor_selection_moveRight">انتخاب متن و حرکت به راست</string>
+    <string name="title_menus_editor_selection_moveLeft">انتخاب متن و حرکت به چپ</string>
+    <string name="title_menus_editor_selection_moveDown">انتخاب متن و پایین بردن</string>
+    <string name="title_menus_editor_cursor_nextLocation">بازنشانی موقعیت مکان‌نما</string>
+    <string name="title_menus_editor_cursor_prevLocation">بازگرداندن مکان‌نما</string>
+
     <string name="msg_data_file_tree">درخت فایل داده</string>
     <string name="select_directory_prompt">یک پوشه برای نصب انتخاب کنید</string>
     <string name="select_directory_button">فهرست مطالب را انتخاب کنید</string>

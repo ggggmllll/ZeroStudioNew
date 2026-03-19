@@ -37,6 +37,7 @@ fun basicActivityProject(): ProjectTemplate {
 	return baseProjectImpl {
 		templateName = R.string.template_basic
 		thumb = R.drawable.template_basic_activity
+		  description = string.title_template_description_basicactivity
 		defaultAppModule {
 			recipe = createRecipe {
 				sources {

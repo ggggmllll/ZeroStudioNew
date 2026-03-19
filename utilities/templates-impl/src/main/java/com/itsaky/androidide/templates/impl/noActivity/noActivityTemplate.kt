@@ -26,5 +26,6 @@ import com.itsaky.androidide.templates.impl.baseProjectImpl
 fun noActivityProject() = baseProjectImpl {
   templateName = R.string.template_no_activity
   thumb = R.drawable.template_no_activity
+  description = R.string.title_template_no_activity_desc
   defaultAppModule { recipe = createRecipe { res { emptyThemesAndColors(actionBar = true) } } }
 }

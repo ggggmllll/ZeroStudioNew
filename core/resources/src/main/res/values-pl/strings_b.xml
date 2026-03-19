@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
+    <string name="title_template_description_tablayout_tabactivity">Aktywność TabLayout: Komponenty zarządzania wieloma stronami</string>
+    <string name="title_template_description_basicactivity">Podstawowa Demonstracja Aktywności</string>
+    <string name="title_menus_editor_lines_swapUp">Zamień z poprzednim wierszem</string>
+    <string name="title_menus_editor_lines_swapDown">Zamień z następnym wierszem</string>
+    <string name="title_menus_editor_selection_moveUp">Przenieś wybrany tekst w górę</string>
+    <string name="title_menus_editor_selection_moveRight">Przesuń zaznaczony tekst w prawo</string>
+    <string name="title_menus_editor_selection_moveLeft">Przesuń zaznaczony tekst w lewo</string>
+    <string name="title_menus_editor_selection_moveDown">Przesuń zaznaczony tekst w dół</string>
+    <string name="title_menus_editor_cursor_nextLocation">Ponownie ustaw pozycję kursora</string>
+    <string name="title_menus_editor_cursor_prevLocation">Cofnij pozycję kursora</string>
+
     <string name="title_test">test</string>
     <string name="permission_title_notifications">Uprawnienia powiadomień</string>
     <string name="permission_desc_notifications">Wymagane jest to uprawnienie, aby wyświetlać stałe powiadomienia podczas działania zadań w tle (takich jak sesje terminalowe).</string>

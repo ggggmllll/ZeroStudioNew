@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
+    <string name="title_template_description_tablayout_tabactivity">TabLayout गतिविधि: बहु-पृष्ठ प्रबंधन घटक</string>
+    <string name="title_template_description_basicactivity">मूल गतिविधि प्रदर्शन</string>
+    <string name="title_menus_editor_lines_swapUp">पिछली पंक्ति के साथ बदलें</string>
+    <string name="title_menus_editor_lines_swapDown">अगली पंक्ति के साथ बदलें</string>
+    <string name="title_menus_editor_selection_moveUp">चयनित पाठ को ऊपर ले जाएँ</string>
+    <string name="title_menus_editor_selection_moveRight">चयनित पाठ को दाईं ओर शिफ्ट करें</string>
+    <string name="title_menus_editor_selection_moveLeft">चयनित पाठ बाएँ ले जाएँ</string>
+    <string name="title_menus_editor_selection_moveDown">चयनित पाठ को नीचे ले जाएँ</string>
+    <string name="title_menus_editor_cursor_nextLocation">कर्सर स्थिति फिर से करें</string>
+    <string name="title_menus_editor_cursor_prevLocation">कर्सर स्थान वापस लेना</string>
+
     <string name="title_test">परीक्षण</string>
     <string name="permission_title_notifications">सूचना अनुमति</string>
     <string name="permission_desc_notifications">इस अनुमति की आवश्यकता है ताकि पृष्ठभूमि कार्यों (जैसे टर्मिनल सत्र) के चलने के दौरान निरंतर सूचनाएँ दिखाई जा सकें।</string>

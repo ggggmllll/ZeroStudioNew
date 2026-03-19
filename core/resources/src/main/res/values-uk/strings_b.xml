@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
+    <string name="title_template_description_tablayout_tabactivity">Активність TabLayout: Компоненти управління багатосторінковими інтерфейсами</string>
+    <string name="title_template_description_basicactivity">Демонстрація базової діяльності</string>
+    <string name="title_menus_editor_lines_swapUp">Поміняти з попереднім рядком</string>
+    <string name="title_menus_editor_lines_swapDown">Поміняти місцями з наступним рядком</string>
+    <string name="title_menus_editor_selection_moveUp">Перемістити виділений текст вгору</string>
+    <string name="title_menus_editor_selection_moveRight">Зсуньте виділений текст вправо</string>
+    <string name="title_menus_editor_selection_moveLeft">Зсуньте виділений текст ліворуч</string>
+    <string name="title_menus_editor_selection_moveDown">Перемістити виділений текст униз</string>
+    <string name="title_menus_editor_cursor_nextLocation">Переробити позицію курсору</string>
+    <string name="title_menus_editor_cursor_prevLocation">Скасувати позицію курсору</string>
+
     <string name="title_test">тест</string>
     <string name="permission_title_notifications">Дозвіл на сповіщення</string>
     <string name="permission_desc_notifications">Потрібен цей дозвіл для відображення постійних сповіщень під час виконання фонових завдань (наприклад, термінальних сеансів).</string>

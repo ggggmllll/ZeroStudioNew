@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
+    <string name="title_template_description_tablayout_tabactivity">Atividade TabLayout: Componentes de gerenciamento de múltiplas páginas</string>
+    <string name="title_template_description_basicactivity">Demonstração de Atividade Básica</string>
+    <string name="title_menus_editor_lines_swapUp">Trocar com a linha acima</string>
+    <string name="title_menus_editor_lines_swapDown">Trocar com a linha seguinte</string>
+    <string name="title_menus_editor_selection_moveUp">Mover texto selecionado para cima</string>
+    <string name="title_menus_editor_selection_moveRight">Mover texto selecionado para a direita</string>
+    <string name="title_menus_editor_selection_moveLeft">Mover texto selecionado para a esquerda</string>
+    <string name="title_menus_editor_selection_moveDown">Mover texto selecionado para baixo</string>
+    <string name="title_menus_editor_cursor_nextLocation">Refazer posição do cursor</string>
+    <string name="title_menus_editor_cursor_prevLocation">Retornar a posição do cursor</string>
+
     <string name="title_test">teste</string>
     <string name="permission_title_notifications">Permissão de notificações</string>
     <string name="permission_desc_notifications">Esta permissão é necessária para mostrar notificações persistentes ao executar tarefas em segundo plano (como sessões de terminal).</string>

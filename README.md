@@ -63,8 +63,8 @@
     - [ ] Markdown preview
     - [ ] web(html，vue，nodejs，js，etc ...) preview
     - [ ] C/C++ drawing preview
-    - [ ] C/C++ drawing preview
     - [ ] flutter preview
+    - [ ] More waiting ...
 - [x] Built in Kotlin+JSON written MCP server, tools can be freely defined
 - [x] Regular expression preview
 

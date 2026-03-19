@@ -10,8 +10,15 @@ import com.itsaky.androidide.viewmodel.EditorViewModel
 import java.io.File
 import com.itsaky.androidide.actions.code.CodeActionsMenu
 
-import com.itsaky.androidide.actions.editor.cursor.*
-import com.itsaky.androidide.actions.editor.text.*
+import com.itsaky.androidide.actions.editor.cursor.CursorPreviousLocationAction
+import com.itsaky.androidide.actions.editor.cursor.CursorNextLocationAction
+import com.itsaky.androidide.actions.editor.text.SwapLineUpAction
+import com.itsaky.androidide.actions.editor.text.SwapLineDownAction
+import com.itsaky.androidide.actions.editor.text.MoveSelectionUpAction
+import com.itsaky.androidide.actions.editor.text.MoveSelectionRightAction
+import com.itsaky.androidide.actions.editor.text.MoveSelectionLeftAction
+import com.itsaky.androidide.actions.editor.text.MoveSelectionDownAction
+import com.itsaky.androidide.actions.editor.text.MoveSelectionActionBase
 
 /**
  * An [ActionMenu] that consolidates all "Edit" menu operations for the text editor.
@@ -37,7 +44,7 @@ class EditorEditLineMenuAction(context: Context, override val order: Int) : Edit
     init {
         label = context.getString(R.string.edit)
         icon = ContextCompat.getDrawable(context, R.drawable.ic_editor_text)
-      var order = 0
+        var order = 0
 
         // Register all line and navigation operations as children of this ActionMenu
         addAction(CopyLineAction(context, order++))

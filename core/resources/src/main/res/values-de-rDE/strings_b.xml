@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
+    <string name="title_template_description_tablayout_tabactivity">TabLayout-Aktivität: Mehrseiten-Verwaltungskomponenten</string>
+    <string name="title_template_description_basicactivity">Grundlegende Aktivitätsdemonstration</string>
+    <string name="title_menus_editor_lines_swapUp">Mit der vorherigen Zeile tauschen</string>
+    <string name="title_menus_editor_lines_swapDown">Mit der nächsten Zeile tauschen</string>
+    <string name="title_menus_editor_selection_moveUp">Ausgewählten Text nach oben verschieben</string>
+    <string name="title_menus_editor_selection_moveRight">Markierten Text nach rechts verschieben</string>
+    <string name="title_menus_editor_selection_moveLeft">Markierten Text nach links verschieben</string>
+    <string name="title_menus_editor_selection_moveDown">Ausgewählten Text nach unten verschieben</string>
+    <string name="title_menus_editor_cursor_nextLocation">Cursorposition zurücksetzen</string>
+    <string name="title_menus_editor_cursor_prevLocation">Cursorposition zurücksetzen</string>
+
     <string name="title_test">Test</string>
     <string name="permission_title_notifications">Benachrichtigungsberechtigung</string>
     <string name="permission_desc_notifications">Diese Berechtigung wird benötigt, um kontinuierliche Benachrichtigungen anzuzeigen, während Hintergrundaufgaben (wie Terminalsitzungen) ausgeführt werden.</string>

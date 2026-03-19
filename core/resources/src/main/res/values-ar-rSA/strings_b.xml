@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
+    <string name="title_template_description_tablayout_tabactivity">نشاط TabLayout: مكونات إدارة الصفحات المتعددة</string>
+    <string name="title_template_description_basicactivity">عرض النشاط الأساسي</string>
+    <string name="title_menus_editor_lines_swapUp">تبديل مع السطر السابق</string>
+    <string name="title_menus_editor_lines_swapDown">تبديل مع السطر التالي</string>
+    <string name="title_menus_editor_selection_moveUp">نقل النص المحدد إلى الأعلى</string>
+    <string name="title_menus_editor_selection_moveRight">تحريك النص المحدد إلى اليمين</string>
+    <string name="title_menus_editor_selection_moveLeft">تحريك النص المحدد إلى اليسار</string>
+    <string name="title_menus_editor_selection_moveDown">نقل النص المحدد إلى الأسفل</string>
+    <string name="title_menus_editor_cursor_nextLocation">إعادة وضع المؤشر</string>
+    <string name="title_menus_editor_cursor_prevLocation">تراجع موضع المؤشر</string>
+
     <string name="title_test">اختبار</string>
     <string name="permission_title_notifications">إذن الإشعارات</string>
     <string name="permission_desc_notifications">تحتاج هذه الإذن لعرض الإشعارات المستمرة أثناء تشغيل المهام في الخلفية (مثل جلسات الطرفية).</string>

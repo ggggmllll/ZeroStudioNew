@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
+    <string name="title_template_description_tablayout_tabactivity">TabLayout செயல்பாடு：பல பக்கங்களை நிர்வகிக்கும் கூறுகள்</string>
+    <string name="title_template_description_basicactivity">அடிப்படை செயல்பாட்டு காட்சி</string>
+    <string name="title_menus_editor_lines_swapUp">முந்தைய வரியுடன் பரிமாற்றிக்கவும்</string>
+    <string name="title_menus_editor_lines_swapDown">அடுத்த வரியுடன் பரிமாறவும்</string>
+    <string name="title_menus_editor_selection_moveUp">தேர்ந்தெடுக்கப்பட்ட உரையை மேலுக்கு நகர்த்தவும்</string>
+    <string name="title_menus_editor_selection_moveRight">தேர்ந்தெடுக்கப்பட்ட உரையை வலமாக நகர்த்தவும்</string>
+    <string name="title_menus_editor_selection_moveLeft">தேர்ந்தெடுக்கப்பட்ட உரையை இடது பகுதியிற்கு நகர்த்துக</string>
+    <string name="title_menus_editor_selection_moveDown">தேர்ந்தெடுக்கப்பட்ட உரையை கீழே நகர்த்தவும்</string>
+    <string name="title_menus_editor_cursor_nextLocation">கேர்சர் இடத்தை மீண்டும் செய்வது</string>
+    <string name="title_menus_editor_cursor_prevLocation">கேர்சரை திருப்பி விடு</string>
+
     <string name="title_test">சோதனை</string>
     <string name="permission_title_notifications">அறிவிப்பு அனுமதி</string>
     <string name="permission_desc_notifications">இந்த அனுமதி பின்னணி பணிகள் (உதாரணமாக டெர்மினல் செஷன்கள்) ஓடும்போது தொடர்ச்சியான அறிவிப்புகளை دکھ செய்ய தேவையாகிறது.</string>

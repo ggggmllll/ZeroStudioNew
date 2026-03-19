@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
+    <string name="title_template_description_tablayout_tabactivity">TabLayout অ্যাক্টিভিটি：বহু-পৃষ্ঠার ব্যবস্থাপনা উপাদান</string>
+    <string name="title_template_description_basicactivity">মূল কার্যক্রম প্রদর্শন</string>
+    <string name="title_menus_editor_lines_swapUp">পূর্ববর্তী লাইনের সঙ্গে বিনিময় করুন</string>
+    <string name="title_menus_editor_lines_swapDown">পরবর্তী লাইনের সঙ্গে বিনিময় করুন</string>
+    <string name="title_menus_editor_selection_moveUp">নির্বাচিত টেক্সট উপরে সরান</string>
+    <string name="title_menus_editor_selection_moveRight">নির্বাচিত টেক্সট ডানদিকে সরান</string>
+    <string name="title_menus_editor_selection_moveLeft">নির্বাচিত টেক্সট বাম দিকে সরান</string>
+    <string name="title_menus_editor_selection_moveDown">নির্বাচিত টেক্সট নিচে সরান</string>
+    <string name="title_menus_editor_cursor_nextLocation">কার্সরের অবস্থান পুনরায় তৈরি করুন</string>
+    <string name="title_menus_editor_cursor_prevLocation">কার্সরের অবস্থান প্রত্যাহার করুন</string>
+
     <string name="title_test">পরীক্ষা</string>
     <string name="permission_title_notifications">নোটিফিকেশন অনুমতি</string>
     <string name="permission_desc_notifications">এই অনুমতি প্রয়োজন যাতে ব্যাকগ্রাউন্ড টাস্ক (যেমন টার্মিনাল সেশন) চলাকালীন ধারাবাহিক বিজ্ঞপ্তি প্রদর্শন করা যায়।</string>
