@@ -226,7 +226,7 @@ private fun AndroidModuleTemplateBuilder.showNdkNotInstalledDialog(context: Cont
 private fun AndroidModuleTemplateBuilder.buildGradleSrcKts(isComposeModule: Boolean): String {
     val compileSdkValue = if (isComposeModule) 36 else data.versions.compileSdk.api
     
-    // 1. TOML or Standard Plugins
+    // TOML or Standard Plugins
     val pluginsBlock = if (data.useToml) {
         """
 plugins {
@@ -244,6 +244,16 @@ plugins {
 }
         """.trimIndent()
     }
+
+  val KotlinJvmTargetKTDSL = if (data.language == Language.Kotlin) {
+       """
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+        }
+    }
+       """ .trimIndent()
+}
 
     // Native Build Logic (Separated CMake and NDK)
     val nativeBuildBlock = if (data.useCmake) {
@@ -310,11 +320,7 @@ android {
         targetCompatibility = ${data.versions.javaTarget()}
     }
 
-    kotlin {
-        compilerOptions {
-            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
-        }
-    }
+    $KotlinJvmTargetKTDSL
 
     buildTypes {
         release {
@@ -358,6 +364,17 @@ plugins {
 }
         """.trimIndent()
     }
+
+  val KotlinJvmTargetGroovyDSL = if (data.language == Language.Kotlin) {
+       """
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+        }
+    }
+       """ .trimIndent()
+}
+
 
     val nativeBuildBlock = if (data.useCmake) {
         """
@@ -422,11 +439,8 @@ android {
         sourceCompatibility ${data.versions.javaSource()}
         targetCompatibility ${data.versions.javaTarget()}
     }
-    kotlin {
-        compilerOptions {
-            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
-        }
-    }
+
+       $KotlinJvmTargetGroovyDSL
     
     buildTypes {
         release {

@@ -1,4 +1,4 @@
-package com.itsaky.androidide.actions.editor.text
+package com.itsaky.androidide.actions.editor
 
 import android.content.Context
 import android.content.Intent

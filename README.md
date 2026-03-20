@@ -56,7 +56,7 @@
 - [ ] Asset Studio (Drawable & Icon Maker)
 - [x] (Git)[https://github.com/catpuppyapp/PuppyGit] 
 - [ ] git CD/CI/PR/workflow container
-- [x] (Chat ai)[https://github.com/rikkahub/rikkahub] Support assistant skills, mcp， Numerous common provider models etc...
+- [x] (Chat ai)[https://github.com/rikkahub/rikkahub] Support assistant skills, tts ， mcp， Numerous common provider models etc...
 - [ ] Preview function
     - [x]  AndroidX Jetpack Compose Preview //Currently, errors need to be fixed before use
     - [ ] advanced images Preview
@@ -74,19 +74,7 @@ Here is the decorated version:
 
 ---
 
-<details close>
-<summary>⚖️ <strong>🍀 Core projects referenced in project integration</strong></summary>
 
-## Thank you to the developers for their outstanding contributions to open source.
--> The order of arrangement is not important.
-
- - [x] (sora editor)[https://github.com/Rosemoe/sora-editor]
- - [x] (PuppyGit)[https://github.com/catpuppyapp/PuppyGit]
- - [x] (rikkahub)[https://github.com/rikkahub/rikkahub] 
- - [x] (termux)[https://github.com/termux/termux-app]
-
-</details>
-<details close>
 
 <summary>⚖️ <strong>🌿 About Android Tree-Sitter</strong></summary>
 
@@ -179,6 +167,17 @@ See the [contributing guide](./CONTRIBUTING.md).
 
 For translations, visit the [Crowdin project page](https://crowdin.com/project/ZeroStudio).
 
+<details close>
+<summary>⚖️ <strong>🍀 Core projects referenced in project integration</strong></summary>
+
+## Thank you to the developers for their outstanding contributions to open source.
+-> The order of arrangement is not important.
+
+ - [x] (sora editor)[https://github.com/Rosemoe/sora-editor]
+ - [x] (PuppyGit)[https://github.com/catpuppyapp/PuppyGit]
+ - [x] (rikkahub)[https://github.com/rikkahub/rikkahub] 
+ - [x] (termux)[https://github.com/termux/termux-app]
+
 ## Thanks to
 
 - **[AndroidIDE](https://github.com/AndroidIDEOfficial/AndroidIDE)** by **[itsaky](https://github.com/itsaky)** and **[AndroidIDEOfficial](https://github.com/AndroidIDEOfficial)** for the original project foundation.
@@ -188,9 +187,11 @@ For translations, visit the [Crowdin project page](https://crowdin.com/project/Z
 - [George Fraser](https://github.com/georgewfraser) for the [Java Language Server](https://github.com/georgewfraser/java-language-server)
 - [Vivek](https://github.com/itsvks19) for [LayoutEditor](https://github.com/itsvks19/LayoutEditor)
 - [catpuppyapp](https://github.com/catpuppyapp) for [PuppyGit](https://github.com/catpuppyapp/PuppyGit)
+- [rikkahub](https://github.com/rikkahub) for [Rikkahub](https://github.com/rikkahub/rikkahub)
 
 Thanks to all the developers who have contributed to this project.
-
+</details>
+<details close>
 
 ## Contact Us
 - [Telegram channel](https://t.me/android_zero_studio)

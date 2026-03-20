@@ -1,4 +1,3 @@
-// by android_zero
 package com.itsaky.androidide.actions.editor
 
 import android.content.Context
