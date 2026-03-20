@@ -1,4 +1,3 @@
-// by android_zero
 package com.itsaky.androidide.cursor
 
 import io.github.rosemoe.sora.event.EventReceiver
@@ -23,10 +22,8 @@ object CursorHistoryManager {
 
         init {
             editor.subscribeEvent(SelectionChangeEvent::class.java, this)
-            if (editor.text.length > 0) {
-                history.add(editor.cursor.left().fromThis())
-                currentIndex = 0
-            }
+            // 强行记录初始位置，防止全新文件刚打开时无记录
+            recordPosition(editor.cursor.left().fromThis())
         }
 
         override fun onReceive(event: SelectionChangeEvent, unsubscribe: Unsubscribe) {
@@ -35,23 +32,23 @@ object CursorHistoryManager {
                 event.cause == SelectionChangeEvent.CAUSE_UNKNOWN) {
                 return
             }
+            recordPosition(event.left.fromThis())
+        }
 
-            val pos = event.left.fromThis()
-
+        private fun recordPosition(pos: CharPosition) {
             if (currentIndex >= 0 && currentIndex < history.size) {
                 val last = history[currentIndex]
+                // 防抖：同行内移动小于10字符，直接覆盖最新位置，不新增历史记录
                 if (last.line == pos.line && abs(last.column - pos.column) < 10) {
                     history[currentIndex] = pos
                     return
                 }
             }
-
-            if (currentIndex < history.size - 1) {
+            // 如果中途发生跳转，裁剪掉未来的记录
+            if (currentIndex < history.size - 1 && currentIndex >= 0) {
                 history.subList(currentIndex + 1, history.size).clear()
             }
-            
             history.add(pos)
-            
             if (history.size > 100) {
                 history.removeAt(0)
             } else {
@@ -84,7 +81,7 @@ object CursorHistoryManager {
         }
         
         fun canGoBack() = currentIndex > 0
-        fun canGoForward() = currentIndex < history.size - 1
+        fun canGoForward() = currentIndex >= 0 && currentIndex < history.size - 1
     }
 
     private val trackers = WeakHashMap<CodeEditor, Tracker>()

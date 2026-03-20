@@ -34,16 +34,12 @@ class CursorNextLocationAction(context: Context, override val order: Int) : Edit
     override fun prepare(data: ActionData) {
         super.prepare(data)
         val editor = data.get(CodeEditor::class.java)
-        if (editor != null) {
-            currentEditor = editor
-            enabled = CursorHistoryManager.getTracker(editor).canGoForward()
-        } else {
-            enabled = false
-        }
+        // 动态切换可点击状态
+        enabled = editor != null && CursorHistoryManager.getTracker(editor).canGoForward()
     }
 
     override suspend fun execAction(data: ActionData): Any {
-        val editor = currentEditor ?: return false
+        val editor = data.get(CodeEditor::class.java) ?: return false
         CursorHistoryManager.getTracker(editor).goForward()
         return true
     }

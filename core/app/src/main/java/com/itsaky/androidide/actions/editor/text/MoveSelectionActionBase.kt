@@ -1,4 +1,3 @@
-// by android_zero
 package com.itsaky.androidide.actions.editor.text
 
 import android.graphics.drawable.Drawable
@@ -8,33 +7,24 @@ import com.itsaky.androidide.actions.EditorActionItem
 import io.github.rosemoe.sora.text.CharPosition
 import io.github.rosemoe.sora.widget.CodeEditor
 
-/**
- * The base execution class for moving selected content
- * @author android_zero
- */
 abstract class MoveSelectionActionBase : EditorActionItem {
     override var label: String = ""
-    override var visible: Boolean = true
-    override var enabled: Boolean = false
+    override var visible: Boolean = true // 始终可见
+    override var enabled: Boolean = false // 未选中时禁用
     override var icon: Drawable? = null
     override var requiresUIThread: Boolean = true
     override var location: ActionItem.Location = ActionItem.Location.EDITOR_TEXT_ACTIONS
 
-    private var currentEditor: CodeEditor? = null
-
     override fun prepare(data: ActionData) {
         super.prepare(data)
         val editor = data.get(CodeEditor::class.java)
-        if (editor != null) {
-            currentEditor = editor
-            enabled = editor.cursor.isSelected
-        } else {
-            enabled = false
-        }
+        val isSelected = editor?.cursor?.isSelected ?: false
+        // 动态切换菜单的点击权限
+        enabled = isSelected 
     }
 
     override suspend fun execAction(data: ActionData): Any {
-        val editor = currentEditor ?: return false
+        val editor = data.get(CodeEditor::class.java) ?: return false
         if (!editor.cursor.isSelected) return false
 
         val text = editor.text

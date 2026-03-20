@@ -1,4 +1,4 @@
-package com.itsaky.androidide.actions.editor
+package com.itsaky.androidide.actions.editor.text
 
 import android.content.Context
 import android.content.Intent
@@ -11,7 +11,6 @@ import android.widget.PopupWindow
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -27,31 +26,25 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.drawable.toBitmap
+import androidx.lifecycle.findViewTreeLifecycleOwner
+import androidx.lifecycle.findViewTreeViewModelStoreOwner
+import androidx.lifecycle.setViewTreeLifecycleOwner
+import androidx.lifecycle.setViewTreeViewModelStoreOwner
+import androidx.savedstate.findViewTreeSavedStateRegistryOwner
+import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import io.github.rosemoe.sora.widget.CodeEditor
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-/**
- * 动态读取系统 `ACTION_PROCESS_TEXT` 的 Compose 悬浮窗
- * 采用 Material 3 标准，支持平滑展开与收起动画
- *
- * @author android_zero
- */
 class SystemTextActionsPopup(
     private val context: Context,
     private val editor: CodeEditor,
     private val selectedText: String
 ) : PopupWindow(context) {
 
-    // 存储系统动作的数据模型
-    data class ProcessTextAction(
-        val label: String,
-        val icon: Drawable?,
-        val intent: Intent
-    )
+    data class ProcessTextAction(val label: String, val icon: Drawable?, val intent: Intent)
 
     private val composeView: ComposeView
-    // 控制动画状态
     private val isVisibleState = mutableStateOf(false)
 
     init {
@@ -69,23 +62,23 @@ class SystemTextActionsPopup(
             }
         }
 
+        composeView.setViewTreeLifecycleOwner(editor.findViewTreeLifecycleOwner())
+        composeView.setViewTreeViewModelStoreOwner(editor.findViewTreeViewModelStoreOwner())
+        composeView.setViewTreeSavedStateRegistryOwner(editor.findViewTreeSavedStateRegistryOwner())
+
         contentView = composeView
         width = ViewGroup.LayoutParams.WRAP_CONTENT
         height = ViewGroup.LayoutParams.WRAP_CONTENT
         isFocusable = true
         isOutsideTouchable = true
-        elevation = 0f // 交给 Compose 内部处理阴影
-        setBackgroundDrawable(null) // 透明背景，使用 Compose 的 Surface
+        elevation = 0f
+        setBackgroundDrawable(null)
 
-        // 拦截原生的 dismiss，使其先执行动画再关闭
         setOnDismissListener {
             isVisibleState.value = false
         }
     }
 
-    /**
-     * 获取系统注册的所有文本处理动作 (翻译、搜索、小爱等)
-     */
     private fun getSystemTextActions(): List<ProcessTextAction> {
         val pm: PackageManager = context.packageManager
         val intent = Intent(Intent.ACTION_PROCESS_TEXT).setType("text/plain")
@@ -99,7 +92,7 @@ class SystemTextActionsPopup(
                 action = Intent.ACTION_PROCESS_TEXT
                 type = "text/plain"
                 putExtra(Intent.EXTRA_PROCESS_TEXT, selectedText)
-                putExtra(Intent.EXTRA_PROCESS_TEXT_READONLY, true) // 这里声明为只读(如翻译/搜索)
+                putExtra(Intent.EXTRA_PROCESS_TEXT_READONLY, true)
             }
             ProcessTextAction(label, icon, actionIntent)
         }.distinctBy { it.label }
@@ -110,22 +103,13 @@ class SystemTextActionsPopup(
         val isVisible by isVisibleState
         val coroutineScope = rememberCoroutineScope()
 
-        // 丝滑的展开和淡入动画
         AnimatedVisibility(
             visible = isVisible,
-            enter = expandVertically(
-                animationSpec = tween(250),
-                expandFrom = Alignment.Top
-            ) + fadeIn(animationSpec = tween(200)),
-            exit = shrinkVertically(
-                animationSpec = tween(200),
-                shrinkTowards = Alignment.Top
-            ) + fadeOut(animationSpec = tween(150))
+            enter = expandVertically(animationSpec = tween(250), expandFrom = Alignment.Top) + fadeIn(animationSpec = tween(200)),
+            exit = shrinkVertically(animationSpec = tween(200), shrinkTowards = Alignment.Top) + fadeOut(animationSpec = tween(150))
         ) {
             Surface(
-                modifier = Modifier
-                    .widthIn(min = 160.dp, max = 240.dp)
-                    .padding(8.dp),
+                modifier = Modifier.widthIn(min = 160.dp, max = 240.dp).padding(8.dp),
                 shape = RoundedCornerShape(12.dp),
                 color = MaterialTheme.colorScheme.surfaceContainerHigh,
                 tonalElevation = 6.dp,
@@ -136,16 +120,13 @@ class SystemTextActionsPopup(
                         Text("无可用系统动作", style = MaterialTheme.typography.bodyMedium)
                     }
                 } else {
-                    LazyColumn(
-                        modifier = Modifier.padding(vertical = 8.dp)
-                    ) {
+                    LazyColumn(modifier = Modifier.padding(vertical = 8.dp)) {
                         items(actions) { action ->
                             ActionItemRow(action) {
-                                // 点击项后执行 Intent 并关闭弹窗
                                 executeAction(action.intent)
                                 coroutineScope.launch {
                                     isVisibleState.value = false
-                                    delay(200) // 等待动画结束
+                                    delay(200)
                                     super@SystemTextActionsPopup.dismiss()
                                 }
                             }
@@ -192,13 +173,8 @@ class SystemTextActionsPopup(
         }
     }
 
-    /**
-     * 带有动画的显示方法
-     */
     fun show(anchor: View, x: Int, y: Int) {
-        // 先显示透明的 PopupWindow
         showAtLocation(anchor, Gravity.NO_GRAVITY, x, y)
-        // 触发 Compose 动画
         isVisibleState.value = true
     }
 }
