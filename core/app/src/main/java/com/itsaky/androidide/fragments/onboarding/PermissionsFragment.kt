@@ -151,7 +151,7 @@ class PermissionsFragment : FragmentWithBinding<FragmentOnboardingPermissionsBin
 
     private fun requestPermission(key: String) {
         when (key) {
-            // 通知权限：完全依照参考代码逻辑
+            // 通知权限
             Manifest.permission.POST_NOTIFICATIONS -> {
                 requestSettingsTogglePermission(
                     Settings.ACTION_APP_NOTIFICATION_SETTINGS,
@@ -186,7 +186,7 @@ class PermissionsFragment : FragmentWithBinding<FragmentOnboardingPermissionsBin
     }
 
     /**
-     * 核心 Intent 构建方法 (源自参考代码)
+     * 核心 Intent 构建方法
      */
     private fun requestSettingsTogglePermission(
         action: String,

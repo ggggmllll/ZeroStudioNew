@@ -253,7 +253,7 @@ plugins {
         }
     }
        """ .trimIndent()
-}
+}  else ""
 
     // Native Build Logic (Separated CMake and NDK)
     val nativeBuildBlock = if (data.useCmake) {
@@ -373,7 +373,7 @@ plugins {
         }
     }
        """ .trimIndent()
-}
+} else ""
 
 
     val nativeBuildBlock = if (data.useCmake) {
