@@ -75,7 +75,7 @@ Here is the decorated version:
 ---
 
 
-
+<details close>
 <summary>⚖️ <strong>🌿 About Android Tree-Sitter</strong></summary>
 
 A streamlined port of the Tree-Sitter parser generator, specifically optimized for the Android NDK environment.
@@ -130,6 +130,8 @@ Create `*.scm` mapping files based on the language's AST node types.
 English：python3 ./generate_structured_scm.py -c "Your parser.c path" -o "Output folder path"
 中文：python3 ./generate_structured_scm.py -c "你的parser.c路径" -o "输出文件夹路径"
 ```
+-> The generated may not be useful, and it is necessary to use the official SCM tool of TS to check the tool reference error and then throw it to AI for repair
+
 #tree-sitter Syntax Tree Playground（SCM verification）：[Syntax Tree Playground](https://tree-sitter.github.io/tree-sitter/7-playground.html?ref=journal.hexmos.com)
 
 </details>
@@ -191,7 +193,7 @@ For translations, visit the [Crowdin project page](https://crowdin.com/project/Z
 
 Thanks to all the developers who have contributed to this project.
 </details>
-<details close>
+
 
 ## Contact Us
 - [Telegram channel](https://t.me/android_zero_studio)

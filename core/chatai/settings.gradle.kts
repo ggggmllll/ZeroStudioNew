@@ -29,12 +29,12 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "rikkahub"
-include(":app")
-include(":highlight")
-include(":ai")
-include(":search")
-include(":tts")
-include(":common")
-include(":document")
-include(":web")
+// rootProject.name = "rikkahub"
+// include(":app")
+// include(":highlight")
+// include(":ai")
+// include(":search")
+// include(":tts")
+// include(":common")
+// include(":document")
+// include(":web")

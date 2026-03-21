@@ -5,13 +5,13 @@ project_root: ".."
 
 # 模块配置
 modules:
-  - name: "app"
-    res_path: "app/src/main/res"
+  - name: "core/app"
+    res_path: "core/resources/src/main/res"
     source_patterns:
-      - "app/src/main/java/**/*.kt"
-      - "app/src/main/java/**/*.java"
-      - "app/src/main/AndroidManifest.xml"
-      - "app/src/main/res/xml/*.xml"
+      - "core/app/src/main/java/**/*.kt"
+      - "core/app/src/main/java/**/*.java"
+      - "core/app/src/main/AndroidManifest.xml"
+      - "core/app/src/main/res/xml/*.xml"
   - name: "ai"
     res_path: "ai/src/main/res"
     source_patterns:

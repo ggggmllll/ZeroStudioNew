@@ -38,11 +38,11 @@ import com.itsaky.androidide.R
 import com.itsaky.androidide.R.string
 import com.itsaky.androidide.app.configuration.IDEBuildConfigProvider
 import com.itsaky.androidide.app.configuration.IJdkDistributionProvider
+import com.itsaky.androidide.fragments.onboarding.DisclaimerFragment
 import com.itsaky.androidide.fragments.onboarding.GreetingFragment
 import com.itsaky.androidide.fragments.onboarding.IdeSetupConfigurationFragment
 import com.itsaky.androidide.fragments.onboarding.OnboardingInfoFragment
 import com.itsaky.androidide.fragments.onboarding.PermissionsFragment
-// import com.itsaky.androidide.fragments.onboarding.PermissionsInfoFragment
 import com.itsaky.androidide.models.JdkDistribution
 import com.itsaky.androidide.preferences.internal.prefManager
 import com.itsaky.androidide.tasks.launchAsyncWithProgress
@@ -155,6 +155,9 @@ class OnboardingActivity : AppIntro2() {
       return
     }
     
+    // ===免责与隐私协议 ===
+    addSlide(DisclaimerFragment.newInstance(this))
+
     // 如果权限未全部满足，则显示权限页
     if (!checkAllPermissionsGranted()) {
       addSlide(PermissionsFragment.newInstance(this))
@@ -198,21 +201,6 @@ class OnboardingActivity : AppIntro2() {
     tryNavigateToMainIfSetupIsCompleted()
   }
 
-  /**
-   * 处理页面滑动事件
-   */
-  override fun onPageSelected(position: Int) {
-      super.onPageSelected(position)
-      val fragment = supportFragmentManager.fragments.getOrNull(position)
-      
-      if (fragment is PermissionsFragment) {
-          isIndicatorEnabled = false
-          isButtonsEnabled = false // 隐藏 Next/Skip/Done 按钮
-      } else {
-          isIndicatorEnabled = true
-          isButtonsEnabled = true
-      }
-  }
 
   /**
    * 严格检查所有权限
