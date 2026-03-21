@@ -145,6 +145,7 @@ dependencies {
   implementation(libs.common.org.apache.commons.compress)
   implementation(libs.common.org.tukaani.tarxzip)
   implementation(libs.common.org.eclipse.lsp4j)
+  implementation(libs.bundles.io.markwon)
   
   implementation(libs.google.auto.service.annotations)
   implementation(libs.google.gson)
