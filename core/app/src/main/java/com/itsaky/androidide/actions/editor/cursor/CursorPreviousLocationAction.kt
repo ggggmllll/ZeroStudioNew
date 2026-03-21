@@ -24,7 +24,7 @@ class CursorPreviousLocationAction(context: Context, override val order: Int) : 
 
     init {
         label = context.getString(R.string.title_menus_editor_cursor_nextLocation)
-        icon = ContextCompat.getDrawable(context, R.drawable.ic_editor_cursor_next_location)
+        icon = ContextCompat.getDrawable(context, R.drawable.ic_editor_cursor_prev_location)
     }
 
 

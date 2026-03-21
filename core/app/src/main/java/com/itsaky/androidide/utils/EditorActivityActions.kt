@@ -115,8 +115,8 @@ class EditorActivityActions {
       registry.registerAction(OpenWithAction(context, order++))
       registry.registerAction(NewFileOrFolderAction(context, order++))
       registry.registerAction(RenameAction(context, order++))
+            registry.registerAction(RefactorRenameAction(context, order++))
       registry.registerAction(ConvertPathToAction(context, order++))
-      registry.registerAction(RefactorRenameAction(context, order++))
     }
 
     @JvmStatic

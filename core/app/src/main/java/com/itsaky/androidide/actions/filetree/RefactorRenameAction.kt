@@ -2,6 +2,7 @@ package com.itsaky.androidide.actions.filetree
 
 import android.app.Activity
 import android.content.Context
+import androidx.core.content.ContextCompat
 import android.graphics.drawable.Drawable
 import android.view.ViewGroup
 import android.widget.Toast
@@ -36,6 +37,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.util.regex.Pattern
+import com.itsaky.androidide.resources.R
 
 /**
  * 强大的项目重构类
@@ -45,7 +47,7 @@ import java.util.regex.Pattern
 class RefactorRenameAction(context: Context, override val order: Int) : ActionItem {
 
     override val id: String = "filetree.refactor.rename"
-    override var label: String = "Refactor > Rename"
+    override var label: String = "Rename/Refactor Packages"
     override var visible: Boolean = false 
     override var enabled: Boolean = false
     override var icon: Drawable? = null
@@ -57,6 +59,11 @@ class RefactorRenameAction(context: Context, override val order: Int) : ActionIt
     
     private val LOG = Logger.instance("RefactorRenameAction")
 
+  init {
+    // label = context.getString(R.string.refactoring_renaming_package_names)
+    icon = ContextCompat.getDrawable(context, R.drawable.ic_file_rename_package)
+  }
+  
     override fun prepare(data: ActionData) {
         val file = data.requireFile()
         projectRoot = IProjectManager.getInstance().projectDir

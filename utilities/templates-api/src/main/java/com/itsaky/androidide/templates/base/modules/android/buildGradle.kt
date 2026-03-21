@@ -225,6 +225,7 @@ private fun AndroidModuleTemplateBuilder.showNdkNotInstalledDialog(context: Cont
       .show()
 }
 
+// kotlin dsl
 private fun AndroidModuleTemplateBuilder.buildGradleSrcKts(isComposeModule: Boolean): String {
     val compileSdkValue = if (isComposeModule) 36 else data.versions.compileSdk.api
     
@@ -344,6 +345,7 @@ ${dependencies()}
 """
 }
 
+//groovy dsl
 private fun AndroidModuleTemplateBuilder.buildGradleSrcGroovy(isComposeModule: Boolean): String {
     val compileSdkValue = if (isComposeModule) 36 else data.versions.compileSdk.api
     

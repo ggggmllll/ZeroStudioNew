@@ -61,6 +61,11 @@ class ConvertPathToAction(context: Context, override val order: Int) : ActionIte
     private var javaPackagePath: String? = null
     private var kotlinPackagePath: String? = null
 
+  init {
+    // label = context.getString(R.string.title_file_copy_convert_path)
+    icon = ContextCompat.getDrawable(context, R.drawable.ic_file_copy_convert_path)
+  }
+  
     override fun prepare(data: ActionData) {
         val file = data.requireFile()
         targetFile = file
