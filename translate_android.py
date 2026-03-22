@@ -5,11 +5,12 @@ import re
 from openai import OpenAI
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-# --- 配置 ---
+# --- 核心配置 ---
 CHUNK_SIZE = 30  
 MAX_WORKERS = 6  
 TARGET_MODEL = "tencent/Hunyuan-MT-7B"
 
+# 目标文件夹列表（你要求的全量列表）
 LANG_FOLDERS = [
     "values", "values-ar-rSA", "values-bn-rIN", "values-de-rDE", "values-es-rES", 
     "values-fa", "values-fil", "values-fr-rFR", "values-hi-rIN", "values-in-rID", 
@@ -38,29 +39,33 @@ def translate_chunk(client, model, chunk_data, target_lang):
             temperature=0.1
         )
         batch_res = json.loads(response.choices.message.content)
+        
+        # 日志输出：已在 YML 中 mask 了 key，这里可以安全输出翻译详情
+        print(f"\n📝 [Lang: {target_lang}] Batch Result:")
+        for k, v in batch_res.items():
+            print(f"   {k} -> {v}")
+            
         return {k: fix_format(v) for k, v in batch_res.items()}
     except Exception as e:
         print(f"   ⚠️ Chunk Error: {e}")
         return {k: v for k, v in chunk_data.items()}
 
 def process_file_with_regex(client, model, file_path, target_lang):
-    """使用正则读取和替换，确保格式、注释、空行不动"""
+    """正则方案：只改内容，不改格式、注释、空格、空行"""
     if not os.path.exists(file_path): return
     
     with open(file_path, 'r', encoding='utf-8') as f:
         content = f.read()
 
-    # 正则匹配: <string name="ID">VALUE</string>
-    # 排除 translatable="false" 的行
+    # 匹配 <string name="ID">VALUE</string>，排除不翻译的
     pattern = re.compile(r'<string\s+name="([^"]+)"(?![^>]*translatable="false")>(.*?)</string>', re.DOTALL)
     matches = pattern.findall(content)
 
     to_translate = {name: val for name, val in matches if val and not val.startswith("@string/")}
     if not to_translate: return
 
-    print(f"🚀 [File] {file_path} | Translating {len(to_translate)} items...")
+    print(f"\n📂 [Processing] {file_path} ({len(to_translate)} items)")
 
-    # 分片并行翻译
     keys = list(to_translate.keys())
     chunks = [{k: to_translate[k] for k in keys[i:i+CHUNK_SIZE]} for i in range(0, len(keys), CHUNK_SIZE)]
     translated_map = {}
@@ -70,26 +75,29 @@ def process_file_with_regex(client, model, file_path, target_lang):
         for f in as_completed(futures):
             translated_map.update(f.result())
 
-    # --- 按顺序回填内容 ---
+    # 原位精准回填
     new_content = content
     for name, trans_val in translated_map.items():
-        # 精准匹配该 ID 的标签内容进行替换，保持前后文不动
-        # 使用 lambda 避免反斜杠转义问题
+        # 使用正向限定，确保只替换对应 ID 的内容
         specific_pattern = re.compile(f'(<string\\s+name="{re.escape(name)}"[^>]*>)(.*?)(</string>)', re.DOTALL)
         new_content = specific_pattern.sub(rf'\1{trans_val}\3', new_content)
 
     with open(file_path, 'w', encoding='utf-8') as f:
         f.write(new_content)
-    print(f"✅ [Done] {file_path}")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--api_key", required=True)
     parser.add_argument("--base_url", default="https://api.siliconflow.cn")
     parser.add_argument("--files", default="strings.xml")
     args = parser.parse_args()
 
-    client = OpenAI(api_key=args.api_key, base_url=args.base_url)
+    # 从环境变量读取 Key
+    api_key = os.getenv("SF_API_KEY")
+    if not api_key:
+        print("❌ Error: SF_API_KEY environment variable is missing.")
+        exit(1)
+
+    client = OpenAI(api_key=api_key, base_url=args.base_url)
     target_files = [f.strip() for f in args.files.replace(",", " ").split() if f.strip()]
     
     module_paths = ["core/resources/src/main/res/", "core/chatai/resources/src/main/res/"]
@@ -99,3 +107,5 @@ if __name__ == "__main__":
             for folder in LANG_FOLDERS:
                 f_path = os.path.join(module, folder, fname)
                 process_file_with_regex(client, TARGET_MODEL, f_path, folder)
+
+    print("\n🎉 All tasks finished! Formats preserved.")
