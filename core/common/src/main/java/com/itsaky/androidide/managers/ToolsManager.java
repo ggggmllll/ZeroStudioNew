@@ -91,21 +91,18 @@ public class ToolsManager {
    */
   private static void installExtraTools() {
   
-  //解压构建所需logger插件
-  installAsset("data/logger-runtime.aar",
-   new File(Environment.PLUGIN_HOME , "logger"), false, 0);
+    installAsset("data/common/logger-runtime.aar",
+        new File(Environment.PLUGIN_HOME , "logger"), false, 0, null);
   
-  installAsset("data/common/plugin-api.jar", 
-  Environment.PLUGIN_HOME, false, 0);
+    installAsset("data/common/plugin-api.jar", 
+        Environment.PLUGIN_HOME, false, 0, null);
   
-  installAsset("data/common/zerostudio-gradle-plugin-1.0.0.jar", 
-  new File(Environment.ANDROIDIDE_HOME , "init"), false, 0);
+    installAsset("data/common/zerostudio-gradle-plugin-1.0.0.jar", 
+        new File(Environment.ANDROIDIDE_HOME , "init"), false, 0, null);
   
-  //解压compose预览所需文件
-  installAsset("compose/compose-jars.zip",
-   Environment.COMPOSE_HOME, true, 0);
-   
-  
+    // 解压 compose 预览所需文件
+    installAsset("compose/compose-jars.zip",
+        Environment.COMPOSE_HOME, true, 0, null);
   }
 
   private static void extractColorScheme(final BaseApplication app) {
