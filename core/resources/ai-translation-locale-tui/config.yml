@@ -5,36 +5,18 @@ project_root: ".."
 
 # 模块配置
 modules:
-  - name: "app"
-    res_path: "app/src/main/res"
+  - name: "core:resources"
+    res_path: "core/resources/src/main/res"
     source_patterns:
-      - "app/src/main/java/**/*.kt"
-      - "app/src/main/java/**/*.java"
-      - "app/src/main/AndroidManifest.xml"
-      - "app/src/main/res/xml/*.xml"
-  - name: "ai"
+      # - "core/resources/src/main/java/**/*.kt"
+      # - "core/resources/src/main/java/**/*.java"
+      - "core/resources/src/main/AndroidManifest.xml"
+      - "core/resources/src/main/res/xml/*.xml"
+  - name: "core:chatai:resources"
     res_path: "ai/src/main/res"
     source_patterns:
-      - "ai/src/main/java/**/*.kt"
-      - "ai/src/main/java/**/*.java"
-  - name: "highlight"
-    res_path: "highlight/src/main/res"
-    source_patterns:
-      - "highlight/src/main/java/**/*.kt"
-      - "highlight/src/main/java/**/*.java"
-      - "highlight/src/main/AndroidManifest.xml"
-  - name: "search"
-    res_path: "search/src/main/res"
-    source_patterns:
-      - "search/src/main/java/**/*.kt"
-      - "search/src/main/java/**/*.java"
-      - "search/src/main/AndroidManifest.xml"
-  - name: "rag"
-    res_path: "rag/src/main/res"
-    source_patterns:
-      - "rag/src/main/java/**/*.kt"
-      - "rag/src/main/java/**/*.java"
-      - "rag/src/main/AndroidManifest.xml"
+      - "core/resources/src/main/AndroidManifest.xml"
+      - "core/resources/src/main/res/xml/*.xml"
 
 # 支持的语言列表
 languages:

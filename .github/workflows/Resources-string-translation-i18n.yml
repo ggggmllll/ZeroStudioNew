@@ -1,0 +1,33 @@
+name: AI Resources string translation i18n
+on:
+  workflow_dispatch:
+    inputs:
+      api_key:
+        description: 'LLM API Key'
+        required: true
+      base_url:
+        description: 'API Base URL'
+        default: 'https://api.siliconflow.cn'
+
+jobs:
+  translate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with: { python-version: '3.10' }
+      - run: pip install openai requests
+      - name: Run AI Translation
+        run: python translate_android.py --api_key "${{ github.event.inputs.api_key }}" --base_url "${{ github.event.inputs.base_url }}"
+      - name: Package Results
+        run: |
+          mkdir download
+          # 保持目录结构拷贝生成的 values-* 文件夹
+          find core -name "strings.xml" -path "*/values-*/*" -exec cp --parents {} download/ \;
+          zip -r i18n_results.zip download
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: translated-xml-files
+          path: i18n_results.zip
