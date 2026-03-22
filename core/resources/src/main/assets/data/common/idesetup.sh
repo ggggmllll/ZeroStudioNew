@@ -74,7 +74,7 @@ check_arg_value() {
 }
 
 check_command_exists() {
-  if ! command -v "$1" &>/dev/null; then
+  if command -v "$1" &>/dev/null; then
     return
   else
     print_err "Command '$1' not found!"
@@ -100,7 +100,7 @@ install_p7zip() {
     "x86_64") p7zip_url="https://github.com/msmt2018/termux-packages/releases/download/p7zip-17.06-1/debs-x86_64-e9f3af7af65c6f737f41404dbd6babf727147861.deb" ;;
   esac
 
-  if[ -n "$p7zip_url" ]; then
+  if [ -n "$p7zip_url" ]; then
     tmp_p7zip_dir="$install_dir/tmp_p7zip_$$"
     mkdir -p "$tmp_p7zip_dir"
     cd "$tmp_p7zip_dir"
@@ -129,6 +129,8 @@ print_help() {
   echo "Options :"
   echo "-i   Set the installation directory. Defaults to \$HOME."
   echo "-s   Android SDK version to download."
+  echo "-n   Android NDK version to download."
+  echo "-k   Android CMake version to download."
   echo "-c   Download Android SDK with command line tools."
   echo "-m   Manifest file URL. Defaults to 'manifest.json' in 'androidide-tools' GitHub repository."
   echo "-j   OpenJDK version to install. Values can be '17' or '21'"
@@ -165,8 +167,8 @@ download_and_extract() {
 
   do_download=true
   if [ -f "$dest" ]; then
-    name_file=$(basename "$dest")
-    print_info "File ${name_file} already exists."
+    name=$(basename "$dest")
+    print_info "File ${name} already exists."
     if is_yes "Do you want to skip the download process?"; then
       do_download=false
     fi
@@ -236,7 +238,7 @@ download_comp() {
   url=$(jq -r "${jq_query}" "$downloaded_manifest")
   
   # 拦截无效链接
-  if[ "$url" == "x" ] || [ "$url" == "null" ] || [ -z "$url" ]; then
+  if [ "$url" == "x" ] || [ "$url" == "null" ] || [ -z "$url" ]; then
     print_warn "Component $nm is not available for architecture $arch. Skipping..."
     echo ""
     return
@@ -414,13 +416,13 @@ curl -L -o "$downloaded_manifest" "$manifest" && print_success "Manifest file do
 echo ""
 
 # Install the Android SDK
-download_comp "Android SDK" ".android_sdk" "$install_dir/android-sdk" "android-sdk"
+download_comp "Android SDK" ".android_sdk" "$install_dir" "android-sdk"
 
 # Install build tools
-download_comp "Android SDK Build Tools" ".build_tools | .${arch} | .${sdk_version}" "$install_dir/android-sdk/build-tools/$sdkver_org" "android-sdk-build-tools"
+download_comp "Android SDK Build Tools" ".build_tools | .${arch} | .${sdk_version}" "$install_dir/android-sdk" "android-sdk-build-tools"
 
 # Install platform tools
-download_comp "Android SDK Platform Tools" ".platform_tools | .${arch} | .${sdk_version}" "$install_dir/android-sdk/platform-tools" "android-sdk-platform-tools"
+download_comp "Android SDK Platform Tools" ".platform_tools | .${arch} | .${sdk_version}" "$install_dir/android-sdk" "android-sdk-platform-tools"
 
 # Install NDK (解压到 ndk/版本号 目录下)
 download_comp "Android NDK" ".android_ndk | .${arch} | .${ndk_version}" "$install_dir/android-sdk/ndk/$ndkver_org" "android-ndk"
@@ -430,7 +432,7 @@ download_comp "CMake" ".android_cmake | .${arch} | .${cmake_version}" "$install_
 
 if [ "$with_cmdline" = true ]; then
   # Install the Command Line tools
-  download_comp "Command-line tools" ".cmdline_tools" "$install_dir/android-sdk/cmdline-tools/latest" "cmdline-tools"
+  download_comp "Command-line tools" ".cmdline_tools" "$install_dir/android-sdk" "cmdline-tools"
 fi
 
 # Install JDK
@@ -464,6 +466,3 @@ print_success "================================================="
 print_success " Downloads completed. Environment is ready!"
 print_success " Returning to IDE automatically..."
 print_success "================================================="
-
-# 强制进程退出，通知 AndroidIDE TerminalActivity 结束并返回上级界面
-exit 0

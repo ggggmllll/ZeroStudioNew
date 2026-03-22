@@ -156,7 +156,7 @@ class OnboardingActivity : AppIntro2() {
     }
     
     // ===免责与隐私协议 ===
-    addSlide(DisclaimerFragment.newInstance(this))
+    // addSlide(DisclaimerFragment.newInstance(this))
 
     // 如果权限未全部满足，则显示权限页
     if (!checkAllPermissionsGranted()) {
