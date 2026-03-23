@@ -66,6 +66,7 @@ public final class Environment {
   public static File REALM_DB_DIR;
   public static File MAVEN_REPOSITORY;
   public static File PROJETS_JAVA2KOTLIN_BAK;
+  public static File PROTOC_BIN; // Protobuf 编译器
   
   public static final String PLUGIN_API_JAR_RELATIVE_PATH = "libs/plugin-api.jar";
 
@@ -131,10 +132,16 @@ public final class Environment {
 
     
     ANDROID_HOME = new File(HOME, "android-sdk");
+    
+    // 交叉编译变量环境
     ANDROID_NDK_HOME = new File(ANDROID_HOME, "ndk"); 
-    // File ndkBaseDir = new File(ANDROID_HOME, "ndk");
-    // ANDROID_NDK_HOME = findLatestNdkVersion(ndkBaseDir);
     NDK_HOME = ANDROID_NDK_HOME;
+    CMAKE_HOME = new File(ANDROID_HOME, "cmake");
+    CMAKE_BIN = new File(CMAKE_HOME, "bin");
+    // Protobuf (protoc) 路径
+    PROTOC_BIN = new File(PREFIX, "bin");
+
+    
     KOTLINC_HOME = mkdirIfNotExits(new File(HOME, ".kotlinc"));
     
     File idePluginDir = mkdirIfNotExits(new File(ANDROIDIDE_HOME, "ideplugin"));
@@ -153,13 +160,23 @@ public final class Environment {
 
     setExecutable(JAVA);
     setExecutable(BASH_SHELL);
+    setExecutable(new File(CMAKE_BIN, "cmake"));
+    setExecutable(new File(CMAKE_BIN, "ninja")); // CMake 通常配合 ninja
+    setExecutable(new File(PROTOC_BIN, "protoc"));
+
     // 设置 Java System Properties (供 JVM 内部使用)
     System.setProperty("user.home", HOME.getAbsolutePath());
     System.setProperty("android.home", ANDROID_HOME.getAbsolutePath());
     System.setProperty("ANDROID_HOME", ANDROID_HOME.getAbsolutePath());
-    System.setProperty("ANDROID_NDK_ROOT", ANDROID_HOME.getAbsolutePath());
-    System.setProperty("ANDROID_NDK_HOME", ANDROID_HOME.getAbsolutePath());
-    System.setProperty("NDK_HOME", ANDROID_HOME.getAbsolutePath());
+    System.setProperty("ANDROID_NDK", ANDROID_NDK_HOME.getAbsolutePath());
+    System.setProperty("ANDROID_NDK_ROOT", ANDROID_NDK_HOME.getAbsolutePath());
+    System.setProperty("ANDROID_NDK_HOME", ANDROID_NDK_HOME.getAbsolutePath());
+    System.setProperty("NDK_HOME", ANDROID_NDK_HOME.getAbsolutePath());
+    System.setProperty("cmake.dir", CMAKE_HOME.getAbsolutePath());
+    System.setProperty("CMAKE_HOME", CMAKE_HOME.getAbsolutePath());
+    // 如果使用了 Proto 插件，有时需要指定 protoc 路径
+    System.setProperty("protoc", new File(PROTOC_BIN, "protoc").getAbsolutePath());
+
     System.setProperty("java.home", JAVA_HOME.getAbsolutePath());
     System.setProperty("gradle.user.home", GRADLE_USER_HOME.getAbsolutePath());
     System.setProperty("kotlin.home", KOTLINC_HOME.getAbsolutePath());
@@ -210,19 +227,6 @@ public final class Environment {
     }
   }
   
-  //因为不知道开发者会安装什么版本ndk，所以只能模糊化，通过一些技巧取得ndk版本号
-// private static File findLatestNdkVersion(File ndkBaseDir) {
-    // if (ndkBaseDir.exists() && ndkBaseDir.isDirectory()) {
-        // File[] subDirs = ndkBaseDir.listFiles(File::isDirectory);
-        // if (subDirs != null && subDirs.length > 0) {
-            // // 按名称倒序排序（通常版本号越大，字符串排序越靠后）
-            // java.util.Arrays.sort(subDirs, (f1, f2) -> f2.getName().compareTo(f1.getName()));
-            // return subDirs[0]; // 返回版本号最大的那个文件夹
-        // }
-    // }
-    // // 如果找不到子目录，回退到根目录（虽然这可能导致 Gradle 报错，但总比 null 好）
-    // return ndkBaseDir;
-// }
 
   public static File mkdirIfNotExits(File in) {
     if (in != null && !in.exists()) {
@@ -258,7 +262,12 @@ public final class Environment {
     env.put("HOME", HOME.getAbsolutePath());
     env.put("ANDROID_HOME", ANDROID_HOME.getAbsolutePath());
     env.put("ANDROID_NDK_HOME", ANDROID_NDK_HOME.getAbsolutePath());
+    env.put("ANDROID_NDK_ROOT", ANDROID_NDK_HOME.getAbsolutePath());
+    env.put("ANDROID_NDK", ANDROID_NDK_HOME.getAbsolutePath());
     env.put("NDK_HOME", NDK_HOME.getAbsolutePath());
+    env.put("CMAKE_HOME", CMAKE_HOME.getAbsolutePath());
+    env.put("CMAKE_ROOT", CMAKE_HOME.getAbsolutePath());
+    env.put("PROTOC_HOME", PROTOC_BIN.getParent()); 
     env.put("KOTLINC_HOME", KOTLINC_HOME.getAbsolutePath());
     env.put("KOTLIN_LSP_HOME", KOTLIN_LSP_HOME.getAbsolutePath());
     env.put("ANDROID_SDK_ROOT", ANDROID_HOME.getAbsolutePath());
