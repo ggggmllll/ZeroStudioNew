@@ -21,6 +21,8 @@ plugins {
     id("com.android.library")
     id("kotlin-android")
     alias(libs.plugins.org.jetbrains.kotlin.plugin.compose)
+    
+    alias(libs.plugins.composeHotReload)
 }
 
 android {

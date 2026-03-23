@@ -55,6 +55,9 @@ plugins {
   alias(libs.plugins.benchmark) apply false
   alias(libs.plugins.baselineprofile) apply false
   
+  //Build Compose UIs faster and let your creativity flow when designing multiplatform user interfaces.
+  alias(libs.plugins.composeHotReload) apply false
+
 }
 
 buildscript {

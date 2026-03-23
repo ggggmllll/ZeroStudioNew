@@ -556,6 +556,9 @@ org-jetbrains-kotlin-plugin-compose = { id = "org.jetbrains.kotlin.plugin.compos
 org-jetbrains-kotlin-compose = { id = "org.jetbrains.compose", version = "1.11.0-alpha02" }
 org-jetbrains-kotlin-plugin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 
+#Build Compose UIs faster and let your creativity flow when designing multiplatform user interfaces.
+composeHotReload = { id = "org.jetbrains.compose.hot-reload", version.ref = "composeHotReload"}
+
 #github
 com-github-jk1-tcdeps = { id = "com.github.jk1.tcdeps", version = "1.2" }
 
