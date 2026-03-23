@@ -67,7 +67,9 @@ public final class Environment {
   public static File MAVEN_REPOSITORY;
   public static File PROJETS_JAVA2KOTLIN_BAK;
   public static File PROTOC_BIN; // Protobuf 编译器
-  
+  public static File CMAKE_HOME;
+  public static File CMAKE_BIN;
+
   public static final String PLUGIN_API_JAR_RELATIVE_PATH = "libs/plugin-api.jar";
 
     // Lottie 动画目录
