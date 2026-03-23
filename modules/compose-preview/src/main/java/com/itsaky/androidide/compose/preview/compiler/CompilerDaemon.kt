@@ -1,3 +1,20 @@
+/*
+ *  This file is part of AndroidIDE.
+ *
+ *  AndroidIDE is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  AndroidIDE is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *   along with AndroidIDE.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.itsaky.androidide.compose.preview.compiler
 
 import com.itsaky.androidide.utils.Environment
@@ -19,6 +36,19 @@ import java.io.InputStreamReader
 import java.io.OutputStreamWriter
 import java.util.concurrent.TimeUnit
 
+/**
+ * 热重载的核心：一个常驻的编译守护进程 (Daemon)。
+ *
+ * <p>工作流程：</p>
+ * <ol>
+ *   <li><b>自引导编译</b>: 首次启动时，动态编译一个内置的 Java 反射包装器 <code>CompilerWrapper.java</code>，用于后续统一调用 Kotlin 编译器和 D8。</li>
+ *   <li><b>进程复用</b>: 启动一个长期存活的 JVM 进程，通过标准输入(stdin)接收编译或DEX转换指令。</li>
+ *   <li><b>指令分发</b>: 根据指令前缀（"COMPILE" 或 "DEX"），在同一个 JVM 内部调用相应的工具链，避免了重复启动 JVM 的巨大开销。</li>
+ *   <li><b>生命周期管理</b>: 进程在空闲超时后会自动退出以释放资源，并在下次需要时自动重启。</li>
+ * </ol>
+ *
+ * @author android_zero
+ */
 class CompilerDaemon(
     private val classpathManager: ComposeClasspathManager,
     private val workDir: File
@@ -31,7 +61,6 @@ class CompilerDaemon(
 
     private var idleTimeoutJob: Job? = null
     private val timeoutScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-    private var isStartingUp = false
 
     private val wrapperDir = File(workDir, "daemon").apply { mkdirs() }
     private val wrapperClass = File(wrapperDir, "CompilerWrapper.class")
@@ -148,14 +177,7 @@ class CompilerDaemon(
     private fun buildD8Args(classFiles: List<File>, outputDir: File): List<String> = buildList {
         add("--release")
         add("--min-api")
-        add("21")
-
-        classpathManager.getRuntimeJars()
-            .filter { it.exists() }
-            .forEach { jar ->
-                add("--classpath")
-                add(jar.absolutePath)
-            }
+        add("21") // 保持与 AndroidIDE 兼容
 
         if (Environment.ANDROID_JAR.exists()) {
             add("--lib")
@@ -192,7 +214,7 @@ class CompilerDaemon(
         if (daemonProcess?.isAlive == true) {
             return
         }
-
+        stopDaemon() //确保清理旧的
         ensureWrapperCompiled()
         startDaemon()
     }
@@ -214,7 +236,7 @@ class CompilerDaemon(
 
         val javac = File(Environment.JAVA.parentFile, "javac")
         val kotlinCompilerJar = classpathManager.getKotlinCompiler()
-            ?: throw RuntimeException("Kotlin compiler not found in local Maven repository. Build any project first.")
+            ?: throw RuntimeException("Kotlin compiler not found. Please build the project at least once.")
 
         val command = listOf(
             javac.absolutePath,
@@ -258,7 +280,7 @@ class CompilerDaemon(
             "CompilerWrapper"
         )
 
-        LOG.info("Starting compiler daemon...")
+        LOG.info("Starting hot-reload compiler daemon...")
 
         val processBuilder = ProcessBuilder(command)
             .directory(workDir)
@@ -300,7 +322,7 @@ class CompilerDaemon(
             processWriter?.flush()
             daemonProcess?.waitFor(SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS)
         } catch (e: Exception) {
-            LOG.debug("Error sending EXIT to daemon", e)
+            // Ignore
         }
 
         try {
@@ -309,7 +331,7 @@ class CompilerDaemon(
             errorReader?.close()
             daemonProcess?.destroyForcibly()
         } catch (e: Exception) {
-            LOG.warn("Error stopping daemon", e)
+            // Ignore
         } finally {
             daemonProcess = null
             processWriter = null
@@ -326,11 +348,10 @@ class CompilerDaemon(
     suspend fun startEagerly() = mutex.withLock {
         withContext(Dispatchers.IO) {
             if (daemonProcess?.isAlive == true) return@withContext
-            isStartingUp = true
             try {
                 ensureDaemonRunning()
-            } finally {
-                isStartingUp = false
+            } catch(e: Exception) {
+                 LOG.error("Eager start of daemon failed", e)
             }
         }
     }
@@ -350,9 +371,9 @@ class CompilerDaemon(
     companion object {
         private val LOG = LoggerFactory.getLogger(CompilerDaemon::class.java)
 
-        private const val IDLE_TIMEOUT_MS = 120_000L
-        private const val SHUTDOWN_TIMEOUT_SECONDS = 5L
-        private const val COMPILE_TIMEOUT_MS = 300_000L
+        private const val IDLE_TIMEOUT_MS = 90_000L // 1.5分钟
+        private const val SHUTDOWN_TIMEOUT_SECONDS = 3L
+        private const val COMPILE_TIMEOUT_MS = 60_000L // 1分钟
         private const val WRAPPER_VERSION = 2
 
         private val WRAPPER_SOURCE = """
@@ -368,9 +389,20 @@ class CompilerDaemon(
                 private static Class<?> d8CommandClass;
 
                 public static void main(String[] args) throws Exception {
+                    // 初始化 Kotlin 编译器
                     Class<?> compilerClass = Class.forName("org.jetbrains.kotlin.cli.jvm.K2JVMCompiler");
                     kotlinCompiler = compilerClass.getDeclaredConstructor().newInstance();
                     kotlinExecMethod = compilerClass.getMethod("exec", PrintStream.class, String[].class);
+
+                    // 初始化 D8 (如果可用)
+                    try {
+                        d8CommandClass = Class.forName("com.android.tools.r8.D8Command");
+                        d8ParseMethod = d8CommandClass.getMethod("parse", String[].class);
+                        Class<?> d8Class = Class.forName("com.android.tools.r8.D8");
+                        d8RunMethod = d8Class.getMethod("run", d8CommandClass);
+                    } catch (ClassNotFoundException e) {
+                        System.err.println("D8 not found in classpath, DEX command will not be available.");
+                    }
 
                     BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
                     System.out.println("READY");
@@ -387,44 +419,38 @@ class CompilerDaemon(
 
                         try {
                             if (command.equals("DEX")) {
+                                if (d8RunMethod == null) throw new RuntimeException("D8 is not available.");
                                 String[] d8Args = Arrays.copyOfRange(parts, 1, parts.length);
                                 handleDex(d8Args);
                             } else if (command.equals("COMPILE")) {
                                 String[] compilerArgs = Arrays.copyOfRange(parts, 1, parts.length);
                                 handleCompile(compilerArgs);
-                            } else {
-                                handleCompile(parts);
                             }
                         } catch (Exception e) {
-                            System.out.println("ERROR:" + e.getMessage());
-                            e.printStackTrace(System.out);
+                            System.err.println("ERROR:" + e.getMessage());
+                            e.printStackTrace(System.err);
                         }
 
                         System.out.println("---END---");
                         System.out.flush();
+                        System.err.flush();
                     }
                 }
 
                 private static void handleCompile(String[] compilerArgs) throws Exception {
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
                     PrintStream ps = new PrintStream(baos);
-                    Object result = kotlinExecMethod.invoke(kotlinCompiler, ps, compilerArgs);
+                    // K2JVMCompiler.exec 返回一个 ExitCode 对象
+                    Object result = kotlinExecMethod.invoke(kotlinCompiler, ps, (Object) compilerArgs);
                     ps.flush();
                     String output = baos.toString();
                     if (!output.isEmpty()) {
                         System.out.print(output);
                     }
-                    System.out.println("EXIT_CODE:" + result);
+                    System.out.println("EXIT_CODE:" + result.toString());
                 }
 
                 private static void handleDex(String[] d8Args) throws Exception {
-                    if (d8CommandClass == null) {
-                        d8CommandClass = Class.forName("com.android.tools.r8.D8Command");
-                        d8ParseMethod = d8CommandClass.getMethod("parse", String[].class);
-                        Class<?> d8Class = Class.forName("com.android.tools.r8.D8");
-                        d8RunMethod = d8Class.getMethod("run", d8CommandClass);
-                    }
-
                     Object cmd = d8ParseMethod.invoke(null, (Object) d8Args);
                     d8RunMethod.invoke(null, cmd);
                     System.out.println("DEX_SUCCESS");

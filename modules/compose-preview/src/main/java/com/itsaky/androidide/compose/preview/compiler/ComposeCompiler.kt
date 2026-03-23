@@ -1,3 +1,20 @@
+/*
+ *  This file is part of AndroidIDE.
+ *
+ *  AndroidIDE is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  AndroidIDE is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *   along with AndroidIDE.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.itsaky.androidide.compose.preview.compiler
 
 import com.itsaky.androidide.utils.Environment
@@ -28,8 +45,6 @@ data class CompileDiagnostic(
     enum class Severity { ERROR, WARNING, INFO }
 }
 
-private val compilerArgsLog = LoggerFactory.getLogger("ComposeCompilerArgs")
-
 internal fun buildCompilerArgs(
     sourceFiles: List<File>,
     outputDir: File,
@@ -37,36 +52,32 @@ internal fun buildCompilerArgs(
     composePlugin: File
 ): List<String> = buildList {
     if (composePlugin.exists()) {
-        compilerArgsLog.info("Using Compose compiler plugin: {}", composePlugin.absolutePath)
         add("-Xplugin=${composePlugin.absolutePath}")
     } else {
-        compilerArgsLog.warn("Compose compiler plugin NOT found at: {}", composePlugin.absolutePath)
+        LoggerFactory.getLogger("ComposeCompiler").warn("Compose compiler plugin NOT found at: {}", composePlugin.absolutePath)
     }
 
     add("-classpath")
     add(classpath)
-
     add("-d")
     add(outputDir.absolutePath)
-
     add("-jvm-target")
     add("1.8")
-
     add("-no-stdlib")
-
     add("-Xskip-metadata-version-check")
-
-    sourceFiles.forEach { file ->
-        add(file.absolutePath)
-    }
+    sourceFiles.forEach { add(it.absolutePath) }
 }
 
+/**
+ * 命令行直调模式的 Kotlin 编译器封装。
+ * 作为 CompilerDaemon 的备用方案。
+ *
+ * @author android_zero
+ */
 class ComposeCompiler(
     private val classpathManager: ComposeClasspathManager,
     private val workDir: File
 ) {
-    private val incrementalCacheDir = File(workDir, "ic-cache").apply { mkdirs() }
-
     suspend fun compile(
         sourceFiles: List<File>,
         outputDir: File,
@@ -81,44 +92,20 @@ class ComposeCompiler(
             val compilerBootstrapClasspath = classpathManager.getCompilerBootstrapClasspath()
 
             if (kotlinCompiler == null || !kotlinCompiler.exists()) {
-                return@withContext CompilationResult(
-                    success = false,
-                    outputDir = null,
-                    diagnostics = listOf(
-                        CompileDiagnostic(
-                            CompileDiagnostic.Severity.ERROR,
-                            "Kotlin compiler not found in local Maven repository. Build any project first.",
-                            null, null, null
-                        )
-                    )
+                return@withContext CompilationResult(false, null, listOf(
+                    CompileDiagnostic(CompileDiagnostic.Severity.ERROR, "Kotlin compiler not found.", null, null, null))
                 )
             }
 
-            val args = buildCompilerArgs(
-                sourceFiles = sourceFiles,
-                outputDir = outputDir,
-                classpath = classpath,
-                composePlugin = composePlugin
-            )
-
-            LOG.info("Compiling with args: {}", args.joinToString(" "))
-
+            val args = buildCompilerArgs(sourceFiles, outputDir, classpath, composePlugin)
+            
             try {
                 val result = invokeKotlinCompiler(compilerBootstrapClasspath, args)
                 parseCompilationResult(result, outputDir)
             } catch (e: Exception) {
-                LOG.error("Compilation failed", e)
-                CompilationResult(
-                    success = false,
-                    outputDir = null,
-                    diagnostics = listOf(
-                        CompileDiagnostic(
-                            CompileDiagnostic.Severity.ERROR,
-                            "Compilation exception: ${e.message}",
-                            null, null, null
-                        )
-                    ),
-                    errorOutput = e.stackTraceToString()
+                LOG.error("CLI Compilation failed", e)
+                CompilationResult(false, null, listOf(
+                    CompileDiagnostic(CompileDiagnostic.Severity.ERROR, "Exception: ${e.message}", null, null, null)), e.stackTraceToString()
                 )
             }
         }
@@ -130,15 +117,9 @@ class ComposeCompiler(
         val javaExecutable = Environment.JAVA
 
         if (!javaExecutable.exists()) {
-            LOG.error("Java executable not found at: {}", javaExecutable.absolutePath)
             return ProcessResult(-1, "", "Java executable not found at: ${javaExecutable.absolutePath}")
         }
-
-        if (compilerBootstrapClasspath.isEmpty()) {
-            LOG.error("Compiler bootstrap classpath is empty")
-            return ProcessResult(-1, "", "Compiler bootstrap classpath is empty")
-        }
-
+        
         val command = buildList {
             add(javaExecutable.absolutePath)
             add("-cp")
@@ -146,8 +127,6 @@ class ComposeCompiler(
             add("org.jetbrains.kotlin.cli.jvm.K2JVMCompiler")
             addAll(args)
         }
-
-        LOG.debug("Running: {}", command.joinToString(" "))
 
         val processBuilder = ProcessBuilder(command)
             .directory(workDir)
@@ -165,8 +144,7 @@ class ComposeCompiler(
             if (!completed) {
                 process.destroyForcibly()
                 val output = outputDeferred.await()
-                LOG.error("Compilation timed out after {} minutes", COMPILATION_TIMEOUT_MINUTES)
-                return@coroutineScope ProcessResult(-1, output, "Compilation timed out after $COMPILATION_TIMEOUT_MINUTES minutes")
+                return@coroutineScope ProcessResult(-1, output, "Compilation timed out")
             }
 
             val output = outputDeferred.await()
@@ -179,21 +157,15 @@ class ComposeCompiler(
         outputDir: File
     ): CompilationResult {
         val diagnostics = mutableListOf<CompileDiagnostic>()
-
-        val combinedOutput = processResult.stderr + processResult.stdout
         val diagnosticRegex = Regex("""(.+):(\d+):(\d+): (error|warning): (.+)""")
 
-        combinedOutput.lines().forEach { line ->
+        processResult.stdout.lines().forEach { line ->
             val match = diagnosticRegex.find(line)
             if (match != null) {
                 val (file, lineNum, col, severity, message) = match.destructured
                 diagnostics.add(
                     CompileDiagnostic(
-                        severity = when (severity) {
-                            "error" -> CompileDiagnostic.Severity.ERROR
-                            "warning" -> CompileDiagnostic.Severity.WARNING
-                            else -> CompileDiagnostic.Severity.INFO
-                        },
+                        severity = if (severity == "error") CompileDiagnostic.Severity.ERROR else CompileDiagnostic.Severity.WARNING,
                         message = message,
                         file = file,
                         line = lineNum.toIntOrNull(),
@@ -201,20 +173,13 @@ class ComposeCompiler(
                     )
                 )
             } else if (line.contains("error:", ignoreCase = true)) {
-                diagnostics.add(
-                    CompileDiagnostic(
-                        CompileDiagnostic.Severity.ERROR,
-                        line,
-                        null, null, null
-                    )
-                )
+                diagnostics.add(CompileDiagnostic(CompileDiagnostic.Severity.ERROR, line, null, null, null))
             }
         }
 
         val hasErrors = diagnostics.any { it.severity == CompileDiagnostic.Severity.ERROR }
-        val hasClassFiles = outputDir.walkTopDown().any { it.extension == "class" }
-        val success = processResult.exitCode == 0 && !hasErrors && hasClassFiles
-
+        val success = processResult.exitCode == 0 && !hasErrors
+        
         return CompilationResult(
             success = success,
             outputDir = if (success) outputDir else null,
@@ -223,14 +188,10 @@ class ComposeCompiler(
         )
     }
 
-    private data class ProcessResult(
-        val exitCode: Int,
-        val stdout: String,
-        val stderr: String
-    )
+    private data class ProcessResult(val exitCode: Int, val stdout: String, val stderr: String)
 
     companion object {
         private val LOG = LoggerFactory.getLogger(ComposeCompiler::class.java)
-        private const val COMPILATION_TIMEOUT_MINUTES = 5L
+        private const val COMPILATION_TIMEOUT_MINUTES = 2L
     }
 }

@@ -3,30 +3,39 @@ package com.itsaky.androidide.compose.preview
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.itsaky.androidide.compose.preview.compiler.CompileDiagnostic
 import com.itsaky.androidide.compose.preview.databinding.ActivityComposePreviewBinding
 import com.itsaky.androidide.compose.preview.runtime.ComposeClassLoader
 import com.itsaky.androidide.compose.preview.runtime.ComposableRenderer
 import com.itsaky.androidide.compose.preview.ui.BoundedComposeView
-import com.itsaky.androidide.lookup.Lookup
-import com.itsaky.androidide.projects.builder.BuildService
-import com.itsaky.androidide.resources.R as ResourcesR
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 
+/**
+ * 核心 Compose 预览宿主 Activity。
+ *
+ * <p>用途与工作流程：</p>
+ * <ul>
+ *   <li><b>Compose-Preview-Renderer 整合</b>: 作为预览界面的顶级容器，负责将由 Kotlin 脚本动态编译后生成的 DEX 文件传递给底层渲染器。</li>
+ *   <li><b>Compose-Hot-Reload 支撑</b>: 监听基于增量编译的热重载流 (Hot-Reload Flow)。当源码发生修改时，直接接收新的运行时状态而无需重启 Activity。</li>
+ *   <li><b>静态/动态多模式切换</b>: 提供交互模式 (Interactive Mode) 的实时切换，允许开发者在“静态 UI 审查”和“动态事件交互”之间无缝过渡。</li>
+ * </ul>
+ *
+ * @author android_zero
+ */
 class ComposePreviewActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityComposePreviewBinding
@@ -37,8 +46,16 @@ class ComposePreviewActivity : AppCompatActivity() {
     private var singleRenderer: ComposableRenderer? = null
     private val multiRenderers = mutableMapOf<String, ComposableRenderer>()
 
-    private var toggleMenuItem: android.view.MenuItem? = null
+    private var toggleMenuItem: MenuItem? = null
+    private var interactiveMenuItem: MenuItem? = null
     private var selectorAdapter: ArrayAdapter<String>? = null
+
+    /**
+     * 交互模式状态标志。
+     * false = 静态模式 (Static Preview)：拦截触摸事件，启用 LocalInspectionMode。
+     * true  = 动态模式 (Interactive)：放开事件拦截，运行真实动画和状态流转。
+     */
+    private var isInteractiveMode = false
 
     private val sourceCode: String by lazy {
         intent.getStringExtra(EXTRA_SOURCE_CODE) ?: ""
@@ -67,25 +84,71 @@ class ComposePreviewActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * 初始化独立于宿主应用的 Compose 类加载器，支持动态 DEX 热插拔。
+     */
     private fun setupClassLoader() {
         classLoader = ComposeClassLoader(this)
     }
 
+    /**
+     * 配置顶部工具栏，注入模式切换与交互控制逻辑。
+     */
     private fun setupToolbar() {
         binding.toolbar.title = filePath.substringAfterLast('/').ifEmpty {
-            getString(ResourcesR.string.title_compose_preview)
+            getString(R.string.title_compose_preview)
         }
         binding.toolbar.setNavigationOnClickListener { finish() }
 
-        toggleMenuItem = binding.toolbar.menu.findItem(R.id.action_toggle_mode)
         binding.toolbar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.action_toggle_mode -> {
                     viewModel.toggleDisplayMode()
                     true
                 }
+                INTERACTIVE_MENU_ID -> {
+                    toggleInteractiveMode()
+                    true
+                }
                 else -> false
             }
+        }
+    }
+
+    /**
+     * 动态注入交互模式菜单项。
+     */
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu_compose_preview, menu)
+        toggleMenuItem = menu.findItem(R.id.action_toggle_mode)
+        
+        // 动态添加 Interactive Mode 按钮
+        interactiveMenuItem = menu.add(Menu.NONE, INTERACTIVE_MENU_ID, Menu.NONE, "Static Mode").apply {
+            setIcon(android.R.drawable.ic_media_play) // 默认显示播放图标代表可开启交互
+            setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
+        }
+        return true
+    }
+
+    /**
+     * 切换静态/动态交互模式，并强制触发当前已渲染组件的重组以应用 LocalInspectionMode 变更。
+     */
+    private fun toggleInteractiveMode() {
+        isInteractiveMode = !isInteractiveMode
+        interactiveMenuItem?.let {
+            if (isInteractiveMode) {
+                it.title = "Interactive Mode"
+                it.setIcon(android.R.drawable.ic_media_pause) // 显示暂停图标代表可退出交互
+            } else {
+                it.title = "Static Mode"
+                it.setIcon(android.R.drawable.ic_media_play)
+            }
+        }
+        
+        // 触发重渲染以应用新的交互模式上下文
+        val state = viewModel.previewState.value
+        if (state is PreviewState.Ready) {
+            refreshRenderers(state)
         }
     }
 
@@ -115,61 +178,30 @@ class ComposePreviewActivity : AppCompatActivity() {
         singleRenderer = ComposableRenderer(binding.singlePreviewView, loader)
     }
 
+    /**
+     * 绑定构建/热重载按钮。
+     * 重构说明：移除了对外部耗时 Gradle 任务的硬依赖，转而调用 ViewModel 内部封装的增量热重载链路。
+     */
     private fun setupBuildButton() {
         binding.buildProjectButton.setOnClickListener {
-            triggerBuild()
+            triggerHotReload()
         }
         binding.errorBuildButton.setOnClickListener {
-            triggerBuildFromError()
+            triggerHotReload()
         }
     }
 
-    private fun triggerBuild() {
+    /**
+     * 触发热重载/增量构建机制。
+     */
+    private fun triggerHotReload() {
         val state = viewModel.previewState.value
-        if (state !is PreviewState.NeedsBuild) return
-
-        executeBuild(state.modulePath, state.variantName)
-    }
-
-    private fun triggerBuildFromError() {
-        val modulePath = viewModel.getModulePath()
-        val variantName = viewModel.getVariantName()
-        executeBuild(modulePath, variantName)
-    }
-
-    private fun executeBuild(modulePath: String, variantName: String) {
-        val buildService = Lookup.getDefault().lookup(BuildService.KEY_BUILD_SERVICE)
-        if (buildService == null) {
-            LOG.error("BuildService not available")
-            return
-        }
-
-        if (buildService.isBuildInProgress) {
-            LOG.warn("Build already in progress")
-            return
-        }
-
+        if (state !is PreviewState.NeedsBuild && state !is PreviewState.Error) return
+        
+        LOG.info("Triggering Compose Hot-Reload for: {}", filePath)
         viewModel.setBuildingState()
-
-        val capitalizedVariant = variantName.replaceFirstChar { it.uppercaseChar() }
-        val task = if (modulePath.isNotEmpty()) {
-            "$modulePath:assemble$capitalizedVariant"
-        } else {
-            "assemble$capitalizedVariant"
-        }
-        LOG.info("Running build task: {}", task)
-
-        buildService.executeTasks(task).whenComplete { result, error ->
-            runOnUiThread {
-                if (error != null || !result.isSuccessful) {
-                    LOG.error("Build failed", error)
-                    viewModel.setBuildFailed()
-                } else {
-                    LOG.info("Build completed, refreshing preview")
-                    viewModel.refreshAfterBuild(this@ComposePreviewActivity)
-                }
-            }
-        }
+        // 交由底层 Daemon 调度局部编译
+        viewModel.refreshAfterBuild(this@ComposePreviewActivity)
     }
 
     private fun observeState() {
@@ -234,40 +266,36 @@ class ComposePreviewActivity : AppCompatActivity() {
                 binding.loadingIndicator.isVisible = true
             }
             is PreviewState.Initializing -> {
-                binding.statusText.text = "Initializing..."
+                binding.statusText.text = "Initializing Incremental Daemon..."
                 binding.statusSubtext.isVisible = false
                 binding.loadingIndicator.isVisible = true
             }
             is PreviewState.Compiling -> {
-                binding.statusText.text = "Compiling..."
+                binding.statusText.text = "Hot-Reloading Component..."
                 binding.statusSubtext.isVisible = false
                 binding.loadingIndicator.isVisible = true
             }
             is PreviewState.Building -> {
-                binding.statusText.text = "Building project..."
-                binding.statusSubtext.text = "First build may take 10-15 minutes"
+                binding.statusText.text = "Syncing Incremental Changes..."
+                binding.statusSubtext.text = "Processing..."
                 binding.statusSubtext.isVisible = true
                 binding.loadingIndicator.isVisible = true
             }
             is PreviewState.NeedsBuild -> {
-                LOG.debug("Build required for multi-file preview support")
+                LOG.debug("Initial Build required for multi-file dependencies")
             }
             is PreviewState.Empty -> {
                 LOG.debug("No preview composables found")
             }
             is PreviewState.Ready -> {
-                LOG.info("Runtime DEX from state: {}, project DEX files: {}",
+                LOG.info("Applying new DEX to classloader. Runtime DEX: {}, Project DEX: {}",
                     state.runtimeDex?.absolutePath ?: "null", state.projectDexFiles.size)
+                
+                // 热重载核心：将新的局部编译产物载入类加载器
                 classLoader?.setProjectDexFiles(state.projectDexFiles)
                 classLoader?.setRuntimeDex(state.runtimeDex)
-                if (viewModel.displayMode.value == DisplayMode.ALL) {
-                    renderAllPreviews(state)
-                } else {
-                    val selected = viewModel.selectedPreview.value
-                    if (selected != null) {
-                        renderSinglePreview(state, selected)
-                    }
-                }
+                
+                refreshRenderers(state)
             }
             is PreviewState.Error -> {
                 binding.errorMessage.text = state.message
@@ -291,7 +319,20 @@ class ComposePreviewActivity : AppCompatActivity() {
                 binding.errorBuildButton.isVisible = viewModel.canTriggerBuild()
 
                 LOG.error("Preview error: {}", state.message)
-                LOG.error("Diagnostics: {}", details)
+            }
+        }
+    }
+
+    /**
+     * 内部路由，根据当前的 DisplayMode 选择渲染单一视图或全部视图。
+     */
+    private fun refreshRenderers(state: PreviewState.Ready) {
+        if (viewModel.displayMode.value == DisplayMode.ALL) {
+            renderAllPreviews(state)
+        } else {
+            val selected = viewModel.selectedPreview.value
+            if (selected != null) {
+                renderSinglePreview(state, selected)
             }
         }
     }
@@ -338,6 +379,10 @@ class ComposePreviewActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * 渲染全部多配置预览组件。
+     * 将交互状态 [isInteractiveMode] 传递给渲染器以模拟独立运行环境。
+     */
     private fun renderAllPreviews(state: PreviewState.Ready) {
         val container = binding.previewListContainer
         val loader = classLoader ?: return
@@ -349,12 +394,13 @@ class ComposePreviewActivity : AppCompatActivity() {
         val newFunctions = functionNames.toSet()
 
         if (currentFunctions == newFunctions) {
-            LOG.debug("Same functions, re-rendering existing views")
+            LOG.debug("Re-rendering existing views for Hot-Reload or Mode-Toggle")
             functionNames.forEach { functionName ->
                 multiRenderers[functionName]?.render(
                     dexFile = state.dexFile,
                     className = state.className,
-                    functionName = functionName
+                    functionName = functionName,
+                    isInteractive = isInteractiveMode
                 )
             }
             return
@@ -365,7 +411,6 @@ class ComposePreviewActivity : AppCompatActivity() {
         multiRenderers.clear()
 
         state.previewConfigs.forEachIndexed { index, config ->
-            LOG.debug("Adding preview item {}: {}", index, config.functionName)
             val previewItem = createPreviewItem(config.functionName, index == 0)
             container.addView(previewItem)
 
@@ -385,18 +430,21 @@ class ComposePreviewActivity : AppCompatActivity() {
             renderer.render(
                 dexFile = state.dexFile,
                 className = state.className,
-                functionName = config.functionName
+                functionName = config.functionName,
+                isInteractive = isInteractiveMode
             )
         }
-
-        LOG.debug("Container now has {} children", container.childCount)
     }
 
+    /**
+     * 渲染单一组件全屏/聚焦预览。
+     */
     private fun renderSinglePreview(state: PreviewState.Ready, functionName: String) {
         singleRenderer?.render(
             dexFile = state.dexFile,
             className = state.className,
-            functionName = functionName
+            functionName = functionName,
+            isInteractive = isInteractiveMode
         )
     }
 
@@ -422,12 +470,14 @@ class ComposePreviewActivity : AppCompatActivity() {
         classLoader = null
         selectorAdapter = null
         toggleMenuItem = null
+        interactiveMenuItem = null
     }
 
     override fun onLowMemory() {
         super.onLowMemory()
+        // 深度释放旧版 DEX 类加载器缓存，保障热重载期间的内存健康
         classLoader?.release()
-        LOG.warn("Low memory - released preview resources")
+        LOG.warn("Low memory trigger - Released old DEX caches and preview resources.")
     }
 
     companion object {
@@ -435,7 +485,11 @@ class ComposePreviewActivity : AppCompatActivity() {
 
         private const val EXTRA_SOURCE_CODE = "source_code"
         private const val EXTRA_FILE_PATH = "file_path"
+        private const val INTERACTIVE_MENU_ID = 1001
 
+        /**
+         * 启动预览 Activity，提供源码和路径上下文用于增量热重载计算。
+         */
         fun start(context: Context, sourceCode: String, filePath: String) {
             val intent = Intent(context, ComposePreviewActivity::class.java).apply {
                 putExtra(EXTRA_SOURCE_CODE, sourceCode)

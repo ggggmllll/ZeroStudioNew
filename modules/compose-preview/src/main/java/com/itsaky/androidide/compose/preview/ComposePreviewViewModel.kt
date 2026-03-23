@@ -1,3 +1,20 @@
+/*
+ *  This file is part of AndroidIDE.
+ *
+ *  AndroidIDE is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  AndroidIDE is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *   along with AndroidIDE.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.itsaky.androidide.compose.preview
 
 import android.content.Context
@@ -52,6 +69,11 @@ data class PreviewConfig(
     val widthDp: Int? = null
 )
 
+/**
+ * 预览容器的状态与热重载调度器。
+ *
+ * @author android_zero
+ */
 @OptIn(FlowPreview::class)
 class ComposePreviewViewModel(
     private val repository: ComposePreviewRepository = ComposePreviewRepositoryImpl(),
@@ -87,6 +109,7 @@ class ComposePreviewViewModel(
 
     init {
         viewModelScope.launch {
+            // 热重载防抖：用户停止修改/保存 500ms 后才触发编译
             sourceChanges
                 .debounce(DEBOUNCE_MS)
                 .distinctUntilChanged { old, new -> old.source == new.source }
@@ -112,10 +135,11 @@ class ComposePreviewViewModel(
                             variantName = result.projectContext.variantName
                             initializationDeferred.complete(Unit)
                             _previewState.value = PreviewState.Idle
-                            LOG.info("ViewModel initialized, modulePath={}, variant={}",
+                            LOG.info("Hot-Reload Environment Ready, modulePath={}, variant={}",
                                 modulePath, variantName)
                         }
                         is InitializationResult.NeedsBuild -> {
+                            // 此状态通常意味着项目中完全没有 R.class 或任何中间产物，需做一次增量即可
                             modulePath = result.modulePath
                             variantName = result.variantName
                             initializationDeferred.complete(Unit)
@@ -132,7 +156,7 @@ class ComposePreviewViewModel(
                     }
                 }
                 .onFailure { error ->
-                    LOG.error("Initialization failed", error)
+                    LOG.error("Hot-Reload Initialization failed", error)
                     isInitialized.set(false)
                     initializationDeferred.complete(Unit)
                     _previewState.value = PreviewState.Error(
@@ -162,7 +186,7 @@ class ComposePreviewViewModel(
 
     private fun parseAndValidateSource(source: String): ParsedPreviewSource? {
         if (_previewState.value is PreviewState.NeedsBuild) {
-            LOG.debug("Skipping source processing - build required")
+            LOG.debug("Skipping source processing - initial build required")
             return null
         }
 
@@ -198,12 +222,13 @@ class ComposePreviewViewModel(
         }
 
         if (_previewState.value is PreviewState.NeedsBuild) {
-            LOG.debug("Skipping compilePreview - build required")
+            LOG.debug("Skipping compilePreview - initial build required")
             return
         }
 
         _previewState.value = PreviewState.Compiling
 
+        // 局部极速编译
         repository.compilePreview(source, parsed)
             .onSuccess { result ->
                 _previewState.value = PreviewState.Ready(
@@ -249,13 +274,18 @@ class ComposePreviewViewModel(
     }
 
     fun setBuildFailed() {
-        _previewState.value = PreviewState.Error("Build failed. Check build output for details.")
+        _previewState.value = PreviewState.Error("Hot-Reload Sync failed. Check IDE log for details.")
     }
 
+    /**
+     * 接管构建后的刷新。
+     * 由于 AndroidIDE 的特殊性，我们在强制刷新时仅清空并重启内部状态，
+     * 而不再向系统外部丢巨大的 Gradle 任务，完全信赖我们改造后的局部编译流。
+     */
     fun refreshAfterBuild(context: Context) {
         viewModelScope.launch {
             initMutex.withLock {
-                LOG.debug("refreshAfterBuild: starting, currentSource length={}", currentSource.length)
+                LOG.debug("refreshAfterBuild: Triggering forced hot-reload sync...")
 
                 repository.reset()
                 isInitialized.set(false)
@@ -263,45 +293,44 @@ class ComposePreviewViewModel(
 
                 _previewState.value = PreviewState.Initializing
 
-            repository.initialize(context, cachedFilePath)
-                .onSuccess { result ->
-                    when (result) {
-                        is InitializationResult.Ready -> {
-                            modulePath = result.projectContext.modulePath
-                            variantName = result.projectContext.variantName
-                            isInitialized.set(true)
-                            initializationDeferred.complete(Unit)
-                            LOG.debug("refreshAfterBuild: initialization complete, state=Ready")
-                            if (currentSource.isNotBlank()) {
-                                compileNow(currentSource)
-                            } else {
-                                _previewState.value = PreviewState.Idle
+                repository.initialize(context, cachedFilePath)
+                    .onSuccess { result ->
+                        when (result) {
+                            is InitializationResult.Ready -> {
+                                modulePath = result.projectContext.modulePath
+                                variantName = result.projectContext.variantName
+                                isInitialized.set(true)
+                                initializationDeferred.complete(Unit)
+                                if (currentSource.isNotBlank()) {
+                                    compileNow(currentSource)
+                                } else {
+                                    _previewState.value = PreviewState.Idle
+                                }
+                            }
+                            is InitializationResult.NeedsBuild -> {
+                                modulePath = result.modulePath
+                                variantName = result.variantName
+                                isInitialized.set(true)
+                                initializationDeferred.complete(Unit)
+                                _previewState.value = PreviewState.NeedsBuild(
+                                    result.modulePath,
+                                    result.variantName
+                                )
+                            }
+                            is InitializationResult.Failed -> {
+                                initializationDeferred.complete(Unit)
+                                LOG.error("refreshAfterBuild: sync failed - {}", result.message)
+                                _previewState.value = PreviewState.Error(result.message)
                             }
                         }
-                        is InitializationResult.NeedsBuild -> {
-                            modulePath = result.modulePath
-                            variantName = result.variantName
-                            isInitialized.set(true)
-                            initializationDeferred.complete(Unit)
-                            _previewState.value = PreviewState.NeedsBuild(
-                                result.modulePath,
-                                result.variantName
-                            )
-                        }
-                        is InitializationResult.Failed -> {
-                            initializationDeferred.complete(Unit)
-                            LOG.error("refreshAfterBuild: initialization failed - {}", result.message)
-                            _previewState.value = PreviewState.Error(result.message)
-                        }
                     }
-                }
-                .onFailure { error ->
-                    initializationDeferred.complete(Unit)
-                    LOG.error("refreshAfterBuild: initialization failed", error)
-                    _previewState.value = PreviewState.Error(
-                        error.message ?: "Initialization failed"
-                    )
-                }
+                    .onFailure { error ->
+                        initializationDeferred.complete(Unit)
+                        LOG.error("refreshAfterBuild: sync failed", error)
+                        _previewState.value = PreviewState.Error(
+                            error.message ?: "Sync failed"
+                        )
+                    }
             }
         }
     }

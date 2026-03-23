@@ -91,18 +91,29 @@ public class ToolsManager {
    */
   private static void installExtraTools() {
   
-    installAsset("data/common/logger-runtime.aar",
-        new File(Environment.PLUGIN_HOME , "logger"), false, 0, null);
+   // ResourceUtils.copyFileFromAssets(getCommonAsset("logger-runtime.aar"),
+          // new File(Environment.PLUGIN_HOME,"logger").getAbsolutePath());
+          
+   ResourceUtils.copyFileFromAssets(getCommonAsset("plugin-api.jar"),
+          Environment.PLUGIN_HOME.getAbsolutePath());
+          
+   ResourceUtils.copyFileFromAssets(getCommonAsset("zerostudio-gradle-plugin-1.0.0.jar"),
+          new File(Environment.ANDROIDIDE_HOME, "init").getAbsolutePath());
+          
+          
   
-    installAsset("data/common/plugin-api.jar", 
-        Environment.PLUGIN_HOME, false, 0, null);
+    // installAsset("data/common/logger-runtime.aar",
+        // new File(Environment.PLUGIN_HOME , "logger"), false, 0, null);
   
-    installAsset("data/common/zerostudio-gradle-plugin-1.0.0.jar", 
-        new File(Environment.ANDROIDIDE_HOME , "init"), false, 0, null);
+    // installAsset("data/common/plugin-api.jar", 
+        // Environment.PLUGIN_HOME, false, 0, null);
+  
+    // installAsset("data/common/zerostudio-gradle-plugin-1.0.0.jar", 
+        // new File(Environment.ANDROIDIDE_HOME , "init"), false, 0, null);
   
     // 解压 compose 预览所需文件
-    installAsset("compose/compose-jars.zip",
-        Environment.COMPOSE_HOME, true, 0, null);
+    // installAsset("compose/compose-jars.zip",
+        // Environment.COMPOSE_HOME, true, 0, null);
   }
 
   private static void extractColorScheme(final BaseApplication app) {

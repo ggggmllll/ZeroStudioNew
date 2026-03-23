@@ -1,164 +1,26 @@
+/*
+ *  This file is part of AndroidIDE.
+ *
+ *  AndroidIDE is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  AndroidIDE is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *   along with AndroidIDE.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 import com.itsaky.androidide.build.config.BuildConfig
-import java.util.zip.ZipFile
 
 plugins {
     id("com.android.library")
     id("kotlin-android")
     alias(libs.plugins.org.jetbrains.kotlin.plugin.compose)
-}
-
-val composeVersion = "1.6.0"
-val material3Version = "1.2.0"
-val composeCompilerVersion = "1.5.10"
-
-val composeCompilerJars: Configuration by configurations.creating {
-    isTransitive = false
-}
-
-val composeAarsForPreview: Configuration by configurations.creating {
-    isTransitive = false
-}
-
-dependencies {
-    composeCompilerJars("androidx.compose.compiler:compiler:$composeCompilerVersion")
-
-    composeAarsForPreview("androidx.compose.runtime:runtime-android:$composeVersion")
-    composeAarsForPreview("androidx.compose.ui:ui-android:$composeVersion")
-    composeAarsForPreview("androidx.compose.ui:ui-graphics-android:$composeVersion")
-    composeAarsForPreview("androidx.compose.ui:ui-text-android:$composeVersion")
-    composeAarsForPreview("androidx.compose.ui:ui-unit-android:$composeVersion")
-    composeAarsForPreview("androidx.compose.ui:ui-geometry-android:$composeVersion")
-    composeAarsForPreview("androidx.compose.animation:animation-android:$composeVersion")
-    composeAarsForPreview("androidx.compose.animation:animation-core-android:$composeVersion")
-    composeAarsForPreview("androidx.compose.foundation:foundation-android:$composeVersion")
-    composeAarsForPreview("androidx.compose.foundation:foundation-layout-android:$composeVersion")
-    composeAarsForPreview("androidx.compose.material3:material3-android:$material3Version")
-    composeAarsForPreview("androidx.compose.ui:ui-tooling-preview-android:$composeVersion")
-    composeAarsForPreview("androidx.activity:activity-compose:1.8.2")
-    composeAarsForPreview("androidx.activity:activity-ktx:1.8.2")
-    composeAarsForPreview("androidx.activity:activity:1.8.2")
-    composeAarsForPreview("androidx.lifecycle:lifecycle-runtime:2.6.1")
-    composeAarsForPreview("androidx.lifecycle:lifecycle-common:2.6.1")
-    composeAarsForPreview("androidx.lifecycle:lifecycle-viewmodel:2.6.1")
-    composeAarsForPreview("androidx.lifecycle:lifecycle-viewmodel-savedstate:2.6.1")
-    composeAarsForPreview("androidx.savedstate:savedstate:1.2.1")
-    composeAarsForPreview("androidx.core:core:1.12.0")
-    composeAarsForPreview("androidx.core:core-ktx:1.12.0")
-    composeAarsForPreview("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.7.3")
-    composeAarsForPreview("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
-}
-
-val copyComposeCompilerPlugin by tasks.registering(Copy::class) {
-    from(composeCompilerJars)
-    into(layout.buildDirectory.dir("compose-jars"))
-
-    rename { originalName ->
-        when {
-            originalName.startsWith("compiler-") -> "compose-compiler-plugin.jar"
-            else -> originalName
-        }
-    }
-}
-
-val extractComposeClasses by tasks.registering {
-    dependsOn(copyComposeCompilerPlugin)
-
-    val outputDir = layout.buildDirectory.dir("compose-jars")
-
-    doLast {
-        val outDir = outputDir.get().asFile
-        outDir.mkdirs()
-
-        composeAarsForPreview.files.forEach { file ->
-            when {
-                file.name.endsWith(".aar") -> {
-                    ZipFile(file).use { aar ->
-                        val classesEntry = aar.getEntry("classes.jar")
-                        if (classesEntry != null) {
-                            val targetName = file.nameWithoutExtension + ".jar"
-                            val targetFile = File(outDir, targetName)
-                            aar.getInputStream(classesEntry).use { input ->
-                                targetFile.outputStream().use { output ->
-                                    input.copyTo(output)
-                                }
-                            }
-                            println("Extracted classes.jar from ${file.name} -> $targetName")
-                        }
-                    }
-                }
-                file.name.endsWith(".jar") -> {
-                    val targetFile = File(outDir, file.name)
-                    file.copyTo(targetFile, overwrite = true)
-                    println("Copied JAR: ${file.name}")
-                }
-            }
-        }
-    }
-}
-
-fun resolveD8Jar(): File {
-    val buildToolsDir = File(android.sdkDirectory, "build-tools")
-    return buildToolsDir.listFiles()
-        ?.filter { it.isDirectory }
-        ?.sortedByDescending { it.name }
-        ?.firstNotNullOfOrNull { File(it, "lib/d8.jar").takeIf { jar -> jar.exists() } }
-        ?: throw GradleException("D8 jar not found in $buildToolsDir")
-}
-
-fun resolveAndroidJar(): File {
-    val platformsDir = File(android.sdkDirectory, "platforms")
-    return platformsDir.listFiles()
-        ?.filter { it.isDirectory }
-        ?.sortedByDescending { it.name }
-        ?.firstNotNullOfOrNull { File(it, "android.jar").takeIf { jar -> jar.exists() } }
-        ?: throw GradleException("android.jar not found in $platformsDir")
-}
-
-val compileRuntimeDex by tasks.registering {
-    dependsOn(extractComposeClasses)
-
-    val jarsDir = layout.buildDirectory.dir("compose-jars")
-    val dexOutputDir = layout.buildDirectory.dir("compose-jars/dex")
-
-    doLast {
-        val outDir = dexOutputDir.get().asFile.apply { mkdirs() }
-        val runtimeJars = jarsDir.get().asFile.listFiles { file: File ->
-            file.extension == "jar" && file.name != "compose-compiler-plugin.jar"
-        }?.toList() ?: throw GradleException("No runtime JARs found to compile to DEX")
-
-        project.javaexec {
-            classpath = files(resolveD8Jar())
-            mainClass.set("com.android.tools.r8.D8")
-            maxHeapSize = "1g"
-            args = buildList {
-                add("--release")
-                add("--min-api"); add("21")
-                add("--lib"); add(resolveAndroidJar().absolutePath)
-                add("--output"); add(outDir.absolutePath)
-                runtimeJars.forEach { add(it.absolutePath) }
-            }
-        }
-
-        File(outDir, "classes.dex").let {
-            if (it.exists()) it.renameTo(File(outDir, "compose-runtime.dex"))
-        }
-    }
-}
-
-val packageComposeJars by tasks.registering(Zip::class) {
-    dependsOn(compileRuntimeDex)
-
-    from(layout.buildDirectory.dir("compose-jars"))
-    archiveFileName.set("compose-jars.zip")
-    destinationDirectory.set(file("src/main/assets/compose"))
-
-    doFirst {
-        file("src/main/assets/compose").mkdirs()
-    }
-}
-
-tasks.named("preBuild") {
-    dependsOn(packageComposeJars)
 }
 
 android {
@@ -168,10 +30,21 @@ android {
         compose = true
         viewBinding = true
     }
+    
+    defaultConfig {
+        consumerProguardFiles("proguard-rules.pro")
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
 }
 
 dependencies {
     implementation(platform(libs.androidx.compose.bom))
+    
+    // Compose 基础依赖
     implementation(libs.androidx.compose.runtime)
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.tooling.preview)
@@ -180,6 +53,7 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     debugImplementation(libs.androidx.compose.ui.tooling)
 
+    // AndroidX & 基础 UI
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.google.material)
@@ -189,6 +63,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.common.kotlin.coroutines.android)
 
+    // AndroidIDE模块
     implementation(projects.core.common)
     implementation(projects.editor.impl)
     implementation(projects.editor.api)

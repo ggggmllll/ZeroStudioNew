@@ -1,10 +1,27 @@
+/*
+ *  This file is part of AndroidIDE.
+ *
+ *  AndroidIDE is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  AndroidIDE is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *   along with AndroidIDE.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.itsaky.androidide.compose.preview
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import androidx.compose.ui.platform.ComposeView
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -14,10 +31,21 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.itsaky.androidide.compose.preview.databinding.FragmentComposePreviewBinding
 import com.itsaky.androidide.compose.preview.runtime.ComposeClassLoader
 import com.itsaky.androidide.compose.preview.runtime.ComposableRenderer
-import com.itsaky.androidide.resources.R as ResourcesR
 import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 
+/**
+ * Compose 预览 Fragment 容器。
+ *
+ * <p>用途：</p>
+ * <ul>
+ *   <li>支持在 AndroidIDE 的编辑器多标签页中嵌入 Compose 预览。</li>
+ *   <li>支持基于增量编译的毫秒级 Hot-Reload。</li>
+ *   <li>提供 Interactive / Static 模式的无缝切换。</li>
+ * </ul>
+ *
+ * @author android_zero
+ */
 class ComposePreviewFragment : Fragment() {
 
     private var _binding: FragmentComposePreviewBinding? = null
@@ -30,6 +58,9 @@ class ComposePreviewFragment : Fragment() {
 
     private var sourceCode: String = DEFAULT_SOURCE
     private var onNavigateBack: (() -> Unit)? = null
+
+    private var isInteractiveMode = false
+    private var interactiveMenuItem: MenuItem? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -58,6 +89,38 @@ class ComposePreviewFragment : Fragment() {
     private fun setupToolbar() {
         binding.toolbar.setNavigationOnClickListener {
             onNavigateBack?.invoke() ?: parentFragmentManager.popBackStack()
+        }
+        
+        val menu = binding.toolbar.menu
+        interactiveMenuItem = menu.add(Menu.NONE, INTERACTIVE_MENU_ID, Menu.NONE, "Static Mode").apply {
+            setIcon(android.R.drawable.ic_media_play)
+            setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
+        }
+        
+        binding.toolbar.setOnMenuItemClickListener { item ->
+            if (item.itemId == INTERACTIVE_MENU_ID) {
+                toggleInteractiveMode()
+                true
+            } else {
+                false
+            }
+        }
+    }
+
+    private fun toggleInteractiveMode() {
+        isInteractiveMode = !isInteractiveMode
+        interactiveMenuItem?.let {
+            if (isInteractiveMode) {
+                it.title = "Interactive Mode"
+                it.setIcon(android.R.drawable.ic_media_pause)
+            } else {
+                it.title = "Static Mode"
+                it.setIcon(android.R.drawable.ic_media_play)
+            }
+        }
+        val state = viewModel.previewState.value
+        if (state is PreviewState.Ready) {
+            handleReadyState(state)
         }
     }
 
@@ -92,37 +155,45 @@ class ComposePreviewFragment : Fragment() {
                 }
             }
             is PreviewState.Initializing -> {
-                binding.initializingText.setText(ResourcesR.string.preview_initializing)
+                binding.initializingText.setText(R.string.preview_initializing)
             }
             is PreviewState.Empty -> {
-                binding.initializingText.setText(ResourcesR.string.preview_empty_title)
+                binding.initializingText.setText(R.string.preview_empty_title)
             }
             is PreviewState.Compiling -> {
-                LOG.debug("Compiling...")
+                LOG.debug("Hot-Reloading Component...")
+                binding.initializingText.text = "Hot-Reloading..."
             }
             is PreviewState.Building -> {
-                binding.initializingText.setText(ResourcesR.string.preview_building_project)
+                binding.initializingText.setText(R.string.preview_building_project)
                 binding.loadingIndicator.isVisible = true
             }
             is PreviewState.NeedsBuild -> {
-                binding.initializingText.setText(ResourcesR.string.preview_build_required_title)
+                binding.initializingText.setText(R.string.preview_build_required_title)
             }
             is PreviewState.Ready -> {
-                val loader = classLoader ?: return
-                val render = renderer ?: return
-                loader.setProjectDexFiles(state.projectDexFiles)
-                loader.setRuntimeDex(state.runtimeDex)
-                val config = state.previewConfigs.firstOrNull() ?: return
-                render.render(
-                    dexFile = state.dexFile,
-                    className = state.className,
-                    functionName = config.functionName
-                )
+                handleReadyState(state)
             }
             is PreviewState.Error -> {
                 showError(state)
             }
         }
+    }
+
+    private fun handleReadyState(state: PreviewState.Ready) {
+        val loader = classLoader ?: return
+        val render = renderer ?: return
+        
+        loader.setProjectDexFiles(state.projectDexFiles)
+        loader.setRuntimeDex(state.runtimeDex)
+        
+        val config = state.previewConfigs.firstOrNull() ?: return
+        render.render(
+            dexFile = state.dexFile,
+            className = state.className,
+            functionName = config.functionName,
+            isInteractive = isInteractiveMode
+        )
     }
 
     private fun showError(state: PreviewState.Error) {
@@ -162,9 +233,7 @@ class ComposePreviewFragment : Fragment() {
     override fun onLowMemory() {
         super.onLowMemory()
         classLoader?.release()
-        classLoader = null
-        renderer = null
-        LOG.warn("Low memory - released preview resources")
+        LOG.warn("Low memory - released hot-reload preview resources")
     }
 
     companion object {
@@ -172,6 +241,7 @@ class ComposePreviewFragment : Fragment() {
 
         private const val ARG_SOURCE_CODE = "source_code"
         private const val ARG_FILE_PATH = "file_path"
+        private const val INTERACTIVE_MENU_ID = 2001
 
         private const val DEFAULT_SOURCE = """
 package preview

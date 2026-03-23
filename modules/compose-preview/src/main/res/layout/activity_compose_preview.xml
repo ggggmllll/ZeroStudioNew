@@ -2,27 +2,29 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="?attr/colorSurface">
+    android:background="?attr/colorSurface"
+    tools:context=".ComposePreviewActivity">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        app:navigationIcon="@drawable/ic_close"
+        app:navigationIcon="@android:drawable/ic_menu_close_clear_cancel"
         app:navigationIconTint="?attr/colorOnSurface"
-        app:menu="@menu/menu_compose_preview"
         app:titleTextAppearance="@style/TextAppearance.Material3.TitleMedium">
 
         <Spinner
             android:id="@+id/previewSelector"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_marginStart="8dp"
-            android:visibility="gone" />
+            android:layout_gravity="end"
+            android:layout_marginEnd="16dp"
+            android:visibility="gone"
+            tools:visibility="visible"/>
 
     </com.google.android.material.appbar.MaterialToolbar>
 
@@ -36,13 +38,15 @@
             android:id="@+id/singlePreviewView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="gone" />
+            android:visibility="gone"
+            tools:visibility="gone" />
 
         <androidx.core.widget.NestedScrollView
             android:id="@+id/previewScrollView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="gone">
+            android:visibility="gone"
+            tools:visibility="visible">
 
             <LinearLayout
                 android:id="@+id/previewListContainer"
@@ -60,7 +64,9 @@
             android:layout_gravity="center"
             android:orientation="vertical"
             android:gravity="center"
-            android:padding="24dp">
+            android:padding="24dp"
+            android:visibility="gone"
+            tools:visibility="visible">
 
             <ProgressBar
                 android:id="@+id/loadingIndicator"
@@ -73,6 +79,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
+                tools:text="Hot-Reloading Component..."
                 android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
                 android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -84,7 +91,9 @@
                 android:textAppearance="@style/TextAppearance.Material3.BodySmall"
                 android:textColor="?attr/colorOutline"
                 android:gravity="center"
-                android:visibility="gone" />
+                android:visibility="gone"
+                tools:text="This may take a moment..."
+                tools:visibility="visible"/>
 
         </LinearLayout>
 
@@ -95,12 +104,13 @@
             android:orientation="vertical"
             android:padding="24dp"
             android:gravity="center_horizontal"
+            android:background="?attr/colorSurface"
             android:visibility="gone">
 
             <ImageView
                 android:layout_width="48dp"
                 android:layout_height="48dp"
-                android:src="@drawable/ic_error"
+                android:src="@android:drawable/ic_dialog_alert"
                 app:tint="?attr/colorError"
                 android:importantForAccessibility="no" />
 
@@ -120,7 +130,8 @@
                 android:layout_marginTop="8dp"
                 android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
                 android:textColor="?attr/colorOnSurfaceVariant"
-                android:gravity="center" />
+                android:gravity="center"
+                tools:text="Compilation failed"/>
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/errorBuildButton"
@@ -129,7 +140,8 @@
                 android:layout_marginTop="16dp"
                 android:text="@string/preview_build_project"
                 android:visibility="gone"
-                app:icon="@drawable/ic_gradle" />
+                tools:visibility="visible"
+                app:icon="@android:drawable/ic_menu_rotate" />
 
             <ScrollView
                 android:layout_width="match_parent"
@@ -145,10 +157,10 @@
                     android:textAppearance="@style/TextAppearance.Material3.BodySmall"
                     android:textColor="?attr/colorOnSurfaceVariant"
                     android:fontFamily="monospace"
-                    android:visibility="gone" />
-
+                    android:visibility="gone"
+                    tools:text="Error details go here..."
+                    tools:visibility="visible"/>
             </ScrollView>
-
         </LinearLayout>
 
         <LinearLayout
@@ -184,7 +196,6 @@
                 android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
                 android:textColor="?attr/colorOutline"
                 android:gravity="center" />
-
         </LinearLayout>
 
         <LinearLayout
@@ -227,9 +238,6 @@
                 android:layout_marginTop="24dp"
                 android:text="@string/preview_build_project"
                 app:icon="@drawable/ic_gradle" />
-
         </LinearLayout>
-
     </FrameLayout>
-
 </LinearLayout>
