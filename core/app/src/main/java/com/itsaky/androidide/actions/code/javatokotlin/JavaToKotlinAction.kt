@@ -7,6 +7,7 @@ import androidx.lifecycle.lifecycleScope
 import com.itsaky.androidide.resources.R
 import com.itsaky.androidide.actions.ActionData
 import com.itsaky.androidide.actions.EditorRelatedAction
+import com.itsaky.androidide.actions.requireContext
 import com.itsaky.androidide.projects.IProjectManager
 import com.itsaky.androidide.projects.ModuleProject
 import com.itsaky.androidide.tasks.launchAsyncWithProgress
@@ -20,7 +21,6 @@ import android.zero.studio.kotlin.analysis.symbolic.J2kConverterHelper
 
 /**
  * Action to convert the current Java file to Kotlin using the Kotlin Compiler SDK.
- *
  *
  * @author android_zero
  */
@@ -44,7 +44,7 @@ class JavaToKotlinAction(context: Context, override val order: Int) : EditorRela
 
     override suspend fun execAction(data: ActionData): Boolean {
         val editor = data.getEditor() ?: return false
-        val activity = editor.context as? AppCompatActivity ?: return false
+        val activity = data.requireContext() as? AppCompatActivity ?: return false
         val file = data.get(File::class.java) ?: return false
         
         val workspace = IProjectManager.getInstance().getWorkspace()

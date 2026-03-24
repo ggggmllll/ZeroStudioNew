@@ -6,15 +6,12 @@ import androidx.core.content.ContextCompat
 import com.itsaky.androidide.actions.ActionData
 import com.itsaky.androidide.actions.ActionItem
 import com.itsaky.androidide.actions.EditorActionItem
+import com.itsaky.androidide.actions.requireContext
 import io.github.rosemoe.sora.widget.CodeEditor
 import com.itsaky.androidide.resources.R
 
 /**
  * 触发系统自定义文本操作菜单的 Action（自动收集系统应用扩展功能，如翻译、小爱同学等的intent浮动菜单）
- *
- * 已修复问题：【内存泄漏修复优化】：
- * 1. 移除了 private val context 和 private var currentEditor 强引用，避免泄漏 Activity
- * 2. 所有的对象引用都在运行时从 ActionData 中获取，实现绝对的无状态安全。
  *
  * @author android_zero
  */
@@ -31,22 +28,15 @@ class SystemTextMenuAction(context: Context, override val order: Int) : EditorAc
     override var requiresUIThread: Boolean = true
 
     init {
-        // 在初始化阶段加载图标，不再将 context 作为类的持久属性保存
         icon = ContextCompat.getDrawable(context, R.drawable.more_vert)
     }
 
     override fun prepare(data: ActionData) {
         super.prepare(data)
-        // 动态验证即可，不再使用 currentEditor 长期缓存
-        val editor = data.get(CodeEditor::class.java)
-        enabled = editor != null
-        visible = editor != null
     }
 
     override suspend fun execAction(data: ActionData): Any {
-        // 运行时动态获取 Editor 和 Context，彻底断开强引用关系
         val editor = data.get(CodeEditor::class.java) ?: return false
-        val context = data.get(Context::class.java) ?: return false
 
         val text = editor.text
         val cursor = editor.cursor
@@ -70,8 +60,8 @@ class SystemTextMenuAction(context: Context, override val order: Int) : EditorAc
         // 加上行高，使其显示在光标下方
         val posY = (screenPos[1] + layoutOffset[0] - editor.offsetY + editor.rowHeight).toInt()
 
-        // 实例化并显示 Compose 浮窗
-        val popup = SystemTextActionsPopup(context, editor, selectedText)
+        // 实例化并显示 Compose 浮窗，动态从 data 获取 context
+        val popup = SystemTextActionsPopup(data.requireContext(), editor, selectedText)
         popup.show(editor, posX, posY)
 
         return true

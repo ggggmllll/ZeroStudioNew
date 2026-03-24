@@ -34,6 +34,7 @@ import java.lang.ref.WeakReference
 /**
  * Handles events received from [GradleBuildService] updates [EditorHandlerActivity].
  * @author Akash Yadav
+ * @author android_zero
  */
 class EditorBuildEventListener : GradleBuildService.EventListener {
 
@@ -47,6 +48,7 @@ class EditorBuildEventListener : GradleBuildService.EventListener {
 
   private val _activity: EditorHandlerActivity?
     get() = activityReference.get()
+    
   private val activity: EditorHandlerActivity
     get() = checkNotNull(activityReference.get()) { "Activity reference has been destroyed!" }
 
@@ -61,85 +63,91 @@ class EditorBuildEventListener : GradleBuildService.EventListener {
   }
 
   override fun prepareBuild(buildInfo: BuildInfo) {
-    checkActivity("prepareBuild") ?: return
+    val act = checkActivity("prepareBuild") ?: return
 
     val isFirstBuild = GeneralPreferences.isFirstBuild
-    activity
-      .setStatus(
-        activity.getString(if (isFirstBuild) string.preparing_first else string.preparing)
-      )
+    act.setStatus(
+      act.getString(if (isFirstBuild) string.preparing_first else string.preparing)
+    )
 
     if (isFirstBuild) {
-      activity.showFirstBuildNotice()
+      act.showFirstBuildNotice()
     }
 
-    activity.editorViewModel.isBuildInProgress = true
-    activity.content.bottomSheet.clearBuildOutput()
+    act.editorViewModel.isBuildInProgress = true
+    
+    // 安全更新底栏
+    act.clearBuildOutputSafely()
 
     if (buildInfo.tasks.isNotEmpty()) {
-      activity.content.bottomSheet.appendBuildOut(
-        activity.getString(R.string.title_run_tasks) + " : " + buildInfo.tasks)
+      act.appendBuildOutput(act.getString(R.string.title_run_tasks) + " : " + buildInfo.tasks)
     }
   }
 
   override fun onBuildSuccessful(tasks: List<String?>) {
-    checkActivity("onBuildSuccessful") ?: return
+    val act = checkActivity("onBuildSuccessful") ?: return
 
     analyzeCurrentFile()
 
     GeneralPreferences.isFirstBuild = false
-    activity.editorViewModel.isBuildInProgress = false
+    act.editorViewModel.isBuildInProgress = false
 
-    activity.flashSuccess(R.string.build_status_sucess)
+    act.flashSuccess(R.string.build_status_sucess)
   }
 
   override fun onProgressEvent(event: ProgressEvent) {
-    checkActivity("onProgressEvent") ?: return
+    val act = checkActivity("onProgressEvent") ?: return
 
     if (event is ProjectConfigurationStartEvent || event is TaskStartEvent) {
-      activity.setStatus(event.descriptor.displayName)
+      act.setStatus(event.descriptor.displayName)
     }
   }
 
   override fun onBuildFailed(tasks: List<String?>) {
-    checkActivity("onBuildFailed") ?: return
+    val act = checkActivity("onBuildFailed") ?: return
 
     analyzeCurrentFile()
 
     GeneralPreferences.isFirstBuild = false
-    activity.editorViewModel.isBuildInProgress = false
+    act.editorViewModel.isBuildInProgress = false
 
-    activity.flashError(R.string.build_status_failed)
+    act.flashError(R.string.build_status_failed)
   }
 
   override fun onOutput(line: String?) {
-    checkActivity("onOutput") ?: return
+    val act = checkActivity("onOutput") ?: return
 
-    line?.let { activity.appendBuildOutput(it) }
-    // TODO This can be handled better when ProgressEvents are received from Tooling API server
-    if (line!!.contains("BUILD SUCCESSFUL") || line.contains("BUILD FAILED")) {
-      activity.setStatus(line)
+    line?.let { act.appendBuildOutput(it) }
+    
+    if (line != null && (line.contains("BUILD SUCCESSFUL") || line.contains("BUILD FAILED"))) {
+      act.setStatus(line)
     }
   }
 
   private fun analyzeCurrentFile() {
-    checkActivity("analyzeCurrentFile") ?: return
+    val act = checkActivity("analyzeCurrentFile") ?: return
 
-    val editorView = _activity?.getCurrentEditor()
+    val editorView = act.getCurrentEditor()
     if (editorView != null) {
       val editor = editorView.editor
       editor?.analyze()
     }
   }
 
+  /**
+   * Safe getter: Verifies that the activity is neither null, nor finishing, nor destroyed.
+   * This is crucial for preventing IllegalStateException when trying to update UI bindings
+   * that have already been torn down by the system.
+   */
   private fun checkActivity(action: String): EditorHandlerActivity? {
     if (!enabled) return null
 
-    return _activity.also {
-      if (it == null) {
-        log.warn("[{}] Activity reference has been destroyed!", action)
-        enabled = false
-      }
+    val act = _activity
+    if (act == null || act.isDestroyed || act.isFinishing) {
+      log.warn("[{}] Activity reference is null or has been destroyed. Ignoring callback.", action)
+      enabled = false
+      return null
     }
+    return act
   }
 }

@@ -47,6 +47,11 @@ import com.itsaky.androidide.services.builder.GradleBuildServiceConnnection
 import com.itsaky.androidide.services.builder.gradleDistributionParams
 import com.itsaky.androidide.tasks.executeAsyncProvideError
 import com.itsaky.androidide.tasks.executeWithProgress
+import com.itsaky.androidide.tooling.api.ForwardingToolingApiClient
+import com.itsaky.androidide.tooling.api.IProject
+import com.itsaky.androidide.tooling.api.IToolingApiClient
+import com.itsaky.androidide.tooling.api.IToolingApiServer
+import com.itsaky.androidide.tooling.api.LogSenderConfig.PROPERTY_LOGSENDER_ENABLED
 import com.itsaky.androidide.tooling.api.messages.AndroidInitializationParams
 import com.itsaky.androidide.tooling.api.messages.InitializeProjectParams
 import com.itsaky.androidide.tooling.api.messages.result.InitializeResult
@@ -223,11 +228,21 @@ abstract class ProjectHandlerActivity : BaseEditorActivity() {
   }
 
   fun setStatus(status: CharSequence, @GravityInt gravity: Int) {
+    // 增加销毁和安全绑定拦截，避免崩溃
+    if (isDestroying || isFinishing || _binding == null) return
     doSetStatus(status, gravity)
   }
 
   fun appendBuildOutput(str: String) {
+    // 增加销毁和安全绑定拦截，避免收到延迟的异步线程请求导致的崩溃
+    if (isDestroying || isFinishing || _binding == null) return
     content.bottomSheet.appendBuildOut(str)
+  }
+
+  fun clearBuildOutputSafely() {
+    // 提供给 EventListener 使用的安全清屏 API
+    if (isDestroying || isFinishing || _binding == null) return
+    content.bottomSheet.clearBuildOutput()
   }
 
   fun notifySyncNeeded() {
@@ -235,6 +250,8 @@ abstract class ProjectHandlerActivity : BaseEditorActivity() {
   }
 
   private fun notifySyncNeeded(onConfirm: () -> Unit) {
+    if (isDestroying || isFinishing || _binding == null) return
+
     val buildService = Lookup.getDefault().lookup(BuildService.KEY_BUILD_SERVICE)
     if (buildService == null || editorViewModel.isInitializing || buildService.isBuildInProgress)
         return
@@ -356,7 +373,7 @@ abstract class ProjectHandlerActivity : BaseEditorActivity() {
    *
    * @param buildVariants A map of project paths to the selected build variants.
    */
-fun initializeProject(buildVariants: Map<String, String>) {
+  fun initializeProject(buildVariants: Map<String, String>) {
     val manager = ProjectManagerImpl.getInstance()
     val projectDir = manager.projectDir
     if (!projectDir.exists()) {
@@ -460,7 +477,7 @@ fun initializeProject(buildVariants: Map<String, String>) {
   protected fun onGradleBuildServiceConnected(service: GradleBuildService) {
     log.info("Connected to Gradle build service")
 
-    log.info("Thank you for supporting ZeroStudio,💪🏻👍🏻Don't be too tired when writing code, you may not stay up late to write code.")
+    log.info("Thank you for supporting ZeroStudio,If you encounter any problems, you can provide feedback on GitHub, URL：https://github.com/msmt2018/ZeroStudio/issues")
 
     buildServiceConnection.onConnected = null
     editorViewModel.isBoundToBuildSerice = true
@@ -483,11 +500,7 @@ fun initializeProject(buildVariants: Map<String, String>) {
           }
 
           if (pid != metadata.pid) {
-            log.warn(
-                "Tooling server pid mismatch. Expected: {}, Actual: {}. Replacing memory watcher...",
-                pid,
-                metadata.pid,
-            )
+            log.warn("Tooling server pid mismatch. Expected: {}, Actual: {}. Replacing memory watcher...", pid, metadata.pid)
             try {
               memoryUsageWatcher.watchProcess(metadata.pid, PROC_GRADLE_TOOLING)
               resetMemUsageChart()
@@ -519,10 +532,7 @@ fun initializeProject(buildVariants: Map<String, String>) {
 
         if (workspace == null) {
           com.itsaky.androidide.tasks.runOnUiThread {
-            showProjectSetupFailedDialog(
-                "Workspace initialization failed. The project structure could not be analyzed.",
-                null,
-            )
+            showProjectSetupFailedDialog("Workspace initialization failed. The project structure could not be analyzed.", null)
             postProjectInit(false, null)
           }
           return@launch
@@ -535,14 +545,11 @@ fun initializeProject(buildVariants: Map<String, String>) {
       } catch (e: Exception) {
         log.error("Project setup failed", e)
         com.itsaky.androidide.tasks.runOnUiThread {
-          val errorMessage =
-              when {
-                e.message?.contains("workspace", ignoreCase = true) == true ->
-                    "Failed to configure workspace: ${e.message}"
-                e.message?.contains("build", ignoreCase = true) == true ->
-                    "Failed to build project model: ${e.message}"
-                else -> "Project setup failed: ${e.message ?: "Unknown error occurred"}"
-              }
+          val errorMessage = when {
+            e.message?.contains("workspace", ignoreCase = true) == true -> "Failed to configure workspace: ${e.message}"
+            e.message?.contains("build", ignoreCase = true) == true -> "Failed to build project model: ${e.message}"
+            else -> "Project setup failed: ${e.message ?: "Unknown error occurred"}"
+          }
           showProjectSetupFailedDialog(errorMessage, e)
           postProjectInit(false, null)
         }
@@ -599,9 +606,7 @@ fun initializeProject(buildVariants: Map<String, String>) {
   
       val builder = newMaterialDialogBuilder(this)
       builder.setTitle("Project Setup Failed")
-      builder.setMessage(
-          "The project could not be initialized properly.\n\n$errorMessage\n\nFull error details have been copied to clipboard.\n\nYou can try:\n• Update top level build.gradle\n• Syncing the project again\n• Checking if all required files are present\n• Restarting the IDE"
-      )
+      builder.setMessage("The project could not be initialized properly.\n\n$errorMessage\n\nFull error details have been copied to clipboard.\n\nYou can try:\n• Update top level build.gradle\n• Syncing the project again\n• Checking if all required files are present\n• Restarting the IDE")
       builder.setIcon(R.drawable.ic_error)
       builder.setCancelable(false)
   
@@ -683,8 +688,7 @@ fun initializeProject(buildVariants: Map<String, String>) {
     if (mFindInProjectDialog?.isShowing == true) {
       mFindInProjectDialog!!.dismiss()
     }
-
-    mFindInProjectDialog = null // Create the dialog again if needed
+    mFindInProjectDialog = null
   }
 
   private fun updateBuildVariants(buildVariants: Map<String, BuildVariantInfo>) {
@@ -705,10 +709,7 @@ fun initializeProject(buildVariants: Map<String, String>) {
 
     val moduleDirs =
         try {
-          manager
-              .getWorkspace()!!
-              .getSubProjects()
-              .stream()
+          manager.getWorkspace()!!.getSubProjects().stream()
               .map(GradleProject::projectDir)
               .collect(Collectors.toList())
         } catch (e: Throwable) {

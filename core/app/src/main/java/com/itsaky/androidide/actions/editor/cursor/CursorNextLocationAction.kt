@@ -11,9 +11,6 @@ import com.itsaky.androidide.cursor.CursorHistoryManager
 
 /**
  * Navigate to the next cursor position (Action: Redo cursor)
- * 
- * 已修复bug：【内存泄漏修复优化】：去除了对 CodeEditor 的全局缓存 (currentEditor)。
- *
  * @author android_zero
  */
 class CursorNextLocationAction(context: Context, override val order: Int) : EditorActionItem {
@@ -32,8 +29,8 @@ class CursorNextLocationAction(context: Context, override val order: Int) : Edit
 
     override fun prepare(data: ActionData) {
         super.prepare(data)
-        // 动态切换可点击状态，不再保存对 Editor 的强引用
         val editor = data.get(CodeEditor::class.java)
+        // 动态切换可点击状态
         enabled = editor != null && CursorHistoryManager.getTracker(editor).canGoForward()
     }
 

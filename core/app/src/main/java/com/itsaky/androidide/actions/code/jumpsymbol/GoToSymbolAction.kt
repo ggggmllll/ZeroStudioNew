@@ -7,6 +7,7 @@ import androidx.lifecycle.lifecycleScope
 import com.itsaky.androidide.resources.R
 import com.itsaky.androidide.actions.ActionData
 import com.itsaky.androidide.actions.EditorRelatedAction
+import com.itsaky.androidide.actions.requireContext
 import com.itsaky.androidide.tasks.launchAsyncWithProgress
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -14,7 +15,8 @@ import java.io.File
 
 /**
  * An action to parse the current file using Tree-Sitter and display a bottom sheet with all symbols.
- *
+ * 
+ * Supports Java, Kotlin, and can be extended.
  *
  * @author android_zero
  */
@@ -36,18 +38,20 @@ class GoToSymbolAction(context: Context, override val order: Int) : EditorRelate
 
     override suspend fun execAction(data: ActionData): Boolean {
         val editor = data.getEditor() ?: return false
-        val activity = editor.context as? AppCompatActivity ?: return false
+        val context = data.requireContext()
+        val activity = context as? AppCompatActivity ?: return false
         val file = data.get(File::class.java) ?: return false
 
         activity.lifecycleScope.launchAsyncWithProgress(
             configureFlashbar = { builder, _ ->
-                builder.message("Parsing symbols...") 
+                builder.message("Parsing symbols...")
             }
         ) { _, _ ->
             val code = editor.text.toString()
             
+            // 使用 Tree-Sitter 解析，避免 Unsafe 崩溃
             val symbols = withContext(Dispatchers.IO) {
-                TreeSitterSymbolResolver.parseSymbols(activity, file, code)
+                TreeSitterSymbolResolver.parseSymbols(context, file, code)
             }
 
             withContext(Dispatchers.Main) {
@@ -59,7 +63,7 @@ class GoToSymbolAction(context: Context, override val order: Int) : EditorRelate
                     }
                     sheet.show(activity.supportFragmentManager, "SymbolListBottomSheet")
                 } else {
-                    com.itsaky.androidide.utils.flashInfo(activity.getString(R.string.msg_no_symbols_found))
+                    com.itsaky.androidide.utils.flashInfo(context.getString(R.string.msg_no_symbols_found))
                 }
             }
         }

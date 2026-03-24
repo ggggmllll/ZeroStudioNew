@@ -240,7 +240,7 @@
           "aarch64": {
                "_30_0_14904198_beta1": "https://github.com/HomuHomu833/android-ndk-custom/releases/download/r30/android-ndk-r30-beta1-aarch64-linux-android.tar.xz",
                "_29_0_14033849": "https://github.com/HomuHomu833/android-ndk-custom/releases/download/r29/android-ndk-r29-aarch64-linux-android.tar.xz",
-               "_29_0_13113456": "https://github.com/ZeroAicy/AIDE-Ndk-Install/releases/download/v2.7.8/android-ndk-r29-beta1-aarch64.zip",
+               "_29_0_13113456_beta1": "https://github.com/ZeroAicy/AIDE-Ndk-Install/releases/download/v2.7.8/android-ndk-r29-beta1-aarch64.zip",
                "_29_0_14206865": "https://github.com/lzhiyong/termux-ndk/releases/download/android-ndk/android-ndk-r29-aarch64.7z",
                "_28_2_13676358_A1": "https://github.com/HomuHomu833/android-ndk-custom/releases/download/r28/android-ndk-r28c-aarch64-linux-android.tar.xz",
                "_28_2_13676358_A2": "https://github.com/codehasan/dex2c/releases/download/ollvm-termux/android-ndk-r28c.tar.xz",
@@ -266,7 +266,7 @@
           },
           "arm": {
                "_30_0_14904198_beta1": "https://github.com/HomuHomu833/android-ndk-custom/releases/download/r30/android-ndk-r30-beta1-x86_64-linux-android.tar.xz",
-               "_29_0_14033849_beta4": "https://github.com/HomuHomu833/android-ndk-custom/releases/download/r29/android-ndk-r29-armv7a-linux-androideabi.tar.xz",
+               "_29_0_14033849": "https://github.com/HomuHomu833/android-ndk-custom/releases/download/r29/android-ndk-r29-armv7a-linux-androideabi.tar.xz",
                "_28_2_13676358": "https://github.com/HomuHomu833/android-ndk-custom/releases/download/r28/android-ndk-r28c-armv7a-linux-androideabi.tar.xz",
                "_27_3_13750724": "https://github.com/HomuHomu833/android-ndk-custom/releases/download/r27/android-ndk-r27d-armv7a-linux-androideabi.tar.xz",
                "_26_3_11579264": "https://github.com/HomuHomu833/android-ndk-custom/releases/download/r26/android-ndk-r26d-armv7a-linux-androideabi.tar.xz"

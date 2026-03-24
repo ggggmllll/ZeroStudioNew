@@ -425,7 +425,10 @@ download_comp "Android SDK Build Tools" ".build_tools | .${arch} | .${sdk_versio
 download_comp "Android SDK Platform Tools" ".platform_tools | .${arch} | .${sdk_version}" "$install_dir/android-sdk" "android-sdk-platform-tools"
 
 # Install NDK (解压到 ndk/版本号 目录下)
-download_comp "Android NDK" ".android_ndk.\"${arch}\".\"${ndk_version}\"" "$install_dir/android-sdk/ndk/$ndkver_org" "android-ndk"
+# download_comp "Android NDK" ".android_ndk | .${arch} | .${ndk_version}" ...
+# 使用 sed 将所有 . 和 - 替换为 _，并在开头加上 _
+ndk_jq_key="_$(echo "$ndk_version" | sed 's/[\.-]/_/g')"
+download_comp "Android NDK" ".android_ndk.\"${arch}\".\"${ndk_jq_key}\"" "$install_dir/android-sdk/ndk/$ndkver_org" "android-ndk"
 
 # Install CMake (解压到 cmake/版本号 目录下)
 download_comp "CMake" ".android_cmake | .${arch} | .${cmake_version}" "$install_dir/android-sdk/cmake/$cmakever_org" "android-cmake"

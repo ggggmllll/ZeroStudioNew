@@ -100,6 +100,9 @@ class GradleBuildService : Service(), BuildService, IToolingApiClient,
   private var eventListener: EventListener? = null
   private var isReleaseVariant = false
 
+  @Volatile
+  private var currentBuildProcess: Process? = null
+
   private val buildServiceScope =
       CoroutineScope(Dispatchers.Default + CoroutineName("GradleBuildService"))
 
@@ -223,6 +226,10 @@ class GradleBuildService : Service(), BuildService, IToolingApiClient,
     log.debug("Cancelling tooling server output reader job...")
     outputReaderJob?.cancel()
     outputReaderJob = null
+
+    // Ensure the build process is terminated immediately upon Service destruction to prevent leaks
+    currentBuildProcess?.destroy()
+    currentBuildProcess = null
 
     isToolingServerStarted = false
   }
@@ -629,6 +636,7 @@ class GradleBuildService : Service(), BuildService, IToolingApiClient,
             log.info("LD_LIBRARY_PATH set to: ${finalEnv["LD_LIBRARY_PATH"]}")
 
             val process = processBuilder.start()
+            currentBuildProcess = process
 
             val outputReader = process.inputStream.bufferedReader()
             val errorReader = process.errorStream.bufferedReader()
@@ -638,6 +646,7 @@ class GradleBuildService : Service(), BuildService, IToolingApiClient,
             buildServiceScope.launch { errorReader.forEachLine { line -> logOutput(line) } }
 
             val exitCode = process.waitFor()
+            currentBuildProcess = null
 
             val result =
                 if (exitCode == 0) {
@@ -657,6 +666,7 @@ class GradleBuildService : Service(), BuildService, IToolingApiClient,
             log.error("Failed to execute gradlew with sh", e)
             val result = TaskExecutionResult(false, TaskExecutionResult.Failure.BUILD_FAILED)
             onBuildFailed(BuildResult(tasksList))
+            currentBuildProcess = null
             result
           }
         }
@@ -700,6 +710,7 @@ class GradleBuildService : Service(), BuildService, IToolingApiClient,
         log.info("Force stopping Gradle daemons after build cancellation...")
         // stopGradleDaemons().get()
         killGradlewProcesses()
+        currentBuildProcess?.destroy()
       } catch (e: Exception) {
         log.error("Error during forced daemon shutdown", e)
       }

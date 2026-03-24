@@ -158,6 +158,7 @@ abstract class BaseEditorActivity : EdgeToEdgeIDEActivity(), TabLayout.OnTabSele
   internal var _binding: ActivityEditorBinding? = null
   val binding: ActivityEditorBinding
     get() = checkNotNull(_binding) { "Activity has been destroyed" }
+    
   val content: ContentEditorBinding
     get() = binding.content
 
@@ -166,6 +167,9 @@ abstract class BaseEditorActivity : EdgeToEdgeIDEActivity(), TabLayout.OnTabSele
 
   private val onBackPressedCallback: OnBackPressedCallback = object : OnBackPressedCallback(true) {
     override fun handleOnBackPressed() {
+      if (isDestroying || isFinishing) return // Protect
+      if (_binding == null) return
+      
       if (binding.root.isDrawerOpen(GravityCompat.START)) {
         binding.root.closeDrawer(GravityCompat.START)
       } else if (editorBottomSheet?.state != BottomSheetBehavior.STATE_COLLAPSED) {
@@ -179,6 +183,7 @@ abstract class BaseEditorActivity : EdgeToEdgeIDEActivity(), TabLayout.OnTabSele
   }
 
   private val memoryUsageListener = MemoryUsageWatcher.MemoryUsageListener { memoryUsage ->
+    if (isDestroying || _binding == null) return@MemoryUsageListener
     memoryUsage.forEachValue { proc ->
       _binding?.memUsageView?.chart?.apply {
         val dataset = (data.getDataSetByIndex(pidToDatasetIdxMap[proc.pid]) as LineDataSet?)
@@ -280,6 +285,7 @@ abstract class BaseEditorActivity : EdgeToEdgeIDEActivity(), TabLayout.OnTabSele
 
   override fun onApplyWindowInsets(insets: WindowInsetsCompat) {
     super.onApplyWindowInsets(insets)
+    if (_binding == null) return
     val height = contentCardRealHeight ?: return
     val imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime())
 
@@ -297,6 +303,7 @@ abstract class BaseEditorActivity : EdgeToEdgeIDEActivity(), TabLayout.OnTabSele
 
   override fun onApplySystemBarInsets(insets: Insets) {
     super.onApplySystemBarInsets(insets)
+    if (_binding == null) return
     this._binding?.apply {
       drawerSidebar.getFragment<EditorSidebarFragment>()
         .onApplyWindowInsets(insets)
@@ -312,30 +319,24 @@ abstract class BaseEditorActivity : EdgeToEdgeIDEActivity(), TabLayout.OnTabSele
       }
     }
   }
+  
 
   protected fun releaseBottomSheetHeaderHide(reason: String) {
     runOnUiThread {
-      if (_binding == null) {
-        return@runOnUiThread
-      }
+      if (_binding == null || isDestroying) return@runOnUiThread
       val wasRemoved = bottomSheetHeaderHideReasons.remove(reason)
-      if (!wasRemoved || bottomSheetHeaderHideReasons.isNotEmpty()) {
-        return@runOnUiThread
-      }
+      if (!wasRemoved || bottomSheetHeaderHideReasons.isNotEmpty()) return@runOnUiThread
       val bottomSheetBinding = content.bottomSheet.binding
       bottomSheetBinding.cardView.visibility = bottomSheetCardVisibilitySnapshot
       bottomSheetBinding.headerContainer.visibility = bottomSheetHeaderVisibilitySnapshot
     }
   }
+
   protected fun requestBottomSheetHeaderHide(reason: String) {
     runOnUiThread {
-      if (_binding == null) {
-        return@runOnUiThread
-      }
+      if (_binding == null || isDestroying) return@runOnUiThread
       val wasAdded = bottomSheetHeaderHideReasons.add(reason)
-      if (!wasAdded || bottomSheetHeaderHideReasons.size > 1) {
-        return@runOnUiThread
-      }
+      if (!wasAdded || bottomSheetHeaderHideReasons.size > 1) return@runOnUiThread
       val bottomSheetBinding = content.bottomSheet.binding
       bottomSheetCardVisibilitySnapshot = bottomSheetBinding.cardView.visibility
       bottomSheetHeaderVisibilitySnapshot = bottomSheetBinding.headerContainer.visibility
@@ -344,13 +345,10 @@ abstract class BaseEditorActivity : EdgeToEdgeIDEActivity(), TabLayout.OnTabSele
     }
   }
 
-
   @Subscribe(threadMode = MAIN)
   open fun onInstallationResult(event: InstallationResultEvent) {
     val intent = event.intent
-    if (isDestroying) {
-      return
-    }
+    if (isDestroying || _binding == null) return
 
     val packageName = onResult(this, intent) ?: return
 
@@ -366,7 +364,9 @@ abstract class BaseEditorActivity : EdgeToEdgeIDEActivity(), TabLayout.OnTabSele
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
-    this.optionsMenuInvalidator = Runnable { super.invalidateOptionsMenu() }
+    this.optionsMenuInvalidator = Runnable { 
+        if (!isDestroying && !isFinishing) super.invalidateOptionsMenu() 
+    }
 
     registerLanguageServers()
 
@@ -378,32 +378,21 @@ abstract class BaseEditorActivity : EdgeToEdgeIDEActivity(), TabLayout.OnTabSele
     onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
     lifecycle.addObserver(mLifecycleObserver)
 
-    // 配置并初始化支持的操作栏 (Toolbar)
-    setSupportActionBar(content.editorToolbar)
-
-    //取消string.app_name的标题设置，解决action menu拥挤
-    supportActionBar?.setDisplayShowTitleEnabled(false)
-    
-    setupDrawers()
-    content.tabs.addOnTabSelectedListener(this)
-
-    setupViews()
-
-    setupContainers()
-    setupDiagnosticInfo()
-
-/*
-*旧版布局编辑器所需的回调，这已经没用了，完全归档
-    uiDesignerResultLauncher = registerForActivityResult(
-      StartActivityForResult(),
-      this::handleUiDesignerResult
-    )
-*/
-    setupMemUsageChart()
-    watchMemory()
+    if (_binding != null) {
+        setSupportActionBar(content.editorToolbar)
+        supportActionBar?.setDisplayShowTitleEnabled(false)
+        setupDrawers()
+        content.tabs.addOnTabSelectedListener(this)
+        setupViews()
+        setupContainers()
+        setupDiagnosticInfo()
+        setupMemUsageChart()
+        watchMemory()
+    }
   }
 
   private fun onSwipeRevealDragProgress(progress: Float) {
+    if (_binding == null) return
     _binding?.apply {
       contentCard.progress = progress
       val insetsTop = systemBarInsets?.top ?: 0
@@ -447,6 +436,7 @@ abstract class BaseEditorActivity : EdgeToEdgeIDEActivity(), TabLayout.OnTabSele
   }
 
   protected fun resetMemUsageChart() {
+    if (_binding == null) return
     val processes = memoryUsageWatcher.getMemoryUsages()
     val datasets = Array(processes.size) { index ->
       LineDataSet(
@@ -538,6 +528,7 @@ abstract class BaseEditorActivity : EdgeToEdgeIDEActivity(), TabLayout.OnTabSele
   }
 
   override fun invalidateOptionsMenu() {
+    if (isDestroying || isFinishing) return
     val mainHandler = ThreadUtils.getMainHandler()
     optionsMenuInvalidator?.also {
       mainHandler.removeCallbacks(it)
@@ -546,6 +537,7 @@ abstract class BaseEditorActivity : EdgeToEdgeIDEActivity(), TabLayout.OnTabSele
   }
 
   override fun onTabSelected(tab: Tab) {
+    if (isDestroying || _binding == null) return
     val position = tab.position
     editorViewModel.displayedFileIndex = position
 
@@ -564,10 +556,12 @@ abstract class BaseEditorActivity : EdgeToEdgeIDEActivity(), TabLayout.OnTabSele
   override fun onTabUnselected(tab: Tab) {}
 
   override fun onTabReselected(tab: Tab) {
+    if (isDestroying || _binding == null) return
     createMenu(this, tab.view, EDITOR_FILE_TABS, true).show()
   }
 
   override fun onGroupClick(group: DiagnosticGroup?) {
+    if (isDestroying || _binding == null) return
     if (group?.file?.exists() == true && FileUtils.isUtf8(group.file)) {
       doOpenFile(group.file, null)
       hideBottomSheet()
@@ -575,11 +569,13 @@ abstract class BaseEditorActivity : EdgeToEdgeIDEActivity(), TabLayout.OnTabSele
   }
 
   override fun onDiagnosticClick(file: File, diagnostic: DiagnosticItem) {
+    if (isDestroying || _binding == null) return
     doOpenFile(file, diagnostic.range)
     hideBottomSheet()
   }
 
   open fun handleSearchResults(map: Map<File, List<SearchResult>>?) {
+    if (isDestroying || _binding == null) return
     val results = map ?: emptyMap()
     setSearchResultAdapter(SearchListAdapter(results, { file ->
       doOpenFile(file, null)
@@ -594,20 +590,24 @@ abstract class BaseEditorActivity : EdgeToEdgeIDEActivity(), TabLayout.OnTabSele
   }
 
   open fun setSearchResultAdapter(adapter: SearchListAdapter) {
+    if (isDestroying || _binding == null) return
     content.bottomSheet.setSearchResultAdapter(adapter)
   }
 
   open fun setDiagnosticsAdapter(adapter: DiagnosticsAdapter) {
+    if (isDestroying || _binding == null) return
     content.bottomSheet.setDiagnosticsAdapter(adapter)
   }
 
   open fun hideBottomSheet() {
+    if (isDestroying || _binding == null) return
     if (editorBottomSheet?.state != BottomSheetBehavior.STATE_COLLAPSED) {
       editorBottomSheet?.state = BottomSheetBehavior.STATE_COLLAPSED
     }
   }
 
   open fun showSearchResults() {
+    if (isDestroying || _binding == null) return
     if (editorBottomSheet?.state != BottomSheetBehavior.STATE_EXPANDED) {
       editorBottomSheet?.state = BottomSheetBehavior.STATE_EXPANDED
     }
@@ -622,20 +622,24 @@ abstract class BaseEditorActivity : EdgeToEdgeIDEActivity(), TabLayout.OnTabSele
   }
 
   open fun handleDiagnosticsResultVisibility(errorVisible: Boolean) {
+    if (isDestroying || _binding == null) return
     content.bottomSheet.handleDiagnosticsResultVisibility(errorVisible)
   }
 
   open fun handleSearchResultVisibility(errorVisible: Boolean) {
+    if (isDestroying || _binding == null) return
     content.bottomSheet.handleSearchResultVisibility(errorVisible)
   }
 
   open fun showFirstBuildNotice() {
+    if (isDestroying || isFinishing) return
     newMaterialDialogBuilder(this).setPositiveButton(android.R.string.ok, null)
       .setTitle(string.title_first_build).setMessage(string.msg_first_build).setCancelable(false)
       .create().show()
   }
 
   open fun getFileTreeFragment(): FileTreeFragment? {
+    if (isDestroying) return null
     if (filesTreeFragment == null) {
       filesTreeFragment = supportFragmentManager.findFragmentByTag(
         FileTreeFragment.TAG
@@ -645,15 +649,18 @@ abstract class BaseEditorActivity : EdgeToEdgeIDEActivity(), TabLayout.OnTabSele
   }
 
   fun doSetStatus(text: CharSequence, @GravityInt gravity: Int) {
+    if (isDestroying || _binding == null) return
     editorViewModel.statusText = text
     editorViewModel.statusGravity = gravity
   }
 
   fun refreshSymbolInput() {
+    if (isDestroying || _binding == null) return
     provideCurrentEditor()?.also { refreshSymbolInput(it) }
   }
 
   fun refreshSymbolInput(editor: CodeEditorView) {
+    if (isDestroying || _binding == null) return
     content.bottomSheet.refreshSymbolInput(editor)
   }
 
@@ -662,31 +669,9 @@ abstract class BaseEditorActivity : EdgeToEdgeIDEActivity(), TabLayout.OnTabSele
       isDestroying = true
     }
   }
-/*
-*这个handleUiDesignerResult已经完全归档删除，没有任何作用了，已经被新版布局编辑器替代
-  private fun handleUiDesignerResult(result: ActivityResult) {
-    if (result.resultCode != RESULT_OK || result.data == null) {
-      log.warn(
-        "UI Designer returned invalid result: resultCode={}, data={}", result.resultCode,
-        result.data
-      )
-      return
-    }
-    val generated = result.data!!.getStringExtra(UIDesignerActivity.RESULT_GENERATED_XML)
-    if (TextUtils.isEmpty(generated)) {
-      log.warn("UI Designer returned blank generated XML code")
-      return
-    }
-    val view = provideCurrentEditor()
-    val text = view?.editor?.text ?: run {
-      log.warn("No file opened to append UI designer result")
-      return
-    }
-    val endLine = text.lineCount - 1
-    text.replace(0, 0, endLine, text.getColumnCount(endLine), generated)
-  }
-*/
+
   private fun setupDrawers() {
+    if (_binding == null) return
     val toggle = ActionBarDrawerToggle(
       this, binding.editorDrawerLayout, content.editorToolbar,
       string.app_name, string.app_name
@@ -705,6 +690,7 @@ abstract class BaseEditorActivity : EdgeToEdgeIDEActivity(), TabLayout.OnTabSele
   }
 
   private fun onBuildStatusChanged() {
+    if (isDestroying || _binding == null) return
     log.debug(
       "onBuildStatusChanged: isInitializing: ${editorViewModel.isInitializing}, isBuildInProgress: ${editorViewModel.isBuildInProgress}"
     )
@@ -716,9 +702,14 @@ abstract class BaseEditorActivity : EdgeToEdgeIDEActivity(), TabLayout.OnTabSele
   private fun setupViews() {
     editorViewModel._isBuildInProgress.observe(this) { onBuildStatusChanged() }
     editorViewModel._isInitializing.observe(this) { onBuildStatusChanged() }
-    editorViewModel._statusText.observe(this) { content.bottomSheet.setStatus(it.first, it.second) }
+    editorViewModel._statusText.observe(this) { 
+        if (!isDestroying && _binding != null) {
+            content.bottomSheet.setStatus(it.first, it.second) 
+        }
+    }
 
     editorViewModel.observeFiles(this) { files ->
+      if (isDestroying || _binding == null) return@observeFiles
       content.apply {
         if (files.isNullOrEmpty()) {
           tabs.visibility = View.GONE
@@ -741,8 +732,10 @@ abstract class BaseEditorActivity : EdgeToEdgeIDEActivity(), TabLayout.OnTabSele
     ) {
       editorBottomSheet?.state = BottomSheetBehavior.STATE_EXPANDED
       ThreadUtils.runOnUiThreadDelayed({
-        editorBottomSheet?.state = BottomSheetBehavior.STATE_COLLAPSED
-        app.prefManager.putBoolean(KEY_BOTTOM_SHEET_SHOWN, true)
+        if (!isDestroying) {
+            editorBottomSheet?.state = BottomSheetBehavior.STATE_COLLAPSED
+            app.prefManager.putBoolean(KEY_BOTTOM_SHEET_SHOWN, true)
+        }
       }, 1500)
     }
 
@@ -756,15 +749,16 @@ abstract class BaseEditorActivity : EdgeToEdgeIDEActivity(), TabLayout.OnTabSele
   }
 
   private fun setupNoEditorView() {
+    if (_binding == null) return
     content.noEditorSummary.movementMethod = LinkMovementMethod()
     val filesSpan: ClickableSpan = object : ClickableSpan() {
       override fun onClick(widget: View) {
-        binding.root.openDrawer(GravityCompat.START)
+        if (!isDestroying && _binding != null) binding.root.openDrawer(GravityCompat.START)
       }
     }
     val bottomSheetSpan: ClickableSpan = object : ClickableSpan() {
       override fun onClick(widget: View) {
-        editorBottomSheet?.state = BottomSheetBehavior.STATE_EXPANDED
+        if (!isDestroying && _binding != null) editorBottomSheet?.state = BottomSheetBehavior.STATE_EXPANDED
       }
     }
     val sb = SpannableStringBuilder()
@@ -793,9 +787,11 @@ abstract class BaseEditorActivity : EdgeToEdgeIDEActivity(), TabLayout.OnTabSele
   }
 
   private fun setupBottomSheet() {
+    if (_binding == null) return
     editorBottomSheet = BottomSheetBehavior.from<View>(content.bottomSheet)
     editorBottomSheet?.addBottomSheetCallback(object : BottomSheetCallback() {
       override fun onStateChanged(bottomSheet: View, newState: Int) {
+        if (isDestroying || _binding == null) return
         if (newState == BottomSheetBehavior.STATE_EXPANDED) {
           val editor = provideCurrentEditor()
           editor?.editor?.ensureWindowsDismissed()
@@ -803,6 +799,7 @@ abstract class BaseEditorActivity : EdgeToEdgeIDEActivity(), TabLayout.OnTabSele
       }
 
       override fun onSlide(bottomSheet: View, slideOffset: Float) {
+        if (isDestroying || _binding == null) return
         content.apply {
           val editorScale = 1 - slideOffset * (1 - EDITOR_CONTAINER_SCALE_FACTOR)
           this.bottomSheet.onSlide(slideOffset)
@@ -814,6 +811,7 @@ abstract class BaseEditorActivity : EdgeToEdgeIDEActivity(), TabLayout.OnTabSele
 
     val observer: OnGlobalLayoutListener = object : OnGlobalLayoutListener {
       override fun onGlobalLayout() {
+        if (isDestroying || _binding == null) return
         contentCardRealHeight = binding.contentCard.height
         content.also {
           it.realContainer.pivotX = it.realContainer.width.toFloat() / 2f
@@ -832,6 +830,7 @@ abstract class BaseEditorActivity : EdgeToEdgeIDEActivity(), TabLayout.OnTabSele
   }
 
   private fun setupDiagnosticInfo() {
+    if (diagnosticInfoBinding == null) return
     val gd = GradientDrawable()
     gd.shape = GradientDrawable.RECTANGLE
     gd.setColor(-0xdededf)
@@ -842,6 +841,7 @@ abstract class BaseEditorActivity : EdgeToEdgeIDEActivity(), TabLayout.OnTabSele
   }
 
   private fun setupContainers() {
+    if (_binding == null) return
     handleDiagnosticsResultVisibility(true)
     handleSearchResultVisibility(true)
   }
@@ -849,11 +849,12 @@ abstract class BaseEditorActivity : EdgeToEdgeIDEActivity(), TabLayout.OnTabSele
   private fun onSoftInputChanged() {
     if (!isDestroying) {
       invalidateOptionsMenu()
-      content.bottomSheet.onSoftInputChanged()
+      if (_binding != null) content.bottomSheet.onSoftInputChanged()
     }
   }
 
   private fun showNeedHelpDialog() {
+    if (isDestroying || isFinishing) return
     val builder = newMaterialDialogBuilder(this)
     builder.setTitle(string.need_help)
     builder.setMessage(string.msg_need_help)

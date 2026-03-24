@@ -39,16 +39,16 @@
                </intent-filter>
           </activity>
 
-          <!-- <activity -->
-          <!-- android:exported="true" -->
-          <!-- android:theme="@style/Theme.AndroidIDE" -->
-          <!-- android:name=".activities.SplashActivity" -->
-          <!-- > -->
-          <!-- <intent-filter> -->
-          <!-- <action android:name="android.intent.action.MAIN" /> -->
-          <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
-          <!-- </intent-filter> -->
-          <!-- </activity> -->
+          <activity
+               android:exported="true"
+               android:theme="@style/Theme.AndroidIDE"
+               android:name=".activities.SplashActivity">
+               <intent-filter>
+                    <action android:name="android.intent.action.MAIN" />
+                    <category android:name="android.intent.category.LAUNCHER" />
+               </intent-filter>
+          </activity>
+          
           <activity
                android:exported="false"
                android:screenOrientation="portrait"
@@ -59,6 +59,7 @@
                     <category android:name="android.intent.category.LAUNCHER" />
                </intent-filter>
           </activity>
+          
           <activity
                android:exported="false"
                android:name=".activities.MainActivity"

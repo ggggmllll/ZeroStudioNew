@@ -1,6 +1,3 @@
-==
-FILE: core/app/src/main/java/com/itsaky/androidide/actions/editor/cursor/CursorPreviousLocationAction.kt
-==
 package com.itsaky.androidide.actions.editor.cursor
 
 import android.content.Context
@@ -14,12 +11,10 @@ import com.itsaky.androidide.cursor.CursorHistoryManager
 
 /**
  * Navigate to the last cursor position Action
- *
- * 【内存泄漏修复优化】：所有的 ActionItem 都已重构为无状态设计，通过 ActionData 获取参数。
- *
  * @author android_zero
  */
 class CursorPreviousLocationAction(context: Context, override val order: Int) : EditorActionItem {
+    
     override val id: String = "ide.editor.cursor.prevLocation"
     override var label: String = ""
     override var visible: Boolean = true
@@ -33,9 +28,9 @@ class CursorPreviousLocationAction(context: Context, override val order: Int) : 
         icon = ContextCompat.getDrawable(context, R.drawable.ic_editor_cursor_prev_location)
     }
 
-
     override fun prepare(data: ActionData) {
         super.prepare(data)
+        // 动态从数据总线中获取，绝不在类层级保留缓存
         val editor = data.get(CodeEditor::class.java)
         // 动态切换可点击状态
         enabled = editor != null && CursorHistoryManager.getTracker(editor).canGoBack()

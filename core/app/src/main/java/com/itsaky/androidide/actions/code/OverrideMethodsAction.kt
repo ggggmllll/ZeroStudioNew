@@ -1,6 +1,3 @@
-==
-FILE: core/app/src/main/java/com/itsaky/androidide/actions/code/OverrideMethodsAction.kt
-==
 package com.itsaky.androidide.actions.code
 
 import android.content.Context
@@ -9,6 +6,7 @@ import androidx.lifecycle.lifecycleScope
 import com.itsaky.androidide.resources.R
 import com.itsaky.androidide.actions.ActionData
 import com.itsaky.androidide.actions.EditorRelatedAction
+import com.itsaky.androidide.actions.requireContext
 import com.itsaky.androidide.projects.IProjectManager
 import com.itsaky.androidide.projects.ModuleProject
 import com.itsaky.androidide.tasks.launchAsyncWithProgress
@@ -20,7 +18,6 @@ import android.zero.studio.kotlin.analysis.symbolic.*
 
 /**
  * Action to override or implement methods from superclasses or interfaces.
- *
  *
  * @author android_zero
  */
@@ -44,7 +41,7 @@ class OverrideMethodsAction(context: Context, override val order: Int) : EditorR
 
     override suspend fun execAction(data: ActionData): Boolean {
         val editor = data.getEditor() ?: return false
-        val activity = editor.context as? AppCompatActivity ?: return false
+        val activity = data.requireContext() as? AppCompatActivity ?: return false
         val file = data.get(File::class.java) ?: return false
         
         val workspace = IProjectManager.getInstance().getWorkspace()
@@ -90,6 +87,7 @@ class OverrideMethodsAction(context: Context, override val order: Int) : EditorR
                 val selectedMembers = members.filterIndexed { index, _ -> checkedItems[index] }
                 if (selectedMembers.isNotEmpty()) {
                     val generatedCode = CodeGenerator.generateOverrideMethods(selectedMembers)
+                    
                     val insertOffset = selectedMembers.first().insertOffset
                     val pos = editor.text.indexer.getCharPosition(insertOffset)
                     val textToInsert = "\n\n$generatedCode"
