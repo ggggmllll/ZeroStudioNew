@@ -21,7 +21,6 @@ import android.zero.studio.kotlin.analysis.symbolic.*
 /**
  * Action to override or implement methods from superclasses or interfaces.
  *
- * 【内存泄漏修复优化】：取消 `private val context` 的修饰符，不保留该 Activity 的长期引用。
  *
  * @author android_zero
  */

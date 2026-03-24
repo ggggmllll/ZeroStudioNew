@@ -18,6 +18,8 @@
 package com.itsaky.androidide.templates.base.root
 
 import com.itsaky.androidide.templates.base.ProjectTemplateBuilder
+import com.itsaky.androidide.templates.base.*
+import com.itsaky.androidide.templates.*
 
 private fun mavenUrl(url: String): String {
     return if (data.useKts) {

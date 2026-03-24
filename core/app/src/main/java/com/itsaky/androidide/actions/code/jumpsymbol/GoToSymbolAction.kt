@@ -15,7 +15,6 @@ import java.io.File
 /**
  * An action to parse the current file using Tree-Sitter and display a bottom sheet with all symbols.
  *
- * 【内存泄漏修复优化】：取消 `private val context` 的修饰符，不保留该 Activity 的长期引用。
  *
  * @author android_zero
  */
@@ -47,7 +46,6 @@ class GoToSymbolAction(context: Context, override val order: Int) : EditorRelate
         ) { _, _ ->
             val code = editor.text.toString()
             
-            // 使用 Tree-Sitter 解析，避免 Unsafe 崩溃
             val symbols = withContext(Dispatchers.IO) {
                 TreeSitterSymbolResolver.parseSymbols(activity, file, code)
             }
