@@ -256,7 +256,7 @@ dependencies {
   // implementation(projects.core.chatai.tts)
   implementation(projects.modules.zeroRegularPreview)
   implementation(projects.modules.composePreview)
-  implementation(projects.modules.colorpicker)
+  // implementation(projects.modules.colorpicker)
   implementation(libs.common.soraLanguageTextmate)
 
   

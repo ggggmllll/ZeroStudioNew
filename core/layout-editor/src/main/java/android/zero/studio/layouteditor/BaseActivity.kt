@@ -37,6 +37,9 @@ open class BaseActivity : AppCompatActivity() {
     override fun onDestroy() {
         ctx.clear()
         super.onDestroy()
+        if (instance == this) {
+        instance = null;
+    }
     }
 
     companion object {
