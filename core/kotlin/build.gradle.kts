@@ -78,7 +78,7 @@ dependencies {
     implementation(projects.core.actions)
     
     // implementation(fileTree(mapOf("dir" to "lib", "include" to listOf("*.jar", "*.aar"))))
-    implementation(files("libs/CreateKotlincJar-2.1.10.jar"))
+    implementation(files("libs/kotlin-compiler-2.2.0b.jar"))
     implementation(files("libs/kotlin-compiler-2.2.0.jar"))
     
     implementation(files("libs/j2k-services-222-1.8.21-377-IJ4167.29.jar"))
