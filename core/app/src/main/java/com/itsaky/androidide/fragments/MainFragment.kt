@@ -198,23 +198,43 @@ class MainFragment : BaseFragment() {
         ) {
             Box(modifier = Modifier.fillMaxSize().background(cardGradient).padding(20.dp)) {
                 Column(modifier = Modifier.fillMaxSize()) {
-                    Text(stringResource(R.string.main_quick_start), color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+                    Text(
+                        text = stringResource(R.string.main_quick_start), 
+                        color = Color.White, 
+                        fontSize = 22.sp, 
+                        fontWeight = FontWeight.Bold
+                    )
                     
                     Box(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
                         Row(
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp), // 按钮之间的间距
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            QuickActionButton(Icons.Default.Add, stringResource(R.string.main_new_project)) {
+                            QuickActionButton(
+                                modifier = Modifier.weight(1f),
+                                icon = Icons.Default.Add, 
+                                label = stringResource(R.string.main_new_project)
+                            ) {
                                 viewModel.setScreen(MainViewModel.SCREEN_TEMPLATE_LIST)
                             }
-                            QuickActionButton(Icons.Default.FolderOpen, stringResource(R.string.main_open_project)) {
+                            
+                            QuickActionButton(
+                                modifier = Modifier.weight(1f),
+                                icon = Icons.Default.FolderOpen, 
+                                label = stringResource(R.string.main_open_project)
+                            ) {
                                 pickDirectory { openProject(it) }
                             }
-                            QuickActionButton(Icons.Default.Share, stringResource(R.string.main_clone_repo)) {
+                            
+                            QuickActionButton(
+                                modifier = Modifier.weight(1f),
+                                icon = Icons.Default.Share, 
+                                label = stringResource(R.string.main_clone_repo)
+                            ) {
                                 ZeroCloneDialogBottomSheetFragment.newInstance(repoId = "").show(childFragmentManager, "CloneBottomSheet")
                             }
                         }
@@ -225,21 +245,29 @@ class MainFragment : BaseFragment() {
     }
 
     @Composable
-    private fun QuickActionButton(icon: ImageVector, label: String, onClick: () -> Unit) {
+    private fun QuickActionButton(modifier: Modifier = Modifier, icon: ImageVector, label: String, onClick: () -> Unit) {
         Surface(
             onClick = onClick,
             color = Color.White.copy(alpha = 0.15f),
-            shape = RoundedCornerShape(10.dp)
+            shape = RoundedCornerShape(10.dp),
+            modifier = modifier
         ) {
             Row(
-                modifier = Modifier.padding(horizontal = 20.dp, vertical = 15.dp), 
+                modifier = Modifier.padding(vertical = 12.dp, horizontal = 4.dp), 
+                horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 // 图标尺寸
                 Icon(icon, null, tint = Color.White, modifier = Modifier.size(18.dp))
-                Spacer(modifier = Modifier.width(6.dp))
-                // 文字尺寸
-                Text(label, color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.Medium)
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = label, 
+                    color = Color.White, 
+                    fontSize = 13.sp, 
+                    fontWeight = FontWeight.Medium,
+                    maxLines = 1, // 设置为不换行
+                    overflow = TextOverflow.Ellipsis
+                )
             }
         }
     }
