@@ -64,7 +64,7 @@ android {
   buildTypes {
     all{ signingConfig = signingConfigs.getByName("all") }
     debug{ isShrinkResources = false }
-    release { isMinifyEnabled = false }
+    release { isMinifyEnabled = true }
   }
   
     compileOptions {
