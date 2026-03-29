@@ -238,6 +238,7 @@ common-org-nanohttpd = { module = "org.nanohttpd:nanohttpd", version.ref = "orgN
 common-com-squareup-javapoet = { module = "com.squareup:javapoet", version = "1.13.0" }
 common-net-ltgt-gradle-incap = { module = "net.ltgt.gradle.incap:incap", version.ref = "incap" }
 common-net-ltgt-gradle-incap-processor = { module = "net.ltgt.gradle.incap:incap-processor", version.ref = "incap" }
+common-asm = { module = "org.ow2.asm:asm", version = "9.7.1" }
 
 # AndroidX 相关sdk
 androidx-annotation = { module = "androidx.annotation:annotation", version.ref = "androidxCore" }
@@ -415,6 +416,7 @@ io-ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "
 io-ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "io-ktor" }
 
 #kotlin相关
+org-jetbrains-kotlin-scripting-compiler-embeddable = { module = "org.jetbrains.kotlin:kotlin-scripting-compiler-embeddable", version.ref = "kotlin" }
 org-jetbrains-kotlin-compiler = { module = "org.jetbrains.kotlin:kotlin-compiler", version.ref = "kotlin" }
 org-jetbrains-kotlin-compiler-embeddable = { module = "org.jetbrains.kotlin:kotlin-compiler-embeddable", version.ref = "kotlin" }
 org-jetbrains-kotlin-ktscompiler = { module = "org.jetbrains.kotlin:kotlin-scripting-compiler", version.ref = "kotlin" }

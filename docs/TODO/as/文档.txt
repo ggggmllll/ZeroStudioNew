@@ -1,0 +1,31 @@
+想要在 AndroidIDE 中实现类似 Android Studio (AS) 的 Layout Editor（包含可视化预览、属性面板和 ConstraintLayout 拖拽手柄），这是 Android 源码库中最复杂的部分之一。它不仅仅是 UI，还涉及到一套完整的 Layoutlib 渲染引擎。
+以下是实现这一功能的核心源码路径及其逻辑架构：
+1. 核心渲染引擎：Layoutlib
+这是 AS 能够在 IDE 界面显示 XML 布局的核心。
+
+* 源码路径：frameworks/layoutlib/ (在 AOSP 仓库中) 或 tools/base/layoutlib-api/ (在 AS 源码中)。
+* 功能：它是一个特殊的 Android 运行时版本，可以将 XML 转换为 Canvas 上的位图。
+* 难点：在安卓手机上运行 Layoutlib 非常困难，因为它是为桌面 JVM 设计的。你可能需要改为使用 本地反射渲染（直接在 Android 系统上实例化 View 并截图）。
+
+2. 布局编辑器 UI (布局预览与设计器)
+这部分负责显示网格、缩放和各种编辑器组件。
+
+* 源码路径：tools/adt/idea/designer/
+* 核心类：
+* NlDesignSurface：主画布区域。
+   * Scene：管理布局中所有 View 的位置和状态。
+   * DesignLayer：处理网格线、内边距和装饰层。
+
+3. 可拖拽手柄与交互 (ConstraintLayout)
+这是你提到的“抓手”和约束逻辑。
+
+* 源码路径：tools/adt/idea/designer/src/com/android/tools/idea/uibuilder/handlers/constraint/
+* 关键组件：
+* ConstraintHandler：专门处理 ConstraintLayout 的拖拽、锚点吸附和约束创建。
+   * SelectionHandle：实现选定 View 边缘的蓝色小圆点（手柄）。
+   * ConstraintInteraction：处理用户拖动锚点连接到另一个 View 的交互逻辑。
+
+4. 属性面板 (Attributes Panel)
+
+* 源码路径：tools/adt/idea/android/src/com/android/tools/idea/uibuilder/property/
+* 功能：根据选中的 View 类型（如 TextView），动态显示可修改的属性（text, color, layout_width 等）。

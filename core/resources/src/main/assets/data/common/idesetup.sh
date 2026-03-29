@@ -431,8 +431,7 @@ download_comp "Android NDK" ".android_ndk.\"${arch}\".\"${ndk_version}\"" "$inst
 download_comp "CMake" ".android_cmake | .${arch} | .${cmake_version}" "$install_dir/android-sdk/cmake/$cmakever_org" "android-cmake"
 
 if [ "$with_cmdline" = true ]; then
-  # Install the Command Line tools
-  download_comp "Command-line tools" ".cmdline_tools" "$install_dir/android-sdk" "cmdline-tools"
+  download_comp "Command-line tools" ".cmdline_tools" "$install_dir/android-sdk/cmdline-tools"
 fi
 
 # Install JDK
@@ -466,3 +465,5 @@ print_success "================================================="
 print_success " Downloads completed. Environment is ready!"
 print_success " Returning to IDE automatically..."
 print_success "================================================="
+
+exit 0

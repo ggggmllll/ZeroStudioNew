@@ -98,7 +98,11 @@ public final class Environment {
   // KtLsp specific
   public static File KOTLIN_LSP_LIBS_JAR_DIR;
   public static File KOTLIN_LSP_LAUNCHER;
-
+  public static File SERVERS_DIR;
+  public static File SERVERS_C_CPP_DIR;
+  public static File SERVERS_KOTLIN_DIR;
+  public static File SERVER_CONFIG_DIR;
+    
   public static File ANDROIDIDE;
 
   /**
@@ -153,9 +157,13 @@ public final class Environment {
     //plugin
     File idePluginDir = mkdirIfNotExits(new File(ANDROIDIDE_HOME, "ideplugin"));
     PLUGIN_HOME = mkdirIfNotExits(new File(ANDROIDIDE_HOME, "plugin"));
+    
     KOTLIN_LSP_HOME = mkdirIfNotExits(new File(idePluginDir, "kotlinLanguageServices"));
     KOTLIN_LSP_LAUNCHER = new File(KOTLIN_LSP_HOME, "bin/kotlin-language-server");
     KOTLIN_LSP_LIBS_JAR_DIR = new File(KOTLIN_LSP_HOME, "lib");
+    SERVERS_KOTLIN_DIR = KOTLIN_LSP_HOME;
+    SERVER_CONFIG_DIR = mkdirIfNotExits(new File(HOME, ".config/kotlin-language-server"));
+    //格式化插件
     FORMAT_KOTLIN_KTFMT = mkdirIfNotExits(new File(idePluginDir, "ktfmt"));
     
     JAVA_HOME = new File(PREFIX, "opt/openjdk");

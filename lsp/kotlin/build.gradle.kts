@@ -17,32 +17,75 @@
 
 import com.itsaky.androidide.build.config.BuildConfig
 
-
 plugins {
-    id("com.android.library")
-    id("kotlin-android")
+  id("com.android.library")
+  id("kotlin-android")
+  id("kotlin-kapt")
+  id("org.jetbrains.kotlin.plugin.compose")
 }
-
-
 
 android {
-    namespace = "${BuildConfig.packageName}.javac.services"
-    
-    buildTypes {
-        release {
-            isMinifyEnabled = false
-        }
-    }
+  namespace = "${BuildConfig.packageName}.lsp.kotlin"
+
+  sourceSets {
+    getByName("androidTest") { assets.srcDirs(rootProject.file("utilities/framework-stubs/libs")) }
+  }
+    composeOptions { kotlinCompilerExtensionVersion = "1.5.15" }
+
+    buildFeatures {
+    compose = true
+  }
 }
 
+kapt { arguments { arg("eventBusIndex", "${BuildConfig.packageName}.events.LspKotlinEventsIndex") } }
+
 dependencies {
-    api(libs.composite.javac)
+  kapt(projects.annotation.processors)
+  kapt(libs.google.auto.service)
 
-    implementation(libs.common.kotlin)
-    implementation(libs.common.utilcode)
-    implementation(libs.google.guava)
+  api(projects.core.indexingApi)
 
-    implementation(projects.core.common)
-    implementation(projects.logging.logger)
-    
+  implementation(libs.androidide.ts)
+  implementation(libs.androidide.ts.java)
+  implementation(libs.androidx.annotation)
+  implementation(libs.androidx.appcompat)
+  implementation(libs.common.editor)
+  implementation(libs.common.javaparser)
+  implementation(libs.common.utilcode)
+
+  // UI/UX
+  implementation(libs.bundles.compose) // androidx compose
+  implementation(libs.androidx.core.ktx)
+
+  implementation(libs.google.auto.service.annotations)
+  implementation(libs.google.guava)
+  implementation(libs.google.gson)
+  implementation(libs.google.material)
+
+  implementation(projects.core.actions)
+  implementation(projects.core.common)
+  implementation(projects.core.lspApi)
+  implementation(projects.core.resources)
+  implementation(projects.editor.api)
+  implementation(projects.java.javacServices)
+  implementation(projects.java.lsp)
+  implementation(projects.termux.shell)
+  implementation(projects.event.eventbusEvents)
+  
+  implementation(libs.composite.javac)
+  implementation(libs.composite.javapoet)
+  implementation(libs.composite.jaxp)
+  implementation(libs.composite.jdkJdeps)
+  implementation(libs.composite.jdt)
+  implementation(libs.composite.googleJavaFormat)
+
+  implementation(libs.androidx.core.ktx)
+  implementation(libs.common.kotlin)
+
+  implementation(libs.org.jetbrains.kotlin.compiler.embeddable)
+  implementation(libs.org.jetbrains.kotlin.scripting.compiler.embeddable)
+  implementation(libs.common.asm)
+
+  implementation(libs.common.org.eclipse.lsp4j)
+  implementation(libs.common.lsp4j.jsonrpc)
 }
