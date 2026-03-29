@@ -1,7 +1,0 @@
-android {
-  packagingOptions {
-    resources {
-      merges += ['merges2']
-    }
-  }
-}

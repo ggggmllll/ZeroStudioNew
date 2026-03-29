@@ -1,6 +1,0 @@
-android {
-  androidResources {
-    additionalParameters 'efgh'
-    noCompress 'a'
-  }
-}

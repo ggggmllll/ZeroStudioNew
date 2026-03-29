@@ -1,7 +1,0 @@
-android {
-  buildTypes {
-    create('of') {
-      applicationIdSuffix 'foo'
-    }
-  }
-}

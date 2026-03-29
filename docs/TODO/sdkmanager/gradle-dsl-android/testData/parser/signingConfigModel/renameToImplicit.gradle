@@ -1,7 +1,0 @@
-android {
-  signingConfigs {
-    notDebug {
-      storePassword 'aPassword'
-    }
-  }
-}

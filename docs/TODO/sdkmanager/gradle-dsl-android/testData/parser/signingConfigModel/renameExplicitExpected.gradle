@@ -1,7 +1,0 @@
-android {
-  signingConfigs {
-    newDebug {
-      storePassword 'aPassword'
-    }
-  }
-}

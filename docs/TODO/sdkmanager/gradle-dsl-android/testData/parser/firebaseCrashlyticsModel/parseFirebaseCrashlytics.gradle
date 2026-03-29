@@ -1,9 +1,0 @@
-android {
-  buildTypes {
-    release {
-      firebaseCrashlytics {
-        nativeSymbolUploadEnabled false
-      }
-    }
-  }
-}

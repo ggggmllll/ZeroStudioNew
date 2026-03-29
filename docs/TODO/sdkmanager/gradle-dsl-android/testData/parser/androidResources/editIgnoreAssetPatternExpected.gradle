@@ -1,6 +1,0 @@
-android {
-  androidResources {
-    additionalParameters 'abcd', 'efgh'
-    ignoreAssetsPattern 'mnop'
-  }
-}

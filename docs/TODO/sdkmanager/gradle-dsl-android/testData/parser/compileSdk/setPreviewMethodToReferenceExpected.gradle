@@ -1,8 +1,0 @@
-ext {
-  sdkVersion = 'Tiramisu'
-}
-android {
-  compileSdk {
-    version = preview(sdkVersion)
-  }
-}

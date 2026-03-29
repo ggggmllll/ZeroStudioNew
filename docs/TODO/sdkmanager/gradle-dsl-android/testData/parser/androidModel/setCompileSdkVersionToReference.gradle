@@ -1,6 +1,0 @@
-ext {
-  sdkVersion = 30
-}
-android {
-  compileSdk 29
-}

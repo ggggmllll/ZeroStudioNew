@@ -1,9 +1,0 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<androidx.appsearch>
-  <appsearch versions="1.1.0-alpha02"/>
-  <appsearch-builtin-types versions="1.1.0-alpha02"/>
-  <appsearch-compiler versions="1.1.0-alpha02"/>
-  <appsearch-local-storage versions="1.1.0-alpha02"/>
-  <appsearch-platform-storage versions="1.1.0-alpha02"/>
-</androidx.appsearch>
-
