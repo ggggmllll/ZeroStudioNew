@@ -221,6 +221,7 @@ include(
     ":termux:emulator",
     ":termux:shared",
     ":termux:view",
+    ":termux:shell",
     ":testing:androidTest",
     ":testing:benchmarks",
     ":testing:commonTest",

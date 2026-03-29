@@ -224,6 +224,7 @@ dependencies {
   implementation(projects.termux.view)
   implementation(projects.termux.emulator)
   implementation(projects.termux.shared)
+  implementation(projects.termux.shell)
   implementation(projects.xml.aaptcompiler)
   implementation(projects.xml.lsp)
   implementation(projects.xml.utils)
