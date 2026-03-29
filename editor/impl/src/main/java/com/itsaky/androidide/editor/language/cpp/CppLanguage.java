@@ -66,7 +66,10 @@ public class CppLanguage extends IDELanguage {
       @NonNull Bundle extraArguments)
       throws CompletionCancelledException {
 
-    //  completer.complete(content, position, publisher, extraArguments);
+    LOG.debug("requireAutoComplete called for C/C++ at line={}, column={}", 
+        position.line, position.column);
+    
+    super.requireAutoComplete(content, position, publisher, extraArguments);
   }
 
   @Override

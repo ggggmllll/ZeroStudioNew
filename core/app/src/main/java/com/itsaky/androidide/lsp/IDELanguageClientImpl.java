@@ -115,45 +115,49 @@ public class IDELanguageClientImpl implements ILanguageClient {
     return mInstance != null;
   }
 
-  @Override
-  public void publishDiagnostics(DiagnosticResult result) {
-    if (result == DiagnosticResult.NO_UPDATE || !canUseActivity()) {
-      // No update is expected
-      return;
-    }
 
-    boolean error = result == null;
-    activity.handleDiagnosticsResultVisibility(error || result.getDiagnostics().isEmpty());
-
-    if (error) {
-      return;
-    }
-
-    File file = result.getFile().toFile();
-    if (!file.exists() || !file.isFile()) {
-      return;
-    }
-
-    final var editorView = activity.getEditorForFile(file);
-    if (editorView != null) {
-      final var editor = editorView.getEditor();
-      if (editor != null) {
-        final var container = new DiagnosticsContainer();
-        try {
-          container.addDiagnostics(
-              result.getDiagnostics().stream()
-                  .map(DiagnosticItem::asDiagnosticRegion)
-                  .collect(Collectors.toList()));
-        } catch (Throwable err) {
-          LOG.error("Unable to map DiagnosticItem to DiagnosticRegion", err);
-        }
-        editor.setDiagnostics(container);
-      }
-    }
-
-    diagnostics.put(file, result.getDiagnostics());
-    activity.setDiagnosticsAdapter(newDiagnosticsAdapter());
+@Override
+public void publishDiagnostics(DiagnosticResult result) {
+  if (result == DiagnosticResult.NO_UPDATE || !canUseActivity()) {
+    // No update is expected
+    return;
   }
+
+  boolean error = result == null;
+  activity.handleDiagnosticsResultVisibility(error || result.getDiagnostics().isEmpty());
+
+  if (error) {
+    return;
+  }
+
+  File file = result.getFile().toFile();
+  if (!file.exists() || !file.isFile()) {
+    return;
+  }
+
+  final var editorView = activity.getEditorForFile(file);
+  if (editorView != null) {
+    final var editor = editorView.getEditor();
+    if (editor != null) {
+      final var container = new DiagnosticsContainer();
+      try {
+        // Get the editor content for position conversion
+        final var content = editor.getText();
+        
+        container.addDiagnostics(
+            result.getDiagnostics().stream()
+                .map(diagnostic -> diagnostic.asDiagnosticRegion(content))
+                .collect(Collectors.toList()));
+      } catch (Throwable err) {
+        LOG.error("Unable to map DiagnosticItem to DiagnosticRegion", err);
+      }
+      editor.setDiagnostics(container);
+    }
+  }
+
+  diagnostics.put(file, result.getDiagnostics());
+  activity.setDiagnosticsAdapter(newDiagnosticsAdapter());
+}
 
   @Nullable
   @Override

@@ -24,6 +24,7 @@ import android.os.Handler
 import android.os.Looper
 import android.util.AttributeSet
 import android.view.inputmethod.EditorInfo
+import android.widget.Toast
 import androidx.annotation.StringRes
 import com.blankj.utilcode.util.FileUtils
 import com.blankj.utilcode.util.SizeUtils
@@ -72,10 +73,12 @@ import com.itsaky.androidide.tasks.cancelIfActive
 import com.itsaky.androidide.tasks.launchAsyncWithProgress
 import com.itsaky.androidide.utils.DocumentUtils
 import com.itsaky.androidide.utils.flashError
+import com.itsaky.androidide.utils.flashInfo
 import io.github.rosemoe.sora.event.ContentChangeEvent
 import io.github.rosemoe.sora.event.SelectionChangeEvent
 import io.github.rosemoe.sora.lang.EmptyLanguage
 import io.github.rosemoe.sora.lang.Language
+import io.github.rosemoe.sora.text.CharPosition
 import io.github.rosemoe.sora.text.UndoManager
 import io.github.rosemoe.sora.widget.CodeEditor
 import io.github.rosemoe.sora.widget.EditorSearcher
@@ -146,10 +149,29 @@ constructor(
     if (cursor.isSelected || _signatureHelpWindow?.isShowing == true) {
       return@Runnable
     }
+    diagnosticWindow.showDiagnostic(
+        languageClient?.getDiagnosticAt(file, cursor.leftLine, cursor.leftColumn)
+    )
 
-    // Get diagnostics using the safe reference
-    val diagnostic = client.getDiagnosticAt(file, cursor.leftLine, cursor.leftColumn)
-    diagnosticWindow.showDiagnostic(diagnostic)
+    // Simple hover tooltip: request hover from server and show as a transient flashbar
+    val server = languageServer ?: return@Runnable
+    val f = file ?: return@Runnable
+    val pos = cursorLSPPosition
+    editorScope.launch(Dispatchers.Default) {
+      val content =
+          safeGet("hover request") {
+            val params = DefinitionParams(f.toPath(), pos, JobCancelChecker())
+            server.hover(params)
+          }
+      content ?: return@launch
+      val text = content.value
+      if (text.isNullOrBlank()) return@launch
+      withContext(Dispatchers.Main) {
+        // Show brief tooltip using Flashbar
+        com.itsaky.androidide.utils.dismissFlashbar()
+        (context as? android.app.Activity)?.flashInfo(text)
+      }
+    }
   }
 
   /**
@@ -293,6 +315,7 @@ constructor(
                     SignatureHelpParams(
                         file = file.toPath(),
                         position = cursorLSPPosition,
+                        content = text,
                         cancelChecker = cancelChecker,
                     )
                 languageServer.signatureHelp(params)

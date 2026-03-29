@@ -44,5 +44,6 @@ data class SignatureHelp(
 data class SignatureHelpParams(
     var file: Path,
     var position: Position,
+    var content: CharSequence? = null,
     override val cancelChecker: ICancelChecker,
 ) : CancellableRequestParams

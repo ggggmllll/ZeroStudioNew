@@ -141,6 +141,11 @@ interface ILanguageServer {
    */
   suspend fun signatureHelp(params: SignatureHelpParams): SignatureHelp
 
+  /** Request hover/tooltip documentation at a position. Default returns empty content. */
+  suspend fun hover(params: DefinitionParams): com.itsaky.androidide.lsp.models.MarkupContent {
+    return com.itsaky.androidide.lsp.models.MarkupContent()
+  }
+
   /**
    * Analyze the given file and provide diagnostics from the analyze result.
    *

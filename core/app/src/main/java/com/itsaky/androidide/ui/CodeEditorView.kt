@@ -32,6 +32,13 @@ import com.itsaky.androidide.editor.databinding.LayoutCodeEditorBinding
 import com.itsaky.androidide.editor.ui.EditorSearchLayout
 import com.itsaky.androidide.editor.ui.IDEEditor
 import com.itsaky.androidide.editor.ui.IDEEditor.Companion.createInputTypeFlags
+import com.itsaky.androidide.editor.ui.cleanupCompletionTooltips
+import com.itsaky.androidide.editor.ui.cleanupHoverTooltips
+import com.itsaky.androidide.editor.ui.clearDiagnostics
+import com.itsaky.androidide.editor.ui.initCompletionTooltips
+import com.itsaky.androidide.editor.ui.initDiagnosticHandling
+import com.itsaky.androidide.editor.ui.initHoverTooltips
+import com.itsaky.androidide.editor.ui.updateEditorDiagnostics
 import com.itsaky.androidide.editor.utils.ContentReadWrite.readContent
 import com.itsaky.androidide.editor.utils.ContentReadWrite.writeTo
 import com.itsaky.androidide.eventbus.events.preferences.PreferenceChangeEvent
@@ -39,6 +46,8 @@ import com.itsaky.androidide.lsp.IDELanguageClientImpl
 import com.itsaky.androidide.lsp.api.ILanguageServer
 import com.itsaky.androidide.lsp.api.ILanguageServerRegistry
 import com.itsaky.androidide.lsp.java.JavaLanguageServer
+import com.itsaky.androidide.lsp.kotlin.KotlinLanguageServer
+import com.itsaky.androidide.lsp.models.DiagnosticResult
 import com.itsaky.androidide.lsp.xml.XMLLanguageServer
 import com.itsaky.androidide.models.Range
 import com.itsaky.androidide.preferences.internal.EditorPreferences
@@ -103,6 +112,8 @@ class CodeEditorView(context: Context, file: File, selection: Range) :
   private val searchLayout: EditorSearchLayout
     get() = checkNotNull(_searchLayout) { "Search layout has been destroyed" }
 
+  private var analysisJob: Job? = null
+
   /** Get the file of this editor. */
   val file: File?
     get() = editor?.file
@@ -156,8 +167,20 @@ class CodeEditorView(context: Context, file: File, selection: Range) :
     addView(searchLayout, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT))
 
     readFileAndApplySelection(file, selection)
+    
+    setupContentChangeListener()
   }
-
+  
+  private fun setupContentChangeListener() {
+    binding.editor.subscribeEvent(io.github.rosemoe.sora.event.ContentChangeEvent::class.java) {
+        event: io.github.rosemoe.sora.event.ContentChangeEvent,
+        _: Any? ->
+      val editorFile = binding.editor.file
+      if (editorFile != null && (editorFile.extension == "kt" || editorFile.extension == "kts")) {
+        startDiagnosticAnalysis(editorFile)
+      }
+    }
+  }
   /**
    * Schedules an auto-save operation if enabled. It cancels any pending auto-save job and starts a
    * new one with the configured delay.
@@ -275,26 +298,38 @@ class CodeEditorView(context: Context, file: File, selection: Range) :
     return true
   }
 
-  // private fun onSmoothCursorMovementChanged() {
-  // binding.editor.isCursorAnimationEnabled = EditorPreferences.smoothCursorMovement
+  private fun startDiagnosticAnalysis(file: File) {
+    // Cancel previous analysis
+    analysisJob?.cancel()
 
-  // val smooth = EditorPreferences.smoothCursorMovement
-  // val style = EditorPreferences.cursorStyle
+    analysisJob = codeEditorScope.launch {
+      // Wait a bit for typing to finish
+      delay(500)
 
-  // if (smooth) {
-  // if (style == "Block") {
-  // binding.editor.setCursorAnimator(BlockCursorAnimator(binding.editor))
-  // } else { // "Underline" or default
-  // binding.editor.setCursorAnimator(MoveCursorAnimator(binding.editor))
-  // }
-  // } else {
-  // binding.editor.isCursorAnimationEnabled = false
-  // }
-  // }
+      val editor = _binding?.editor ?: return@launch
+      val languageServer = editor.languageServer
 
-  // private fun onAutoCompleteOnTypeChanged() {
-  // binding.editor.props.autoCompletionOnComposing = EditorPreferences.autoCompleteOnType
-  // }
+      if (
+          languageServer is KotlinLanguageServer &&
+              (file.extension == "kt" || file.extension == "kts")
+      ) {
+        try {
+          val result = languageServer.analyze(file.toPath())
+
+          if (result != DiagnosticResult.NO_UPDATE) {
+            withContext(Dispatchers.Main) {
+              // Access the diagnostics field directly
+              editor.updateEditorDiagnostics(result.diagnostics)
+            }
+          }
+        } catch (e: Exception) {
+          log.error("Failed to analyze file for diagnostics", e)
+        }
+      }
+
+
+    }
+  }
 
   private fun updateReadWriteProgress(progress: Int) {
     val binding = this.binding
@@ -369,6 +404,16 @@ class CodeEditorView(context: Context, file: File, selection: Range) :
     // This will make sure that textDocument/didOpen is sent
     binding.editor.file = file
 
+    // Initialize diagnostic handling for Kotlin files
+    if (file.extension == "kt" || file.extension == "kts") {
+      binding.editor.initDiagnosticHandling()
+      startDiagnosticAnalysis(file)
+    }
+    binding.editor.initCompletionTooltips()
+    // if (LspUtils.isHoverEnabled() == true) {
+    binding.editor.initHoverTooltips()
+    // }
+
     // do not pass this editor instance
     // symbol input must be updated for the current editor
     (context as? BaseEditorActivity?)?.refreshSymbolInput()
@@ -384,6 +429,8 @@ class CodeEditorView(context: Context, file: File, selection: Range) :
         when (file.extension) {
           "java" -> JavaLanguageServer.SERVER_ID
           "xml" -> XMLLanguageServer.SERVER_ID
+          "kt",
+          "kts" -> KotlinLanguageServer.SERVER_ID
           else -> return null
         }
 
@@ -560,10 +607,14 @@ class CodeEditorView(context: Context, file: File, selection: Range) :
   }
 
   override fun close() {
+    analysisJob?.cancel()
     codeEditorScope.cancelIfActive("Cancellation was requested")
-    autoSaveJob?.cancel()
-
     _binding?.editor?.apply {
+      clearDiagnostics()
+      cleanupCompletionTooltips()
+      // if (LspUtils.isHoverEnabled() == true) {
+      cleanupHoverTooltips()
+      // }
       notifyClose()
       release()
     }

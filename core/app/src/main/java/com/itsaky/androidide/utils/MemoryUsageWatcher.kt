@@ -77,6 +77,7 @@ class MemoryUsageWatcher(private val updateInterval: Long = DEFAULT_UPDATE_INTER
 
     const val MAX_USAGE_ENTRIES = 30
     const val DEFAULT_UPDATE_INTERVAL = 1000L
+    const val MEMORY_PRESSURE_THRESHOLD = 85 // Percentage
     private val log = LoggerFactory.getLogger(MemoryUsageWatcher::class.java)
   }
 
@@ -108,6 +109,19 @@ class MemoryUsageWatcher(private val updateInterval: Long = DEFAULT_UPDATE_INTER
   }
 
   private fun readUsages() {
+    // Check memory pressure before reading usage
+    val runtime = Runtime.getRuntime()
+    val usedMemory = runtime.totalMemory() - runtime.freeMemory()
+    val maxMemory = runtime.maxMemory()
+    val memoryUsagePercent = (usedMemory.toFloat() / maxMemory.toFloat()) * 100
+
+    if (memoryUsagePercent > MEMORY_PRESSURE_THRESHOLD) {
+      log.warn(
+          "High memory pressure detected: ${memoryUsagePercent.toInt()}%, skipping memory reading"
+      )
+      return
+    }
+
     val activityManager = BaseApplication.getBaseInstance().getSystemService<ActivityManager>()
     if (activityManager == null) {
       log.error("ActivityManager is null")

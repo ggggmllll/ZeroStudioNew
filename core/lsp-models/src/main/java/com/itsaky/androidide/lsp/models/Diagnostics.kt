@@ -53,10 +53,51 @@ data class DiagnosticItem(
         HINT -> SEVERITY_TYPO
       }
     }
+
+    // Helper to convert line/column to character index
+    fun lineColumnToIndex(content: CharSequence, line: Int, column: Int): Int {
+      var currentLine = 0
+      var index = 0
+
+      while (currentLine < line && index < content.length) {
+        if (content[index] == '\n') {
+          currentLine++
+        }
+        index++
+      }
+
+      return minOf(index + column, content.length)
+    }
   }
 
-  fun asDiagnosticRegion(): DiagnosticRegion =
-      DiagnosticRegion(range.start.requireIndex(), range.end.requireIndex(), mapSeverity(severity))
+  fun asDiagnosticRegion(content: CharSequence): DiagnosticRegion {
+    try {
+      // Convert line/column positions to character indices
+      val startIndex = lineColumnToIndex(content, range.start.line, range.start.column)
+      val endIndex = lineColumnToIndex(content, range.end.line, range.end.column)
+
+      return DiagnosticRegion(startIndex, endIndex, mapSeverity(severity))
+    } catch (e: Exception) {
+      // KslLogs.error("Failed to create diagnostic region", e)
+      // Return a minimal valid region
+      return DiagnosticRegion(0, 1, mapSeverity(severity))
+    }
+  }
+
+  private fun lineColumnToIndex(content: CharSequence, line: Int, column: Int): Int {
+    var currentLine = 0
+    var index = 0
+
+    while (currentLine < line && index < content.length) {
+      if (content[index] == '\n') {
+        currentLine++
+      }
+      index++
+    }
+
+    // Add column offset
+    return minOf(index + column, content.length)
+  }
 }
 
 data class DiagnosticResult(var file: Path, var diagnostics: List<DiagnosticItem>) {
