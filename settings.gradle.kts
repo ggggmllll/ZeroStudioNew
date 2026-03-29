@@ -213,6 +213,7 @@ include(
     ":event:eventbus-events",
     ":java:javac-services",
     ":java:lsp",
+    ":lsp:kotlin",
     ":logging:idestats",
     ":logging:logger",
     ":logging:logsender",
