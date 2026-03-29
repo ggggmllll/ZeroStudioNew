@@ -4,8 +4,7 @@ plugins {
 }
 
 android {
-  namespace = "com.termux"
-  }
+  namespace = "com.termux.shell"
 }
 
 dependencies {
