@@ -20,6 +20,7 @@ package com.itsaky.androidide.templates.base
 import android.content.Context
 import android.view.View
 import androidx.annotation.StringRes
+import com.itsaky.androidide.templates.*
 import com.itsaky.androidide.templates.BooleanParameter
 import com.itsaky.androidide.templates.CheckBoxWidget
 import com.itsaky.androidide.templates.EnumParameter
@@ -31,7 +32,6 @@ import com.itsaky.androidide.templates.ModuleTemplateData
 import com.itsaky.androidide.templates.ModuleType
 import com.itsaky.androidide.templates.ModuleType.AndroidApp
 import com.itsaky.androidide.templates.ModuleType.AndroidLibrary
-import com.itsaky.androidide.templates.*
 import com.itsaky.androidide.templates.ParameterConstraint.DIRECTORY
 import com.itsaky.androidide.templates.ParameterConstraint.EXISTS
 import com.itsaky.androidide.templates.ParameterConstraint.MODULE_NAME
@@ -49,10 +49,10 @@ import com.itsaky.androidide.templates.base.util.moduleNameToDir
 import com.itsaky.androidide.templates.enumParameter
 import com.itsaky.androidide.templates.minSdkParameter
 import com.itsaky.androidide.templates.packageNameParameter
+import com.itsaky.androidide.templates.projectCmakeVersionParameter
 import com.itsaky.androidide.templates.projectLanguageParameter
 import com.itsaky.androidide.templates.projectNameParameter
 import com.itsaky.androidide.templates.projectNdkVersionParameter
-import com.itsaky.androidide.templates.projectCmakeVersionParameter
 import com.itsaky.androidide.templates.stringParameter
 import com.itsaky.androidide.templates.useKtsParameter
 import com.itsaky.androidide.templates.useNdkParameter
@@ -136,7 +136,6 @@ internal fun updateBrowseClickListener(parameter: StringParameter) {
   _currentBrowseParameter = parameter
 }
 
-
 /**
  * Setup base files for project templates.
  *
@@ -174,12 +173,11 @@ inline fun baseProject(
         Environment.mkdirIfNotExits(Environment.PROJECTS_DIR)
 
         // Create the click listener that will be used
-        val browseClickListener =
-            View.OnClickListener {
-              _currentBrowseParameter?.let { param ->
-                _fileBrowserCallback?.openFileBrowser(param.value, param)
-              }
-            }
+        val browseClickListener = View.OnClickListener {
+          _currentBrowseParameter?.let { param ->
+            _fileBrowserCallback?.openFileBrowser(param.value, param)
+          }
+        }
 
         val saveLocation = stringParameter {
           name = R.string.wizard_save_location
@@ -197,7 +195,7 @@ inline fun baseProject(
         projectName.doBeforeCreateView {
           it.setValue(getNewProjectName(saveLocation.value, projectName.value))
         }
-        
+
         ndkVersion.isVisible = useNdk.default
         cmakeVersion.isVisible = useCmake.default
 
@@ -223,14 +221,14 @@ inline fun baseProject(
 
         // 监听复选框状态改变
         useNdk.observe { ndkParam ->
-            val isNativeEnabled = ndkParam.value
-            // 当勾选 NDK 时显示，取消勾选时隐藏（监听器会自动更新UI）
-            ndkVersion.isVisible = isNativeEnabled
-            cmakeVersion.isVisible = isNativeEnabled
+          val isNativeEnabled = ndkParam.value
+          // 当勾选 NDK 时显示，取消勾选时隐藏（监听器会自动更新UI）
+          ndkVersion.isVisible = isNativeEnabled
+          cmakeVersion.isVisible = isNativeEnabled
         }
 
         saveLastSaveLocation(context, saveLocation.value)
- 
+
         // Setup the required properties before executing the recipe
         preRecipe = {
           this@apply._executor = this
@@ -250,7 +248,7 @@ inline fun baseProject(
                   ndkVersion = ndkVersion.value.version,
                   useCmake = useCmake.value,
                   cmakeVersion = cmakeVersion.value.version,
-            )
+              )
 
           if (data.projectDir.exists() && data.projectDir.listFiles()?.isNotEmpty() == true) {
             throw IllegalArgumentException("Project directory already exists")
@@ -291,11 +289,11 @@ inline fun baseProject(
 
           // .gitignore
           gitignore()
-          
-          
-          // generateToml和buildGradle因为执行顺序导致bug，所以已经迁移到ProjectTemplateBuilder.kt -> buildInternal(): ProjectTemplate
+
+          // generateToml和buildGradle因为执行顺序导致bug，所以已经迁移到ProjectTemplateBuilder.kt ->
+          // buildInternal(): ProjectTemplate
           // Automatically generate TOML
-          // generateToml() 
+          // generateToml()
           // build.gradle[.kts] - Call this LAST after modules have been processed
           // buildGradle()
         }

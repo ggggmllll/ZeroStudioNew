@@ -16,7 +16,7 @@
 package com.android.tools.idea.wizard.template.impl.other.emptyCalApp.res.xml
 
 fun automotiveAppDescXml() =
-  """
+    """
 <?xml version="1.0" encoding="utf-8"?>
 <automotiveApp>
     <uses name="template" />

@@ -29,8 +29,7 @@ import org.xmlpull.v1.XmlPullParser
  *
  * @author Akash Yadav
  */
-class StateListParser(parser: XmlPullParser?, minDepth: Int) :
-  IDrawableParser(parser, minDepth) {
+class StateListParser(parser: XmlPullParser?, minDepth: Int) : IDrawableParser(parser, minDepth) {
 
   companion object {
 
@@ -67,8 +66,7 @@ class StateListParser(parser: XmlPullParser?, minDepth: Int) :
   }
 
   /**
-   * Add all the defined states of the current tag in `parser` to the given state list
-   * drawable.
+   * Add all the defined states of the current tag in `parser` to the given state list drawable.
    *
    * @param states The drawable to add states to.
    * @param drawable The drawable associated with the defined states;

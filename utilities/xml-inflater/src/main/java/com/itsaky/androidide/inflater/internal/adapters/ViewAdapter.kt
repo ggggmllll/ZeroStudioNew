@@ -186,10 +186,10 @@ open class ViewAdapter<T : View> : IViewAdapter<T>() {
   }
 
   protected open fun applyLayoutParams(
-    context: Context,
-    params: LayoutParams,
-    name: String,
-    value: String,
+      context: Context,
+      params: LayoutParams,
+      name: String,
+      value: String,
   ): Boolean {
     var applied = true
     when (name) {
@@ -201,10 +201,10 @@ open class ViewAdapter<T : View> : IViewAdapter<T>() {
   }
 
   protected open fun applyMarginParams(
-    context: Context,
-    params: MarginLayoutParams,
-    name: String,
-    value: String,
+      context: Context,
+      params: MarginLayoutParams,
+      name: String,
+      value: String,
   ): Boolean {
     var handled = true
     when (name) {
@@ -224,9 +224,9 @@ open class ViewAdapter<T : View> : IViewAdapter<T>() {
   }
 
   protected open fun applyLinearLayoutParams(
-    params: LinearLayout.LayoutParams,
-    name: String,
-    value: String,
+      params: LinearLayout.LayoutParams,
+      name: String,
+      value: String,
   ): Boolean {
     var applied = true
     when (name) {
@@ -238,10 +238,10 @@ open class ViewAdapter<T : View> : IViewAdapter<T>() {
   }
 
   protected open fun applyRelativeLayoutParams(
-    params: RelativeLayout.LayoutParams,
-    resName: String,
-    name: String,
-    value: String,
+      params: RelativeLayout.LayoutParams,
+      resName: String,
+      name: String,
+      value: String,
   ): Boolean {
     var handled = true
     when (name) {
@@ -274,9 +274,9 @@ open class ViewAdapter<T : View> : IViewAdapter<T>() {
   }
 
   protected open fun applyFrameLayoutParams(
-    params: FrameLayout.LayoutParams,
-    name: String,
-    value: String,
+      params: FrameLayout.LayoutParams,
+      name: String,
+      value: String,
   ): Boolean {
     var applied = true
     if ("layout_gravity" == name) {
@@ -313,9 +313,9 @@ open class ViewAdapter<T : View> : IViewAdapter<T>() {
   }
 
   private fun setRuleIf(
-    condition: Boolean,
-    rule: Int,
-    params: RelativeLayout.LayoutParams,
+      condition: Boolean,
+      rule: Int,
+      params: RelativeLayout.LayoutParams,
   ) {
     if (condition) {
       params.addRule(rule)

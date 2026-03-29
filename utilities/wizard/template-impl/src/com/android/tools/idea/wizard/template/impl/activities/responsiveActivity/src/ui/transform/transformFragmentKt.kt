@@ -21,12 +21,12 @@ import com.android.tools.idea.wizard.template.impl.activities.common.importViewB
 import com.android.tools.idea.wizard.template.impl.activities.common.layoutToViewBindingClass
 
 fun transformFragmentKt(
-  packageName: String,
-  applicationPackage: String?,
-  fragmentClassName: String,
-  navFragmentPrefix: String,
-  navViewModelClass: String,
-  isViewBindingSupported: Boolean,
+    packageName: String,
+    applicationPackage: String?,
+    fragmentClassName: String,
+    navFragmentPrefix: String,
+    navViewModelClass: String,
+    isViewBindingSupported: Boolean,
 ): String {
 
   val layoutName = "fragment_transform"

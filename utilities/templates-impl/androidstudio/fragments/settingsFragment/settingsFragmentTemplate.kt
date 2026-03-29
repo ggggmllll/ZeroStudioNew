@@ -26,10 +26,10 @@ import com.android.tools.idea.wizard.template.TemplateConstraint
 import com.android.tools.idea.wizard.template.TemplateData
 import com.android.tools.idea.wizard.template.TextFieldWidget
 import com.android.tools.idea.wizard.template.WizardUiContext
-import com.itsaky.androidide.templates.impl.androidstudio.activities.common.MIN_API
-import com.itsaky.androidide.templates.impl.androidstudio.defaultPackageNameParameter
 import com.android.tools.idea.wizard.template.stringParameter
 import com.android.tools.idea.wizard.template.template
+import com.itsaky.androidide.templates.impl.androidstudio.activities.common.MIN_API
+import com.itsaky.androidide.templates.impl.androidstudio.defaultPackageNameParameter
 import java.io.File
 
 val settingsFragmentTemplate
@@ -57,5 +57,7 @@ val settingsFragmentTemplate
 
     thumb { File("settings-fragment").resolve("template_settings_fragment.png") }
 
-    recipe = { data: TemplateData -> settingsFragmentRecipe(data as ModuleTemplateData, fragmentClass.value, packageName.value) }
+    recipe = { data: TemplateData ->
+      settingsFragmentRecipe(data as ModuleTemplateData, fragmentClass.value, packageName.value)
+    }
   }

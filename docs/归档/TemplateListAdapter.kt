@@ -34,21 +34,19 @@ import com.itsaky.androidide.templates.Template
  * @author Akash Yadav
  */
 class TemplateListAdapter(
-  templates: List<Template<*>>,
-  private val onClick: ((Template<*>, ViewHolder) -> Unit)? = null
+    templates: List<Template<*>>,
+    private val onClick: ((Template<*>, ViewHolder) -> Unit)? = null,
 ) : RecyclerView.Adapter<ViewHolder>() {
 
   private val templates = templates.toMutableList()
 
   class ViewHolder(internal val binding: LayoutTemplateListItemBinding) :
-    RecyclerView.ViewHolder(binding.root)
+      RecyclerView.ViewHolder(binding.root)
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-    return ViewHolder(LayoutTemplateListItemBinding.inflate(
-      LayoutInflater.from(parent.context),
-      parent,
-      false
-    ))
+    return ViewHolder(
+        LayoutTemplateListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+    )
   }
 
   override fun getItemCount(): Int {
@@ -65,13 +63,12 @@ class TemplateListAdapter(
       templateName.setText(template.templateName)
       templateIcon.setImageResource(template.thumb)
       templateIcon.shapeAppearanceModel =
-        templateIcon.shapeAppearanceModel.toBuilder()
-          .setAllCorners(CornerFamily.ROUNDED, ConvertUtils.dp2px(8f).toFloat())
-          .build()
+          templateIcon.shapeAppearanceModel
+              .toBuilder()
+              .setAllCorners(CornerFamily.ROUNDED, ConvertUtils.dp2px(8f).toFloat())
+              .build()
 
-      root.setOnClickListener {
-        onClick?.invoke(template, holder)
-      }
+      root.setOnClickListener { onClick?.invoke(template, holder) }
     }
   }
 
@@ -81,23 +78,26 @@ class TemplateListAdapter(
       templates.add(Template.EMPTY)
     }
 
-    val diff = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
-      override fun getOldListSize(): Int {
-        return count
-      }
+    val diff =
+        DiffUtil.calculateDiff(
+            object : DiffUtil.Callback() {
+              override fun getOldListSize(): Int {
+                return count
+              }
 
-      override fun getNewListSize(): Int {
-        return count + extras
-      }
+              override fun getNewListSize(): Int {
+                return count + extras
+              }
 
-      override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-        return newItemPosition < count && oldItemPosition == newItemPosition
-      }
+              override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                return newItemPosition < count && oldItemPosition == newItemPosition
+              }
 
-      override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-        return areItemsTheSame(oldItemPosition, newItemPosition)
-      }
-    })
+              override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                return areItemsTheSame(oldItemPosition, newItemPosition)
+              }
+            }
+        )
 
     diff.dispatchUpdatesTo(this)
   }

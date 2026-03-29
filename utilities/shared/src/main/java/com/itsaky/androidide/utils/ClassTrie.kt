@@ -195,7 +195,7 @@ open class ClassTrie(val root: Node = Node()) {
   }
 
   protected open fun createNode(node: Node, segment: String, segments: List<String>, index: Int) =
-    node.createChild(segment, segments.subList(0, index + 1).joinToString(separator = "."))
+      node.createChild(segment, segments.subList(0, index + 1).joinToString(separator = "."))
 
   private fun addRecursively(node: Node, classes: MutableList<Node>) {
     if (node.isClass) {

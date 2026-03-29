@@ -19,14 +19,14 @@ package com.android.tools.idea.wizard.template.impl.activities.composeNavigation
 import com.android.tools.idea.wizard.template.escapeKotlinIdentifier
 
 fun mainActivityKt(
-  activityClass: String,
-  defaultPreview: String,
-  greeting: String,
-  packageName: String,
-  themeName: String,
-  appComposableName: String,
+    activityClass: String,
+    defaultPreview: String,
+    greeting: String,
+    packageName: String,
+    themeName: String,
+    appComposableName: String,
 ) =
-  """
+    """
 package ${escapeKotlinIdentifier(packageName)}
 
 import android.os.Bundle

@@ -20,7 +20,7 @@ import com.android.tools.idea.wizard.template.ThemesData
 import com.android.tools.idea.wizard.template.impl.activities.fullscreenActivity.res.values.getFullscreenContainerThemeOverlay
 
 fun fullscreenThemes(themesData: ThemesData) =
-  """<resources>
+    """<resources>
     <style name="${getFullscreenContainerThemeOverlay(themesData.overlay.name)}" parent="">
         <item name="fullscreenBackgroundColor">@color/${MaterialColor.LIGHT_BLUE_900.colorName}</item>
         <item name="fullscreenTextColor">@color/${MaterialColor.LIGHT_BLUE_A400.colorName}</item>

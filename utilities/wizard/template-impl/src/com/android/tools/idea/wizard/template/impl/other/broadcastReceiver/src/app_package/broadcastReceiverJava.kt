@@ -17,7 +17,7 @@
 package com.android.tools.idea.wizard.template.impl.other.broadcastReceiver.src.app_package
 
 fun broadcastReceiverJava(className: String, packageName: String) =
-  """
+    """
 package ${packageName};
 
 import android.content.BroadcastReceiver;

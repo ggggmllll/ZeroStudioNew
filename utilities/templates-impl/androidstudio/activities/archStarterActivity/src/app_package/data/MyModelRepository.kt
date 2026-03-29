@@ -25,7 +25,7 @@ import com.itsaky.androidide.templates.impl.androidstudio.activities.archStarter
  * @author android_zero
  */
 fun ArchStarterActivityTemplateVariables.repository() =
-  """
+    """
 package $dataPackage
 
 import kotlinx.coroutines.flow.Flow

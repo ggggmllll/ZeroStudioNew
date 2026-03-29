@@ -19,10 +19,10 @@ package com.itsaky.androidide.javac.services.fs
 
 import com.itsaky.androidide.zipfs2.ZipFileSystem
 import com.itsaky.androidide.zipfs2.ZipFileSystemProvider
-import jdkx.lang.model.SourceVersion
-import openjdk.tools.javac.file.RelativePath.RelativeDirectory
 import java.io.IOException
 import java.nio.file.Path
+import jdkx.lang.model.SourceVersion
+import openjdk.tools.javac.file.RelativePath.RelativeDirectory
 
 /**
  * A cached file system for JAR files.
@@ -30,11 +30,11 @@ import java.nio.file.Path
  * @author Akash Yadav
  */
 class CachedJarFileSystem(
-  provider: ZipFileSystemProvider?,
-  zfpath: Path?,
-  env: MutableMap<String, *>?
+    provider: ZipFileSystemProvider?,
+    zfpath: Path?,
+    env: MutableMap<String, *>?,
 ) : ZipFileSystem(provider, zfpath, env) {
-  
+
   internal val packages = mutableMapOf<RelativeDirectory, Path>()
 
   override fun close() {

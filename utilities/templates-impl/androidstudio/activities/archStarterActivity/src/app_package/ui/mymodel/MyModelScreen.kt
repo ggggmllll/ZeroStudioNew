@@ -25,7 +25,7 @@ import com.itsaky.androidide.templates.impl.androidstudio.activities.archStarter
  * @author android_zero
  */
 fun ArchStarterActivityTemplateVariables.modelScreen() =
-  """
+    """
 package $modelPackage
 
 import $themeNameQualified

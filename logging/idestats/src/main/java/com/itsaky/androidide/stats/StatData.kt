@@ -34,23 +34,12 @@ import com.itsaky.androidide.stats.StatUploadWorker.Companion.KEY_DEVICE_NAME
  * @author Akash Yadav
  */
 data class StatData(
-  @SerializedName(KEY_DEVICE_ID)
-  val deviceId: String,
-
-  @SerializedName(KEY_DEVICE_NAME)
-  val deviceName: String,
-
-  @SerializedName(KEY_DEVICE_COUNTRY)
-  val deviceCountry: String,
-
-  @SerializedName(KEY_ANDROID_VERSION)
-  val androidVersion: Int,
-
-  @SerializedName(KEY_APP_VERSION)
-  val appVersion: String,
-
-  @SerializedName(KEY_APP_CPU_ARCH)
-  val cpuArch: String
+    @SerializedName(KEY_DEVICE_ID) val deviceId: String,
+    @SerializedName(KEY_DEVICE_NAME) val deviceName: String,
+    @SerializedName(KEY_DEVICE_COUNTRY) val deviceCountry: String,
+    @SerializedName(KEY_ANDROID_VERSION) val androidVersion: Int,
+    @SerializedName(KEY_APP_VERSION) val appVersion: String,
+    @SerializedName(KEY_APP_CPU_ARCH) val cpuArch: String,
 ) {
 
   companion object {
@@ -69,32 +58,32 @@ data class StatData(
       val appVersion = inputData.getString(KEY_APP_VERSION)
       val cpuArch = inputData.getString(KEY_APP_CPU_ARCH)
 
-      if (deviceId == null
-        || deviceName == null
-        || deviceCountry == null
-        || androidVersion < Build.VERSION_CODES.O
-        || appVersion == null
-        || cpuArch == null
+      if (
+          deviceId == null ||
+              deviceName == null ||
+              deviceCountry == null ||
+              androidVersion < Build.VERSION_CODES.O ||
+              appVersion == null ||
+              cpuArch == null
       ) {
         throw IllegalArgumentException(
-          "Work data does not contain required fields or has invalid field values")
+            "Work data does not contain required fields or has invalid field values"
+        )
       }
 
       return StatData(deviceId, deviceName, deviceCountry, androidVersion, appVersion, cpuArch)
     }
   }
 
-  /**
-   * Get the stat data as [input data][Data].
-   */
+  /** Get the stat data as [input data][Data]. */
   fun toInputData(): Data {
     return workDataOf(
-      KEY_DEVICE_ID to deviceId,
-      KEY_DEVICE_NAME to deviceName,
-      KEY_DEVICE_COUNTRY to deviceCountry,
-      KEY_ANDROID_VERSION to androidVersion,
-      KEY_APP_VERSION to appVersion,
-      KEY_APP_CPU_ARCH to cpuArch
+        KEY_DEVICE_ID to deviceId,
+        KEY_DEVICE_NAME to deviceName,
+        KEY_DEVICE_COUNTRY to deviceCountry,
+        KEY_ANDROID_VERSION to androidVersion,
+        KEY_APP_VERSION to appVersion,
+        KEY_APP_CPU_ARCH to cpuArch,
     )
   }
 }

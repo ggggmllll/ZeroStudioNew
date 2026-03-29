@@ -17,7 +17,7 @@
 package com.itsaky.androidide.templates.impl.androidstudio.fragments.viewModelFragment.res.layout
 
 fun blankFragmentXml(fragmentClass: String, packageName: String) =
-  """
+    """
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"

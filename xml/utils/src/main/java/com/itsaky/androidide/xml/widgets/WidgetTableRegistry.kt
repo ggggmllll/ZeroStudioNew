@@ -36,8 +36,8 @@ interface WidgetTableRegistry : XmlRegistry<WidgetTable> {
     @JvmStatic
     fun getInstance(): WidgetTableRegistry {
       val klass = WidgetTableRegistry::class.java
-      return sInstance ?: ServiceLoader.load(klass, klass.classLoader).findFirstOrThrow()
-        .also { sInstance = it }
+      return sInstance
+          ?: ServiceLoader.load(klass, klass.classLoader).findFirstOrThrow().also { sInstance = it }
     }
   }
 }

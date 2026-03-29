@@ -21,45 +21,47 @@ import androidx.compose.runtime.mutableStateListOf
 import com.itsaky.androidide.lsp.util.Logger
 
 /**
- * A dedicated registry for Language Server Protocol (LSP) servers that are
- * dynamically provided by AndroidIDE extensions (plugins).
+ * A dedicated registry for Language Server Protocol (LSP) servers that are dynamically provided by
+ * AndroidIDE extensions (plugins).
  *
- * This object provides a safe and standard way for extensions to add or remove
- * their LSP capabilities at runtime. The [LspManager] will query this registry
- * to get a complete list of all available servers.
+ * This object provides a safe and standard way for extensions to add or remove their LSP
+ * capabilities at runtime. The [LspManager] will query this registry to get a complete list of all
+ * available servers.
  *
  * @author android_zero
  */
 object ExtensionLspRegistry {
-    private val LOG = Logger.instance("ExtensionLspRegistry")
-    
-    /**
-     * A Compose-observable and thread-safe list holding servers registered by extensions.
-     */
-    val servers = mutableStateListOf<BaseLspServer>()
+  private val LOG = Logger.instance("ExtensionLspRegistry")
 
-    /**
-     * Called by the extension host to register a new LSP server.
-     * The method is idempotent; registering the same server multiple times has no effect.
-     *
-     * @param server The [BaseLspServer] implementation provided by the extension.
-     */
-    fun registerServer(server: BaseLspServer) {
-        if (servers.none { it.id == server.id }) {
-            servers.add(server)
-            LOG.info("Extension LSP server '${server.languageName}' (id: ${server.id}) has been registered.")
-        }
-    }
+  /** A Compose-observable and thread-safe list holding servers registered by extensions. */
+  val servers = mutableStateListOf<BaseLspServer>()
 
-    /**
-     * Called by the extension host when an extension is being unloaded or disabled.
-     * This removes the server from the active list.
-     *
-     * @param server The [BaseLspServer] instance to unregister.
-     */
-    fun unregisterServer(server: BaseLspServer) {
-        if (servers.remove(server)) {
-            LOG.info("Extension LSP server '${server.languageName}' (id: ${server.id}) has been unregistered.")
-        }
+  /**
+   * Called by the extension host to register a new LSP server. The method is idempotent;
+   * registering the same server multiple times has no effect.
+   *
+   * @param server The [BaseLspServer] implementation provided by the extension.
+   */
+  fun registerServer(server: BaseLspServer) {
+    if (servers.none { it.id == server.id }) {
+      servers.add(server)
+      LOG.info(
+          "Extension LSP server '${server.languageName}' (id: ${server.id}) has been registered."
+      )
     }
+  }
+
+  /**
+   * Called by the extension host when an extension is being unloaded or disabled. This removes the
+   * server from the active list.
+   *
+   * @param server The [BaseLspServer] instance to unregister.
+   */
+  fun unregisterServer(server: BaseLspServer) {
+    if (servers.remove(server)) {
+      LOG.info(
+          "Extension LSP server '${server.languageName}' (id: ${server.id}) has been unregistered."
+      )
+    }
+  }
 }

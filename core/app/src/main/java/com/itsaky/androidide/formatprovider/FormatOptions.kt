@@ -14,18 +14,15 @@
  *  You should have received a copy of the GNU General Public License
  *   along with AndroidIDE.  If not, see <https://www.gnu.org/licenses/>.
  */
- package com.itsaky.androidide.formatprovider
+package com.itsaky.androidide.formatprovider
 
-data class FormatOptions(
-    val indentSize: Int = 4,
-    val useTabs: Boolean = false
-)
+data class FormatOptions(val indentSize: Int = 4, val useTabs: Boolean = false)
 
-data class JavaFormatOptions(
-    val style: Style = Style.AOSP,
-    val organizeImports: Boolean = true
-) {
-    enum class Style { AOSP, GOOGLE }
+data class JavaFormatOptions(val style: Style = Style.AOSP, val organizeImports: Boolean = true) {
+  enum class Style {
+    AOSP,
+    GOOGLE,
+  }
 }
 
 // NOTE: This class was redeclared in another file.

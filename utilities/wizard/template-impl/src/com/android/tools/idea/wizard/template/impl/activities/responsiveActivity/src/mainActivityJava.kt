@@ -20,14 +20,14 @@ import com.android.tools.idea.wizard.template.impl.activities.common.importViewB
 import com.android.tools.idea.wizard.template.underscoreToLowerCamelCase
 
 fun mainActivityJava(
-  packageName: String,
-  applicationPackage: String?,
-  activityClass: String,
-  appBarLayoutName: String,
-  contentMainLayoutName: String,
-  layoutName: String,
-  navHostFragmentId: String,
-  isViewBindingSupported: Boolean,
+    packageName: String,
+    applicationPackage: String?,
+    activityClass: String,
+    appBarLayoutName: String,
+    contentMainLayoutName: String,
+    layoutName: String,
+    navHostFragmentId: String,
+    isViewBindingSupported: Boolean,
 ): String {
 
   val appBarMainBinding = underscoreToLowerCamelCase(appBarLayoutName)

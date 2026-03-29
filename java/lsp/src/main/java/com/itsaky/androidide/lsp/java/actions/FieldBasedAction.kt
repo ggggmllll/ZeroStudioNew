@@ -30,14 +30,14 @@ import com.itsaky.androidide.projects.IProjectManager
 import com.itsaky.androidide.resources.R
 import com.itsaky.androidide.utils.flashInfo
 import io.github.rosemoe.sora.widget.CodeEditor
+import java.nio.file.Path
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.CompletionException
 import jdkx.lang.model.element.Modifier.STATIC
 import openjdk.source.tree.ClassTree
 import openjdk.source.tree.Tree.Kind.VARIABLE
 import openjdk.source.tree.VariableTree
 import org.slf4j.LoggerFactory
-import java.nio.file.Path
-import java.util.concurrent.CompletableFuture
-import java.util.concurrent.CompletionException
 
 /**
  * Any action that has to work with fields in the current class can inherit this action.
@@ -55,12 +55,12 @@ abstract class FieldBasedAction : BaseJavaCodeAction() {
     super.prepare(data)
 
     if (
-      !visible ||
-      !data.hasRequiredData(
-        com.itsaky.androidide.models.Range::class.java,
-        CodeEditor::class.java
-      ) ||
-      IProjectManager.getInstance().getWorkspace() == null
+        !visible ||
+            !data.hasRequiredData(
+                com.itsaky.androidide.models.Range::class.java,
+                CodeEditor::class.java,
+            ) ||
+            IProjectManager.getInstance().getWorkspace() == null
     ) {
       markInvisible()
       return
@@ -74,7 +74,7 @@ abstract class FieldBasedAction : BaseJavaCodeAction() {
     val range = data[com.itsaky.androidide.models.Range::class.java]!!
     val file = data.requirePath()
     val module =
-      IProjectManager.getInstance().getWorkspace()?.findModuleForFile(file, false) ?: return Any()
+        IProjectManager.getInstance().getWorkspace()?.findModuleForFile(file, false) ?: return Any()
 
     return JavaCompilerProvider.get(module).compile(file).get { task ->
       val triple = findFields(task, file, range)
@@ -89,9 +89,9 @@ abstract class FieldBasedAction : BaseJavaCodeAction() {
   }
 
   protected fun findFields(
-    task: CompileTask,
-    file: Path,
-    range: com.itsaky.androidide.models.Range
+      task: CompileTask,
+      file: Path,
+      range: com.itsaky.androidide.models.Range,
   ): Triple<FindTypeDeclarationAt, ClassTree, MutableList<VariableTree>> {
     // 1-based line and column index
     val startLine = range.start.line + 1
@@ -104,7 +104,7 @@ abstract class FieldBasedAction : BaseJavaCodeAction() {
 
     if (start == (-1).toLong() || end == (-1).toLong()) {
       throw CompletionException(
-        RuntimeException("Unable to find position for the given selection range")
+          RuntimeException("Unable to find position for the given selection range")
       )
     }
 
@@ -116,16 +116,16 @@ abstract class FieldBasedAction : BaseJavaCodeAction() {
 
     if (type == null) {
       throw CompletionException(
-        RuntimeException("Unable to find class declaration within cursor range")
+          RuntimeException("Unable to find class declaration within cursor range")
       )
     }
 
     val fields =
-      type.members
-        .filter { it.kind == VARIABLE }
-        .map { it as VariableTree }
-        .filter { !it.modifiers.flags.contains(STATIC) }
-        .toMutableList()
+        type.members
+            .filter { it.kind == VARIABLE }
+            .map { it as VariableTree }
+            .filter { !it.modifiers.flags.contains(STATIC) }
+            .toMutableList()
     return Triple(typeFinder, type, fields)
   }
 
@@ -155,9 +155,9 @@ abstract class FieldBasedAction : BaseJavaCodeAction() {
    * confirms the selected fields.
    */
   protected fun showFieldSelector(
-    fields: List<String>,
-    data: ActionData,
-    listener: OnFieldsSelectedListener?
+      fields: List<String>,
+      data: ActionData,
+      listener: OnFieldsSelectedListener?,
   ) {
     val names = fields.toTypedArray()
     val checkedNames = mutableSetOf<String>()

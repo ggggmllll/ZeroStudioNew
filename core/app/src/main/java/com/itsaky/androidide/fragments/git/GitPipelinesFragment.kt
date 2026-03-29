@@ -22,24 +22,26 @@ import android.view.View
 import android.view.ViewGroup
 import com.itsaky.androidide.R
 
-/**
- * CD/CI 流水线状态页面。
- */
+/** CD/CI 流水线状态页面。 */
 class GitPipelinesFragment : BaseGitPageFragment() {
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return inflater.inflate(R.layout.fragment_git_branches, container, false)
+  override fun onCreateView(
+      inflater: LayoutInflater,
+      container: ViewGroup?,
+      savedInstanceState: Bundle?,
+  ): View {
+    return inflater.inflate(R.layout.fragment_git_branches, container, false)
+  }
+
+  override fun setupToolbar() {
+    // 刷新流水线状态
+    addToolbarAction(R.drawable.ic_refresh_24, "Refresh Pipelines") {
+      // TODO: Refresh CI status
     }
 
-    override fun setupToolbar() {
-        // 刷新流水线状态
-        addToolbarAction(R.drawable.ic_refresh_24, "Refresh Pipelines") {
-            // TODO: Refresh CI status
-        }
-        
-        // 查看配置 (比如 .gitlab-ci.yml 或 workflows)
-        addToolbarAction(R.drawable.ic_info_24, "View Config") {
-            // TODO: Open config file
-        }
+    // 查看配置 (比如 .gitlab-ci.yml 或 workflows)
+    addToolbarAction(R.drawable.ic_info_24, "View Config") {
+      // TODO: Open config file
     }
+  }
 }

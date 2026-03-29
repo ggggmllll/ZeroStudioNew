@@ -23,22 +23,22 @@ import com.android.tools.idea.wizard.template.impl.activities.common.layoutToVie
 import com.android.tools.idea.wizard.template.renderIf
 
 fun cppEmptyActivityJava(
-  packageName: String,
-  applicationPackage: String?,
-  activityClass: String,
-  layoutName: String,
-  useAndroidX: Boolean,
-  isViewBindingSupported: Boolean,
-  libraryName: String,
+    packageName: String,
+    applicationPackage: String?,
+    activityClass: String,
+    layoutName: String,
+    useAndroidX: Boolean,
+    isViewBindingSupported: Boolean,
+    libraryName: String,
 ): String {
 
   val contentViewBlock =
-    if (isViewBindingSupported)
-      """
+      if (isViewBindingSupported)
+          """
      binding = ${layoutToViewBindingClass(layoutName)}.inflate(getLayoutInflater());
      setContentView(binding.getRoot());
   """
-    else "setContentView(R.layout.$layoutName);"
+      else "setContentView(R.layout.$layoutName);"
 
   return """
 package ${packageName};

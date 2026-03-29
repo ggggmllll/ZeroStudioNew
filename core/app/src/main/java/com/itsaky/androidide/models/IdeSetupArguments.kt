@@ -33,5 +33,5 @@ enum class IdeSetupArgument(val argumentName: String, val requiresValue: Boolean
   SDK_VERSION("--sdk", true),
   NDK_VERSION("--ndk", true),
   CMAKE_VERSION("--cmake", true),
-  JDK_VERSION("--jdk", true)
+  JDK_VERSION("--jdk", true),
 }

@@ -32,38 +32,37 @@ import io.github.rosemoe.sora.util.MyCharacter
 class PythonLanguage(context: Context) :
     TreeSitterLanguage(context, TSLanguagePython.getInstance(), TS_TYPE) {
 
-    companion object {
+  companion object {
 
-        const val TS_TYPE = "py"
-        const val TS_TYPE_PYS = "python"
-        const val TS_TYPE_PYI = "pyi"
-        const val TS_TYPE_PYW = "pyw"
-        
-        @JvmField
-        val FACTORY = Factory { PythonLanguage(it) }
-    }
+    const val TS_TYPE = "py"
+    const val TS_TYPE_PYS = "python"
+    const val TS_TYPE_PYI = "pyi"
+    const val TS_TYPE_PYW = "pyw"
 
-    /**
-     * Determines whether the given character should trigger code completion.
-     * CMake identifiers typically consist of letters, numbers, and underscores.
-     */
-    override fun checkIsCompletionChar(c: Char): Boolean {
-        return MyCharacter.isJavaIdentifierPart(c) || c == '_' || c == '-'
-    }
+    @JvmField val FACTORY = Factory { PythonLanguage(it) }
+  }
 
-    /**
-     * Set the interruption level.
-     * Determines how aggressively the editor responds to language typing events.
-     */
-    override fun getInterruptionLevel(): Int {
-        return INTERRUPTION_LEVEL_SLIGHT
-    }
+  /**
+   * Determines whether the given character should trigger code completion. CMake identifiers
+   * typically consist of letters, numbers, and underscores.
+   */
+  override fun checkIsCompletionChar(c: Char): Boolean {
+    return MyCharacter.isJavaIdentifierPart(c) || c == '_' || c == '-'
+  }
 
-    /**
-     * Define how newlines inside brackets are handled.
-     * CMake heavily uses parentheses `()` for commands, so standard C-style handling is perfect.
-     */
-    override fun createNewlineHandlers(): Array<TSBracketsHandler> {
-        return arrayOf(TSCStyleBracketsHandler(this))
-    }
+  /**
+   * Set the interruption level. Determines how aggressively the editor responds to language typing
+   * events.
+   */
+  override fun getInterruptionLevel(): Int {
+    return INTERRUPTION_LEVEL_SLIGHT
+  }
+
+  /**
+   * Define how newlines inside brackets are handled. CMake heavily uses parentheses `()` for
+   * commands, so standard C-style handling is perfect.
+   */
+  override fun createNewlineHandlers(): Array<TSBracketsHandler> {
+    return arrayOf(TSCStyleBracketsHandler(this))
+  }
 }

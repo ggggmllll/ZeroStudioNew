@@ -27,6 +27,8 @@ import com.itsaky.androidide.tooling.api.IToolingApiServer
 import com.itsaky.androidide.tooling.api.util.ToolingApiLauncher
 import com.itsaky.androidide.utils.Environment
 import com.termux.shared.reflection.ReflectionUtils
+import java.io.InputStream
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
@@ -35,8 +37,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
-import java.io.InputStream
-import java.util.concurrent.atomic.AtomicBoolean
 
 /**
  * Runner thread for the Tooling API.

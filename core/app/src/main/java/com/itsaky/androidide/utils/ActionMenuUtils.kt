@@ -36,10 +36,10 @@ object ActionMenuUtils {
   @JvmStatic
   @JvmOverloads
   fun createMenu(
-    context: Context,
-    anchor: View,
-    location: ActionItem.Location,
-    dragToOpen: Boolean = false
+      context: Context,
+      anchor: View,
+      location: ActionItem.Location,
+      dragToOpen: Boolean = false,
   ): PopupMenu {
     return PopupMenu(context, anchor).apply {
       val data = ActionData()

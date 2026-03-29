@@ -24,22 +24,22 @@ import com.android.tools.idea.wizard.template.impl.activities.common.layoutToVie
 import com.android.tools.idea.wizard.template.renderIf
 
 fun firstFragmentKt(
-  packageName: String,
-  applicationPackage: String?,
-  firstFragmentClass: String,
-  secondFragmentClass: String,
-  firstFragmentLayoutName: String,
-  useAndroidX: Boolean = true,
-  isViewBindingSupported: Boolean,
+    packageName: String,
+    applicationPackage: String?,
+    firstFragmentClass: String,
+    secondFragmentClass: String,
+    firstFragmentLayoutName: String,
+    useAndroidX: Boolean = true,
+    isViewBindingSupported: Boolean,
 ): String {
 
   val onCreateViewBlock =
-    if (isViewBindingSupported)
-      """
+      if (isViewBindingSupported)
+          """
       _binding = ${layoutToViewBindingClass(firstFragmentLayoutName)}.inflate(inflater, container, false)
       return binding.root
   """
-    else "return inflater.inflate(R.layout.$firstFragmentLayoutName, container, false)"
+      else "return inflater.inflate(R.layout.$firstFragmentLayoutName, container, false)"
 
   return """package ${escapeKotlinIdentifier(packageName)}
 

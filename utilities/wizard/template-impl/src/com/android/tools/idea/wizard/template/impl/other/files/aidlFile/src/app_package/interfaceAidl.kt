@@ -17,7 +17,7 @@
 package com.android.tools.idea.wizard.template.impl.other.files.aidlFile.src.app_package
 
 fun interfaceAidl(interfaceName: String, packageName: String) =
-  """
+    """
 // ${interfaceName}.aidl
 package ${packageName};
 

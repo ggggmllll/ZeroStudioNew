@@ -16,8 +16,8 @@
 package com.android.tools.idea.wizard.template.impl.other.wearDeclarativeWatchFace.res.raw
 
 fun rawWatchFaceXml() =
-  // language=XML
-  """
+    // language=XML
+    """
 <WatchFace width="450" height="450">
   <Metadata key="CLOCK_TYPE" value="DIGITAL"/>
     <Scene>

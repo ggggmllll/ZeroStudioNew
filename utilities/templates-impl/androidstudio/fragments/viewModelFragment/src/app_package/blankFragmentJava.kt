@@ -20,17 +20,18 @@ import com.android.tools.idea.wizard.template.getMaterialComponentName
 import com.android.tools.idea.wizard.template.renderIf
 
 fun blankFragmentJava(
-  applicationPackage: String?,
-  fragmentClass: String,
-  layoutName: String,
-  packageName: String,
-  useAndroidX: Boolean,
-  viewModelName: String,
+    applicationPackage: String?,
+    fragmentClass: String,
+    layoutName: String,
+    packageName: String,
+    useAndroidX: Boolean,
+    viewModelName: String,
 ): String {
 
   val viewModelInitializationBlock =
-    if (useAndroidX) "new ViewModelProvider(this).get(${viewModelName}.class);"
-    else "new ViewModelProvider(this, new ViewModelProvider.NewInstanceFactory()).get(${viewModelName}.class);"
+      if (useAndroidX) "new ViewModelProvider(this).get(${viewModelName}.class);"
+      else
+          "new ViewModelProvider(this, new ViewModelProvider.NewInstanceFactory()).get(${viewModelName}.class);"
 
   return """
 package ${packageName};

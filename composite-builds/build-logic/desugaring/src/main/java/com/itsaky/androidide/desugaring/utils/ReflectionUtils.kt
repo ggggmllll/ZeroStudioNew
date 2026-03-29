@@ -27,9 +27,7 @@ import java.lang.reflect.Modifier
  */
 object ReflectionUtils {
 
-  /**
-   * Returns the descriptor for the given method.
-   */
+  /** Returns the descriptor for the given method. */
   @JvmStatic
   fun describe(method: Method): String {
     val desc = StringBuilder(64)
@@ -46,9 +44,7 @@ object ReflectionUtils {
     return desc.toString()
   }
 
-  /**
-   * Returns the binary name of the given class.
-   */
+  /** Returns the binary name of the given class. */
   fun describe(clazz: Class<*>): String {
     if (clazz.isArray) {
       // clazz.name returns the binary name
@@ -82,7 +78,9 @@ object ReflectionUtils {
     }
 
     if (!target.parameterTypes[0].equals(source.declaringClass)) {
-      throw IllegalArgumentException("Target method's first parameter type must be source method's declaring class")
+      throw IllegalArgumentException(
+          "Target method's first parameter type must be source method's declaring class"
+      )
     }
   }
 }

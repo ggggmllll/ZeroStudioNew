@@ -17,8 +17,8 @@
 
 package com.itsaky.androidide.utils
 
-import org.slf4j.LoggerFactory
 import java.io.PrintStream
+import org.slf4j.LoggerFactory
 
 /**
  * A stop watch helps to log duration between the time when the instance of the stopwatch instance
@@ -30,9 +30,9 @@ import java.io.PrintStream
 class StopWatch
 @JvmOverloads
 constructor(
-  val label: String,
-  val start: Long = System.currentTimeMillis(),
-  var lastLap: Long = start
+    val label: String,
+    val start: Long = System.currentTimeMillis(),
+    var lastLap: Long = start,
 ) {
 
   companion object {
@@ -65,10 +65,10 @@ constructor(
  * @see StopWatch
  */
 inline fun <R> withStopWatch(
-  label: String,
-  start: Long = System.currentTimeMillis(),
-  lastLap: Long = start,
-  action: (StopWatch) -> R
+    label: String,
+    start: Long = System.currentTimeMillis(),
+    lastLap: Long = start,
+    action: (StopWatch) -> R,
 ): R {
   return StopWatch(label, start, lastLap).run {
     try {

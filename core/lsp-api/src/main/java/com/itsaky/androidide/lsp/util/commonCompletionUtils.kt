@@ -19,8 +19,8 @@ package com.itsaky.androidide.lsp.util
 
 import com.itsaky.androidide.lookup.Lookup
 import com.itsaky.androidide.projects.IProjectManager
-import com.itsaky.androidide.projects.android.AndroidModule
 import com.itsaky.androidide.projects.ModuleProject
+import com.itsaky.androidide.projects.android.AndroidModule
 import com.itsaky.androidide.xml.resources.ResourceTableRegistry
 import com.itsaky.androidide.xml.versions.ApiVersions
 import com.itsaky.androidide.xml.widgets.WidgetTable
@@ -33,7 +33,7 @@ fun setupLookupForCompletion(file: File) {
 
 fun setupLookupForCompletion(file: Path) {
   val module =
-    IProjectManager.getInstance().getWorkspace()?.findModuleForFile(file, false) ?: return
+      IProjectManager.getInstance().getWorkspace()?.findModuleForFile(file, false) ?: return
   val lookup = Lookup.getDefault()
 
   lookup.update(ModuleProject.COMPLETION_MODULE_KEY, module)

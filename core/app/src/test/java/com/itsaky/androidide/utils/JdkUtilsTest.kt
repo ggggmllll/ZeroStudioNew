@@ -24,9 +24,7 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
-/**
- * @author Akash Yadav
- */
+/** @author Akash Yadav */
 @RunWith(RobolectricTestRunner::class)
 @Config(application = Application::class)
 class JdkUtilsTest {
@@ -34,7 +32,7 @@ class JdkUtilsTest {
   companion object {
 
     const val JDK_17_PROPS =
-      """
+        """
         Property settings:
     file.encoding = UTF-8
     file.separator = /
@@ -89,7 +87,7 @@ OpenJDK 64-Bit Server VM (build 17-internal+0-adhoc.root.src, mixed mode)
       """
 
     const val JDK_21_PROPS =
-      """
+        """
         Property settings:
     file.encoding = UTF-8
     file.separator = /
@@ -144,7 +142,8 @@ OpenJDK 64-Bit Server VM (build 21.0.1-internal-adhoc.root.src, mixed mode)
       """
 
     const val JDK_PROPS_EMPTY = ""
-    const val JDK_PROPS_INVALID = """
+    const val JDK_PROPS_INVALID =
+        """
       abcdef = ghijk
       java.ver = 17-internal
       java.hme = /somewhere/
@@ -156,9 +155,8 @@ OpenJDK 64-Bit Server VM (build 21.0.1-internal-adhoc.root.src, mixed mode)
     val dist = JdkUtils.readDistFromProps(JDK_17_PROPS)
     assertThat(dist).isNotNull()
     assertThat(dist!!.javaVersion).isEqualTo("17-internal")
-    assertThat(dist.javaHome).isEqualTo(
-      "/data/data/com.itsaky.androidide/files/usr/opt/openjdk-17.0"
-    )
+    assertThat(dist.javaHome)
+        .isEqualTo("/data/data/com.itsaky.androidide/files/usr/opt/openjdk-17.0")
   }
 
   @Test
@@ -166,9 +164,8 @@ OpenJDK 64-Bit Server VM (build 21.0.1-internal-adhoc.root.src, mixed mode)
     val dist = JdkUtils.readDistFromProps(JDK_21_PROPS)
     assertThat(dist).isNotNull()
     assertThat(dist!!.javaVersion).isEqualTo("21.0.1-internal")
-    assertThat(dist.javaHome).isEqualTo(
-      "/data/data/com.itsaky.androidide/files/usr/opt/openjdk-21.0.1"
-    )
+    assertThat(dist.javaHome)
+        .isEqualTo("/data/data/com.itsaky.androidide/files/usr/opt/openjdk-21.0.1")
   }
 
   @Test

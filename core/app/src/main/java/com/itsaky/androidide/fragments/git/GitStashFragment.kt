@@ -28,48 +28,48 @@ import com.itsaky.androidide.databinding.FragmentGitStashBinding
 /**
  * Git Stash (贮藏) 管理页面。
  *
- * @author android_zero
- * 功能说明：
+ * @author android_zero 功能说明：
  * 1. 展示 Stash 列表。
  * 2. 提供 Apply, Pop, Drop, Clear All 操作。
  */
 class GitStashFragment : BaseGitPageFragment() {
 
-    private var _binding: FragmentGitStashBinding? = null
-    private val binding get() = _binding!!
+  private var _binding: FragmentGitStashBinding? = null
+  private val binding
+    get() = _binding!!
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = FragmentGitStashBinding.inflate(inflater, container, false)
-        return binding.root
+  override fun onCreateView(
+      inflater: LayoutInflater,
+      container: ViewGroup?,
+      savedInstanceState: Bundle?,
+  ): View {
+    _binding = FragmentGitStashBinding.inflate(inflater, container, false)
+    return binding.root
+  }
+
+  override fun setupToolbar() {
+    // --- Stash 页面工具栏 ---
+
+    // 1. 清空所有 (Clear All)
+    addToolbarAction(R.drawable.ic_delete_sweep_24, getString(R.string.clear_all)) {
+      // TODO: Confirm and Git Stash Clear
+      Toast.makeText(context, getString(R.string.clear_all_ask_text), Toast.LENGTH_LONG).show()
     }
 
-    override fun setupToolbar() {
-        // --- Stash 页面工具栏 ---
-
-        // 1. 清空所有 (Clear All)
-        addToolbarAction(R.drawable.ic_delete_sweep_24, getString(R.string.clear_all)) {
-            // TODO: Confirm and Git Stash Clear
-            Toast.makeText(context, getString(R.string.clear_all_ask_text), Toast.LENGTH_LONG).show()
-        }
-
-        // 2. 新增 Stash (Push Stash) - 通常 Stash 是在 Changes 页面做，但这里也可以提供快捷入口
-        addToolbarAction(R.drawable.ic_add_24, getString(R.string.stash)) {
-            // TODO: Git Stash Push
-        }
+    // 2. 新增 Stash (Push Stash) - 通常 Stash 是在 Changes 页面做，但这里也可以提供快捷入口
+    addToolbarAction(R.drawable.ic_add_24, getString(R.string.stash)) {
+      // TODO: Git Stash Push
     }
+  }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        binding.rvStash.layoutManager = LinearLayoutManager(context)
-        // TODO: Setup StashAdapter
-    }
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+    binding.rvStash.layoutManager = LinearLayoutManager(context)
+    // TODO: Setup StashAdapter
+  }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
+  override fun onDestroyView() {
+    super.onDestroyView()
+    _binding = null
+  }
 }

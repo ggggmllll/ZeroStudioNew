@@ -42,11 +42,16 @@ val fullscreenActivityTemplate
   get() = template {
     name = "Fullscreen Views Activity"
     description =
-      "Creates a new activity that toggles the visibility of the system UI (status and navigation bars) and action bar upon user interaction"
+        "Creates a new activity that toggles the visibility of the system UI (status and navigation bars) and action bar upon user interaction"
     minApi = MIN_API
     category = Category.Activity
     formFactor = FormFactor.Mobile
-    screens = listOf(WizardUiContext.ActivityGallery, WizardUiContext.MenuEntry, WizardUiContext.NewModule)
+    screens =
+        listOf(
+            WizardUiContext.ActivityGallery,
+            WizardUiContext.MenuEntry,
+            WizardUiContext.NewModule,
+        )
 
     lateinit var layoutName: StringParameter
     val activityClass = stringParameter {
@@ -69,22 +74,29 @@ val fullscreenActivityTemplate
     val isLauncher = booleanParameter {
       name = "Launcher Activity"
       default = false
-      help = "If true, this activity will have a CATEGORY_LAUNCHER intent filter, making it visible in the launcher"
+      help =
+          "If true, this activity will have a CATEGORY_LAUNCHER intent filter, making it visible in the launcher"
     }
 
     val packageName = defaultPackageNameParameter
 
     widgets(
-      TextFieldWidget(activityClass),
-      TextFieldWidget(layoutName),
-      CheckBoxWidget(isLauncher),
-      PackageNameWidget(packageName),
-      LanguageWidget(),
+        TextFieldWidget(activityClass),
+        TextFieldWidget(layoutName),
+        CheckBoxWidget(isLauncher),
+        PackageNameWidget(packageName),
+        LanguageWidget(),
     )
 
     thumb { File("fullscreen-activity").resolve("template_fullscreen_activity.png") }
 
     recipe = { data: TemplateData ->
-      fullscreenActivityRecipe(data as ModuleTemplateData, activityClass.value, isLauncher.value, layoutName.value, packageName.value)
+      fullscreenActivityRecipe(
+          data as ModuleTemplateData,
+          activityClass.value,
+          isLauncher.value,
+          layoutName.value,
+          packageName.value,
+      )
     }
   }

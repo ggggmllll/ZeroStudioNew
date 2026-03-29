@@ -42,8 +42,8 @@ const val LAUNCH_TIMEOUT = 5000L
  * @param clearTasks Whether the application's previous tasks must be cleared.
  */
 fun launchAndroidIDE(
-  fromLauncher: Boolean = true,
-  clearTasks: Boolean = true,
+    fromLauncher: Boolean = true,
+    clearTasks: Boolean = true,
 ): UiDevice {
   val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
 
@@ -53,10 +53,7 @@ fun launchAndroidIDE(
     val launcherPackage = device.launcherPackageName
     assertThat(launcherPackage).isNotNull()
 
-    device.wait(
-      Until.hasObject(By.pkg(launcherPackage).depth(0)),
-      LAUNCH_TIMEOUT
-    )
+    device.wait(Until.hasObject(By.pkg(launcherPackage).depth(0)), LAUNCH_TIMEOUT)
   }
 
   // Launch the app
@@ -71,17 +68,12 @@ fun launchAndroidIDE(
   context.startActivity(intent)
 
   // Wait for the app to appear
-  device.wait(
-    Until.hasObject(By.pkg(BuildInfo.PACKAGE_NAME).depth(0)),
-    LAUNCH_TIMEOUT
-  )
+  device.wait(Until.hasObject(By.pkg(BuildInfo.PACKAGE_NAME).depth(0)), LAUNCH_TIMEOUT)
 
   return device
 }
 
-/**
- * Get the first activity in the given [stage].
- */
+/** Get the first activity in the given [stage]. */
 fun <T : Activity> getActivityInStage(stage: Stage): T? {
   var activity: T? = null
   InstrumentationRegistry.getInstrumentation().runOnMainSync {
@@ -94,8 +86,6 @@ fun <T : Activity> getActivityInStage(stage: Stage): T? {
   return activity
 }
 
-/**
- * @see UiDeviceAccessor.getUiAutomation
- */
+/** @see UiDeviceAccessor.getUiAutomation */
 val UiDevice.uiAutomation: UiAutomation
   get() = UiDeviceAccessor.getUiAutomation(this)

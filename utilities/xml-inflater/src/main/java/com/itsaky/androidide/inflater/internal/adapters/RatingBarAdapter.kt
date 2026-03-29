@@ -44,7 +44,7 @@ open class RatingBarAdapter<T : RatingBar> : AbsSeekBarAdapter<T>() {
 
   override fun createUiWidgets(): List<UiWidget> {
     return listOf(
-      UiWidget(RatingBar::class.java, string.widget_rating_bar, drawable.ic_widget_rating_bar)
+        UiWidget(RatingBar::class.java, string.widget_rating_bar, drawable.ic_widget_rating_bar)
     )
   }
 }

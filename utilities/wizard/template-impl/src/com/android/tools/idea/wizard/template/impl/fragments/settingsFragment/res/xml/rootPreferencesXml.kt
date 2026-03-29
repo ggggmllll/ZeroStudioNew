@@ -17,7 +17,7 @@
 package com.android.tools.idea.wizard.template.impl.fragments.settingsFragment.res.xml
 
 fun rootPreferencesXml() =
-  """
+    """
 <PreferenceScreen
     xmlns:app="http://schemas.android.com/apk/res-auto">
 

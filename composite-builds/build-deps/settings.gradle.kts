@@ -35,31 +35,29 @@ dependencyResolutionManagement {
     mavenCentral()
   }
 
-  versionCatalogs { create("libs") { from(files("../../gradle/libs.versions.toml")) }
-  }
+  versionCatalogs { create("libs") { from(files("../../gradle/libs.versions.toml")) } }
 }
 
 include(
-  ":appintro",
-  ":fuzzysearch",
-  ":google-java-format",
-  ":javac",
-  ":javapoet",
-  ":jaxp",
-  ":java-compiler",
-  ":jdk-compiler",
-  ":jdk-jdeps",
-  ":jdt",
-  ":layoutlib-api",
-  ":logback-core",
-  ":compose-pullrefresh",
+    ":appintro",
+    ":fuzzysearch",
+    ":google-java-format",
+    ":javac",
+    ":javapoet",
+    ":jaxp",
+    ":java-compiler",
+    ":jdk-compiler",
+    ":jdk-jdeps",
+    ":jdt",
+    ":layoutlib-api",
+    ":logback-core",
+    ":compose-pullrefresh",
     "soraLanguageTextmate",
-  ":editor",
-  
-    ":soraOnigurumaNative" //来自  root/:modules:soraOnigurumaNative
+    ":editor",
+    ":soraOnigurumaNative", // 来自  root/:modules:soraOnigurumaNative
 )
 
-//注册项目主构建模块到复合构建内
+// 注册项目主构建模块到复合构建内
 project(":soraOnigurumaNative").projectDir = file("../../modules/soraOnigurumaNative")
 
 rootProject.name = "build-deps"
@@ -67,7 +65,8 @@ rootProject.name = "build-deps"
 gradle.rootProject {
 
   // required for setting SDK location for android modules
-  project.file("../../local.properties")
-    .takeIf { it.exists() }
-    ?.copyTo(project.file("local.properties"), overwrite = true)
+  project
+      .file("../../local.properties")
+      .takeIf { it.exists() }
+      ?.copyTo(project.file("local.properties"), overwrite = true)
 }

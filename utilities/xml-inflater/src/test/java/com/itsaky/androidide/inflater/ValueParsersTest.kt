@@ -30,11 +30,11 @@ import com.itsaky.androidide.inflater.internal.utils.parseInteger
 import com.itsaky.androidide.inflater.internal.utils.parseIntegerArray
 import com.itsaky.androidide.inflater.internal.utils.parseString
 import com.itsaky.androidide.inflater.internal.utils.parseStringArray
+import kotlin.math.roundToInt
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
-import kotlin.math.roundToInt
 
 @RunWith(RobolectricTestRunner::class)
 class ValueParsersTest {
@@ -61,15 +61,16 @@ class ValueParsersTest {
         assertThat(parseDimension(this, "@android:dimen/status_bar_height_portrait")).isEqualTo(24)
 
         val exists =
-          try {
-            // The app module here targets android 31 and the dimension resource below was added in
-            // android 31. So, this should throw an exception
-            assertThat(parseDimension(this, "@android:dimen/status_bar_height_default"))
-              .isEqualTo(-2)
-            true
-          } catch (err: IllegalArgumentException) {
-            false
-          }
+            try {
+              // The app module here targets android 31 and the dimension resource below was added
+              // in
+              // android 31. So, this should throw an exception
+              assertThat(parseDimension(this, "@android:dimen/status_bar_height_default"))
+                  .isEqualTo(-2)
+              true
+            } catch (err: IllegalArgumentException) {
+              false
+            }
 
         assertThat(exists).isFalse()
 
@@ -131,7 +132,7 @@ class ValueParsersTest {
         assertThat(parseInteger("10")).isEqualTo(10)
         assertThat(parseInteger("110")).isEqualTo(110)
         assertThat(parseInteger("@android:integer/button_pressed_animation_duration"))
-          .isEqualTo(100)
+            .isEqualTo(100)
         assertThat(parseInteger("@android:integer/dock_enter_exit_duration")).isEqualTo(250)
         assertThat(parseInteger("@android:integer/kg_carousel_angle")).isEqualTo(75)
         assertThat(parseInteger("@android:integer/date_picker_mode")).isEqualTo(1)
@@ -160,11 +161,11 @@ class ValueParsersTest {
   fun `string array parser test`() {
     inflaterTest {
       assertThat(parseStringArray("@android:array/phoneTypes"))
-        .isEqualTo(
-          arrayOf("Home", "Mobile", "Work", "Work Fax", "Home Fax", "Pager", "Other", "Custom")
-        )
+          .isEqualTo(
+              arrayOf("Home", "Mobile", "Work", "Work Fax", "Home Fax", "Pager", "Other", "Custom")
+          )
       assertThat(parseStringArray("@array/test_string_array"))
-        .isEqualTo(arrayOf("I", "love", "Android"))
+          .isEqualTo(arrayOf("I", "love", "Android"))
     }
   }
 
@@ -172,9 +173,11 @@ class ValueParsersTest {
   fun `integer array parser test`() {
     inflaterTest {
       assertThat(
-          parseIntegerArray("@android:array/config_defaultImperceptibleKillingExemptionProcStates")
-        )
-        .isEqualTo(intArrayOf(0, 1, 2, 4, 12))
+              parseIntegerArray(
+                  "@android:array/config_defaultImperceptibleKillingExemptionProcStates"
+              )
+          )
+          .isEqualTo(intArrayOf(0, 1, 2, 4, 12))
       assertThat(parseIntegerArray("@array/test_integer_array")).isEqualTo(intArrayOf(2, 4, 8))
     }
   }

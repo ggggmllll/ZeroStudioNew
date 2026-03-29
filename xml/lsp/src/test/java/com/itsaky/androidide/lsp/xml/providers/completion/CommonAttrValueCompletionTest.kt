@@ -51,7 +51,7 @@ class CommonAttrValueCompletionTest : CompletionHelper by CompletionHelperImpl()
       val (_, items) = complete()
       // Only integer values
       assertThat(items.filter { it.startsWith("@integer/") || it.startsWith("@android:integer/") })
-        .hasSize(items.size)
+          .hasSize(items.size)
     }
   }
 
@@ -62,7 +62,7 @@ class CommonAttrValueCompletionTest : CompletionHelper by CompletionHelperImpl()
       val (_, items) = complete()
       // Only integer values
       assertThat(items.filter { it.startsWith("@integer/") || it.startsWith("@android:integer/") })
-        .hasSize(items.size)
+          .hasSize(items.size)
     }
   }
 }

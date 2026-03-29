@@ -24,19 +24,17 @@ import java.io.Serializable
  *
  * @property id The unique ID of the server (matches [BaseLspServer.id]).
  * @property enabled Whether the server is enabled by the user.
- * @property userExtensions A list of additional file extensions added by the user (e.g., mapping *.h to C++ server).
- *
+ * @property userExtensions A list of additional file extensions added by the user (e.g., mapping
+ *   *.h to C++ server).
  * @author android_zero
  */
 data class LspServerConfig(
     val id: String,
     var enabled: Boolean = true,
-    var userExtensions: List<String> = emptyList()
+    var userExtensions: List<String> = emptyList(),
 ) : Serializable
 
-/**
- * Data class for storing user-defined external servers.
- */
+/** Data class for storing user-defined external servers. */
 data class ExternalServerData(
     val id: String,
     val name: String,
@@ -47,5 +45,5 @@ data class ExternalServerData(
     val port: Int = 0,
     // Process data
     val command: String = "",
-    val args: List<String> = emptyList()
+    val args: List<String> = emptyList(),
 ) : Serializable

@@ -15,31 +15,30 @@
  *   along with AndroidIDE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 @Suppress("JavaPluginLanguageLevel")
 plugins {
-    id("java-library")
-    id("org.jetbrains.kotlin.jvm")
+  id("java-library")
+  id("org.jetbrains.kotlin.jvm")
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
+  sourceCompatibility = JavaVersion.VERSION_11
+  targetCompatibility = JavaVersion.VERSION_11
 }
 
 dependencies {
-    api(libs.common.jkotlin)
-    api(libs.tests.robolectric)
-    api(libs.tests.junit)
-    api(libs.tests.google.truth)
-    api(libs.tests.mockk)
-    testImplementation(libs.tests.conscrypt.openjdk)
-    api(projects.logging.logger)
-    api(projects.utilities.buildInfo)
-    api(projects.utilities.shared)
-    api(projects.testing.commonTest)
-    api(projects.tooling.api)
+  api(libs.common.jkotlin)
+  api(libs.tests.robolectric)
+  api(libs.tests.junit)
+  api(libs.tests.google.truth)
+  api(libs.tests.mockk)
+  testImplementation(libs.tests.conscrypt.openjdk)
+  api(projects.logging.logger)
+  api(projects.utilities.buildInfo)
+  api(projects.utilities.shared)
+  api(projects.testing.commonTest)
+  api(projects.tooling.api)
 
-    // build tooling API before tests
-    compileOnly(projects.tooling.impl)
+  // build tooling API before tests
+  compileOnly(projects.tooling.impl)
 }

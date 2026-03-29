@@ -57,11 +57,11 @@ open class CalendarViewAdapter<T : CalendarView> : FrameLayoutAdapter<T>() {
 
   override fun createUiWidgets(): List<UiWidget> {
     return listOf(
-      UiWidget(
-        CalendarView::class.java,
-        string.widget_calendar_view,
-        drawable.ic_widget_calendar_view
-      )
+        UiWidget(
+            CalendarView::class.java,
+            string.widget_calendar_view,
+            drawable.ic_widget_calendar_view,
+        )
     )
   }
 }

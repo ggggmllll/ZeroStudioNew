@@ -19,16 +19,18 @@ import com.android.tools.idea.wizard.template.renderIf
 import com.android.tools.idea.wizard.template.withoutSkipLines
 
 fun commonActivityBody(isLauncher: Boolean, isLibraryProject: Boolean = false) =
-  renderIf(isLauncher && !isLibraryProject) {
-    """
+    renderIf(isLauncher && !isLibraryProject) {
+      """
     <intent-filter>
       <action android:name="android.intent.action.MAIN" />
       <category android:name="android.intent.category.LAUNCHER" />
     </intent-filter>
     """
-  }
+    }
 
 fun String.collapseEmptyActivityTags(): String {
   // Tags with empty body show a lint warning. We only handle <activity>
-  return withoutSkipLines().replace("(<activity[^>]*)>\\s*</activity>".toRegex()) { "${it.groupValues[1]} />" }
+  return withoutSkipLines().replace("(<activity[^>]*)>\\s*</activity>".toRegex()) {
+    "${it.groupValues[1]} />"
+  }
 }

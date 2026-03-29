@@ -19,7 +19,7 @@ package com.itsaky.androidide.templates.impl.androidstudio.fragments.fullscreenF
 import com.android.tools.idea.wizard.template.MaterialColor.*
 
 fun fullScreenColorsXml() =
-  """
+    """
 <resources>
     ${LIGHT_BLUE_600.xmlElement()}
     ${LIGHT_BLUE_900.xmlElement()}

@@ -42,8 +42,8 @@ import java.util.Objects
  * Designed for plugin authors to compare the currently running plugin version, so implements
  * comparable.
  *
- * For example `AndroidPluginVersion(7, 0)` refers to Android Gradle Plugin version 7.0.0,
- * and `AndroidPluginVersion(7, 0, 1)` refers to Android Gradle Plugin version 7.0.1.
+ * For example `AndroidPluginVersion(7, 0)` refers to Android Gradle Plugin version 7.0.0, and
+ * `AndroidPluginVersion(7, 0, 1)` refers to Android Gradle Plugin version 7.0.1.
  *
  * The internal representation is normalized, so that `AndroidPluginVersion(7, 0)` equals
  * `AndroidPluginVersion(7, 0, 0)`
@@ -52,8 +52,8 @@ import java.util.Objects
  * specific version. For example `AndroidPluginVersion(7, 0).alpha(5)` refers to Android Gradle
  * Plugin version 7.0.0-alpha05. This is for use when developing using incubating APIs that have
  * changed between preview releases of the Android Gradle Plugin. Once those APIs are stable in a
- * stable version of Android Gradle Plugin, it's recommended to drop support for the preview versions.
- * For example, if a new API was introduced in 7.0.0-alpha05, you can test for that using
+ * stable version of Android Gradle Plugin, it's recommended to drop support for the preview
+ * versions. For example, if a new API was introduced in 7.0.0-alpha05, you can test for that using
  *
  * ```if (androidComponents.pluginVersion >= AndroidPluginVersion(7.0).alpha(5)) { ... }```
  *
@@ -62,38 +62,40 @@ import java.util.Objects
  *
  * ```if (androidComponents.pluginVersion >= AndroidPluginVersion(7.0)) { ... }```
  */
-class AndroidPluginVersion private constructor(
-  /**
-   * The major version.
-   *
-   * e.g. 7 for Android Gradle Plugin Version 7.0.1
-   */
-  val major: Int,
-  /**
-   * The minor version.
-   *
-   * e.g. 0 for Android Gradle Plugin Version 7.0.1
-   */
-  val minor: Int,
-  /**
-   * The micro, or patch version.
-   *
-   * e.g. 1 for Android Gradle Plugin Version 7.0.1
-   */
-  val micro: Int,
-  private val _previewType: PreviewType,
+class AndroidPluginVersion
+private constructor(
+    /**
+     * The major version.
+     *
+     * e.g. 7 for Android Gradle Plugin Version 7.0.1
+     */
+    val major: Int,
+    /**
+     * The minor version.
+     *
+     * e.g. 0 for Android Gradle Plugin Version 7.0.1
+     */
+    val minor: Int,
+    /**
+     * The micro, or patch version.
+     *
+     * e.g. 1 for Android Gradle Plugin Version 7.0.1
+     */
+    val micro: Int,
+    private val _previewType: PreviewType,
 
-  /**
-   * The preview version.
-   *
-   * e.g. 5 for Android Gradle Plugin Version 7.0.0-alpha05
-   */
-  val preview: Int,
+    /**
+     * The preview version.
+     *
+     * e.g. 5 for Android Gradle Plugin Version 7.0.0-alpha05
+     */
+    val preview: Int,
 ) : Comparable<AndroidPluginVersion> {
 
   init {
-    require(
-      major >= 0 && minor >= 0 && micro >= 0) { "Versions of the Android Gradle Plugin must not be negative" }
+    require(major >= 0 && minor >= 0 && micro >= 0) {
+      "Versions of the Android Gradle Plugin must not be negative"
+    }
   }
 
   /**
@@ -103,7 +105,8 @@ class AndroidPluginVersion private constructor(
    *
    * e.g. 'alpha' for Android Gradle Plugin Version 7.0.0-alpha05
    */
-  val previewType: String? get() = _previewType.publicName
+  val previewType: String?
+    get() = _previewType.publicName
 
   /**
    * Create an AndroidPluginVersion with the given major and minor version.
@@ -148,11 +151,13 @@ class AndroidPluginVersion private constructor(
   /**
    * From a stable [AndroidPluginVersion] returns an alpha version.
    *
-   * For example `AndroidPluginVersion(7, 0).alpha(5)` refers to Android Gradle Plugin version 7.0.0-alpha05.
+   * For example `AndroidPluginVersion(7, 0).alpha(5)` refers to Android Gradle Plugin version
+   * 7.0.0-alpha05.
    */
   fun alpha(alpha: Int): AndroidPluginVersion {
-    require(
-      _previewType == PreviewType.FINAL) { "alpha(int) only expected to be called on final versions" }
+    require(_previewType == PreviewType.FINAL) {
+      "alpha(int) only expected to be called on final versions"
+    }
     require(alpha >= 1) { "Alpha version must be at least 1" }
     return AndroidPluginVersion(major, minor, micro, PreviewType.ALPHA, preview = alpha)
   }
@@ -160,11 +165,13 @@ class AndroidPluginVersion private constructor(
   /**
    * From a stable [AndroidPluginVersion] returns a beta version.
    *
-   * For example `AndroidPluginVersion(7, 0).beta(2)` refers to Android Gradle Plugin version 7.0.0-beta02.
+   * For example `AndroidPluginVersion(7, 0).beta(2)` refers to Android Gradle Plugin version
+   * 7.0.0-beta02.
    */
   fun beta(beta: Int): AndroidPluginVersion {
-    require(
-      _previewType == PreviewType.FINAL) { "beta(int) only expected to be called on final versions" }
+    require(_previewType == PreviewType.FINAL) {
+      "beta(int) only expected to be called on final versions"
+    }
     require(beta >= 1) { "Beta version must be at least 1" }
     return AndroidPluginVersion(major, minor, micro, PreviewType.BETA, preview = beta)
   }
@@ -172,11 +179,13 @@ class AndroidPluginVersion private constructor(
   /**
    * From a stable [AndroidPluginVersion] returns a release candidate version.
    *
-   * For example `AndroidPluginVersion(7, 0).rc(1)` refers to Android Gradle Plugin version 7.0.0-rc01.
+   * For example `AndroidPluginVersion(7, 0).rc(1)` refers to Android Gradle Plugin version
+   * 7.0.0-rc01.
    */
   fun rc(rc: Int): AndroidPluginVersion {
-    require(
-      _previewType == PreviewType.FINAL) { "rc(int) only expected to be called on final versions" }
+    require(_previewType == PreviewType.FINAL) {
+      "rc(int) only expected to be called on final versions"
+    }
     require(rc >= 1) { "Release candidate version must be at least 1" }
     return AndroidPluginVersion(major, minor, micro, PreviewType.RC, preview = rc)
   }
@@ -184,24 +193,23 @@ class AndroidPluginVersion private constructor(
   /**
    * From a stable [AndroidPluginVersion] specify an internal development version.
    *
-   * `-dev` versions are never publicly released, but this can be useful if you are
-   * building the Android Gradle Plugin from source.
+   * `-dev` versions are never publicly released, but this can be useful if you are building the
+   * Android Gradle Plugin from source.
    *
-   * For example `AndroidPluginVersion(7, 0).dev()` refers to Android Gradle Plugin version 7.0.0-dev.
+   * For example `AndroidPluginVersion(7, 0).dev()` refers to Android Gradle Plugin version
+   * 7.0.0-dev.
    */
   fun dev(): AndroidPluginVersion {
     return AndroidPluginVersion(major, minor, micro, PreviewType.DEV, preview = 0)
   }
 
-  /**
-   * Creates a new [AndroidPluginVersion] from this version with the given values updated.
-   */
+  /** Creates a new [AndroidPluginVersion] from this version with the given values updated. */
   fun update(
-    major: Int = this.major,
-    minor: Int = this.minor,
-    micro: Int = this.micro,
-    previewType: String? = this.previewType,
-    preview: Int = this.preview
+      major: Int = this.major,
+      minor: Int = this.minor,
+      micro: Int = this.micro,
+      previewType: String? = this.previewType,
+      preview: Int = this.preview,
   ): AndroidPluginVersion {
     return AndroidPluginVersion(major, minor, micro, PreviewType.find(previewType), preview)
   }
@@ -223,54 +231,46 @@ class AndroidPluginVersion private constructor(
     return Objects.hash(major, minor, micro, _previewType, preview)
   }
 
-  override fun toString(): String =
-    "Android Gradle Plugin version ${toStringSimple()}"
+  override fun toString(): String = "Android Gradle Plugin version ${toStringSimple()}"
 
-  fun toStringSimple(): String = "$major.$minor.$micro" +
-      (if (previewType != null) "-$previewType" else "") +
-      (if (preview > 0) if(preview < 10) "0$preview" else preview else "")
+  fun toStringSimple(): String =
+      "$major.$minor.$micro" +
+          (if (previewType != null) "-$previewType" else "") +
+          (if (preview > 0) if (preview < 10) "0$preview" else preview else "")
 
   companion object {
 
     private val comparator: Comparator<AndroidPluginVersion> =
-      Comparator.comparingInt<AndroidPluginVersion> { it.major }
-        .thenComparingInt { it.minor }
-        .thenComparingInt { it.micro }
-        .thenComparingInt { it._previewType.ordinal }
-        .thenComparingInt { it.preview }
+        Comparator.comparingInt<AndroidPluginVersion> { it.major }
+            .thenComparingInt { it.minor }
+            .thenComparingInt { it.micro }
+            .thenComparingInt { it._previewType.ordinal }
+            .thenComparingInt { it.preview }
 
-    /**
-     * The minimum version of Android Gradle Plugin that is supported by AndroidIDE>
-     */
-    @JvmField
-    val MINIMUM_SUPPORTED = parse(BuildInfo.AGP_VERSION_MININUM)
+    /** The minimum version of Android Gradle Plugin that is supported by AndroidIDE> */
+    @JvmField val MINIMUM_SUPPORTED = parse(BuildInfo.AGP_VERSION_MININUM)
 
-    /**
-     * The version of Android Gradle Plugin that has been known to work with AndroidIDE>
-     */
-    @JvmField
-    val LATEST_TESTED = parse(BuildInfo.AGP_VERSION_LATEST)
+    /** The version of Android Gradle Plugin that has been known to work with AndroidIDE> */
+    @JvmField val LATEST_TESTED = parse(BuildInfo.AGP_VERSION_LATEST)
 
     /**
      * Parses the given AGP version and returns the [AndroidPluginVersion] representing the same.
      */
     @JvmStatic
     fun parse(version: String): AndroidPluginVersion {
-      require(version.isNotBlank()) {
-        "Invalid input '$version'"
-      }
+      require(version.isNotBlank()) { "Invalid input '$version'" }
 
       val regex = """^(\d+)(?:\.(\d+)(?:\.(\d+)(?:-([a-z]+)(\d+)?)?)?)?${'$'}""".toRegex()
-      val match = checkNotNull(regex.find(version)) {
-        "Failed to match input '$version'"
-      }
+      val match = checkNotNull(regex.find(version)) { "Failed to match input '$version'" }
 
       return match.groupValues.run {
-        val int = fun(index: Int, default: Int): Int =
-          if (lastIndex >= index) this[index].let { if (it.isBlank()) 0 else it.toInt() } else default
+        val int =
+            fun(index: Int, default: Int): Int =
+                if (lastIndex >= index) this[index].let { if (it.isBlank()) 0 else it.toInt() }
+                else default
 
-        val str = fun(index: Int, default: String) =
-          if (lastIndex >= index) this[index] else default
+        val str =
+            fun(index: Int, default: String) = if (lastIndex >= index) this[index] else default
 
         val major = this[1].toInt()
         val minor = int(2, 0)

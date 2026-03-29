@@ -20,7 +20,10 @@ import com.android.tools.idea.wizard.template.activityToLayout
 import com.android.tools.idea.wizard.template.renderIf
 
 fun stringsXml(activityClass: String, isNewModule: Boolean): String {
-  val nameBlock = renderIf(!isNewModule) { "<string name=\"title_${activityToLayout(activityClass)}\">${activityClass}</string>" }
+  val nameBlock =
+      renderIf(!isNewModule) {
+        "<string name=\"title_${activityToLayout(activityClass)}\">${activityClass}</string>"
+      }
   return """
 <resources>
     $nameBlock

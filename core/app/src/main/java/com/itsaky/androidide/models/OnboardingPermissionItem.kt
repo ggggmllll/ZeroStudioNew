@@ -19,16 +19,10 @@ package com.itsaky.androidide.models
 
 import androidx.annotation.StringRes
 
-/**
- * @author Akash Yadav
- */
+/** @author Akash Yadav */
 data class OnboardingPermissionItem(
-  val permission: String,
-
-  @StringRes
-  val title: Int,
-
-  @StringRes
-  val description: Int,
-  var isGranted: Boolean
+    val permission: String,
+    @StringRes val title: Int,
+    @StringRes val description: Int,
+    var isGranted: Boolean,
 )

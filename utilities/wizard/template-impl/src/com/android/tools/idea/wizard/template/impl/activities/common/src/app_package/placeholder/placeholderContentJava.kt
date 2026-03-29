@@ -17,7 +17,7 @@
 package com.android.tools.idea.wizard.template.impl.activities.common.src.app_package.placeholder
 
 fun placeholderContentJava(packageName: String) =
-  """
+    """
 package ${packageName}.placeholder;
 
 import java.util.ArrayList;

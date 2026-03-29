@@ -48,7 +48,7 @@ internal fun AndroidModuleTemplateBuilder.bottomNavNavigationXmlSrc() =
 </navigation>
 """
         .trim()
-        
+
 // res/layout/activity_main.xml
 internal fun bottomNavActivityMainLayout() =
     """
@@ -85,7 +85,8 @@ internal fun bottomNavActivityMainLayout() =
         app:navGraph="@navigation/mobile_navigation" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-""".trim()
+"""
+        .trim()
 
 // res/layout/fragment_dashboard.xml
 internal fun bottomNavActivityFragmentDashboardLayout() =
@@ -112,9 +113,10 @@ internal fun bottomNavActivityFragmentDashboardLayout() =
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
-""".trim()
+"""
+        .trim()
 
-//layout/fragment_home.xml
+// layout/fragment_home.xml
 internal fun bottomNavActivityFragmentHomeLayout() =
     """
 <?xml version="1.0" encoding="utf-8"?>
@@ -139,7 +141,8 @@ internal fun bottomNavActivityFragmentHomeLayout() =
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
-""".trim()
+"""
+        .trim()
 
 // layout/fragment_notifications.xml
 internal fun bottomNavActivityFragmentNotificationsLayout() =
@@ -166,4 +169,5 @@ internal fun bottomNavActivityFragmentNotificationsLayout() =
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
-""".trim()
+"""
+        .trim()

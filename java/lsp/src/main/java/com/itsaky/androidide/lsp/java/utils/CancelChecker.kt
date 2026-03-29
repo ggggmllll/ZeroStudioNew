@@ -31,9 +31,7 @@ class CancelChecker {
         return false
       }
 
-      return err is CancellationException ||
-          err is CancelAbort ||
-          isCancelled(err.cause)
+      return err is CancellationException || err is CancelAbort || isCancelled(err.cause)
     }
   }
 }

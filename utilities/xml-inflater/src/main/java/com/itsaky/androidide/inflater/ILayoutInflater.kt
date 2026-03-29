@@ -87,13 +87,13 @@ interface ILayoutInflater : Closeable {
      *
      * @param module The [AndroidModule] that will be used to resolve resource references.
      * @param componentFactory The [IComponentFactory] that will be used to create [ILayoutInflater]
-     * components.
+     *   components.
      */
     @JvmStatic
     @JvmOverloads
     fun newInflater(
-      module: AndroidModule? = null,
-      componentFactory: IComponentFactory = DefaultComponentFactory()
+        module: AndroidModule? = null,
+        componentFactory: IComponentFactory = DefaultComponentFactory(),
     ): ILayoutInflater {
       return LayoutInflaterImpl().also {
         it.module = module

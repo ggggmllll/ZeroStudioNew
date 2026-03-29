@@ -25,21 +25,21 @@ import com.android.tools.idea.wizard.template.impl.activities.common.layoutToVie
 import com.android.tools.idea.wizard.template.renderIf
 
 fun adMobInterstitialAdFragmentKt(
-  applicationPackage: String?,
-  fragmentClass: String,
-  layoutName: String,
-  packageName: String,
-  useAndroidX: Boolean,
-  isViewBindingSupported: Boolean,
+    applicationPackage: String?,
+    fragmentClass: String,
+    layoutName: String,
+    packageName: String,
+    useAndroidX: Boolean,
+    isViewBindingSupported: Boolean,
 ): String {
 
   val onCreateViewBlock =
-    if (isViewBindingSupported)
-      """
+      if (isViewBindingSupported)
+          """
       _binding = ${layoutToViewBindingClass(layoutName)}.inflate(inflater, container, false)
       return binding.root
   """
-    else "return inflater.inflate(R.layout.$layoutName, container, false)"
+      else "return inflater.inflate(R.layout.$layoutName, container, false)"
 
   return """
 package ${escapeKotlinIdentifier(packageName)}

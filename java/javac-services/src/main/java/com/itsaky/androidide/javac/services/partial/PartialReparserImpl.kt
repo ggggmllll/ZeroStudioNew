@@ -21,6 +21,8 @@ import com.itsaky.androidide.javac.services.compiler.JavacFlowListener
 import com.itsaky.androidide.javac.services.util.ReparserUtils
 import com.itsaky.androidide.javac.services.visitors.FindAnonymousVisitor
 import com.itsaky.androidide.javac.services.visitors.TranslateMethodPositionsVisitor
+import java.nio.CharBuffer
+import java.util.Arrays
 import openjdk.source.tree.BlockTree
 import openjdk.source.tree.ClassTree
 import openjdk.source.tree.CompilationUnitTree
@@ -54,8 +56,6 @@ import openjdk.tools.javac.util.List
 import openjdk.tools.javac.util.Log
 import openjdk.tools.javac.util.Names
 import org.slf4j.LoggerFactory
-import java.nio.CharBuffer
-import java.util.Arrays
 
 /**
  * Partial reparser implementation.
@@ -71,10 +71,10 @@ class PartialReparserImpl : PartialReparser {
   }
 
   override fun reparseMethod(
-    ci: CompilationInfo,
-    methodPath: TreePath,
-    newBody: String,
-    fileContents: CharSequence
+      ci: CompilationInfo,
+      methodPath: TreePath,
+      newBody: String,
+      fileContents: CharSequence,
   ): Boolean {
 
     if (!allowPartialReparse) {
@@ -211,11 +211,11 @@ class PartialReparserImpl : PartialReparser {
   }
 
   private fun reparseMethodBody(
-    context: Context,
-    cu: CompilationUnitTree,
-    method: JCMethodDecl,
-    newBody: String,
-    docComments: MutableMap<JCTree, Entry>,
+      context: Context,
+      cu: CompilationUnitTree,
+      method: JCMethodDecl,
+      newBody: String,
+      docComments: MutableMap<JCTree, Entry>,
   ): JCBlock? {
     val startPos = method.body.pos
     val body = CharArray(startPos + newBody.length + 1)
@@ -241,33 +241,33 @@ class PartialReparserImpl : PartialReparser {
   }
 
   private fun newParser(
-    context: Context,
-    buf: CharBuffer?,
-    endPositions: EndPosTable?,
+      context: Context,
+      buf: CharBuffer?,
+      endPositions: EndPosTable?,
   ): JavacParser {
     val factory =
-      com.itsaky.androidide.javac.services.NBParserFactory.instance(context)
-        as com.itsaky.androidide.javac.services.NBParserFactory
+        com.itsaky.androidide.javac.services.NBParserFactory.instance(context)
+            as com.itsaky.androidide.javac.services.NBParserFactory
     val scannerFactory = ScannerFactory.instance(context)
     val cancelService = com.itsaky.androidide.javac.services.CancelService.instance(context)
     val lexer = scannerFactory.newScanner(buf, true)
     if (
-      endPositions
-        is com.itsaky.androidide.javac.services.NBParserFactory.NBJavacParser.EndPosTableImpl
+        endPositions
+            is com.itsaky.androidide.javac.services.NBParserFactory.NBJavacParser.EndPosTableImpl
     ) {
       endPositions.resetErrorEndPos()
     }
 
     return object :
-      com.itsaky.androidide.javac.services.NBParserFactory.NBJavacParser(
-        factory,
-        lexer,
-        true,
-        false,
-        true,
-        false,
-        cancelService
-      ) {
+        com.itsaky.androidide.javac.services.NBParserFactory.NBJavacParser(
+            factory,
+            lexer,
+            true,
+            false,
+            true,
+            false,
+            cancelService,
+        ) {
       override fun newEndPosTable(keepEndPositions: Boolean): AbstractEndPosTable {
         return object : AbstractEndPosTable(this) {
           override fun storeEnd(tree: JCTree?, endpos: Int) {
@@ -302,10 +302,10 @@ class PartialReparserImpl : PartialReparser {
   }
 
   private fun reAttrMethodBody(
-    context: Context,
-    scope: JavacScope,
-    tree: JCMethodDecl,
-    block: JCBlock,
+      context: Context,
+      scope: JavacScope,
+      tree: JCMethodDecl,
+      block: JCBlock,
   ): JCBlock {
     val attr = Attr.instance(context)
     val names: Names = Names.instance(context)
@@ -319,25 +319,25 @@ class PartialReparserImpl : PartialReparser {
       val body = tree.body
       if (body.stats.isEmpty() || !TreeInfo.isSelfCall(body.stats.head)) {
         body.stats =
-          body.stats.prepend(
-            make.at(body.pos).Exec(make.Apply(List.nil(), make.Ident(names._super), List.nil()))
-          )
+            body.stats.prepend(
+                make.at(body.pos).Exec(make.Apply(List.nil(), make.Ident(names._super), List.nil()))
+            )
       } else if (
-        (env.enclClass.sym.flags() and Flags.ENUM.toLong()) != 0L &&
-          (tree.mods.flags and Flags.GENERATEDCONSTR) == 0L &&
-          TreeInfo.isSuperCall(body.stats.head)
+          (env.enclClass.sym.flags() and Flags.ENUM.toLong()) != 0L &&
+              (tree.mods.flags and Flags.GENERATEDCONSTR) == 0L &&
+              TreeInfo.isSuperCall(body.stats.head)
       ) {
         // enum constructors are not allowed to call super
         // directly, so make sure there aren't any super calls
         // in enum constructorObjectCheckers, except in the compiler
         // generated one.
         log.error(
-          tree.body.stats.head.pos(),
-          openjdk.tools.javac.util.JCDiagnostic.Error(
-            "compiler",
-            "call.to.super.not.allowed.in.enum.ctor",
-            env.enclClass.sym
-          )
+            tree.body.stats.head.pos(),
+            openjdk.tools.javac.util.JCDiagnostic.Error(
+                "compiler",
+                "call.to.super.not.allowed.in.enum.ctor",
+                env.enclClass.sym,
+            ),
         )
       }
     }
@@ -346,9 +346,9 @@ class PartialReparserImpl : PartialReparser {
   }
 
   private fun reflowMethodBody(
-    context: Context,
-    ownerClass: ClassTree,
-    decl: JCMethodDecl
+      context: Context,
+      ownerClass: ClassTree,
+      decl: JCMethodDecl,
   ): BlockTree {
     val flow = Flow.instance(context)
     val maker = TreeMaker.instance(context)

@@ -23,15 +23,15 @@ package com.itsaky.androidide.lsp.snippets
  * @author Akash Yadav
  */
 data class DefaultSnippet(
-  override val prefix: String,
-  override val description: String,
-  override val body: Array<String>
+    override val prefix: String,
+    override val description: String,
+    override val body: Array<String>,
 ) : ISnippet {
 
   constructor(
-    prefix: String,
-    description: String,
-    content: () -> Array<String>
+      prefix: String,
+      description: String,
+      content: () -> Array<String>,
   ) : this(prefix, description, content())
 
   override fun equals(other: Any?): Boolean {

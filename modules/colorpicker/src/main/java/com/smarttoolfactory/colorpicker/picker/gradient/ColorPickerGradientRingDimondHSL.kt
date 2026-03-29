@@ -21,12 +21,11 @@ import com.smarttoolfactory.extendedcolors.util.ColorUtil
 
 /**
  * ColorPicker with [SelectorRingHue] hue selector and [SelectorDiamondSaturationLightnessHSL]
- * saturation lightness Selector uses [HSL](https://en.wikipedia.org/wiki/HSL_and_HSV)
- * color model as base.
+ * saturation lightness Selector uses [HSL](https://en.wikipedia.org/wiki/HSL_and_HSV) color model
+ * as base.
  *
- * This color picker has tabs section that can be changed between
- * HSL, HSV and RGB color models and color can be set using [CompositeSliderPanel] which contains
- * sliders for each color models.
+ * This color picker has tabs section that can be changed between HSL, HSV and RGB color models and
+ * color can be set using [CompositeSliderPanel] which contains sliders for each color models.
  *
  * @param initialBrushColor [BrushColor] that is passed to this picker initially.
  * @param ringOuterRadiusFraction outer radius of [SelectorRingHue].
@@ -35,8 +34,8 @@ import com.smarttoolfactory.extendedcolors.util.ColorUtil
  * @param ringBorderStrokeColor stroke color for drawing borders around inner or outer radius.
  * @param ringBorderStrokeWidth stroke width of borders.
  * @param selectionRadius radius of white and black circle selector.
- * @param onBrushColorChange callback that is triggered when [Color] is changed using [SelectorRingHue],
- * [SelectorDiamondSaturationLightnessHSL] or [CompositeSliderPanel]
+ * @param onBrushColorChange callback that is triggered when [Color] is changed using
+ *   [SelectorRingHue], [SelectorDiamondSaturationLightnessHSL] or [CompositeSliderPanel]
  */
 @Composable
 fun ColorPickerGradientRingDiamondHSL(
@@ -49,147 +48,132 @@ fun ColorPickerGradientRingDiamondHSL(
     ringBorderStrokeColor: Color = Color.Black,
     ringBorderStrokeWidth: Dp = 4.dp,
     selectionRadius: Dp = 8.dp,
-    onBrushColorChange: (BrushColor) -> Unit
+    onBrushColorChange: (BrushColor) -> Unit,
 ) {
 
-    var inputColorModel by remember { mutableStateOf(ColorModel.HSL) }
+  var inputColorModel by remember { mutableStateOf(ColorModel.HSL) }
 
-    var colorMode by remember {
-        mutableStateOf(
-            if (initialBrushColor.brush != null) ColorMode.Gradient else ColorMode.HSL
-        )
-    }
+  var colorMode by remember {
+    mutableStateOf(if (initialBrushColor.brush != null) ColorMode.Gradient else ColorMode.HSL)
+  }
 
-    // Hue, Saturation, Lightness and Alpha properties
-    val hslArray = remember { ColorUtil.colorToHSL(gradientColorState.color) }
-    var hue by remember { mutableStateOf(hslArray[0]) }
-    var saturation by remember { mutableStateOf(hslArray[1]) }
-    var lightness by remember { mutableStateOf(hslArray[2]) }
-    var alpha by remember { mutableStateOf(gradientColorState.color.alpha) }
+  // Hue, Saturation, Lightness and Alpha properties
+  val hslArray = remember { ColorUtil.colorToHSL(gradientColorState.color) }
+  var hue by remember { mutableStateOf(hslArray[0]) }
+  var saturation by remember { mutableStateOf(hslArray[1]) }
+  var lightness by remember { mutableStateOf(hslArray[2]) }
+  var alpha by remember { mutableStateOf(gradientColorState.color.alpha) }
 
-    Column(
-        modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
+  Column(
+      modifier = modifier,
+      horizontalAlignment = Alignment.CenterHorizontally,
+  ) {
+    Spacer(modifier = Modifier.height(10.dp))
 
-        Spacer(modifier = Modifier.height(10.dp))
-
-        // Initial-Current Colors/Gradient Color
-        Box(modifier = Modifier.height(80.dp), contentAlignment = Alignment.Center) {
-            when (colorMode) {
-                ColorMode.Gradient -> BrushDisplay(gradientColorState = gradientColorState)
-                else -> ColorDisplayRoundedRect(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 50.dp, vertical = 10.dp),
-                    initialColor = initialBrushColor.color,
-                    currentColor = gradientColorState.color
-                )
-            }
-        }
-
-        Box(contentAlignment = Alignment.Center) {
-
-            // Ring Shaped Hue Selector
-            SelectorRingHue(
-                modifier = Modifier.fillMaxWidth(.9f),
-                hue = hue,
-                outerRadiusFraction = ringOuterRadiusFraction,
-                innerRadiusFraction = ringInnerRadiusFraction,
-                backgroundColor = ringBackgroundColor,
-                borderStrokeColor = ringBorderStrokeColor,
-                borderStrokeWidth = ringBorderStrokeWidth,
-                selectionRadius = selectionRadius
-            ) { hueChange ->
-                hue = hueChange
-
-                setGradientColor(gradientColorState, hue, saturation, lightness, alpha)
-                onBrushColorChange(BrushColor(color = gradientColorState.color))
-            }
-
-            // Diamond Shaped Saturation and Lightness Selector
-            SelectorDiamondSaturationLightnessHSL(
-                modifier = Modifier.fillMaxWidth(ringInnerRadiusFraction * .8f),
-                hue = hue,
-                saturation = saturation,
-                lightness = lightness,
-                selectionRadius = selectionRadius
-            ) { s, l ->
-                saturation = s
-                lightness = l
-
-                setGradientColor(gradientColorState, hue, saturation, lightness, alpha)
-                onBrushColorChange(BrushColor(color = gradientColorState.color))
-            }
-        }
-
-        // HSL-HSV-RGB-Gradient Color Model Change Tabs
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            ColorGradientModeChangeTabRow(
-                colorMode = colorMode,
-                onColorModeChange = {
-                    colorMode = it
-                    when (colorMode) {
-                        ColorMode.HSL -> {
-                            inputColorModel = ColorModel.HSL
-                        }
-                        ColorMode.HSV -> {
-                            inputColorModel = ColorModel.HSV
-                        }
-                        ColorMode.RGB -> {
-                            inputColorModel = ColorModel.RGB
-                        }
-                        else -> Unit
-                    }
-                }
+    // Initial-Current Colors/Gradient Color
+    Box(modifier = Modifier.height(80.dp), contentAlignment = Alignment.Center) {
+      when (colorMode) {
+        ColorMode.Gradient -> BrushDisplay(gradientColorState = gradientColorState)
+        else ->
+            ColorDisplayRoundedRect(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 50.dp, vertical = 10.dp),
+                initialColor = initialBrushColor.color,
+                currentColor = gradientColorState.color,
             )
-        }
-
-        // HSL-HSV-RGB Sliders
-        when (colorMode) {
-            ColorMode.Gradient -> {
-                Column(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .verticalScroll(rememberScrollState())
-                ) {
-                    GradientSelector(
-                        color = gradientColorState.color,
-                        gradientColorState = gradientColorState
-                    ) {
-                        onBrushColorChange(BrushColor(brush = it))
-                    }
-                }
-            }
-            else -> {
-                CompositeSliderPanel(
-                    compositeColor = ColorHSL(
-                        hue = hue,
-                        saturation = saturation,
-                        lightness = lightness,
-                        alpha = alpha
-                    ),
-                    onColorChange = {
-                        (it as? ColorHSL)?.let { color ->
-                            hue = color.hue
-                            saturation = color.saturation
-                            lightness = color.lightness
-                            alpha = color.alpha
-
-                            setGradientColor(gradientColorState, hue, saturation, lightness, alpha)
-                            onBrushColorChange(BrushColor(color = gradientColorState.color))
-                        }
-                    },
-                    showAlphaSlider = true,
-                    inputColorModel = inputColorModel,
-                    outputColorModel = ColorModel.HSL
-                )
-            }
-        }
+      }
     }
+
+    Box(contentAlignment = Alignment.Center) {
+
+      // Ring Shaped Hue Selector
+      SelectorRingHue(
+          modifier = Modifier.fillMaxWidth(.9f),
+          hue = hue,
+          outerRadiusFraction = ringOuterRadiusFraction,
+          innerRadiusFraction = ringInnerRadiusFraction,
+          backgroundColor = ringBackgroundColor,
+          borderStrokeColor = ringBorderStrokeColor,
+          borderStrokeWidth = ringBorderStrokeWidth,
+          selectionRadius = selectionRadius,
+      ) { hueChange ->
+        hue = hueChange
+
+        setGradientColor(gradientColorState, hue, saturation, lightness, alpha)
+        onBrushColorChange(BrushColor(color = gradientColorState.color))
+      }
+
+      // Diamond Shaped Saturation and Lightness Selector
+      SelectorDiamondSaturationLightnessHSL(
+          modifier = Modifier.fillMaxWidth(ringInnerRadiusFraction * .8f),
+          hue = hue,
+          saturation = saturation,
+          lightness = lightness,
+          selectionRadius = selectionRadius,
+      ) { s, l ->
+        saturation = s
+        lightness = l
+
+        setGradientColor(gradientColorState, hue, saturation, lightness, alpha)
+        onBrushColorChange(BrushColor(color = gradientColorState.color))
+      }
+    }
+
+    // HSL-HSV-RGB-Gradient Color Model Change Tabs
+    Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+      ColorGradientModeChangeTabRow(
+          colorMode = colorMode,
+          onColorModeChange = {
+            colorMode = it
+            when (colorMode) {
+              ColorMode.HSL -> {
+                inputColorModel = ColorModel.HSL
+              }
+              ColorMode.HSV -> {
+                inputColorModel = ColorModel.HSV
+              }
+              ColorMode.RGB -> {
+                inputColorModel = ColorModel.RGB
+              }
+              else -> Unit
+            }
+          },
+      )
+    }
+
+    // HSL-HSV-RGB Sliders
+    when (colorMode) {
+      ColorMode.Gradient -> {
+        Column(modifier = Modifier.fillMaxHeight().verticalScroll(rememberScrollState())) {
+          GradientSelector(
+              color = gradientColorState.color,
+              gradientColorState = gradientColorState,
+          ) {
+            onBrushColorChange(BrushColor(brush = it))
+          }
+        }
+      }
+      else -> {
+        CompositeSliderPanel(
+            compositeColor =
+                ColorHSL(hue = hue, saturation = saturation, lightness = lightness, alpha = alpha),
+            onColorChange = {
+              (it as? ColorHSL)?.let { color ->
+                hue = color.hue
+                saturation = color.saturation
+                lightness = color.lightness
+                alpha = color.alpha
+
+                setGradientColor(gradientColorState, hue, saturation, lightness, alpha)
+                onBrushColorChange(BrushColor(color = gradientColorState.color))
+              }
+            },
+            showAlphaSlider = true,
+            inputColorModel = inputColorModel,
+            outputColorModel = ColorModel.HSL,
+        )
+      }
+    }
+  }
 }
 
 private fun setGradientColor(
@@ -197,14 +181,8 @@ private fun setGradientColor(
     hue: Float,
     saturation: Float,
     lightness: Float,
-    alpha: Float
+    alpha: Float,
 ) {
-    gradientColorState.color =
-        Color.hsl(
-            hue = hue,
-            saturation = saturation,
-            lightness = lightness,
-            alpha = alpha
-        )
+  gradientColorState.color =
+      Color.hsl(hue = hue, saturation = saturation, lightness = lightness, alpha = alpha)
 }
-

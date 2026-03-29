@@ -24,12 +24,12 @@ import com.itsaky.androidide.lsp.models.CompletionItem
 import com.itsaky.androidide.lsp.models.CompletionResult
 import com.itsaky.androidide.lsp.models.MatchLevel.NO_MATCH
 import com.itsaky.androidide.progress.ProgressManager.Companion.abortIfCancelled
+import java.nio.file.Path
 import openjdk.source.tree.ClassTree
 import openjdk.source.tree.CompilationUnitTree
 import openjdk.source.tree.MethodTree
 import openjdk.source.tree.Tree
 import openjdk.source.util.TreePath
-import java.nio.file.Path
 
 /**
  * Provides keyword completions.
@@ -37,17 +37,17 @@ import java.nio.file.Path
  * @author Akash Yadav
  */
 class KeywordCompletionProvider(
-  completingFile: Path,
-  cursor: Long,
-  compiler: JavaCompilerService,
-  settings: IServerSettings
+    completingFile: Path,
+    cursor: Long,
+    compiler: JavaCompilerService,
+    settings: IServerSettings,
 ) : IJavaCompletionProvider(cursor, completingFile, compiler, settings) {
 
   override fun doComplete(
-    task: CompileTask,
-    path: TreePath,
-    partial: String,
-    endsWithParen: Boolean,
+      task: CompileTask,
+      path: TreePath,
+      partial: String,
+      endsWithParen: Boolean,
   ): CompletionResult {
 
     if (partial.isBlank()) {
@@ -90,75 +90,75 @@ class KeywordCompletionProvider(
 
   companion object {
     private val TOP_LEVEL_KEYWORDS =
-      arrayOf(
-        "package",
-        "import",
-        "public",
-        "private",
-        "protected",
-        "abstract",
-        "class",
-        "interface",
-        "@interface",
-        "extends",
-        "implements"
-      )
+        arrayOf(
+            "package",
+            "import",
+            "public",
+            "private",
+            "protected",
+            "abstract",
+            "class",
+            "interface",
+            "@interface",
+            "extends",
+            "implements",
+        )
     private val CLASS_BODY_KEYWORDS =
-      arrayOf(
-        "public",
-        "private",
-        "protected",
-        "static",
-        "final",
-        "native",
-        "synchronized",
-        "abstract",
-        "default",
-        "class",
-        "interface",
-        "void",
-        "boolean",
-        "int",
-        "long",
-        "float",
-        "double",
-        "true",
-        "false",
-        "null"
-      )
+        arrayOf(
+            "public",
+            "private",
+            "protected",
+            "static",
+            "final",
+            "native",
+            "synchronized",
+            "abstract",
+            "default",
+            "class",
+            "interface",
+            "void",
+            "boolean",
+            "int",
+            "long",
+            "float",
+            "double",
+            "true",
+            "false",
+            "null",
+        )
     private val METHOD_BODY_KEYWORDS =
-      arrayOf(
-        "new",
-        "assert",
-        "try",
-        "catch",
-        "finally",
-        "throw",
-        "return",
-        "break",
-        "case",
-        "continue",
-        "default",
-        "do",
-        "while",
-        "for",
-        "switch",
-        "if",
-        "else",
-        "instanceof",
-        "var",
-        "final",
-        "class",
-        "void",
-        "boolean",
-        "int",
-        "long",
-        "float",
-        "double",
-        "synchronized",
-        "true",
-        "false",
-        "null"
-      )
+        arrayOf(
+            "new",
+            "assert",
+            "try",
+            "catch",
+            "finally",
+            "throw",
+            "return",
+            "break",
+            "case",
+            "continue",
+            "default",
+            "do",
+            "while",
+            "for",
+            "switch",
+            "if",
+            "else",
+            "instanceof",
+            "var",
+            "final",
+            "class",
+            "void",
+            "boolean",
+            "int",
+            "long",
+            "float",
+            "double",
+            "synchronized",
+            "true",
+            "false",
+            "null",
+        )
   }
 }

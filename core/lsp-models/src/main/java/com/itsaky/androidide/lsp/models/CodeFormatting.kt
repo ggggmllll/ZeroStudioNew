@@ -32,9 +32,9 @@ constructor(val content: CharSequence, val range: Range = Range.NONE)
 data class CodeFormatResult
 @JvmOverloads
 constructor(
-  val isIndexed: Boolean = false,
-  val edits: MutableList<out TextEdit> = mutableListOf(),
-  val indexedTextEdits: MutableList<IndexedTextEdit> = mutableListOf()
+    val isIndexed: Boolean = false,
+    val edits: MutableList<out TextEdit> = mutableListOf(),
+    val indexedTextEdits: MutableList<IndexedTextEdit> = mutableListOf(),
 ) {
 
   companion object {

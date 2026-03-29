@@ -21,7 +21,7 @@ import com.itsaky.androidide.templates.impl.androidstudio.activities.fullscreenA
 import com.itsaky.androidide.templates.impl.androidstudio.activities.fullscreenActivity.res.values.getFullscreenContainerThemeOverlay
 
 fun fragmentFullscreenXml(fragmentClass: String, packageName: String, themesData: ThemesData) =
-  """
+    """
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:theme="@style/${getFullscreenContainerThemeOverlay(themesData.overlay.name)}"

@@ -74,11 +74,11 @@ open class ReusableCompiler {
    *   compilation units are of other kind than [source][JavaFileObject.Kind.SOURCE]
    */
   open fun getTask(
-    fileManager: JavaFileManager?,
-    diagnosticListener: DiagnosticListener<in JavaFileObject?>?,
-    options: Iterable<String>,
-    classes: Iterable<String>,
-    compilationUnits: Iterable<JavaFileObject?>?
+      fileManager: JavaFileManager?,
+      diagnosticListener: DiagnosticListener<in JavaFileObject?>?,
+      options: Iterable<String>,
+      classes: Iterable<String>,
+      compilationUnits: Iterable<JavaFileObject?>?,
   ): ReusableBorrow {
 
     if (checkedOut) {
@@ -94,15 +94,15 @@ open class ReusableCompiler {
     }
 
     val task =
-      systemProvider.getTask(
-        null,
-        fileManager,
-        diagnosticListener,
-        opts,
-        classes,
-        compilationUnits,
-        currentContext
-      ) as JavacTaskImpl
+        systemProvider.getTask(
+            null,
+            fileManager,
+            diagnosticListener,
+            opts,
+            classes,
+            compilationUnits,
+            currentContext,
+        ) as JavacTaskImpl
 
     task.addTaskListener(currentContext)
 
@@ -118,7 +118,6 @@ open class ReusableCompiler {
   }
 
   companion object {
-    @JvmStatic
-    private val cancelService: CancelService = CancelServiceImpl()
+    @JvmStatic private val cancelService: CancelService = CancelServiceImpl()
   }
 }

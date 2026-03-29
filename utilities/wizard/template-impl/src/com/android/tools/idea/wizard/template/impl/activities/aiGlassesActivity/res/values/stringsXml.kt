@@ -16,7 +16,7 @@
 package com.android.tools.idea.wizard.template.impl.activities.aiGlassesActivity.res.values
 
 fun stringsXml() =
-  """
+    """
 <resources>
     <string name="app_name">Basic AI Glasses Activity</string>
     <string name="hello_ai_glasses">Hello, AI Glasses!</string>

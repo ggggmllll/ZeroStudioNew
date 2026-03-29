@@ -17,12 +17,12 @@
 
 package com.itsaky.androidide.plugins
 
+import com.itsaky.androidide.build.config.BuildConfig
 import com.itsaky.androidide.plugins.util.DownloadUtils
+import java.io.File
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.internal.os.OperatingSystem
-import java.io.File
-import com.itsaky.androidide.build.config.BuildConfig
 
 /**
  * Gradle plugin which downloads the bootstrap packages for the terminal.
@@ -34,50 +34,66 @@ class TerminalBootstrapPackagesPlugin : Plugin<Project> {
   companion object {
 
     /**
-     * The bootstrap packages, mapped with the CPU ABI as the key and the ZIP file's sha256sum as the value.
+     * The bootstrap packages, mapped with the CPU ABI as the key and the ZIP file's sha256sum as
+     * the value.
      */
     // private val BOOTSTRAP_PACKAGES = mapOf(
-      // /**"aarch64"*/ BuildConfig.ABI_ARMEABI_AARCH64 to "d10fa952769b07b3d0babf6e155aacf58e5d441bb0ed87d4f9e8e54b73575180",
-      // /**"arm"*/ BuildConfig.ABI_ARM32 to "0c87c46b5a3ca04035f831d6271b9ef241ce55bc26f6ec1539017901853e3c9e",
-      // /**"x86_64"*/ BuildConfig.ABI_X86_64 to "00dcbe6c8f8bf09a996128789cf54e2586bb07a05d4cb2f217c18af592e466b0"
+    // /**"aarch64"*/ BuildConfig.ABI_ARMEABI_AARCH64 to
+    // "d10fa952769b07b3d0babf6e155aacf58e5d441bb0ed87d4f9e8e54b73575180",
+    // /**"arm"*/ BuildConfig.ABI_ARM32 to
+    // "0c87c46b5a3ca04035f831d6271b9ef241ce55bc26f6ec1539017901853e3c9e",
+    // /**"x86_64"*/ BuildConfig.ABI_X86_64 to
+    // "00dcbe6c8f8bf09a996128789cf54e2586bb07a05d4cb2f217c18af592e466b0"
     // )
-    private val BOOTSTRAP_PACKAGES = mapOf(
-      /**"aarch64"*/ BuildConfig.ABI_ARMEABI_AARCH64 to BuildConfig.BOOTSTRAP_PACKAGES_ABI_ARMEABI_AARCH64, /**"d10fa952769b07b3d0babf6e155aacf58e5d441bb0ed87d4f9e8e54b73575180",*/
-      /**"arm"*/ BuildConfig.ABI_ARM32 to BuildConfig.BOOTSTRAP_PACKAGES_ABI_ARM32, /**"0c87c46b5a3ca04035f831d6271b9ef241ce55bc26f6ec1539017901853e3c9e",*/
-      /**"x86_64"*/ BuildConfig.ABI_X86_64 to BuildConfig.BOOTSTRAP_PACKAGES_ABI_X86_64 /**"00dcbe6c8f8bf09a996128789cf54e2586bb07a05d4cb2f217c18af592e466b0"*/
-    )
+    private val BOOTSTRAP_PACKAGES =
+        mapOf(
+            /** "aarch64" */
+            BuildConfig.ABI_ARMEABI_AARCH64 to BuildConfig.BOOTSTRAP_PACKAGES_ABI_ARMEABI_AARCH64,
+            /** "d10fa952769b07b3d0babf6e155aacf58e5d441bb0ed87d4f9e8e54b73575180", */
+            /** "arm" */
+            BuildConfig.ABI_ARM32 to BuildConfig.BOOTSTRAP_PACKAGES_ABI_ARM32,
+            /** "0c87c46b5a3ca04035f831d6271b9ef241ce55bc26f6ec1539017901853e3c9e", */
+            /** "x86_64" */
+            BuildConfig.ABI_X86_64 to BuildConfig.BOOTSTRAP_PACKAGES_ABI_X86_64,
+            /** "00dcbe6c8f8bf09a996128789cf54e2586bb07a05d4cb2f217c18af592e466b0" */
+        )
 
-    /**
-     * The bootstrap packages version, basically the tag name of the GitHub release.
-     */
-    private const val BOOTSTRAP_PACKAGES_VERSION = /**"03.03.2025"*/ BuildConfig.BOOTSTRAP_PACKAGES_VERSION
+    /** The bootstrap packages version, basically the tag name of the GitHub release. */
+    private const val BOOTSTRAP_PACKAGES_VERSION =
+    /** "03.03.2025" */
+        BuildConfig.BOOTSTRAP_PACKAGES_VERSION
 
     private const val PACKAGES_DOWNLOAD_URL = BuildConfig.PACKAGES_DOWNLOAD_URL
-     /** "https://github.com/msmt2017/termux-packages-zero/releases/download/bootstrap-%1\$s/bootstrap-%2\$s.zip"*/
+
+    /**
+     * "https://github.com/msmt2017/termux-packages-zero/releases/download/bootstrap-%1\$s/bootstrap-%2\$s.zip"
+     */
   }
 
   override fun apply(target: Project) {
     target.run {
+      val bootstrapOut = project.layout.buildDirectory.dir("bootstrap-packages").get().asFile
 
-      val bootstrapOut = project.layout.buildDirectory.dir("bootstrap-packages")
-        .get().asFile
+      val files =
+          BOOTSTRAP_PACKAGES.map { (arch, sha256) ->
+                val file = File(bootstrapOut, "bootstrap-${arch}.zip")
+                file.parentFile.mkdirs()
 
-      val files = BOOTSTRAP_PACKAGES.map { (arch, sha256) ->
-        val file = File(bootstrapOut, "bootstrap-${arch}.zip")
-        file.parentFile.mkdirs()
+                DownloadUtils.doDownload(
+                    file = file,
+                    remoteUrl = PACKAGES_DOWNLOAD_URL.format(BOOTSTRAP_PACKAGES_VERSION, arch),
+                    expectedChecksum = sha256,
+                    logger = logger,
+                )
 
-        DownloadUtils.doDownload(
-          file = file,
-          remoteUrl = PACKAGES_DOWNLOAD_URL.format(BOOTSTRAP_PACKAGES_VERSION, arch),
-          expectedChecksum = sha256,
-          logger = logger
-        )
+                return@map arch to file
+              }
+              .toMap()
 
-        return@map arch to file
-      }.toMap()
-
-      project.file("src/main/cpp/termux-bootstrap-zip.S").writeText(
-        """
+      project
+          .file("src/main/cpp/termux-bootstrap-zip.S")
+          .writeText(
+              """
              .global blob
              .global blob_size
              .section .rodata
@@ -95,8 +111,9 @@ class TerminalBootstrapPackagesPlugin : Plugin<Project> {
          blob_size:
              .int 1b - blob
          
-      """.trimIndent()
-      )
+      """
+                  .trimIndent()
+          )
     }
   }
 

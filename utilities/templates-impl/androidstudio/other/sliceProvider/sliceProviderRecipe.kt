@@ -24,11 +24,11 @@ import com.itsaky.androidide.templates.impl.androidstudio.other.sliceProvider.sr
 import com.itsaky.androidide.templates.impl.androidstudio.other.sliceProvider.src.app_package.sliceProviderKt
 
 fun RecipeExecutor.sliceProviderRecipe(
-  moduleData: ModuleTemplateData,
-  className: String,
-  authorities: String,
-  hostUrl: String,
-  pathPrefix: String,
+    moduleData: ModuleTemplateData,
+    className: String,
+    authorities: String,
+    hostUrl: String,
+    pathPrefix: String,
 ) {
   val (projectData, srcOut, resOut, manifestOut) = moduleData
   val ktOrJavaExt = projectData.language.extension
@@ -37,12 +37,15 @@ fun RecipeExecutor.sliceProviderRecipe(
 
   addDependency("androidx.annotation:annotation:+")
   addDependency("androidx.slice:slice-builders:+")
-  mergeXml(androidManifestXml(authorities, className, hostUrl, packageName, pathPrefix), manifestOut.resolve("AndroidManifest.xml"))
+  mergeXml(
+      androidManifestXml(authorities, className, hostUrl, packageName, pathPrefix),
+      manifestOut.resolve("AndroidManifest.xml"),
+  )
   val sliceProvider =
-    when (projectData.language) {
-      Language.Java -> sliceProviderJava(className, packageName, pathPrefix)
-      Language.Kotlin -> sliceProviderKt(className, packageName, pathPrefix)
-    }
+      when (projectData.language) {
+        Language.Java -> sliceProviderJava(className, packageName, pathPrefix)
+        Language.Kotlin -> sliceProviderKt(className, packageName, pathPrefix)
+      }
   save(sliceProvider, srcOut.resolve("${className}.${ktOrJavaExt}"))
 
   open(srcOut.resolve("${className}.${ktOrJavaExt}"))

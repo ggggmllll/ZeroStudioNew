@@ -19,7 +19,6 @@ package com.itsaky.androidide.templates.base
 
 import android.content.Context
 import com.android.SdkConstants.ANDROID_MANIFEST_XML
-import com.squareup.javapoet.TypeSpec
 import com.itsaky.androidide.templates.ModuleType.AndroidLibrary
 import com.itsaky.androidide.templates.RecipeExecutor
 import com.itsaky.androidide.templates.SrcSet
@@ -29,6 +28,7 @@ import com.itsaky.androidide.templates.base.modules.android.proguardRules
 import com.itsaky.androidide.templates.base.util.AndroidManifestBuilder
 import com.itsaky.androidide.templates.base.util.AndroidModuleResManager
 import com.itsaky.androidide.templates.base.util.stringRes
+import com.squareup.javapoet.TypeSpec
 import java.io.File
 
 /**
@@ -156,8 +156,8 @@ open class AndroidModuleTemplateBuilder : ModuleTemplateBuilder() {
 
     // Create marker file if this is a compose module
     // if (isComposeModule) {
-      // val markerFile = File(data.projectDir.parentFile, ".compose_enabled")
-      // markerFile.createNewFile()
+    // val markerFile = File(data.projectDir.parentFile, ".compose_enabled")
+    // markerFile.createNewFile()
     // }
   }
 

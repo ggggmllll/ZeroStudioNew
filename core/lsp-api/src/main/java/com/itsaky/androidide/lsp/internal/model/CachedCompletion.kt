@@ -20,8 +20,8 @@ package com.itsaky.androidide.lsp.internal.model
 import com.itsaky.androidide.lsp.models.CompletionParams
 import com.itsaky.androidide.progress.ICancelChecker
 import com.itsaky.androidide.utils.DocumentUtils
-import org.slf4j.LoggerFactory
 import java.nio.file.Paths
+import org.slf4j.LoggerFactory
 
 /**
  * Cached version of a completion result. Keeps only required properties from [params].
@@ -30,8 +30,8 @@ import java.nio.file.Paths
  */
 class CachedCompletion
 private constructor(
-  val params: CompletionParams,
-  val result: com.itsaky.androidide.lsp.models.CompletionResult
+    val params: CompletionParams,
+    val result: com.itsaky.androidide.lsp.models.CompletionResult,
 ) {
 
   companion object {
@@ -41,31 +41,32 @@ private constructor(
     /** Empty cached completion. Could be used to represent "no cache available". */
     @JvmField
     val EMPTY =
-      cache(
-        CompletionParams(
-          com.itsaky.androidide.models.Position.NONE,
-          Paths.get(""), ICancelChecker.CANCELLED
-        ),
-        com.itsaky.androidide.lsp.models.CompletionResult.EMPTY
-      )
+        cache(
+            CompletionParams(
+                com.itsaky.androidide.models.Position.NONE,
+                Paths.get(""),
+                ICancelChecker.CANCELLED,
+            ),
+            com.itsaky.androidide.lsp.models.CompletionResult.EMPTY,
+        )
 
     /**
      * Creates cached version of the result from the given params and result.
      *
      * @param _params The [CompletionParams] used to trigger the completion request. A shallow copy
-     * of this request is created.
+     *   of this request is created.
      * @param result The result of the completion to cache.
      */
     @JvmStatic
     fun cache(
-      _params: CompletionParams,
-      result: com.itsaky.androidide.lsp.models.CompletionResult
+        _params: CompletionParams,
+        result: com.itsaky.androidide.lsp.models.CompletionResult,
     ): CachedCompletion {
       val params =
-        CompletionParams(_params.position, _params.file, ICancelChecker.CANCELLED).apply {
-          prefix = _params.prefix ?: ""
-          content = ""
-        }
+          CompletionParams(_params.position, _params.file, ICancelChecker.CANCELLED).apply {
+            prefix = _params.prefix ?: ""
+            content = ""
+          }
 
       return CachedCompletion(params, result)
     }

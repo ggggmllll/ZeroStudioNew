@@ -21,10 +21,10 @@ import com.itsaky.androidide.build.config.AUTH_PASS
 import com.itsaky.androidide.build.config.AUTH_USER
 import com.itsaky.androidide.build.config.KEY_BIN
 import com.itsaky.androidide.build.config.KEY_URL
-import org.gradle.api.Project
 import com.itsaky.androidide.build.config.signingKey
-import org.gradle.api.invocation.Gradle
 import java.util.Base64
+import org.gradle.api.Project
+import org.gradle.api.invocation.Gradle
 
 /**
  * Helper class for downloading and setting up the signing key.
@@ -32,7 +32,7 @@ import java.util.Base64
  * @author Akash Yadav
  */
 object SigningKeyUtils {
-  
+
   private val _warned = mutableMapOf<String, Boolean>()
 
   @JvmStatic
@@ -86,5 +86,4 @@ object SigningKeyUtils {
     }
     return value
   }
-
 }

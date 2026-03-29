@@ -21,9 +21,7 @@ import android.os.Build
 import com.google.auto.service.AutoService
 import com.itsaky.androidide.app.IDEApplication
 
-/**
- * @author Akash Yadav
- */
+/** @author Akash Yadav */
 @AutoService(IDEBuildConfigProvider::class)
 @Suppress("UNUSED")
 open class IDEBuildConfigProviderImpl : IDEBuildConfigProvider {

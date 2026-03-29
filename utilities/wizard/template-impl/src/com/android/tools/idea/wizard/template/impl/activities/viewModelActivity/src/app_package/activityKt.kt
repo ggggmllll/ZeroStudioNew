@@ -19,14 +19,14 @@ package com.android.tools.idea.wizard.template.impl.activities.viewModelActivity
 import com.android.tools.idea.wizard.template.escapeKotlinIdentifier
 
 fun activityKt(
-  activityClass: String,
-  activityLayout: String,
-  fragmentClass: String,
-  fragmentPackage: String,
-  packageName: String,
-  superClassFqcn: String,
+    activityClass: String,
+    activityLayout: String,
+    fragmentClass: String,
+    fragmentPackage: String,
+    packageName: String,
+    superClassFqcn: String,
 ) =
-  """package ${escapeKotlinIdentifier(packageName)}
+    """package ${escapeKotlinIdentifier(packageName)}
 
 import ${superClassFqcn}
 import android.os.Bundle

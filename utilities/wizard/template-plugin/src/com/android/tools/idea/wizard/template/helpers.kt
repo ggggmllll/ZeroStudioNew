@@ -30,7 +30,8 @@ package com.android.tools.idea.wizard.template
  * """
  * ```
  *
- * If we will render a template containing `text` it will contain only two lines without an empty line between them.
+ * If we will render a template containing `text` it will contain only two lines without an empty
+ * line between them.
  */
 const val SKIP_LINE = "[THIS LINE SHOULD NOT BE RENDERED!]"
 
@@ -39,8 +40,12 @@ const val SKIP_LINE = "[THIS LINE SHOULD NOT BE RENDERED!]"
  *
  * @see SKIP_LINE
  */
-inline fun renderIf(predicate: Boolean, trim: Boolean = true, skipLine: Boolean = true, str: () -> String) =
-  if (predicate) if (trim) str().trim() else str() else SKIP_LINE.takeIf { skipLine }.orEmpty()
+inline fun renderIf(
+    predicate: Boolean,
+    trim: Boolean = true,
+    skipLine: Boolean = true,
+    str: () -> String,
+) = if (predicate) if (trim) str().trim() else str() else SKIP_LINE.takeIf { skipLine }.orEmpty()
 
 /**
  * Returns a new String with [SKIP_LINE] removed.
@@ -48,7 +53,7 @@ inline fun renderIf(predicate: Boolean, trim: Boolean = true, skipLine: Boolean 
  * @see SKIP_LINE
  */
 fun CharSequence.withoutSkipLines() =
-  this.split("\n")
-    .filter { it.trim() != SKIP_LINE }
-    .joinToString("\n")
-    .replace(SKIP_LINE, "") // for some SKIP_LINEs which are not on their own line
+    this.split("\n")
+        .filter { it.trim() != SKIP_LINE }
+        .joinToString("\n")
+        .replace(SKIP_LINE, "") // for some SKIP_LINEs which are not on their own line

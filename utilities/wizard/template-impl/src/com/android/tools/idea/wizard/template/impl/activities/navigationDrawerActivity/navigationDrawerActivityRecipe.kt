@@ -42,16 +42,16 @@ import com.android.tools.idea.wizard.template.impl.activities.navigationDrawerAc
 import java.io.File
 
 fun RecipeExecutor.generateNavigationDrawer(
-  data: ModuleTemplateData,
-  activityClass: String,
-  layoutName: String,
-  isLauncher: Boolean,
-  packageName: PackageName,
-  appBarLayoutName: String,
-  navHeaderLayoutName: String,
-  drawerMenu: String,
-  contentLayoutName: String,
-  navGraphName: String,
+    data: ModuleTemplateData,
+    activityClass: String,
+    layoutName: String,
+    isLauncher: Boolean,
+    packageName: PackageName,
+    appBarLayoutName: String,
+    navHeaderLayoutName: String,
+    drawerMenu: String,
+    contentLayoutName: String,
+    navGraphName: String,
 ) {
   val excludeMenu = false
   val menuName = classToResource(activityClass)
@@ -68,7 +68,14 @@ fun RecipeExecutor.generateNavigationDrawer(
   addMaterialDependency(useAndroidX)
   addViewBindingSupport(data.viewBindingSupport, true)
 
-  generateManifest(data, activityClass, packageName, isLauncher, hasNoActionBar = true, generateActivityTitle = true)
+  generateManifest(
+      data,
+      activityClass,
+      packageName,
+      isLauncher,
+      hasNoActionBar = true,
+      generateActivityTitle = true,
+  )
 
   mergeXml(strings(), resOut.resolve("values/strings.xml"))
   mergeXml(dimens(), resOut.resolve("values/dimens.xml"))
@@ -91,8 +98,8 @@ fun RecipeExecutor.generateNavigationDrawer(
   val navHostFragmentId = "nav_host_fragment_${contentLayoutName}"
 
   save(
-    navigationContentMain(appBarLayoutName, navGraphName, navHostFragmentId, useAndroidX),
-    resOut.resolve("layout/${contentLayoutName}.xml"),
+      navigationContentMain(appBarLayoutName, navGraphName, navHostFragmentId, useAndroidX),
+      resOut.resolve("layout/${contentLayoutName}.xml"),
   )
 
   if (isNewModule && !excludeMenu) {
@@ -101,34 +108,34 @@ fun RecipeExecutor.generateNavigationDrawer(
 
   val isViewBindingSupported = data.viewBindingSupport.isViewBindingSupported()
   saveFragmentAndViewModel(
-    resOut = resOut,
-    srcOut = srcOut,
-    language = language,
-    packageName = packageName,
-    applicationPackage = data.projectTemplateData.applicationPackage,
-    fragmentPrefix = "home",
-    useAndroidX = useAndroidX,
-    isViewBindingSupported = isViewBindingSupported,
+      resOut = resOut,
+      srcOut = srcOut,
+      language = language,
+      packageName = packageName,
+      applicationPackage = data.projectTemplateData.applicationPackage,
+      fragmentPrefix = "home",
+      useAndroidX = useAndroidX,
+      isViewBindingSupported = isViewBindingSupported,
   )
   saveFragmentAndViewModel(
-    resOut = resOut,
-    srcOut = srcOut,
-    language = language,
-    packageName = packageName,
-    applicationPackage = data.projectTemplateData.applicationPackage,
-    fragmentPrefix = "gallery",
-    useAndroidX = useAndroidX,
-    isViewBindingSupported = isViewBindingSupported,
+      resOut = resOut,
+      srcOut = srcOut,
+      language = language,
+      packageName = packageName,
+      applicationPackage = data.projectTemplateData.applicationPackage,
+      fragmentPrefix = "gallery",
+      useAndroidX = useAndroidX,
+      isViewBindingSupported = isViewBindingSupported,
   )
   saveFragmentAndViewModel(
-    resOut = resOut,
-    srcOut = srcOut,
-    language = language,
-    packageName = packageName,
-    applicationPackage = data.projectTemplateData.applicationPackage,
-    fragmentPrefix = "slideshow",
-    useAndroidX = useAndroidX,
-    isViewBindingSupported = isViewBindingSupported,
+      resOut = resOut,
+      srcOut = srcOut,
+      language = language,
+      packageName = packageName,
+      applicationPackage = data.projectTemplateData.applicationPackage,
+      fragmentPrefix = "slideshow",
+      useAndroidX = useAndroidX,
+      isViewBindingSupported = isViewBindingSupported,
   )
   if (language == Language.Kotlin) {
     setJavaKotlinCompileOptions(true)
@@ -136,41 +143,58 @@ fun RecipeExecutor.generateNavigationDrawer(
   val generateKotlin = language == Language.Kotlin
   navigationDependencies(generateKotlin, useAndroidX, appCompatVersion)
 
-  save(mobileNavigation(navGraphName, packageName), resOut.resolve("navigation/${navGraphName}.xml"))
+  save(
+      mobileNavigation(navGraphName, packageName),
+      resOut.resolve("navigation/${navGraphName}.xml"),
+  )
   open(resOut.resolve("navigation/${navGraphName}.xml"))
 
-  generateAppBar(data, activityClass, packageName, contentLayoutName, appBarLayoutName, useAndroidX = useAndroidX, isMaterial3 = false)
+  generateAppBar(
+      data,
+      activityClass,
+      packageName,
+      contentLayoutName,
+      appBarLayoutName,
+      useAndroidX = useAndroidX,
+      isMaterial3 = false,
+  )
 
   save(drawer(), resOut.resolve("menu/${drawerMenu}.xml"))
 
-  save(navigationViewXml(appBarLayoutName, navHeaderLayoutName, drawerMenu, useAndroidX), resOut.resolve("layout/${layoutName}.xml"))
-  save(navigationHeaderXml(appCompatVersion, targetApi.apiLevel, data.isLibrary), resOut.resolve("layout/${navHeaderLayoutName}.xml"))
   save(
-    if (generateKotlin)
-      drawerActivityKt(
-        packageName = packageName,
-        applicationPackage = data.projectTemplateData.applicationPackage,
-        activityClass = activityClass,
-        appBarLayoutName = appBarLayoutName,
-        layoutName = layoutName,
-        menuName = menuName,
-        navHostFragmentId = navHostFragmentId,
-        useAndroidX = useAndroidX,
-        isViewBindingSupported = isViewBindingSupported,
-      )
-    else
-      drawerActivityJava(
-        packageName = packageName,
-        applicationPackage = data.projectTemplateData.applicationPackage,
-        activityClass = activityClass,
-        appBarLayoutName = appBarLayoutName,
-        layoutName = layoutName,
-        menuName = menuName,
-        navHostFragmentId = navHostFragmentId,
-        useAndroidX = useAndroidX,
-        isViewBindingSupported = isViewBindingSupported,
-      ),
-    srcOut.resolve("${activityClass}.${language.extension}"),
+      navigationViewXml(appBarLayoutName, navHeaderLayoutName, drawerMenu, useAndroidX),
+      resOut.resolve("layout/${layoutName}.xml"),
+  )
+  save(
+      navigationHeaderXml(appCompatVersion, targetApi.apiLevel, data.isLibrary),
+      resOut.resolve("layout/${navHeaderLayoutName}.xml"),
+  )
+  save(
+      if (generateKotlin)
+          drawerActivityKt(
+              packageName = packageName,
+              applicationPackage = data.projectTemplateData.applicationPackage,
+              activityClass = activityClass,
+              appBarLayoutName = appBarLayoutName,
+              layoutName = layoutName,
+              menuName = menuName,
+              navHostFragmentId = navHostFragmentId,
+              useAndroidX = useAndroidX,
+              isViewBindingSupported = isViewBindingSupported,
+          )
+      else
+          drawerActivityJava(
+              packageName = packageName,
+              applicationPackage = data.projectTemplateData.applicationPackage,
+              activityClass = activityClass,
+              appBarLayoutName = appBarLayoutName,
+              layoutName = layoutName,
+              menuName = menuName,
+              navHostFragmentId = navHostFragmentId,
+              useAndroidX = useAndroidX,
+              isViewBindingSupported = isViewBindingSupported,
+          ),
+      srcOut.resolve("${activityClass}.${language.extension}"),
   )
 
   open(srcOut.resolve("${activityClass}.${language.extension}"))

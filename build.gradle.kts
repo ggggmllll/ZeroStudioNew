@@ -29,10 +29,10 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
 
-  //全局变量环境
+  // 全局变量环境
   id("build-logic.root-project")
-  
-    // Android/Google
+
+  // Android/Google
   alias(libs.plugins.android.application) apply false
   alias(libs.plugins.android.library) apply false
   alias(libs.plugins.android.test) apply false
@@ -40,13 +40,13 @@ plugins {
   alias(libs.plugins.com.google.devtools.ksp) apply false
   alias(libs.plugins.google.services) apply false
   id("com.google.firebase.firebase-perf") version "2.0.2" apply false
-      
-  //kotlin相关
+
+  // kotlin相关
   alias(libs.plugins.kotlin.android) apply false
   alias(libs.plugins.kotlin.jvm) apply false
   alias(libs.plugins.org.jetbrains.kotlin.plugin.compose) apply false
   alias(libs.plugins.org.jetbrains.kotlin.plugin.serialization) apply false
-  
+
   // maven插件
   alias(libs.plugins.maven.publish) apply false
   alias(libs.plugins.gradle.publish) apply false
@@ -55,7 +55,6 @@ plugins {
   alias(libs.plugins.androidx.room) apply false
   alias(libs.plugins.benchmark) apply false
   alias(libs.plugins.baselineprofile) apply false
-
 }
 
 buildscript {
@@ -63,7 +62,6 @@ buildscript {
     classpath(libs.kotlin.gradle.plugin)
     classpath(libs.nav.safe.args.gradle.plugin)
     classpath("io.realm:realm-gradle-plugin:10.19.0")
-
   }
 }
 
@@ -82,25 +80,17 @@ subprojects {
   // Always load the F-Droid config
   FDroidConfig.load(project)
 
-  afterEvaluate {
-    apply { plugin(AndroidIDEPlugin::class.java) }
-  }
+  afterEvaluate { apply { plugin(AndroidIDEPlugin::class.java) } }
 
   project.version = rootProject.version
 
-  plugins.withId("com.android.application") {
-    configureAndroidModule(libs.androidx.libDesugaring)
-  }
-  plugins.withId("com.android.library") {
-    configureAndroidModule(libs.androidx.libDesugaring)
-  }
+  plugins.withId("com.android.application") { configureAndroidModule(libs.androidx.libDesugaring) }
+  plugins.withId("com.android.library") { configureAndroidModule(libs.androidx.libDesugaring) }
   plugins.withId("java-library") { configureJavaModule() }
   plugins.withId("com.vanniktech.maven.publish.base") { configureMavenPublish() }
 
   plugins.withId("com.gradle.plugin-publish") {
-    configure<GradlePluginDevelopmentExtension> {
-      version = project.publishingVersion
-    }
+    configure<GradlePluginDevelopmentExtension> { version = project.publishingVersion }
   }
 
   tasks.withType<KotlinCompile>().configureEach {

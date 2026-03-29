@@ -19,9 +19,7 @@ package com.itsaky.androidide.services.log
 
 import java.util.concurrent.ConcurrentHashMap
 
-/**
- * @author Akash Yadav
- */
+/** @author Akash Yadav */
 internal class LogSendersRegistry {
 
   private val senders = ConcurrentHashMap<String, CachingLogSender>()

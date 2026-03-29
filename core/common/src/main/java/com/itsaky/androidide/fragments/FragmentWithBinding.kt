@@ -31,12 +31,10 @@ import androidx.viewbinding.ViewBinding
  */
 abstract class FragmentWithBinding<T : ViewBinding> : BaseFragment {
 
-  @Suppress("PropertyName")
-  protected var _binding: T? = null
+  @Suppress("PropertyName") protected var _binding: T? = null
 
   protected val binding: T
-    get() = checkNotNull(
-      _binding) { "Cannot access ViewHolder. Fragment may have been destroyed." }
+    get() = checkNotNull(_binding) { "Cannot access ViewHolder. Fragment may have been destroyed." }
 
   private var bind: ((View) -> T)? = null
 
@@ -50,14 +48,15 @@ abstract class FragmentWithBinding<T : ViewBinding> : BaseFragment {
     this.inflate = inflate
   }
 
-  override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-    savedInstanceState: Bundle?
+  override fun onCreateView(
+      inflater: LayoutInflater,
+      container: ViewGroup?,
+      savedInstanceState: Bundle?,
   ): View {
     this.bind?.let { bind ->
-      return super.onCreateView(inflater, container, savedInstanceState)!!
-        .also {
-          _binding = bind(it)
-        }
+      return super.onCreateView(inflater, container, savedInstanceState)!!.also {
+        _binding = bind(it)
+      }
     }
 
     return inflate!!.invoke(inflater, container, false).let {

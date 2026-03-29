@@ -41,9 +41,9 @@ import java.util.function.Consumer
 const val DEFAULT_MIN_MATCH_RATIO = 59
 
 data class CompletionParams(
-  var position: Position,
-  var file: Path,
-  override val cancelChecker: ICancelChecker
+    var position: Position,
+    var file: Path,
+    override val cancelChecker: ICancelChecker,
 ) : CancellableRequestParams {
   var content: CharSequence? = null
   var prefix: String? = null
@@ -86,9 +86,9 @@ open class CompletionResult(items: Collection<CompletionItem>) {
     @JvmStatic
     @JvmOverloads
     fun mapAndFilter(
-      src: CompletionResult,
-      partial: String,
-      map: Consumer<CompletionItem> = Consumer {}
+        src: CompletionResult,
+        partial: String,
+        map: Consumer<CompletionItem> = Consumer {},
     ): CompletionResult {
       val newItems = src.items.toMutableList()
       newItems.forEach(map)
@@ -121,19 +121,20 @@ open class CompletionResult(items: Collection<CompletionItem>) {
 }
 
 open class CompletionItem(
-  var ideLabel: String,
-  var detail: String,
-  insertText: String?,
-  insertTextFormat: InsertTextFormat?,
-  sortText: String?,
-  var command: Command?,
-  var completionKind: CompletionItemKind,
-  var matchLevel: MatchLevel,
-  var additionalTextEdits: List<TextEdit>?,
-  var data: ICompletionData?,
-  var editHandler: IEditHandler = DefaultEditHandler()
+    var ideLabel: String,
+    var detail: String,
+    insertText: String?,
+    insertTextFormat: InsertTextFormat?,
+    sortText: String?,
+    var command: Command?,
+    var completionKind: CompletionItemKind,
+    var matchLevel: MatchLevel,
+    var additionalTextEdits: List<TextEdit>?,
+    var data: ICompletionData?,
+    var editHandler: IEditHandler = DefaultEditHandler(),
 ) :
-  io.github.rosemoe.sora.lang.completion.CompletionItem(ideLabel, detail), Comparable<CompletionItem> {
+    io.github.rosemoe.sora.lang.completion.CompletionItem(ideLabel, detail),
+    Comparable<CompletionItem> {
 
   var ideSortText: String? = sortText
     get() {
@@ -159,27 +160,27 @@ open class CompletionItem(
   var overrideTypeText: String? = null
 
   constructor() :
-    this(
-      "", // label
-      "", // detail
-      null, // insertText
-      null, // insertTextFormat
-      null, // sortText
-      null, // command
-      NONE, // kind
-      NO_MATCH, // match level
-      ArrayList(), // additionalEdits
-      null // data
-    )
+      this(
+          "", // label
+          "", // detail
+          null, // insertText
+          null, // insertTextFormat
+          null, // sortText
+          null, // command
+          NONE, // kind
+          NO_MATCH, // match level
+          ArrayList(), // additionalEdits
+          null, // data
+      )
 
   companion object {
 
     @JvmStatic
     @JvmOverloads
     fun matchLevel(
-      candidate: String,
-      partial: String,
-      minMatchRatio: Int = DEFAULT_MIN_MATCH_RATIO
+        candidate: String,
+        partial: String,
+        minMatchRatio: Int = DEFAULT_MIN_MATCH_RATIO,
     ): MatchLevel {
       if (candidate.startsWith(partial)) {
         return if (candidate.length == partial.length) {
@@ -266,10 +267,10 @@ open class CompletionItem(
 data class SnippetDescription
 @JvmOverloads
 constructor(
-  val selectedLength: Int,
-  val deleteSelected: Boolean = true,
-  val snippet: CodeSnippet? = null,
-  val allowCommandExecution: Boolean = false
+    val selectedLength: Int,
+    val deleteSelected: Boolean = true,
+    val snippet: CodeSnippet? = null,
+    val allowCommandExecution: Boolean = false,
 )
 
 data class Command(var title: String, var command: String) {
@@ -303,7 +304,7 @@ enum class CompletionItemKind {
   MODULE,
   SNIPPET,
   VALUE,
-  NONE
+  NONE,
 }
 
 enum class MatchLevel {
@@ -312,10 +313,10 @@ enum class MatchLevel {
   CASE_SENSITIVE_PREFIX,
   CASE_INSENSITIVE_PREFIX,
   PARTIAL_MATCH,
-  NO_MATCH
+  NO_MATCH,
 }
 
 enum class InsertTextFormat {
   PLAIN_TEXT,
-  SNIPPET
+  SNIPPET,
 }

@@ -50,68 +50,65 @@ class RootModelBuilder(initializationParams: InitializeProjectParams) :
     // do not reference the 'initializationParams' field in the
     val initializationParams = initializationParams
 
-    val executor =
-        projectConnection.action { controller ->
-          val ideaProject = controller.getModelAndLog(IdeaProject::class.java)
+    val executor = projectConnection.action { controller ->
+      val ideaProject = controller.getModelAndLog(IdeaProject::class.java)
 
-          val ideaModules = ideaProject.modules
-          val modulePaths =
-              mapOf(*ideaModules.map { it.name to it.gradleProject.path }.toTypedArray())
-          val rootModule =
-              ideaModules.find { it.gradleProject.parent == null }
-                  ?: throw ModelBuilderException("Unable to find root project")
+      val ideaModules = ideaProject.modules
+      val modulePaths = mapOf(*ideaModules.map { it.name to it.gradleProject.path }.toTypedArray())
+      val rootModule =
+          ideaModules.find { it.gradleProject.parent == null }
+              ?: throw ModelBuilderException("Unable to find root project")
 
-          val rootProjectVersions = getAndroidVersions(rootModule, controller)
+      val rootProjectVersions = getAndroidVersions(rootModule, controller)
 
-          val syncIssues = hashSetOf<DefaultSyncIssue>()
-          val syncIssueReporter = ISyncIssueReporter {
-            if (it.shouldBeIgnored()) {
-              // this SyncIssue should not be shown to the user
-              return@ISyncIssueReporter
-            }
+      val syncIssues = hashSetOf<DefaultSyncIssue>()
+      val syncIssueReporter = ISyncIssueReporter {
+        if (it.shouldBeIgnored()) {
+          // this SyncIssue should not be shown to the user
+          return@ISyncIssueReporter
+        }
 
-            val issue = it as? DefaultSyncIssue ?: AndroidModulePropertyCopier.copy(it)
-            syncIssues.add(issue)
+        val issue = it as? DefaultSyncIssue ?: AndroidModulePropertyCopier.copy(it)
+        syncIssues.add(issue)
+      }
+
+      val rootProject =
+          if (rootProjectVersions != null) {
+            // Root project is an Android project
+            checkAgpVersion(rootProjectVersions, syncIssueReporter)
+            AndroidProjectModelBuilder(initializationParams)
+                .build(
+                    AndroidProjectModelBuilderParams(
+                        controller,
+                        rootModule,
+                        rootProjectVersions,
+                        syncIssueReporter,
+                    )
+                )
+          } else {
+            GradleProjectModelBuilder(initializationParams).build(rootModule.gradleProject)
           }
 
-          val rootProject =
-              if (rootProjectVersions != null) {
-                // Root project is an Android project
-                checkAgpVersion(rootProjectVersions, syncIssueReporter)
-                AndroidProjectModelBuilder(initializationParams)
-                    .build(
-                        AndroidProjectModelBuilderParams(
-                            controller,
-                            rootModule,
-                            rootProjectVersions,
-                            syncIssueReporter,
-                        )
-                    )
-              } else {
-                GradleProjectModelBuilder(initializationParams).build(rootModule.gradleProject)
-              }
+      val projects = ideaModules.map { ideaModule ->
+        ModuleProjectModelBuilder(initializationParams)
+            .build(
+                ModuleProjectModelBuilderParams(
+                    controller,
+                    ideaProject,
+                    ideaModule,
+                    modulePaths,
+                    syncIssueReporter,
+                )
+            )
+      }
 
-          val projects =
-              ideaModules.map { ideaModule ->
-                ModuleProjectModelBuilder(initializationParams)
-                    .build(
-                        ModuleProjectModelBuilderParams(
-                            controller,
-                            ideaProject,
-                            ideaModule,
-                            modulePaths,
-                            syncIssueReporter,
-                        )
-                    )
-              }
-
-          return@action ProjectImpl(
-              rootProject,
-              rootModule.gradleProject.path,
-              projects,
-              DefaultProjectSyncIssues(syncIssues),
-          )
-        }
+      return@action ProjectImpl(
+          rootProject,
+          rootModule.gradleProject.path,
+          projects,
+          DefaultProjectSyncIssues(syncIssues),
+      )
+    }
 
     finalizeLauncher(executor)
     applyAndroidModelBuilderProps(executor)

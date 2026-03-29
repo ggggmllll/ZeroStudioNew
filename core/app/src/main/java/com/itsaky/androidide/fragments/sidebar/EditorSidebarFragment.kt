@@ -35,26 +35,25 @@ import com.itsaky.androidide.utils.EditorSidebarActions
  *
  * @author Akash Yadav
  */
-class EditorSidebarFragment : FragmentWithBinding<FragmentEditorSidebarBinding>(
-  FragmentEditorSidebarBinding::inflate
-) {
+class EditorSidebarFragment :
+    FragmentWithBinding<FragmentEditorSidebarBinding>(FragmentEditorSidebarBinding::inflate) {
 
   internal fun onApplyWindowInsets(insets: Insets) {
     _binding?.apply {
       title.updateLayoutParams<MarginLayoutParams> {
         updateMarginsRelative(
-          top = title.marginTop + insets.top,
+            top = title.marginTop + insets.top,
         )
       }
       fragmentContainer.updateLayoutParams<MarginLayoutParams> {
         updateMarginsRelative(
-          bottom = fragmentContainer.marginBottom + insets.bottom,
+            bottom = fragmentContainer.marginBottom + insets.bottom,
         )
       }
       navigation.updatePadding(
-        top = navigation.paddingTop + insets.top,
-        bottom = navigation.paddingBottom + insets.bottom,
-        left = navigation.paddingLeft + insets.left,
+          top = navigation.paddingTop + insets.top,
+          bottom = navigation.paddingBottom + insets.bottom,
+          left = navigation.paddingLeft + insets.left,
       )
     }
   }
@@ -64,8 +63,6 @@ class EditorSidebarFragment : FragmentWithBinding<FragmentEditorSidebarBinding>(
     EditorSidebarActions.setup(this)
   }
 
-  /**
-   * Get the (nullable) binding object for this fragment.
-   */
+  /** Get the (nullable) binding object for this fragment. */
   internal fun getBinding() = _binding
 }

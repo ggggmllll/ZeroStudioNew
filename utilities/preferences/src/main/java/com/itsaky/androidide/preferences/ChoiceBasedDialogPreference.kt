@@ -50,26 +50,26 @@ abstract class ChoiceBasedDialogPreference : DialogPreference(), PreferenceChoic
 
   @CallSuper
   override fun onSelectionChanged(
-    preference: Preference,
-    entry: PreferenceChoices.Entry,
-    position: Int,
-    isSelected: Boolean
+      preference: Preference,
+      entry: PreferenceChoices.Entry,
+      position: Int,
+      isSelected: Boolean,
   ) {
     entry._isChecked = isSelected
   }
 
-  /**
-   * Configure the dialog choices.
-   */
+  /** Configure the dialog choices. */
   protected abstract fun onConfigureDialogChoices(
-    preference: Preference,
-    dialog: MaterialAlertDialogBuilder,
-    entries: Array<PreferenceChoices.Entry>,
-    selections: BooleanArray
+      preference: Preference,
+      dialog: MaterialAlertDialogBuilder,
+      entries: Array<PreferenceChoices.Entry>,
+      selections: BooleanArray,
   )
 
-  override fun onChoicesConfirmed(preference: Preference, entries: Array<PreferenceChoices.Entry>) {
-  }
+  override fun onChoicesConfirmed(
+      preference: Preference,
+      entries: Array<PreferenceChoices.Entry>,
+  ) {}
 
   override fun onChoicesCancelled(preference: Preference) {}
 }

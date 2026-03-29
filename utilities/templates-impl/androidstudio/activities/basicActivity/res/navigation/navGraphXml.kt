@@ -22,13 +22,13 @@ package com.itsaky.androidide.templates.impl.androidstudio.activities.basicActiv
  * @author android_zero
  */
 fun navGraphXml(
-  packageName: String,
-  firstFragmentClass: String,
-  secondFragmentClass: String,
-  firstFragmentLayoutName: String,
-  secondFragmentLayoutName: String,
+    packageName: String,
+    firstFragmentClass: String,
+    secondFragmentClass: String,
+    firstFragmentLayoutName: String,
+    secondFragmentLayoutName: String,
 ): String =
-  """<?xml version="1.0" encoding="utf-8"?>
+    """<?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"

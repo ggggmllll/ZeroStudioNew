@@ -15,7 +15,6 @@
  *   along with AndroidIDE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 import com.itsaky.androidide.build.config.BuildConfig
 
 plugins {
@@ -23,17 +22,13 @@ plugins {
   id("org.jetbrains.kotlin.android")
 }
 
-
-
-android {
-  namespace = "${BuildConfig.packageName}.templates"
-}
+android { namespace = "${BuildConfig.packageName}.templates" }
 
 dependencies {
 
-  //Handle tar.xz compressed packages
+  // Handle tar.xz compressed packages
   implementation(libs.common.org.tukaani.tarxzip)
-  //Handle .tar archiving
+  // Handle .tar archiving
   implementation(libs.common.org.apache.commons.compress)
   // Secondary IO Flow operations
   implementation(libs.common.io)
@@ -50,6 +45,6 @@ dependencies {
   api(libs.androidx.annotation)
   api(libs.androidx.appcompat)
   api(libs.google.material)
-  
+
   implementation(projects.utilities.preferences)
 }

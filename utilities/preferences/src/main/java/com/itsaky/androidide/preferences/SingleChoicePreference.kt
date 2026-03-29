@@ -23,8 +23,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 /**
  * A preference which allows selecting a single value from a list of values.
  *
- * The [onSelectionChanged] method is called exactly two times when the user changes the selection, first call for the previously
- * selected item and second call for the newly selected item.
+ * The [onSelectionChanged] method is called exactly two times when the user changes the selection,
+ * first call for the previously selected item and second call for the newly selected item.
  *
  * The [onChoicesConfirmed] is always called with a singleton list.
  *
@@ -32,24 +32,18 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
  */
 abstract class SingleChoicePreference : ChoiceBasedDialogPreference(), PreferenceChoices {
 
-  /**
-   * The currently selected item in the dialog.
-   */
+  /** The currently selected item in the dialog. */
   protected open var currentSelection: Int = -1
 
   override fun onConfigureDialogChoices(
-    preference: Preference,
-    dialog: MaterialAlertDialogBuilder,
-    entries: Array<PreferenceChoices.Entry>,
-    selections: BooleanArray
+      preference: Preference,
+      dialog: MaterialAlertDialogBuilder,
+      entries: Array<PreferenceChoices.Entry>,
+      selections: BooleanArray,
   ) {
     currentSelection = entries.indexOfFirst { it.isChecked }
 
-    dialog.setSingleChoiceItems(
-      entries.labels,
-      currentSelection
-    )
-    { _, position ->
+    dialog.setSingleChoiceItems(entries.labels, currentSelection) { _, position ->
       if (currentSelection != -1) {
         onSelectionChanged(preference, entries[currentSelection], currentSelection, false)
       }
@@ -59,10 +53,7 @@ abstract class SingleChoicePreference : ChoiceBasedDialogPreference(), Preferenc
     }
   }
 
-  override fun onChoicesConfirmed(
-    preference: Preference,
-    entries: Array<PreferenceChoices.Entry>
-  ) {
+  override fun onChoicesConfirmed(preference: Preference, entries: Array<PreferenceChoices.Entry>) {
     if (currentSelection < 0 || currentSelection > entries.lastIndex) {
       onChoiceConfirmed(preference, null, currentSelection)
     } else {
@@ -71,9 +62,8 @@ abstract class SingleChoicePreference : ChoiceBasedDialogPreference(), Preferenc
   }
 
   protected open fun onChoiceConfirmed(
-    preference: Preference,
-    entry: PreferenceChoices.Entry?,
-    position: Int
-  ) {
-  }
+      preference: Preference,
+      entry: PreferenceChoices.Entry?,
+      position: Int,
+  ) {}
 }

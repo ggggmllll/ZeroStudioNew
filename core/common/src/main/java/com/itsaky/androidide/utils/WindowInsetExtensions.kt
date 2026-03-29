@@ -37,13 +37,13 @@ import androidx.core.view.marginTop
  * [doOnApplyWindowInsets] will be ran.
  */
 fun View.doOnApplyWindowInsets(
-  windowInsetsListener:
-    (
-      insetView: View,
-      windowInsets: WindowInsetsCompat,
-      initialPadding: Insets,
-      initialMargins: Insets
-    ) -> Unit
+    windowInsetsListener:
+        (
+            insetView: View,
+            windowInsets: WindowInsetsCompat,
+            initialPadding: Insets,
+            initialMargins: Insets,
+        ) -> Unit
 ) {
   val initialPadding = Insets.of(paddingStart, paddingTop, paddingEnd, paddingBottom)
   val initialMargins = Insets.of(marginStart, marginTop, marginEnd, marginBottom)
@@ -55,13 +55,13 @@ fun View.doOnApplyWindowInsets(
   }
 
   addOnAttachStateChangeListener(
-    object : View.OnAttachStateChangeListener {
-      override fun onViewAttachedToWindow(v: View) {
-        v.requestApplyInsets()
-      }
+      object : View.OnAttachStateChangeListener {
+        override fun onViewAttachedToWindow(v: View) {
+          v.requestApplyInsets()
+        }
 
-      override fun onViewDetachedFromWindow(v: View) = Unit
-    }
+        override fun onViewDetachedFromWindow(v: View) = Unit
+      }
   )
 
   // If the view is already attached, immediately request insets be applied.

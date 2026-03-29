@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.sp
 
 /**
  * Column with full width title and expand icon that can expand/shrink with [AnimatedVisibility].
+ *
  * @param title text on top of the column that is visible on both states.
  * @param color of [title].
  * @param initialExpandState whether this composable should be expanded initially.
@@ -30,39 +31,31 @@ fun ExpandableColumnWithTitle(
     title: String,
     color: Color,
     initialExpandState: Boolean = true,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
-    var expanded by remember { mutableStateOf(initialExpandState) }
-    Column(
-        modifier = modifier.fillMaxWidth(),
-        horizontalAlignment = horizontalAlignment
+  var expanded by remember { mutableStateOf(initialExpandState) }
+  Column(modifier = modifier.fillMaxWidth(), horizontalAlignment = horizontalAlignment) {
+    Row(
+        modifier = Modifier.clickable { expanded = !expanded },
+        verticalAlignment = Alignment.CenterVertically,
     ) {
+      Text(
+          modifier = Modifier.padding(vertical = 8.dp),
+          text = title,
+          fontSize = 16.sp,
+          color = color,
+          fontWeight = FontWeight.Bold,
+      )
 
-        Row(
-            modifier = Modifier
-                .clickable { expanded = !expanded },
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                modifier = Modifier.padding(vertical = 8.dp),
-                text = title,
-                fontSize = 16.sp,
-                color = color,
-                fontWeight = FontWeight.Bold
-            )
+      Spacer(modifier = Modifier.weight(1f))
 
-            Spacer(modifier = Modifier.weight(1f))
-
-            Icon(
-                imageVector = if (expanded) Icons.Filled.ExpandLess
-                else Icons.Filled.ExpandMore,
-                contentDescription = null,
-                tint = color
-            )
-        }
-
-        AnimatedVisibility(visible = expanded) {
-            content()
-        }
+      Icon(
+          imageVector = if (expanded) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
+          contentDescription = null,
+          tint = color,
+      )
     }
+
+    AnimatedVisibility(visible = expanded) { content() }
+  }
 }

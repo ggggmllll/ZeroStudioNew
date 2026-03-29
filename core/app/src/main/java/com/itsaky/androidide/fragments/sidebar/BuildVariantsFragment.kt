@@ -35,15 +35,12 @@ import com.itsaky.androidide.viewmodel.EditorViewModel
  * @author Akash Yadav
  */
 class BuildVariantsFragment :
-  EmptyStateFragment<FragmentBuildVariantsBinding>(FragmentBuildVariantsBinding::inflate) {
+    EmptyStateFragment<FragmentBuildVariantsBinding>(FragmentBuildVariantsBinding::inflate) {
 
-  private val variantsViewModel by viewModels<BuildVariantsViewModel>(
-    ownerProducer = { requireActivity() }
-  )
+  private val variantsViewModel by
+      viewModels<BuildVariantsViewModel>(ownerProducer = { requireActivity() })
 
-  private val editorViewModel by viewModels<EditorViewModel>(
-    ownerProducer = { requireActivity() }
-  )
+  private val editorViewModel by viewModels<EditorViewModel>(ownerProducer = { requireActivity() })
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
@@ -65,9 +62,7 @@ class BuildVariantsFragment :
       updateButtonStates(variantsViewModel.updatedBuildVariants)
     }
 
-    binding.apply.setOnClickListener {
-      (activity as? ProjectHandlerActivity?)?.initializeProject()
-    }
+    binding.apply.setOnClickListener { (activity as? ProjectHandlerActivity?)?.initializeProject() }
 
     binding.discard.setOnClickListener {
       variantsViewModel.resetUpdatedSelections()
@@ -75,15 +70,13 @@ class BuildVariantsFragment :
     }
 
     binding.variantsList.addItemDecoration(
-      DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL)
+        DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL)
     )
 
     populateRecyclerView()
   }
 
-  private fun updateButtonStates(
-    updatedVariants: MutableMap<String, BuildVariantInfo>?
-  ) {
+  private fun updateButtonStates(updatedVariants: MutableMap<String, BuildVariantInfo>?) {
     _binding?.apply {
       // enable buttons only if any of the project's selected build variant was changed
       // also, changes can only if be applied if no build is in progress
@@ -97,8 +90,8 @@ class BuildVariantsFragment :
 
   private fun populateRecyclerView() {
     _binding?.variantsList?.apply {
-      this.adapter = BuildVariantsAdapter(variantsViewModel,
-        variantsViewModel.buildVariants.values.toList())
+      this.adapter =
+          BuildVariantsAdapter(variantsViewModel, variantsViewModel.buildVariants.values.toList())
       checkIsEmpty()
     }
   }

@@ -33,25 +33,27 @@ import org.eclipse.lemminx.dom.DOMDocument
  * @author Akash Yadav
  */
 open class LayoutTagCompletionProvider(val provider: ICompletionProvider) :
-  IXmlCompletionProvider(provider) {
+    IXmlCompletionProvider(provider) {
 
   override fun canProvideCompletions(pathData: ResourcePathData, type: NodeType): Boolean {
-    return super.canProvideCompletions(pathData, type) && canCompleteLayout(pathData, type) && type == TAG
+    return super.canProvideCompletions(pathData, type) &&
+        canCompleteLayout(pathData, type) &&
+        type == TAG
   }
 
   override fun doComplete(
-    params: CompletionParams,
-    pathData: ResourcePathData,
-    document: DOMDocument,
-    type: NodeType,
-    prefix: String
+      params: CompletionParams,
+      pathData: ResourcePathData,
+      document: DOMDocument,
+      type: NodeType,
+      prefix: String,
   ): CompletionResult {
     val newPrefix =
-      if (prefix.startsWith("<")) {
-        prefix.substring(1)
-      } else {
-        prefix
-      }
+        if (prefix.startsWith("<")) {
+          prefix.substring(1)
+        } else {
+          prefix
+        }
 
     return getCompleter(newPrefix).complete(params, pathData, document, type, newPrefix)
   }

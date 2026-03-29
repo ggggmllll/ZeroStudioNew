@@ -26,9 +26,9 @@ import com.android.tools.idea.wizard.template.TemplateConstraint
 import com.android.tools.idea.wizard.template.TemplateData
 import com.android.tools.idea.wizard.template.TextFieldWidget
 import com.android.tools.idea.wizard.template.WizardUiContext
-import com.itsaky.androidide.templates.impl.androidstudio.defaultPackageNameParameter
 import com.android.tools.idea.wizard.template.stringParameter
 import com.android.tools.idea.wizard.template.template
+import com.itsaky.androidide.templates.impl.androidstudio.defaultPackageNameParameter
 import java.io.File
 
 val emptyCalAppTemplate
@@ -66,16 +66,22 @@ val emptyCalAppTemplate
     val packageName = defaultPackageNameParameter
 
     widgets(
-      TextFieldWidget(carAppServiceName),
-      TextFieldWidget(sessionName),
-      TextFieldWidget(screenName),
-      PackageNameWidget(packageName),
-      LanguageWidget(),
+        TextFieldWidget(carAppServiceName),
+        TextFieldWidget(sessionName),
+        TextFieldWidget(screenName),
+        PackageNameWidget(packageName),
+        LanguageWidget(),
     )
 
     thumb { File("empty-cal-app").resolve("empty-cal-app.png") }
 
     recipe = { data: TemplateData ->
-      emptyCalAppRecipe(data as ModuleTemplateData, carAppServiceName.value, sessionName.value, screenName.value, packageName.value)
+      emptyCalAppRecipe(
+          data as ModuleTemplateData,
+          carAppServiceName.value,
+          sessionName.value,
+          screenName.value,
+          packageName.value,
+      )
     }
   }

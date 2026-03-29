@@ -21,9 +21,14 @@ package com.itsaky.androidide.templates.impl.androidstudio.activities.aiGlassesA
  * @author Historical contributors (The Android Open Source Project)
  * @author android_zero
  */
-fun mainActivityKt(activityClass: String, glassesActivityClass: String, packageName: String, themeName: String) =
-  // language=kotlin
-  """
+fun mainActivityKt(
+    activityClass: String,
+    glassesActivityClass: String,
+    packageName: String,
+    themeName: String,
+) =
+    // language=kotlin
+    """
 @file:OptIn(ExperimentalProjectedApi::class)
 
 package $packageName

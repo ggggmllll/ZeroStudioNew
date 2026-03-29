@@ -23,6 +23,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 /**
  * Cancel service implementation for the java compiler.
+ *
  * @author Akash Yadav
  */
 class CancelServiceImpl : CancelService() {
@@ -32,7 +33,7 @@ class CancelServiceImpl : CancelService() {
    * Sets the cancellation flag.
    *
    * @return `true` if compilation process was running and it was set to be cancelled, `false`
-   * otherwise.
+   *   otherwise.
    */
   fun cancel(): Boolean {
     ILogger.ROOT.info("...requesting compilation cancellation")

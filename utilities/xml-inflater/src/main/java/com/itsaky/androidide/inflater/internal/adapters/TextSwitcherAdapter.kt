@@ -35,11 +35,11 @@ import com.itsaky.androidide.resources.R.string
 open class TextSwitcherAdapter<T : TextSwitcher> : ViewSwitcherAdapter<T>() {
   override fun createUiWidgets(): List<UiWidget> {
     return listOf(
-      UiWidget(
-        TextSwitcher::class.java,
-        string.widget_textswitcher,
-        drawable.ic_widget_textswitcher
-      )
+        UiWidget(
+            TextSwitcher::class.java,
+            string.widget_textswitcher,
+            drawable.ic_widget_textswitcher,
+        )
     )
   }
 }

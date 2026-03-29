@@ -16,9 +16,9 @@ import com.itsaky.androidide.resources.R
 import com.itsaky.androidide.utils.BuildInfoUtils
 
 /*
-*2025.10.28  Update log: Added restart button, copy without report button, added close program button
-*
-*/
+ *2025.10.28  Update log: Added restart button, copy without report button, added close program button
+ *
+ */
 class CrashReportFragment : Fragment() {
 
   private var binding: LayoutCrashReportBinding? = null
@@ -38,27 +38,28 @@ class CrashReportFragment : Fragment() {
 
     @JvmStatic
     fun newInstance(
-      title: String?,
-      message: String?,
-      trace: String,
-      closeAppOnClick: Boolean
+        title: String?,
+        message: String?,
+        trace: String,
+        closeAppOnClick: Boolean,
     ): CrashReportFragment {
       val frag = CrashReportFragment()
-      val args = Bundle().apply {
-        putString(KEY_TRACE, trace)
-        putBoolean(KEY_CLOSE_APP_ON_CLICK, closeAppOnClick)
-        title?.let { putString(KEY_TITLE, it) }
-        message?.let { putString(KEY_MESSAGE, it) }
-      }
+      val args =
+          Bundle().apply {
+            putString(KEY_TRACE, trace)
+            putBoolean(KEY_CLOSE_APP_ON_CLICK, closeAppOnClick)
+            title?.let { putString(KEY_TITLE, it) }
+            message?.let { putString(KEY_MESSAGE, it) }
+          }
       frag.arguments = args
       return frag
     }
   }
 
   override fun onCreateView(
-    inflater: LayoutInflater,
-    container: ViewGroup?,
-    savedInstanceState: Bundle?
+      inflater: LayoutInflater,
+      container: ViewGroup?,
+      savedInstanceState: Bundle?,
   ): View {
     return LayoutCrashReportBinding.inflate(inflater, container, false).also { binding = it }.root
   }
@@ -77,11 +78,12 @@ class CrashReportFragment : Fragment() {
       message = args.getString(KEY_MESSAGE)
     }
 
-    val trace: String = if (args.containsKey(KEY_TRACE)) {
-      buildReportText(args.getString(KEY_TRACE))
-    } else {
-      "No stack trace was provided for the report"
-    }
+    val trace: String =
+        if (args.containsKey(KEY_TRACE)) {
+          buildReportText(args.getString(KEY_TRACE))
+        } else {
+          "No stack trace was provided for the report"
+        }
 
     binding!!.apply {
       crashTitle.text = title
@@ -89,7 +91,7 @@ class CrashReportFragment : Fragment() {
       logText.text = trace
 
       val report: String = trace
-      
+
       // Original close button (top right)
       closeButton.setOnClickListener {
         if (closeAppOnClick) {
@@ -101,9 +103,10 @@ class CrashReportFragment : Fragment() {
 
       // New "Restart" button
       restartButton.setOnClickListener {
-        val intent = Intent(requireActivity(), MainActivity::class.java).apply {
-          addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-        }
+        val intent =
+            Intent(requireActivity(), MainActivity::class.java).apply {
+              addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+            }
         startActivity(intent)
         requireActivity().finishAffinity()
       }
@@ -118,20 +121,21 @@ class CrashReportFragment : Fragment() {
       reportIssueButton.setOnClickListener { reportTrace(report) }
 
       // New "Exit App" button
-      exitButton.setOnClickListener {
-        requireActivity().finishAffinity()
-      }
+      exitButton.setOnClickListener { requireActivity().finishAffinity() }
     }
   }
 
   private fun reportTrace(report: String) {
     ClipboardUtils.copyText("AndroidIDE CrashLog", report)
-    Toast.makeText(requireContext(), R.string.msg_log_copied_opening_browser, Toast.LENGTH_LONG).show()
-    val url = BuildInfo.REPO_URL + "/issues/new?assignees=&labels=bug&template=bug_report.md&title=[Bug]"
-    val intent = Intent(Intent.ACTION_VIEW).apply {
-        data = Uri.parse(url)
-        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-    }
+    Toast.makeText(requireContext(), R.string.msg_log_copied_opening_browser, Toast.LENGTH_LONG)
+        .show()
+    val url =
+        BuildInfo.REPO_URL + "/issues/new?assignees=&labels=bug&template=bug_report.md&title=[Bug]"
+    val intent =
+        Intent(Intent.ACTION_VIEW).apply {
+          data = Uri.parse(url)
+          addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
     startActivity(intent)
   }
 

@@ -20,19 +20,15 @@ import android.content.Context
 import android.content.ContextWrapper
 
 /**
- * Main interaction point with the WindowManager library. An instance of this class allows
- * polling the current state of the device and display, and registering callbacks for changes in
- * the corresponding states.
+ * Main interaction point with the WindowManager library. An instance of this class allows polling
+ * the current state of the device and display, and registering callbacks for changes in the
+ * corresponding states.
  *
- * All methods of this class will return information that is associated with this visual
- * context.
- *
+ * All methods of this class will return information that is associated with this visual context.
  */
 class WindowManager(
-  /**
-   * A visual [Context], such as an [Activity] or a [ContextWrapper]
-   */
-  context: Context
+    /** A visual [Context], such as an [Activity] or a [ContextWrapper] */
+    context: Context
 ) {
 
   /**
@@ -42,30 +38,28 @@ class WindowManager(
   internal var windowMetricsCalculator: WindowMetricsCalculator = WindowMetricsCalculatorCompat
 
   /**
-   * Activity that was registered with this instance of [WindowManager] at creation.
-   * This is used to find the token identifier of the window when requesting layout information
-   * from the [com.itsaky.androidide.window.sidecar.SidecarInterface] or is passed directly to the
+   * Activity that was registered with this instance of [WindowManager] at creation. This is used to
+   * find the token identifier of the window when requesting layout information from the
+   * [com.itsaky.androidide.window.sidecar.SidecarInterface] or is passed directly to the
    * [com.itsaky.androidide.window.extensions.ExtensionInterface].
    */
-  private val activity: Activity = getActivityFromContext(context)
-    ?: throw IllegalArgumentException(
-      "Used non-visual Context to obtain an instance of WindowManager. Please use an " +
-          "Activity or a ContextWrapper around one instead."
-    )
+  private val activity: Activity =
+      getActivityFromContext(context)
+          ?: throw IllegalArgumentException(
+              "Used non-visual Context to obtain an instance of WindowManager. Please use an " +
+                  "Activity or a ContextWrapper around one instead."
+          )
 
   /**
    * Returns the [WindowMetrics] according to the current system state.
    *
-   *
    * The metrics describe the size of the area the window would occupy with
-   * [MATCH_PARENT][android.view.WindowManager.LayoutParams.MATCH_PARENT] width and height
-   * and any combination of flags that would allow the window to extend behind display cutouts.
+   * [MATCH_PARENT][android.view.WindowManager.LayoutParams.MATCH_PARENT] width and height and any
+   * combination of flags that would allow the window to extend behind display cutouts.
    *
-   *
-   * The value of this is based on the **current** windowing state of the system. For
-   * example, for activities in multi-window mode, the metrics returned are based on the
-   * current bounds that the user has selected for the [Activity][android.app.Activity]'s
-   * window.
+   * The value of this is based on the **current** windowing state of the system. For example, for
+   * activities in multi-window mode, the metrics returned are based on the current bounds that the
+   * user has selected for the [Activity][android.app.Activity]'s window.
    *
    * @see getMaximumWindowMetrics
    * @see android.view.WindowManager.getCurrentWindowMetrics
@@ -77,24 +71,20 @@ class WindowManager(
   /**
    * Returns the largest [WindowMetrics] an app may expect in the current system state.
    *
-   *
    * The metrics describe the size of the largest potential area the window might occupy with
-   * [MATCH_PARENT][android.view.WindowManager.LayoutParams.MATCH_PARENT] width and height
-   * and any combination of flags that would allow the window to extend behind display cutouts.
+   * [MATCH_PARENT][android.view.WindowManager.LayoutParams.MATCH_PARENT] width and height and any
+   * combination of flags that would allow the window to extend behind display cutouts.
    *
+   * The value of this is based on the largest **potential** windowing state of the system. For
+   * example, for activities in multi-window mode the metrics returned are based on what the bounds
+   * would be if the user expanded the window to cover the entire screen.
    *
-   * The value of this is based on the largest **potential** windowing state of the system.
-   * For example, for activities in multi-window mode the metrics returned are based on what the
-   * bounds would be if the user expanded the window to cover the entire screen.
-   *
-   *
-   * Note that this might still be smaller than the size of the physical display if certain
-   * areas of the display are not available to windows created for the associated [Context].
-   * For example, devices with foldable displays that wrap around the enclosure may split the
-   * physical display into different regions, one for the front and one for the back, each acting
-   * as different logical displays. In this case [.getMaximumWindowMetrics] would return
-   * the region describing the side of the device the associated [context&#39;s][Context]
-   * window is placed.
+   * Note that this might still be smaller than the size of the physical display if certain areas of
+   * the display are not available to windows created for the associated [Context]. For example,
+   * devices with foldable displays that wrap around the enclosure may split the physical display
+   * into different regions, one for the front and one for the back, each acting as different
+   * logical displays. In this case [.getMaximumWindowMetrics] would return the region describing
+   * the side of the device the associated [context&#39;s][Context] window is placed.
    *
    * @see getCurrentWindowMetrics
    * @see android.view.WindowManager.getMaximumWindowMetrics

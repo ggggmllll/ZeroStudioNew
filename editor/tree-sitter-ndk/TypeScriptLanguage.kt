@@ -14,27 +14,26 @@ import io.github.rosemoe.sora.widget.SymbolPairMatch
 open class TypeScriptLanguage(context: Context, lang: com.itsaky.androidide.treesitter.TSLanguage) :
     TreeSitterLanguage(context, lang, TS_TYPE) {
 
-    companion object {
-        const val TS_TYPE = "ts"
-        const val TSX_TYPE = "tsx"
+  companion object {
+    const val TS_TYPE = "ts"
+    const val TSX_TYPE = "tsx"
 
-        @JvmField
-        val FACTORY = Factory { TypeScriptLanguage(it, TSLanguageTypeScript.getInstance()) }
-        
-        @JvmField
-        val TSX_FACTORY = Factory { TypeScriptLanguage(it, TSLanguageTypeScript.getTsxInstance()) }
+    @JvmField val FACTORY = Factory { TypeScriptLanguage(it, TSLanguageTypeScript.getInstance()) }
+
+    @JvmField
+    val TSX_FACTORY = Factory { TypeScriptLanguage(it, TSLanguageTypeScript.getTsxInstance()) }
+  }
+
+  override fun getInterruptionLevel(): Int = INTERRUPTION_LEVEL_STRONG
+
+  override fun getSymbolPairs(): SymbolPairMatch {
+    return SymbolPairMatch().apply {
+      putPair('(', SymbolPairMatch.SymbolPair("(", ")"))
+      putPair('[', SymbolPairMatch.SymbolPair("[", "]"))
+      putPair('{', SymbolPairMatch.SymbolPair("{", "}"))
+      putPair('<', SymbolPairMatch.SymbolPair("<", ">"))
+      putPair('"', SymbolPairMatch.SymbolPair("\"", "\""))
+      putPair('\'', SymbolPairMatch.SymbolPair("'", "'"))
     }
-
-    override fun getInterruptionLevel(): Int = INTERRUPTION_LEVEL_STRONG
-
-    override fun getSymbolPairs(): SymbolPairMatch {
-        return SymbolPairMatch().apply {
-            putPair('(', SymbolPairMatch.SymbolPair("(", ")"))
-            putPair('[', SymbolPairMatch.SymbolPair("[", "]"))
-            putPair('{', SymbolPairMatch.SymbolPair("{", "}"))
-            putPair('<', SymbolPairMatch.SymbolPair("<", ">"))
-            putPair('"', SymbolPairMatch.SymbolPair("\"", "\""))
-            putPair('\'', SymbolPairMatch.SymbolPair("'", "'"))
-        }
-    }
+  }
 }

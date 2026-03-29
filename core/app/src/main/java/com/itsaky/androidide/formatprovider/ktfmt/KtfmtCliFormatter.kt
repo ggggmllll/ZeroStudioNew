@@ -22,88 +22,90 @@ import com.itsaky.androidide.preferences.KtfmtPreferences
 import com.itsaky.androidide.projects.IProjectManager
 import com.itsaky.androidide.utils.Environment
 import com.itsaky.androidide.utils.executioncommand.TermuxCommand
-import kotlinx.coroutines.runBlocking
 import java.io.File
+import kotlinx.coroutines.runBlocking
 
 /**
  * CLI 版本的 Ktfmt 格式化提供器
  *
  * 通过 TermuxCommand 进行格式化交互。支持 Stdin 管道传输和 File 路径传递两种模式。
- * 
+ *
  * @author android_zero
  */
-class KtfmtCliFormatter(
-    private val context: Context,
-    private val file: File
-) : CodeFormatter {
+class KtfmtCliFormatter(private val context: Context, private val file: File) : CodeFormatter {
 
-    override fun format(source: String): String {
-        if (!KtfmtEnv.isInstalled()) return source
+  override fun format(source: String): String {
+    if (!KtfmtEnv.isInstalled()) return source
 
-        // 获取项目根目录 (用于 .editorconfig 读取)
-        val projectRoot = try {
-            IProjectManager.getInstance().projectDir
+    // 获取项目根目录 (用于 .editorconfig 读取)
+    val projectRoot =
+        try {
+          IProjectManager.getInstance().projectDir
         } catch (e: Exception) {
-            file.parentFile
+          file.parentFile
         }
 
-        val args = mutableListOf("-jar", KtfmtEnv.KTFMT_JAR.absolutePath)
-        
-        // 追加风格选项
-        args.add(KtfmtPreferences.style)
-        
-        if (KtfmtPreferences.keepImports) {
-            args.add("--do-not-remove-unused-imports")
-        }
-        if (KtfmtPreferences.enableEditorConfig) {
-            args.add("--enable-editorconfig")
-        }
-        if (KtfmtPreferences.quietMode) {
-            args.add("--quiet")
-        }
+    val args = mutableListOf("-jar", KtfmtEnv.KTFMT_JAR.absolutePath)
 
-        val mode = KtfmtPreferences.formatMode
+    // 追加风格选项
+    args.add(KtfmtPreferences.style)
 
-        if (mode == "stdin") {
-            args.add("--stdin-name=${file.absolutePath}")
-            args.add("-")
-
-            val result = runBlocking {
-                TermuxCommand.run(context) {
-                    label("Ktfmt CLI (Stdin)")
-                    executable(Environment.JAVA.absolutePath)
-                    args(*args.toTypedArray())
-                    workingDir(projectRoot.absolutePath)
-                    stdin(source)
-                }
-            }
-
-            if (result.isSuccess) {
-                return result.stdout
-            } else {
-                throw RuntimeException("Ktfmt formatting failed. Code: ${result.exitCode}\nError: ${result.stderr}")
-            }
-        } else {
-            // File 模式 (默认 & 更稳定)
-            file.writeText(source)
-            
-            args.add(file.absolutePath)
-
-            val result = runBlocking {
-                TermuxCommand.run(context) {
-                    label("Ktfmt CLI (File)")
-                    executable(Environment.JAVA.absolutePath)
-                    args(*args.toTypedArray())
-                    workingDir(projectRoot.absolutePath)
-                }
-            }
-
-            if (result.isSuccess) {
-                // 读取已在硬盘中被格式化好的文件内容并返回
-                return file.readText()
-            } else {
-                throw RuntimeException("Ktfmt formatting failed. Code: ${result.exitCode}\nError: ${result.stderr}")
-            }
-        }
+    if (KtfmtPreferences.keepImports) {
+      args.add("--do-not-remove-unused-imports")
     }
+    if (KtfmtPreferences.enableEditorConfig) {
+      args.add("--enable-editorconfig")
+    }
+    if (KtfmtPreferences.quietMode) {
+      args.add("--quiet")
+    }
+
+    val mode = KtfmtPreferences.formatMode
+
+    if (mode == "stdin") {
+      args.add("--stdin-name=${file.absolutePath}")
+      args.add("-")
+
+      val result = runBlocking {
+        TermuxCommand.run(context) {
+          label("Ktfmt CLI (Stdin)")
+          executable(Environment.JAVA.absolutePath)
+          args(*args.toTypedArray())
+          workingDir(projectRoot.absolutePath)
+          stdin(source)
+        }
+      }
+
+      if (result.isSuccess) {
+        return result.stdout
+      } else {
+        throw RuntimeException(
+            "Ktfmt formatting failed. Code: ${result.exitCode}\nError: ${result.stderr}"
+        )
+      }
+    } else {
+      // File 模式 (默认 & 更稳定)
+      file.writeText(source)
+
+      args.add(file.absolutePath)
+
+      val result = runBlocking {
+        TermuxCommand.run(context) {
+          label("Ktfmt CLI (File)")
+          executable(Environment.JAVA.absolutePath)
+          args(*args.toTypedArray())
+          workingDir(projectRoot.absolutePath)
+        }
+      }
+
+      if (result.isSuccess) {
+        // 读取已在硬盘中被格式化好的文件内容并返回
+        return file.readText()
+      } else {
+        throw RuntimeException(
+            "Ktfmt formatting failed. Code: ${result.exitCode}\nError: ${result.stderr}"
+        )
+      }
+    }
+  }
 }

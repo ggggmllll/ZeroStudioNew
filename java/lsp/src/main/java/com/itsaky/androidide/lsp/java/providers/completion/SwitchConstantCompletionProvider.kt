@@ -23,6 +23,7 @@ import com.itsaky.androidide.lsp.java.compiler.JavaCompilerService
 import com.itsaky.androidide.lsp.models.CompletionResult
 import com.itsaky.androidide.lsp.models.MatchLevel.NO_MATCH
 import com.itsaky.androidide.progress.ProgressManager.Companion.abortIfCancelled
+import java.nio.file.Path
 import jdkx.lang.model.element.ElementKind.ENUM
 import jdkx.lang.model.element.ElementKind.ENUM_CONSTANT
 import jdkx.lang.model.element.TypeElement
@@ -30,7 +31,6 @@ import jdkx.lang.model.type.DeclaredType
 import openjdk.source.tree.SwitchTree
 import openjdk.source.util.TreePath
 import openjdk.source.util.Trees
-import java.nio.file.Path
 
 /**
  * Provides completions for switch constants.
@@ -38,17 +38,17 @@ import java.nio.file.Path
  * @author Akash Yadav
  */
 class SwitchConstantCompletionProvider(
-  completingFile: Path,
-  cursor: Long,
-  compiler: JavaCompilerService,
-  settings: IServerSettings,
+    completingFile: Path,
+    cursor: Long,
+    compiler: JavaCompilerService,
+    settings: IServerSettings,
 ) : IJavaCompletionProvider(cursor, completingFile, compiler, settings) {
 
   override fun doComplete(
-    task: CompileTask,
-    path: TreePath,
-    partial: String,
-    endsWithParen: Boolean,
+      task: CompileTask,
+      path: TreePath,
+      partial: String,
+      endsWithParen: Boolean,
   ): CompletionResult {
     val switchTree = path.leaf as SwitchTree
     val exprPath = TreePath(path, switchTree.expression)
@@ -95,14 +95,14 @@ class SwitchConstantCompletionProvider(
   }
 
   private fun completeIdentifier(
-    task: CompileTask,
-    path: TreePath,
-    partial: String,
-    endsWithParen: Boolean
+      task: CompileTask,
+      path: TreePath,
+      partial: String,
+      endsWithParen: Boolean,
   ): CompletionResult {
     abortIfCancelled()
     abortCompletionIfCancelled()
     return IdentifierCompletionProvider(file, cursor, compiler, settings)
-      .complete(task, path, partial, endsWithParen)
+        .complete(task, path, partial, endsWithParen)
   }
 }

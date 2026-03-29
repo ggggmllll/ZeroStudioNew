@@ -17,12 +17,12 @@
 
 package com.itsaky.androidide.templates.base.util
 
-import com.squareup.javapoet.ClassName
-import com.squareup.javapoet.JavaFile
-import com.squareup.javapoet.TypeSpec
 import com.itsaky.androidide.templates.Language
 import com.itsaky.androidide.templates.SrcSet
 import com.itsaky.androidide.templates.base.ModuleTemplateBuilder
+import com.squareup.javapoet.ClassName
+import com.squareup.javapoet.JavaFile
+import com.squareup.javapoet.TypeSpec
 import jdkx.lang.model.element.Modifier
 
 /**

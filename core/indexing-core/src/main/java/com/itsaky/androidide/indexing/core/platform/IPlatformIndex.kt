@@ -28,9 +28,7 @@ interface IPlatformIndex<T : IPlatformIndexable> : IIndex<T> {
 
   companion object {
 
-    /**
-     * Base path for the platform index.
-     */
+    /** Base path for the platform index. */
     val PLATFORM_INDEX_BASE_PATH = IIndex.createIndexPath(IIndex.INDEX_BASE_PATH, "platform")
   }
 }

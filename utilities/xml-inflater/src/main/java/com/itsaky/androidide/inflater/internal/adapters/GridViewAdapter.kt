@@ -49,7 +49,7 @@ open class GridViewAdapter<T : GridView> : AbsListViewAdapter<T>() {
 
   override fun createUiWidgets(): List<UiWidget> {
     return listOf(
-      UiWidget(GridView::class.java, string.widget_grid_view, drawable.ic_widget_grid_view)
+        UiWidget(GridView::class.java, string.widget_grid_view, drawable.ic_widget_grid_view)
     )
   }
 

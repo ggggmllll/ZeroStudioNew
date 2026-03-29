@@ -15,52 +15,42 @@
  *   along with AndroidIDE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 import com.itsaky.androidide.build.config.BuildConfig
 
 plugins {
-    id("com.android.library")
-    id("kotlin-android")
-    id("kotlin-kapt")
+  id("com.android.library")
+  id("kotlin-android")
+  id("kotlin-kapt")
 }
 
+android { namespace = "${BuildConfig.packageName}.xml.lsp" }
 
-
-android {
-    namespace = "${BuildConfig.packageName}.xml.lsp"
-}
-
-kapt {
-    arguments {
-        arg ("eventBusIndex", "${BuildConfig.packageName}.events.LspXmlEventsIndex")
-    }
-}
+kapt { arguments { arg("eventBusIndex", "${BuildConfig.packageName}.events.LspXmlEventsIndex") } }
 
 dependencies {
-    
-    kapt(projects.annotation.processors)
-    
-    implementation(libs.common.editor)
-    implementation(libs.common.utilcode)
-    implementation(libs.androidide.ts)
-    implementation(libs.androidide.ts.xml)
-    
-    implementation(projects.core.actions)
-    implementation(projects.core.lspApi)
-    implementation(projects.editor.lexers)
-    implementation(projects.xml.dom)
-    implementation(projects.xml.utils)
-    
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.common.kotlin)
-    implementation(libs.google.material)
+  kapt(projects.annotation.processors)
 
-    testImplementation(projects.core.actions)
-    testImplementation(projects.core.projects)
-    testImplementation(projects.tooling.api)
-    testImplementation(projects.testing.commonTest)
-    testImplementation(projects.testing.lspTest)
+  implementation(libs.common.editor)
+  implementation(libs.common.utilcode)
+  implementation(libs.androidide.ts)
+  implementation(libs.androidide.ts.xml)
 
-    compileOnly(projects.core.common)
-    compileOnly(libs.common.antlr4)
+  implementation(projects.core.actions)
+  implementation(projects.core.lspApi)
+  implementation(projects.editor.lexers)
+  implementation(projects.xml.dom)
+  implementation(projects.xml.utils)
+
+  implementation(libs.androidx.core.ktx)
+  implementation(libs.common.kotlin)
+  implementation(libs.google.material)
+
+  testImplementation(projects.core.actions)
+  testImplementation(projects.core.projects)
+  testImplementation(projects.tooling.api)
+  testImplementation(projects.testing.commonTest)
+  testImplementation(projects.testing.lspTest)
+
+  compileOnly(projects.core.common)
+  compileOnly(libs.common.antlr4)
 }

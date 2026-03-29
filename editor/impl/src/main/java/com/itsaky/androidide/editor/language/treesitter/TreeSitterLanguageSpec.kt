@@ -35,6 +35,7 @@ constructor(val spec: TsLanguageSpec, indentsQueryScm: String = "") : Closeable 
   // <editor-fold desc="Proxy properties">
   val language: TSLanguage
     get() = spec.language
+
   // </editor-fold>
 
   val indentsQuery: TSQuery? =

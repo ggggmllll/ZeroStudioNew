@@ -9,7 +9,7 @@ import androidx.compose.ui.unit.Dp
 @Composable
 internal fun surfaceColorAtElevation(color: Color, elevation: Dp): Color =
     when (color) {
-        MaterialTheme.colorScheme.surface ->
-            MaterialTheme.colorScheme.surfaceColorAtElevation(elevation)
-        else -> color
+      MaterialTheme.colorScheme.surface ->
+          MaterialTheme.colorScheme.surfaceColorAtElevation(elevation)
+      else -> color
     }

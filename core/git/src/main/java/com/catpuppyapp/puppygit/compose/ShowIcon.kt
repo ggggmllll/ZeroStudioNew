@@ -7,7 +7,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 
-
 @Composable
 fun ShowIcon(
     icon: ImageVector,
@@ -15,10 +14,10 @@ fun ShowIcon(
     iconColor: Color = LocalContentColor.current,
     modifier: Modifier = Modifier,
 ) {
-    Icon(
-        imageVector = icon,
-        contentDescription = contentDescription,
-        tint = iconColor,
-        modifier = modifier
-    )
+  Icon(
+      imageVector = icon,
+      contentDescription = contentDescription,
+      tint = iconColor,
+      modifier = modifier,
+  )
 }

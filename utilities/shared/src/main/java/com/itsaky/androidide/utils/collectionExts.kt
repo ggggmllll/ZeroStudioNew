@@ -19,9 +19,6 @@ package com.itsaky.androidide.utils
 
 import androidx.collection.mutableIntObjectMapOf
 
-/**
- * Create an IntIntMap from a vararg of pairs.
- */
-fun intByteMapOf(vararg pairs: Pair<Int, Byte>) = mutableIntObjectMapOf<Byte>().apply {
-  pairs.forEach { pair -> put(pair.first, pair.second) }
-}
+/** Create an IntIntMap from a vararg of pairs. */
+fun intByteMapOf(vararg pairs: Pair<Int, Byte>) =
+    mutableIntObjectMapOf<Byte>().apply { pairs.forEach { pair -> put(pair.first, pair.second) } }

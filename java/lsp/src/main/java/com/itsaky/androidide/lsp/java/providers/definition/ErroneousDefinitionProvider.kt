@@ -26,12 +26,12 @@ import com.itsaky.androidide.models.Location
 import com.itsaky.androidide.models.Position
 import com.itsaky.androidide.progress.ICancelChecker
 import com.itsaky.androidide.utils.DocumentUtils.isSameFile
+import java.nio.file.Path
+import java.nio.file.Paths
 import jdkx.lang.model.element.Element
 import jdkx.lang.model.element.TypeElement
 import jdkx.tools.JavaFileObject
 import openjdk.source.util.Trees
-import java.nio.file.Path
-import java.nio.file.Paths
 
 /**
  * Finds definition for erroneous elements.
@@ -39,10 +39,11 @@ import java.nio.file.Paths
  * @author Akash Yadav
  */
 class ErroneousDefinitionProvider(
-  position: Position,
-  completingFile: Path,
-  compiler: JavaCompilerService,
-  settings: IServerSettings, cancelChecker: ICancelChecker,
+    position: Position,
+    completingFile: Path,
+    compiler: JavaCompilerService,
+    settings: IServerSettings,
+    cancelChecker: ICancelChecker,
 ) : IJavaDefinitionProvider(position, completingFile, compiler, settings, cancelChecker) {
 
   override fun doFindDefinition(element: Element): List<Location> {

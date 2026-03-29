@@ -17,7 +17,7 @@
 package com.itsaky.androidide.templates.impl.androidstudio.fragments.loginFragment.src.app_package.ui.login
 
 fun loggedInUserViewJava(packageName: String) =
-  """
+    """
 package  ${packageName}.ui.login;
 
 /**

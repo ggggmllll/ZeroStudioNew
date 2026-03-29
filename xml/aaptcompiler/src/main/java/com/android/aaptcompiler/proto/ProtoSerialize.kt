@@ -58,7 +58,7 @@ internal fun serializeSourceToPb(source: Source, sourcePool: StringPool): Resour
   sourceBuilder.setPathIdx(ref.index())
   if (source.line != null) {
     sourceBuilder.setPosition(
-      Resources.SourcePosition.newBuilder().setLineNumber(source.line!!).build()
+        Resources.SourcePosition.newBuilder().setLineNumber(source.line!!).build()
     )
   }
   return sourceBuilder.build()
@@ -68,12 +68,11 @@ fun serializeTableToPb(table: ResourceTable, logger: ILogger? = null): Resources
   val tableBuilder = Resources.ResourceTable.newBuilder()
   val sourcePool = StringPool()
 
-
   tableBuilder.addToolFingerprint(
-    Resources.ToolFingerprint.newBuilder()
-      .setTool(ToolFingerprint.TOOL_NAME)
-      .setVersion(ToolFingerprint.FINGERPRINT)
-      .build()
+      Resources.ToolFingerprint.newBuilder()
+          .setTool(ToolFingerprint.TOOL_NAME)
+          .setVersion(ToolFingerprint.FINGERPRINT)
+          .build()
   )
   val overlayables = mutableListOf<Overlayable>()
   for (resourcePackage in table.packages) {
@@ -81,11 +80,7 @@ fun serializeTableToPb(table: ResourceTable, logger: ILogger? = null): Resources
 
     val packageId = resourcePackage.id
     if (packageId != null) {
-      packageBuilder.setPackageId(
-        Resources.PackageId.newBuilder()
-          .setId(packageId.toInt())
-          .build()
-      )
+      packageBuilder.setPackageId(Resources.PackageId.newBuilder().setId(packageId.toInt()).build())
     }
     packageBuilder.setPackageName(resourcePackage.name)
 
@@ -94,11 +89,7 @@ fun serializeTableToPb(table: ResourceTable, logger: ILogger? = null): Resources
 
       val groupId = resourceGroup.id
       if (groupId != null) {
-        groupBuilder.setTypeId(
-          Resources.TypeId.newBuilder()
-            .setId(groupId.toInt())
-            .build()
-        )
+        groupBuilder.setTypeId(Resources.TypeId.newBuilder().setId(groupId.toInt()).build())
       }
 
       groupBuilder.setName(resourceGroup.type.tagName)
@@ -109,11 +100,7 @@ fun serializeTableToPb(table: ResourceTable, logger: ILogger? = null): Resources
 
           val entryId = entry.id
           if (entryId != null) {
-            entryBuilder.setEntryId(
-              Resources.EntryId.newBuilder()
-                .setId(entryId.toInt())
-                .build()
-            )
+            entryBuilder.setEntryId(Resources.EntryId.newBuilder().setId(entryId.toInt()).build())
           }
           entryBuilder.setName(entry.name)
 
@@ -122,10 +109,10 @@ fun serializeTableToPb(table: ResourceTable, logger: ILogger? = null): Resources
             visibilityBuilder.setSource(serializeSourceToPb(entry.visibility.source, sourcePool))
           }
           entryBuilder.setVisibility(
-            visibilityBuilder
-              .setLevel(serializeVisibilityToPb(entry.visibility.level))
-              .setComment(entry.visibility.comment)
-              .build()
+              visibilityBuilder
+                  .setLevel(serializeVisibilityToPb(entry.visibility.level))
+                  .setComment(entry.visibility.comment)
+                  .build()
           )
 
           val entryAllowNew = entry.allowNew
@@ -134,32 +121,28 @@ fun serializeTableToPb(table: ResourceTable, logger: ILogger? = null): Resources
             if (entryAllowNew.source.isNotEmpty()) {
               allowNewBuilder.setSource(serializeSourceToPb(entryAllowNew.source, sourcePool))
             }
-            entryBuilder.setAllowNew(
-              allowNewBuilder
-                .setComment(entryAllowNew.comment)
-                .build()
-            )
+            entryBuilder.setAllowNew(allowNewBuilder.setComment(entryAllowNew.comment).build())
           }
 
           val entryOverlayableItem = entry.overlayable
           if (entryOverlayableItem != null) {
 
             entryBuilder.setOverlayableItem(
-              serializeOverlayableToPb(
-                entryOverlayableItem,
-                overlayables,
-                tableBuilder,
-                sourcePool
-              )
+                serializeOverlayableToPb(
+                    entryOverlayableItem,
+                    overlayables,
+                    tableBuilder,
+                    sourcePool,
+                )
             )
           }
 
           for (configValue in entry.values) {
             entryBuilder.addConfigValue(
-              Resources.ConfigValue.newBuilder()
-                .setConfig(serializeConfigToPb(configValue.config, configValue.product, logger))
-                .setValue(serializeValueToPb(configValue.value!!, sourcePool, logger))
-                .build()
+                Resources.ConfigValue.newBuilder()
+                    .setConfig(serializeConfigToPb(configValue.config, configValue.product, logger))
+                    .setValue(serializeValueToPb(configValue.value!!, sourcePool, logger))
+                    .build()
             )
           }
           groupBuilder.addEntry(entryBuilder.build())
@@ -169,43 +152,42 @@ fun serializeTableToPb(table: ResourceTable, logger: ILogger? = null): Resources
     }
     tableBuilder.addPackage(packageBuilder.build())
   }
-  return tableBuilder.setSourcePool(serializePoolToPb(sourcePool, logger))
-    .build()
+  return tableBuilder.setSourcePool(serializePoolToPb(sourcePool, logger)).build()
 }
 
 fun serializeVisibilityToPb(resourceVisibility: ResourceVisibility) =
-  when (resourceVisibility) {
-    ResourceVisibility.PRIVATE,
-    ResourceVisibility.PRIVATE_XML_ONLY -> Resources.Visibility.Level.PRIVATE
+    when (resourceVisibility) {
+      ResourceVisibility.PRIVATE,
+      ResourceVisibility.PRIVATE_XML_ONLY -> Resources.Visibility.Level.PRIVATE
 
-    ResourceVisibility.PUBLIC -> Resources.Visibility.Level.PUBLIC
-    else -> Resources.Visibility.Level.UNKNOWN
-  }
+      ResourceVisibility.PUBLIC -> Resources.Visibility.Level.PUBLIC
+      else -> Resources.Visibility.Level.UNKNOWN
+    }
 
 fun serializeCompiledFileToPb(file: ResourceFile): ResourcesInternal.CompiledFile {
-  val compiledFile = ResourcesInternal.CompiledFile.newBuilder()
-    .setResourceName(file.name.toString())
-    .setSourcePath(file.source.path)
-    .setType(serializeFileTypeToPb(file.type))
-    .setConfig(serializeConfigToPb(file.configuration, null, null))
+  val compiledFile =
+      ResourcesInternal.CompiledFile.newBuilder()
+          .setResourceName(file.name.toString())
+          .setSourcePath(file.source.path)
+          .setType(serializeFileTypeToPb(file.type))
+          .setConfig(serializeConfigToPb(file.configuration, null, null))
 
   for (exportedResourceName in file.exportedSymbols) {
     compiledFile.addExportedSymbol(
-      ResourcesInternal.CompiledFile.Symbol.newBuilder()
-        .setResourceName(exportedResourceName.name.toString())
-        .setSource(
-          Resources.SourcePosition.newBuilder()
-            .setLineNumber(exportedResourceName.line)
-        )
+        ResourcesInternal.CompiledFile.Symbol.newBuilder()
+            .setResourceName(exportedResourceName.name.toString())
+            .setSource(
+                Resources.SourcePosition.newBuilder().setLineNumber(exportedResourceName.line)
+            )
     )
   }
   return compiledFile.build()
 }
 
 fun serializeConfigToPb(
-  config: ConfigDescription,
-  product: String?,
-  logger: ILogger?
+    config: ConfigDescription,
+    product: String?,
+    logger: ILogger?,
 ): ConfigurationOuterClass.Configuration {
 
   val configBuilder = ConfigurationOuterClass.Configuration.newBuilder()
@@ -214,15 +196,15 @@ fun serializeConfigToPb(
   configBuilder.setLocale(config.getBcp47Locale())
 
   configBuilder.setLayoutDirection(
-    when ((config.screenLayout.toInt() and ResTableConfig.SCREEN_LAYOUT.DIR_MASK).toByte()) {
-      ResTableConfig.SCREEN_LAYOUT.DIR_LTR ->
-        ConfigurationOuterClass.Configuration.LayoutDirection.LAYOUT_DIRECTION_LTR
+      when ((config.screenLayout.toInt() and ResTableConfig.SCREEN_LAYOUT.DIR_MASK).toByte()) {
+        ResTableConfig.SCREEN_LAYOUT.DIR_LTR ->
+            ConfigurationOuterClass.Configuration.LayoutDirection.LAYOUT_DIRECTION_LTR
 
-      ResTableConfig.SCREEN_LAYOUT.DIR_RTL ->
-        ConfigurationOuterClass.Configuration.LayoutDirection.LAYOUT_DIRECTION_RTL
+        ResTableConfig.SCREEN_LAYOUT.DIR_RTL ->
+            ConfigurationOuterClass.Configuration.LayoutDirection.LAYOUT_DIRECTION_RTL
 
-      else -> ConfigurationOuterClass.Configuration.LayoutDirection.LAYOUT_DIRECTION_UNSET
-    }
+        else -> ConfigurationOuterClass.Configuration.LayoutDirection.LAYOUT_DIRECTION_UNSET
+      }
   )
 
   configBuilder.setScreenWidth(config.screenWidth)
@@ -232,215 +214,215 @@ fun serializeConfigToPb(
   configBuilder.setSmallestScreenWidthDp(config.smallestScreenWidthDp)
 
   configBuilder.setScreenLayoutSize(
-    when ((config.screenLayout.toInt() and ResTableConfig.SCREEN_LAYOUT.SIZE_MASK).toByte()) {
-      ResTableConfig.SCREEN_LAYOUT.SIZE_SMALL ->
-        ConfigurationOuterClass.Configuration.ScreenLayoutSize.SCREEN_LAYOUT_SIZE_SMALL
+      when ((config.screenLayout.toInt() and ResTableConfig.SCREEN_LAYOUT.SIZE_MASK).toByte()) {
+        ResTableConfig.SCREEN_LAYOUT.SIZE_SMALL ->
+            ConfigurationOuterClass.Configuration.ScreenLayoutSize.SCREEN_LAYOUT_SIZE_SMALL
 
-      ResTableConfig.SCREEN_LAYOUT.SIZE_NORMAL ->
-        ConfigurationOuterClass.Configuration.ScreenLayoutSize.SCREEN_LAYOUT_SIZE_NORMAL
+        ResTableConfig.SCREEN_LAYOUT.SIZE_NORMAL ->
+            ConfigurationOuterClass.Configuration.ScreenLayoutSize.SCREEN_LAYOUT_SIZE_NORMAL
 
-      ResTableConfig.SCREEN_LAYOUT.SIZE_LARGE ->
-        ConfigurationOuterClass.Configuration.ScreenLayoutSize.SCREEN_LAYOUT_SIZE_LARGE
+        ResTableConfig.SCREEN_LAYOUT.SIZE_LARGE ->
+            ConfigurationOuterClass.Configuration.ScreenLayoutSize.SCREEN_LAYOUT_SIZE_LARGE
 
-      ResTableConfig.SCREEN_LAYOUT.SIZE_XLARGE ->
-        ConfigurationOuterClass.Configuration.ScreenLayoutSize.SCREEN_LAYOUT_SIZE_XLARGE
+        ResTableConfig.SCREEN_LAYOUT.SIZE_XLARGE ->
+            ConfigurationOuterClass.Configuration.ScreenLayoutSize.SCREEN_LAYOUT_SIZE_XLARGE
 
-      else -> ConfigurationOuterClass.Configuration.ScreenLayoutSize.SCREEN_LAYOUT_SIZE_UNSET
-    }
+        else -> ConfigurationOuterClass.Configuration.ScreenLayoutSize.SCREEN_LAYOUT_SIZE_UNSET
+      }
   )
 
   configBuilder.setScreenLayoutLong(
-    when (
-      (config.screenLayout.toInt() and ResTableConfig.SCREEN_LAYOUT.SCREENLONG_MASK).toByte()) {
+      when (
+          (config.screenLayout.toInt() and ResTableConfig.SCREEN_LAYOUT.SCREENLONG_MASK).toByte()
+      ) {
+        ResTableConfig.SCREEN_LAYOUT.SCREENLONG_YES ->
+            ConfigurationOuterClass.Configuration.ScreenLayoutLong.SCREEN_LAYOUT_LONG_LONG
 
-      ResTableConfig.SCREEN_LAYOUT.SCREENLONG_YES ->
-        ConfigurationOuterClass.Configuration.ScreenLayoutLong.SCREEN_LAYOUT_LONG_LONG
+        ResTableConfig.SCREEN_LAYOUT.SCREENLONG_NO ->
+            ConfigurationOuterClass.Configuration.ScreenLayoutLong.SCREEN_LAYOUT_LONG_NOTLONG
 
-      ResTableConfig.SCREEN_LAYOUT.SCREENLONG_NO ->
-        ConfigurationOuterClass.Configuration.ScreenLayoutLong.SCREEN_LAYOUT_LONG_NOTLONG
-
-      else -> ConfigurationOuterClass.Configuration.ScreenLayoutLong.SCREEN_LAYOUT_LONG_UNSET
-    }
+        else -> ConfigurationOuterClass.Configuration.ScreenLayoutLong.SCREEN_LAYOUT_LONG_UNSET
+      }
   )
 
   configBuilder.setScreenRound(
-    when (
-      (config.screenLayout2.toInt() and ResTableConfig.SCREEN_LAYOUT2.SCREENROUND_MASK).toByte()) {
+      when (
+          (config.screenLayout2.toInt() and ResTableConfig.SCREEN_LAYOUT2.SCREENROUND_MASK).toByte()
+      ) {
+        ResTableConfig.SCREEN_LAYOUT2.SCREENROUND_YES ->
+            ConfigurationOuterClass.Configuration.ScreenRound.SCREEN_ROUND_ROUND
 
-      ResTableConfig.SCREEN_LAYOUT2.SCREENROUND_YES ->
-        ConfigurationOuterClass.Configuration.ScreenRound.SCREEN_ROUND_ROUND
+        ResTableConfig.SCREEN_LAYOUT2.SCREENROUND_NO ->
+            ConfigurationOuterClass.Configuration.ScreenRound.SCREEN_ROUND_NOTROUND
 
-      ResTableConfig.SCREEN_LAYOUT2.SCREENROUND_NO ->
-        ConfigurationOuterClass.Configuration.ScreenRound.SCREEN_ROUND_NOTROUND
-
-      else -> ConfigurationOuterClass.Configuration.ScreenRound.SCREEN_ROUND_UNSET
-    }
+        else -> ConfigurationOuterClass.Configuration.ScreenRound.SCREEN_ROUND_UNSET
+      }
   )
 
   configBuilder.setWideColorGamut(
-    when ((config.colorMode.toInt() and ResTableConfig.COLOR_MODE.WIDE_GAMUT_MASK).toByte()) {
-      ResTableConfig.COLOR_MODE.WIDE_GAMUT_YES ->
-        ConfigurationOuterClass.Configuration.WideColorGamut.WIDE_COLOR_GAMUT_WIDECG
+      when ((config.colorMode.toInt() and ResTableConfig.COLOR_MODE.WIDE_GAMUT_MASK).toByte()) {
+        ResTableConfig.COLOR_MODE.WIDE_GAMUT_YES ->
+            ConfigurationOuterClass.Configuration.WideColorGamut.WIDE_COLOR_GAMUT_WIDECG
 
-      ResTableConfig.COLOR_MODE.WIDE_GAMUT_NO ->
-        ConfigurationOuterClass.Configuration.WideColorGamut.WIDE_COLOR_GAMUT_NOWIDECG
+        ResTableConfig.COLOR_MODE.WIDE_GAMUT_NO ->
+            ConfigurationOuterClass.Configuration.WideColorGamut.WIDE_COLOR_GAMUT_NOWIDECG
 
-      else -> ConfigurationOuterClass.Configuration.WideColorGamut.WIDE_COLOR_GAMUT_UNSET
-    }
+        else -> ConfigurationOuterClass.Configuration.WideColorGamut.WIDE_COLOR_GAMUT_UNSET
+      }
   )
 
   configBuilder.setHdr(
-    when ((config.colorMode.toInt() and ResTableConfig.COLOR_MODE.HDR_MASK).toByte()) {
-      ResTableConfig.COLOR_MODE.HDR_YES -> ConfigurationOuterClass.Configuration.Hdr.HDR_HIGHDR
-      ResTableConfig.COLOR_MODE.HDR_NO -> ConfigurationOuterClass.Configuration.Hdr.HDR_LOWDR
-      else -> ConfigurationOuterClass.Configuration.Hdr.HDR_UNSET
-    }
+      when ((config.colorMode.toInt() and ResTableConfig.COLOR_MODE.HDR_MASK).toByte()) {
+        ResTableConfig.COLOR_MODE.HDR_YES -> ConfigurationOuterClass.Configuration.Hdr.HDR_HIGHDR
+        ResTableConfig.COLOR_MODE.HDR_NO -> ConfigurationOuterClass.Configuration.Hdr.HDR_LOWDR
+        else -> ConfigurationOuterClass.Configuration.Hdr.HDR_UNSET
+      }
   )
 
   configBuilder.setOrientation(
-    when (config.orientation) {
-      ResTableConfig.ORIENTATION.PORT ->
-        ConfigurationOuterClass.Configuration.Orientation.ORIENTATION_PORT
+      when (config.orientation) {
+        ResTableConfig.ORIENTATION.PORT ->
+            ConfigurationOuterClass.Configuration.Orientation.ORIENTATION_PORT
 
-      ResTableConfig.ORIENTATION.LAND ->
-        ConfigurationOuterClass.Configuration.Orientation.ORIENTATION_LAND
+        ResTableConfig.ORIENTATION.LAND ->
+            ConfigurationOuterClass.Configuration.Orientation.ORIENTATION_LAND
 
-      ResTableConfig.ORIENTATION.SQUARE ->
-        ConfigurationOuterClass.Configuration.Orientation.ORIENTATION_SQUARE
+        ResTableConfig.ORIENTATION.SQUARE ->
+            ConfigurationOuterClass.Configuration.Orientation.ORIENTATION_SQUARE
 
-      else -> ConfigurationOuterClass.Configuration.Orientation.ORIENTATION_UNSET
-    }
+        else -> ConfigurationOuterClass.Configuration.Orientation.ORIENTATION_UNSET
+      }
   )
 
   configBuilder.setUiModeType(
-    when ((config.uiMode.toInt() and ResTableConfig.UI_MODE.TYPE_MASK).toByte()) {
-      ResTableConfig.UI_MODE.TYPE_NORMAL ->
-        ConfigurationOuterClass.Configuration.UiModeType.UI_MODE_TYPE_NORMAL
+      when ((config.uiMode.toInt() and ResTableConfig.UI_MODE.TYPE_MASK).toByte()) {
+        ResTableConfig.UI_MODE.TYPE_NORMAL ->
+            ConfigurationOuterClass.Configuration.UiModeType.UI_MODE_TYPE_NORMAL
 
-      ResTableConfig.UI_MODE.TYPE_DESK ->
-        ConfigurationOuterClass.Configuration.UiModeType.UI_MODE_TYPE_DESK
+        ResTableConfig.UI_MODE.TYPE_DESK ->
+            ConfigurationOuterClass.Configuration.UiModeType.UI_MODE_TYPE_DESK
 
-      ResTableConfig.UI_MODE.TYPE_CAR ->
-        ConfigurationOuterClass.Configuration.UiModeType.UI_MODE_TYPE_CAR
+        ResTableConfig.UI_MODE.TYPE_CAR ->
+            ConfigurationOuterClass.Configuration.UiModeType.UI_MODE_TYPE_CAR
 
-      ResTableConfig.UI_MODE.TYPE_TELEVISION ->
-        ConfigurationOuterClass.Configuration.UiModeType.UI_MODE_TYPE_TELEVISION
+        ResTableConfig.UI_MODE.TYPE_TELEVISION ->
+            ConfigurationOuterClass.Configuration.UiModeType.UI_MODE_TYPE_TELEVISION
 
-      ResTableConfig.UI_MODE.TYPE_APPLIANCE ->
-        ConfigurationOuterClass.Configuration.UiModeType.UI_MODE_TYPE_APPLIANCE
+        ResTableConfig.UI_MODE.TYPE_APPLIANCE ->
+            ConfigurationOuterClass.Configuration.UiModeType.UI_MODE_TYPE_APPLIANCE
 
-      ResTableConfig.UI_MODE.TYPE_WATCH ->
-        ConfigurationOuterClass.Configuration.UiModeType.UI_MODE_TYPE_WATCH
+        ResTableConfig.UI_MODE.TYPE_WATCH ->
+            ConfigurationOuterClass.Configuration.UiModeType.UI_MODE_TYPE_WATCH
 
-      ResTableConfig.UI_MODE.TYPE_VR_HEADSET ->
-        ConfigurationOuterClass.Configuration.UiModeType.UI_MODE_TYPE_VRHEADSET
+        ResTableConfig.UI_MODE.TYPE_VR_HEADSET ->
+            ConfigurationOuterClass.Configuration.UiModeType.UI_MODE_TYPE_VRHEADSET
 
-      else -> ConfigurationOuterClass.Configuration.UiModeType.UI_MODE_TYPE_UNSET
-    }
+        else -> ConfigurationOuterClass.Configuration.UiModeType.UI_MODE_TYPE_UNSET
+      }
   )
 
   configBuilder.setUiModeNight(
-    when ((config.uiMode.toInt() and ResTableConfig.UI_MODE.NIGHT_MASK).toByte()) {
-      ResTableConfig.UI_MODE.NIGHT_YES ->
-        ConfigurationOuterClass.Configuration.UiModeNight.UI_MODE_NIGHT_NIGHT
+      when ((config.uiMode.toInt() and ResTableConfig.UI_MODE.NIGHT_MASK).toByte()) {
+        ResTableConfig.UI_MODE.NIGHT_YES ->
+            ConfigurationOuterClass.Configuration.UiModeNight.UI_MODE_NIGHT_NIGHT
 
-      ResTableConfig.UI_MODE.NIGHT_NO ->
-        ConfigurationOuterClass.Configuration.UiModeNight.UI_MODE_NIGHT_NOTNIGHT
+        ResTableConfig.UI_MODE.NIGHT_NO ->
+            ConfigurationOuterClass.Configuration.UiModeNight.UI_MODE_NIGHT_NOTNIGHT
 
-      else -> ConfigurationOuterClass.Configuration.UiModeNight.UI_MODE_NIGHT_UNSET
-    }
+        else -> ConfigurationOuterClass.Configuration.UiModeNight.UI_MODE_NIGHT_UNSET
+      }
   )
 
   configBuilder.setDensity(config.density)
 
   configBuilder.setTouchscreen(
-    when (config.touchscreen) {
-      ResTableConfig.TOUCHSCREEN.NOTOUCH ->
-        ConfigurationOuterClass.Configuration.Touchscreen.TOUCHSCREEN_NOTOUCH
+      when (config.touchscreen) {
+        ResTableConfig.TOUCHSCREEN.NOTOUCH ->
+            ConfigurationOuterClass.Configuration.Touchscreen.TOUCHSCREEN_NOTOUCH
 
-      ResTableConfig.TOUCHSCREEN.STYLUS ->
-        ConfigurationOuterClass.Configuration.Touchscreen.TOUCHSCREEN_STYLUS
+        ResTableConfig.TOUCHSCREEN.STYLUS ->
+            ConfigurationOuterClass.Configuration.Touchscreen.TOUCHSCREEN_STYLUS
 
-      ResTableConfig.TOUCHSCREEN.FINGER ->
-        ConfigurationOuterClass.Configuration.Touchscreen.TOUCHSCREEN_FINGER
+        ResTableConfig.TOUCHSCREEN.FINGER ->
+            ConfigurationOuterClass.Configuration.Touchscreen.TOUCHSCREEN_FINGER
 
-      else -> ConfigurationOuterClass.Configuration.Touchscreen.TOUCHSCREEN_UNSET
-    }
+        else -> ConfigurationOuterClass.Configuration.Touchscreen.TOUCHSCREEN_UNSET
+      }
   )
 
   configBuilder.setKeysHidden(
-    when ((config.inputFlags.toInt() and ResTableConfig.INPUT_FLAGS.KEYSHIDDEN_MASK).toByte()) {
-      ResTableConfig.INPUT_FLAGS.KEYSHIDDEN_NO ->
-        ConfigurationOuterClass.Configuration.KeysHidden.KEYS_HIDDEN_KEYSEXPOSED
+      when ((config.inputFlags.toInt() and ResTableConfig.INPUT_FLAGS.KEYSHIDDEN_MASK).toByte()) {
+        ResTableConfig.INPUT_FLAGS.KEYSHIDDEN_NO ->
+            ConfigurationOuterClass.Configuration.KeysHidden.KEYS_HIDDEN_KEYSEXPOSED
 
-      ResTableConfig.INPUT_FLAGS.KEYSHIDDEN_YES ->
-        ConfigurationOuterClass.Configuration.KeysHidden.KEYS_HIDDEN_KEYSHIDDEN
+        ResTableConfig.INPUT_FLAGS.KEYSHIDDEN_YES ->
+            ConfigurationOuterClass.Configuration.KeysHidden.KEYS_HIDDEN_KEYSHIDDEN
 
-      ResTableConfig.INPUT_FLAGS.KEYSHIDDEN_SOFT ->
-        ConfigurationOuterClass.Configuration.KeysHidden.KEYS_HIDDEN_KEYSSOFT
+        ResTableConfig.INPUT_FLAGS.KEYSHIDDEN_SOFT ->
+            ConfigurationOuterClass.Configuration.KeysHidden.KEYS_HIDDEN_KEYSSOFT
 
-      else -> ConfigurationOuterClass.Configuration.KeysHidden.KEYS_HIDDEN_UNSET
-    }
+        else -> ConfigurationOuterClass.Configuration.KeysHidden.KEYS_HIDDEN_UNSET
+      }
   )
 
   configBuilder.setKeyboard(
-    when (config.keyboard) {
-      ResTableConfig.KEYBOARD.NOKEYS ->
-        ConfigurationOuterClass.Configuration.Keyboard.KEYBOARD_NOKEYS
+      when (config.keyboard) {
+        ResTableConfig.KEYBOARD.NOKEYS ->
+            ConfigurationOuterClass.Configuration.Keyboard.KEYBOARD_NOKEYS
 
-      ResTableConfig.KEYBOARD.QWERTY ->
-        ConfigurationOuterClass.Configuration.Keyboard.KEYBOARD_QWERTY
+        ResTableConfig.KEYBOARD.QWERTY ->
+            ConfigurationOuterClass.Configuration.Keyboard.KEYBOARD_QWERTY
 
-      ResTableConfig.KEYBOARD.TWELVEKEY ->
-        ConfigurationOuterClass.Configuration.Keyboard.KEYBOARD_TWELVEKEY
+        ResTableConfig.KEYBOARD.TWELVEKEY ->
+            ConfigurationOuterClass.Configuration.Keyboard.KEYBOARD_TWELVEKEY
 
-      else -> ConfigurationOuterClass.Configuration.Keyboard.KEYBOARD_UNSET
-    }
+        else -> ConfigurationOuterClass.Configuration.Keyboard.KEYBOARD_UNSET
+      }
   )
 
   configBuilder.setNavHidden(
-    when ((config.inputFlags.toInt() and ResTableConfig.INPUT_FLAGS.NAVHIDDEN_MASK).toByte()) {
-      ResTableConfig.INPUT_FLAGS.NAVHIDDEN_YES ->
-        ConfigurationOuterClass.Configuration.NavHidden.NAV_HIDDEN_NAVHIDDEN
+      when ((config.inputFlags.toInt() and ResTableConfig.INPUT_FLAGS.NAVHIDDEN_MASK).toByte()) {
+        ResTableConfig.INPUT_FLAGS.NAVHIDDEN_YES ->
+            ConfigurationOuterClass.Configuration.NavHidden.NAV_HIDDEN_NAVHIDDEN
 
-      ResTableConfig.INPUT_FLAGS.NAVHIDDEN_NO ->
-        ConfigurationOuterClass.Configuration.NavHidden.NAV_HIDDEN_NAVEXPOSED
+        ResTableConfig.INPUT_FLAGS.NAVHIDDEN_NO ->
+            ConfigurationOuterClass.Configuration.NavHidden.NAV_HIDDEN_NAVEXPOSED
 
-      else -> ConfigurationOuterClass.Configuration.NavHidden.NAV_HIDDEN_UNSET
-    }
+        else -> ConfigurationOuterClass.Configuration.NavHidden.NAV_HIDDEN_UNSET
+      }
   )
 
   configBuilder.setNavigation(
-    when (config.navigation) {
-      ResTableConfig.NAVIGATION.NONAV ->
-        ConfigurationOuterClass.Configuration.Navigation.NAVIGATION_NONAV
+      when (config.navigation) {
+        ResTableConfig.NAVIGATION.NONAV ->
+            ConfigurationOuterClass.Configuration.Navigation.NAVIGATION_NONAV
 
-      ResTableConfig.NAVIGATION.DPAD ->
-        ConfigurationOuterClass.Configuration.Navigation.NAVIGATION_DPAD
+        ResTableConfig.NAVIGATION.DPAD ->
+            ConfigurationOuterClass.Configuration.Navigation.NAVIGATION_DPAD
 
-      ResTableConfig.NAVIGATION.TRACKBALL ->
-        ConfigurationOuterClass.Configuration.Navigation.NAVIGATION_TRACKBALL
+        ResTableConfig.NAVIGATION.TRACKBALL ->
+            ConfigurationOuterClass.Configuration.Navigation.NAVIGATION_TRACKBALL
 
-      ResTableConfig.NAVIGATION.WHEEL ->
-        ConfigurationOuterClass.Configuration.Navigation.NAVIGATION_WHEEL
+        ResTableConfig.NAVIGATION.WHEEL ->
+            ConfigurationOuterClass.Configuration.Navigation.NAVIGATION_WHEEL
 
-      else -> ConfigurationOuterClass.Configuration.Navigation.NAVIGATION_UNSET
-    }
+        else -> ConfigurationOuterClass.Configuration.Navigation.NAVIGATION_UNSET
+      }
   )
 
   configBuilder.setGrammaticalGender(
-    when (config.grammaticalInflection) {
-      ResTableConfig.GRAMMATICAL_GENDER.NEUTER ->
-        ConfigurationOuterClass.Configuration.GrammaticalGender.GRAM_GENDER_NEUTER
+      when (config.grammaticalInflection) {
+        ResTableConfig.GRAMMATICAL_GENDER.NEUTER ->
+            ConfigurationOuterClass.Configuration.GrammaticalGender.GRAM_GENDER_NEUTER
 
-      ResTableConfig.GRAMMATICAL_GENDER.FEMININE ->
-        ConfigurationOuterClass.Configuration.GrammaticalGender.GRAM_GENDER_FEMININE
+        ResTableConfig.GRAMMATICAL_GENDER.FEMININE ->
+            ConfigurationOuterClass.Configuration.GrammaticalGender.GRAM_GENDER_FEMININE
 
-      ResTableConfig.GRAMMATICAL_GENDER.MASCULINE ->
-        ConfigurationOuterClass.Configuration.GrammaticalGender.GRAM_GENDER_MASCULINE
+        ResTableConfig.GRAMMATICAL_GENDER.MASCULINE ->
+            ConfigurationOuterClass.Configuration.GrammaticalGender.GRAM_GENDER_MASCULINE
 
-      else -> ConfigurationOuterClass.Configuration.GrammaticalGender.GRAM_GENDER_USET
-    }
+        else -> ConfigurationOuterClass.Configuration.GrammaticalGender.GRAM_GENDER_USET
+      }
   )
 
   configBuilder.setSdkVersion(config.sdkVersion.toInt() and 0xffff)
@@ -453,10 +435,10 @@ fun serializeConfigToPb(
 }
 
 fun serializeOverlayableToPb(
-  item: OverlayableItem,
-  overlayables: MutableList<Overlayable>,
-  table: Resources.ResourceTable.Builder,
-  sourcePool: StringPool
+    item: OverlayableItem,
+    overlayables: MutableList<Overlayable>,
+    table: Resources.ResourceTable.Builder,
+    sourcePool: StringPool,
 ): Resources.OverlayableItem {
 
   // Retrieve the index of the overlayable in the list of groups that have already been serialized.
@@ -465,9 +447,10 @@ fun serializeOverlayableToPb(
   // Serialize the overlayable if it has not been serialized already.
   if (foundIndex == -1) {
     overlayables.add(item.overlayable)
-    val overlayableBuilder = Resources.Overlayable.newBuilder()
-      .setName(item.overlayable.name)
-      .setActor(item.overlayable.actor)
+    val overlayableBuilder =
+        Resources.Overlayable.newBuilder()
+            .setName(item.overlayable.name)
+            .setActor(item.overlayable.actor)
     if (item.overlayable.source.isNotEmpty()) {
       overlayableBuilder.setSource(serializeSourceToPb(item.overlayable.source, sourcePool))
     }
@@ -512,13 +495,12 @@ fun serializeOverlayableToPb(
   return itemBuilder.build()
 }
 
-fun serializeReferenceTypeToPb(type: Reference.Type) = when (type) {
-  Reference.Type.RESOURCE ->
-    Resources.Reference.Type.REFERENCE
+fun serializeReferenceTypeToPb(type: Reference.Type) =
+    when (type) {
+      Reference.Type.RESOURCE -> Resources.Reference.Type.REFERENCE
 
-  Reference.Type.ATTRIBUTE ->
-    Resources.Reference.Type.ATTRIBUTE
-}
+      Reference.Type.ATTRIBUTE -> Resources.Reference.Type.ATTRIBUTE
+    }
 
 fun serializeReferenceToPb(ref: Reference): Resources.Reference {
   val refBuilder = Resources.Reference.newBuilder()
@@ -536,46 +518,46 @@ fun serializeReferenceToPb(ref: Reference): Resources.Reference {
   return refBuilder.build()
 }
 
-fun serializePluralTypeToPb(type: Plural.Type) = when (type) {
-  Plural.Type.ZERO -> Resources.Plural.Arity.ZERO
-  Plural.Type.ONE -> Resources.Plural.Arity.ONE
-  Plural.Type.TWO -> Resources.Plural.Arity.TWO
-  Plural.Type.FEW -> Resources.Plural.Arity.FEW
-  Plural.Type.MANY -> Resources.Plural.Arity.MANY
-  else -> Resources.Plural.Arity.OTHER
-}
+fun serializePluralTypeToPb(type: Plural.Type) =
+    when (type) {
+      Plural.Type.ZERO -> Resources.Plural.Arity.ZERO
+      Plural.Type.ONE -> Resources.Plural.Arity.ONE
+      Plural.Type.TWO -> Resources.Plural.Arity.TWO
+      Plural.Type.FEW -> Resources.Plural.Arity.FEW
+      Plural.Type.MANY -> Resources.Plural.Arity.MANY
+      else -> Resources.Plural.Arity.OTHER
+    }
 
-fun serializeFileTypeToPb(type: ResourceFile.Type) = when (type) {
-  ResourceFile.Type.BinaryXml -> Resources.FileReference.Type.BINARY_XML
-  ResourceFile.Type.ProtoXml -> Resources.FileReference.Type.PROTO_XML
-  ResourceFile.Type.Png -> Resources.FileReference.Type.PNG
-  else -> Resources.FileReference.Type.UNKNOWN
-}
+fun serializeFileTypeToPb(type: ResourceFile.Type) =
+    when (type) {
+      ResourceFile.Type.BinaryXml -> Resources.FileReference.Type.BINARY_XML
+      ResourceFile.Type.ProtoXml -> Resources.FileReference.Type.PROTO_XML
+      ResourceFile.Type.Png -> Resources.FileReference.Type.PNG
+      else -> Resources.FileReference.Type.UNKNOWN
+    }
 
 fun serializeStringToPb(string: BasicString) =
-  Resources.String.newBuilder().setValue(string.ref.value()).build()
+    Resources.String.newBuilder().setValue(string.ref.value()).build()
 
 fun serializeRawToPb(string: RawString) =
-  Resources.RawString.newBuilder().setValue(string.value.value()).build()
+    Resources.RawString.newBuilder().setValue(string.value.value()).build()
 
 fun serializeStyledStrToPb(string: StyledString): Resources.StyledString {
   val styleBuilder = Resources.StyledString.newBuilder()
   styleBuilder.setValue(string.ref.value())
   for (span in string.ref.spans()) {
     val spanBuilder = Resources.StyledString.Span.newBuilder()
-    spanBuilder.setTag(span.name.value())
-      .setFirstChar(span.firstChar)
-      .setLastChar(span.lastChar)
+    spanBuilder.setTag(span.name.value()).setFirstChar(span.firstChar).setLastChar(span.lastChar)
     styleBuilder.addSpan(spanBuilder.build())
   }
   return styleBuilder.build()
 }
 
 fun serializeFileRefToPb(file: FileReference) =
-  Resources.FileReference.newBuilder()
-    .setPath(file.path.value())
-    .setType(serializeFileTypeToPb(file.type))
-    .build()
+    Resources.FileReference.newBuilder()
+        .setPath(file.path.value())
+        .setType(serializeFileTypeToPb(file.type))
+        .build()
 
 fun serializeBinPrimitiveToPb(primitive: BinaryPrimitive, logger: ILogger?): Resources.Primitive {
   val resVal = primitive.flatten()
@@ -584,7 +566,10 @@ fun serializeBinPrimitiveToPb(primitive: BinaryPrimitive, logger: ILogger?): Res
 
   if (resVal == null) {
     logger?.error(
-      null, "%s, Failed to serialize primitive %s.", blameSource(primitive.source), primitive
+        null,
+        "%s, Failed to serialize primitive %s.",
+        blameSource(primitive.source),
+        primitive,
     )
     return primitiveBuilder.build()
   }
@@ -593,10 +578,10 @@ fun serializeBinPrimitiveToPb(primitive: BinaryPrimitive, logger: ILogger?): Res
     ResValue.DataType.NULL -> {
       when (resVal.data) {
         ResValue.NullFormat.UNDEFINED ->
-          primitiveBuilder.setNullValue(Resources.Primitive.NullType.newBuilder().build())
+            primitiveBuilder.setNullValue(Resources.Primitive.NullType.newBuilder().build())
 
         ResValue.NullFormat.EMPTY ->
-          primitiveBuilder.setEmptyValue(Resources.Primitive.EmptyType.newBuilder().build())
+            primitiveBuilder.setEmptyValue(Resources.Primitive.EmptyType.newBuilder().build())
 
         else -> {
           val errorMsg = "%s, Invalid null format value '%s' for primitive %s."
@@ -625,10 +610,11 @@ fun serializeBinPrimitiveToPb(primitive: BinaryPrimitive, logger: ILogger?): Res
 }
 
 fun serializeAttrToPb(attribute: AttributeResource, sourcePool: StringPool): Resources.Attribute {
-  val attrBuilder = Resources.Attribute.newBuilder()
-    .setFormatFlags(attribute.typeMask)
-    .setMinInt(attribute.minInt)
-    .setMaxInt(attribute.maxInt)
+  val attrBuilder =
+      Resources.Attribute.newBuilder()
+          .setFormatFlags(attribute.typeMask)
+          .setMinInt(attribute.minInt)
+          .setMaxInt(attribute.maxInt)
 
   for (symbol in attribute.symbols) {
     val symbolBuilder = Resources.Attribute.Symbol.newBuilder()
@@ -636,12 +622,12 @@ fun serializeAttrToPb(attribute: AttributeResource, sourcePool: StringPool): Res
       symbolBuilder.setSource(serializeSourceToPb(symbol.symbol.source, sourcePool))
     }
     attrBuilder.addSymbol(
-      symbolBuilder
-        .setComment(symbol.symbol.comment)
-        .setName(serializeReferenceToPb(symbol.symbol))
-        .setValue(symbol.value)
-        .setType(symbol.type.toInt())
-        .build()
+        symbolBuilder
+            .setComment(symbol.symbol.comment)
+            .setName(serializeReferenceToPb(symbol.symbol))
+            .setValue(symbol.value)
+            .setType(symbol.type.toInt())
+            .build()
     )
   }
 
@@ -665,11 +651,11 @@ fun serializeStyleToPb(style: Style, sourcePool: StringPool, logger: ILogger?): 
       entryBuilder.setSource(serializeSourceToPb(entry.key.source, sourcePool))
     }
     styleBuilder.addEntry(
-      entryBuilder
-        .setKey(serializeReferenceToPb(entry.key))
-        .setComment(entry.key.comment)
-        .setItem(serializeItemToPb(entry.value!!, logger))
-        .build()
+        entryBuilder
+            .setKey(serializeReferenceToPb(entry.key))
+            .setComment(entry.key.comment)
+            .setItem(serializeItemToPb(entry.value!!, logger))
+            .build()
     )
   }
   return styleBuilder.build()
@@ -684,17 +670,16 @@ fun serializeStyleableToPb(styleable: Styleable, sourcePool: StringPool): Resour
       entryBuilder.setSource(serializeSourceToPb(entry.source, sourcePool))
     }
     styleableBuilder.addEntry(
-      entryBuilder
-        .setComment(entry.comment)
-        .setAttr(serializeReferenceToPb(entry))
-        .build()
+        entryBuilder.setComment(entry.comment).setAttr(serializeReferenceToPb(entry)).build()
     )
   }
   return styleableBuilder.build()
 }
 
 fun serializeArrayToPb(
-  array: ArrayResource, sourcePool: StringPool, logger: ILogger?
+    array: ArrayResource,
+    sourcePool: StringPool,
+    logger: ILogger?,
 ): Resources.Array {
 
   val arrayBuilder = Resources.Array.newBuilder()
@@ -704,17 +689,16 @@ fun serializeArrayToPb(
       entryBuilder.setSource(serializeSourceToPb(element.source, sourcePool))
     }
     arrayBuilder.addElement(
-      entryBuilder
-        .setComment(element.comment)
-        .setItem(serializeItemToPb(element, logger))
-        .build()
+        entryBuilder.setComment(element.comment).setItem(serializeItemToPb(element, logger)).build()
     )
   }
   return arrayBuilder.build()
 }
 
 fun serializePluralToPb(
-  plural: Plural, sourcePool: StringPool, logger: ILogger?
+    plural: Plural,
+    sourcePool: StringPool,
+    logger: ILogger?,
 ): Resources.Plural {
 
   val pluralBuilder = Resources.Plural.newBuilder()
@@ -726,11 +710,11 @@ fun serializePluralToPb(
       entryBuilder.setSource(serializeSourceToPb(entry.source, sourcePool))
     }
     pluralBuilder.addEntry(
-      entryBuilder
-        .setComment(entry.comment)
-        .setArity(serializePluralTypeToPb(type))
-        .setItem(serializeItemToPb(entry, logger))
-        .build()
+        entryBuilder
+            .setComment(entry.comment)
+            .setArity(serializePluralTypeToPb(type))
+            .setItem(serializeItemToPb(entry, logger))
+            .build()
     )
   }
   return pluralBuilder.build()
@@ -811,8 +795,5 @@ fun serializeValueToPb(value: Value, sourcePool: StringPool, logger: ILogger?): 
   if (value.source.isNotEmpty()) {
     valueBuilder.setSource(serializeSourceToPb(value.source, sourcePool))
   }
-  return valueBuilder
-    .setComment(value.comment)
-    .setWeak(value.weak)
-    .build()
+  return valueBuilder.setComment(value.comment).setWeak(value.weak).build()
 }

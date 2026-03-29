@@ -32,26 +32,26 @@ import org.slf4j.LoggerFactory
 private val log = LoggerFactory.getLogger("ParseLookupUtils")
 
 internal data class LookupResult(
-  val table: IResourceTable,
-  val group: IResourceGroup,
-  val pack: IResourceTablePackage,
-  val entry: IResourceEntry
+    val table: IResourceTable,
+    val group: IResourceGroup,
+    val pack: IResourceTablePackage,
+    val entry: IResourceEntry,
 )
 
 internal fun lookupUnqualifedResource(
-  type: AaptResourceType,
-  name: String,
-  value: String?
+    type: AaptResourceType,
+    name: String,
+    value: String?,
 ): LookupResult? {
   if (name.isBlank()) {
     throw IllegalArgumentException("Cannot parse resource reference: '$value'")
   }
   val (table, group, pack, entry) =
-    findUnqualifiedResourceEntry(type, name)
-      ?: run {
-        log.warn("Unable to find resource entry '{}'", value)
-        return null
-      }
+      findUnqualifiedResourceEntry(type, name)
+          ?: run {
+            log.warn("Unable to find resource entry '{}'", value)
+            return null
+          }
 
   return LookupResult(table, group, pack, entry)
 }
@@ -63,16 +63,16 @@ internal fun findUnqualifiedResourceEntry(type: AaptResourceType, name: String):
   var resEntry: IResourceEntry? = null
   for (t in module.getAllResourceTables()) {
     val entries =
-      t.packages.mapNotNull {
-        if (it.name == SdkConstants.ANDROID_PKG) {
-          // Do not look in 'android' package
-          return@mapNotNull null
-        }
+        t.packages.mapNotNull {
+          if (it.name == SdkConstants.ANDROID_PKG) {
+            // Do not look in 'android' package
+            return@mapNotNull null
+          }
 
-        val group = it.findGroup(type) ?: return@mapNotNull null
-        val entry = group.findEntry(name) ?: return@mapNotNull null
-        Triple(it, group, entry)
-      }
+          val group = it.findGroup(type) ?: return@mapNotNull null
+          val entry = group.findEntry(name) ?: return@mapNotNull null
+          Triple(it, group, entry)
+        }
     if (entries.isEmpty()) {
       continue
     }
@@ -90,25 +90,25 @@ internal fun findUnqualifiedResourceEntry(type: AaptResourceType, name: String):
 }
 
 internal fun findQualifedResourceEntry(
-  pack: String,
-  type: AaptResourceType,
-  name: String
+    pack: String,
+    type: AaptResourceType,
+    name: String,
 ): IResourceEntry? {
   return module
-    .findResourceTableForPackage(pack, type)
-    ?.findResource(ResourceName(pack, type, name))
-    ?.entry
+      .findResourceTableForPackage(pack, type)
+      ?.findResource(ResourceName(pack, type, name))
+      ?.entry
 }
 
 internal fun findAttributeResource(
-  pck: String?,
-  type: AaptResourceType,
-  name: String
+    pck: String?,
+    type: AaptResourceType,
+    name: String,
 ): AttributeResource? {
   val entry =
-    if (pck == null) {
-      (findUnqualifiedResourceEntry(type, name) ?: return null).entry
-    } else findQualifedResourceEntry(pck, type, name)
+      if (pck == null) {
+        (findUnqualifiedResourceEntry(type, name) ?: return null).entry
+      } else findQualifedResourceEntry(pck, type, name)
 
   return entry?.findValue(ConfigDescription())?.value as? AttributeResource
 }

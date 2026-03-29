@@ -17,7 +17,7 @@
 package com.android.tools.idea.wizard.template.impl.fragments.blankFragment.res.layout
 
 fun fragmentBlankXml(className: String, packageName: String) =
-  """
+    """
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"

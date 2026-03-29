@@ -22,10 +22,10 @@ import com.android.tools.idea.wizard.template.SourceSetType
 import java.io.File
 
 fun RecipeExecutor.androidManifestRecipe(
-  moduleData: ModuleTemplateData,
-  remapFolder: Boolean,
-  relativeNewLocation: String,
-  sourceProviderNameSupplier: () -> String,
+    moduleData: ModuleTemplateData,
+    remapFolder: Boolean,
+    relativeNewLocation: String,
+    sourceProviderNameSupplier: () -> String,
 ) {
   if (remapFolder) {
     val newLocation = moduleData.rootDir.resolve(relativeNewLocation)

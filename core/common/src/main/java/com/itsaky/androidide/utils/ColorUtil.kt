@@ -18,14 +18,13 @@
 package com.itsaky.androidide.utils
 
 /**
- * Parses the given [hex color string][hexColor] and returns the [Long] representing
- * the color.
+ * Parses the given [hex color string][hexColor] and returns the [Long] representing the color.
  *
  * @param hexColor The color string.
  * @return The parsed color value.
  * @throws IllegalArgumentException If there was an error parsing the hex color.
  */
-fun parseHexColor(hexColor: String) : Long {
+fun parseHexColor(hexColor: String): Long {
   var str = hexColor
   if (str[0] == '#') {
     str = str.substring(1)
@@ -47,6 +46,9 @@ fun parseHexColor(hexColor: String) : Long {
 
     java.lang.Long.parseLong(str, 16)
   } catch (e: Exception) {
-    throw IllegalArgumentException("Failed to parse hex color. color=$hexColor, processedColorString=$str", e)
+    throw IllegalArgumentException(
+        "Failed to parse hex color. color=$hexColor, processedColorString=$str",
+        e,
+    )
   }
 }

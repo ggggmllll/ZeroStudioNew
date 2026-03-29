@@ -54,7 +54,12 @@ val googleAdMobAdsActivityTemplate
 
     category = Category.Google
     formFactor = FormFactor.Mobile
-    screens = listOf(WizardUiContext.ActivityGallery, WizardUiContext.MenuEntry, WizardUiContext.NewModule)
+    screens =
+        listOf(
+            WizardUiContext.ActivityGallery,
+            WizardUiContext.MenuEntry,
+            WizardUiContext.NewModule,
+        )
 
     lateinit var layoutName: StringParameter
     val activityClass = stringParameter {
@@ -85,41 +90,45 @@ val googleAdMobAdsActivityTemplate
     }
 
     val adFormat =
-      enumParameter<AdFormat> {
-        name = "Ad Format"
-        default = AdFormat.Interstitial
-        help = "Select Interstitial Ad or Banner Ad"
-      }
+        enumParameter<AdFormat> {
+          name = "Ad Format"
+          default = AdFormat.Interstitial
+          help = "Select Interstitial Ad or Banner Ad"
+        }
 
     val isLauncher = booleanParameter {
       name = "Launcher Activity"
       default = false
-      help = "If true, this activity will have a CATEGORY_LAUNCHER intent filter, making it visible in the launcher"
+      help =
+          "If true, this activity will have a CATEGORY_LAUNCHER intent filter, making it visible in the launcher"
     }
 
     val packageName = defaultPackageNameParameter
 
     widgets(
-      TextFieldWidget(activityClass),
-      TextFieldWidget(layoutName),
-      TextFieldWidget(menuName),
-      EnumWidget(adFormat),
-      CheckBoxWidget(isLauncher),
-      PackageNameWidget(packageName),
-      LanguageWidget(),
+        TextFieldWidget(activityClass),
+        TextFieldWidget(layoutName),
+        TextFieldWidget(menuName),
+        EnumWidget(adFormat),
+        CheckBoxWidget(isLauncher),
+        PackageNameWidget(packageName),
+        LanguageWidget(),
     )
 
-    thumb { File("google-admob-ads-activity").resolve("template_admob_activity_" + adFormat.value.name.lowercase(Locale.US) + ".png") }
+    thumb {
+      File("google-admob-ads-activity")
+          .resolve("template_admob_activity_" + adFormat.value.name.lowercase(Locale.US) + ".png")
+    }
 
     recipe = { data: TemplateData ->
       googleAdMobAdsActivityRecipe(
-        data as ModuleTemplateData,
-        activityClass.value,
-        layoutName.value,
-        menuName.value,
-        adFormat.value,
-        isLauncher.value,
-        packageName.value,
+          data as ModuleTemplateData,
+          activityClass.value,
+          layoutName.value,
+          menuName.value,
+          adFormat.value,
+          isLauncher.value,
+          packageName.value,
       )
     }
   }

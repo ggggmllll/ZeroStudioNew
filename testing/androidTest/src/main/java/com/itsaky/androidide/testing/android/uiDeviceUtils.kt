@@ -25,40 +25,24 @@ import androidx.test.uiautomator.UiObject2
 import com.google.common.truth.Truth.assertThat
 import com.itsaky.androidide.buildinfo.BuildInfo
 
-private val keyCharMap by lazy {
-  KeyCharacterMap.load(KeyCharacterMap.VIRTUAL_KEYBOARD)
-}
+private val keyCharMap by lazy { KeyCharacterMap.load(KeyCharacterMap.VIRTUAL_KEYBOARD) }
 
-/**
- * @see UiDevice.waitForWindowUpdate
- */
+/** @see UiDevice.waitForWindowUpdate */
 fun UiDevice.waitForWindowUpdate(timeout: Long) =
-  waitForWindowUpdate(BuildInfo.PACKAGE_NAME, timeout)
+    waitForWindowUpdate(BuildInfo.PACKAGE_NAME, timeout)
 
-/**
- * @see UiDevice.hasObject
- */
-fun UiDevice.hasObjectWithText(text: String) =
-  hasObject(By.text(text))
+/** @see UiDevice.hasObject */
+fun UiDevice.hasObjectWithText(text: String) = hasObject(By.text(text))
 
-/**
- * @see UiDevice.hasObject
- */
-fun UiDevice.hasObjectWithText(@StringRes text: Int) =
-  hasObjectWithText(stringRes(text))
+/** @see UiDevice.hasObject */
+fun UiDevice.hasObjectWithText(@StringRes text: Int) = hasObjectWithText(stringRes(text))
 
-/**
- * @see UiDevice.findObject
- */
-fun UiDevice.findObjectWithText(text: String): UiObject2? =
-  findObject(By.text(text))
+/** @see UiDevice.findObject */
+fun UiDevice.findObjectWithText(text: String): UiObject2? = findObject(By.text(text))
 
-/**
- * @see UiDevice.findObjectWithText
- */
+/** @see UiDevice.findObjectWithText */
 fun UiDevice.findObjectWithText(@StringRes text: Int): UiObject2? =
-  findObjectWithText(stringRes(text))
-
+    findObjectWithText(stringRes(text))
 
 fun UiDevice.getObjectWithText(text: String): UiObject2 {
   val obj = findObjectWithText(text)
@@ -68,9 +52,7 @@ fun UiDevice.getObjectWithText(text: String): UiObject2 {
 
 fun UiDevice.getObjectWithText(@StringRes text: Int): UiObject2 = getObjectWithText(stringRes(text))
 
-/**
- * Sends key events to this [UiDevice] to type the given [text].
- */
+/** Sends key events to this [UiDevice] to type the given [text]. */
 fun UiDevice.sendKeyEvents(text: String) {
   waitForIdle()
   val keyEvents = keyCharMap.getEvents(text.toCharArray())

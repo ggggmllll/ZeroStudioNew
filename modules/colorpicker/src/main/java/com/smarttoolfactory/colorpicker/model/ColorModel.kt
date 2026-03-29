@@ -1,15 +1,16 @@
 package com.smarttoolfactory.colorpicker.model
 
-/**
- * Color Model HSV(Hue-Saturation-Value), HSL(Hue-Saturation-Lightness), RGB(Red-Green-Blue)
- */
+/** Color Model HSV(Hue-Saturation-Value), HSL(Hue-Saturation-Lightness), RGB(Red-Green-Blue) */
 enum class ColorModel {
-    RGB, HSV, HSL
+  RGB,
+  HSV,
+  HSL,
 }
 
-/**
- * Color Modes that contain HSL, HSV, RGB, and Gradient
- */
+/** Color Modes that contain HSL, HSV, RGB, and Gradient */
 enum class ColorMode {
-    HSL, HSV, RGB, Gradient
+  HSL,
+  HSV,
+  RGB,
+  Gradient,
 }

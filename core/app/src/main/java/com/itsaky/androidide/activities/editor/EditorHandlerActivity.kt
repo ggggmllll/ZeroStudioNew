@@ -17,16 +17,19 @@
 
 package com.itsaky.androidide.activities.editor
 
+// import com.itsaky.androidide.editor.language.treesitter.DartLanguage
+// import com.itsaky.androidide.editor.language.treesitter.PythonLanguage
+// import com.itsaky.androidide.editor.language.treesitter.MarkdownLanguage
+// import com.itsaky.androidide.editor.language.treesitter.reStructuredTextLanguage
+// import com.itsaky.androidide.editor.language.treesitter.TypeScriptLanguage
+// import com.itsaky.androidide.editor.language.treesitter.SqliteLanguage
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.Menu
 import android.view.MenuItem
 import android.view.ViewGroup.LayoutParams
-import androidx.annotation.DrawableRes
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.collection.MutableIntObjectMap
 import androidx.core.content.res.ResourcesCompat
@@ -37,24 +40,18 @@ import com.itsaky.androidide.actions.ActionData
 import com.itsaky.androidide.actions.ActionItem.Location.EDITOR_TOOLBAR
 import com.itsaky.androidide.actions.ActionsRegistry.Companion.getInstance
 import com.itsaky.androidide.actions.FillMenuParams
+import com.itsaky.androidide.editor.language.treesitter.AidlLanguage
+import com.itsaky.androidide.editor.language.treesitter.CLang
+import com.itsaky.androidide.editor.language.treesitter.CmakeLanguage
+import com.itsaky.androidide.editor.language.treesitter.CppLang
 import com.itsaky.androidide.editor.language.treesitter.JavaLanguage
 import com.itsaky.androidide.editor.language.treesitter.JsonLanguage
 import com.itsaky.androidide.editor.language.treesitter.KotlinLanguage
 import com.itsaky.androidide.editor.language.treesitter.LogLanguage
 import com.itsaky.androidide.editor.language.treesitter.TSLanguageRegistry
-import com.itsaky.androidide.editor.language.treesitter.XMLLanguage
 import com.itsaky.androidide.editor.language.treesitter.TomlLanguage
-// import com.itsaky.androidide.editor.language.treesitter.DartLanguage
-import com.itsaky.androidide.editor.language.treesitter.CppLang
-import com.itsaky.androidide.editor.language.treesitter.CLang
-import com.itsaky.androidide.editor.language.treesitter.CmakeLanguage
-// import com.itsaky.androidide.editor.language.treesitter.PythonLanguage
-// import com.itsaky.androidide.editor.language.treesitter.MarkdownLanguage
-// import com.itsaky.androidide.editor.language.treesitter.reStructuredTextLanguage
+import com.itsaky.androidide.editor.language.treesitter.XMLLanguage
 import com.itsaky.androidide.editor.language.treesitter.YamlLanguage
-// import com.itsaky.androidide.editor.language.treesitter.TypeScriptLanguage
-// import com.itsaky.androidide.editor.language.treesitter.SqliteLanguage
-import com.itsaky.androidide.editor.language.treesitter.AidlLanguage
 import com.itsaky.androidide.editor.schemes.IDEColorSchemeProvider
 import com.itsaky.androidide.editor.ui.IDEEditor
 import com.itsaky.androidide.eventbus.events.editor.DocumentChangeEvent
@@ -68,7 +65,6 @@ import com.itsaky.androidide.models.OpenedFilesCache
 import com.itsaky.androidide.models.Range
 import com.itsaky.androidide.models.SaveResult
 import com.itsaky.androidide.preferences.internal.EditorPreferences
-import com.itsaky.androidide.preferences.internal.GeneralPreferences
 import com.itsaky.androidide.projects.internal.ProjectManagerImpl
 import com.itsaky.androidide.tasks.executeAsync
 import com.itsaky.androidide.ui.CodeEditorView
@@ -76,14 +72,14 @@ import com.itsaky.androidide.utils.DialogUtils.newYesNoDialog
 import com.itsaky.androidide.utils.IntentUtils.openImage
 import com.itsaky.androidide.utils.UniqueNameBuilder
 import com.itsaky.androidide.utils.flashSuccess
+import java.io.File
+import java.util.concurrent.atomic.AtomicBoolean
+import kotlin.collections.set
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
-import java.io.File
-import java.util.concurrent.atomic.AtomicBoolean
-import kotlin.collections.set
 
 /**
  * Base class for EditorActivity. Handles logic for working with file editors.
@@ -115,15 +111,15 @@ open class EditorHandlerActivity : ProjectHandlerActivity(), IEditorHandler {
     super.preDestroy()
     TSLanguageRegistry.instance.destroy()
     editorViewModel.removeAllFiles()
-    
   }
 
   override fun onCreate(savedInstanceState: Bundle?) {
     mBuildEventListener.setActivity(this)
     super.onCreate(savedInstanceState)
-    
-    editorViewModel._displayedFile.observe(
-      this) { this.content.editorContainer.displayedChild = it }
+
+    editorViewModel._displayedFile.observe(this) {
+      this.content.editorContainer.displayedChild = it
+    }
     editorViewModel._startDrawerOpened.observe(this) { opened ->
       this.binding.editorDrawerLayout.apply {
         if (opened) openDrawer(GravityCompat.START) else closeDrawer(GravityCompat.START)
@@ -136,12 +132,12 @@ open class EditorHandlerActivity : ProjectHandlerActivity(), IEditorHandler {
     editorViewModel.observeFiles(this) {
       // rewrite the cached files index if there are any opened files
       val currentFile =
-        getCurrentEditor()?.editor?.file?.absolutePath
-          ?: run {
-            editorViewModel.writeOpenedFiles(null)
-            editorViewModel.openedFilesCache = null
-            return@observeFiles
-          }
+          getCurrentEditor()?.editor?.file?.absolutePath
+              ?: run {
+                editorViewModel.writeOpenedFiles(null)
+                editorViewModel.openedFilesCache = null
+                return@observeFiles
+              }
       getOpenedFiles().also {
         val cache = OpenedFilesCache(currentFile, it)
         editorViewModel.writeOpenedFiles(cache)
@@ -156,44 +152,55 @@ open class EditorHandlerActivity : ProjectHandlerActivity(), IEditorHandler {
       TSLanguageRegistry.instance.register(LogLanguage.TS_TYPE, LogLanguage.FACTORY)
       TSLanguageRegistry.instance.register(JsonLanguage.TS_TYPE, JsonLanguage.FACTORY)
       TSLanguageRegistry.instance.register(TomlLanguage.TOML_TYPE, TomlLanguage.FACTORY)
-      
+
       // TSLanguageRegistry.instance.register(DartLanguage.TS_TYPE, DartLanguage.FACTORY)
       TSLanguageRegistry.instance.register(AidlLanguage.TS_TYPE, AidlLanguage.FACTORY)
       // TSLanguageRegistry.instance.register(SqliteLanguage.TS_TYPE, SqliteLanguage.FACTORY)
 
-
-      //TypeScript Language
-      // TSLanguageRegistry.instance.register(TypeScriptLanguage.TS_TYPE, TypeScriptLanguage.FACTORY)
-      // TSLanguageRegistry.instance.register(TypeScriptLanguage.TSX_TYPE, TypeScriptLanguage.TSX_FACTORY)
+      // TypeScript Language
+      // TSLanguageRegistry.instance.register(TypeScriptLanguage.TS_TYPE,
+      // TypeScriptLanguage.FACTORY)
+      // TSLanguageRegistry.instance.register(TypeScriptLanguage.TSX_TYPE,
+      // TypeScriptLanguage.TSX_FACTORY)
       // //reStructuredText Language
-      // TSLanguageRegistry.instance.register(reStructuredTextLanguage.TS_TYPE, reStructuredTextLanguage.FACTORY)
-      // TSLanguageRegistry.instance.register(reStructuredTextLanguage.TS_TYPE_REST, reStructuredTextLanguage.FACTORY)
-      //Markdown Language
-      // TSLanguageRegistry.instance.register(MarkdownLanguage.TS_TYPE_MD, MarkdownLanguage.FACTORY_BLOCK)
-      // TSLanguageRegistry.instance.register(MarkdownLanguage.EXT_MARKDOWN, MarkdownLanguage.FACTORY_BLOCK)
-      // TSLanguageRegistry.instance.register(MarkdownLanguage.EXT_MKD, MarkdownLanguage.FACTORY_BLOCK)
-      // TSLanguageRegistry.instance.register(MarkdownLanguage.EXT_MKDN, MarkdownLanguage.FACTORY_BLOCK)
-      // TSLanguageRegistry.instance.register(MarkdownLanguage.EXT_MDOWN, MarkdownLanguage.FACTORY_BLOCK)
-      // TSLanguageRegistry.instance.register(MarkdownLanguage.EXT_MDWN, MarkdownLanguage.FACTORY_BLOCK)
-      // TSLanguageRegistry.instance.register(MarkdownLanguage.EXT_MDTXT, MarkdownLanguage.FACTORY_BLOCK)
-      // TSLanguageRegistry.instance.register(MarkdownLanguage.TS_TYPE_INLINE, MarkdownLanguage.FACTORY_INLINE) //内联解析器 (Inline Parser)
-      
-      //Yaml Language
+      // TSLanguageRegistry.instance.register(reStructuredTextLanguage.TS_TYPE,
+      // reStructuredTextLanguage.FACTORY)
+      // TSLanguageRegistry.instance.register(reStructuredTextLanguage.TS_TYPE_REST,
+      // reStructuredTextLanguage.FACTORY)
+      // Markdown Language
+      // TSLanguageRegistry.instance.register(MarkdownLanguage.TS_TYPE_MD,
+      // MarkdownLanguage.FACTORY_BLOCK)
+      // TSLanguageRegistry.instance.register(MarkdownLanguage.EXT_MARKDOWN,
+      // MarkdownLanguage.FACTORY_BLOCK)
+      // TSLanguageRegistry.instance.register(MarkdownLanguage.EXT_MKD,
+      // MarkdownLanguage.FACTORY_BLOCK)
+      // TSLanguageRegistry.instance.register(MarkdownLanguage.EXT_MKDN,
+      // MarkdownLanguage.FACTORY_BLOCK)
+      // TSLanguageRegistry.instance.register(MarkdownLanguage.EXT_MDOWN,
+      // MarkdownLanguage.FACTORY_BLOCK)
+      // TSLanguageRegistry.instance.register(MarkdownLanguage.EXT_MDWN,
+      // MarkdownLanguage.FACTORY_BLOCK)
+      // TSLanguageRegistry.instance.register(MarkdownLanguage.EXT_MDTXT,
+      // MarkdownLanguage.FACTORY_BLOCK)
+      // TSLanguageRegistry.instance.register(MarkdownLanguage.TS_TYPE_INLINE,
+      // MarkdownLanguage.FACTORY_INLINE) //内联解析器 (Inline Parser)
+
+      // Yaml Language
       TSLanguageRegistry.instance.register(YamlLanguage.TS_TYPE, YamlLanguage.FACTORY)
       TSLanguageRegistry.instance.register(YamlLanguage.TS_TYPE_YML, YamlLanguage.FACTORY)
-      //Python Language
+      // Python Language
       // TSLanguageRegistry.instance.register(PythonLanguage.TS_TYPE, PythonLanguage.FACTORY)
       // TSLanguageRegistry.instance.register(PythonLanguage.TS_TYPE_PYW, PythonLanguage.FACTORY)
       // TSLanguageRegistry.instance.register(PythonLanguage.TS_TYPE_PYI, PythonLanguage.FACTORY)
       // TSLanguageRegistry.instance.register(PythonLanguage.TS_TYPE_PYS, PythonLanguage.FACTORY)
-      //xml language tree sitter
+      // xml language tree sitter
       TSLanguageRegistry.instance.register(XMLLanguage.TS_TYPE, XMLLanguage.FACTORY)
       TSLanguageRegistry.instance.register(XMLLanguage.TS_TYPE_QRC, XMLLanguage.FACTORY)
       TSLanguageRegistry.instance.register(XMLLanguage.TS_TYPE_UI, XMLLanguage.FACTORY)
       TSLanguageRegistry.instance.register(XMLLanguage.TS_TYPE_POML, XMLLanguage.FACTORY)
       TSLanguageRegistry.instance.register(XMLLanguage.TS_TYPE_KML, XMLLanguage.FACTORY)
       TSLanguageRegistry.instance.register(XMLLanguage.TS_TYPE_SVG, XMLLanguage.FACTORY)
-       //C++ language tree sitter
+      // C++ language tree sitter
       TSLanguageRegistry.instance.register(CppLang.TS_TYPE_CPP, CppLang.FACTORY)
       TSLanguageRegistry.instance.register(CppLang.TS_TYPE_C, CppLang.FACTORY)
       TSLanguageRegistry.instance.register(CppLang.TS_TYPE_H_small, CppLang.FACTORY)
@@ -212,23 +219,29 @@ open class EditorHandlerActivity : ProjectHandlerActivity(), IEditorHandler {
       TSLanguageRegistry.instance.register(CppLang.TS_TYPE_HIN, CppLang.FACTORY)
       TSLanguageRegistry.instance.register(CppLang.TS_TYPE_HXXIN, CppLang.FACTORY)
       TSLanguageRegistry.instance.register(CppLang.TS_TYPE_CXXIN, CppLang.FACTORY)
-       //C language tree sitter
+      // C language tree sitter
       TSLanguageRegistry.instance.register(CLang.TS_TYPE_C, CLang.FACTORY)
       TSLanguageRegistry.instance.register(CLang.TS_TYPE_M_small, CLang.FACTORY)
       TSLanguageRegistry.instance.register(CLang.TS_TYPE_M_CAPITAL_LETTERS, CLang.FACTORY)
-      //cmake language tree sitter
+      // cmake language tree sitter
       TSLanguageRegistry.instance.register(CmakeLanguage.TS_TYPE, CmakeLanguage.FACTORY)
       TSLanguageRegistry.instance.register(CmakeLanguage.TS_TYPE_CMAKE_IN, CmakeLanguage.FACTORY)
       TSLanguageRegistry.instance.register(CmakeLanguage.TS_TYPE_CMAKE_CTEST, CmakeLanguage.FACTORY)
       TSLanguageRegistry.instance.register(CmakeLanguage.TS_TYPE_CMAKE_CPACK, CmakeLanguage.FACTORY)
       TSLanguageRegistry.instance.register(CmakeLanguage.TS_TYPE_CMAKE_CBPS, CmakeLanguage.FACTORY)
-      TSLanguageRegistry.instance.register(CmakeLanguage.TS_TYPE_CMAKE_CMLISTSTXT, CmakeLanguage.FACTORY)
-      TSLanguageRegistry.instance.register(CmakeLanguage.TS_TYPE_CMAKE_CMCACHE, CmakeLanguage.FACTORY)
-      
+      TSLanguageRegistry.instance.register(
+          CmakeLanguage.TS_TYPE_CMAKE_CMLISTSTXT,
+          CmakeLanguage.FACTORY,
+      )
+      TSLanguageRegistry.instance.register(
+          CmakeLanguage.TS_TYPE_CMAKE_CMCACHE,
+          CmakeLanguage.FACTORY,
+      )
+
       IDEColorSchemeProvider.initIfNeeded()
     }
   }
-        
+
   override fun onPause() {
     super.onPause()
 
@@ -278,9 +291,7 @@ open class EditorHandlerActivity : ProjectHandlerActivity(), IEditorHandler {
 
   private fun onReadOpenedFilesCache(cache: OpenedFilesCache?) {
     cache ?: return
-    cache.allFiles.forEach { file ->
-      openFile(File(file.filePath), file.selection)
-    }
+    cache.allFiles.forEach { file -> openFile(File(file.filePath), file.selection) }
     openFile(File(cache.selectedFile))
   }
 
@@ -311,18 +322,20 @@ open class EditorHandlerActivity : ProjectHandlerActivity(), IEditorHandler {
         item.isEnabled = action.enabled
         item.title = action.label
 
-        item.icon = action.icon?.apply {
-          colorFilter = action.createColorFilter(data)
-          alpha = if (action.enabled) 255 else 76
-        }
+        item.icon =
+            action.icon?.apply {
+              colorFilter = action.createColorFilter(data)
+              alpha = if (action.enabled) 255 else 76
+            }
 
         var showAsAction = action.getShowAsActionFlags(data)
         if (showAsAction == -1) {
-          showAsAction = if (action.icon != null) {
-            MenuItem.SHOW_AS_ACTION_IF_ROOM
-          } else {
-            MenuItem.SHOW_AS_ACTION_NEVER
-          }
+          showAsAction =
+              if (action.icon != null) {
+                MenuItem.SHOW_AS_ACTION_IF_ROOM
+              } else {
+                MenuItem.SHOW_AS_ACTION_NEVER
+              }
         }
 
         if (!action.enabled) {
@@ -455,11 +468,11 @@ open class EditorHandlerActivity : ProjectHandlerActivity(), IEditorHandler {
   }
 
   override fun saveAllAsync(
-    notify: Boolean,
-    requestSync: Boolean,
-    processResources: Boolean,
-    progressConsumer: ((Int, Int) -> Unit)?,
-    runAfter: (() -> Unit)?
+      notify: Boolean,
+      requestSync: Boolean,
+      processResources: Boolean,
+      progressConsumer: ((Int, Int) -> Unit)?,
+      runAfter: (() -> Unit)?,
   ) {
     editorActivityScope.launch {
       saveAll(notify, requestSync, processResources, progressConsumer)
@@ -468,10 +481,10 @@ open class EditorHandlerActivity : ProjectHandlerActivity(), IEditorHandler {
   }
 
   override suspend fun saveAll(
-    notify: Boolean,
-    requestSync: Boolean,
-    processResources: Boolean,
-    progressConsumer: ((Int, Int) -> Unit)?
+      notify: Boolean,
+      requestSync: Boolean,
+      processResources: Boolean,
+      progressConsumer: ((Int, Int) -> Unit)?,
   ): Boolean {
     val result = saveAllResult(progressConsumer)
 
@@ -508,15 +521,10 @@ open class EditorHandlerActivity : ProjectHandlerActivity(), IEditorHandler {
   }
 
   override suspend fun saveResult(index: Int, result: SaveResult) {
-    performFileSave {
-      saveResultInternal(index, result)
-    }
+    performFileSave { saveResultInternal(index, result) }
   }
 
-  private suspend fun saveResultInternal(
-    index: Int,
-    result: SaveResult
-  ) : Boolean {
+  private suspend fun saveResultInternal(index: Int, result: SaveResult): Boolean {
     if (index < 0 || index >= editorViewModel.getOpenedFileCount()) {
       return false
     }
@@ -559,18 +567,15 @@ open class EditorHandlerActivity : ProjectHandlerActivity(), IEditorHandler {
     return true
   }
 
-  private fun hasUnsavedFiles() = editorViewModel.getOpenedFiles().any { file ->
-    getEditorForFile(file)?.isModified == true
-  }
-  
-  /**
-   * Central method to check if any open editor has modifications and update the ViewModel.
-   */
+  private fun hasUnsavedFiles() =
+      editorViewModel.getOpenedFiles().any { file -> getEditorForFile(file)?.isModified == true }
+
+  /** Central method to check if any open editor has modifications and update the ViewModel. */
   private fun updateModificationState() {
-      editorViewModel.areFilesModified = hasUnsavedFiles()
+    editorViewModel.areFilesModified = hasUnsavedFiles()
   }
 
-  private suspend inline fun <T : Any?> performFileSave(crossinline action: suspend () -> T) : T {
+  private suspend inline fun <T : Any?> performFileSave(crossinline action: suspend () -> T): T {
     setFilesSaving(true)
     try {
       return action()
@@ -580,9 +585,7 @@ open class EditorHandlerActivity : ProjectHandlerActivity(), IEditorHandler {
   }
 
   private suspend fun setFilesSaving(saving: Boolean) {
-    withContext(Dispatchers.Main.immediate) {
-      editorViewModel.areFilesSaving = saving
-    }
+    withContext(Dispatchers.Main.immediate) { editorViewModel.areFilesSaving = saving }
   }
 
   override fun areFilesModified(): Boolean {
@@ -605,15 +608,11 @@ open class EditorHandlerActivity : ProjectHandlerActivity(), IEditorHandler {
     val editor = getEditorAtIndex(index)
     if (editor?.isModified == true) {
       log.info("File has been modified: {}", opened)
-      notifyFilesUnsaved(listOf(editor)) {
-        closeFile(index, runAfter)
-      }
+      notifyFilesUnsaved(listOf(editor)) { closeFile(index, runAfter) }
       return
     }
 
-    editor?.close() ?: run {
-      log.error("Cannot save file before close. Editor instance is null")
-    }
+    editor?.close() ?: run { log.error("Cannot save file before close. Editor instance is null") }
 
     editorViewModel.removeFile(index)
     content.apply {
@@ -633,8 +632,9 @@ open class EditorHandlerActivity : ProjectHandlerActivity(), IEditorHandler {
     }
 
     val unsavedFiles =
-      editorViewModel.getOpenedFiles().map(::getEditorForFile)
-        .filter { it != null && it.isModified }
+        editorViewModel.getOpenedFiles().map(::getEditorForFile).filter {
+          it != null && it.isModified
+        }
 
     if (unsavedFiles.isNotEmpty()) {
       notifyFilesUnsaved(unsavedFiles) { closeOthers() }
@@ -667,8 +667,9 @@ open class EditorHandlerActivity : ProjectHandlerActivity(), IEditorHandler {
   override fun closeAll(runAfter: () -> Unit) {
     val count = editorViewModel.getOpenedFileCount()
     val unsavedFiles =
-      editorViewModel.getOpenedFiles().map(this::getEditorForFile)
-        .filter { it != null && it.isModified }
+        editorViewModel.getOpenedFiles().map(this::getEditorForFile).filter {
+          it != null && it.isModified
+        }
 
     if (unsavedFiles.isNotEmpty()) {
       // There are unsaved files
@@ -678,9 +679,7 @@ open class EditorHandlerActivity : ProjectHandlerActivity(), IEditorHandler {
 
     // Files were already saved, close all files one by one
     for (i in 0 until count) {
-      getEditorAtIndex(i)?.close() ?: run {
-        log.error("Unable to close file at index {}", i)
-      }
+      getEditorAtIndex(i)?.close() ?: run { log.error("Unable to close file at index {}", i) }
     }
 
     editorViewModel.removeAllFiles()
@@ -694,10 +693,10 @@ open class EditorHandlerActivity : ProjectHandlerActivity(), IEditorHandler {
   }
 
   override fun getOpenedFiles() =
-    editorViewModel.getOpenedFiles().mapNotNull {
-      val editor = getEditorForFile(it)?.editor ?: return@mapNotNull null
-      OpenedFile(it.absolutePath, editor.cursorLSPRange)
-    }
+      editorViewModel.getOpenedFiles().mapNotNull {
+        val editor = getEditorForFile(it)?.editor ?: return@mapNotNull null
+        OpenedFile(it.absolutePath, editor.cursorLSPRange)
+      }
 
   private fun notifyFilesUnsaved(unsavedEditors: List<CodeEditorView?>, invokeAfter: Runnable) {
     if (isDestroying) {
@@ -712,22 +711,22 @@ open class EditorHandlerActivity : ProjectHandlerActivity(), IEditorHandler {
 
     val mapped = unsavedEditors.mapNotNull { it?.file?.absolutePath }
     val builder =
-      newYesNoDialog(
-        context = this,
-        title = getString(string.title_files_unsaved),
-        message = getString(string.msg_files_unsaved, TextUtils.join("\n", mapped)),
-        positiveClickListener = { dialog, _ ->
+        newYesNoDialog(
+            context = this,
+            title = getString(string.title_files_unsaved),
+            message = getString(string.msg_files_unsaved, TextUtils.join("\n", mapped)),
+            positiveClickListener = { dialog, _ ->
+              dialog.dismiss()
+              saveAllAsync(notify = true, runAfter = { runOnUiThread(invokeAfter) })
+            },
+        ) { dialog, _ ->
           dialog.dismiss()
-          saveAllAsync(notify = true, runAfter = { runOnUiThread(invokeAfter) })
+          // Mark all the files as saved, then try to close them all
+          for (editor in unsavedEditors) {
+            editor?.markAsSaved()
+          }
+          invokeAfter.run()
         }
-      ) { dialog, _ ->
-        dialog.dismiss()
-        // Mark all the files as saved, then try to close them all
-        for (editor in unsavedEditors) {
-          editor?.markAsSaved()
-        }
-        invokeAfter.run()
-      }
     builder.show()
   }
 
@@ -757,18 +756,18 @@ open class EditorHandlerActivity : ProjectHandlerActivity(), IEditorHandler {
 
     val tab = content.tabs.getTabAt(index)!!
     val editorView = getEditorAtIndex(index)
-    
+
     // Update the tab's text based on the new isModified state
     if (editorView?.isModified == true) {
-        if (tab.text?.startsWith('*') == false) {
-            tab.text = "*${tab.text}"
-        }
+      if (tab.text?.startsWith('*') == false) {
+        tab.text = "*${tab.text}"
+      }
     } else {
-        if (tab.text?.startsWith('*') == true) {
-            tab.text = tab.text!!.substring(startIndex = 1)
-        }
+      if (tab.text?.startsWith('*') == true) {
+        tab.text = tab.text!!.substring(startIndex = 1)
+      }
     }
-}
+  }
 
   @Subscribe(threadMode = ThreadMode.MAIN)
   fun onDocumentSaved(event: DocumentSaveEvent) {
@@ -782,14 +781,16 @@ open class EditorHandlerActivity : ProjectHandlerActivity(), IEditorHandler {
   override fun onBasePreferenceChanged(event: PreferenceChangeEvent) {
     // Delegate to BaseIDEActivity first for Theme handling
     super.onBasePreferenceChanged(event)
-    
+
     // Handle Editor specific preferences here
     when (event.key) {
-        EditorPreferences.AUTO_SAVE_ENABLED,
-        EditorPreferences.AUTO_SAVE_DELAY_VALUE,
-        EditorPreferences.AUTO_SAVE_DELAY_UNIT -> {
-             log.debug("Activity received Auto-Save Preference change: Key=${event.key}, Value=${event.value}")
-        }
+      EditorPreferences.AUTO_SAVE_ENABLED,
+      EditorPreferences.AUTO_SAVE_DELAY_VALUE,
+      EditorPreferences.AUTO_SAVE_DELAY_UNIT -> {
+        log.debug(
+            "Activity received Auto-Save Preference change: Key=${event.key}, Value=${event.value}"
+        )
+      }
     }
   }
 
@@ -799,11 +800,11 @@ open class EditorHandlerActivity : ProjectHandlerActivity(), IEditorHandler {
     if (index == -1) return
     val tab = content.tabs.getTabAt(index) ?: return
     val editorView = getEditorAtIndex(index)
-    
+
     if (editorView?.isModified == true) {
-        if (tab.text?.startsWith('*') == false) {
-            tab.text = "*${tab.text}"
-        }
+      if (tab.text?.startsWith('*') == false) {
+        tab.text = "*${tab.text}"
+      }
     }
   }
 
@@ -814,7 +815,7 @@ open class EditorHandlerActivity : ProjectHandlerActivity(), IEditorHandler {
     val tab = content.tabs.getTabAt(index) ?: return
 
     if (tab.text?.startsWith('*') == true) {
-        tab.text = tab.text!!.substring(startIndex = 1)
+      tab.text = tab.text!!.substring(startIndex = 1)
     }
   }
 

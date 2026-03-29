@@ -58,7 +58,6 @@ import kotlin.math.pow
  * The default indicator for Compose pull-to-refresh, based on Android's SwipeRefreshLayout.
  *
  * @sample androidx.compose.material.samples.PullRefreshSample
- *
  * @param isRefreshing A boolean representing whether a refresh is occurring.
  * @param state The [PullRefreshState] which controls where and how the indicator will be drawn.
  * @param modifier Modifiers for the indicator.
@@ -77,89 +76,89 @@ fun PullRefreshIndicator(
     contentColor: Color = contentColorFor(backgroundColor),
     scale: Boolean = false,
 ) {
-    val showElevation by remember(isRefreshing, state) {
-        derivedStateOf { isRefreshing || state.position > 0.5f }
-    }
+  val showElevation by
+      remember(isRefreshing, state) { derivedStateOf { isRefreshing || state.position > 0.5f } }
 
-    Box(
-        modifier = modifier
-            .size(IndicatorSize)
-            .pullRefreshIndicatorTransform(state, scale)
-            .shadow(if (showElevation) Elevation else 0.dp, SpinnerShape, clip = true)
-            .background(color = surfaceColorAtElevation(color = backgroundColor, elevation = Elevation), shape = SpinnerShape),
-    ) {
-        Crossfade(
-            targetState = isRefreshing,
-            animationSpec = tween(durationMillis = CrossfadeDurationMs),
-        ) { isRefreshing ->
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center,
-            ) {
-                val spinnerSize = (ArcRadius + StrokeWidth).times(2)
+  Box(
+      modifier =
+          modifier
+              .size(IndicatorSize)
+              .pullRefreshIndicatorTransform(state, scale)
+              .shadow(if (showElevation) Elevation else 0.dp, SpinnerShape, clip = true)
+              .background(
+                  color = surfaceColorAtElevation(color = backgroundColor, elevation = Elevation),
+                  shape = SpinnerShape,
+              ),
+  ) {
+    Crossfade(
+        targetState = isRefreshing,
+        animationSpec = tween(durationMillis = CrossfadeDurationMs),
+    ) { isRefreshing ->
+      Box(
+          modifier = Modifier.fillMaxSize(),
+          contentAlignment = Alignment.Center,
+      ) {
+        val spinnerSize = (ArcRadius + StrokeWidth).times(2)
 
-                if (isRefreshing) {
-                    CircularProgressIndicator(
-                        color = contentColor,
-                        strokeWidth = StrokeWidth,
-                        modifier = Modifier.size(spinnerSize),
-                    )
-                } else {
-                    CircularArrowIndicator(state, contentColor, Modifier.size(spinnerSize))
-                }
-            }
+        if (isRefreshing) {
+          CircularProgressIndicator(
+              color = contentColor,
+              strokeWidth = StrokeWidth,
+              modifier = Modifier.size(spinnerSize),
+          )
+        } else {
+          CircularArrowIndicator(state, contentColor, Modifier.size(spinnerSize))
         }
+      }
     }
+  }
 }
 
-/**
- * Modifier.size MUST be specified.
- */
+/** Modifier.size MUST be specified. */
 @Composable
 private fun CircularArrowIndicator(
     state: PullRefreshState,
     color: Color,
     modifier: Modifier,
 ) {
-    val path = remember { Path().apply { fillType = PathFillType.EvenOdd } }
+  val path = remember { Path().apply { fillType = PathFillType.EvenOdd } }
 
-    val targetAlpha by remember(state) {
-        derivedStateOf {
-            if (state.progress >= 1f) MaxAlpha else MinAlpha
-        }
+  val targetAlpha by
+      remember(state) { derivedStateOf { if (state.progress >= 1f) MaxAlpha else MinAlpha } }
+
+  val alphaState = animateFloatAsState(targetValue = targetAlpha, animationSpec = AlphaTween)
+
+  // Empty semantics for tests
+  Canvas(modifier.semantics {}) {
+    val values = ArrowValues(state.progress)
+    val alpha = alphaState.value
+
+    rotate(degrees = values.rotation) {
+      val arcRadius = ArcRadius.toPx() + StrokeWidth.toPx() / 2f
+      val arcBounds =
+          Rect(
+              size.center.x - arcRadius,
+              size.center.y - arcRadius,
+              size.center.x + arcRadius,
+              size.center.y + arcRadius,
+          )
+      drawArc(
+          color = color,
+          alpha = alpha,
+          startAngle = values.startAngle,
+          sweepAngle = values.endAngle - values.startAngle,
+          useCenter = false,
+          topLeft = arcBounds.topLeft,
+          size = arcBounds.size,
+          style =
+              Stroke(
+                  width = StrokeWidth.toPx(),
+                  cap = StrokeCap.Square,
+              ),
+      )
+      drawArrow(path, arcBounds, color, alpha, values)
     }
-
-    val alphaState = animateFloatAsState(targetValue = targetAlpha, animationSpec = AlphaTween)
-
-    // Empty semantics for tests
-    Canvas(modifier.semantics {}) {
-        val values = ArrowValues(state.progress)
-        val alpha = alphaState.value
-
-        rotate(degrees = values.rotation) {
-            val arcRadius = ArcRadius.toPx() + StrokeWidth.toPx() / 2f
-            val arcBounds = Rect(
-                size.center.x - arcRadius,
-                size.center.y - arcRadius,
-                size.center.x + arcRadius,
-                size.center.y + arcRadius,
-            )
-            drawArc(
-                color = color,
-                alpha = alpha,
-                startAngle = values.startAngle,
-                sweepAngle = values.endAngle - values.startAngle,
-                useCenter = false,
-                topLeft = arcBounds.topLeft,
-                size = arcBounds.size,
-                style = Stroke(
-                    width = StrokeWidth.toPx(),
-                    cap = StrokeCap.Square,
-                ),
-            )
-            drawArrow(path, arcBounds, color, alpha, values)
-        }
-    }
+  }
 }
 
 @Immutable
@@ -171,23 +170,23 @@ private class ArrowValues(
 )
 
 private fun ArrowValues(progress: Float): ArrowValues {
-    // Discard first 40% of progress. Scale remaining progress to full range between 0 and 100%.
-    val adjustedPercent = max(min(1f, progress) - 0.4f, 0f) * 5 / 3
-    // How far beyond the threshold pull has gone, as a percentage of the threshold.
-    val overshootPercent = abs(progress) - 1.0f
-    // Limit the overshoot to 200%. Linear between 0 and 200.
-    val linearTension = overshootPercent.coerceIn(0f, 2f)
-    // Non-linear tension. Increases with linearTension, but at a decreasing rate.
-    val tensionPercent = linearTension - linearTension.pow(2) / 4
+  // Discard first 40% of progress. Scale remaining progress to full range between 0 and 100%.
+  val adjustedPercent = max(min(1f, progress) - 0.4f, 0f) * 5 / 3
+  // How far beyond the threshold pull has gone, as a percentage of the threshold.
+  val overshootPercent = abs(progress) - 1.0f
+  // Limit the overshoot to 200%. Linear between 0 and 200.
+  val linearTension = overshootPercent.coerceIn(0f, 2f)
+  // Non-linear tension. Increases with linearTension, but at a decreasing rate.
+  val tensionPercent = linearTension - linearTension.pow(2) / 4
 
-    // Calculations based on SwipeRefreshLayout specification.
-    val endTrim = adjustedPercent * MaxProgressArc
-    val rotation = (-0.25f + 0.4f * adjustedPercent + tensionPercent) * 0.5f
-    val startAngle = rotation * 360
-    val endAngle = (rotation + endTrim) * 360
-    val scale = min(1f, adjustedPercent)
+  // Calculations based on SwipeRefreshLayout specification.
+  val endTrim = adjustedPercent * MaxProgressArc
+  val rotation = (-0.25f + 0.4f * adjustedPercent + tensionPercent) * 0.5f
+  val startAngle = rotation * 360
+  val endAngle = (rotation + endTrim) * 360
+  val scale = min(1f, adjustedPercent)
 
-    return ArrowValues(rotation, startAngle, endAngle, scale)
+  return ArrowValues(rotation, startAngle, endAngle, scale)
 }
 
 private fun DrawScope.drawArrow(
@@ -197,28 +196,26 @@ private fun DrawScope.drawArrow(
     alpha: Float,
     values: ArrowValues,
 ) {
-    arrow.reset()
-    arrow.moveTo(0f, 0f) // Move to left corner
-    arrow.lineTo(x = ArrowWidth.toPx() * values.scale, y = 0f) // Line to right corner
+  arrow.reset()
+  arrow.moveTo(0f, 0f) // Move to left corner
+  arrow.lineTo(x = ArrowWidth.toPx() * values.scale, y = 0f) // Line to right corner
 
-    // Line to tip of arrow
-    arrow.lineTo(
-        x = ArrowWidth.toPx() * values.scale / 2,
-        y = ArrowHeight.toPx() * values.scale,
-    )
+  // Line to tip of arrow
+  arrow.lineTo(
+      x = ArrowWidth.toPx() * values.scale / 2,
+      y = ArrowHeight.toPx() * values.scale,
+  )
 
-    val radius = min(bounds.width, bounds.height) / 2f
-    val inset = ArrowWidth.toPx() * values.scale / 2f
-    arrow.translate(
-        Offset(
-            x = radius + bounds.center.x - inset,
-            y = bounds.center.y + StrokeWidth.toPx() / 2f,
-        ),
-    )
-    arrow.close()
-    rotate(degrees = values.endAngle) {
-        drawPath(path = arrow, color = color, alpha = alpha)
-    }
+  val radius = min(bounds.width, bounds.height) / 2f
+  val inset = ArrowWidth.toPx() * values.scale / 2f
+  arrow.translate(
+      Offset(
+          x = radius + bounds.center.x - inset,
+          y = bounds.center.y + StrokeWidth.toPx() / 2f,
+      ),
+  )
+  arrow.close()
+  rotate(degrees = values.endAngle) { drawPath(path = arrow, color = color, alpha = alpha) }
 }
 
 private const val CrossfadeDurationMs = 100

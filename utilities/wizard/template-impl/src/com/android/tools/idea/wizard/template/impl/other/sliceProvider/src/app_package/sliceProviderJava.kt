@@ -17,7 +17,7 @@
 package com.android.tools.idea.wizard.template.impl.other.sliceProvider.src.app_package
 
 fun sliceProviderJava(className: String, packageName: String, pathPrefix: String) =
-  """
+    """
 package ${packageName};
 
 import android.content.ContentResolver;

@@ -78,6 +78,9 @@ import com.github.javaparser.printer.configuration.DefaultPrinterConfiguration
 import com.github.javaparser.printer.configuration.PrinterConfiguration
 import com.itsaky.androidide.lsp.java.utils.TypeUtils.toType
 import com.itsaky.androidide.lsp.java.visitors.PrettyPrintingVisitor
+import java.util.function.Predicate
+import java.util.stream.IntStream
+import java.util.stream.Stream
 import jdkx.lang.model.element.ExecutableElement
 import jdkx.lang.model.element.Modifier
 import jdkx.lang.model.element.TypeParameterElement
@@ -86,6 +89,7 @@ import jdkx.lang.model.type.ExecutableType
 import jdkx.lang.model.type.TypeKind
 import jdkx.lang.model.type.TypeMirror
 import jdkx.lang.model.type.TypeVariable
+import kotlin.jvm.optionals.getOrNull
 import openjdk.source.tree.AnnotationTree
 import openjdk.source.tree.AssignmentTree
 import openjdk.source.tree.BlockTree
@@ -106,10 +110,6 @@ import openjdk.source.tree.Tree
 import openjdk.source.tree.TypeParameterTree
 import openjdk.source.tree.VariableTree
 import org.jetbrains.annotations.Contract
-import java.util.function.Predicate
-import java.util.stream.IntStream
-import java.util.stream.Stream
-import kotlin.jvm.optionals.getOrNull
 
 object JavaParserUtils {
 
@@ -124,9 +124,9 @@ object JavaParserUtils {
     val returnType = type.returnType
     if (returnType != null) {
       if (
-        returnType.kind != TypeKind.VOID &&
-        returnType.kind != TypeKind.TYPEVAR &&
-        !returnType.kind.isPrimitive
+          returnType.kind != TypeKind.VOID &&
+              returnType.kind != TypeKind.TYPEVAR &&
+              !returnType.kind.isPrimitive
       ) {
         val fqn = getTypeToImport(returnType)
         if (fqn != null) {
@@ -171,9 +171,9 @@ object JavaParserUtils {
   }
 
   fun printMethod(
-    method: ExecutableElement,
-    parameterizedType: ExecutableType?,
-    source: MethodTree,
+      method: ExecutableElement,
+      parameterizedType: ExecutableType?,
+      source: MethodTree,
   ): MethodDeclaration {
     val methodDeclaration: MethodDeclaration = toMethodDeclaration(source, parameterizedType)
     printMethodInternal(methodDeclaration, method)
@@ -181,9 +181,9 @@ object JavaParserUtils {
   }
 
   fun printMethod(
-    method: ExecutableElement?,
-    parameterizedType: ExecutableType?,
-    source: ExecutableElement,
+      method: ExecutableElement?,
+      parameterizedType: ExecutableType?,
+      source: ExecutableElement,
   ): MethodDeclaration {
     val methodDeclaration: MethodDeclaration = toMethodDeclaration(method, parameterizedType)
     printMethodInternal(methodDeclaration, source)
@@ -191,8 +191,8 @@ object JavaParserUtils {
   }
 
   private fun printMethodInternal(
-    methodDeclaration: MethodDeclaration,
-    method: ExecutableElement,
+      methodDeclaration: MethodDeclaration,
+      method: ExecutableElement,
   ) {
     methodDeclaration.addMarkerAnnotation(Override::class.java)
     val recentlyNonNull = methodDeclaration.getAnnotationByName("RecentlyNonNull")
@@ -215,10 +215,10 @@ object JavaParserUtils {
       val methodCallExpr = MethodCallExpr()
       methodCallExpr.name = methodDeclaration.name
       methodCallExpr.arguments =
-        methodDeclaration.parameters
-          .stream()
-          .map { obj: Parameter -> obj.nameAsExpression }
-          .collect(NodeList.toNodeList())
+          methodDeclaration.parameters
+              .stream()
+              .map { obj: Parameter -> obj.nameAsExpression }
+              .collect(NodeList.toNodeList())
       methodCallExpr.setScope(SuperExpr())
       if (methodDeclaration.type.isVoidType) {
         blockStmt.addStatement(methodCallExpr)
@@ -252,10 +252,10 @@ object JavaParserUtils {
       compilationUnit.addImport(toImportDeclaration(importTree!!))
     }
     compilationUnit.types =
-      tree.typeDecls
-        .stream()
-        .map { toClassOrInterfaceDeclaration(it) }
-        .collect(NodeList.toNodeList())
+        tree.typeDecls
+            .stream()
+            .map { toClassOrInterfaceDeclaration(it) }
+            .collect(NodeList.toNodeList())
     return compilationUnit
   }
 
@@ -281,7 +281,7 @@ object JavaParserUtils {
   fun toBlockStatement(tree: BlockTree): BlockStmt {
     val blockStmt = BlockStmt()
     blockStmt.statements =
-      tree.statements.stream().map { toStatement(it) }.collect(NodeList.toNodeList())
+        tree.statements.stream().map { toStatement(it) }.collect(NodeList.toNodeList())
     return blockStmt
   }
 
@@ -336,7 +336,7 @@ object JavaParserUtils {
   fun toVariableDeclarationExpression(tree: VariableTree): ExpressionStmt {
     val expr = VariableDeclarationExpr()
     expr.modifiers =
-      tree.modifiers.flags.stream().map { toModifier(it) }.collect(NodeList.toNodeList())
+        tree.modifiers.flags.stream().map { toModifier(it) }.collect(NodeList.toNodeList())
     val declarator = VariableDeclarator()
     declarator.setName(tree.name.toString())
     declarator.setInitializer(toExpression(tree.initializer))
@@ -384,7 +384,7 @@ object JavaParserUtils {
     }
     expr.arguments = tree.arguments.stream().map { toExpression(it) }.collect(NodeList.toNodeList())
     expr.setTypeArguments(
-      tree.typeArguments.stream().map { toType(it) }.collect(NodeList.toNodeList())
+        tree.typeArguments.stream().map { toType(it) }.collect(NodeList.toNodeList())
     )
     if (tree.methodSelect is IdentifierTree) {
       expr.name = toNameExpr((tree.methodSelect as IdentifierTree)).name
@@ -403,20 +403,20 @@ object JavaParserUtils {
     val declaration = ClassOrInterfaceDeclaration()
     declaration.setName(tree.simpleName.toString())
     declaration.extendedTypes =
-      NodeList.nodeList(TypeUtils.toClassOrInterfaceType(tree.extendsClause))
+        NodeList.nodeList(TypeUtils.toClassOrInterfaceType(tree.extendsClause))
     declaration.typeParameters =
-      tree.typeParameters.stream().map { toTypeParameter(it) }.collect(NodeList.toNodeList())
+        tree.typeParameters.stream().map { toTypeParameter(it) }.collect(NodeList.toNodeList())
     declaration.typeParameters =
-      tree.typeParameters.stream().map { toTypeParameter(it) }.collect(NodeList.toNodeList())
+        tree.typeParameters.stream().map { toTypeParameter(it) }.collect(NodeList.toNodeList())
     declaration.implementedTypes =
-      tree.implementsClause
-        .stream()
-        .map { TypeUtils.toClassOrInterfaceType(it) }
-        .collect(NodeList.toNodeList())
+        tree.implementsClause
+            .stream()
+            .map { TypeUtils.toClassOrInterfaceType(it) }
+            .collect(NodeList.toNodeList())
     declaration.modifiers =
-      tree.modifiers.flags.stream().map { toModifier(it) }.collect(NodeList.toNodeList())
+        tree.modifiers.flags.stream().map { toModifier(it) }.collect(NodeList.toNodeList())
     declaration.members =
-      tree.members.stream().map { toBodyDeclaration(it) }.collect(NodeList.toNodeList())
+        tree.members.stream().map { toBodyDeclaration(it) }.collect(NodeList.toNodeList())
     return declaration
   }
 
@@ -432,7 +432,7 @@ object JavaParserUtils {
   fun toFieldDeclaration(tree: VariableTree): FieldDeclaration {
     val declaration = FieldDeclaration()
     declaration.modifiers =
-      tree.modifiers.flags.stream().map { toModifier(it) }.collect(NodeList.toNodeList())
+        tree.modifiers.flags.stream().map { toModifier(it) }.collect(NodeList.toNodeList())
     val declarator = VariableDeclarator()
     declarator.setName(tree.name.toString())
     val initializer = toExpression(tree.initializer)
@@ -450,34 +450,37 @@ object JavaParserUtils {
   fun toMethodDeclaration(method: MethodTree, type: ExecutableType?): MethodDeclaration {
     val methodDeclaration = MethodDeclaration()
     methodDeclaration.annotations =
-      method.modifiers.annotations.stream().map { toAnnotation(it) }.collect(NodeList.toNodeList())
+        method.modifiers.annotations
+            .stream()
+            .map { toAnnotation(it) }
+            .collect(NodeList.toNodeList())
     methodDeclaration.setName(method.name.toString())
     val returnType =
-      if (type != null) {
-        toType(type.returnType)
-      } else {
-        toType(method.returnType)
-      }
+        if (type != null) {
+          toType(type.returnType)
+        } else {
+          toType(method.returnType)
+        }
     if (returnType != null) {
       methodDeclaration.type = getTypeWithoutBounds(returnType)
     }
     methodDeclaration.modifiers =
-      method.modifiers.flags.stream().map { toModifier(it) }.collect(NodeList.toNodeList())
+        method.modifiers.flags.stream().map { toModifier(it) }.collect(NodeList.toNodeList())
     methodDeclaration.parameters =
-      method.parameters
-        .map { variable ->
-          return@map toParameter(variable).also { param ->
-            val firstType = getTypeWithoutBounds(param.type)
-            param.type = firstType
-          }
-        }
-        .toNodeList()
+        method.parameters
+            .map { variable ->
+              return@map toParameter(variable).also { param ->
+                val firstType = getTypeWithoutBounds(param.type)
+                param.type = firstType
+              }
+            }
+            .toNodeList()
     methodDeclaration.typeParameters =
-      method.typeParameters
-        .mapNotNull {
-          return@mapNotNull toType(it as Tree?)?.toTypeParameter()?.getOrNull()
-        }
-        .toNodeList()
+        method.typeParameters
+            .mapNotNull {
+              return@mapNotNull toType(it as Tree?)?.toTypeParameter()?.getOrNull()
+            }
+            .toNodeList()
     if (method.body != null) {
       methodDeclaration.setBody(toBlockStatement(method.body))
     }
@@ -502,17 +505,17 @@ object JavaParserUtils {
     val expr = NormalAnnotationExpr()
     expr.setName(toType(tree.annotationType).toString())
     expr.pairs =
-      tree.arguments
-        .map {
-          return@map if (it is AssignmentTree) {
-            val assignExpr = toAssignExpression((it as AssignmentTree?)!!)
-            val pair = MemberValuePair()
-            pair.setName(assignExpr.target.toString())
-            pair.value = assignExpr.value
-            pair
-          } else null
-        }
-        .toNodeList()
+        tree.arguments
+            .map {
+              return@map if (it is AssignmentTree) {
+                val assignExpr = toAssignExpression((it as AssignmentTree?)!!)
+                val pair = MemberValuePair()
+                pair.setName(assignExpr.target.toString())
+                pair.value = assignExpr.value
+                pair
+              } else null
+            }
+            .toNodeList()
     return expr
   }
 
@@ -551,37 +554,37 @@ object JavaParserUtils {
   fun toMethodDeclaration(method: ExecutableElement?, type: ExecutableType?): MethodDeclaration {
     val methodDeclaration = MethodDeclaration()
     val returnType =
-      if (type != null) {
-        toType(type.returnType)
-      } else {
-        toType(method!!.returnType)
-      }
+        if (type != null) {
+          toType(type.returnType)
+        } else {
+          toType(method!!.returnType)
+        }
     if (returnType != null) {
       methodDeclaration.type = getTypeWithoutBounds(returnType)
     }
     methodDeclaration.isDefault = method!!.isDefault
     methodDeclaration.setName(method.simpleName.toString())
     methodDeclaration.setModifiers(
-      *method.modifiers
-        .stream()
-        .map { com.github.javaparser.ast.Modifier.Keyword.valueOf(it!!.name) }
-        .asArray()
+        *method.modifiers
+            .stream()
+            .map { com.github.javaparser.ast.Modifier.Keyword.valueOf(it!!.name) }
+            .asArray()
     )
     methodDeclaration.parameters =
-      IntStream.range(0, method.parameters.size)
-        .mapToObj {
-          return@mapToObj toParameter(type!!.parameterTypes[it],
-            method.parameters[it]).also { parameter ->
-            val firstType = getTypeWithoutBounds(parameter.type)
-            parameter.type = firstType
-          }
-        }
-        .collect(NodeList.toNodeList())
+        IntStream.range(0, method.parameters.size)
+            .mapToObj {
+              return@mapToObj toParameter(type!!.parameterTypes[it], method.parameters[it]).also {
+                  parameter ->
+                val firstType = getTypeWithoutBounds(parameter.type)
+                parameter.type = firstType
+              }
+            }
+            .collect(NodeList.toNodeList())
     methodDeclaration.typeParameters =
-      type!!
-        .typeVariables
-        .mapNotNull { toType(it as TypeMirror?)?.toTypeParameter()?.getOrNull() }
-        .toNodeList()
+        type!!
+            .typeVariables
+            .mapNotNull { toType(it as TypeMirror?)?.toTypeParameter()?.getOrNull() }
+            .toNodeList()
     return methodDeclaration
   }
 
@@ -645,7 +648,7 @@ object JavaParserUtils {
     }
     if (type is NodeWithSimpleName<*>) {
       return StaticJavaParser.parseClassOrInterfaceType(
-        (type as NodeWithSimpleName<*>).nameAsString
+          (type as NodeWithSimpleName<*>).nameAsString
       )
     }
     return if (type.isArrayType) {
@@ -656,7 +659,7 @@ object JavaParserUtils {
   @Contract("_ -> new")
   fun toModifier(modifier: Modifier): com.github.javaparser.ast.Modifier {
     return com.github.javaparser.ast.Modifier(
-      com.github.javaparser.ast.Modifier.Keyword.valueOf(modifier.name)
+        com.github.javaparser.ast.Modifier.Keyword.valueOf(modifier.name)
     )
   }
 
@@ -706,11 +709,11 @@ object JavaParserUtils {
     }
     if (type.isIntersectionType) {
       type
-        .asIntersectionType()
-        .elements
-        .stream()
-        .map { getClassNames(it) }
-        .forEach { c: MutableList<String?>? -> classNames.addAll(c!!) }
+          .asIntersectionType()
+          .elements
+          .stream()
+          .map { getClassNames(it) }
+          .forEach { c: MutableList<String?>? -> classNames.addAll(c!!) }
     }
     return classNames
   }
@@ -725,22 +728,22 @@ object JavaParserUtils {
   fun prettyPrint(node: Node?, delegate: Predicate<String>?): String? {
     val configuration: PrinterConfiguration = DefaultPrinterConfiguration()
     val visitor: PrettyPrintingVisitor =
-      object : PrettyPrintingVisitor(configuration) {
-        override fun visit(n: SimpleName?, arg: Void?) {
-          printOrphanCommentsBeforeThisChildNode(n)
-          printComment(n!!.comment, arg)
-          val identifier = n.identifier
-          if (delegate!!.test(identifier)) {
-            printer.print(identifier)
-          } else {
-            printer.print(getSimpleName(identifier))
+        object : PrettyPrintingVisitor(configuration) {
+          override fun visit(n: SimpleName?, arg: Void?) {
+            printOrphanCommentsBeforeThisChildNode(n)
+            printComment(n!!.comment, arg)
+            val identifier = n.identifier
+            if (delegate!!.test(identifier)) {
+              printer.print(identifier)
+            } else {
+              printer.print(getSimpleName(identifier))
+            }
+          }
+
+          override fun visit(n: Name?, arg: Void?) {
+            super.visit(n, arg)
           }
         }
-
-        override fun visit(n: Name?, arg: Void?) {
-          super.visit(n, arg)
-        }
-      }
     val prettyPrinter = DefaultPrettyPrinter({ visitor }, configuration)
     return prettyPrinter.print(node)
   }

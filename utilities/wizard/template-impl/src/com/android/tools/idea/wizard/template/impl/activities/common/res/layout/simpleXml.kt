@@ -19,31 +19,31 @@ import com.android.tools.idea.wizard.template.getMaterialComponentName
 import com.android.tools.idea.wizard.template.renderIf
 
 fun simpleLayoutXml(
-  isNewModule: Boolean,
-  includeCppSupport: Boolean,
-  useAndroidX: Boolean,
-  packageName: String,
-  activityClass: String,
-  appBarLayoutName: String?,
-  containerId: String?,
+    isNewModule: Boolean,
+    includeCppSupport: Boolean,
+    useAndroidX: Boolean,
+    packageName: String,
+    activityClass: String,
+    appBarLayoutName: String?,
+    containerId: String?,
 ): String {
   val layout = getMaterialComponentName("android.support.constraint.ConstraintLayout", useAndroidX)
 
   val containerIdBlock = renderIf(containerId != null) { """android:id="@+id/$containerId"""" }
 
   val appBarLayoutNameBlock =
-    renderIf(appBarLayoutName != null) {
-      """
+      renderIf(appBarLayoutName != null) {
+        """
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:showIn="@layout/${appBarLayoutName}"
     """
-    }
+      }
 
   val includeCppSupportBlock = renderIf(includeCppSupport) { """android:id="@+id/sample_text"""" }
 
   val isNewBlock =
-    renderIf(isNewModule) {
-      """<TextView
+      renderIf(isNewModule) {
+        """<TextView
       $includeCppSupportBlock
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
@@ -53,7 +53,7 @@ fun simpleLayoutXml(
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintTop_toTopOf="parent" />
     """
-    }
+      }
 
   return """
   <?xml version="1.0" encoding="utf-8"?>

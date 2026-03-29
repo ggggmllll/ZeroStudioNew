@@ -30,14 +30,14 @@ android {
   sourceSets {
     getByName("androidTest") { assets.srcDirs(rootProject.file("utilities/framework-stubs/libs")) }
   }
-    composeOptions { kotlinCompilerExtensionVersion = "1.5.15" }
+  composeOptions { kotlinCompilerExtensionVersion = "1.5.15" }
 
-    buildFeatures {
-    compose = true
-  }
+  buildFeatures { compose = true }
 }
 
-kapt { arguments { arg("eventBusIndex", "${BuildConfig.packageName}.events.LspKotlinEventsIndex") } }
+kapt {
+  arguments { arg("eventBusIndex", "${BuildConfig.packageName}.events.LspKotlinEventsIndex") }
+}
 
 dependencies {
   kapt(projects.annotation.processors)
@@ -71,7 +71,7 @@ dependencies {
   implementation(projects.java.lsp)
   implementation(projects.termux.shell)
   implementation(projects.event.eventbusEvents)
-  
+
   implementation(libs.composite.javac)
   implementation(libs.composite.javapoet)
   implementation(libs.composite.jaxp)

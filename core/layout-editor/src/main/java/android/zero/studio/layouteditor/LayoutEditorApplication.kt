@@ -3,33 +3,34 @@ package android.zero.studio.layouteditor
 import android.app.Activity
 import android.content.Context
 import android.os.Build
+import android.zero.studio.layouteditor.managers.PreferencesManager
 import androidx.appcompat.app.AppCompatDelegate
 import com.google.android.material.color.DynamicColors
-import android.zero.studio.layouteditor.managers.PreferencesManager
 import com.itsaky.androidide.app.BaseApplication
 
 open class LayoutEditorApplication : BaseApplication() {
-    override fun onCreate() {
-        super.onCreate()
-        instance = this
-        AppCompatDelegate.setDefaultNightMode(PreferencesManager.currentTheme)
-        if (PreferencesManager.isApplyDynamicColors && DynamicColors.isDynamicColorAvailable()) {
-            DynamicColors.applyToActivitiesIfAvailable(this)
-        }
+  override fun onCreate() {
+    super.onCreate()
+    instance = this
+    AppCompatDelegate.setDefaultNightMode(PreferencesManager.currentTheme)
+    if (PreferencesManager.isApplyDynamicColors && DynamicColors.isDynamicColorAvailable()) {
+      DynamicColors.applyToActivitiesIfAvailable(this)
     }
+  }
 
-    val context: Context
-        get() = instance!!.applicationContext
-    val isAtLeastTiramisu: Boolean
-        get() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+  val context: Context
+    get() = instance!!.applicationContext
 
-    fun updateTheme(nightMode: Int, activity: Activity) {
-        AppCompatDelegate.setDefaultNightMode(nightMode)
-        activity.recreate()
-    }
+  val isAtLeastTiramisu: Boolean
+    get() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
 
-    companion object {
-        var instance: LayoutEditorApplication? = null
-            private set
-    }
+  fun updateTheme(nightMode: Int, activity: Activity) {
+    AppCompatDelegate.setDefaultNightMode(nightMode)
+    activity.recreate()
+  }
+
+  companion object {
+    var instance: LayoutEditorApplication? = null
+      private set
+  }
 }

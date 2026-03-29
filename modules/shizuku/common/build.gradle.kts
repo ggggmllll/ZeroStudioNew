@@ -1,15 +1,11 @@
-plugins {
-	id("com.android.library")
-}
+plugins { id("com.android.library") }
 
 android {
-	namespace = "rikka.shizuku.common"
-	buildFeatures {
-		buildConfig = false
-	}
+  namespace = "rikka.shizuku.common"
+  buildFeatures { buildConfig = false }
 }
 
 dependencies {
-	compileOnly(libs.rikka.hidden.stub)
-	api(libs.rikka.hidden.compat)
+  compileOnly(libs.rikka.hidden.stub)
+  api(libs.rikka.hidden.compat)
 }

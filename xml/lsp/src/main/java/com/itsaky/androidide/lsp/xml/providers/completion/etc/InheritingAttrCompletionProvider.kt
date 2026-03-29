@@ -30,9 +30,9 @@ import org.eclipse.lemminx.dom.DOMNode
  * @author Akash Yadav
  */
 class InheritingAttrCompletionProvider(
-  private val parentProvider: (String) -> List<String> = { emptyList() },
-  private val tagTransform: ITagTransformer,
-  provider: ICompletionProvider
+    private val parentProvider: (String) -> List<String> = { emptyList() },
+    private val tagTransform: ITagTransformer,
+    provider: ICompletionProvider,
 ) : AttrCompletionProvider(provider) {
 
   override fun findNodeStyleables(node: DOMNode, styleables: IResourceGroup): Set<Styleable> {

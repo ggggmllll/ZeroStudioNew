@@ -9,48 +9,39 @@ import com.smarttoolfactory.colorpicker.model.GradientColorState
 import com.smarttoolfactory.colorpicker.ui.Pink400
 import com.smarttoolfactory.colorpicker.widget.ExpandableColumnWithTitle
 
-
 @Composable
 internal fun RadialGradientSelection(
     gradientColorState: GradientColorState,
-    onRadialDimensionsChange: (Offset, Float) -> Unit
+    onRadialDimensionsChange: (Offset, Float) -> Unit,
 ) {
 
-    var centerX by remember { mutableStateOf(gradientColorState.centerFriction.x) }
-    var centerY by remember { mutableStateOf(gradientColorState.centerFriction.y) }
-    var radiusFriction by remember { mutableStateOf(gradientColorState.radiusFriction) }
+  var centerX by remember { mutableStateOf(gradientColorState.centerFriction.x) }
+  var centerY by remember { mutableStateOf(gradientColorState.centerFriction.y) }
+  var radiusFriction by remember { mutableStateOf(gradientColorState.radiusFriction) }
 
-    onRadialDimensionsChange(Offset(centerX, centerY), radiusFriction)
+  onRadialDimensionsChange(Offset(centerX, centerY), radiusFriction)
 
-    ExpandableColumnWithTitle(
-        title = "Gradient Center/Radius",
-        color = Pink400,
-        initialExpandState = false
-    ) {
-        Column {
-            SliderWithPercent(
-                modifier = Modifier.fillMaxWidth(),
-                title = "CenterX",
-                value = centerX
-            ) {
-                centerX = it
-            }
+  ExpandableColumnWithTitle(
+      title = "Gradient Center/Radius",
+      color = Pink400,
+      initialExpandState = false,
+  ) {
+    Column {
+      SliderWithPercent(modifier = Modifier.fillMaxWidth(), title = "CenterX", value = centerX) {
+        centerX = it
+      }
 
-            SliderWithPercent(
-                modifier = Modifier.fillMaxWidth(),
-                title = "CenterY",
-                value = centerY
-            ) {
-                centerY = it
-            }
+      SliderWithPercent(modifier = Modifier.fillMaxWidth(), title = "CenterY", value = centerY) {
+        centerY = it
+      }
 
-            SliderWithPercent(
-                modifier = Modifier.fillMaxWidth(),
-                title = "Radius",
-                value = radiusFriction
-            ) {
-                radiusFriction = it
-            }
-        }
+      SliderWithPercent(
+          modifier = Modifier.fillMaxWidth(),
+          title = "Radius",
+          value = radiusFriction,
+      ) {
+        radiusFriction = it
+      }
     }
+  }
 }

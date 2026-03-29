@@ -38,10 +38,10 @@ import com.android.tools.idea.wizard.template.impl.activities.common.generateThe
 import java.io.File
 
 fun RecipeExecutor.archStarterActivityRecipe(
-  moduleData: ModuleTemplateData,
-  activityClass: String,
-  packageName: String,
-  isLauncher: Boolean,
+    moduleData: ModuleTemplateData,
+    activityClass: String,
+    packageName: String,
+    isLauncher: Boolean,
 ) {
   val (_, srcOut, resOut, _) = moduleData
   addAllKotlinDependencies(moduleData)
@@ -58,15 +58,19 @@ fun RecipeExecutor.archStarterActivityRecipe(
   addComposeDependencies(moduleData)
 
   val hiltVersion = "2.57.2"
-  addPlugin("com.google.dagger.hilt.android", "com.google.dagger:hilt-android-gradle-plugin", hiltVersion)
+  addPlugin(
+      "com.google.dagger.hilt.android",
+      "com.google.dagger:hilt-android-gradle-plugin",
+      hiltVersion,
+  )
 
   // KSP is needed for Hilt and Room
   addPlugin(
-    "com.google.devtools.ksp",
-    "com.google.devtools.ksp:symbol-processing-gradle-plugin",
-    // KSP versions are a composite of the Kotlin version and the KSP library version. We have to
-    // take the Kotiln version we're given, so use the latest KSP that is compatible with it.
-    "${moduleData.projectTemplateData.kotlinVersion}-+",
+      "com.google.devtools.ksp",
+      "com.google.devtools.ksp:symbol-processing-gradle-plugin",
+      // KSP versions are a composite of the Kotlin version and the KSP library version. We have to
+      // take the Kotiln version we're given, so use the latest KSP that is compatible with it.
+      "${moduleData.projectTemplateData.kotlinVersion}-+",
   )
 
   val hiltNavigationComposeVersion = "1.2.0"
@@ -83,9 +87,15 @@ fun RecipeExecutor.archStarterActivityRecipe(
   addDependency("com.google.dagger:hilt-android:$hiltVersion")
   addDependency("com.google.dagger:hilt-android-compiler:$hiltVersion", configuration = "ksp")
   addDependency("com.google.dagger:hilt-compiler:$hiltVersion", configuration = "ksp")
-  addDependency("com.google.dagger:hilt-android-testing:$hiltVersion", configuration = "androidTestImplementation")
+  addDependency(
+      "com.google.dagger:hilt-android-testing:$hiltVersion",
+      configuration = "androidTestImplementation",
+  )
   addDependency("junit:junit:4.13.2", configuration = "testImplementation")
-  addDependency("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2", configuration = "testImplementation")
+  addDependency(
+      "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2",
+      configuration = "testImplementation",
+  )
   addDependency("androidx.test:core:1.6.1", configuration = "testImplementation")
   addDependency("androidx.test.ext:junit:1.3.0", configuration = "testImplementation")
   addDependency("androidx.test:runner:1.6.2", configuration = "androidTestImplementation")
@@ -145,33 +155,33 @@ fun RecipeExecutor.archStarterActivityRecipe(
   generateThemeStyles(moduleData.themesData.main, true, resOut)
 
   val recipe =
-    ArchStarterActivityTemplateVariables(
-      basePackage = packageName,
-      appName = moduleData.themesData.appName,
-      activityName = activityClass,
-      modelName = modelName,
-      themeName = themeName,
-    )
+      ArchStarterActivityTemplateVariables(
+          basePackage = packageName,
+          appName = moduleData.themesData.appName,
+          activityName = activityClass,
+          modelName = modelName,
+          themeName = themeName,
+      )
 
   with(recipe) {
     generateManifest(
-      moduleData = moduleData,
-      activityClass = activityClass,
-      activityThemeName = moduleData.themesData.main.name,
-      packageName = packageName("ui"),
-      isLauncher = isLauncher,
-      hasNoActionBar = true,
-      generateActivityTitle = true,
+        moduleData = moduleData,
+        activityClass = activityClass,
+        activityThemeName = moduleData.themesData.main.name,
+        packageName = packageName("ui"),
+        isLauncher = isLauncher,
+        hasNoActionBar = true,
+        generateActivityTitle = true,
     )
     mergeXml(
-      """
+        """
           <manifest xmlns:android ="http://schemas.android.com/apk/res/android">
             <uses-permission android:name="android.permission.INTERNET" />
             <application android:name=".$appName"/>
           </manifest>
       """
-        .trimIndent(),
-      moduleData.manifestDir.resolve("AndroidManifest.xml"),
+            .trimIndent(),
+        moduleData.manifestDir.resolve("AndroidManifest.xml"),
     )
 
     save(application(), srcOut.resolve("$appName.kt"))
@@ -208,13 +218,14 @@ fun RecipeExecutor.archStarterActivityRecipe(
 }
 
 class ArchStarterActivityTemplateVariables(
-  val basePackage: String,
-  val appName: String,
-  val activityName: String,
-  val modelName: String,
-  val themeName: String,
+    val basePackage: String,
+    val appName: String,
+    val activityName: String,
+    val modelName: String,
+    val themeName: String,
 ) {
-  fun packageName(vararg subpackages: String) = escapeKotlinIdentifier(listOf(basePackage, *subpackages).joinToString("."))
+  fun packageName(vararg subpackages: String) =
+      escapeKotlinIdentifier(listOf(basePackage, *subpackages).joinToString("."))
 
   fun packageDeclaration(vararg subpackages: String) = "package ${packageName(*subpackages)}"
 

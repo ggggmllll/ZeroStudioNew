@@ -20,14 +20,15 @@ package com.itsaky.androidide.services.log
 import com.itsaky.androidide.logsender.ILogSender
 
 /**
- * An implementation of [ILogSender] which caches the ID, PID and package name from the provided sender.
+ * An implementation of [ILogSender] which caches the ID, PID and package name from the provided
+ * sender.
  *
  * @author Akash Yadav
  */
 class CachingLogSender(
-  private val sender: ILogSender,
-  internal val port: Int,
-  internal var isStarted: Boolean
+    private val sender: ILogSender,
+    internal val port: Int,
+    internal var isStarted: Boolean,
 ) : ILogSender by sender {
 
   private var cachedPid: Int = -1

@@ -15,7 +15,6 @@
  *   along with AndroidIDE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 import com.itsaky.androidide.build.config.BuildConfig
 
 @Suppress("JavaPluginLanguageLevel")
@@ -26,16 +25,12 @@ plugins {
   id("org.jetbrains.kotlin.jvm")
 }
 
-
-
 tasks.withType<Jar> {
   manifest { attributes("Main-Class" to "${BuildConfig.packageName}.tooling.impl.Main") }
 }
 
 tasks.register("deleteExistingJarFiles") {
-  delete {
-    delete(project.layout.buildDirectory.dir("libs"))
-  }
+  delete { delete(project.layout.buildDirectory.dir("libs")) }
 }
 
 tasks.register("copyJar") {
@@ -56,14 +51,11 @@ project.tasks.getByName("jar") {
   finalizedBy("shadowJar")
 }
 
-project.tasks.getByName("shadowJar") {
-  finalizedBy("copyJar")
-}
+project.tasks.getByName("shadowJar") { finalizedBy("copyJar") }
 
 dependencies {
-
   implementation("io.hotmoka:toml4j:0.7.3")
-  
+
   kapt(libs.google.auto.service)
 
   api(projects.tooling.api)
@@ -76,7 +68,6 @@ dependencies {
   implementation(libs.xml.xercesImpl)
   implementation(libs.xml.apis)
   implementation(libs.tooling.gradleApi)
-
 
   runtimeOnly(libs.tooling.slf4j)
 }

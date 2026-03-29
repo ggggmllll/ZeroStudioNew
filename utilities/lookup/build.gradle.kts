@@ -15,24 +15,23 @@
  *   along with AndroidIDE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 @Suppress("JavaPluginLanguageLevel")
 plugins {
-    id("java-library")
-    id("org.jetbrains.kotlin.jvm")
-    id("kotlin-kapt")
+  id("java-library")
+  id("org.jetbrains.kotlin.jvm")
+  id("kotlin-kapt")
 }
 
 dependencies {
-    kapt(libs.google.auto.service)
+  kapt(libs.google.auto.service)
 
-    implementation(projects.logging.logger)
-    implementation(projects.utilities.shared)
+  implementation(projects.logging.logger)
+  implementation(projects.utilities.shared)
 
-    implementation(libs.common.jkotlin)
-    implementation(libs.google.auto.service.annotations)
-    implementation(libs.google.guava)
+  implementation(libs.common.jkotlin)
+  implementation(libs.google.auto.service.annotations)
+  implementation(libs.google.guava)
 
-    testImplementation(libs.tests.junit)
-    testImplementation(libs.tests.google.truth)
+  testImplementation(libs.tests.junit)
+  testImplementation(libs.tests.google.truth)
 }

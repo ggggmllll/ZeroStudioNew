@@ -48,7 +48,8 @@ val androidTVActivityTemplate
 
     category = Category.Activity
     formFactor = FormFactor.Tv
-    screens = listOf(WizardUiContext.MenuEntry, WizardUiContext.NewProject, WizardUiContext.NewModule)
+    screens =
+        listOf(WizardUiContext.MenuEntry, WizardUiContext.NewProject, WizardUiContext.NewModule)
 
     lateinit var layoutName: StringParameter
     val activityClass = stringParameter {
@@ -108,35 +109,36 @@ val androidTVActivityTemplate
     val isLauncher = booleanParameter {
       name = "Launcher Activity"
       default = false
-      help = "If true, this activity will have a CATEGORY_LAUNCHER intent filter, making it visible in the launcher"
+      help =
+          "If true, this activity will have a CATEGORY_LAUNCHER intent filter, making it visible in the launcher"
     }
 
     val packageName = defaultPackageNameParameter
 
     widgets(
-      TextFieldWidget(activityClass),
-      TextFieldWidget(layoutName),
-      TextFieldWidget(mainFragment),
-      TextFieldWidget(detailsActivity),
-      TextFieldWidget(detailsLayoutName),
-      TextFieldWidget(detailsFragment),
-      CheckBoxWidget(isLauncher),
-      PackageNameWidget(packageName),
-      LanguageWidget(),
+        TextFieldWidget(activityClass),
+        TextFieldWidget(layoutName),
+        TextFieldWidget(mainFragment),
+        TextFieldWidget(detailsActivity),
+        TextFieldWidget(detailsLayoutName),
+        TextFieldWidget(detailsFragment),
+        CheckBoxWidget(isLauncher),
+        PackageNameWidget(packageName),
+        LanguageWidget(),
     )
 
     thumb { File("androidtv-activity").resolve("template-leanback-TV.png") }
 
     recipe = { data: TemplateData ->
       androidTVActivityRecipe(
-        data as ModuleTemplateData,
-        activityClass.value,
-        layoutName.value,
-        mainFragment.value,
-        detailsActivity.value,
-        detailsLayoutName.value,
-        detailsFragment.value,
-        packageName.value,
+          data as ModuleTemplateData,
+          activityClass.value,
+          layoutName.value,
+          mainFragment.value,
+          detailsActivity.value,
+          detailsLayoutName.value,
+          detailsFragment.value,
+          packageName.value,
       )
     }
   }

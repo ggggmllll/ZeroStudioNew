@@ -25,12 +25,12 @@ import com.itsaky.androidide.lsp.models.CompletionItem
 import com.itsaky.androidide.lsp.models.CompletionResult
 import com.itsaky.androidide.lsp.models.MatchLevel.NO_MATCH
 import com.itsaky.androidide.progress.ProgressManager.Companion.abortIfCancelled
-import openjdk.source.tree.ClassTree
-import openjdk.source.tree.CompilationUnitTree
-import openjdk.source.util.TreePath
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.Objects
+import openjdk.source.tree.ClassTree
+import openjdk.source.tree.CompilationUnitTree
+import openjdk.source.util.TreePath
 
 /**
  * Completes class names.
@@ -38,18 +38,18 @@ import java.util.Objects
  * @author Akash Yadav
  */
 class ClassNamesCompletionProvider(
-  completingFile: Path,
-  cursor: Long,
-  compiler: JavaCompilerService,
-  settings: IServerSettings,
-  val root: CompilationUnitTree,
+    completingFile: Path,
+    cursor: Long,
+    compiler: JavaCompilerService,
+    settings: IServerSettings,
+    val root: CompilationUnitTree,
 ) : IJavaCompletionProvider(cursor, completingFile, compiler, settings) {
 
   override fun doComplete(
-    task: CompileTask,
-    path: TreePath,
-    partial: String,
-    endsWithParen: Boolean,
+      task: CompileTask,
+      path: TreePath,
+      partial: String,
+      endsWithParen: Boolean,
   ): CompletionResult {
     val list = mutableListOf<CompletionItem>()
     val packageName = Objects.toString(root.packageName, "")
@@ -57,7 +57,7 @@ class ClassNamesCompletionProvider(
 
     val file: Path = Paths.get(root.sourceFile.toUri())
     val imports: Set<String> =
-      root.imports.map { it.qualifiedIdentifier }.mapNotNull { it.toString() }.toSet()
+        root.imports.map { it.qualifiedIdentifier }.mapNotNull { it.toString() }.toSet()
 
     abortIfCancelled()
     abortCompletionIfCancelled()

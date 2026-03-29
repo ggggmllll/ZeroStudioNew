@@ -22,7 +22,6 @@ import com.itsaky.androidide.editor.language.newline.TSBracketsHandler
 import com.itsaky.androidide.editor.language.newline.TSCStyleBracketsHandler
 import com.itsaky.androidide.treesitter.dart.TSLanguageDart
 import io.github.rosemoe.sora.lang.Language.INTERRUPTION_LEVEL_SLIGHT
-import io.github.rosemoe.sora.util.MyCharacter
 
 /**
  * Tree Sitter language specification for dart.
@@ -32,35 +31,34 @@ import io.github.rosemoe.sora.util.MyCharacter
 class DartLanguage(context: Context) :
     TreeSitterLanguage(context, TSLanguageDart.getInstance(), TS_TYPE) {
 
-    companion object {
+  companion object {
 
-        const val TS_TYPE = "dart"
-        
-        @JvmField
-        val FACTORY = Factory { DartLanguage(it) }
-    }
+    const val TS_TYPE = "dart"
 
-    // /**
-     // * Determines whether the given character should trigger code completion.
-     // * CMake identifiers typically consist of letters, numbers, and underscores.
-     // */
-    // override fun checkIsCompletionChar(c: Char): Boolean {
-        // return MyCharacter.isJavaIdentifierPart(c) || c == '_' || c == '-'
-    // }
+    @JvmField val FACTORY = Factory { DartLanguage(it) }
+  }
 
-    /**
-     * Set the interruption level.
-     * Determines how aggressively the editor responds to language typing events.
-     */
-    override fun getInterruptionLevel(): Int {
-        return INTERRUPTION_LEVEL_SLIGHT
-    }
+  // /**
+  // * Determines whether the given character should trigger code completion.
+  // * CMake identifiers typically consist of letters, numbers, and underscores.
+  // */
+  // override fun checkIsCompletionChar(c: Char): Boolean {
+  // return MyCharacter.isJavaIdentifierPart(c) || c == '_' || c == '-'
+  // }
 
-    /**
-     * Define how newlines inside brackets are handled.
-     * CMake heavily uses parentheses `()` for commands, so standard C-style handling is perfect.
-     */
-    override fun createNewlineHandlers(): Array<TSBracketsHandler> {
-        return arrayOf(TSCStyleBracketsHandler(this))
-    }
+  /**
+   * Set the interruption level. Determines how aggressively the editor responds to language typing
+   * events.
+   */
+  override fun getInterruptionLevel(): Int {
+    return INTERRUPTION_LEVEL_SLIGHT
+  }
+
+  /**
+   * Define how newlines inside brackets are handled. CMake heavily uses parentheses `()` for
+   * commands, so standard C-style handling is perfect.
+   */
+  override fun createNewlineHandlers(): Array<TSBracketsHandler> {
+    return arrayOf(TSCStyleBracketsHandler(this))
+  }
 }

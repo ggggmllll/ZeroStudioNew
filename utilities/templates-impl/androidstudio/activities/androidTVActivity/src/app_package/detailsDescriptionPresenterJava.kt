@@ -23,7 +23,7 @@ package com.itsaky.androidide.templates.impl.androidstudio.activities.androidTVA
  * @author android_zero
  */
 fun detailsDescriptionPresenterJava(packageName: String) =
-  """
+    """
 package ${packageName};
 
 import androidx.leanback.widget.AbstractDetailsDescriptionPresenter;

@@ -27,98 +27,95 @@ import java.io.File
 
 /**
  * 移植优化的 NDK 模块构建器
+ *
  * @author android_zero
  */
 class NdkModuleTemplateBuilder : AndroidModuleTemplateBuilder() {
 
-    /**
-     * 根据是否开启 Cmake，自动决定 native 源码该放置在 cpp 还是 jni 目录下
-     */
-    fun srcNativeFilePath(srcSet: SrcSet, fileName: String): File {
-        val nativeDir = if (data.useCmake) {
-            File(srcFolder(srcSet), "cpp")
+  /** 根据是否开启 Cmake，自动决定 native 源码该放置在 cpp 还是 jni 目录下 */
+  fun srcNativeFilePath(srcSet: SrcSet, fileName: String): File {
+    val nativeDir =
+        if (data.useCmake) {
+          File(srcFolder(srcSet), "cpp")
         } else {
-            File(srcFolder(srcSet), "jni")
+          File(srcFolder(srcSet), "jni")
         }
-        if (!nativeDir.exists()) {
-            nativeDir.mkdirs()
-        }
-        return File(nativeDir, fileName)
+    if (!nativeDir.exists()) {
+      nativeDir.mkdirs()
     }
+    return File(nativeDir, fileName)
+  }
 
-    /**
-     * 快捷写入 cpp 源码至项目指定位置
-     */
-    inline fun writeCpp(
-        writer: SourceWriter,
-        fileName: String,
-        crossinline cppSrcProvider: () -> String
-    ) {
-        val src = cppSrcProvider()
-        if (src.isNotBlank() && fileName.isNotBlank()) {
-            executor.save(src, srcNativeFilePath(SrcSet.Main, fileName))
-        }
+  /** 快捷写入 cpp 源码至项目指定位置 */
+  inline fun writeCpp(
+      writer: SourceWriter,
+      fileName: String,
+      crossinline cppSrcProvider: () -> String,
+  ) {
+    val src = cppSrcProvider()
+    if (src.isNotBlank() && fileName.isNotBlank()) {
+      executor.save(src, srcNativeFilePath(SrcSet.Main, fileName))
     }
+  }
 
-    /**
-     * 快捷写入 CMakeLists 源码至项目指定位置
-     */
-    inline fun writeCMakeList(
-        writer: SourceWriter,
-        fileName: String,
-        crossinline cmakeSrcProvider: () -> String
-    ) {
-        val src = cmakeSrcProvider()
-        if (src.isNotBlank() && fileName.isNotBlank()) {
-            executor.save(src, srcNativeFilePath(SrcSet.Main, fileName))
-        }
+  /** 快捷写入 CMakeLists 源码至项目指定位置 */
+  inline fun writeCMakeList(
+      writer: SourceWriter,
+      fileName: String,
+      crossinline cmakeSrcProvider: () -> String,
+  ) {
+    val src = cmakeSrcProvider()
+    if (src.isNotBlank() && fileName.isNotBlank()) {
+      executor.save(src, srcNativeFilePath(SrcSet.Main, fileName))
     }
+  }
 
-    /**
-     * 覆写 build.gradle 配置，使其直接对接经过更新后的 buildGradleSrc()，自动配置 ndk 模块和参数。
-     */
-    override fun RecipeExecutor.buildGradle() {
-        val gradleContent = buildGradleSrc(isComposeModule, context)
-        save(gradleContent, buildGradleFile())
-    }
+  /** 覆写 build.gradle 配置，使其直接对接经过更新后的 buildGradleSrc()，自动配置 ndk 模块和参数。 */
+  override fun RecipeExecutor.buildGradle() {
+    val gradleContent = buildGradleSrc(isComposeModule, context)
+    save(gradleContent, buildGradleFile())
+  }
 }
 
-/**
- * 带有 NDK 构建能力的默认模块配置函数。
- */
+/** 带有 NDK 构建能力的默认模块配置函数。 */
 inline fun ProjectTemplateBuilder.defaultAppModuleWithNdk(
     name: String = ":app",
     addAndroidX: Boolean = true,
     copyDefAssets: Boolean = true,
-    crossinline block: NdkModuleTemplateBuilder.() -> Unit
+    crossinline block: NdkModuleTemplateBuilder.() -> Unit,
 ) {
-    val module = NdkModuleTemplateBuilder().apply {
-        projectBuilder = this@defaultAppModuleWithNdk
-        // This ensures its dependencies are collected for TOML generation.
-        this@defaultAppModuleWithNdk.moduleBuilders.add(this)
-        _name = name
+  val module =
+      NdkModuleTemplateBuilder()
+          .apply {
+            projectBuilder = this@defaultAppModuleWithNdk
+            // This ensures its dependencies are collected for TOML generation.
+            this@defaultAppModuleWithNdk.moduleBuilders.add(this)
+            _name = name
 
-        templateName = 0
-        thumb = 0
+            templateName = 0
+            thumb = 0
 
-        preRecipe = commonPreRecipe { return@commonPreRecipe defModule }
-        postRecipe = commonPostRecipe {
-            if (copyDefAssets) {
+            preRecipe = commonPreRecipe {
+              return@commonPreRecipe defModule
+            }
+            postRecipe = commonPostRecipe {
+              if (copyDefAssets) {
                 copyDefaultRes()
 
                 manifest {
-                    configure(APPLICATION_ATTR) {
-                        androidAttribute("dataExtractionRules", "@xml/data_extraction_rules")
-                        androidAttribute("fullBackupContent", "@xml/backup_rules")
-                    }
+                  configure(APPLICATION_ATTR) {
+                    androidAttribute("dataExtractionRules", "@xml/data_extraction_rules")
+                    androidAttribute("fullBackupContent", "@xml/backup_rules")
+                  }
                 }
+              }
             }
-        }
 
-        if (addAndroidX) baseAndroidXDependencies()
+            if (addAndroidX) baseAndroidXDependencies()
 
-        block()
-    }.build() as ModuleTemplate
+            block()
+          }
+          .build() as ModuleTemplate
 
-    modules.add(module)
+  modules.add(module)
 }

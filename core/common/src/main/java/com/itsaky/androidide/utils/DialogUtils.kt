@@ -24,8 +24,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.itsaky.androidide.common.databinding.LayoutDialogProgressBinding
 import com.itsaky.androidide.resources.R.string
 import com.itsaky.androidide.resources.R.style
-import org.jetbrains.annotations.Contract
 import java.util.concurrent.atomic.AtomicInteger
+import org.jetbrains.annotations.Contract
 
 /**
  * Utility class for creating dialogs.
@@ -37,11 +37,11 @@ object DialogUtils {
   @JvmStatic
   @JvmOverloads
   fun newProgressDialog(
-    context: Context,
-    title: String,
-    message: String? = null,
-    cancelable: Boolean = false,
-    onCancelClick: OnClickListener? = null
+      context: Context,
+      title: String,
+      message: String? = null,
+      cancelable: Boolean = false,
+      onCancelClick: OnClickListener? = null,
   ): MaterialAlertDialogBuilder {
     val binding = LayoutDialogProgressBinding.inflate(LayoutInflater.from(context))
     val builder = newMaterialDialogBuilder(context)
@@ -70,24 +70,24 @@ object DialogUtils {
    *
    * @param context The context for the dialog.
    * @param positiveClickListener A listener that will be invoked on the <span>Yes</span> button
-   * click.
+   *   click.
    * @param negativeClickListener A listener that will be invoked on the <span>No</span> button
-   * click.
+   *   click.
    * @return The newly created dialog.
    */
   @JvmStatic
   @JvmOverloads
   fun newYesNoDialog(
-    context: Context,
-    positiveClickListener: OnClickListener? = null,
-    negativeClickListener: OnClickListener? = null
+      context: Context,
+      positiveClickListener: OnClickListener? = null,
+      negativeClickListener: OnClickListener? = null,
   ): MaterialAlertDialogBuilder {
     return newYesNoDialog(
-      context,
-      context.getString(string.msg_yesno_def_title),
-      context.getString(string.msg_yesno_def_message),
-      positiveClickListener,
-      negativeClickListener
+        context,
+        context.getString(string.msg_yesno_def_title),
+        context.getString(string.msg_yesno_def_message),
+        positiveClickListener,
+        negativeClickListener,
     )
   }
 
@@ -98,19 +98,19 @@ object DialogUtils {
    * @param title The title of the dialog.
    * @param message The message of the dialog.
    * @param positiveClickListener A listener that will be invoked on the <span>Yes</span> button
-   * click.
+   *   click.
    * @param negativeClickListener A listener that will be invoked on the <span>No</span> button
-   * click.
+   *   click.
    * @return The newly created dialog instance.
    */
   @JvmStatic
   @JvmOverloads
   fun newYesNoDialog(
-    context: Context,
-    title: String,
-    message: String? = null,
-    positiveClickListener: OnClickListener? = null,
-    negativeClickListener: OnClickListener? = null
+      context: Context,
+      title: String,
+      message: String? = null,
+      positiveClickListener: OnClickListener? = null,
+      negativeClickListener: OnClickListener? = null,
   ): MaterialAlertDialogBuilder {
     val builder = newMaterialDialogBuilder(context)
     builder.setTitle(title)
@@ -144,24 +144,22 @@ object DialogUtils {
    */
   @JvmStatic
   fun newSingleChoiceDialog(
-    context: Context,
-    title: String,
-    choices: Array<CharSequence>,
-    checkedChoice: Int,
-    cancelable: Boolean = false,
-    onSelected: (Int) -> Unit
+      context: Context,
+      title: String,
+      choices: Array<CharSequence>,
+      checkedChoice: Int,
+      cancelable: Boolean = false,
+      onSelected: (Int) -> Unit,
   ): MaterialAlertDialogBuilder {
     val selection = AtomicInteger(checkedChoice)
     return newMaterialDialogBuilder(context)
-      .setTitle(title)
-      .setSingleChoiceItems(choices, checkedChoice) { _, which ->
-        selection.set(which)
-      }
-      .setPositiveButton(android.R.string.ok) { dialog, _ ->
-        dialog.dismiss()
-        onSelected(selection.get())
-      }
-      .setNegativeButton(android.R.string.cancel, null)
-      .setCancelable(cancelable)
+        .setTitle(title)
+        .setSingleChoiceItems(choices, checkedChoice) { _, which -> selection.set(which) }
+        .setPositiveButton(android.R.string.ok) { dialog, _ ->
+          dialog.dismiss()
+          onSelected(selection.get())
+        }
+        .setNegativeButton(android.R.string.cancel, null)
+        .setCancelable(cancelable)
   }
 }

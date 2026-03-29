@@ -21,6 +21,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Gravity
 import android.view.ViewGroup.MarginLayoutParams
+import android.view.WindowManager
 import android.widget.CheckBox
 import androidx.activity.viewModels
 import androidx.annotation.GravityInt
@@ -47,11 +48,6 @@ import com.itsaky.androidide.services.builder.GradleBuildServiceConnnection
 import com.itsaky.androidide.services.builder.gradleDistributionParams
 import com.itsaky.androidide.tasks.executeAsyncProvideError
 import com.itsaky.androidide.tasks.executeWithProgress
-import com.itsaky.androidide.tooling.api.ForwardingToolingApiClient
-import com.itsaky.androidide.tooling.api.IProject
-import com.itsaky.androidide.tooling.api.IToolingApiClient
-import com.itsaky.androidide.tooling.api.IToolingApiServer
-import com.itsaky.androidide.tooling.api.LogSenderConfig.PROPERTY_LOGSENDER_ENABLED
 import com.itsaky.androidide.tooling.api.messages.AndroidInitializationParams
 import com.itsaky.androidide.tooling.api.messages.InitializeProjectParams
 import com.itsaky.androidide.tooling.api.messages.result.InitializeResult
@@ -76,8 +72,6 @@ import java.util.regex.Pattern
 import java.util.stream.Collectors
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import android.view.WindowManager
-import com.google.android.material.bottomsheet.BottomSheetBehavior
 
 /** @author Akash Yadav */
 @Suppress("MemberVisibilityCanBePrivate")
@@ -279,7 +273,6 @@ abstract class ProjectHandlerActivity : BaseEditorActivity() {
             .build()
 
     this.syncNotificationFlashbar?.showOnUiThread()
-
   }
 
   fun startServices() {
@@ -477,7 +470,9 @@ abstract class ProjectHandlerActivity : BaseEditorActivity() {
   protected fun onGradleBuildServiceConnected(service: GradleBuildService) {
     log.info("Connected to Gradle build service")
 
-    log.info("Thank you for supporting ZeroStudio,If you encounter any problems, you can provide feedback on GitHub, URL：https://github.com/msmt2018/ZeroStudio/issues")
+    log.info(
+        "Thank you for supporting ZeroStudio,If you encounter any problems, you can provide feedback on GitHub, URL：https://github.com/msmt2018/ZeroStudio/issues"
+    )
 
     buildServiceConnection.onConnected = null
     editorViewModel.isBoundToBuildSerice = true
@@ -500,7 +495,11 @@ abstract class ProjectHandlerActivity : BaseEditorActivity() {
           }
 
           if (pid != metadata.pid) {
-            log.warn("Tooling server pid mismatch. Expected: {}, Actual: {}. Replacing memory watcher...", pid, metadata.pid)
+            log.warn(
+                "Tooling server pid mismatch. Expected: {}, Actual: {}. Replacing memory watcher...",
+                pid,
+                metadata.pid,
+            )
             try {
               memoryUsageWatcher.watchProcess(metadata.pid, PROC_GRADLE_TOOLING)
               resetMemUsageChart()
@@ -532,7 +531,10 @@ abstract class ProjectHandlerActivity : BaseEditorActivity() {
 
         if (workspace == null) {
           com.itsaky.androidide.tasks.runOnUiThread {
-            showProjectSetupFailedDialog("Workspace initialization failed. The project structure could not be analyzed.", null)
+            showProjectSetupFailedDialog(
+                "Workspace initialization failed. The project structure could not be analyzed.",
+                null,
+            )
             postProjectInit(false, null)
           }
           return@launch
@@ -545,11 +547,14 @@ abstract class ProjectHandlerActivity : BaseEditorActivity() {
       } catch (e: Exception) {
         log.error("Project setup failed", e)
         com.itsaky.androidide.tasks.runOnUiThread {
-          val errorMessage = when {
-            e.message?.contains("workspace", ignoreCase = true) == true -> "Failed to configure workspace: ${e.message}"
-            e.message?.contains("build", ignoreCase = true) == true -> "Failed to build project model: ${e.message}"
-            else -> "Project setup failed: ${e.message ?: "Unknown error occurred"}"
-          }
+          val errorMessage =
+              when {
+                e.message?.contains("workspace", ignoreCase = true) == true ->
+                    "Failed to configure workspace: ${e.message}"
+                e.message?.contains("build", ignoreCase = true) == true ->
+                    "Failed to build project model: ${e.message}"
+                else -> "Project setup failed: ${e.message ?: "Unknown error occurred"}"
+              }
           showProjectSetupFailedDialog(errorMessage, e)
           postProjectInit(false, null)
         }
@@ -558,100 +563,102 @@ abstract class ProjectHandlerActivity : BaseEditorActivity() {
   }
 
   private fun showProjectSetupFailedDialog(errorMessage: String, exception: Exception?) {
-      if (isFinishing || isDestroyed) {
-          log.warn("Activity is finishing/destroyed. Cannot show error dialog.")
-          return
-      }
-  
-      val fullErrorDetails = buildString {
-        appendLine("Error Message:")
-        appendLine(errorMessage)
+    if (isFinishing || isDestroyed) {
+      log.warn("Activity is finishing/destroyed. Cannot show error dialog.")
+      return
+    }
+
+    val fullErrorDetails = buildString {
+      appendLine("Error Message:")
+      appendLine(errorMessage)
+      appendLine()
+
+      if (exception != null) {
+        appendLine("Exception Details:")
+        appendLine("Type: ${exception.javaClass.name}")
+        appendLine("Message: ${exception.message}")
         appendLine()
-  
-        if (exception != null) {
-          appendLine("Exception Details:")
-          appendLine("Type: ${exception.javaClass.name}")
-          appendLine("Message: ${exception.message}")
+        appendLine("Stack Trace:")
+        appendLine(exception.stackTraceToString())
+
+        var cause = exception.cause
+        var depth = 1
+        while (cause != null && depth < 5) {
           appendLine()
-          appendLine("Stack Trace:")
-          appendLine(exception.stackTraceToString())
-  
-          var cause = exception.cause
-          var depth = 1
-          while (cause != null && depth < 5) {
-            appendLine()
-            appendLine("Caused by ($depth):")
-            appendLine("Type: ${cause.javaClass.name}")
-            appendLine("Message: ${cause.message}")
-            appendLine(cause.stackTraceToString())
-            cause = cause.cause
-            depth++
-          }
+          appendLine("Caused by ($depth):")
+          appendLine("Type: ${cause.javaClass.name}")
+          appendLine("Message: ${cause.message}")
+          appendLine(cause.stackTraceToString())
+          cause = cause.cause
+          depth++
         }
       }
-  
-      try {
-        val clipboard = getSystemService(CLIPBOARD_SERVICE) as android.content.ClipboardManager
-        val clip = android.content.ClipData.newPlainText("Project Setup Error", fullErrorDetails)
-        clipboard.setPrimaryClip(clip)
-        log.info("Error details copied to clipboard")
-      } catch (e: Exception) {
-        log.error("Failed to copy error to clipboard", e)
+    }
+
+    try {
+      val clipboard = getSystemService(CLIPBOARD_SERVICE) as android.content.ClipboardManager
+      val clip = android.content.ClipData.newPlainText("Project Setup Error", fullErrorDetails)
+      clipboard.setPrimaryClip(clip)
+      log.info("Error details copied to clipboard")
+    } catch (e: Exception) {
+      log.error("Failed to copy error to clipboard", e)
+    }
+
+    if (isFinishing || isDestroyed) {
+      log.warn("Activity finished before showing dialog.")
+      return
+    }
+
+    val builder = newMaterialDialogBuilder(this)
+    builder.setTitle("Project Setup Failed")
+    builder.setMessage(
+        "The project could not be initialized properly.\n\n$errorMessage\n\nFull error details have been copied to clipboard.\n\nYou can try:\n• Update top level build.gradle\n• Syncing the project again\n• Checking if all required files are present\n• Restarting the IDE"
+    )
+    builder.setIcon(R.drawable.ic_error)
+    builder.setCancelable(false)
+
+    builder.setPositiveButton("Retry") { dialog, _ ->
+      dialog.dismiss()
+      if (!isFinishing && !isDestroyed) {
+        initializeProject()
       }
-  
+    }
+
+    builder.setNegativeButton("Close Project") { dialog, _ ->
+      dialog.dismiss()
+      if (!isFinishing && !isDestroyed) {
+        confirmProjectClose()
+      }
+    }
+
+    builder.setNeutralButton("View Error") { dialog, _ ->
       if (isFinishing || isDestroyed) {
-          log.warn("Activity finished before showing dialog.")
-          return
+        return@setNeutralButton
       }
-  
-      val builder = newMaterialDialogBuilder(this)
-      builder.setTitle("Project Setup Failed")
-      builder.setMessage("The project could not be initialized properly.\n\n$errorMessage\n\nFull error details have been copied to clipboard.\n\nYou can try:\n• Update top level build.gradle\n• Syncing the project again\n• Checking if all required files are present\n• Restarting the IDE")
-      builder.setIcon(R.drawable.ic_error)
-      builder.setCancelable(false)
-  
-      builder.setPositiveButton("Retry") { dialog, _ ->
-        dialog.dismiss()
-        if (!isFinishing && !isDestroyed) {
-            initializeProject()
+
+      val errorBuilder = newMaterialDialogBuilder(this)
+      errorBuilder.setTitle("Full Error Details")
+      errorBuilder.setMessage(fullErrorDetails)
+      errorBuilder.setPositiveButton("OK") { d, _ -> d.dismiss() }
+      errorBuilder.setNeutralButton("Copy Again") { d, _ ->
+        try {
+          val clipboard = getSystemService(CLIPBOARD_SERVICE) as android.content.ClipboardManager
+          val clip = android.content.ClipData.newPlainText("Project Setup Error", fullErrorDetails)
+          clipboard.setPrimaryClip(clip)
+        } catch (e: Exception) {
+          log.error("Failed to copy error to clipboard", e)
         }
       }
-  
-      builder.setNegativeButton("Close Project") { dialog, _ ->
-        dialog.dismiss()
-        if (!isFinishing && !isDestroyed) {
-            confirmProjectClose()
-        }
+      errorBuilder.show()
+    }
+
+    try {
+      if (!isFinishing && !isDestroyed) {
+        builder.show()
       }
-  
-      builder.setNeutralButton("View Error") { dialog, _ ->
-        if (isFinishing || isDestroyed) {
-            return@setNeutralButton
-        }
-        
-        val errorBuilder = newMaterialDialogBuilder(this)
-        errorBuilder.setTitle("Full Error Details")
-        errorBuilder.setMessage(fullErrorDetails)
-        errorBuilder.setPositiveButton("OK") { d, _ -> d.dismiss() }
-        errorBuilder.setNeutralButton("Copy Again") { d, _ ->
-          try {
-            val clipboard = getSystemService(CLIPBOARD_SERVICE) as android.content.ClipboardManager
-            val clip = android.content.ClipData.newPlainText("Project Setup Error", fullErrorDetails)
-            clipboard.setPrimaryClip(clip)
-          } catch (e: Exception) {
-            log.error("Failed to copy error to clipboard", e)
-          }
-        }
-        errorBuilder.show()
-      }
-  
-      try {
-          if (!isFinishing && !isDestroyed) {
-              builder.show()
-          }
-      } catch (e: WindowManager.BadTokenException) {
-          log.error("Failed to show dialog - activity token invalid", e)
-      }
+    } catch (e: WindowManager.BadTokenException) {
+      log.error("Failed to show dialog - activity token invalid", e)
+    }
   }
 
   protected open fun preProjectInit() {
@@ -709,7 +716,10 @@ abstract class ProjectHandlerActivity : BaseEditorActivity() {
 
     val moduleDirs =
         try {
-          manager.getWorkspace()!!.getSubProjects().stream()
+          manager
+              .getWorkspace()!!
+              .getSubProjects()
+              .stream()
               .map(GradleProject::projectDir)
               .collect(Collectors.toList())
         } catch (e: Throwable) {
@@ -747,7 +757,7 @@ abstract class ProjectHandlerActivity : BaseEditorActivity() {
     builder.setTitle(string.menu_find_project)
     builder.setView(binding.root)
     builder.setCancelable(false)
-    
+
     builder.setPositiveButton(string.menu_find) { dialog, _ ->
       val text = binding.input.editText!!.text.toString().trim()
       if (text.isEmpty()) {

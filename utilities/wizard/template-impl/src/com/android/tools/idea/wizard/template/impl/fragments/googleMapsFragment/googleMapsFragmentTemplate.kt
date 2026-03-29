@@ -66,11 +66,21 @@ val googleMapsFragmentTemplate
 
     val packageName = defaultPackageNameParameter
 
-    widgets(TextFieldWidget(fragmentClass), TextFieldWidget(layoutName), PackageNameWidget(packageName), LanguageWidget())
+    widgets(
+        TextFieldWidget(fragmentClass),
+        TextFieldWidget(layoutName),
+        PackageNameWidget(packageName),
+        LanguageWidget(),
+    )
 
     thumb { File("google-maps-fragment").resolve("template_map_fragment.png") }
 
     recipe = { data: TemplateData ->
-      googleMapsFragmentRecipe(data as ModuleTemplateData, fragmentClass.value, layoutName.value, packageName.value)
+      googleMapsFragmentRecipe(
+          data as ModuleTemplateData,
+          fragmentClass.value,
+          layoutName.value,
+          packageName.value,
+      )
     }
   }

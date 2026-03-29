@@ -20,7 +20,7 @@ import com.android.tools.idea.wizard.template.escapeKotlinIdentifier
 import com.android.tools.idea.wizard.template.getMaterialComponentName
 
 fun sectionsPagerAdapterKt(packageName: String, useAndroidX: Boolean) =
-  """package ${escapeKotlinIdentifier(packageName)}.ui.main
+    """package ${escapeKotlinIdentifier(packageName)}.ui.main
 
 import android.content.Context
 import ${getMaterialComponentName("android.support.v4.app.Fragment", useAndroidX)}

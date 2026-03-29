@@ -54,7 +54,7 @@ open class ListViewAdapter<T : ListView> : AbsListViewAdapter<T>() {
 
   override fun createUiWidgets(): List<UiWidget> {
     return listOf(
-      UiWidget(ListView::class.java, string.widget_listview, drawable.ic_widget_list_view)
+        UiWidget(ListView::class.java, string.widget_listview, drawable.ic_widget_list_view)
     )
   }
 }

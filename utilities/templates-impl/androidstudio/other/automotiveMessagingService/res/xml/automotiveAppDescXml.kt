@@ -17,7 +17,7 @@
 package com.itsaky.androidide.templates.impl.androidstudio.other.automotiveMessagingService.res.xml
 
 fun automotiveAppDescXml() =
-  """
+    """
 <?xml version="1.0" encoding="utf-8"?>
 <automotiveApp>
     <uses name="notification"/>

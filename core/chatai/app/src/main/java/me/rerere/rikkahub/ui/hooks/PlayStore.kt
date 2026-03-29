@@ -7,8 +7,6 @@ import me.rerere.rikkahub.utils.PlayStoreUtil
 
 @Composable
 fun rememberIsPlayStoreVersion(): Boolean {
-    val context = LocalContext.current
-    return remember {
-        PlayStoreUtil.isInstalledFromPlayStore(context)
-    }
+  val context = LocalContext.current
+  return remember { PlayStoreUtil.isInstalledFromPlayStore(context) }
 }

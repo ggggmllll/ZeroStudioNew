@@ -17,7 +17,7 @@
 package com.android.tools.idea.wizard.template.impl.activities.androidTVActivity.src.app_package
 
 fun browseErrorActivityJava(layoutName: String, packageName: String, mainFragment: String) =
-  """
+    """
 package ${packageName};
 
 import android.os.Bundle;

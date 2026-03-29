@@ -17,9 +17,7 @@
 
 package com.itsaky.androidide.preferences.internal
 
-/**
- * @author Akash Yadav
- */
+/** @author Akash Yadav */
 @Suppress("MemberVisibilityCanBePrivate")
 object JavaPreferences {
 
@@ -38,5 +36,4 @@ object JavaPreferences {
     set(value) {
       prefManager.putBoolean(JAVA_DIAGNOSTICS_ENABLED, value)
     }
-
 }

@@ -15,6 +15,4 @@
  *   along with AndroidIDE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-require(project == rootProject) {
-  "This script must be apply to the root project."
-}
+require(project == rootProject) { "This script must be apply to the root project." }

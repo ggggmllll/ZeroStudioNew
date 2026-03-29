@@ -68,37 +68,38 @@ class PartialReparserImplTest {
     JavaLSPTest.apply {
       openFile("partial/PartialErrReparserTest")
       getCompiler()
-        .compile(
-          CompilationRequest(
-            listOf(SourceFileObject(file)),
-            PartialReparseRequest(172, contents.toString())
+          .compile(
+              CompilationRequest(
+                  listOf(SourceFileObject(file)),
+                  PartialReparseRequest(172, contents.toString()),
+              )
           )
-        )
-        .run { PrintingVisitor().scan(it.root() as JCCompilationUnit) }
+          .run { PrintingVisitor().scan(it.root() as JCCompilationUnit) }
       val changedText = contents!!.insert(192, "trim().").toString()
       dispatchEvent(
-        DocumentChangeEvent(
-          file!!,
-          changedText,
-          changedText,
-          2,
-          INSERT,
-          "trim().".length,
-          Range.NONE
-        )
+          DocumentChangeEvent(
+              file!!,
+              changedText,
+              changedText,
+              2,
+              INSERT,
+              "trim().".length,
+              Range.NONE,
+          )
       )
       getCompiler()
-        .compile(
-          CompilationRequest(
-            listOf(SourceFileObject(file)),
-            PartialReparseRequest(179, contents.toString())
+          .compile(
+              CompilationRequest(
+                  listOf(SourceFileObject(file)),
+                  PartialReparseRequest(179, contents.toString()),
+              )
           )
-        )
     }
   }
 
   class AssertingScanner : TreeScanner() {
     private var methodCount = 0
+
     override fun visitMethodDef(tree: JCMethodDecl?) {
       assertThat(tree).isNotNull()
       tree!!

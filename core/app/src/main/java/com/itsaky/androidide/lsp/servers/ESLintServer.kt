@@ -23,7 +23,6 @@ import com.itsaky.androidide.lsp.connection.ProcessStreamProvider
 import com.itsaky.androidide.lsp.core.LspConnectionFactory
 import com.itsaky.androidide.lsp.util.Logger
 import com.itsaky.androidide.lsp.util.LspShellUtils
-import com.itsaky.androidide.models.FileExtension
 import com.itsaky.androidide.utils.Environment
 import java.io.File
 
@@ -34,44 +33,41 @@ import java.io.File
  * @author android_zero
  */
 class ESLintServer : BaseLspServer() {
-    override val id: String = "eslint-lsp"
-    override val languageName: String = "ESLint"
-    override val serverName: String = "vscode-eslint-language-server"
-    override val supportedExtensions: List<String> = listOf("js", "mjs", "cjs", "jscsrc", "jshintrc", "mut","ts", "mts", "cts","jsx","tsx")
+  override val id: String = "eslint-lsp"
+  override val languageName: String = "ESLint"
+  override val serverName: String = "vscode-eslint-language-server"
+  override val supportedExtensions: List<String> =
+      listOf("js", "mjs", "cjs", "jscsrc", "jshintrc", "mut", "ts", "mts", "cts", "jsx", "tsx")
 
-    
-    private val LOG = Logger.instance("ESLintServer")
+  private val LOG = Logger.instance("ESLintServer")
 
-    private val serverBin: File
-        get() = File(Environment.PREFIX, "bin/vscode-eslint-language-server")
+  private val serverBin: File
+    get() = File(Environment.PREFIX, "bin/vscode-eslint-language-server")
 
-    override fun isInstalled(context: Context): Boolean {
-        return LspShellUtils.isTerminalEnvironmentReady() && serverBin.exists()
+  override fun isInstalled(context: Context): Boolean {
+    return LspShellUtils.isTerminalEnvironmentReady() && serverBin.exists()
+  }
+
+  override fun install(context: Context) {
+    val installScript = File(Environment.HOME, ".androidide/local/bin/lsp/eslint")
+    if (installScript.exists()) {
+      LspShellUtils.installPackage(installScript.absolutePath, "$id-installer")
+    } else {
+      LOG.error("ESLint install script missing: ${installScript.absolutePath}")
     }
+  }
 
-    override fun install(context: Context) {
-        val installScript = File(Environment.HOME, ".androidide/local/bin/lsp/eslint")
-        if (installScript.exists()) {
-            LspShellUtils.installPackage(installScript.absolutePath, "$id-installer")
-        } else {
-            LOG.error("ESLint install script missing: ${installScript.absolutePath}")
-        }
+  override fun getConnectionFactory(): LspConnectionFactory {
+    return LspConnectionFactory { workingDir ->
+      ProcessStreamProvider(
+          command =
+              listOf(LspShellUtils.getNodeExecutablePath(), serverBin.absolutePath, "--stdio"),
+          workingDir = workingDir,
+      )
     }
+  }
 
-    override fun getConnectionFactory(): LspConnectionFactory {
-        return LspConnectionFactory { workingDir ->
-            ProcessStreamProvider(
-                command = listOf(
-                    LspShellUtils.getNodeExecutablePath(),
-                    serverBin.absolutePath,
-                    "--stdio"
-                ),
-                workingDir = workingDir
-            )
-        }
-    }
-    
-    override fun isSupported(file: File): Boolean {
-        return supportedExtensions.contains(file.extension.lowercase())
-    }
+  override fun isSupported(file: File): Boolean {
+    return supportedExtensions.contains(file.extension.lowercase())
+  }
 }

@@ -24,8 +24,6 @@ package com.itsaky.androidide.indexing
  */
 interface IIndexerParams<ParamsT : IIndexParams> {
 
-  /**
-   * Parameters for the index.
-   */
+  /** Parameters for the index. */
   val indexParams: ParamsT
 }

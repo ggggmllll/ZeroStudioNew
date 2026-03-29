@@ -17,7 +17,7 @@
 package com.itsaky.androidide.templates.impl.androidstudio.fragments.googleAdMobAdsFragment
 
 fun androidManifestXml() =
-  """
+    """
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- Include required permissions for Google Mobile Ads to run. -->

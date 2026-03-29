@@ -51,7 +51,13 @@ val basicActivityTemplate
 
     category = Category.Activity
     formFactor = FormFactor.Mobile
-    screens = listOf(WizardUiContext.ActivityGallery, WizardUiContext.MenuEntry, WizardUiContext.NewProject, WizardUiContext.NewModule)
+    screens =
+        listOf(
+            WizardUiContext.ActivityGallery,
+            WizardUiContext.MenuEntry,
+            WizardUiContext.NewProject,
+            WizardUiContext.NewModule,
+        )
     constraints = listOf(TemplateConstraint.AndroidX, TemplateConstraint.Material3)
 
     lateinit var activityClass: StringParameter
@@ -86,7 +92,8 @@ val basicActivityTemplate
       name = "Launcher Activity"
       visible = { !isNewModule }
       default = false
-      help = "If true, this activity will have a CATEGORY_LAUNCHER intent filter, making it visible in the launcher"
+      help =
+          "If true, this activity will have a CATEGORY_LAUNCHER intent filter, making it visible in the launcher"
     }
 
     val contentLayoutName: StringParameter = stringParameter {
@@ -130,19 +137,19 @@ val basicActivityTemplate
     val packageName = defaultPackageNameParameter
 
     widgets(
-      TextFieldWidget(activityClass),
-      TextFieldWidget(layoutName),
-      TextFieldWidget(menuName),
-      CheckBoxWidget(isLauncher),
-      Separator, // for example
-      PackageNameWidget(packageName),
-      LanguageWidget(),
+        TextFieldWidget(activityClass),
+        TextFieldWidget(layoutName),
+        TextFieldWidget(menuName),
+        CheckBoxWidget(isLauncher),
+        Separator, // for example
+        PackageNameWidget(packageName),
+        LanguageWidget(),
 
-      // Invisible widgets. Defining these to impose constraints
-      TextFieldWidget(contentLayoutName),
-      TextFieldWidget(firstFragmentLayoutName),
-      TextFieldWidget(secondFragmentLayoutName),
-      TextFieldWidget(navGraphName),
+        // Invisible widgets. Defining these to impose constraints
+        TextFieldWidget(contentLayoutName),
+        TextFieldWidget(firstFragmentLayoutName),
+        TextFieldWidget(secondFragmentLayoutName),
+        TextFieldWidget(navGraphName),
     )
 
     thumb { File("basic-activity-material3").resolve("template_basic_activity_material3.png") }
@@ -151,16 +158,16 @@ val basicActivityTemplate
       val moduleData = data as ModuleTemplateData
 
       generateBasicActivity(
-        moduleData = data,
-        activityClass = activityClass.value,
-        layoutName = layoutName.value,
-        contentLayoutName = contentLayoutName.value,
-        packageName = packageName.value,
-        menuName = menuName.value,
-        isLauncher = isLauncher.value,
-        firstFragmentLayoutName = firstFragmentLayoutName.value,
-        secondFragmentLayoutName = secondFragmentLayoutName.value,
-        navGraphName = navGraphName.value,
+          moduleData = data,
+          activityClass = activityClass.value,
+          layoutName = layoutName.value,
+          contentLayoutName = contentLayoutName.value,
+          packageName = packageName.value,
+          menuName = menuName.value,
+          isLauncher = isLauncher.value,
+          firstFragmentLayoutName = firstFragmentLayoutName.value,
+          secondFragmentLayoutName = secondFragmentLayoutName.value,
+          navGraphName = navGraphName.value,
       )
     }
   }

@@ -48,7 +48,7 @@ open class SpinnerAdapter<T : Spinner> : AbsSpinnerAdapter<T>() {
 
   override fun createUiWidgets(): List<UiWidget> {
     return listOf(
-      UiWidget(Spinner::class.java, R.string.widget_spinner, R.drawable.ic_widget_spinner)
+        UiWidget(Spinner::class.java, R.string.widget_spinner, R.drawable.ic_widget_spinner)
     )
   }
 }

@@ -15,42 +15,37 @@
  *   along with AndroidIDE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 import com.google.protobuf.gradle.id
 import com.itsaky.androidide.build.config.BuildConfig
 
 plugins {
-    id("com.android.library")
-    id("kotlin-android")
+  id("com.android.library")
+  id("kotlin-android")
 }
 
 android {
-    namespace = "${BuildConfig.packageName}.aaptcompiler"
-    
-    buildTypes {
-        release {
-            isMinifyEnabled = false
-        }
-    }
+  namespace = "${BuildConfig.packageName}.aaptcompiler"
+
+  buildTypes { release { isMinifyEnabled = false } }
 }
 
 dependencies {
-    implementation(libs.common.kotlin)
-    implementation(libs.androidx.collection)
-    implementation(libs.composite.jaxp)
+  implementation(libs.common.kotlin)
+  implementation(libs.androidx.collection)
+  implementation(libs.composite.jaxp)
 
-    implementation(projects.logging.logger)
-    implementation(projects.utilities.shared)
+  implementation(projects.logging.logger)
+  implementation(projects.utilities.shared)
 
-    api(projects.xml.resourcesApi)
+  api(projects.xml.resourcesApi)
 
-    api(libs.aapt2.annotations)
-    api(libs.aapt2.common)
-    api(libs.google.protobuf)
-    api(libs.composite.layoutlibApi)
-    
-    testImplementation(libs.tests.junit)
-    testImplementation(libs.tests.robolectric)
-    testImplementation(libs.tests.google.truth)
-    testImplementation(projects.utilities.shared)
+  api(libs.aapt2.annotations)
+  api(libs.aapt2.common)
+  api(libs.google.protobuf)
+  api(libs.composite.layoutlibApi)
+
+  testImplementation(libs.tests.junit)
+  testImplementation(libs.tests.robolectric)
+  testImplementation(libs.tests.google.truth)
+  testImplementation(projects.utilities.shared)
 }

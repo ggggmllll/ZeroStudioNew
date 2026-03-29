@@ -20,8 +20,9 @@ import com.android.tools.idea.wizard.template.activityToLayout
 
 fun stringsXml(activityClass: String, isNewModule: Boolean): String {
   val labelBlock =
-    if (isNewModule) "<string name=\"app_name\">Leanback ${activityClass}</string>"
-    else "<string name=\"title_${activityToLayout(activityClass)}\">Leanback ${activityClass}</string>"
+      if (isNewModule) "<string name=\"app_name\">Leanback ${activityClass}</string>"
+      else
+          "<string name=\"title_${activityToLayout(activityClass)}\">Leanback ${activityClass}</string>"
   return """
 <resources>
     $labelBlock

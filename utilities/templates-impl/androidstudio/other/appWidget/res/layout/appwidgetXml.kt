@@ -22,7 +22,7 @@ import com.itsaky.androidide.templates.impl.androidstudio.other.appWidget.res.va
 import com.itsaky.androidide.templates.impl.androidstudio.other.appWidget.res.values.getAppWidgetTheme
 
 fun appwidgetXml(themesData: ThemesData) =
-  """
+    """
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     style="@style/${getAppWidgetContainerStyleName(themesData.appName)}"
     android:theme="@style/${getAppWidgetTheme(themesData.main.name)}"

@@ -21,7 +21,6 @@ package com.itsaky.androidide.templates.impl.androidstudio.activities.basicActiv
  * @param navGraphName The name of the navigation graph resource.
  * @param navHostFragmentId The unique ID for the NavHostFragment.
  * @return The XML content as a string.
- *
  * @author Historical contributors (The Android Open Source Project)
  * @author android_zero
  */

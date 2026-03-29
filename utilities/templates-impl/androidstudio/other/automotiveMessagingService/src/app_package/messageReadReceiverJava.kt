@@ -18,8 +18,13 @@ package com.itsaky.androidide.templates.impl.androidstudio.other.automotiveMessa
 
 import com.android.tools.idea.wizard.template.getMaterialComponentName
 
-fun messageReadReceiverJava(packageName: String, readReceiverName: String, serviceName: String, useAndroidX: Boolean) =
-  """
+fun messageReadReceiverJava(
+    packageName: String,
+    readReceiverName: String,
+    serviceName: String,
+    useAndroidX: Boolean,
+) =
+    """
 package ${packageName};
 
 import android.content.BroadcastReceiver;

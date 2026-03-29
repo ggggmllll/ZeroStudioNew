@@ -22,10 +22,12 @@ import java.nio.file.Path
 
 data class Location(var file: Path, var range: Range)
 
-data class Position @JvmOverloads constructor(
-  @SerializedName("line") var line: Int,
-  @SerializedName("column") var column: Int,
-  @SerializedName("index") var index: Int = -1
+data class Position
+@JvmOverloads
+constructor(
+    @SerializedName("line") var line: Int,
+    @SerializedName("column") var column: Int,
+    @SerializedName("index") var index: Int = -1,
 ) : Comparable<Position> {
 
   fun requireIndex(): Int {
@@ -48,18 +50,17 @@ data class Position @JvmOverloads constructor(
 
   companion object {
 
-    @JvmField
-    val NONE = Position(-1, -1)
+    @JvmField val NONE = Position(-1, -1)
   }
 
   override fun compareTo(other: Position): Int {
 
     val byLine =
-      when {
-        line < other.line -> -1
-        line > other.line -> 1
-        else -> 0
-      }
+        when {
+          line < other.line -> -1
+          line > other.line -> 1
+          else -> 0
+        }
 
     if (byLine != 0) {
       return byLine
@@ -92,17 +93,17 @@ data class Position @JvmOverloads constructor(
 open class Range
 @JvmOverloads
 constructor(
-  @SerializedName("start") var start: Position = Position(0, 0),
-  @SerializedName("end") var end: Position = Position(0, 0)
+    @SerializedName("start") var start: Position = Position(0, 0),
+    @SerializedName("end") var end: Position = Position(0, 0),
 ) : Comparable<Range> {
 
-  constructor(src: Range) : this(Position(src.start.line, src.start.column),
-    Position(src.end.line, src.end.column))
+  constructor(
+      src: Range
+  ) : this(Position(src.start.line, src.start.column), Position(src.end.line, src.end.column))
 
   companion object {
 
-    @JvmField
-    val NONE = Range(Position.NONE, Position.NONE)
+    @JvmField val NONE = Range(Position.NONE, Position.NONE)
 
     @JvmStatic
     fun pointRange(line: Int, column: Int): Range {
@@ -117,6 +118,7 @@ constructor(
 
   /**
    * Validate the start and end positions.
+   *
    * @see Position.zeroIfNegative()
    */
   fun validate() {

@@ -45,11 +45,12 @@ import org.slf4j.LoggerFactory
  * @author Akash Yadav
  */
 class TemplateDetailsFragment :
-  FragmentWithBinding<FragmentTemplateDetailsBinding>(
-    R.layout.fragment_template_details, FragmentTemplateDetailsBinding::bind) {
+    FragmentWithBinding<FragmentTemplateDetailsBinding>(
+        R.layout.fragment_template_details,
+        FragmentTemplateDetailsBinding::bind,
+    ) {
 
-  private val viewModel by viewModels<MainViewModel>(
-    ownerProducer = { requireActivity() })
+  private val viewModel by viewModels<MainViewModel>(ownerProducer = { requireActivity() })
 
   companion object {
 
@@ -71,23 +72,23 @@ class TemplateDetailsFragment :
       binding.previous.isEnabled = !it
     }
 
-    binding.previous.setOnClickListener {
-      viewModel.setScreen(MainViewModel.SCREEN_TEMPLATE_LIST)
-    }
+    binding.previous.setOnClickListener { viewModel.setScreen(MainViewModel.SCREEN_TEMPLATE_LIST) }
 
     binding.finish.setOnClickListener {
       viewModel.creatingProject.value = true
-      val template = viewModel.template.value ?: run {
-        viewModel.setScreen(MainViewModel.SCREEN_MAIN)
-        return@setOnClickListener
-      }
+      val template =
+          viewModel.template.value
+              ?: run {
+                viewModel.setScreen(MainViewModel.SCREEN_MAIN)
+                return@setOnClickListener
+              }
 
-      val isValid = template.parameters.fold(true) { isValid, param ->
-        if (param is StringParameter) {
-          return@fold isValid && ConstraintVerifier.isValid(param.value,
-            param.constraints)
-        } else isValid
-      }
+      val isValid =
+          template.parameters.fold(true) { isValid, param ->
+            if (param is StringParameter) {
+              return@fold isValid && ConstraintVerifier.isValid(param.value, param.constraints)
+            } else isValid
+          }
 
       if (!isValid) {
         viewModel.creatingProject.value = false
@@ -96,10 +97,8 @@ class TemplateDetailsFragment :
       }
 
       viewModel.creatingProject.value = true
-      executeAsyncProvideError({
-        template.recipe.execute(TemplateRecipeExecutor())
-      }) { result, err ->
-
+      executeAsyncProvideError({ template.recipe.execute(TemplateRecipeExecutor()) }) { result, err
+        ->
         viewModel.creatingProject.value = false
         if (result == null || err != null || result !is ProjectTemplateRecipeResult) {
           err?.printStackTrace()

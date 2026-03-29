@@ -33,25 +33,22 @@ import com.itsaky.androidide.resources.R.string
  *
  * @author Akash Yadav
  */
-@com.itsaky.androidide.annotations.inflater.ViewAdapter(
-  forView = RadioGroup::class)
+@com.itsaky.androidide.annotations.inflater.ViewAdapter(forView = RadioGroup::class)
 @IncludeInDesigner(group = LAYOUTS)
 open class RadioGroupAdapter<T : RadioGroup> : LinearLayoutAdapter<T>() {
 
-  override fun createAttrHandlers(
-    create: (String, AttributeHandlerScope<T>.() -> Unit) -> Unit
-  ) {
+  override fun createAttrHandlers(create: (String, AttributeHandlerScope<T>.() -> Unit) -> Unit) {
     super.createAttrHandlers(create)
     create("checkedButton") { view.check(parseId(file.resName, value, -1)) }
   }
 
   override fun createUiWidgets(): List<UiWidget> {
-    return listOf(UiWidget(RadioGroup::class.java, string.widget_radio_group,
-      drawable.ic_widget_radio_group))
+    return listOf(
+        UiWidget(RadioGroup::class.java, string.widget_radio_group, drawable.ic_widget_radio_group)
+    )
   }
 
-  override fun canAcceptChild(view: IViewGroup, child: IView?, name: String
-  ): Boolean {
+  override fun canAcceptChild(view: IViewGroup, child: IView?, name: String): Boolean {
     return name == RadioButton::class.java.name
   }
 }

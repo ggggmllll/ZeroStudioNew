@@ -24,21 +24,24 @@ import com.android.tools.idea.wizard.template.impl.activities.common.layoutToVie
 import com.android.tools.idea.wizard.template.renderIf
 
 fun fullscreenActivityKt(
-  activityClass: String,
-  applicationPackage: String?,
-  layoutName: String,
-  packageName: String,
-  superClassFqcn: String,
-  isViewBindingSupported: Boolean,
+    activityClass: String,
+    applicationPackage: String?,
+    layoutName: String,
+    packageName: String,
+    superClassFqcn: String,
+    isViewBindingSupported: Boolean,
 ): String {
-  val applicationPackageBlock = renderIf(applicationPackage != null) { "import ${escapeKotlinIdentifier(applicationPackage!!)}.R" }
+  val applicationPackageBlock =
+      renderIf(applicationPackage != null) {
+        "import ${escapeKotlinIdentifier(applicationPackage!!)}.R"
+      }
   val contentViewBlock =
-    if (isViewBindingSupported)
-      """
+      if (isViewBindingSupported)
+          """
      binding = ${layoutToViewBindingClass(layoutName)}.inflate(layoutInflater)
      setContentView(binding.root)
   """
-    else "setContentView(R.layout.$layoutName)"
+      else "setContentView(R.layout.$layoutName)"
 
   return """package ${escapeKotlinIdentifier(packageName)}
 

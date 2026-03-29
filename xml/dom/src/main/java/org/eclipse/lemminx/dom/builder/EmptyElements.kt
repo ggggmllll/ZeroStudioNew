@@ -25,5 +25,5 @@ package org.eclipse.lemminx.dom.builder
 enum class EmptyElements {
   Expand,
   Collapse,
-  Ignore
+  Ignore,
 }

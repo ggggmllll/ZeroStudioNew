@@ -16,22 +16,22 @@ class FlashAnim(private val compositeAnim: AnimatorSet) {
       val primaryAnim = compositeAnim.childAnimations[0] as ObjectAnimator
 
       primaryAnim.addListener(
-        object : Animator.AnimatorListener {
-          override fun onAnimationRepeat(animator: Animator) {}
+          object : Animator.AnimatorListener {
+            override fun onAnimationRepeat(animator: Animator) {}
 
-          override fun onAnimationEnd(animator: Animator) {
-            listener.onStop()
+            override fun onAnimationEnd(animator: Animator) {
+              listener.onStop()
 
-            primaryAnim.removeAllListeners()
-            primaryAnim.removeAllUpdateListeners()
+              primaryAnim.removeAllListeners()
+              primaryAnim.removeAllUpdateListeners()
+            }
+
+            override fun onAnimationCancel(animator: Animator) {}
+
+            override fun onAnimationStart(animator: Animator) {
+              listener.onStart()
+            }
           }
-
-          override fun onAnimationCancel(animator: Animator) {}
-
-          override fun onAnimationStart(animator: Animator) {
-            listener.onStart()
-          }
-        }
       )
 
       primaryAnim.addUpdateListener { listener.onUpdate(it.animatedFraction) }
@@ -42,7 +42,9 @@ class FlashAnim(private val compositeAnim: AnimatorSet) {
 
   internal interface InternalAnimListener {
     fun onStart()
+
     fun onUpdate(progress: Float)
+
     fun onStop()
   }
 }

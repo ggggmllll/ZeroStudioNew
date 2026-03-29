@@ -32,25 +32,31 @@ import com.itsaky.androidide.templates.base.util.isValidModuleName
 import com.itsaky.androidide.templates.base.util.moduleNameToDirName
 import com.itsaky.androidide.templates.impl.ConstraintVerifier
 import com.itsaky.androidide.utils.FileProvider
+import java.io.File
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
-import java.io.File
 
-/**
- * @author Akash Yadav
- */
+/** @author Akash Yadav */
 @RunWith(RobolectricTestRunner::class)
 @Config(application = BaseApplication::class)
 class UtilTest {
 
   @Test
   fun `test module name conversion`() {
-    val tests = mapOf("2app" to "app", "app2" to "app2", "2app2" to "app2",
-      "2 app2" to "app2", "app name" to "app-name", "app  name" to "app-name",
-      "app-name" to "app-name", "app--name" to "app-name",
-      "my_module" to "my_module")
+    val tests =
+        mapOf(
+            "2app" to "app",
+            "app2" to "app2",
+            "2app2" to "app2",
+            "2 app2" to "app2",
+            "app name" to "app-name",
+            "app  name" to "app-name",
+            "app-name" to "app-name",
+            "app--name" to "app-name",
+            "my_module" to "my_module",
+        )
 
     tests.forEach { (input, expected) ->
       assertThat(moduleNameToDirName(input)).isEqualTo(expected)
@@ -59,9 +65,17 @@ class UtilTest {
 
   @Test
   fun `test module name validation`() {
-    val tests = mapOf("2app" to false, "app2" to true, "2app2" to false,
-      "2 app2" to false, "app name" to false, "app  name" to false,
-      "app-name" to true, "app--name" to false)
+    val tests =
+        mapOf(
+            "2app" to false,
+            "app2" to true,
+            "2app2" to false,
+            "2 app2" to false,
+            "app name" to false,
+            "app  name" to false,
+            "app-name" to true,
+            "app--name" to false,
+        )
 
     tests.forEach { (name, result) ->
       println("Check $name")
@@ -72,7 +86,6 @@ class UtilTest {
   @Test
   fun `test constraint verifier`() {
     ConstraintVerifier.apply {
-
       assertThat(isValid("", listOf(NONEMPTY))).isFalse()
       assertThat(isValid("something", listOf(NONEMPTY))).isTrue()
 

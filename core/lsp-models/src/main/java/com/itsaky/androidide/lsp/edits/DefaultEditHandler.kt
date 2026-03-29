@@ -41,12 +41,12 @@ open class DefaultEditHandler : IEditHandler {
   }
 
   override fun performEdits(
-    item: CompletionItem,
-    editor: CodeEditor,
-    text: Content,
-    line: Int,
-    column: Int,
-    index: Int
+      item: CompletionItem,
+      editor: CodeEditor,
+      text: Content,
+      line: Int,
+      column: Int,
+      index: Int,
   ) {
     if (Looper.myLooper() != Looper.getMainLooper()) {
       ThreadUtils.runOnUiThread { performEditsInternal(item, editor, text, line, column, index) }
@@ -57,12 +57,12 @@ open class DefaultEditHandler : IEditHandler {
   }
 
   protected open fun performEditsInternal(
-    item: CompletionItem,
-    editor: CodeEditor,
-    text: Content,
-    line: Int,
-    column: Int,
-    index: Int
+      item: CompletionItem,
+      editor: CodeEditor,
+      text: Content,
+      line: Int,
+      column: Int,
+      index: Int,
   ) {
     if (item.insertTextFormat == SNIPPET) {
       insertSnippet(item, editor, text, line, column, index)
@@ -85,12 +85,12 @@ open class DefaultEditHandler : IEditHandler {
   }
 
   protected open fun insertSnippet(
-    item: CompletionItem,
-    editor: CodeEditor,
-    text: Content,
-    line: Int,
-    column: Int,
-    index: Int
+      item: CompletionItem,
+      editor: CodeEditor,
+      text: Content,
+      line: Int,
+      column: Int,
+      index: Int,
   ) {
     val snippetDescription = item.snippetDescription!!
     val snippet = CodeSnippetParser.parse(item.insertText)

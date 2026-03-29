@@ -34,10 +34,10 @@ open class DefaultComponentFactory : IComponentFactory {
   }
 
   override fun createAttr(
-    view: IView,
-    namespace: INamespace?,
-    name: String,
-    value: String
+      view: IView,
+      namespace: INamespace?,
+      name: String,
+      value: String,
   ): IAttribute {
     return AttributeImpl(namespace = namespace, name = name, value = value)
   }

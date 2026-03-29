@@ -182,5 +182,4 @@ class EditorSearchLayout(context: Context, val editor: IDEEditor) : FrameLayout(
   fun setOnSearchVisibilityChangeListener(listener: ((Boolean) -> Unit)?) {
     searchVisibilityListener = listener
   }
-
 }

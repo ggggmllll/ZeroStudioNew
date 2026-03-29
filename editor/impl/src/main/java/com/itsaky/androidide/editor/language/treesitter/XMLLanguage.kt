@@ -32,7 +32,7 @@ import io.github.rosemoe.sora.util.MyCharacter
  * @author Akash Yadav
  */
 class XMLLanguage(context: Context) :
-  TreeSitterLanguage(context, lang = TSLanguageXml.getInstance(), langType = TS_TYPE) {
+    TreeSitterLanguage(context, lang = TSLanguageXml.getInstance(), langType = TS_TYPE) {
 
   override val languageServer: ILanguageServer?
     get() = ILanguageServerRegistry.getDefault().getServer(XMLLanguageServer.SERVER_ID)
@@ -45,9 +45,9 @@ class XMLLanguage(context: Context) :
     const val TS_TYPE_QRC = "qrc"
     const val TS_TYPE_SVG = "svg"
     const val TS_TYPE_KML = "kml"
- // ".xsd", ".xsl", ".xslt", ".svg", ".kml", ".pom", 
-        // ".plist", ".fxml", ".jnlp", ".wsdl", ".tld", ".dtml", ".rng", 
-        // ".rss", ".atom", ".xul", ".mxml", ".iml",".ant",".form", ".jrxml"
+    // ".xsd", ".xsl", ".xslt", ".svg", ".kml", ".pom",
+    // ".plist", ".fxml", ".jnlp", ".wsdl", ".tld", ".dtml", ".rng",
+    // ".rss", ".atom", ".xul", ".mxml", ".iml",".ant",".form", ".jrxml"
     @JvmField val FACTORY = Factory { XMLLanguage(it) }
   }
 

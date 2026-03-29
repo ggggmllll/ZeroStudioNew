@@ -28,40 +28,25 @@ import com.itsaky.androidide.treesitter.string.UTF16StringFactory
  *
  * @author Akash Yadav
  */
-class TsTextDocument(
-  language: TSLanguage
-) : AutoCloseable {
+class TsTextDocument(language: TSLanguage) : AutoCloseable {
 
-  @Volatile
-  private var documentVersion = 1L
+  @Volatile private var documentVersion = 1L
 
-  /**
-   * The version of this text document.
-   */
+  /** The version of this text document. */
   val version: Long
     get() = documentVersion
 
-  /**
-   * The source text.
-   */
+  /** The source text. */
   val text = UTF16StringFactory.newString()
 
-  /**
-   * The parser used to parse the source text into a syntax tree.
-   */
-  val parser = TSParser.create().also {
-    it.language = language
-  }
+  /** The parser used to parse the source text into a syntax tree. */
+  val parser = TSParser.create().also { it.language = language }
 
-  /**
-   * The syntax tree.
-   */
+  /** The syntax tree. */
   var tree: TSTree? = null
     internal set
 
-  /**
-   * Request the parser to cancel parsing if a parsing is in progress.
-   */
+  /** Request the parser to cancel parsing if a parsing is in progress. */
   fun requestCancellationAndWaitIfParsing() {
     if (parser.isParsing) {
       parser.requestCancellationAndWait()
@@ -69,8 +54,8 @@ class TsTextDocument(
   }
 
   /**
-   * Initialize the source text with the given initialization message. The caller is responsible
-   * for handling the source text state i.e. this method does not check whether the text is already
+   * Initialize the source text with the given initialization message. The caller is responsible for
+   * handling the source text state i.e. this method does not check whether the text is already
    * initialized or not.
    */
   internal fun doInit(init: TextInit) {

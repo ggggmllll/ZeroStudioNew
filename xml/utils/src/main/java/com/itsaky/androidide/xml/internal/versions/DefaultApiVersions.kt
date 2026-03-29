@@ -56,11 +56,9 @@ internal class DefaultApiVersions : ApiVersions {
   }
 
   private fun computeClass(
-    name: String,
-    version: ApiVersion? = null
+      name: String,
+      version: ApiVersion? = null,
   ): Pair<ApiVersion?, HashMap<String, ApiVersion>> {
-    return classes.computeIfAbsent(name.flatten()) {
-      version to hashMapOf()
-    }
+    return classes.computeIfAbsent(name.flatten()) { version to hashMapOf() }
   }
 }

@@ -27,7 +27,12 @@ import com.android.tools.idea.wizard.template.impl.activities.composeActivityMat
 import com.android.tools.idea.wizard.template.impl.activities.composeActivityMaterial3.src.app_package.ui.typeKt
 import java.io.File
 
-fun RecipeExecutor.aiStarterRecipe(moduleData: ModuleTemplateData, activityClass: String, packageName: String, isLauncher: Boolean) {
+fun RecipeExecutor.aiStarterRecipe(
+    moduleData: ModuleTemplateData,
+    activityClass: String,
+    packageName: String,
+    isLauncher: Boolean,
+) {
   val (_, srcOut, resOut, _) = moduleData
   addAllKotlinDependencies(moduleData)
 
@@ -43,7 +48,11 @@ fun RecipeExecutor.aiStarterRecipe(moduleData: ModuleTemplateData, activityClass
   addComposeDependencies(moduleData)
 
   // KSP is needed for Room
-  addPlugin("com.google.devtools.ksp", "com.google.devtools.ksp:symbol-processing-gradle-plugin", "2.3.5")
+  addPlugin(
+      "com.google.devtools.ksp",
+      "com.google.devtools.ksp:symbol-processing-gradle-plugin",
+      "2.3.5",
+  )
 
   val navigationVersion = "2.8.9"
   addDependency("androidx.navigation:navigation-compose:$navigationVersion")
@@ -54,7 +63,10 @@ fun RecipeExecutor.aiStarterRecipe(moduleData: ModuleTemplateData, activityClass
   addDependency("androidx.room:room-compiler:$roomVersion", configuration = "ksp")
 
   addDependency("junit:junit:4.13.2", configuration = "testImplementation")
-  addDependency("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2", configuration = "testImplementation")
+  addDependency(
+      "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2",
+      configuration = "testImplementation",
+  )
   addDependency("androidx.test:core:1.6.1", configuration = "testImplementation")
   addDependency("androidx.test.ext:junit:1.3.0", configuration = "testImplementation")
   addDependency("androidx.test:runner:1.6.2", configuration = "androidTestImplementation")
@@ -113,25 +125,28 @@ fun RecipeExecutor.aiStarterRecipe(moduleData: ModuleTemplateData, activityClass
   generateThemeStyles(moduleData.themesData.main, true, resOut)
 
   generateManifest(
-    moduleData = moduleData,
-    activityClass = activityClass,
-    activityThemeName = moduleData.themesData.main.name,
-    packageName = packageName,
-    isLauncher = isLauncher,
-    hasNoActionBar = true,
-    generateActivityTitle = true,
+      moduleData = moduleData,
+      activityClass = activityClass,
+      activityThemeName = moduleData.themesData.main.name,
+      packageName = packageName,
+      isLauncher = isLauncher,
+      hasNoActionBar = true,
+      generateActivityTitle = true,
   )
   mergeXml(
-    """
-    <manifest xmlns:android ="http://schemas.android.com/apk/res/android">
-      <uses-permission android:name="android.permission.INTERNET" />
-    </manifest>
-    """
-      .trimIndent(),
-    moduleData.manifestDir.resolve("AndroidManifest.xml"),
+      """
+      <manifest xmlns:android ="http://schemas.android.com/apk/res/android">
+        <uses-permission android:name="android.permission.INTERNET" />
+      </manifest>
+      """
+          .trimIndent(),
+      moduleData.manifestDir.resolve("AndroidManifest.xml"),
   )
 
-  save(mainActivityKt(activityClass, "GreetingPreview", "Greeting", packageName, themeName), srcOut.resolve("${activityClass}.kt"))
+  save(
+      mainActivityKt(activityClass, "GreetingPreview", "Greeting", packageName, themeName),
+      srcOut.resolve("${activityClass}.kt"),
+  )
   val uiThemeFolder = "ui/theme"
   save(colorKt(packageName), srcOut.resolve("$uiThemeFolder/Color.kt"))
   save(themeKt(packageName, themeName), srcOut.resolve("$uiThemeFolder/Theme.kt"))

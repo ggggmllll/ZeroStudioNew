@@ -34,7 +34,7 @@ open class SourceClassTrie(root: SourcePackageNode = SourcePackageNode()) : Clas
     @JvmStatic
     private val pkgNameMethod by lazy {
       Class.forName("com.itsaky.androidide.projects.util.StringSearch")
-        .getDeclaredMethod("packageName", Path::class.java)
+          .getDeclaredMethod("packageName", Path::class.java)
     }
 
     @JvmStatic
@@ -69,24 +69,24 @@ open class SourceClassTrie(root: SourcePackageNode = SourcePackageNode()) : Clas
 
     val name = path.nameWithoutExtension
     val klass =
-      SourceNode(
-        file = path,
-        packageName = packageName,
-        modified = modified,
-        parent = node,
-        name = name
-      )
+        SourceNode(
+            file = path,
+            packageName = packageName,
+            modified = modified,
+            parent = node,
+            name = name,
+        )
     klass.isClass = true
     node.children[name] = klass
     return klass
   }
 
   open fun createNode(
-    dir: Path,
-    node: SourcePackageNode,
-    segment: String,
-    segments: List<String>,
-    index: Int
+      dir: Path,
+      node: SourcePackageNode,
+      segment: String,
+      segments: List<String>,
+      index: Int,
   ) = node.createChild(dir, segment, segments.subList(0, index + 1).joinToString(separator = "."))
 
   override fun createNode(node: Node, segment: String, segments: List<String>, index: Int): Node {
@@ -105,9 +105,9 @@ open class SourceClassTrie(root: SourcePackageNode = SourcePackageNode()) : Clas
     var dirNode: SourcePackageNode? = null
     for (child in node.children.values) {
       if (
-        child !is SourceNode &&
-          child is SourcePackageNode &&
-          DocumentUtils.isSameFile(child.dir, dir)
+          child !is SourceNode &&
+              child is SourcePackageNode &&
+              DocumentUtils.isSameFile(child.dir, dir)
       ) {
         dirNode = child
       }
@@ -146,11 +146,11 @@ open class SourceClassTrie(root: SourcePackageNode = SourcePackageNode()) : Clas
   }
 
   open class SourceNode(
-    val file: Path,
-    val packageName: String,
-    val modified: Instant,
-    parent: SourcePackageNode? = null,
-    name: String
+      val file: Path,
+      val packageName: String,
+      val modified: Instant,
+      parent: SourcePackageNode? = null,
+      name: String,
   ) : Node(name = name, qualifiedName = "$packageName.$name", parent = parent) {
 
     override fun createChild(name: String, qualifiedName: String): Node {
@@ -159,10 +159,10 @@ open class SourceClassTrie(root: SourcePackageNode = SourcePackageNode()) : Clas
   }
 
   open class SourcePackageNode(
-    val dir: Path,
-    parent: SourcePackageNode? = null,
-    name: String,
-    qualifiedName: String
+      val dir: Path,
+      parent: SourcePackageNode? = null,
+      name: String,
+      qualifiedName: String,
   ) : Node(name, qualifiedName, parent) {
 
     internal constructor() : this(Paths.get(""), null, "", "")

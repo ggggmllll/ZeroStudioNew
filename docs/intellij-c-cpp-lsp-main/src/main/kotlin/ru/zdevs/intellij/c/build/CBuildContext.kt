@@ -4,7 +4,7 @@ import com.intellij.execution.process.KillableProcessHandler
 import java.util.concurrent.atomic.AtomicInteger
 
 class CBuildContext(val processHandler: KillableProcessHandler) {
-    val buildId = Any()
-    val errors = AtomicInteger()
-    val warnings = AtomicInteger()
+  val buildId = Any()
+  val errors = AtomicInteger()
+  val warnings = AtomicInteger()
 }

@@ -22,7 +22,6 @@ package com.itsaky.androidide.preferences.internal
  *
  * @author Akash Yadav
  * @author android_zero
- *
  */
 @Suppress("MemberVisibilityCanBePrivate")
 object EditorPreferences {
@@ -52,13 +51,13 @@ object EditorPreferences {
 
   const val COLOR_SCHEME = "idepref_editor_colorScheme"
   const val DEFAULT_COLOR_SCHEME = "default"
-  
-  //光标与选择
+
+  // 光标与选择
   const val SMOOTH_CURSOR_MOVEMENT = "idepref_editor_smoothCursorMovement"
-  
+
   const val CURSOR_STYLE = "idepref_editor_cursorStyle"
   const val CLEAR_LOGCAT_BEFORE_RUN = "idepref_run_clearLogcatBeforeRun"
-  
+
   // Keys for Auto-Save feature
   const val AUTO_COMPLETE_ON_TYPE = "idepref_editor_autoCompleteOnType"
   const val AUTO_SAVE_ENABLED = "idepref_editor_autoSaveEnabled"
@@ -114,7 +113,7 @@ object EditorPreferences {
     set(value) {
       prefManager.putInt(TAB_SIZE, value)
     }
-  
+
   var fontLigatures: Boolean
     get() = prefManager.getBoolean(FONT_LIGATURES, true)
     set(value) {
@@ -184,13 +183,13 @@ object EditorPreferences {
   var pinLineNumbers: Boolean
     get() = prefManager.getBoolean(PIN_LINE_NUMBERS, true)
     set(value) = prefManager.putBoolean(PIN_LINE_NUMBERS, value)
-    
-    var smoothCursorMovement: Boolean
+
+  var smoothCursorMovement: Boolean
     get() = prefManager.getBoolean(SMOOTH_CURSOR_MOVEMENT, false)
     set(value) {
       prefManager.putBoolean(SMOOTH_CURSOR_MOVEMENT, value)
     }
-    
+
   // Properties for Auto-Save feature
   var autoSaveEnabled: Boolean
     get() = prefManager.getBoolean(AUTO_SAVE_ENABLED, true) // Default to open Auto-Save feature
@@ -221,8 +220,8 @@ object EditorPreferences {
     set(value) {
       prefManager.putBoolean(AUTO_SAVE_BEFORE_BUILD, value)
     }
-    
-    var cursorStyle: String
+
+  var cursorStyle: String
     get() = prefManager.getString(CURSOR_STYLE, "Block") // Default to Block
     set(value) {
       prefManager.putString(CURSOR_STYLE, value)
@@ -233,5 +232,4 @@ object EditorPreferences {
     set(value) {
       prefManager.putBoolean(AUTO_COMPLETE_ON_TYPE, value)
     }
-
 }

@@ -27,7 +27,7 @@ import io.github.rosemoe.sora.lang.completion.CompletionPublisher
  * @author Akash Yadav
  */
 class CompletionCancelChecker(private val publisher: CompletionPublisher) :
-  ICancelChecker.Default() {
+    ICancelChecker.Default() {
 
   /** Check if the completion is cancelled. */
   @Throws(CompletionCancelledException::class)

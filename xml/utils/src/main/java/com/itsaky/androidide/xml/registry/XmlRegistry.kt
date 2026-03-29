@@ -27,9 +27,7 @@ import java.io.File
  */
 interface XmlRegistry<T> {
 
-  /**
-   * Whether the actions should be logged.
-   */
+  /** Whether the actions should be logged. */
   var isLoggingEnabled: Boolean
 
   /**

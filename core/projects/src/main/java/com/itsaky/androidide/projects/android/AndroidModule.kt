@@ -140,7 +140,8 @@ open class AndroidModule(
   override fun getSourceDirectories(): Set<File> {
     if (mainSourceSet == null) {
       log.warn(
-        "No main source set is available for project {}. Cannot get source directories.", name
+          "No main source set is available for project {}. Cannot get source directories.",
+          name,
       )
       return mutableSetOf()
     }
@@ -201,84 +202,93 @@ open class AndroidModule(
     return result
   }
 
-    /**
-     * @author android_zero
-     * @description [Compose Preview Support]
-     *              Gets intermediate classpaths like compiled .class files and R.jar,
-     *              which are essential for Compose Preview to dynamically load and render
-     *              user-defined Composable functions from the source code.
-     *
-     * @return A set of File objects pointing to directories and JARs containing intermediate build artifacts.
-     */
-    override fun getIntermediateClasspaths(): Set<File> {
-        val result = mutableSetOf<File>()
-        val variant = getSelectedVariant()?.name ?: "debug"
-        val buildDirectory = buildDir // Inherited from ModuleProject
+  /**
+   * @return A set of File objects pointing to directories and JARs containing intermediate build
+   *   artifacts.
+   * @author android_zero
+   * @description [Compose Preview Support] Gets intermediate classpaths like compiled .class files
+   *   and R.jar, which are essential for Compose Preview to dynamically load and render
+   *   user-defined Composable functions from the source code.
+   */
+  override fun getIntermediateClasspaths(): Set<File> {
+    val result = mutableSetOf<File>()
+    val variant = getSelectedVariant()?.name ?: "debug"
+    val buildDirectory = buildDir // Inherited from ModuleProject
 
-        // Path to compiled Kotlin classes
-        val kotlinClasses = File(buildDirectory, "tmp/kotlin-classes/$variant")
-        if (kotlinClasses.exists()) {
-            result.add(kotlinClasses)
-        }
-
-        // Path to compiled Java classes
-        val javaClassesDir = File(buildDirectory, "intermediates/javac/$variant")
-        if (javaClassesDir.exists()) {
-            javaClassesDir.walkTopDown()
-                .filter { it.name == "classes" && it.isDirectory }
-                .forEach { result.add(it) }
-        }
-
-        // Path to the R class JAR
-        val rClassJar = File(buildDirectory, "intermediates/compile_and_runtime_not_namespaced_r_class_jar/$variant/R.jar")
-        if (rClassJar.exists()) {
-            result.add(rClassJar)
-        }
-
-        return result
+    // Path to compiled Kotlin classes
+    val kotlinClasses = File(buildDirectory, "tmp/kotlin-classes/$variant")
+    if (kotlinClasses.exists()) {
+      result.add(kotlinClasses)
     }
 
-    /**
-     * @author android_zero
-     * @description [Compose Preview & Layout Inspector Support]
-     *              Retrieves the paths to the generated DEX files for the current variant.
-     *              These files are crucial for dynamic class loading mechanisms used by
-     *              tools like Layout Inspector and Compose Preview to render live UI components.
-     *
-     * @return A set of File objects pointing to the .dex files.
-     */
-    override fun getRuntimeDexFiles(): Set<File> {
-        val result = mutableSetOf<File>()
-        val variant = getSelectedVariant()?.name ?: "debug"
-        val buildDirectory = buildDir
-
-        log.info("getRuntimeDexFiles: Searching in buildDir='{}' for variant='{}'", buildDirectory.absolutePath, variant)
-
-        // Standard DEX output directory used by AGP
-        val dexDir = File(buildDirectory, "intermediates/dex/$variant")
-        if (dexDir.exists()) {
-            dexDir.walkTopDown()
-                .filter { it.isFile && it.extension == "dex" }
-                .forEach {
-                    log.debug("Found DEX file: {}", it.absolutePath)
-                    result.add(it)
-                }
-        }
-
-        // Merged project DEX archive directory
-        val mergeProjectDexDir = File(buildDirectory, "intermediates/project_dex_archive/$variant")
-        if (mergeProjectDexDir.exists()) {
-            mergeProjectDexDir.walkTopDown()
-                .filter { it.isFile && it.extension == "dex" }
-                .forEach {
-                    log.debug("Found DEX file in project_dex_archive: {}", it.absolutePath)
-                    result.add(it)
-                }
-        }
-        
-        log.info("Total DEX files found for module '{}': {}", name, result.size)
-        return result
+    // Path to compiled Java classes
+    val javaClassesDir = File(buildDirectory, "intermediates/javac/$variant")
+    if (javaClassesDir.exists()) {
+      javaClassesDir
+          .walkTopDown()
+          .filter { it.name == "classes" && it.isDirectory }
+          .forEach { result.add(it) }
     }
+
+    // Path to the R class JAR
+    val rClassJar =
+        File(
+            buildDirectory,
+            "intermediates/compile_and_runtime_not_namespaced_r_class_jar/$variant/R.jar",
+        )
+    if (rClassJar.exists()) {
+      result.add(rClassJar)
+    }
+
+    return result
+  }
+
+  /**
+   * @return A set of File objects pointing to the .dex files.
+   * @author android_zero
+   * @description [Compose Preview & Layout Inspector Support] Retrieves the paths to the generated
+   *   DEX files for the current variant. These files are crucial for dynamic class loading
+   *   mechanisms used by tools like Layout Inspector and Compose Preview to render live UI
+   *   components.
+   */
+  override fun getRuntimeDexFiles(): Set<File> {
+    val result = mutableSetOf<File>()
+    val variant = getSelectedVariant()?.name ?: "debug"
+    val buildDirectory = buildDir
+
+    log.info(
+        "getRuntimeDexFiles: Searching in buildDir='{}' for variant='{}'",
+        buildDirectory.absolutePath,
+        variant,
+    )
+
+    // Standard DEX output directory used by AGP
+    val dexDir = File(buildDirectory, "intermediates/dex/$variant")
+    if (dexDir.exists()) {
+      dexDir
+          .walkTopDown()
+          .filter { it.isFile && it.extension == "dex" }
+          .forEach {
+            log.debug("Found DEX file: {}", it.absolutePath)
+            result.add(it)
+          }
+    }
+
+    // Merged project DEX archive directory
+    val mergeProjectDexDir = File(buildDirectory, "intermediates/project_dex_archive/$variant")
+    if (mergeProjectDexDir.exists()) {
+      mergeProjectDexDir
+          .walkTopDown()
+          .filter { it.isFile && it.extension == "dex" }
+          .forEach {
+            log.debug("Found DEX file in project_dex_archive: {}", it.absolutePath)
+            result.add(it)
+          }
+    }
+
+    log.info("Total DEX files found for module '{}': {}", name, result.size)
+    return result
+  }
 
   /**
    * Build a map of existing dependencies from classpath files. Key format: "group:name", Value:
@@ -310,27 +320,22 @@ open class AndroidModule(
     return depMap
   }
 
-  /**
-   * [FIXED] Get dependencies from version catalog that don't conflict with existing ones.
-   */
+  /** [FIXED] Get dependencies from version catalog that don't conflict with existing ones. */
   private fun getVersionCatalogDependencies(existingDeps: Map<String, File>): Set<File> {
-      // The `projectDir` of this AndroidModule is the module's directory.
-      // The new VersionCatalogClasspathProvider handles finding the root project dir itself.
-      return try {
-          log.debug("Resolving version catalog dependencies for module: {}", path)
-          
-          // Directly call the static (companion object) method with the module's `projectDir`.
-          val jars = VersionCatalogClasspathProvider.getClasspathFromCatalog(
-              projectDir, 
-              existingDeps
-          )
+    // The `projectDir` of this AndroidModule is the module's directory.
+    // The new VersionCatalogClasspathProvider handles finding the root project dir itself.
+    return try {
+      log.debug("Resolving version catalog dependencies for module: {}", path)
 
-          log.info("Resolved {} JARs from version catalog for module: {}", jars.size, path)
-          jars
-      } catch (e: Exception) {
-          log.error("Failed to resolve version catalog dependencies for module {}", path, e)
-          emptySet()
-      }
+      // Directly call the static (companion object) method with the module's `projectDir`.
+      val jars = VersionCatalogClasspathProvider.getClasspathFromCatalog(projectDir, existingDeps)
+
+      log.info("Resolved {} JARs from version catalog for module: {}", jars.size, path)
+      jars
+    } catch (e: Exception) {
+      log.error("Failed to resolve version catalog dependencies for module {}", path, e)
+      emptySet()
+    }
   }
 
   private fun collectLibraries(root: IWorkspace, libraries: Set<String>, result: MutableSet<File>) {
@@ -374,7 +379,7 @@ open class AndroidModule(
 
     return result
   }
-  
+
   /**
    * Reads the resource files are creates the [com.android.aaptcompiler.ResourceTable] instances for
    * the corresponding resource directories.

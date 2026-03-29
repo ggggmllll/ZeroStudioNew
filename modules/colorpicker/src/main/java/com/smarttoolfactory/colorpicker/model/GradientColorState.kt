@@ -16,93 +16,97 @@ import com.smarttoolfactory.extendedcolors.util.ColorUtil
 @Composable
 fun rememberGradientColorState(
     color: Color = Color.Unspecified,
-    size: DpSize = DpSize.Zero
+    size: DpSize = DpSize.Zero,
 ): GradientColorState {
 
-    val density = LocalDensity.current
+  val density = LocalDensity.current
 
-    return remember {
-
-        val sizePx = if (size == DpSize.Zero) {
-            Size.Zero
+  return remember {
+    val sizePx =
+        if (size == DpSize.Zero) {
+          Size.Zero
         } else {
-            with(density) {
-                Size(
-                    size.width.toPx(),
-                    size.height.toPx()
-                )
-            }
+          with(density) { Size(size.width.toPx(), size.height.toPx()) }
         }
-        GradientColorState(color, sizePx)
-    }
+    GradientColorState(color, sizePx)
+  }
 }
 
 /**
- * Gradient and color state for setting and getting gradient color
- * with [gradientType] such as Linear, Radial or Sweep, [tileMode]s, and [colorStops].
+ * Gradient and color state for setting and getting gradient color with [gradientType] such as
+ * Linear, Radial or Sweep, [tileMode]s, and [colorStops].
  * * Linear gradient uses [gradientOffset] to set offset or angle.
  * * Radial gradient uses [centerFriction] and [radiusFriction]
  */
 class GradientColorState internal constructor(initialColor: Color, size: Size) {
 
-    var size by mutableStateOf(size)
-    var color: Color = initialColor
+  var size by mutableStateOf(size)
+  var color: Color = initialColor
 
-    val hexString: String
-        get() {
-            return ColorUtil.colorToHexAlpha(color)
-        }
+  val hexString: String
+    get() {
+      return ColorUtil.colorToHexAlpha(color)
+    }
 
-    val brush: Brush
-        get() {
+  val brush: Brush
+    get() {
 
-            val colorStops = if (colorStops.size == 1) {
-                listOf(colorStops.first(), colorStops.first()).toTypedArray()
-            } else {
-                colorStops.toTypedArray()
-            }
+      val colorStops =
+          if (colorStops.size == 1) {
+            listOf(colorStops.first(), colorStops.first()).toTypedArray()
+          } else {
+            colorStops.toTypedArray()
+          }
 
-            val brush = when (gradientType) {
-                GradientType.Linear -> Brush.linearGradient(
+      val brush =
+          when (gradientType) {
+            GradientType.Linear ->
+                Brush.linearGradient(
                     colorStops = colorStops,
                     start = gradientOffset.start,
                     end = gradientOffset.end,
-                    tileMode = tileMode
+                    tileMode = tileMode,
                 )
-                GradientType.Radial -> Brush.radialGradient(
+            GradientType.Radial ->
+                Brush.radialGradient(
                     colorStops = colorStops,
-                    center = Offset(
-                        x = size.width * centerFriction.x,
-                        y = size.height * centerFriction.y
-                    ),
-                    radius = ((size.width.coerceAtLeast(size.height)) / 2 * radiusFriction)
-                        .coerceAtLeast(0.01f),
-                    tileMode = tileMode
+                    center =
+                        Offset(
+                            x = size.width * centerFriction.x,
+                            y = size.height * centerFriction.y,
+                        ),
+                    radius =
+                        ((size.width.coerceAtLeast(size.height)) / 2 * radiusFriction)
+                            .coerceAtLeast(0.01f),
+                    tileMode = tileMode,
                 )
-                GradientType.Sweep -> Brush.sweepGradient(
+            GradientType.Sweep ->
+                Brush.sweepGradient(
                     colorStops = colorStops,
-                    center = Offset(
-                        x = size.width * centerFriction.x,
-                        y = size.height * centerFriction.y
-                    ),
+                    center =
+                        Offset(
+                            x = size.width * centerFriction.x,
+                            y = size.height * centerFriction.y,
+                        ),
                 )
-            }
-            return brush
-        }
+          }
+      return brush
+    }
 
-    val brushColor: BrushColor
-        get() {
-            return BrushColor(color = color, brush = brush)
-        }
+  val brushColor: BrushColor
+    get() {
+      return BrushColor(color = color, brush = brush)
+    }
 
-    var gradientType: GradientType by mutableStateOf(GradientType.Linear)
-    var colorStops = mutableStateListOf(
-        0.0f to Color.Red,
-        0.3f to Color.Green,
-        1.0f to Color.Blue,
-    )
-    var tileMode by mutableStateOf(TileMode.Clamp)
-    var gradientOffset by mutableStateOf(GradientOffset(GradientAngle.CW0))
-    var centerFriction by mutableStateOf(Offset(.5f, .5f))
-    var radiusFriction by mutableStateOf(.5f)
+  var gradientType: GradientType by mutableStateOf(GradientType.Linear)
+  var colorStops =
+      mutableStateListOf(
+          0.0f to Color.Red,
+          0.3f to Color.Green,
+          1.0f to Color.Blue,
+      )
+  var tileMode by mutableStateOf(TileMode.Clamp)
+  var gradientOffset by mutableStateOf(GradientOffset(GradientAngle.CW0))
+  var centerFriction by mutableStateOf(Offset(.5f, .5f))
+  var radiusFriction by mutableStateOf(.5f)
 }

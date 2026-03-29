@@ -21,6 +21,7 @@ import com.itsaky.androidide.models.Range
 
 /**
  * Model class for a syntax highlighting token.
+ *
  * @author Akash Yadav
  */
 data class HighlightToken(var range: Range, var kind: HighlightTokenKind)
@@ -58,5 +59,5 @@ enum class HighlightTokenKind {
   TAG_NAME,
   NAMESPACE,
   ATTRIBUTE_NAME,
-  ATTRIBUTE_VALUE
+  ATTRIBUTE_VALUE,
 }

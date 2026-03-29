@@ -25,24 +25,24 @@ import com.android.tools.idea.wizard.template.renderIf
 import com.android.tools.idea.wizard.template.underscoreToLowerCamelCase
 
 fun drawerActivityKt(
-  packageName: String,
-  applicationPackage: String?,
-  activityClass: String,
-  appBarLayoutName: String,
-  layoutName: String,
-  menuName: String,
-  navHostFragmentId: String,
-  useAndroidX: Boolean,
-  isViewBindingSupported: Boolean,
+    packageName: String,
+    applicationPackage: String?,
+    activityClass: String,
+    appBarLayoutName: String,
+    layoutName: String,
+    menuName: String,
+    navHostFragmentId: String,
+    useAndroidX: Boolean,
+    isViewBindingSupported: Boolean,
 ): String {
 
   val contentViewBlock =
-    if (isViewBindingSupported)
-      """
+      if (isViewBindingSupported)
+          """
      binding = ${layoutToViewBindingClass(layoutName)}.inflate(layoutInflater)
      setContentView(binding.root)
   """
-    else "setContentView(R.layout.$layoutName)"
+      else "setContentView(R.layout.$layoutName)"
   val appBarMainBinding = underscoreToLowerCamelCase(appBarLayoutName)
   return """
 package ${escapeKotlinIdentifier(packageName)}

@@ -24,32 +24,34 @@ import com.itsaky.androidide.treesitter.TSQueryMatch
 import com.itsaky.androidide.treesitter.TSTree
 import org.slf4j.LoggerFactory
 
-@PublishedApi
-internal val log = LoggerFactory.getLogger("TsUtilsKt")
+@PublishedApi internal val log = LoggerFactory.getLogger("TsUtilsKt")
 
 /**
- * Safely create a query cursor and execute the given [TSQuery]. The given [action] will be called for
- * every [TSQueryMatch]. If the tree, cursor, tree or the tree's node is closed or edited while the cursor is
- * querying the node, the [onClosedOrEdited] will be called.
+ * Safely create a query cursor and execute the given [TSQuery]. The given [action] will be called
+ * for every [TSQueryMatch]. If the tree, cursor, tree or the tree's node is closed or edited while
+ * the cursor is querying the node, the [onClosedOrEdited] will be called.
  *
  * This method does not close the [TSQueryCursor] instance.
  */
 inline fun <ResultT> TSQueryCursor.safeExecQueryCursor(
-  query: TSQuery,
-  tree: TSTree?,
-  recycleNodeAfterUse: Boolean = true,
-  crossinline matchCondition: (TSQueryMatch?) -> Boolean = { true },
-  crossinline whileTrue: (TSQueryMatch?) -> Boolean = { true },
-  crossinline onClosedOrEdited: () -> Unit = {},
-  debugName: String = "",
-  debugLogging: Boolean = false,
-  crossinline action: (TSQueryMatch) -> ResultT
+    query: TSQuery,
+    tree: TSTree?,
+    recycleNodeAfterUse: Boolean = true,
+    crossinline matchCondition: (TSQueryMatch?) -> Boolean = { true },
+    crossinline whileTrue: (TSQueryMatch?) -> Boolean = { true },
+    crossinline onClosedOrEdited: () -> Unit = {},
+    debugName: String = "",
+    debugLogging: Boolean = false,
+    crossinline action: (TSQueryMatch) -> ResultT,
 ): ResultT? {
 
   if (tree == null || !tree.canAccess()) {
     if (debugLogging) {
-      log.debug("$debugName: Cannot execute query, tree is null or not accessible", "tree=$tree",
-        "tree.canAccess=${tree?.canAccess()}")
+      log.debug(
+          "$debugName: Cannot execute query, tree is null or not accessible",
+          "tree=$tree",
+          "tree.canAccess=${tree?.canAccess()}",
+      )
     }
     return null
   }
@@ -58,77 +60,83 @@ inline fun <ResultT> TSQueryCursor.safeExecQueryCursor(
   if (!rootNode.canAccess() || rootNode.hasChanges()) {
     if (debugLogging) {
       log.debug(
-        "$debugName, Cannot execute query, tree's root node is not accessible or has been edited",
-        "rootNode=$rootNode", "rootNode.canAccess=${rootNode.canAccess()}",
-        "rootNode.hasChanges=${rootNode.canAccess() && rootNode.hasChanges()}")
+          "$debugName, Cannot execute query, tree's root node is not accessible or has been edited",
+          "rootNode=$rootNode",
+          "rootNode.canAccess=${rootNode.canAccess()}",
+          "rootNode.hasChanges=${rootNode.canAccess() && rootNode.hasChanges()}",
+      )
     }
     return null
   }
 
   return safeExecQueryCursor(
-    query = query,
-    node = rootNode,
-    recycleNodeAfterUse = recycleNodeAfterUse,
-    matchCondition = {
-      val result = tree.canAccess() && matchCondition(it)
-      if (!result && debugLogging) {
-        log.debug("$debugName: tree.canAccess=${tree.canAccess()}")
-      }
-      result
-    },
-    whileTrue = whileTrue,
-    onClosedOrEdited = onClosedOrEdited,
-    debugName = debugName,
-    debugLogging = debugLogging,
-    action = action
+      query = query,
+      node = rootNode,
+      recycleNodeAfterUse = recycleNodeAfterUse,
+      matchCondition = {
+        val result = tree.canAccess() && matchCondition(it)
+        if (!result && debugLogging) {
+          log.debug("$debugName: tree.canAccess=${tree.canAccess()}")
+        }
+        result
+      },
+      whileTrue = whileTrue,
+      onClosedOrEdited = onClosedOrEdited,
+      debugName = debugName,
+      debugLogging = debugLogging,
+      action = action,
   )
 }
 
 /**
- * Safely create a query cursor and execute the given [TSQuery]. The given [action] will be called for
- * every [TSQueryMatch]. If the tree, cursor or the node is closed or edited while the cursor is
+ * Safely create a query cursor and execute the given [TSQuery]. The given [action] will be called
+ * for every [TSQueryMatch]. If the tree, cursor or the node is closed or edited while the cursor is
  * querying the node, the [onClosedOrEdited] will be called.
  *
  * This method does not close the [TSQueryCursor] instance.
  */
 inline fun <ResultT> TSQueryCursor.safeExecQueryCursor(
-  query: TSQuery,
-  node: TSNode,
-  recycleNodeAfterUse: Boolean = true,
-  crossinline matchCondition: (TSQueryMatch?) -> Boolean = { true },
-  crossinline whileTrue: (TSQueryMatch?) -> Boolean = { true },
-  crossinline onClosedOrEdited: () -> Unit = {},
-  debugName: String = "",
-  debugLogging: Boolean = false,
-  crossinline action: (TSQueryMatch) -> ResultT
+    query: TSQuery,
+    node: TSNode,
+    recycleNodeAfterUse: Boolean = true,
+    crossinline matchCondition: (TSQueryMatch?) -> Boolean = { true },
+    crossinline whileTrue: (TSQueryMatch?) -> Boolean = { true },
+    crossinline onClosedOrEdited: () -> Unit = {},
+    debugName: String = "",
+    debugLogging: Boolean = false,
+    crossinline action: (TSQueryMatch) -> ResultT,
 ): ResultT? {
 
   return doSafeExecQueryCursor(
-    query = query,
-    node = node,
-    recycleNodeAfterUse = recycleNodeAfterUse,
-    matchCondition = { match ->
-      match != null && canAccess() && node.canAccess() && !node.hasChanges() && matchCondition(
-        match)
-    },
-    whileTrue = whileTrue,
-    onClosedOrEdited = onClosedOrEdited,
-    debugName = debugName,
-    debugLogging = debugLogging,
-    action = action)
+      query = query,
+      node = node,
+      recycleNodeAfterUse = recycleNodeAfterUse,
+      matchCondition = { match ->
+        match != null &&
+            canAccess() &&
+            node.canAccess() &&
+            !node.hasChanges() &&
+            matchCondition(match)
+      },
+      whileTrue = whileTrue,
+      onClosedOrEdited = onClosedOrEdited,
+      debugName = debugName,
+      debugLogging = debugLogging,
+      action = action,
+  )
 }
 
 @PublishedApi
 internal inline fun <ResultT> TSQueryCursor.doSafeExecQueryCursor(
-  query: TSQuery,
-  node: TSNode,
-  recycleNodeAfterUse: Boolean = true,
-  crossinline matchCondition: (TSQueryMatch?) -> Boolean,
-  crossinline whileTrue: (TSQueryMatch?) -> Boolean,
-  crossinline onClosedOrEdited: () -> Unit,
-  debugName: String = "",
-  debugLogging: Boolean = false,
-  crossinline action: (TSQueryMatch) -> ResultT
+    query: TSQuery,
+    node: TSNode,
+    recycleNodeAfterUse: Boolean = true,
+    crossinline matchCondition: (TSQueryMatch?) -> Boolean,
+    crossinline whileTrue: (TSQueryMatch?) -> Boolean,
+    crossinline onClosedOrEdited: () -> Unit,
+    debugName: String = "",
+    debugLogging: Boolean = false,
+    crossinline action: (TSQueryMatch) -> ResultT,
 ): ResultT? {
 
   if (!query.canAccess()) {
@@ -140,9 +148,11 @@ internal inline fun <ResultT> TSQueryCursor.doSafeExecQueryCursor(
 
   if (!node.canAccess() || node.hasChanges()) {
     if (debugLogging) {
-      log.debug("$debugName: Cannot execute query, node is not accessible or has been edited",
-        "node.canAccess=${node.canAccess()}",
-        "node.hasChanges=${node.canAccess() && node.hasChanges()}")
+      log.debug(
+          "$debugName: Cannot execute query, node is not accessible or has been edited",
+          "node.canAccess=${node.canAccess()}",
+          "node.hasChanges=${node.canAccess() && node.hasChanges()}",
+      )
     }
     return null
   }
@@ -156,11 +166,11 @@ internal inline fun <ResultT> TSQueryCursor.doSafeExecQueryCursor(
     if (!matchCondition(match)) {
       if (debugLogging) {
         log.debug(
-          "$debugName: Cannot proceed with query operation.",
-          "cursor.canAccess=${canAccess()}",
-          "query.canAccess=${query.canAccess()}",
-          "node.canAccess=${node.canAccess()}",
-          "node.hasChanges=${node.canAccess() && node.hasErrors()}"
+            "$debugName: Cannot proceed with query operation.",
+            "cursor.canAccess=${canAccess()}",
+            "query.canAccess=${query.canAccess()}",
+            "node.canAccess=${node.canAccess()}",
+            "node.hasChanges=${node.canAccess() && node.hasErrors()}",
         )
       }
       onClosedOrEdited()

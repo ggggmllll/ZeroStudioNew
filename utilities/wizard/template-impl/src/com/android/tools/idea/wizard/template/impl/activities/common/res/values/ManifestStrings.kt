@@ -18,11 +18,15 @@ package com.android.tools.idea.wizard.template.impl.activities.common.res.values
 import com.android.tools.idea.wizard.template.activityToLayout
 import com.android.tools.idea.wizard.template.renderIf
 
-fun manifestStrings(activityClass: String, isNewModule: Boolean, generateActivityTitle: Boolean): String {
+fun manifestStrings(
+    activityClass: String,
+    isNewModule: Boolean,
+    generateActivityTitle: Boolean,
+): String {
   val innerBlock =
-    renderIf(!isNewModule && generateActivityTitle) {
-      """<string name="title_${activityToLayout(activityClass)}">$activityClass</string>"""
-    }
+      renderIf(!isNewModule && generateActivityTitle) {
+        """<string name="title_${activityToLayout(activityClass)}">$activityClass</string>"""
+      }
 
   return """
 <resources>

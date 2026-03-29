@@ -30,25 +30,19 @@ import com.itsaky.androidide.databinding.FragmentRecyclerviewBinding
  * @author Akash Yadav
  */
 abstract class RecyclerViewFragment<A : RecyclerView.Adapter<*>> :
-  EmptyStateFragment<FragmentRecyclerviewBinding>(FragmentRecyclerviewBinding::inflate) {
+    EmptyStateFragment<FragmentRecyclerviewBinding>(FragmentRecyclerviewBinding::inflate) {
 
   private var unsavedAdapter: A? = null
 
-  /**
-   * Creates the adapter for the [RecyclerView].
-   */
+  /** Creates the adapter for the [RecyclerView]. */
   protected abstract fun onCreateAdapter(): RecyclerView.Adapter<*>
 
-  /**
-   * Creates the layout manager for the [RecyclerView].
-   */
+  /** Creates the layout manager for the [RecyclerView]. */
   protected open fun onCreateLayoutManager(): LayoutManager {
     return LinearLayoutManager(requireContext())
   }
 
-  /**
-   * Sets up the recycler view in the fragment.
-   */
+  /** Sets up the recycler view in the fragment. */
   protected open fun onSetupRecyclerView() {
     binding.root.apply {
       layoutManager = onCreateLayoutManager()
@@ -70,9 +64,7 @@ abstract class RecyclerViewFragment<A : RecyclerView.Adapter<*>> :
     unsavedAdapter = null
   }
 
-  /**
-   * Set the adapter for the [RecyclerView].
-   */
+  /** Set the adapter for the [RecyclerView]. */
   fun setAdapter(adapter: A) {
     _binding?.root?.let { list -> list.adapter = adapter } ?: run { unsavedAdapter = adapter }
     checkIsEmpty()

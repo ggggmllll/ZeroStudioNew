@@ -47,55 +47,55 @@ open class TextViewAdapter<T : TextView> : ViewAdapter<T>() {
     create("drawableLeft") {
       val drawables = view.compoundDrawables
       view.setCompoundDrawables(
-        parseDrawable(context, value),
-        drawables[1],
-        drawables[2],
-        drawables[3]
+          parseDrawable(context, value),
+          drawables[1],
+          drawables[2],
+          drawables[3],
       )
     }
     create("drawableTop") {
       val drawables = view.compoundDrawables
       view.setCompoundDrawables(
-        drawables[0],
-        parseDrawable(context, value),
-        drawables[2],
-        drawables[3]
+          drawables[0],
+          parseDrawable(context, value),
+          drawables[2],
+          drawables[3],
       )
     }
     create("drawableRight") {
       val drawables = view.compoundDrawables
       view.setCompoundDrawables(
-        drawables[0],
-        drawables[1],
-        parseDrawable(context, value),
-        drawables[3]
+          drawables[0],
+          drawables[1],
+          parseDrawable(context, value),
+          drawables[3],
       )
     }
     create("drawableBottom") {
       val drawables = view.compoundDrawables
       view.setCompoundDrawables(
-        drawables[0],
-        drawables[1],
-        drawables[2],
-        parseDrawable(context, value)
+          drawables[0],
+          drawables[1],
+          drawables[2],
+          parseDrawable(context, value),
       )
     }
     create("drawableStart") {
       val drawablesRelative = view.compoundDrawablesRelative
       view.setCompoundDrawables(
-        parseDrawable(context, value),
-        drawablesRelative[1],
-        drawablesRelative[2],
-        drawablesRelative[3]
+          parseDrawable(context, value),
+          drawablesRelative[1],
+          drawablesRelative[2],
+          drawablesRelative[3],
       )
     }
     create("drawableEnd") {
       val drawablesRelative = view.compoundDrawablesRelative
       view.setCompoundDrawables(
-        drawablesRelative[0],
-        drawablesRelative[1],
-        parseDrawable(context, value),
-        drawablesRelative[3]
+          drawablesRelative[0],
+          drawablesRelative[1],
+          parseDrawable(context, value),
+          drawablesRelative[3],
       )
     }
     create("drawablePadding") { view.compoundDrawablePadding = parseDimension(context, value, 0) }
@@ -115,8 +115,8 @@ open class TextViewAdapter<T : TextView> : ViewAdapter<T>() {
     create("textColorHint") { view.setHintTextColor(parseColor(context, value)) }
     create("textSize") {
       view.setTextSize(
-        TypedValue.COMPLEX_UNIT_PX,
-        parseDimensionF(context, value, SizeUtils.sp2px(14f).toFloat())
+          TypedValue.COMPLEX_UNIT_PX,
+          parseDimensionF(context, value, SizeUtils.sp2px(14f).toFloat()),
       )
     }
     create("textStyle") { view.setTypeface(view.typeface, parseTextStyle(value)) }
@@ -125,7 +125,7 @@ open class TextViewAdapter<T : TextView> : ViewAdapter<T>() {
 
   override fun createUiWidgets(): List<UiWidget> {
     return listOf(
-      UiWidget(TextView::class.java, R.string.widget_textview, R.drawable.ic_widget_textview)
+        UiWidget(TextView::class.java, R.string.widget_textview, R.drawable.ic_widget_textview)
     )
   }
 
@@ -137,7 +137,7 @@ open class TextViewAdapter<T : TextView> : ViewAdapter<T>() {
 
   protected open fun parseTextStyle(value: String): Int {
     val splits: Array<String> =
-      value.split(Pattern.quote("|").toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        value.split(Pattern.quote("|").toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
     var mask = 0
     for (split in splits) {
       mask = mask or textStyleFor(split)
@@ -177,7 +177,7 @@ open class TextViewAdapter<T : TextView> : ViewAdapter<T>() {
 
   protected open fun parseAutoLinkMask(value: String): Int {
     val splits: Array<String> =
-      value.split(Pattern.quote("|").toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        value.split(Pattern.quote("|").toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
     var mask = 0
     for (split in splits) {
       mask = mask or autoLinkMaskFor(split)

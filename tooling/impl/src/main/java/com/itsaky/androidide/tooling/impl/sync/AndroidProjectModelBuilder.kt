@@ -92,10 +92,8 @@ class AndroidProjectModelBuilder(initializationParams: InitializeProjectParams) 
             ModelBuilderParameter::class.java,
         ) {
           it.variantName = configurationVariant
-          it.additionalArtifactsInModel =
-              true
-          it.dontBuildRuntimeClasspath =
-              false
+          it.additionalArtifactsInModel = true
+          it.dontBuildRuntimeClasspath = false
           it.dontBuildUnitTestRuntimeClasspath = true
           it.dontBuildScreenshotTestRuntimeClasspath = true
           it.dontBuildAndroidTestRuntimeClasspath = true

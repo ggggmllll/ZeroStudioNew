@@ -24,20 +24,16 @@ import com.blankj.utilcode.util.ConvertUtils
 import com.google.common.truth.Truth
 import com.itsaky.androidide.testing.android.rules.RealmDBTestRule
 import io.realm.RealmModel
+import java.io.File
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.io.File
 
-/**
- * @author Akash Yadav
- */
+/** @author Akash Yadav */
 @RunWith(AndroidJUnit4::class)
 class JavaIndexerTest {
 
-  @Rule
-  @JvmField
-  val dbTestRule = RealmDBTestRule(JavaIndexingRealmModule())
+  @Rule @JvmField val dbTestRule = RealmDBTestRule(JavaIndexingRealmModule())
 
   val androidJar: File by lazy {
     val context = ApplicationProvider.getApplicationContext<Context>()
@@ -67,9 +63,7 @@ class JavaIndexerTest {
 
         if (batched.size >= 100) {
           val start = System.currentTimeMillis()
-          executeTransaction {
-            insertOrUpdate(batched)
-          }
+          executeTransaction { insertOrUpdate(batched) }
           dbWriteDuration += System.currentTimeMillis() - start
 
           batched.clear()
@@ -79,15 +73,13 @@ class JavaIndexerTest {
       for ((_, batched) in batches) {
         if (batched.isNotEmpty()) {
           val start = System.currentTimeMillis()
-          executeTransaction {
-            insertOrUpdate(batched)
-          }
+          executeTransaction { insertOrUpdate(batched) }
           dbWriteDuration += System.currentTimeMillis() - start
         }
       }
 
       println(
-        "Took ${dbWriteDuration}ms to write android.jar (${
+          "Took ${dbWriteDuration}ms to write android.jar (${
           ConvertUtils.byte2FitMemorySize(
             androidJar.length()
           )

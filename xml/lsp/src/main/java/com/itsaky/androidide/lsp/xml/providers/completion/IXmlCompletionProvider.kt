@@ -90,22 +90,22 @@ abstract class IXmlCompletionProvider(private val provider: ICompletionProvider)
    * @return The completion result.
    */
   fun complete(
-    params: CompletionParams,
-    pathData: ResourcePathData,
-    document: DOMDocument,
-    type: NodeType,
-    prefix: String
+      params: CompletionParams,
+      pathData: ResourcePathData,
+      document: DOMDocument,
+      type: NodeType,
+      prefix: String,
   ): CompletionResult {
     if (!canProvideCompletions(pathData, type)) {
       return CompletionResult.EMPTY
     }
 
     this.nodeAtCursor =
-      document.findNodeAt(params.position.requireIndex()) ?: return CompletionResult.EMPTY
+        document.findNodeAt(params.position.requireIndex()) ?: return CompletionResult.EMPTY
 
     if (type == ATTRIBUTE_VALUE || type == ATTRIBUTE) {
       this.attrAtCursor =
-        document.findAttrAt(params.position.requireIndex()) ?: return CompletionResult.EMPTY
+          document.findAttrAt(params.position.requireIndex()) ?: return CompletionResult.EMPTY
     }
 
     this.allNamespaces = findAllNamespaces(this.nodeAtCursor)
@@ -122,11 +122,11 @@ abstract class IXmlCompletionProvider(private val provider: ICompletionProvider)
    * @return The completion result.
    */
   protected abstract fun doComplete(
-    params: CompletionParams,
-    pathData: ResourcePathData,
-    document: DOMDocument,
-    type: NodeType,
-    prefix: String
+      params: CompletionParams,
+      pathData: ResourcePathData,
+      document: DOMDocument,
+      type: NodeType,
+      prefix: String,
   ): CompletionResult
 
   /**
@@ -138,22 +138,22 @@ abstract class IXmlCompletionProvider(private val provider: ICompletionProvider)
    * @return The completion item.
    */
   protected open fun createTagCompletionItem(
-    simpleName: String,
-    qualifiedName: String,
-    matchLevel: MatchLevel,
-    isPlatformWidget: Boolean = false
+      simpleName: String,
+      qualifiedName: String,
+      matchLevel: MatchLevel,
+      isPlatformWidget: Boolean = false,
   ): CompletionItem =
-    CompletionItem().apply {
-      this.ideLabel = simpleName
-      this.detail = qualifiedName
-      this.ideSortText = ideLabel
-      this.insertText = if (isPlatformWidget) simpleName else qualifiedName
-      this.insertTextFormat = PLAIN_TEXT
-      this.editHandler = TagEditHandler()
-      this.matchLevel = matchLevel
-      this.completionKind = CLASS
-      this.data = ClassCompletionData(className = qualifiedName)
-    }
+      CompletionItem().apply {
+        this.ideLabel = simpleName
+        this.detail = qualifiedName
+        this.ideSortText = ideLabel
+        this.insertText = if (isPlatformWidget) simpleName else qualifiedName
+        this.insertTextFormat = PLAIN_TEXT
+        this.editHandler = TagEditHandler()
+        this.matchLevel = matchLevel
+        this.completionKind = CLASS
+        this.data = ClassCompletionData(className = qualifiedName)
+      }
 
   /**
    * Creates completion item for attribute completion items.
@@ -162,33 +162,33 @@ abstract class IXmlCompletionProvider(private val provider: ICompletionProvider)
    * @param matchLevel The match level.
    */
   protected open fun createAttrCompletionItem(
-    attr: com.android.aaptcompiler.Reference,
-    partial: String,
-    resPkg: String,
-    nsPrefix: String,
-    hasNamespace: Boolean,
-    matchLevel: MatchLevel
+      attr: com.android.aaptcompiler.Reference,
+      partial: String,
+      resPkg: String,
+      nsPrefix: String,
+      hasNamespace: Boolean,
+      matchLevel: MatchLevel,
   ): CompletionItem =
-    CompletionItem().apply {
-      var prefix = nsPrefix
-      if (nsPrefix.isBlank()) {
-        prefix = ""
-      } else if (!nsPrefix.endsWith(':')) {
-        prefix += ":"
-      }
+      CompletionItem().apply {
+        var prefix = nsPrefix
+        if (nsPrefix.isBlank()) {
+          prefix = ""
+        } else if (!nsPrefix.endsWith(':')) {
+          prefix += ":"
+        }
 
-      val title = "$prefix${attr.name.entry!!}"
-      val insertText = if (hasNamespace) attr.name.entry!! else title
-      this.ideLabel = title
-      this.completionKind = FIELD
-      this.detail = "From package '$resPkg'"
-      this.insertText = "$insertText=\"$0\""
-      this.insertTextFormat = SNIPPET
-      this.snippetDescription = describeSnippet(partial)
-      this.ideSortText = ideLabel
-      this.matchLevel = matchLevel
-      this.command = Command("Trigger completion request", Command.TRIGGER_COMPLETION)
-    }
+        val title = "$prefix${attr.name.entry!!}"
+        val insertText = if (hasNamespace) attr.name.entry!! else title
+        this.ideLabel = title
+        this.completionKind = FIELD
+        this.detail = "From package '$resPkg'"
+        this.insertText = "$insertText=\"$0\""
+        this.insertTextFormat = SNIPPET
+        this.snippetDescription = describeSnippet(partial)
+        this.ideSortText = ideLabel
+        this.matchLevel = matchLevel
+        this.command = Command("Trigger completion request", Command.TRIGGER_COMPLETION)
+      }
 
   /**
    * Create a completion item for an attribute's value.
@@ -199,10 +199,10 @@ abstract class IXmlCompletionProvider(private val provider: ICompletionProvider)
    * @param matchLevel The match level.
    */
   protected open fun createAttrValueCompletionItem(
-    pck: String = "",
-    type: String,
-    name: String,
-    matchLevel: MatchLevel
+      pck: String = "",
+      type: String,
+      name: String,
+      matchLevel: MatchLevel,
   ): CompletionItem {
     val sb = StringBuilder()
     sb.append("@")
@@ -236,9 +236,9 @@ abstract class IXmlCompletionProvider(private val provider: ICompletionProvider)
    * @param matchLevel The match level.
    */
   protected open fun createEnumOrFlagCompletionItem(
-    pck: String = "",
-    name: String,
-    matchLevel: MatchLevel
+      pck: String = "",
+      name: String,
+      matchLevel: MatchLevel,
   ): CompletionItem {
     return CompletionItem().apply {
       this.ideLabel = name
@@ -267,21 +267,21 @@ abstract class IXmlCompletionProvider(private val provider: ICompletionProvider)
 
     if (pck == ResourceTableRegistry.PCK_ANDROID) {
       val platformResTable =
-        Lookup.getDefault().lookup(ResourceTableRegistry.COMPLETION_FRAMEWORK_RES)
-          ?: run {
-            log.debug("No platform resource table is set")
-            return emptySet()
-          }
+          Lookup.getDefault().lookup(ResourceTableRegistry.COMPLETION_FRAMEWORK_RES)
+              ?: run {
+                log.debug("No platform resource table is set")
+                return emptySet()
+              }
 
       return setOf(platformResTable)
     }
 
     val table =
-      ResourceTableRegistry.getInstance().forPackage(pck)
-        ?: run {
-          log.error("Cannot find resource table for package: $pck")
-          return emptySet()
-        }
+        ResourceTableRegistry.getInstance().forPackage(pck)
+            ?: run {
+              log.error("Cannot find resource table for package: $pck")
+              return emptySet()
+            }
 
     return setOf(table)
   }

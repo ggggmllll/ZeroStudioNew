@@ -43,9 +43,9 @@ import com.itsaky.androidide.xml.internal.resources.DefaultResourceTableRegistry
 import com.itsaky.androidide.xml.res.IResourceTable
 import com.itsaky.androidide.xml.resources.ResourceTableRegistry
 import com.itsaky.androidide.xml.resources.ResourceTableRegistry.Companion.PCK_ANDROID
-import org.slf4j.LoggerFactory
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
+import org.slf4j.LoggerFactory
 
 /**
  * Default implementation of the [ResourceTableRegistry].
@@ -66,14 +66,14 @@ class DefaultResourceTableRegistry : ResourceTableRegistry {
     BROADCAST_ACTIONS(FN_INTENT_ACTIONS_BROADCAST),
     SERVICE_ACTIONS(FN_INTENT_ACTIONS_SERVICE),
     CATEGORIES(FN_INTENT_CATEGORIES),
-    FEATURES("features.txt")
+    FEATURES("features.txt"),
   }
 
   private val tables = ConcurrentHashMap<String, ResourceTable>()
   private val platformTables = ConcurrentHashMap<String, ResourceTable>()
   private val manifestAttrs = ConcurrentHashMap<String, ResourceTable>()
   private val singleLineValueEntries =
-    ConcurrentHashMap<String, ConcurrentHashMap<SingleLineValueEntryType, List<String>>>()
+      ConcurrentHashMap<String, ConcurrentHashMap<SingleLineValueEntryType, List<String>>>()
 
   companion object {
 
@@ -89,14 +89,12 @@ class DefaultResourceTableRegistry : ResourceTableRegistry {
     }
 
     return tables[name]
-      ?: createTable(*resDirs)?.also {
-        tables[name] = it
-        it.packages.firstOrNull()?.name = name
+        ?: createTable(*resDirs)?.also {
+          tables[name] = it
+          it.packages.firstOrNull()?.name = name
 
-        resDirs.forEach { resDir ->
-          addFileReferences(it, name, resDir)
+          resDirs.forEach { resDir -> addFileReferences(it, name, resDir) }
         }
-      }
   }
 
   override fun forPlatformDir(platform: File): IResourceTable? {
@@ -111,10 +109,10 @@ class DefaultResourceTableRegistry : ResourceTableRegistry {
 
   override fun getManifestAttrTable(platform: File): ResourceTable? {
     return manifestAttrs[platform.path]
-      ?: createManifestAttrTable(platform)?.also {
-        manifestAttrs[platform.path] = it
-        it.packages.firstOrNull()?.name = PCK_ANDROID
-      }
+        ?: createManifestAttrTable(platform)?.also {
+          manifestAttrs[platform.path] = it
+          it.packages.firstOrNull()?.name = PCK_ANDROID
+        }
   }
 
   override fun getActivityActions(platform: File): List<String> {
@@ -153,15 +151,15 @@ class DefaultResourceTableRegistry : ResourceTableRegistry {
     }
 
     return entries[type]
-      ?: run {
-        readSingleLineEntriesTo(platform, type, entries)
-        entries[type] ?: emptyList()
-      }
+        ?: run {
+          readSingleLineEntriesTo(platform, type, entries)
+          entries[type] ?: emptyList()
+        }
   }
 
   private fun readSingleLineEntry(
-    platform: File,
-    type: SingleLineValueEntryType
+      platform: File,
+      type: SingleLineValueEntryType,
   ): ConcurrentHashMap<SingleLineValueEntryType, List<String>> {
     val map = ConcurrentHashMap<SingleLineValueEntryType, List<String>>()
     readSingleLineEntriesTo(platform, type, map)
@@ -169,9 +167,9 @@ class DefaultResourceTableRegistry : ResourceTableRegistry {
   }
 
   private fun readSingleLineEntriesTo(
-    platform: File,
-    type: SingleLineValueEntryType,
-    map: ConcurrentHashMap<SingleLineValueEntryType, List<String>>
+      platform: File,
+      type: SingleLineValueEntryType,
+      map: ConcurrentHashMap<SingleLineValueEntryType, List<String>>,
   ) {
     val file = File(platform, "${SdkConstants.FD_DATA}/${type.filename}")
     if (!file.exists() || !file.canRead()) {
@@ -197,12 +195,12 @@ class DefaultResourceTableRegistry : ResourceTableRegistry {
 
   private fun platformResourceTable(dir: File): ResourceTable? {
     return platformTables[dir.path]
-      ?: createTable(dir)?.also { table ->
-        platformTables[dir.path] = table
-        table.packages.firstOrNull()?.name = PCK_ANDROID
+        ?: createTable(dir)?.also { table ->
+          platformTables[dir.path] = table
+          table.packages.firstOrNull()?.name = PCK_ANDROID
 
-        addFileReferences(table, PCK_ANDROID, dir)
-      }
+          addFileReferences(table, PCK_ANDROID, dir)
+        }
   }
 
   private fun createTable(vararg resDirs: File): ResourceTable? {
@@ -241,35 +239,34 @@ class DefaultResourceTableRegistry : ResourceTableRegistry {
           typeName = typeName.substringBefore('-')
         }
 
-        val type = try {
-          AaptResourceType.valueOf(typeName.uppercase())
-        } catch (error: Exception) {
-          if (isLoggingEnabled) {
-            log.warn("Unknown resource type: {} :: {}", typeName.uppercase(), error.message)
-          }
-          AaptResourceType.UNKNOWN
-        }
+        val type =
+            try {
+              AaptResourceType.valueOf(typeName.uppercase())
+            } catch (error: Exception) {
+              if (isLoggingEnabled) {
+                log.warn("Unknown resource type: {} :: {}", typeName.uppercase(), error.message)
+              }
+              AaptResourceType.UNKNOWN
+            }
         val resName = ResourceName(pck, type, file.nameWithoutExtension)
-        table.addFileReference(
-          resName, ConfigDescription(),
-          Source(file.path), file.path
-        )
+        table.addFileReference(resName, ConfigDescription(), Source(file.path), file.path)
       }
     }
   }
 
   private fun getDefaultOptions(): TableExtractorOptions {
     return TableExtractorOptions(
-      translatable = true, errorOnPositionalArgs = false,
-      visibility = PUBLIC
+        translatable = true,
+        errorOnPositionalArgs = false,
+        visibility = PUBLIC,
     )
   }
 
   private fun updateFromDirectory(
-    directory: File,
-    table: ResourceTable,
-    options: TableExtractorOptions,
-    logger: BlameLogger = BlameLogger(IDELogger)
+      directory: File,
+      table: ResourceTable,
+      options: TableExtractorOptions,
+      logger: BlameLogger = BlameLogger(IDELogger),
   ) {
     directory.listFiles()?.forEach {
       if (it.isDirectory || it.extension != "xml") {
@@ -281,10 +278,10 @@ class DefaultResourceTableRegistry : ResourceTableRegistry {
   }
 
   private fun updateFromFile(
-    it: File,
-    table: ResourceTable,
-    options: TableExtractorOptions,
-    logger: BlameLogger
+      it: File,
+      table: ResourceTable,
+      options: TableExtractorOptions,
+      logger: BlameLogger,
   ) {
 
     if (it.path.endsWith(OS_PLATFORM_ATTRS_MANIFEST_XML)) {
@@ -297,10 +294,10 @@ class DefaultResourceTableRegistry : ResourceTableRegistry {
   }
 
   private fun extractTable(
-    file: File,
-    table: ResourceTable,
-    options: TableExtractorOptions,
-    logger: BlameLogger
+      file: File,
+      table: ResourceTable,
+      options: TableExtractorOptions,
+      logger: BlameLogger,
   ) {
     val pathData = extractPathData(file)
     if (pathData.extension != "xml") {
@@ -309,13 +306,13 @@ class DefaultResourceTableRegistry : ResourceTableRegistry {
     }
 
     val extractor =
-      TableExtractor(
-        table = table,
-        source = pathData.source,
-        config = pathData.config,
-        options = options,
-        logger = logger
-      )
+        TableExtractor(
+            table = table,
+            source = pathData.source,
+            config = pathData.config,
+            options = options,
+            logger = logger,
+        )
 
     pathData.file.inputStream().use { stream ->
       try {

@@ -42,7 +42,7 @@ open class ChronometerAdapter<T : Chronometer> : TextViewAdapter<T>() {
 
   override fun createUiWidgets(): List<UiWidget> {
     return listOf(
-      UiWidget(Chronometer::class.java, string.widget_chronometer, drawable.ic_widget_chronometer)
+        UiWidget(Chronometer::class.java, string.widget_chronometer, drawable.ic_widget_chronometer)
     )
   }
 }

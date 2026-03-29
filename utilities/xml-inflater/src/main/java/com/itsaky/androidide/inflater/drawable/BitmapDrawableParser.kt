@@ -35,7 +35,8 @@ import org.xmlpull.v1.XmlPullParser
  *
  * @author Akash Yadav
  */
-class BitmapDrawableParser protected constructor(parser: XmlPullParser, minDepth: Int) : IDrawableParser(parser, minDepth) {
+class BitmapDrawableParser protected constructor(parser: XmlPullParser, minDepth: Int) :
+    IDrawableParser(parser, minDepth) {
   @Throws(Exception::class)
   public override fun parseDrawable(context: Context): Drawable {
     var index = attrIndex("src")
@@ -82,7 +83,7 @@ class BitmapDrawableParser protected constructor(parser: XmlPullParser, minDepth
     }
     return bitmap
   }
-  
+
   @Contract(pure = true)
   private fun parseTileMode(value: String): TileMode? {
     return when (value) {
@@ -93,7 +94,7 @@ class BitmapDrawableParser protected constructor(parser: XmlPullParser, minDepth
       else -> null
     }
   }
-  
+
   private fun toBitmap(dr: Drawable): Bitmap {
     if (dr is BitmapDrawable) {
       val bit = dr
@@ -102,12 +103,12 @@ class BitmapDrawableParser protected constructor(parser: XmlPullParser, minDepth
       }
     }
     val bit: Bitmap
-    bit = if (dr.intrinsicWidth > 0 && dr.intrinsicHeight > 0) {
-      Bitmap.createBitmap(
-        dr.intrinsicWidth, dr.intrinsicHeight, ARGB_8888)
-    } else {
-      Bitmap.createBitmap(1, 1, ARGB_8888)
-    }
+    bit =
+        if (dr.intrinsicWidth > 0 && dr.intrinsicHeight > 0) {
+          Bitmap.createBitmap(dr.intrinsicWidth, dr.intrinsicHeight, ARGB_8888)
+        } else {
+          Bitmap.createBitmap(1, 1, ARGB_8888)
+        }
     val canvas = Canvas(bit)
     dr.setBounds(0, 0, canvas.width, canvas.height)
     dr.draw(canvas)

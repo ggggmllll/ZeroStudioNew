@@ -1,69 +1,64 @@
-/*******************************************************************************
- *    sora-editor - the awesome code editor for Android
- *    https://github.com/Rosemoe/sora-editor
- *    Copyright (C) 2020-2024  Rosemoe
+/**
+ * ****************************************************************************
+ * sora-editor - the awesome code editor for Android https://github.com/Rosemoe/sora-editor
+ * Copyright (C) 2020-2024 Rosemoe
  *
- *     This library is free software; you can redistribute it and/or
- *     modify it under the terms of the GNU Lesser General Public
- *     License as published by the Free Software Foundation; either
- *     version 2.1 of the License, or (at your option) any later version.
+ * This library is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *     This library is distributed in the hope that it will be useful,
- *     but WITHOUT ANY WARRANTY; without even the implied warranty of
- *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *     Lesser General Public License for more details.
+ * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
  *
- *     You should have received a copy of the GNU Lesser General Public
- *     License along with this library; if not, write to the Free Software
- *     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301
- *     USA
+ * You should have received a copy of the GNU Lesser General Public License along with this library;
+ * if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+ * 02110-1301 USA
  *
- *     Please contact Rosemoe by email 2073412493@qq.com if you need
- *     additional information or have any questions
- ******************************************************************************/
-
+ * Please contact Rosemoe by email 2073412493@qq.com if you need additional information or have any
+ * questions
+ * ****************************************************************************
+ */
 plugins {
-    id("com.android.library")
-    kotlin("android")
+  id("com.android.library")
+  kotlin("android")
 }
 
 android {
-    namespace = "io.github.rosemoe.sora.langs.monarch"
+  namespace = "io.github.rosemoe.sora.langs.monarch"
 
-    defaultConfig {
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        consumerProguardFiles("consumer-rules.pro")
-    }
+  defaultConfig {
+    testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    consumerProguardFiles("consumer-rules.pro")
+  }
 
-    buildFeatures {
-        buildConfig = true
-    }
+  buildFeatures { buildConfig = true }
 
-    buildTypes {
-        release {
-            isMinifyEnabled = false
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-        }
+  buildTypes {
+    release {
+      isMinifyEnabled = false
+      proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
     }
+  }
 }
 
 dependencies {
-    compileOnly(libs.common.editor)
-    api(libs.common.monarch.code)
-    api(libs.common.monarch.json)
-    api(libs.common.regex.onig)
-    api(libs.common.regex.re2j)
+  compileOnly(libs.common.editor)
+  api(libs.common.monarch.code)
+  api(libs.common.monarch.json)
+  api(libs.common.regex.onig)
+  api(libs.common.regex.re2j)
 
-    implementation(libs.common.com.squareup.moshi)
+  implementation(libs.common.com.squareup.moshi)
 
-    testImplementation(libs.tests.junit)
-    androidTestImplementation(libs.tests.androidx.junit)
-    androidTestImplementation(libs.tests.androidx.espresso.core)
+  testImplementation(libs.tests.junit)
+  androidTestImplementation(libs.tests.androidx.junit)
+  androidTestImplementation(libs.tests.androidx.espresso.core)
 }
 
-//这个publishAllPublicationsToBuildMavenLocalRepository空任务用于解决gradle构建时找不到publishAllPublicationsToBuildMavenLocalRepository
+// 这个publishAllPublicationsToBuildMavenLocalRepository空任务用于解决gradle构建时找不到publishAllPublicationsToBuildMavenLocalRepository
 tasks.register("publishAllPublicationsToBuildMavenLocalRepository") {
-    group = "null"
-    description = "null."
-    enabled = false 
+  group = "null"
+  description = "null."
+  enabled = false
 }

@@ -20,13 +20,14 @@ import com.smarttoolfactory.colorpicker.util.drawBlendingRectGradient
 import com.smarttoolfactory.gesture.detectMotionEvents
 
 /**
- * Rectangle Saturation and Lightness selector for
- * [HSL](https://en.wikipedia.org/wiki/HSL_and_HSV) color model
+ * Rectangle Saturation and Lightness selector for [HSL](https://en.wikipedia.org/wiki/HSL_and_HSV)
+ * color model
+ *
  * @param hue is in [0f..360f] of HSL color
  * @param lightness is in [0f..1f] of HSL color
  * @param selectionRadius radius of selection circle that moves based on touch position
- * @param onChange callback that returns [hue] and [lightness]
- *  when position of touch in this selector has changed.
+ * @param onChange callback that returns [hue] and [lightness] when position of touch in this
+ *   selector has changed.
  */
 @Composable
 fun SelectorRectSaturationLightnessHSL(
@@ -35,31 +36,32 @@ fun SelectorRectSaturationLightnessHSL(
     saturation: Float = 0.5f,
     lightness: Float = 0.5f,
     selectionRadius: Dp = Dp.Unspecified,
-    onChange: (Float, Float) -> Unit
+    onChange: (Float, Float) -> Unit,
 ) {
-    val lightnessGradient = lightnessGradient(hue)
-    val hueSaturation = saturationHSLGradient(hue)
+  val lightnessGradient = lightnessGradient(hue)
+  val hueSaturation = saturationHSLGradient(hue)
 
-    SelectorRect(
-        modifier = modifier,
-        saturation = saturation,
-        property = lightness,
-        brushSrc = hueSaturation,
-        brushDst = lightnessGradient,
-        selectionRadius = selectionRadius,
-        onChange = onChange,
-        colorModel = ColorModel.HSL
-    )
+  SelectorRect(
+      modifier = modifier,
+      saturation = saturation,
+      property = lightness,
+      brushSrc = hueSaturation,
+      brushDst = lightnessGradient,
+      selectionRadius = selectionRadius,
+      onChange = onChange,
+      colorModel = ColorModel.HSL,
+  )
 }
 
 /**
- * Rectangle Saturation and Vale selector for
- * [HSV](https://en.wikipedia.org/wiki/HSL_and_HSV) color model
+ * Rectangle Saturation and Vale selector for [HSV](https://en.wikipedia.org/wiki/HSL_and_HSV) color
+ * model
+ *
  * @param hue is in [0f..360f] of HSL color
  * @param value is in [0f..1f] of HSL color
  * @param selectionRadius radius of selection circle that moves based on touch position
- * @param onChange callback that returns [hue] and [value]
- *  when position of touch in this selector has changed.
+ * @param onChange callback that returns [hue] and [value] when position of touch in this selector
+ *   has changed.
  */
 @Composable
 fun SelectorRectSaturationValueHSV(
@@ -68,22 +70,22 @@ fun SelectorRectSaturationValueHSV(
     saturation: Float = 0.5f,
     value: Float = 0.5f,
     selectionRadius: Dp = Dp.Unspecified,
-    onChange: (Float, Float) -> Unit
+    onChange: (Float, Float) -> Unit,
 ) {
 
-    val valueGradient = valueGradient(hue)
-    val hueSaturation = saturationHSVGradient(hue)
+  val valueGradient = valueGradient(hue)
+  val hueSaturation = saturationHSVGradient(hue)
 
-    SelectorRect(
-        modifier = modifier,
-        saturation = saturation,
-        property = value,
-        brushSrc = hueSaturation,
-        brushDst = valueGradient,
-        selectionRadius = selectionRadius,
-        onChange = onChange,
-        colorModel = ColorModel.HSV
-    )
+  SelectorRect(
+      modifier = modifier,
+      saturation = saturation,
+      property = value,
+      brushSrc = hueSaturation,
+      brushDst = valueGradient,
+      selectionRadius = selectionRadius,
+      onChange = onChange,
+      colorModel = ColorModel.HSV,
+  )
 }
 
 @Composable
@@ -95,73 +97,64 @@ private fun SelectorRect(
     brushDst: Brush,
     selectionRadius: Dp = Dp.Unspecified,
     onChange: (Float, Float) -> Unit,
-    colorModel: ColorModel
+    colorModel: ColorModel,
 ) {
 
-    BoxWithConstraints(modifier) {
+  BoxWithConstraints(modifier) {
+    val density = LocalDensity.current.density
+    val width = constraints.maxWidth.toFloat()
+    val height = constraints.maxHeight.toFloat()
 
-        val density = LocalDensity.current.density
-        val width = constraints.maxWidth.toFloat()
-        val height = constraints.maxHeight.toFloat()
+    // Center position of color picker
+    val center = Offset(width / 2, height / 2)
 
-        // Center position of color picker
-        val center = Offset(width / 2, height / 2)
+    /** Circle selector radius for setting [saturation] and [property] by gesture */
+    val selectorRadius =
+        if (selectionRadius != Dp.Unspecified) selectionRadius.value * density
+        else width.coerceAtMost(height) * .04f
 
-        /**
-         * Circle selector radius for setting [saturation] and [property] by gesture
-         */
-        val selectorRadius =
-            if (selectionRadius != Dp.Unspecified) selectionRadius.value * density
-            else width.coerceAtMost(height) * .04f
+    /**
+     * Current position is initially set by [saturation] and [property] that is bound in diamond
+     * since (1,1) points to bottom left corner of a rectangle but it's bounded in diamond by
+     * [setSelectorPositionFromColorParams]. When user touches anywhere in diamond current position
+     * is updated and this composable is recomposed
+     */
+    var currentPosition by remember { mutableStateOf(center) }
 
-        /**
-         *  Current position is initially set by [saturation] and [property] that is bound
-         *  in diamond since (1,1) points to bottom left corner of a rectangle but it's bounded
-         *  in diamond by [setSelectorPositionFromColorParams].
-         *  When user touches anywhere in diamond current position is updated and
-         *  this composable is recomposed
-         */
-        var currentPosition by remember {
-            mutableStateOf(center)
+    val posX = saturation * width
+    val posY = (1 - property) * height
+    currentPosition = Offset(posX, posY)
+
+    val canvasModifier =
+        Modifier.fillMaxSize().pointerInput(Unit) {
+          detectMotionEvents(
+              onDown = {
+                val position = it.position
+                val saturationChange = (position.x / width).coerceIn(0f, 1f)
+                val valueChange = (1 - (position.y / height)).coerceIn(0f, 1f)
+                onChange(saturationChange, valueChange)
+                it.consume()
+              },
+              onMove = {
+                val position = it.position
+                val saturationChange = (position.x / width).coerceIn(0f, 1f)
+                val valueChange = (1 - (position.y / height)).coerceIn(0f, 1f)
+                onChange(saturationChange, valueChange)
+                it.consume()
+              },
+              delayAfterDownInMillis = 20,
+          )
         }
 
-        val posX = saturation * width
-        val posY = (1 - property) * height
-        currentPosition = Offset(posX, posY)
-
-
-        val canvasModifier = Modifier
-            .fillMaxSize()
-            .pointerInput(Unit) {
-                detectMotionEvents(
-                    onDown = {
-                        val position = it.position
-                        val saturationChange = (position.x / width).coerceIn(0f, 1f)
-                        val valueChange = (1 - (position.y / height)).coerceIn(0f, 1f)
-                        onChange(saturationChange, valueChange)
-                        it.consume()
-
-                    },
-                    onMove = {
-                        val position = it.position
-                        val saturationChange = (position.x / width).coerceIn(0f, 1f)
-                        val valueChange = (1 - (position.y / height)).coerceIn(0f, 1f)
-                        onChange(saturationChange, valueChange)
-                        it.consume()
-                    },
-                    delayAfterDownInMillis = 20
-                )
-            }
-
-        SelectorRectImpl(
-            modifier = canvasModifier,
-            brushSrc = brushSrc,
-            brushDst = brushDst,
-            selectorPosition = currentPosition,
-            selectorRadius = selectorRadius,
-            colorModel = colorModel
-        )
-    }
+    SelectorRectImpl(
+        modifier = canvasModifier,
+        brushSrc = brushSrc,
+        brushDst = brushDst,
+        selectorPosition = currentPosition,
+        selectorRadius = selectorRadius,
+        colorModel = colorModel,
+    )
+  }
 }
 
 @Composable
@@ -171,19 +164,16 @@ private fun SelectorRectImpl(
     brushDst: Brush,
     selectorPosition: Offset,
     selectorRadius: Float,
-    colorModel: ColorModel
+    colorModel: ColorModel,
 ) {
 
-    Canvas(modifier = modifier) {
-        drawBlendingRectGradient(
-            dst = brushDst,
-            src = brushSrc,
-            blendMode = if (colorModel == ColorModel.HSV) BlendMode.Multiply else BlendMode.Overlay
-        )
-        // Saturation and Value/Lightness or value selector
-        drawHueSelectionCircle(
-            center = selectorPosition,
-            radius = selectorRadius
-        )
-    }
+  Canvas(modifier = modifier) {
+    drawBlendingRectGradient(
+        dst = brushDst,
+        src = brushSrc,
+        blendMode = if (colorModel == ColorModel.HSV) BlendMode.Multiply else BlendMode.Overlay,
+    )
+    // Saturation and Value/Lightness or value selector
+    drawHueSelectionCircle(center = selectorPosition, radius = selectorRadius)
+  }
 }

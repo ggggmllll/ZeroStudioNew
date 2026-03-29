@@ -19,7 +19,7 @@ package com.android.tools.idea.wizard.template.impl.activities.archStarterActivi
 import com.android.tools.idea.wizard.template.impl.activities.archStarterActivity.ArchStarterActivityTemplateVariables
 
 fun ArchStarterActivityTemplateVariables.mainActivityKt() =
-  """
+    """
 ${packageDeclaration("ui")}
 
 import android.os.Bundle

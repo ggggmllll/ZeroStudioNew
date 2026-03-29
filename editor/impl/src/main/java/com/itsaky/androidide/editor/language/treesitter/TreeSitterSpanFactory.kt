@@ -39,10 +39,10 @@ import org.slf4j.LoggerFactory
  * @author Akash Yadav
  */
 class TreeSitterSpanFactory(
-  private var content: ContentReference?,
-  private var query: TSQuery?,
-  private var styles: Styles?,
-  private var langScheme: LanguageScheme?
+    private var content: ContentReference?,
+    private var query: TSQuery?,
+    private var styles: Styles?,
+    private var langScheme: LanguageScheme?,
 ) : DefaultSpanFactory() {
 
   companion object {
@@ -71,9 +71,10 @@ class TreeSitterSpanFactory(
       return super.createSpans(capture, column, spanStyle)
     }
 
-    val (start, end) = content.indexer.run {
-      getCharPosition(capture.node.startByte / 2) to getCharPosition(capture.node.endByte / 2)
-    }
+    val (start, end) =
+        content.indexer.run {
+          getCharPosition(capture.node.startByte / 2) to getCharPosition(capture.node.endByte / 2)
+        }
 
     if (start.line != end.line || start.column != column) {
       // A HEX color can only be defined on a single line
@@ -98,24 +99,23 @@ class TreeSitterSpanFactory(
       }
       e = result.range.last
 
-      val color = try {
-        parseHexColor(result.groupValues[1]).toInt()
-      } catch (e: Exception) {
-        log.error("An error occurred parsing hex color. text={}", text, e)
-        return@forEach
-      }
+      val color =
+          try {
+            parseHexColor(result.groupValues[1]).toInt()
+          } catch (e: Exception) {
+            log.error("An error occurred parsing hex color. text={}", text, e)
+            return@forEach
+          }
 
-      val textColor = if (ColorUtils.calculateLuminance(color) > 0.5f) {
-        Color.BLACK
-      } else {
-        Color.WHITE
-      }
+      val textColor =
+          if (ColorUtils.calculateLuminance(color) > 0.5f) {
+            Color.BLACK
+          } else {
+            Color.WHITE
+          }
 
       val col = column + result.range.first
-      val span = SpanFactory.obtain(
-        col,
-        styleDef.makeStaticStyle()
-      )
+      val span = SpanFactory.obtain(col, styleDef.makeStaticStyle())
 
       span.setSpanExt(SpanExtAttrs.EXT_COLOR_RESOLVER, SpanConstColorResolver(textColor, color))
 

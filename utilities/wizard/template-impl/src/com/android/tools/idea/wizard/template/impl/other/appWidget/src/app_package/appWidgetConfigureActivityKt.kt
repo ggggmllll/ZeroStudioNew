@@ -24,20 +24,20 @@ import com.android.tools.idea.wizard.template.impl.activities.common.layoutToVie
 import com.android.tools.idea.wizard.template.renderIf
 
 fun appWidgetConfigureActivityKt(
-  applicationPackage: String?,
-  className: String,
-  layoutName: String,
-  packageName: String,
-  isViewBindingSupported: Boolean,
+    applicationPackage: String?,
+    className: String,
+    layoutName: String,
+    packageName: String,
+    isViewBindingSupported: Boolean,
 ): String {
   val layout = "${layoutName}_configure"
   val contentViewBlock =
-    if (isViewBindingSupported)
-      """
+      if (isViewBindingSupported)
+          """
      binding = ${layoutToViewBindingClass(layout)}.inflate(layoutInflater)
      setContentView(binding.root)
   """
-    else "setContentView(R.layout.$layout)"
+      else "setContentView(R.layout.$layout)"
 
   return """
 package ${escapeKotlinIdentifier(packageName)}

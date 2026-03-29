@@ -17,37 +17,27 @@
 
 package com.itsaky.androidide.build.config
 
-import org.gradle.api.GradleException
 import java.io.BufferedInputStream
 import java.net.URI
 import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.xpath.XPathFactory
+import org.gradle.api.GradleException
 
-import com.itsaky.androidide.build.config.BuildConfig
-
-/**
- * @author Akash Yadav
- */
+/** @author Akash Yadav */
 object VersionUtils {
 
-  /**
-   * The Sonatype snapshots repository.
-   */
-  const val SONATYPE_SNAPSHOTS_REPO = BuildConfig.SONATYPE_SNAPSHOTS_REPO /** "https://s01.oss.sonatype.org/content/repositories/snapshots/" */
+  /** The Sonatype snapshots repository. */
+  const val SONATYPE_SNAPSHOTS_REPO = BuildConfig.SONATYPE_SNAPSHOTS_REPO
+  /** "https://s01.oss.sonatype.org/content/repositories/snapshots/" */
 
-  /**
-   * The Sonatype release repository.
-   */
-  const val SONATYPE_PUBLIC_REPO = BuildConfig.SONATYPE_PUBLIC_REPO /** "https://s01.oss.sonatype.org/content/groups/public/" */
+  /** The Sonatype release repository. */
+  const val SONATYPE_PUBLIC_REPO = BuildConfig.SONATYPE_PUBLIC_REPO
+  /** "https://s01.oss.sonatype.org/content/groups/public/" */
 
-  /**
-   * The latest integration version name.
-   */
+  /** The latest integration version name. */
   const val LATEST_INTEGRATION = "latest.integration"
 
-  /**
-   * The cached version name.
-   */
+  /** The cached version name. */
   private var cachedVersion: String? = null
 
   /**
@@ -63,7 +53,7 @@ object VersionUtils {
     val groupId = BuildConfig.packageName.replace('.', '/')
     val moduleMetadata = "$SONATYPE_SNAPSHOTS_REPO/$groupId/${artifact}/maven-metadata.xml"
     return try {
-       BufferedInputStream(URI.create(moduleMetadata).toURL().openStream()).use { inputStream ->
+      BufferedInputStream(URI.create(moduleMetadata).toURL().openStream()).use { inputStream ->
         val builderFactory = DocumentBuilderFactory.newInstance()
         val builder = builderFactory.newDocumentBuilder()
         val document = builder.parse(inputStream)
@@ -72,7 +62,7 @@ object VersionUtils {
         val xPath = xPathFactory.newXPath()
 
         val latestVersion = xPath.evaluate("/metadata/versioning/latest", document)
-         cachedVersion = latestVersion
+        cachedVersion = latestVersion
         println("Found latest version of artifact '$artifact' : '$latestVersion'")
         return@use latestVersion
       }

@@ -24,12 +24,12 @@ import com.itsaky.androidide.models.JdkDistribution
 import com.itsaky.androidide.preferences.internal.BuildPreferences
 import com.itsaky.androidide.utils.Environment
 import com.itsaky.androidide.utils.JdkUtils
-import org.slf4j.LoggerFactory
 import java.io.File
+import org.slf4j.LoggerFactory
 
 /**
- * Implementation of [IJdkDistributionProvider].
- * Responsible for finding JDKs, selecting the active one, and injecting it into the global environment.
+ * Implementation of [IJdkDistributionProvider]. Responsible for finding JDKs, selecting the active
+ * one, and injecting it into the global environment.
  *
  * @author android_zero
  * @author Akash Yadav
@@ -76,7 +76,8 @@ class JdkDistributionProviderImpl : IJdkDistributionProvider {
       if (!home.exists() || !java.exists() || !java.isFile) {
         if (distributions.isNotEmpty()) {
           log.warn(
-            "Previously selected java.home does not exists! Falling back to ${distributions[0]}...")
+              "Previously selected java.home does not exists! Falling back to ${distributions[0]}..."
+          )
           BuildPreferences.javaHome = distributions[0].javaHome
         }
       }
@@ -89,7 +90,7 @@ class JdkDistributionProviderImpl : IJdkDistributionProvider {
 
       Environment.JAVA_HOME = File(BuildPreferences.javaHome)
       Environment.JAVA = Environment.JAVA_HOME.resolve("bin/java")
-      
+
       // Critical: Inject the selected JDK into the Native OS Environment
       // This ensures that ProcessBuilder, Terminal, and Shell sessions use THIS specific JDK
       updateNativeEnvironment(Environment.JAVA_HOME, Environment.JAVA)
@@ -97,24 +98,24 @@ class JdkDistributionProviderImpl : IJdkDistributionProvider {
   }
 
   /**
-   * Updates the native environment variables (JAVA_HOME and PATH) to reflect the currently selected JDK.
+   * Updates the native environment variables (JAVA_HOME and PATH) to reflect the currently selected
+   * JDK.
    */
   private fun updateNativeEnvironment(javaHome: File, javaBinary: File) {
     try {
       Os.setenv("JAVA_HOME", javaHome.absolutePath, true)
-      
+
       // Update PATH to prioritize the new JDK's bin directory
       val currentPath = System.getenv("PATH") ?: ""
       val newBinPath = javaHome.resolve("bin").absolutePath
-      
+
       // Prevent duplicate entries if possible, but ensure priority
       if (!currentPath.startsWith(newBinPath)) {
         val newPath = "$newBinPath:$currentPath"
         Os.setenv("PATH", newPath, true)
       }
-      
+
       log.info("Global Native Environment updated: JAVA_HOME=${javaHome.absolutePath}")
-      
     } catch (e: ErrnoException) {
       log.error("Failed to update native environment for JDK", e)
     } catch (e: Exception) {

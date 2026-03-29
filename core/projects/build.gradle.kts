@@ -17,7 +17,6 @@
 
 import com.itsaky.androidide.build.config.BuildConfig
 
-
 plugins {
   id("com.android.library")
   id("kotlin-android")
@@ -25,22 +24,16 @@ plugins {
   id("kotlin-kapt")
 }
 
-
-
-android {
-  namespace = "${BuildConfig.packageName}.projects"
-}
+android { namespace = "${BuildConfig.packageName}.projects" }
 
 kapt {
-  arguments {
-    arg("eventBusIndex", "${BuildConfig.packageName}.events.ProjectsApiEventsIndex")
-  }
+  arguments { arg("eventBusIndex", "${BuildConfig.packageName}.events.ProjectsApiEventsIndex") }
 }
 
 dependencies {
   implementation(libs.grpc.android)
   implementation(libs.grpc.okhttp)
-  
+
   kapt(projects.annotation.processors)
   kapt(libs.google.auto.service)
 
@@ -59,5 +52,4 @@ dependencies {
   implementation(libs.common.kotlin.coroutines.android)
   implementation(libs.google.auto.service.annotations)
   implementation(libs.google.guava)
-
 }

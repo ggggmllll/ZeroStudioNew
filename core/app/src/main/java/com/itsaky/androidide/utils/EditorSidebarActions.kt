@@ -43,14 +43,13 @@ import com.itsaky.androidide.actions.SidebarActionItem
 import com.itsaky.androidide.actions.internal.DefaultActionsRegistry
 import com.itsaky.androidide.actions.sidebar.BuildVariantsSidebarAction
 import com.itsaky.androidide.actions.sidebar.CloseProjectSidebarAction
+import com.itsaky.androidide.actions.sidebar.DataFileTreeSidebarAction
 import com.itsaky.androidide.actions.sidebar.FileTreeSidebarAction
+import com.itsaky.androidide.actions.sidebar.McpFragmentSidebarAction
 import com.itsaky.androidide.actions.sidebar.PreferencesSidebarAction
 import com.itsaky.androidide.actions.sidebar.TerminalSidebarAction
-import com.itsaky.androidide.actions.sidebar.McpFragmentSidebarAction
 import com.itsaky.androidide.fragments.sidebar.EditorSidebarFragment
 import java.lang.ref.WeakReference
-import com.itsaky.androidide.actions.sidebar.DataFileTreeSidebarAction
-
 
 /**
  * Sets up the actions that are shown in the
@@ -89,9 +88,10 @@ internal object EditorSidebarActions {
       return
     }
 
-    rail.background = (rail.background as MaterialShapeDrawable).apply {
-      shapeAppearanceModel = shapeAppearanceModel.roundedOnRight()
-    }
+    rail.background =
+        (rail.background as MaterialShapeDrawable).apply {
+          shapeAppearanceModel = shapeAppearanceModel.roundedOnRight()
+        }
 
     rail.menu.clear()
 
@@ -99,84 +99,92 @@ internal object EditorSidebarActions {
     data.put(Context::class.java, context) // needed for inflating the menu
 
     val titleRef = WeakReference(binding.title)
-    val params = FillMenuParams(data, ActionItem.Location.EDITOR_SIDEBAR,
-      rail.menu) { actionsRegistry, action, item, actionsData ->
+    val params =
+        FillMenuParams(data, ActionItem.Location.EDITOR_SIDEBAR, rail.menu) {
+            actionsRegistry,
+            action,
+            item,
+            actionsData ->
+          action as SidebarActionItem
 
-      action as SidebarActionItem
-
-      if (action.fragmentClass == null) {
-        // this action does not show any fragment
-        // execute the action instead
-        (actionsRegistry as DefaultActionsRegistry).executeAction(action, actionsData)
-        return@FillMenuParams true
-      }
-
-      return@FillMenuParams try {
-        controller.navigate(action.id, navOptions {
-          launchSingleTop = true
-          restoreState = true
-        })
-
-        // Return true only if the destination we've navigated to matches the MenuItem
-        val result = controller.currentDestination?.matchDestination(action.id) == true
-        if (result) {
-          item.isChecked = true
-          titleRef.get()?.text = item.title
-        }
-
-        result
-      } catch (e: IllegalArgumentException) {
-        false
-      }
-    }
-
-    registry.fillMenu(params)
-
-    controller.graph = controller.createGraph(startDestination = FileTreeSidebarAction.ID) {
-      actions.forEach { (actionId, action) ->
-        if (action !is SidebarActionItem) {
-          throw IllegalStateException(
-            "Actions registered at location ${ActionItem.Location.EDITOR_SIDEBAR}" +
-                " must implement ${SidebarActionItem::class.java.simpleName}")
-        }
-
-        val fragment = action.fragmentClass ?: return@forEach
-
-        val builder = FragmentNavigatorDestinationBuilder(
-          provider[FragmentNavigator::class],
-          actionId,
-          fragment
-        )
-
-        builder.apply {
-          action.apply { buildNavigation() }
-        }
-
-        destination(builder)
-      }
-    }
-
-    val railRef = WeakReference(rail)
-    controller.addOnDestinationChangedListener(
-      object : NavController.OnDestinationChangedListener {
-        override fun onDestinationChanged(
-          controller: NavController,
-          destination: NavDestination,
-          arguments: Bundle?
-        ) {
-          val railView = railRef.get()
-          if (railView == null) {
-            controller.removeOnDestinationChangedListener(this)
-            return
+          if (action.fragmentClass == null) {
+            // this action does not show any fragment
+            // execute the action instead
+            (actionsRegistry as DefaultActionsRegistry).executeAction(action, actionsData)
+            return@FillMenuParams true
           }
-          railView.menu.forEach { item ->
-            if (destination.matchDestination(item.itemId)) {
+
+          return@FillMenuParams try {
+            controller.navigate(
+                action.id,
+                navOptions {
+                  launchSingleTop = true
+                  restoreState = true
+                },
+            )
+
+            // Return true only if the destination we've navigated to matches the MenuItem
+            val result = controller.currentDestination?.matchDestination(action.id) == true
+            if (result) {
               item.isChecked = true
               titleRef.get()?.text = item.title
             }
+
+            result
+          } catch (e: IllegalArgumentException) {
+            false
           }
         }
-      })
+
+    registry.fillMenu(params)
+
+    controller.graph =
+        controller.createGraph(startDestination = FileTreeSidebarAction.ID) {
+          actions.forEach { (actionId, action) ->
+            if (action !is SidebarActionItem) {
+              throw IllegalStateException(
+                  "Actions registered at location ${ActionItem.Location.EDITOR_SIDEBAR}" +
+                      " must implement ${SidebarActionItem::class.java.simpleName}"
+              )
+            }
+
+            val fragment = action.fragmentClass ?: return@forEach
+
+            val builder =
+                FragmentNavigatorDestinationBuilder(
+                    provider[FragmentNavigator::class],
+                    actionId,
+                    fragment,
+                )
+
+            builder.apply { action.apply { buildNavigation() } }
+
+            destination(builder)
+          }
+        }
+
+    val railRef = WeakReference(rail)
+    controller.addOnDestinationChangedListener(
+        object : NavController.OnDestinationChangedListener {
+          override fun onDestinationChanged(
+              controller: NavController,
+              destination: NavDestination,
+              arguments: Bundle?,
+          ) {
+            val railView = railRef.get()
+            if (railView == null) {
+              controller.removeOnDestinationChangedListener(this)
+              return
+            }
+            railView.menu.forEach { item ->
+              if (destination.matchDestination(item.itemId)) {
+                item.isChecked = true
+                titleRef.get()?.text = item.title
+              }
+            }
+          }
+        }
+    )
     // make sure the 'File tree' item is checked by default
     rail.menu.findItem(FileTreeSidebarAction.ID.hashCode())?.also {
       it.isChecked = true
@@ -188,29 +196,30 @@ internal object EditorSidebarActions {
       if (railView != null) {
 
         (railView.menuView as NavigationBarMenuView)
-          .findViewById<View>(TerminalSidebarAction.ID.hashCode())
-          ?.setOnLongClickListener {
-
-            TerminalSidebarAction.startTerminalActivity(data, true)
-            true
-          }
+            .findViewById<View>(TerminalSidebarAction.ID.hashCode())
+            ?.setOnLongClickListener {
+              TerminalSidebarAction.startTerminalActivity(data, true)
+              true
+            }
       }
       true
     }
   }
 
   /**
-   * Determines whether the given `route` matches the NavDestination. This handles
-   * both the default case (the destination's route matches the given route) and the nested case where
-   * the given route is a parent/grandparent/etc of the destination.
+   * Determines whether the given `route` matches the NavDestination. This handles both the default
+   * case (the destination's route matches the given route) and the nested case where the given
+   * route is a parent/grandparent/etc of the destination.
    */
   @JvmStatic
-  internal fun NavDestination.matchDestination(route: String): Boolean =
-    hierarchy.any { it.route == route }
+  internal fun NavDestination.matchDestination(route: String): Boolean = hierarchy.any {
+    it.route == route
+  }
 
   @JvmStatic
-  internal fun NavDestination.matchDestination(@IdRes destId: Int): Boolean =
-    hierarchy.any { it.id == destId }
+  internal fun NavDestination.matchDestination(@IdRes destId: Int): Boolean = hierarchy.any {
+    it.id == destId
+  }
 
   @JvmStatic
   internal fun ShapeAppearanceModel.roundedOnRight(cornerSize: Float = 28f): ShapeAppearanceModel {

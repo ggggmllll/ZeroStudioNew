@@ -45,11 +45,13 @@ class SaveFileAction(context: Context, override val order: Int) : EditorRelatedA
 
   override fun prepare(data: ActionData) {
     super.prepare(data)
-    val context = data.getActivity() ?: run {
-      visible = false
-      enabled = false
-      return
-    }
+    val context =
+        data.getActivity()
+            ?: run {
+              visible = false
+              enabled = false
+              return
+            }
 
     visible = context.editorViewModel.getOpenedFiles().isNotEmpty()
     enabled = context.areFilesModified() && !context.areFilesSaving()

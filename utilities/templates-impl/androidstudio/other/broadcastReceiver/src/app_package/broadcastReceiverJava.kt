@@ -17,7 +17,7 @@
 package com.itsaky.androidide.templates.impl.androidstudio.other.broadcastReceiver.src.app_package
 
 fun broadcastReceiverJava(className: String, packageName: String) =
-  """
+    """
 package ${packageName};
 
 import android.content.BroadcastReceiver;

@@ -26,17 +26,15 @@ interface IAttribute {
 
   /** The namespace of the attribute. */
   val namespace: INamespace?
-  
+
   /** The name of the attribute. */
   val name: String
 
   /** The value of the attribute. */
   var value: String
-  
-  /**
-   * The name of this attribute the form `<namespace>:<name>`.
-   */
-  val qualifiedName : String
+
+  /** The name of this attribute the form `<namespace>:<name>`. */
+  val qualifiedName: String
     get() {
       val ns = namespace?.prefix?.let { "${it}:" } ?: ""
       return "${ns}${name}"

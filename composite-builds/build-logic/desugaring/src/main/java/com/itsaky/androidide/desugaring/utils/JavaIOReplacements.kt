@@ -29,40 +29,40 @@ import kotlin.reflect.jvm.javaMethod
  */
 object JavaIOReplacements {
 
-  /**
-   * Apply replacements for the `java.io` package.
-   */
+  /** Apply replacements for the `java.io` package. */
   fun DesugarReplacementsContainer.applyJavaIOReplacements() {
     replaceMethod(
-      InputStream::class.java.getDeclaredMethod("readNBytes", Int::class.java),
-      DesugarInputStream::class.java.getDeclaredMethod("readNBytes",
-        InputStream::class.java, Int::class.java)
+        InputStream::class.java.getDeclaredMethod("readNBytes", Int::class.java),
+        DesugarInputStream::class
+            .java
+            .getDeclaredMethod("readNBytes", InputStream::class.java, Int::class.java),
     )
 
     replaceMethod(
-      InputStream::class.java.getDeclaredMethod(
-        "readNBytes",
-        ByteArray::class.java,
-        Int::class.java,
-        Int::class.java
-      ),
-      DesugarInputStream::class.java.getDeclaredMethod(
-        "readNBytes",
-        InputStream::class.java,
-        ByteArray::class.java,
-        Int::class.java,
-        Int::class.java
-      )
+        InputStream::class
+            .java
+            .getDeclaredMethod(
+                "readNBytes",
+                ByteArray::class.java,
+                Int::class.java,
+                Int::class.java,
+            ),
+        DesugarInputStream::class
+            .java
+            .getDeclaredMethod(
+                "readNBytes",
+                InputStream::class.java,
+                ByteArray::class.java,
+                Int::class.java,
+                Int::class.java,
+            ),
     )
 
     replaceMethod(
-      InputStream::readAllBytes.javaMethod!!,
-      DesugarInputStream::readAllBytes.javaMethod!!
+        InputStream::readAllBytes.javaMethod!!,
+        DesugarInputStream::readAllBytes.javaMethod!!,
     )
 
-    replaceMethod(
-      InputStream::transferTo.javaMethod!!,
-      DesugarInputStream::transferTo.javaMethod!!
-    )
+    replaceMethod(InputStream::transferTo.javaMethod!!, DesugarInputStream::transferTo.javaMethod!!)
   }
 }

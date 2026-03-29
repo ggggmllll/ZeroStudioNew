@@ -29,88 +29,82 @@ import com.itsaky.androidide.build.config.isFDroidBuild
 import com.itsaky.androidide.build.config.projectVersionCode
 import com.itsaky.androidide.plugins.NoDesugarPlugin
 import com.itsaky.androidide.plugins.util.SdkUtils.getAndroidJar
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import org.gradle.api.Project
 import org.gradle.api.artifacts.MinimalExternalModuleDependency
 import org.gradle.api.provider.Provider
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 /**
- * ABIs for which the product flavors will be created.
- * The keys in this map are the names of the product flavors whereas,
- * the value for each flavor is a number that will be incremented to the base version code of the IDE
- * and set as the version code of that flavor.
+ * ABIs for which the product flavors will be created. The keys in this map are the names of the
+ * product flavors whereas, the value for each flavor is a number that will be incremented to the
+ * base version code of the IDE and set as the version code of that flavor.
  *
- * For example, if the base version code of the IDE is 270 (for v2.7.0), then for arm64-v8a
- * flavor, the version code will be `100 * 270 + 1` i.e. `27001`
+ * For example, if the base version code of the IDE is 270 (for v2.7.0), then for arm64-v8a flavor,
+ * the version code will be `100 * 270 + 1` i.e. `27001`
  */
 internal val flavorsAbis = mapOf("armeabi-v7a" to 1, "arm64-v8a" to 2, "x86_64" to 3)
 
-fun Project.configureAndroidModule(
-  coreLibDesugDep: Provider<MinimalExternalModuleDependency>
-) {
+fun Project.configureAndroidModule(coreLibDesugDep: Provider<MinimalExternalModuleDependency>) {
   val isAppModule = plugins.hasPlugin("com.android.application")
-  assert(
-    isAppModule || plugins.hasPlugin("com.android.library")
-  ) {
+  assert(isAppModule || plugins.hasPlugin("com.android.library")) {
     "${javaClass.simpleName} can only be applied to Android projects"
   }
 
-  val androidJar = extensions.getByType(AndroidComponentsExtension::class.java)
-    .getAndroidJar(assertExists = true)
-  val frameworkStubsJar = findProject(":utilities:framework-stubs")!!.file("libs/android.jar")
-    .also { it.parentFile.mkdirs() }
+  val androidJar =
+      extensions
+          .getByType(AndroidComponentsExtension::class.java)
+          .getAndroidJar(assertExists = true)
+  val frameworkStubsJar =
+      findProject(":utilities:framework-stubs")!!.file("libs/android.jar").also {
+        it.parentFile.mkdirs()
+      }
 
   if (!(frameworkStubsJar.exists() && frameworkStubsJar.isFile)) {
     androidJar.copyTo(frameworkStubsJar)
   }
-  
-tasks.withType(KotlinCompile::class.java).configureEach {
+
+  tasks.withType(KotlinCompile::class.java).configureEach {
     compilerOptions.jvmTarget.set(JvmTarget.JVM_17)
   }
 
   extensions.getByType(CommonExtension::class.java).run {
-    lint {
-      checkDependencies = true
-    }
+    lint { checkDependencies = true }
 
     packaging {
       resources {
         excludes.addAll(
-          arrayOf(
-            "META-INF/CHANGES",
-            "META-INF/README.md",
-          )
+            arrayOf(
+                "META-INF/CHANGES",
+                "META-INF/README.md",
+            )
         )
         pickFirsts.addAll(
-          arrayOf(
-            "META-INF/eclipse.inf",
-            "META-INF/LICENSE.md",
-            "META-INF/AL2.0",
-            "META-INF/LGPL2.1",
-            "META-INF/INDEX.LIST",
-            "about_files/LICENSE-2.0.txt",
-            "plugin.xml",
-            "plugin.properties",
-            "about.mappings",
-            "about.properties",
-            "about.ini",
-            "modeling32.png"
-          )
+            arrayOf(
+                "META-INF/eclipse.inf",
+                "META-INF/LICENSE.md",
+                "META-INF/AL2.0",
+                "META-INF/LGPL2.1",
+                "META-INF/INDEX.LIST",
+                "about_files/LICENSE-2.0.txt",
+                "plugin.xml",
+                "plugin.properties",
+                "about.mappings",
+                "about.properties",
+                "about.ini",
+                "modeling32.png",
+            )
         )
       }
     }
   }
-/**
- * Helper function to get the current date in YYYYMMDD format.
- */
- fun getCurrentDateVersion(): String {
+  /** Helper function to get the current date in YYYYMMDD format. */
+  fun getCurrentDateVersion(): String {
     val dateFormatter = DateTimeFormatter.ofPattern("yyyyMMdd")
     return LocalDate.now().format(dateFormatter)
-}
+  }
 
   extensions.getByType(BaseExtension::class.java).run {
     compileSdkVersion(BuildConfig.compileSdk)
@@ -135,11 +129,7 @@ tasks.withType(KotlinCompile::class.java).configureEach {
     configureCoreLibDesugaring(coreLibDesugDep)
 
     if (project.plugins.hasPlugin("com.itsaky.androidide.core-app")) {
-      packagingOptions {
-        jniLibs {
-          useLegacyPackaging = true
-        }
-      }
+      packagingOptions { jniLibs { useLegacyPackaging = true } }
 
       splits {
         abi {
@@ -159,10 +149,9 @@ tasks.withType(KotlinCompile::class.java).configureEach {
           variant.outputs.forEach { output ->
 
             // version code increment
-            val verCodeIncr = flavorsAbis[output.getFilter(
-              FilterConfiguration.FilterType.ABI
-            )?.identifier]
-              ?: throw UnsupportedOperationException("Universal APKs are not supported!")
+            val verCodeIncr =
+                flavorsAbis[output.getFilter(FilterConfiguration.FilterType.ABI)?.identifier]
+                    ?: throw UnsupportedOperationException("Universal APKs are not supported!")
 
             output.versionCode.set(100 * projectVersionCode + verCodeIncr)
           }
@@ -192,8 +181,8 @@ tasks.withType(KotlinCompile::class.java).configureEach {
     // this build type can be used to gain release-like performance at runtime
     // the build are faster for this build type as compared to 'release'
     // buildTypes.register("dev") {
-      // initWith(buildTypes.getByName("release"))
-      // isMinifyEnabled = false
+    // initWith(buildTypes.getByName("release"))
+    // isMinifyEnabled = false
     // }
 
     testOptions { unitTests.isIncludeAndroidResources = true }
@@ -207,9 +196,9 @@ tasks.withType(KotlinCompile::class.java).configureEach {
 private fun Project.configureCoreLibDesugaring(
     coreLibDesugDep: Provider<MinimalExternalModuleDependency>
 ) {
-    if (!plugins.hasPlugin(NoDesugarPlugin::class.java)) {
-        dependencies.add("coreLibraryDesugaring", coreLibDesugDep)
-    }
+  if (!plugins.hasPlugin(NoDesugarPlugin::class.java)) {
+    dependencies.add("coreLibraryDesugaring", coreLibDesugDep)
+  }
 }
 
 // private fun Project.configureCoreLibDesugaring(

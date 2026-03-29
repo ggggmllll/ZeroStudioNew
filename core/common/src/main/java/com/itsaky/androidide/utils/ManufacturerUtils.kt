@@ -19,29 +19,27 @@ package com.itsaky.androidide.utils
 
 import android.os.Build
 
-/**
- * @author Akash Yadav
- */
+/** @author Akash Yadav */
 object ManufacturerUtils {
   private const val LGE = "lge"
   private const val SAMSUNG = "samsung"
   private const val MEIZU = "meizu"
-  
-  /** Returns true if the device manufacturer is Meizu.  */
+
+  /** Returns true if the device manufacturer is Meizu. */
   fun isMeizuDevice(): Boolean {
     return Build.MANUFACTURER.lowercase() == MEIZU
   }
-  
-  /** Returns true if the device manufacturer is LG.  */
+
+  /** Returns true if the device manufacturer is LG. */
   fun isLGEDevice(): Boolean {
     return Build.MANUFACTURER.lowercase() == LGE
   }
-  
-  /** Returns true if the device manufacturer is Samsung.  */
+
+  /** Returns true if the device manufacturer is Samsung. */
   fun isSamsungDevice(): Boolean {
     return Build.MANUFACTURER.lowercase() == SAMSUNG
   }
-  
+
   /**
    * Returns true if the date input keyboard is potentially missing separator characters such as /.
    */

@@ -19,7 +19,7 @@ package com.android.tools.idea.wizard.template.impl.activities.settingsActivity.
 import com.android.tools.idea.wizard.template.escapeKotlinIdentifier
 
 fun singleScreenSettingsActivityKt(activityClass: String, packageName: String) =
-  """package ${escapeKotlinIdentifier(packageName)}
+    """package ${escapeKotlinIdentifier(packageName)}
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity

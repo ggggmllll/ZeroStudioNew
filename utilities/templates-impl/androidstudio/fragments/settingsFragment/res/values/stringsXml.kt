@@ -17,7 +17,7 @@
 package com.itsaky.androidide.templates.impl.androidstudio.fragments.settingsFragment.res.values
 
 fun stringsXml() =
-  """
+    """
 <resources>
     <!-- Preference Titles -->
     <string name="messages_header">Messages</string>

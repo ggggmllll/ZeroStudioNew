@@ -25,9 +25,6 @@ import com.google.gson.annotations.SerializedName
  * @author Akash Yadav
  */
 internal data class StatUploadResponse(
-  @SerializedName("status")
-  val status: Int,
-
-  @SerializedName("message")
-  val message: String
+    @SerializedName("status") val status: Int,
+    @SerializedName("message") val message: String,
 )

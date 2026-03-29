@@ -40,11 +40,11 @@ import org.eclipse.lemminx.dom.DOMDocument
 class QualifiedTagCompleter(provider: ICompletionProvider) : LayoutTagCompletionProvider(provider) {
 
   override fun doComplete(
-    params: CompletionParams,
-    pathData: ResourcePathData,
-    document: DOMDocument,
-    type: NodeType,
-    prefix: String
+      params: CompletionParams,
+      pathData: ResourcePathData,
+      document: DOMDocument,
+      type: NodeType,
+      prefix: String,
   ): CompletionResult {
     val result = mutableListOf<CompletionItem>()
     val (widgets, module) = doLookup()
@@ -66,10 +66,10 @@ class QualifiedTagCompleter(provider: ICompletionProvider) : LayoutTagCompletion
   }
 
   private fun addFromTrie(
-    trie: ClassTrie,
-    fqn: String,
-    prefix: String,
-    result: MutableList<CompletionItem>
+      trie: ClassTrie,
+      fqn: String,
+      prefix: String,
+      result: MutableList<CompletionItem>,
   ) {
     val node = trie.findNode(fqn) ?: trie.findNode(fqn.substringBeforeLast('.')) ?: return
     node.children.values.forEach {
@@ -77,18 +77,18 @@ class QualifiedTagCompleter(provider: ICompletionProvider) : LayoutTagCompletion
       if (match == NO_MATCH) {
         return@forEach
       }
-      
+
       result.add(createTagCompletionItem(it.name, it.qualifiedName, match))
     }
   }
 
   private fun doLookup(): Pair<DefaultWidgetTable, ModuleProject> {
     val widgets =
-      Lookup.getDefault().lookup(WidgetTable.COMPLETION_LOOKUP_KEY)
-        ?: throw IllegalStateException("No widget table provided")
+        Lookup.getDefault().lookup(WidgetTable.COMPLETION_LOOKUP_KEY)
+            ?: throw IllegalStateException("No widget table provided")
     val module =
-      Lookup.getDefault().lookup(ModuleProject.COMPLETION_MODULE_KEY)
-        ?: throw IllegalStateException("No module project provided")
+        Lookup.getDefault().lookup(ModuleProject.COMPLETION_MODULE_KEY)
+            ?: throw IllegalStateException("No module project provided")
     return widgets as DefaultWidgetTable to module
   }
 }

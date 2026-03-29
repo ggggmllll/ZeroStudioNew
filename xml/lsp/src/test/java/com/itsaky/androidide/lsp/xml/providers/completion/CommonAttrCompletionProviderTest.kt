@@ -61,12 +61,12 @@ class CommonAttrCompletionProviderTest : CompletionHelper by CompletionHelperImp
       val (incomplete, items) = complete()
       assertThat(incomplete).isFalse()
       assertThat(items)
-        .containsAtLeast(
-          "android:matchOrder",
-          "android:minimumHorizontalAngle",
-          "android:minimumVerticalAngle",
-          "android:maximumAngle"
-        )
+          .containsAtLeast(
+              "android:matchOrder",
+              "android:minimumHorizontalAngle",
+              "android:minimumVerticalAngle",
+              "android:maximumAngle",
+          )
     }
   }
 }

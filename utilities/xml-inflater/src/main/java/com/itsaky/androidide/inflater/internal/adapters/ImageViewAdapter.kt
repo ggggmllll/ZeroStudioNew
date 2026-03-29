@@ -61,7 +61,7 @@ open class ImageViewAdapter<T : ImageView> : ViewAdapter<T>() {
 
   override fun createUiWidgets(): List<UiWidget> {
     return listOf(
-      UiWidget(ImageView::class.java, string.widget_image_view, drawable.ic_widget_imageview)
+        UiWidget(ImageView::class.java, string.widget_image_view, drawable.ic_widget_imageview)
     )
   }
 

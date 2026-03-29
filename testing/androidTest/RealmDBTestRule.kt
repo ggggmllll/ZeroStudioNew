@@ -1,5 +1,3 @@
-
-
 package com.itsaky.androidide.testing.android.rules
 
 import com.itsaky.androidide.db.IRealmProvider
@@ -16,17 +14,16 @@ import org.junit.runners.model.Statement
  * @author android_zero
  */
 class RealmDBTestRule(
-  val baseModule: Any? = null,
-  vararg val additionalModules: Array<Any>,
+    val baseModule: Any? = null,
+    vararg val additionalModules: Array<Any>,
 ) : AbstractAndroidTestRule() {
 
   inline fun withDb(dbName: String, deleteDbAfterTest: Boolean = true, action: Realm.() -> Unit) {
     val name = dbName.replace(IRealmProvider.PATH_SEPARATOR, '-')
-    val realm = IRealmProvider.instance().get("/indexing/java/$name") {
-      baseModule?.let { baseModule ->
-        modules(baseModule, *additionalModules)
-      }
-    }
+    val realm =
+        IRealmProvider.instance().get("/indexing/java/$name") {
+          baseModule?.let { baseModule -> modules(baseModule, *additionalModules) }
+        }
 
     try {
       realm.action()

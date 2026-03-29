@@ -22,32 +22,26 @@ import com.itsaky.androidide.editor.language.treesitter.TreeSitterLanguage.Facto
 import com.itsaky.androidide.treesitter.c.TSLanguageC
 import io.github.rosemoe.sora.widget.SymbolPairMatch
 
-/**
- * @author android_zero
- */
+/** @author android_zero */
 open class CLang(context: Context) :
     TreeSitterLanguage(context, TSLanguageC.getInstance(), TS_TYPE_C) {
 
-    companion object {
+  companion object {
 
-        @JvmField
-        val FACTORY = Factory { CLang(it) }
-        const val TS_TYPE_C = "c"
-        const val TS_TYPE_M_small = "m"
-        const val TS_TYPE_M_CAPITAL_LETTERS = "M"
+    @JvmField val FACTORY = Factory { CLang(it) }
+    const val TS_TYPE_C = "c"
+    const val TS_TYPE_M_small = "m"
+    const val TS_TYPE_M_CAPITAL_LETTERS = "M"
+  }
+
+  /** 设置符号对，实现自动补全括号 */
+  override fun getSymbolPairs(): SymbolPairMatch {
+    return SymbolPairMatch().apply {
+      putPair('(', SymbolPairMatch.SymbolPair("(", ")"))
+      putPair('[', SymbolPairMatch.SymbolPair("[", "]"))
+      putPair('{', SymbolPairMatch.SymbolPair("{", "}"))
+      putPair('"', SymbolPairMatch.SymbolPair("\"", "\""))
+      putPair('\'', SymbolPairMatch.SymbolPair("'", "'"))
     }
-
-    /**
-     * 设置符号对，实现自动补全括号
-     */
-    override fun getSymbolPairs(): SymbolPairMatch {
-        return SymbolPairMatch().apply {
-            putPair('(', SymbolPairMatch.SymbolPair("(", ")"))
-            putPair('[', SymbolPairMatch.SymbolPair("[", "]"))
-            putPair('{', SymbolPairMatch.SymbolPair("{", "}"))
-            putPair('"', SymbolPairMatch.SymbolPair("\"", "\""))
-            putPair('\'', SymbolPairMatch.SymbolPair("'", "'"))
-        }
-    }
-
+  }
 }

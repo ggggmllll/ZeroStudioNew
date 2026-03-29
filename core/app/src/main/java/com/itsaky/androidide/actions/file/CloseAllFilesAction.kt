@@ -38,9 +38,7 @@ class CloseAllFilesAction(context: Context, override val order: Int) : FileTabAc
   }
 
   override fun EditorHandlerActivity.doAction(data: ActionData): Boolean {
-    closeAll {
-      invalidateOptionsMenu()
-    }
+    closeAll { invalidateOptionsMenu() }
     return true
   }
 }

@@ -20,8 +20,6 @@ package com.itsaky.androidide.preferences.internal
 import com.itsaky.androidide.app.BaseApplication
 import com.itsaky.androidide.managers.PreferenceManager
 
-/**
- * The global preference manager instance.
- */
+/** The global preference manager instance. */
 val prefManager: PreferenceManager
   get() = BaseApplication.getBaseInstance().prefManager

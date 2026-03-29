@@ -15,33 +15,26 @@
  *   along with AndroidIDE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
-import com.itsaky.androidide.plugins.NoDesugarPlugin
 import com.itsaky.androidide.build.config.BuildConfig
+import com.itsaky.androidide.plugins.NoDesugarPlugin
 
 plugins {
   id("com.android.library")
   id("com.vanniktech.maven.publish.base")
 }
 
-apply {
-  plugin(NoDesugarPlugin::class.java)
-}
-
-
+apply { plugin(NoDesugarPlugin::class.java) }
 
 description = "LogSender is used to read logs from applications built with AndroidIDE"
 
 android {
   namespace = "${BuildConfig.packageName}.logsender"
-   compileSdk = BuildConfig.compileSdk
-   
+  compileSdk = BuildConfig.compileSdk
+
   defaultConfig {
     minSdk = 16
 
-    vectorDrawables {
-      useSupportLibrary = true
-    }
+    vectorDrawables { useSupportLibrary = true }
   }
 
   compileOptions {

@@ -19,12 +19,12 @@ package com.itsaky.androidide.lsp.xml.providers.snippet
 
 import com.itsaky.androidide.lsp.snippets.ISnippetScope
 
-val XML_SNIPPET_SCOPES : Array<IXmlSnippetScope> =
-  arrayOf(
-    DefaultXmlSnippetScope(XmlResourceType.LAYOUT, XmlScope.TAG),
-    DefaultXmlSnippetScope(XmlResourceType.LAYOUT, XmlScope.INSIDE),
-    DefaultXmlSnippetScope(XmlResourceType.MANIFEST, XmlScope.INSIDE)
-  )
+val XML_SNIPPET_SCOPES: Array<IXmlSnippetScope> =
+    arrayOf(
+        DefaultXmlSnippetScope(XmlResourceType.LAYOUT, XmlScope.TAG),
+        DefaultXmlSnippetScope(XmlResourceType.LAYOUT, XmlScope.INSIDE),
+        DefaultXmlSnippetScope(XmlResourceType.MANIFEST, XmlScope.INSIDE),
+    )
 
 abstract class IXmlSnippetScope : ISnippetScope {
   abstract val type: XmlResourceType
@@ -35,14 +35,14 @@ abstract class IXmlSnippetScope : ISnippetScope {
 }
 
 class DefaultXmlSnippetScope(override val type: XmlResourceType, override val scope: XmlScope) :
-  IXmlSnippetScope()
+    IXmlSnippetScope()
 
 enum class XmlResourceType {
   LAYOUT,
-  MANIFEST
+  MANIFEST,
 }
 
 enum class XmlScope {
   TAG,
-  INSIDE
+  INSIDE,
 }

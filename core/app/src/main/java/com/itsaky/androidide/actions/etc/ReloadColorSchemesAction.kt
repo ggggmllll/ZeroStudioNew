@@ -50,14 +50,11 @@ class ReloadColorSchemesAction(context: Context, override val order: Int) : Edit
   override suspend fun execAction(data: ActionData): Boolean {
     val context = data.requireActivity()
     context.lifecycleScope.launchAsyncWithProgress(
-      context = Dispatchers.Default,
-      configureFlashbar = { builder, _ ->
-        builder.message(R.string.please_wait)
-      }) { flashbar, _ ->
+        context = Dispatchers.Default,
+        configureFlashbar = { builder, _ -> builder.message(R.string.please_wait) },
+    ) { flashbar, _ ->
       IDEColorSchemeProvider.reload()
-      withContext(Dispatchers.Main) {
-        flashbar.dismiss()
-      }
+      withContext(Dispatchers.Main) { flashbar.dismiss() }
     }
     return true
   }

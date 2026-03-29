@@ -21,13 +21,11 @@ import com.itsaky.androidide.treesitter.TSQueryPredicateStep
 import com.itsaky.androidide.utils.DefaultRecyclable
 import com.itsaky.androidide.utils.RecyclableObjectPool
 
-/**
- * @author Akash Yadav
- */
-class TreeSitterQueryPredicateStep @JvmOverloads internal constructor(
-  type: Int = 0,
-  valueId: Int = 0
-) : TSQueryPredicateStep(type, valueId), RecyclableObjectPool.Recyclable by DefaultRecyclable() {
+/** @author Akash Yadav */
+class TreeSitterQueryPredicateStep
+@JvmOverloads
+internal constructor(type: Int = 0, valueId: Int = 0) :
+    TSQueryPredicateStep(type, valueId), RecyclableObjectPool.Recyclable by DefaultRecyclable() {
 
   companion object {
 

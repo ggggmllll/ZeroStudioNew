@@ -15,7 +15,6 @@
  *   along with AndroidIDE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 import com.itsaky.androidide.build.config.BuildConfig
 
 plugins {
@@ -23,28 +22,22 @@ plugins {
   id("kotlin-android")
   id("kotlin-kapt")
   id("realm-android")
-  
 }
-
-
 
 android {
   namespace = "${BuildConfig.packageName}.testing.android"
-  
 
-realm {
-    isSyncEnabled = true
-}
-
+  realm { isSyncEnabled = true }
 }
 
 configurations.api {
   // There is a transitive dependency on 'protobuf-lite' in 'androidTest' configurations
   // which conflicts with the 'protobuf-javalite' library we use
   // hence we exclude the dependency and add ours manually
-  //+--- androidx.test.espresso:espresso-core:<...>
+  // +--- androidx.test.espresso:espresso-core:<...>
   //     +--- com.google.android.material:material:<...>
-  //          \--- com.google.android.apps.common.testing.accessibility.framework:accessibility-test-framework:<...>
+  //          \---
+  // com.google.android.apps.common.testing.accessibility.framework:accessibility-test-framework:<...>
   //               +--- com.google.protobuf:protobuf-lite:3.0.1
   exclude(group = "com.google.protobuf", module = "protobuf-lite")
 }
@@ -62,9 +55,7 @@ dependencies {
   api(libs.tests.androidx.uiautomator)
   api(libs.tests.junit)
   api(libs.tests.google.truth)
-  api(libs.tests.barista) {
-    exclude("org.jetbrains.kotlin")
-  }
+  api(libs.tests.barista) { exclude("org.jetbrains.kotlin") }
 
   api(projects.core.common)
   api(projects.testing.commonTest)

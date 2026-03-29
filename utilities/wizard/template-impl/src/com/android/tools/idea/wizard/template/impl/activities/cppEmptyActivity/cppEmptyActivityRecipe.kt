@@ -31,54 +31,71 @@ import com.android.tools.idea.wizard.template.impl.activities.cppEmptyActivity.s
 import com.android.tools.idea.wizard.template.impl.activities.cppEmptyActivity.src.nativeLibCpp
 
 fun RecipeExecutor.generateCppEmptyActivity(
-  moduleData: ModuleTemplateData,
-  activityClass: String,
-  layoutName: String,
-  isLauncher: Boolean,
-  packageName: PackageName,
-  cppFlags: String,
+    moduleData: ModuleTemplateData,
+    activityClass: String,
+    layoutName: String,
+    isLauncher: Boolean,
+    packageName: PackageName,
+    cppFlags: String,
 ) {
   val (projectData, srcOut) = moduleData
   val useAndroidX = projectData.androidXSupport
   val ktOrJavaExt = projectData.language.extension
 
   addDependency("com.android.support:appcompat-v7:${moduleData.apis.appCompatVersion}.+")
-  setCppOptions(cppFlags = cppFlags, cppPath = "src/main/cpp/CMakeLists.txt", cppVersion = DEFAULT_CMAKE_VERSION)
+  setCppOptions(
+      cppFlags = cppFlags,
+      cppPath = "src/main/cpp/CMakeLists.txt",
+      cppVersion = DEFAULT_CMAKE_VERSION,
+  )
 
-  generateManifest(moduleData, activityClass, packageName, isLauncher, false, generateActivityTitle = false)
+  generateManifest(
+      moduleData,
+      activityClass,
+      packageName,
+      isLauncher,
+      false,
+      generateActivityTitle = false,
+  )
 
   addAllKotlinDependencies(moduleData)
   addViewBindingSupport(moduleData.viewBindingSupport, true)
 
-  generateSimpleLayout(moduleData, activityClass, layoutName, includeCppSupport = true, containerId = null)
+  generateSimpleLayout(
+      moduleData,
+      activityClass,
+      layoutName,
+      includeCppSupport = true,
+      containerId = null,
+  )
 
   val simpleActivityPath = srcOut.resolve("$activityClass.$ktOrJavaExt")
 
   val isViewBindingSupported = moduleData.viewBindingSupport.isViewBindingSupported()
   val libraryName = packageName.deriveNativeLibraryName()
   val simpleActivity =
-    when (projectData.language) {
-      Language.Kotlin ->
-        cppEmptyActivityKt(
-          packageName = packageName,
-          applicationPackage = projectData.applicationPackage,
-          activityClass = activityClass,
-          layoutName = layoutName,
-          useAndroidX = useAndroidX,
-          isViewBindingSupported = isViewBindingSupported,
-          libraryName = libraryName,
-        )
-      Language.Java ->
-        cppEmptyActivityJava(
-          packageName = packageName,
-          applicationPackage = projectData.applicationPackage,
-          activityClass = activityClass,
-          layoutName = layoutName,
-          useAndroidX = useAndroidX,
-          isViewBindingSupported = isViewBindingSupported,
-          libraryName = libraryName,
-        )
-    }
+      when (projectData.language) {
+        Language.Kotlin ->
+            cppEmptyActivityKt(
+                packageName = packageName,
+                applicationPackage = projectData.applicationPackage,
+                activityClass = activityClass,
+                layoutName = layoutName,
+                useAndroidX = useAndroidX,
+                isViewBindingSupported = isViewBindingSupported,
+                libraryName = libraryName,
+            )
+        Language.Java ->
+            cppEmptyActivityJava(
+                packageName = packageName,
+                applicationPackage = projectData.applicationPackage,
+                activityClass = activityClass,
+                layoutName = layoutName,
+                useAndroidX = useAndroidX,
+                isViewBindingSupported = isViewBindingSupported,
+                libraryName = libraryName,
+            )
+      }
   save(simpleActivity, simpleActivityPath)
 
   val nativeSrcOut = moduleData.rootDir.resolve("src/main/cpp")

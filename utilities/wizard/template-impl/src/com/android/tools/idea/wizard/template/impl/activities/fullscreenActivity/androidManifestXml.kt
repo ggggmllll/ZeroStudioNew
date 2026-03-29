@@ -21,15 +21,17 @@ import com.android.tools.idea.wizard.template.impl.activities.common.commonActiv
 import com.android.tools.idea.wizard.template.impl.activities.fullscreenActivity.res.values.getFullscreenTheme
 
 fun androidManifestXml(
-  activityClass: String,
-  packageName: String,
-  simpleName: String,
-  isLauncher: Boolean,
-  isLibrary: Boolean,
-  isNewModule: Boolean,
-  themeName: String,
+    activityClass: String,
+    packageName: String,
+    simpleName: String,
+    isLauncher: Boolean,
+    isLibrary: Boolean,
+    isNewModule: Boolean,
+    themeName: String,
 ): String {
-  val activityLabel = if (isNewModule) """android:label="@string/app_name"""" else """android:label="@string/title_${simpleName}""""
+  val activityLabel =
+      if (isNewModule) """android:label="@string/app_name""""
+      else """android:label="@string/title_${simpleName}""""
   val launcher = isLauncher || isNewModule
   val activityBody = commonActivityBody(launcher, isLibrary)
 
@@ -47,5 +49,5 @@ fun androidManifestXml(
 
 </manifest>
 """
-    .collapseEmptyActivityTags()
+      .collapseEmptyActivityTags()
 }

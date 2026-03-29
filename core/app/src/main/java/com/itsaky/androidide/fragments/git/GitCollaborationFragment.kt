@@ -28,64 +28,66 @@ import com.itsaky.androidide.databinding.FragmentGitCollaborationBinding
 
 /**
  * 协作 (Collaboration) 聚合 Fragment。
- * 
+ *
  * @author android_zero
  */
 class GitCollaborationFragment : Fragment() {
 
-    private var _binding: FragmentGitCollaborationBinding? = null
-    private val binding get() = _binding!!
+  private var _binding: FragmentGitCollaborationBinding? = null
+  private val binding
+    get() = _binding!!
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = FragmentGitCollaborationBinding.inflate(inflater, container, false)
-        return binding.root
-    }
+  override fun onCreateView(
+      inflater: LayoutInflater,
+      container: ViewGroup?,
+      savedInstanceState: Bundle?,
+  ): View {
+    _binding = FragmentGitCollaborationBinding.inflate(inflater, container, false)
+    return binding.root
+  }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        setupViewPager()
-    }
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+    setupViewPager()
+  }
 
-    private fun setupViewPager() {
-        // 使用 childFragmentManager 因为这是嵌套在 Fragment 中的 ViewPager
-        val adapter = CollaborationPagerAdapter(this)
-        binding.pagerCollab.adapter = adapter
-        
-        // 绑定 Tab 标题
-        TabLayoutMediator(binding.tabLayoutCollab, binding.pagerCollab) { tab, position ->
-            tab.text = when (position) {
-                0 -> getString(R.string.collab_tab_pr)        // Pull Requests
+  private fun setupViewPager() {
+    // 使用 childFragmentManager 因为这是嵌套在 Fragment 中的 ViewPager
+    val adapter = CollaborationPagerAdapter(this)
+    binding.pagerCollab.adapter = adapter
+
+    // 绑定 Tab 标题
+    TabLayoutMediator(binding.tabLayoutCollab, binding.pagerCollab) { tab, position ->
+          tab.text =
+              when (position) {
+                0 -> getString(R.string.collab_tab_pr) // Pull Requests
                 1 -> getString(R.string.collab_tab_pipelines) // CD/CI
                 2 -> getString(R.string.collab_tab_conflicts) // 冲突解决
-                3 -> getString(R.string.collab_tab_review)    // 代码审查
+                3 -> getString(R.string.collab_tab_review) // 代码审查
                 else -> ""
-            }
-        }.attach()
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
-
-    /**
-     * 协作子页面的适配器
-     */
-    private inner class CollaborationPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
-        override fun getItemCount(): Int = 4
-
-        override fun createFragment(position: Int): Fragment {
-            return when (position) {
-                0 -> GitPullRequestsFragment()
-                1 -> GitPipelinesFragment()
-                2 -> GitConflictsFragment()
-                3 -> GitCodeReviewFragment()
-                else -> Fragment()
-            }
+              }
         }
+        .attach()
+  }
+
+  override fun onDestroyView() {
+    super.onDestroyView()
+    _binding = null
+  }
+
+  /** 协作子页面的适配器 */
+  private inner class CollaborationPagerAdapter(fragment: Fragment) :
+      FragmentStateAdapter(fragment) {
+    override fun getItemCount(): Int = 4
+
+    override fun createFragment(position: Int): Fragment {
+      return when (position) {
+        0 -> GitPullRequestsFragment()
+        1 -> GitPipelinesFragment()
+        2 -> GitConflictsFragment()
+        3 -> GitCodeReviewFragment()
+        else -> Fragment()
+      }
     }
+  }
 }

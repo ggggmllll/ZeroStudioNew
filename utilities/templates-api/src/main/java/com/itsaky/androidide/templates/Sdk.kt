@@ -19,12 +19,11 @@ package com.itsaky.androidide.templates
 
 /**
  * Android API versions.
- 
+ *
  * It can be viewed here Android api levels：https://apilevels.com/
  *
  * @author Akash Yadav (Historical contributors)
  */
-
 enum class Sdk(val codename: String, val version: String, val api: Int) {
 
   JellyBean("Jelly Bean", "4.1", 16),

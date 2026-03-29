@@ -51,7 +51,6 @@ import com.itsaky.androidide.builder.model.DefaultSourceSetContainer
 import com.itsaky.androidide.builder.model.DefaultSyncIssue
 import com.itsaky.androidide.builder.model.DefaultUnresolvedDependency
 import com.itsaky.androidide.builder.model.DefaultViewBindingOptions
-import java.io.File
 
 /**
  * As the data is sent over streams, and the instances of properties specified in [AndroidModule]

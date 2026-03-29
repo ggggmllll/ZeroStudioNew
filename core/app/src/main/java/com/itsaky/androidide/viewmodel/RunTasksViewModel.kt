@@ -26,7 +26,7 @@ import com.itsaky.androidide.tooling.api.models.GradleTask
 
 /** @author Akash Yadav */
 class RunTasksViewModel : ViewModel() {
-  
+
   private val _tasks = MutableLiveData(listOf<Checkable<GradleTask>>())
   private val _selected = MutableLiveData(mutableSetOf<String>())
   private val _displayedChild = MutableLiveData(0)

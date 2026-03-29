@@ -22,17 +22,17 @@ import com.android.tools.idea.wizard.template.Language
 import com.android.tools.idea.wizard.template.ProjectTemplateData
 import com.android.tools.idea.wizard.template.TemplateKotlinSupport
 import com.android.tools.idea.wizard.template.getMaterialComponentName
+import com.android.tools.idea.wizard.template.renderIf
 import com.itsaky.androidide.templates.impl.androidstudio.compileSdk
 import com.itsaky.androidide.templates.impl.androidstudio.minSdk
 import com.itsaky.androidide.templates.impl.androidstudio.targetSdk
-import com.android.tools.idea.wizard.template.renderIf
 
 fun buildGradle(
-  projectData: ProjectTemplateData,
-  packageName: String,
-  buildApi: AndroidVersion,
-  minApi: AndroidMajorVersion,
-  targetApi: AndroidMajorVersion,
+    projectData: ProjectTemplateData,
+    packageName: String,
+    buildApi: AndroidVersion,
+    minApi: AndroidMajorVersion,
+    targetApi: AndroidMajorVersion,
 ): String {
   val agpVersion = projectData.agpVersion
   val useAndroidX = projectData.androidXSupport

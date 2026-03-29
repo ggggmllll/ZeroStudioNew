@@ -46,11 +46,11 @@ open class AutoCompleteTextViewAdapter<T : AutoCompleteTextView> : EditTextAdapt
 
   override fun createUiWidgets(): List<UiWidget> {
     return listOf(
-      UiWidget(
-        AutoCompleteTextView::class.java,
-        string.widget_auto_complete_textview,
-        drawable.ic_widget_auto_complete_textview
-      )
+        UiWidget(
+            AutoCompleteTextView::class.java,
+            string.widget_auto_complete_textview,
+            drawable.ic_widget_auto_complete_textview,
+        )
     )
   }
 }

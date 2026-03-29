@@ -21,53 +21,53 @@ import android.content.Context
 import com.itsaky.androidide.lsp.BaseLspServer
 import com.itsaky.androidide.lsp.connection.ProcessStreamProvider
 import com.itsaky.androidide.lsp.core.LspConnectionFactory
+import com.itsaky.androidide.lsp.util.Logger
 import com.itsaky.androidide.lsp.util.LspShellUtils
 import com.itsaky.androidide.utils.Environment
 import java.io.File
-import com.itsaky.androidide.lsp.util.Logger
 
 /**
- * An implementation of [BaseLspServer] for CSS, SCSS, and LESS, utilizing the `vscode-css-language-server`.
+ * An implementation of [BaseLspServer] for CSS, SCSS, and LESS, utilizing the
+ * `vscode-css-language-server`.
  *
  * The server is started as a Node.js process with the `--stdio` flag.
  *
  * @author android_zero
  */
 class CssServer : BaseLspServer() {
-    override val id: String = "css-lsp"
-    override val languageName: String = "CSS"
-    override val serverName: String = "vscode-css-language-server"
-    override val supportedExtensions: List<String> = listOf("css", "scss", "less")
+  override val id: String = "css-lsp"
+  override val languageName: String = "CSS"
+  override val serverName: String = "vscode-css-language-server"
+  override val supportedExtensions: List<String> = listOf("css", "scss", "less")
 
-    private val serverPath: File
-        get() = File(Environment.PREFIX, "bin/vscode-css-language-server")
+  private val serverPath: File
+    get() = File(Environment.PREFIX, "bin/vscode-css-language-server")
 
-    override fun isInstalled(context: Context): Boolean {
-        return LspShellUtils.isTerminalEnvironmentReady() && serverPath.exists()
-    }
+  override fun isInstalled(context: Context): Boolean {
+    return LspShellUtils.isTerminalEnvironmentReady() && serverPath.exists()
+  }
 
-    override fun install(context: Context) {
-        val installScript = File(Environment.HOME, ".androidide/local/bin/lsp/css")
-        if (installScript.exists()) {
-            LspShellUtils.installPackage(installScript.absolutePath, "$id-installer")
-        } else {
-            Logger.instance(javaClass.simpleName).error("Installation script for CSS LSP not found at ${installScript.path}")
-        }
+  override fun install(context: Context) {
+    val installScript = File(Environment.HOME, ".androidide/local/bin/lsp/css")
+    if (installScript.exists()) {
+      LspShellUtils.installPackage(installScript.absolutePath, "$id-installer")
+    } else {
+      Logger.instance(javaClass.simpleName)
+          .error("Installation script for CSS LSP not found at ${installScript.path}")
     }
+  }
 
-    override fun getConnectionFactory(): LspConnectionFactory {
-        return LspConnectionFactory { workingDir ->
-            ProcessStreamProvider(
-                command = listOf(
-                    LspShellUtils.getNodeExecutablePath(),
-                    serverPath.absolutePath,
-                    "--stdio"
-                ),
-                workingDir = workingDir
-            )
-        }
+  override fun getConnectionFactory(): LspConnectionFactory {
+    return LspConnectionFactory { workingDir ->
+      ProcessStreamProvider(
+          command =
+              listOf(LspShellUtils.getNodeExecutablePath(), serverPath.absolutePath, "--stdio"),
+          workingDir = workingDir,
+      )
     }
-        override fun isSupported(file: File): Boolean {
-        return supportedExtensions.contains(file.getName().substringAfterLast("."))
-    }
+  }
+
+  override fun isSupported(file: File): Boolean {
+    return supportedExtensions.contains(file.getName().substringAfterLast("."))
+  }
 }

@@ -24,24 +24,25 @@ import com.android.tools.idea.wizard.template.impl.activities.common.layoutToVie
 import com.android.tools.idea.wizard.template.renderIf
 
 fun contentDetailFragmentJava(
-  collection: String,
-  collectionName: String,
-  applicationPackage: String?,
-  detailNameLayout: String,
-  objectKind: String,
-  packageName: String,
-  useAndroidX: Boolean,
-  isViewBindingSupported: Boolean,
+    collection: String,
+    collectionName: String,
+    applicationPackage: String?,
+    detailNameLayout: String,
+    objectKind: String,
+    packageName: String,
+    useAndroidX: Boolean,
+    isViewBindingSupported: Boolean,
 ): String {
 
   val layoutName = "fragment_${detailNameLayout}"
   val onCreateViewBlock =
-    if (isViewBindingSupported)
-      """
+      if (isViewBindingSupported)
+          """
       binding = ${layoutToViewBindingClass(layoutName)}.inflate(inflater, container, false);
       View rootView = binding.getRoot();
   """
-    else "View rootView = inflater.inflate(R.layout.fragment_${detailNameLayout}, container, false);"
+      else
+          "View rootView = inflater.inflate(R.layout.fragment_${detailNameLayout}, container, false);"
 
   return """
 package ${packageName};

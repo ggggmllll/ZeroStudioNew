@@ -23,7 +23,6 @@ import androidx.fragment.app.Fragment
 import com.itsaky.androidide.R
 import com.itsaky.androidide.fragments.sidebar.FileTreeFragment
 import kotlin.reflect.KClass
-import com.itsaky.androidide.utils.getTintedDrawable 
 
 /**
  * Sidebar action for showing file tree.
@@ -33,7 +32,7 @@ import com.itsaky.androidide.utils.getTintedDrawable
 class FileTreeSidebarAction(context: Context, override val order: Int) : AbstractSidebarAction() {
 
   companion object {
-    const val ID ="ide.editor.sidebar.fileTree"
+    const val ID = "ide.editor.sidebar.fileTree"
   }
 
   override val id: String = ID

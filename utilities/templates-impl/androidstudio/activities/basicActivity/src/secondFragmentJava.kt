@@ -15,10 +15,6 @@
  */
 package com.itsaky.androidide.templates.impl.androidstudio.activities.basicActivity.src
 
-import com.itsaky.androidide.templates.Language
-import com.itsaky.androidide.templates.impl.activities.common.findViewById
-import com.itsaky.androidide.templates.impl.activities.common.layoutToViewBindingClass
-
 /**
  * Generates the Java source code for the second fragment.
  *
@@ -26,19 +22,19 @@ import com.itsaky.androidide.templates.impl.activities.common.layoutToViewBindin
  * @author android_zero
  */
 fun secondFragmentJava(
-  packageName: String,
-  firstFragmentClass: String,
-  secondFragmentClass: String,
-  secondFragmentLayoutName: String,
-  isViewBindingSupported: Boolean,
+    packageName: String,
+    firstFragmentClass: String,
+    secondFragmentClass: String,
+    secondFragmentLayoutName: String,
+    isViewBindingSupported: Boolean,
 ): String {
   val onCreateViewBlock =
-    if (isViewBindingSupported)
-      """
+      if (isViewBindingSupported)
+          """
       binding = FragmentSecondBinding.inflate(inflater, container, false);
       return binding.getRoot();
     """
-    else "return inflater.inflate(R.layout.$secondFragmentLayoutName, container, false);"
+      else "return inflater.inflate(R.layout.$secondFragmentLayoutName, container, false);"
 
   return """package ${packageName};
 

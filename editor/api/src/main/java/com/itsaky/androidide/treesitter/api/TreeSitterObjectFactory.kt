@@ -43,15 +43,21 @@ import com.itsaky.androidide.treesitter.util.TSObjectFactory
  */
 class TreeSitterObjectFactory : TSObjectFactory {
 
-  override fun createInputEdit(startByte: Int, oldEndByte: Int, newEndByte: Int,
-    startPoint: TSPoint, oldEndPoint: TSPoint, newEndPoint: TSPoint): TSInputEdit {
+  override fun createInputEdit(
+      startByte: Int,
+      oldEndByte: Int,
+      newEndByte: Int,
+      startPoint: TSPoint,
+      oldEndPoint: TSPoint,
+      newEndPoint: TSPoint,
+  ): TSInputEdit {
     return TreeSitterInputEdit.obtain(
-      startByte,
-      oldEndByte,
-      newEndByte,
-      startPoint,
-      oldEndPoint,
-      newEndPoint
+        startByte,
+        oldEndByte,
+        newEndByte,
+        startPoint,
+        oldEndPoint,
+        newEndPoint,
     )
   }
 
@@ -71,8 +77,12 @@ class TreeSitterObjectFactory : TSObjectFactory {
     return TreeSitterPoint.obtain(row, column)
   }
 
-  override fun createRange(startByte: Int, endByte: Int, startPoint: TSPoint,
-    endPoint: TSPoint?): TSRange {
+  override fun createRange(
+      startByte: Int,
+      endByte: Int,
+      startPoint: TSPoint,
+      endPoint: TSPoint?,
+  ): TSRange {
     return TreeSitterRange.obtain(startByte, endByte, startPoint, endPoint)
   }
 
@@ -88,8 +98,14 @@ class TreeSitterObjectFactory : TSObjectFactory {
     return TreeSitterTreeCursor.obtain(pointer)
   }
 
-  override fun createNode(context0: Int, context1: Int, context2: Int, context3: Int, id: Long,
-    treePointer: Long): TSNode {
+  override fun createNode(
+      context0: Int,
+      context1: Int,
+      context2: Int,
+      context3: Int,
+      id: Long,
+      treePointer: Long,
+  ): TSNode {
     return TreeSitterNode.obtain(context0, context1, context2, context3, id, treePointer)
   }
 
@@ -97,8 +113,11 @@ class TreeSitterObjectFactory : TSObjectFactory {
     return TreeSitterQueryCapture.obtain(node, index)
   }
 
-  override fun createQueryMatch(id: Int, patternIndex: Int,
-    captures: Array<TSQueryCapture?>?): TSQueryMatch {
+  override fun createQueryMatch(
+      id: Int,
+      patternIndex: Int,
+      captures: Array<TSQueryCapture?>?,
+  ): TSQueryMatch {
     return TreeSitterQueryMatch.obtain(id, patternIndex, captures)
   }
 
@@ -111,10 +130,10 @@ class TreeSitterObjectFactory : TSObjectFactory {
   }
 
   override fun createTreeCursorNode(
-    type: String?,
-    name: String?,
-    startByte: Int,
-    endByte: Int
+      type: String?,
+      name: String?,
+      startByte: Int,
+      endByte: Int,
   ): TSTreeCursorNode {
     return TreeSitterTreeCursorNode.obtain(type, name, startByte, endByte)
   }

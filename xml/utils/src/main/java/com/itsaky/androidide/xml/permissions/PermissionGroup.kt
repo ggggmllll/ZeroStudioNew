@@ -38,5 +38,5 @@ enum class PermissionGroup(val constant: String) {
   READ_MEDIA_VISUAL(ManifestPermissionConstants.GROUP_READ_MEDIA_VISUAL),
   SENSORS(ManifestPermissionConstants.GROUP_SENSORS),
   SMS(ManifestPermissionConstants.GROUP_SMS),
-  STORAGE(ManifestPermissionConstants.GROUP_STORAGE)
+  STORAGE(ManifestPermissionConstants.GROUP_STORAGE),
 }

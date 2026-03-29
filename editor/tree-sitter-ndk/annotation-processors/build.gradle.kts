@@ -16,9 +16,7 @@
  */
 
 @Suppress("DSL_SCOPE_VIOLATION") // TODO: Remove once KTIJ-19369 is fixed
-plugins {
-  id("java-library")
-}
+plugins { id("java-library") }
 
 dependencies {
   // implementation(projects.editor.treeSitterNdk.annotations)

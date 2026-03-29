@@ -37,10 +37,10 @@ import com.android.tools.idea.wizard.template.impl.activities.settingsActivity.s
 import java.io.File
 
 fun RecipeExecutor.settingsActivityRecipe(
-  moduleData: ModuleTemplateData,
-  activityClass: String,
-  multipleScreens: Boolean,
-  packageName: String,
+    moduleData: ModuleTemplateData,
+    activityClass: String,
+    multipleScreens: Boolean,
+    packageName: String,
 ) {
   val (projectData, srcOut, resOut, _) = moduleData
   val useAndroidX = moduleData.projectTemplateData.androidXSupport
@@ -53,12 +53,12 @@ fun RecipeExecutor.settingsActivityRecipe(
   addMaterialDependency(useAndroidX)
 
   generateManifest(
-    moduleData,
-    activityClass,
-    packageName,
-    isLauncher = moduleData.isNewModule,
-    hasNoActionBar = false,
-    generateActivityTitle = true,
+      moduleData,
+      activityClass,
+      packageName,
+      isLauncher = moduleData.isNewModule,
+      hasNoActionBar = false,
+      generateActivityTitle = true,
   )
 
   mergeXml(stringsXml(activityClass, simpleName), resOut.resolve("values/strings.xml"))
@@ -68,22 +68,27 @@ fun RecipeExecutor.settingsActivityRecipe(
   if (multipleScreens) {
     copy(File("settings-activity").resolve("drawable"), resOut.resolve("drawable"))
 
-    mergeXml(headerPreferencesXml(activityClass, packageName), resOut.resolve("xml/header_preferences.xml"))
+    mergeXml(
+        headerPreferencesXml(activityClass, packageName),
+        resOut.resolve("xml/header_preferences.xml"),
+    )
     mergeXml(messagesPreferencesXml(), resOut.resolve("xml/messages_preferences.xml"))
     mergeXml(syncPreferencesXml(), resOut.resolve("xml/sync_preferences.xml"))
     val multipleScreenSettingsActivity =
-      when (projectData.language) {
-        Language.Java -> multipleScreenSettingsActivityJava(activityClass, packageName, simpleName)
-        Language.Kotlin -> multipleScreenSettingsActivityKt(activityClass, packageName, simpleName)
-      }
+        when (projectData.language) {
+          Language.Java ->
+              multipleScreenSettingsActivityJava(activityClass, packageName, simpleName)
+          Language.Kotlin ->
+              multipleScreenSettingsActivityKt(activityClass, packageName, simpleName)
+        }
     save(multipleScreenSettingsActivity, srcOut.resolve("${activityClass}.${ktOrJavaExt}"))
   } else {
     mergeXml(rootPreferencesXml(), resOut.resolve("xml/root_preferences.xml"))
     val singleScreenSettingsActivity =
-      when (projectData.language) {
-        Language.Java -> singleScreenSettingsActivityJava(activityClass, packageName)
-        Language.Kotlin -> singleScreenSettingsActivityKt(activityClass, packageName)
-      }
+        when (projectData.language) {
+          Language.Java -> singleScreenSettingsActivityJava(activityClass, packageName)
+          Language.Kotlin -> singleScreenSettingsActivityKt(activityClass, packageName)
+        }
     save(singleScreenSettingsActivity, srcOut.resolve("${activityClass}.${ktOrJavaExt}"))
   }
   open(srcOut.resolve("${activityClass}.${ktOrJavaExt}"))

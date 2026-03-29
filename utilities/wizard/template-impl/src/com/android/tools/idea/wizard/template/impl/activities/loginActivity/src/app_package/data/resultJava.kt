@@ -17,7 +17,7 @@
 package com.android.tools.idea.wizard.template.impl.activities.loginActivity.src.app_package.data
 
 fun resultJava(packageName: String) =
-  """package ${packageName}.data;
+    """package ${packageName}.data;
 
 /**
  * A generic class that holds a result success w/ data or an error exception.

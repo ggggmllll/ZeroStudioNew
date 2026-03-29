@@ -21,12 +21,9 @@ import com.itsaky.androidide.treesitter.TSTree
 import com.itsaky.androidide.utils.DefaultRecyclable
 import com.itsaky.androidide.utils.RecyclableObjectPool
 
-/**
- * @author Akash Yadav
- */
-class TreeSitterTree @JvmOverloads internal constructor(
-  pointer: Long = 0
-) : TSTree(pointer), RecyclableObjectPool.Recyclable by DefaultRecyclable() {
+/** @author Akash Yadav */
+class TreeSitterTree @JvmOverloads internal constructor(pointer: Long = 0) :
+    TSTree(pointer), RecyclableObjectPool.Recyclable by DefaultRecyclable() {
 
   private var ownerThread: Thread? = null
 

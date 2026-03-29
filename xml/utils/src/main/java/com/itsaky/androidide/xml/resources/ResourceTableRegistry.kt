@@ -35,25 +35,21 @@ interface ResourceTableRegistry : XmlRegistry<IResourceTable> {
 
     const val PCK_ANDROID = "android"
 
-    @JvmStatic
-    val COMPLETION_MODULE_RES = Lookup.Key<Set<IResourceTable>>()
+    @JvmStatic val COMPLETION_MODULE_RES = Lookup.Key<Set<IResourceTable>>()
 
-    @JvmStatic
-    val COMPLETION_DEP_RES = Lookup.Key<Set<IResourceTable>>()
+    @JvmStatic val COMPLETION_DEP_RES = Lookup.Key<Set<IResourceTable>>()
 
-    @JvmStatic
-    val COMPLETION_FRAMEWORK_RES = Lookup.Key<IResourceTable>()
+    @JvmStatic val COMPLETION_FRAMEWORK_RES = Lookup.Key<IResourceTable>()
 
-    @JvmStatic
-    val COMPLETION_MANIFEST_ATTR_RES = Lookup.Key<IResourceTable>()
+    @JvmStatic val COMPLETION_MANIFEST_ATTR_RES = Lookup.Key<IResourceTable>()
 
     private var sInstance: ResourceTableRegistry? = null
 
     @JvmStatic
     fun getInstance(): ResourceTableRegistry {
       val klass = ResourceTableRegistry::class.java
-      return sInstance ?: ServiceLoader.load(klass, klass.classLoader).findFirstOrThrow()
-        .also { sInstance = it }
+      return sInstance
+          ?: ServiceLoader.load(klass, klass.classLoader).findFirstOrThrow().also { sInstance = it }
     }
   }
 

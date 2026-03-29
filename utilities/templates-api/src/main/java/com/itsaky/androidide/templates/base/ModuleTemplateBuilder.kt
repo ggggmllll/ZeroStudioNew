@@ -61,7 +61,8 @@ abstract class ModuleTemplateBuilder :
    * @param path The path for the asset.
    * @see com.itsaky.androidide.templates.base.baseAsset
    */
-  open fun baseAsset(path: String) = com.itsaky.androidide.templates.base.util.baseAsset("module", path)
+  open fun baseAsset(path: String) =
+      com.itsaky.androidide.templates.base.util.baseAsset("module", path)
 
   /** Get the `build.gradle[.kts]` file for this module.l */
   fun buildGradleFile(): File {

@@ -25,6 +25,5 @@ import org.junit.runners.model.Statement
  * @author Akash Yadav
  */
 class NoOpStatement : Statement() {
-  override fun evaluate() {
-  }
+  override fun evaluate() {}
 }

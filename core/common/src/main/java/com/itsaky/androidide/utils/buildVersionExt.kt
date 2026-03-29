@@ -20,9 +20,7 @@ package com.itsaky.androidide.utils
 import android.os.Build
 import androidx.annotation.ChecksSdkIntAtLeast
 
-/**
- * @author Akash Yadav
- */
+/** @author Akash Yadav */
 
 // ===================== Android 4.0 - 4.4 区间 =====================
 // Android 4.0 (API 14) - ICE_CREAM_SANDWICH
@@ -64,13 +62,11 @@ fun isAtLeastLMR1() = isAtLeast(Build.VERSION_CODES.LOLLIPOP_MR1)
 
 // ===================== Android 6.0 - 6.0 区间 =====================
 // Android 6.0 (API 23) - M
-@ChecksSdkIntAtLeast(Build.VERSION_CODES.M)
-fun isAtLeastM() = isAtLeast(Build.VERSION_CODES.M)
+@ChecksSdkIntAtLeast(Build.VERSION_CODES.M) fun isAtLeastM() = isAtLeast(Build.VERSION_CODES.M)
 
 // ===================== Android 7.0 - 7.1 区间 =====================
 // Android 7.0 (API 24) - N
-@ChecksSdkIntAtLeast(Build.VERSION_CODES.N)
-fun isAtLeastN() = isAtLeast(Build.VERSION_CODES.N)
+@ChecksSdkIntAtLeast(Build.VERSION_CODES.N) fun isAtLeastN() = isAtLeast(Build.VERSION_CODES.N)
 
 // Android 7.1 (API 25) - N_MR1
 @ChecksSdkIntAtLeast(Build.VERSION_CODES.N_MR1)
@@ -78,8 +74,7 @@ fun isAtLeastNMR1() = isAtLeast(Build.VERSION_CODES.N_MR1)
 
 // ===================== Android 8.0 - 8.1 区间 =====================
 // Android 8.0 (API 26) - O
-@ChecksSdkIntAtLeast(Build.VERSION_CODES.O)
-fun isAtLeastO() = isAtLeast(Build.VERSION_CODES.O)
+@ChecksSdkIntAtLeast(Build.VERSION_CODES.O) fun isAtLeastO() = isAtLeast(Build.VERSION_CODES.O)
 
 // Android 8.1 (API 27) - O_MR1
 @ChecksSdkIntAtLeast(Build.VERSION_CODES.O_MR1)
@@ -87,20 +82,16 @@ fun isAtLeastOMR1() = isAtLeast(Build.VERSION_CODES.O_MR1)
 
 // ===================== Android 9.0 - 16.0 区间 =====================
 // Android 9 (API 28) - P
-@ChecksSdkIntAtLeast(Build.VERSION_CODES.P)
-fun isAtLeastP() = isAtLeast(Build.VERSION_CODES.P)
+@ChecksSdkIntAtLeast(Build.VERSION_CODES.P) fun isAtLeastP() = isAtLeast(Build.VERSION_CODES.P)
 
 // Android 10 (API 29) - Q
-@ChecksSdkIntAtLeast(Build.VERSION_CODES.Q)
-fun isAtLeastQ() = isAtLeast(Build.VERSION_CODES.Q)
+@ChecksSdkIntAtLeast(Build.VERSION_CODES.Q) fun isAtLeastQ() = isAtLeast(Build.VERSION_CODES.Q)
 
 // Android 11 (API 30) - R
-@ChecksSdkIntAtLeast(Build.VERSION_CODES.R)
-fun isAtLeastR() = isAtLeast(Build.VERSION_CODES.R)
+@ChecksSdkIntAtLeast(Build.VERSION_CODES.R) fun isAtLeastR() = isAtLeast(Build.VERSION_CODES.R)
 
 // Android 12 (API 31) - S
-@ChecksSdkIntAtLeast(Build.VERSION_CODES.S)
-fun isAtLeastS() = isAtLeast(Build.VERSION_CODES.S)
+@ChecksSdkIntAtLeast(Build.VERSION_CODES.S) fun isAtLeastS() = isAtLeast(Build.VERSION_CODES.S)
 
 // Android 12L (API 32) - S_V2
 @ChecksSdkIntAtLeast(Build.VERSION_CODES.S_V2)
@@ -119,9 +110,7 @@ fun isAtLeastU() = isAtLeast(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
 fun isAtLeastV() = isAtLeast(Build.VERSION_CODES.VANILLA_ICE_CREAM)
 
 // Android 16 (API 36) - BAKLAVA :: Build.VERSION_CODES.BAKLAVA
-@ChecksSdkIntAtLeast(36)
-fun isAtLeastBaklava() = isAtLeast(36)
-
+@ChecksSdkIntAtLeast(36) fun isAtLeastBaklava() = isAtLeast(36)
 
 @ChecksSdkIntAtLeast(parameter = 0)
 fun isAtLeast(version: Int): Boolean = Build.VERSION.SDK_INT >= version

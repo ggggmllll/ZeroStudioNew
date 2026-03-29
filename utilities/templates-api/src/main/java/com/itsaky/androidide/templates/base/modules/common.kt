@@ -17,11 +17,11 @@
 
 package com.itsaky.androidide.templates.base.modules
 
+import com.itsaky.androidide.templates.base.ModuleTemplateBuilder
 import com.squareup.javapoet.FieldSpec
 import com.squareup.javapoet.MethodSpec
 import com.squareup.javapoet.TypeName
 import com.squareup.javapoet.TypeSpec
-import com.itsaky.androidide.templates.base.ModuleTemplateBuilder
 import jdkx.lang.model.element.Modifier
 
 internal fun ModuleTemplateBuilder.dependencies(): String {

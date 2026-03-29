@@ -26,7 +26,7 @@ import com.itsaky.androidide.fragments.RunTasksDialogFragment
 import com.itsaky.androidide.preferences.internal.EditorPreferences
 import com.itsaky.androidide.resources.R
 
-/** 
+/**
  * @author Akash Yadav
  * @author android_zero
  */
@@ -46,12 +46,11 @@ class RunTasksAction(context: Context, override val order: Int) : BaseBuildActio
    * @return The [RunTasksDialogFragment] instance to be shown.
    * @see com.itsaky.androidide.actions.ActionItem.execAction
    * @see IEditorHandler.saveAll
-   *
    */
   override suspend fun execAction(data: ActionData): Any {
     if (EditorPreferences.autoSaveBeforeBuild) {
-        val activity = data.getActivity() as? EditorHandlerActivity
-        activity?.saveAll(notify = false, requestSync = false)
+      val activity = data.getActivity() as? EditorHandlerActivity
+      activity?.saveAll(notify = false, requestSync = false)
     }
     dialog?.dismiss()
     dialog = null
@@ -67,7 +66,7 @@ class RunTasksAction(context: Context, override val order: Int) : BaseBuildActio
     val activity = data.getActivity() ?: return
     result.show(activity.supportFragmentManager, this.id)
   }
-  
+
   override fun destroy() {
     super.destroy()
     try {

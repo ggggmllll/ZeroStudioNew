@@ -27,7 +27,8 @@ import java.io.Serializable
  * @author Akash Yadav
  * @author android_zero
  *
- * Update: Added missing interface implementations: testSuiteArtifacts, experimentalProperties to fix compilation errors.
+ * Update: Added missing interface implementations: testSuiteArtifacts, experimentalProperties to
+ * fix compilation errors.
  */
 class DefaultVariant : Variant, Serializable {
 
@@ -47,16 +48,9 @@ class DefaultVariant : Variant, Serializable {
   override val deviceTestArtifacts: Map<String, AndroidArtifact> = emptyMap()
   override val hostTestArtifacts: Map<String, JavaArtifact> = emptyMap()
 
-  /**
-   * The test suite artifacts.
-   * Added to satisfy Variant interface requirements.
-   */
+  /** The test suite artifacts. Added to satisfy Variant interface requirements. */
   override val testSuiteArtifacts: Map<String, TestSuiteArtifact> = emptyMap()
 
-  /**
-   * Experimental properties map.
-   * Added to satisfy Variant interface requirements.
-   */
+  /** Experimental properties map. Added to satisfy Variant interface requirements. */
   override val experimentalProperties: Map<String, String> = emptyMap()
-
 }

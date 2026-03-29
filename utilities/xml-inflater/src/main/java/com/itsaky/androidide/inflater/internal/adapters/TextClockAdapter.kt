@@ -44,7 +44,7 @@ open class TextClockAdapter<T : TextClock> : TextViewAdapter<T>() {
 
   override fun createUiWidgets(): List<UiWidget> {
     return listOf(
-      UiWidget(TextClock::class.java, string.widget_text_clock, drawable.ic_widget_text_clock)
+        UiWidget(TextClock::class.java, string.widget_text_clock, drawable.ic_widget_text_clock)
     )
   }
 }

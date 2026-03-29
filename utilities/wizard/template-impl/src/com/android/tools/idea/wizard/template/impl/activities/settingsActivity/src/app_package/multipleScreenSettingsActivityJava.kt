@@ -16,8 +16,12 @@
 
 package com.android.tools.idea.wizard.template.impl.activities.settingsActivity.src.app_package
 
-fun multipleScreenSettingsActivityJava(activityClass: String, packageName: String, simpleName: String) =
-  """package ${packageName};
+fun multipleScreenSettingsActivityJava(
+    activityClass: String,
+    packageName: String,
+    simpleName: String,
+) =
+    """package ${packageName};
 
 import android.os.Bundle;
 import androidx.appcompat.app.ActionBar;

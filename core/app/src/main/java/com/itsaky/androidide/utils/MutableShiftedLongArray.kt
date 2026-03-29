@@ -22,28 +22,25 @@ package com.itsaky.androidide.utils
  *
  * @author Akash Yadav
  */
-class MutableShiftedLongArray(
-  array: LongArray,
-  shift: Int = 0
-) : ShiftedLongArray(array, shift) {
+class MutableShiftedLongArray(array: LongArray, shift: Int = 0) : ShiftedLongArray(array, shift) {
 
   /**
    * @param capacity The capacity of the array.
    * @param shift The shift amount.
    * @param init A function to initialize the values of the array.
    */
-  constructor(capacity: Int, shift: Int = 0, init: (Int) -> Long = { 0 }) : this(
-    LongArray(capacity, init),
-    shift)
+  constructor(
+      capacity: Int,
+      shift: Int = 0,
+      init: (Int) -> Long = { 0 },
+  ) : this(LongArray(capacity, init), shift)
 
   operator fun set(index: Int, value: Long) {
     checkIdx(index)
     array[getShiftedIndex(index)] = value
   }
 
-  /**
-   * Sets the given value at the specified absolute (un-shifted) index.
-   */
+  /** Sets the given value at the specified absolute (un-shifted) index. */
   fun setAbsolute(index: Int, value: Long) {
     array[index] = value
   }

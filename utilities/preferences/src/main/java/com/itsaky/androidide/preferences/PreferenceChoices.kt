@@ -27,9 +27,7 @@ import androidx.preference.Preference
  */
 interface PreferenceChoices {
 
-  /**
-   * Get the entries for this preference.
-   */
+  /** Get the entries for this preference. */
   fun getEntries(preference: Preference): Array<Entry>
 
   /**
@@ -47,9 +45,7 @@ interface PreferenceChoices {
    */
   fun onChoicesConfirmed(preference: Preference, entries: Array<Entry>)
 
-  /**
-   * Called when the user cancels the selections.
-   */
+  /** Called when the user cancels the selections. */
   fun onChoicesCancelled(preference: Preference)
 
   /**
@@ -60,9 +56,9 @@ interface PreferenceChoices {
    * @property data The data object for the value.
    */
   data class Entry(
-    val label: CharSequence,
-    @Suppress("PropertyName") internal var _isChecked: Boolean,
-    val data: Any,
+      val label: CharSequence,
+      @Suppress("PropertyName") internal var _isChecked: Boolean,
+      val data: Any,
   ) {
 
     val isChecked: Boolean
@@ -70,14 +66,11 @@ interface PreferenceChoices {
 
     companion object {
 
-      @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
-      val EMPTY = Entry("", false, 0)
+      @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX) val EMPTY = Entry("", false, 0)
     }
   }
 }
 
-/**
- * Map this [PreferenceChoices.Entry] array to entry labels.
- */
+/** Map this [PreferenceChoices.Entry] array to entry labels. */
 internal val Array<PreferenceChoices.Entry>.labels: Array<CharSequence>
   get() = Array(size) { this[it].label }

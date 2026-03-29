@@ -17,7 +17,6 @@
 
 package com.itsaky.androidide.plugins.tasks
 
-import com.itsaky.androidide.build.config.VersionUtils
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.Property
@@ -25,49 +24,42 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 
-/**
- * Generates the Gradle init script for AndroidIDE.
- */
+/** Generates the Gradle init script for AndroidIDE. */
 abstract class GenerateInitScriptTask : DefaultTask() {
 
-  @get:Input
-  abstract val downloadVersion: Property<String>
+  @get:Input abstract val downloadVersion: Property<String>
 
-  @get:Input
-  abstract val mavenGroupId: Property<String>
+  @get:Input abstract val mavenGroupId: Property<String>
 
-  @get:OutputDirectory
-  abstract val outputDir: DirectoryProperty
+  @get:OutputDirectory abstract val outputDir: DirectoryProperty
 
   @TaskAction
   fun generate() {
 
-    val outFile = this.outputDir.file("data/common/androidide.init.gradle")
-      .also {
-        it.get().asFile.parentFile.mkdirs()
-      }
+    val outFile =
+        this.outputDir.file("data/common/androidide.init.gradle").also {
+          it.get().asFile.parentFile.mkdirs()
+        }
 
     outFile.get().asFile.bufferedWriter().use {
-
       it.write(
-        """
-      initscript {
-          repositories {
-             flatDir {
-              dirs "/data/data/com.itsaky.androidide/files/home/.androidide/init", "init"
-        }
-    }
+          """
+                initscript {
+                    repositories {
+                       flatDir {
+                        dirs "/data/data/com.itsaky.androidide/files/home/.androidide/init", "init"
+                  }
+              }
 
-    dependencies {
-        classpath  name: "zerostudio-gradle-plugin-1.0.0"
-    }
-}
-      
-      apply plugin: com.itsaky.androidide.gradle.AndroidIDEInitScriptPlugin
-    """
-          .trimIndent()
+              dependencies {
+                  classpath  name: "zerostudio-gradle-plugin-1.0.0"
+              }
+          }
+                
+                apply plugin: com.itsaky.androidide.gradle.AndroidIDEInitScriptPlugin
+          """
+              .trimIndent()
       )
     }
   }
-
 }

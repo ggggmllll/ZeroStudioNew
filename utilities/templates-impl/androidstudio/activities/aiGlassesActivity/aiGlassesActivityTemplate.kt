@@ -17,8 +17,8 @@
 package com.itsaky.androidide.templates.impl.androidstudio.activities.aiGlassesActivity
 
 import com.itsaky.androidide.resources.R
-import com.itsaky.androidide.templates.ProjectTemplate
 import com.itsaky.androidide.templates.ParameterConstraint
+import com.itsaky.androidide.templates.ProjectTemplate
 import com.itsaky.androidide.templates.TextFieldWidget
 import com.itsaky.androidide.templates.base.modules.android.defaultAppModule
 import com.itsaky.androidide.templates.impl.baseProjectImpl
@@ -31,20 +31,19 @@ import com.itsaky.androidide.templates.stringParameter
  * @author android_zero
  */
 fun aiGlassesActivityTemplate(): ProjectTemplate {
-    val activityClass = stringParameter {
-        name = R.string.activity_name
-        default = "MainActivity"
-        constraints = listOf(ParameterConstraint.CLASS, ParameterConstraint.UNIQUE, ParameterConstraint.NONEMPTY)
-    }
+  val activityClass = stringParameter {
+    name = R.string.activity_name
+    default = "MainActivity"
+    constraints =
+        listOf(ParameterConstraint.CLASS, ParameterConstraint.UNIQUE, ParameterConstraint.NONEMPTY)
+  }
 
-    return baseProjectImpl {
-        templateName = R.string.template_basic
-        thumb = R.drawable.template_basic_activity
-        
-        widgets(TextFieldWidget(activityClass))
+  return baseProjectImpl {
+    templateName = R.string.template_basic
+    thumb = R.drawable.template_basic_activity
 
-        defaultAppModule {
-            aiGlassesActivityRecipe(activityClass.value, data.packageName)
-        }
-    }
+    widgets(TextFieldWidget(activityClass))
+
+    defaultAppModule { aiGlassesActivityRecipe(activityClass.value, data.packageName) }
+  }
 }

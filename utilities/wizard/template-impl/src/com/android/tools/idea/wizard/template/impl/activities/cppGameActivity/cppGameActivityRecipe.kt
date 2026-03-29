@@ -40,11 +40,11 @@ import com.android.tools.idea.wizard.template.impl.activities.cppGameActivity.sr
 import java.io.File
 
 fun RecipeExecutor.generateCppGameActivity(
-  moduleData: ModuleTemplateData,
-  activityClass: String,
-  isLauncher: Boolean,
-  packageName: PackageName,
-  cppFlags: String,
+    moduleData: ModuleTemplateData,
+    activityClass: String,
+    isLauncher: Boolean,
+    packageName: PackageName,
+    cppFlags: String,
 ) {
   val (projectData, srcOut) = moduleData
   val ktOrJavaExt = projectData.language.extension
@@ -55,21 +55,43 @@ fun RecipeExecutor.generateCppGameActivity(
   setBuildFeature("prefab", true)
   addDependency("androidx.games:games-activity:4.0.0+", minRev = "4.0.0")
 
-  setCppOptions(cppFlags = cppFlags, cppPath = "src/main/cpp/CMakeLists.txt", cppVersion = DEFAULT_CMAKE_VERSION)
+  setCppOptions(
+      cppFlags = cppFlags,
+      cppPath = "src/main/cpp/CMakeLists.txt",
+      cppVersion = DEFAULT_CMAKE_VERSION,
+  )
 
   val libraryName = packageName.deriveNativeLibraryName()
 
-  generateManifest(moduleData, activityClass, packageName, isLauncher, false, generateActivityTitle = false, libraryName = libraryName)
+  generateManifest(
+      moduleData,
+      activityClass,
+      packageName,
+      isLauncher,
+      false,
+      generateActivityTitle = false,
+      libraryName = libraryName,
+  )
 
   addAllKotlinDependencies(moduleData)
 
   val simpleActivityPath = srcOut.resolve("$activityClass.$ktOrJavaExt")
 
   val simpleActivity =
-    when (projectData.language) {
-      Language.Kotlin -> cppGameActivityKt(packageName = packageName, activityClass = activityClass, libraryName = libraryName)
-      Language.Java -> cppGameActivityJava(packageName = packageName, activityClass = activityClass, libraryName = libraryName)
-    }
+      when (projectData.language) {
+        Language.Kotlin ->
+            cppGameActivityKt(
+                packageName = packageName,
+                activityClass = activityClass,
+                libraryName = libraryName,
+            )
+        Language.Java ->
+            cppGameActivityJava(
+                packageName = packageName,
+                activityClass = activityClass,
+                libraryName = libraryName,
+            )
+      }
   save(simpleActivity, simpleActivityPath)
 
   val nativeSrcOut = moduleData.rootDir.resolve("src/main/cpp")

@@ -25,9 +25,9 @@ import com.android.tools.idea.wizard.template.ModuleTemplateData
 import com.android.tools.idea.wizard.template.TemplateData
 import com.android.tools.idea.wizard.template.TextFieldWidget
 import com.android.tools.idea.wizard.template.WizardUiContext
-import com.itsaky.androidide.templates.impl.androidstudio.activities.common.MIN_API
 import com.android.tools.idea.wizard.template.stringParameter
 import com.android.tools.idea.wizard.template.template
+import com.itsaky.androidide.templates.impl.androidstudio.activities.common.MIN_API
 import java.io.File
 
 val valueResourceFileTemplate
@@ -54,5 +54,7 @@ val valueResourceFileTemplate
 
     widgets(TextFieldWidget(fileName))
 
-    recipe = { data: TemplateData -> valueResourceFileRecipe(data as ModuleTemplateData, fileName.value) }
+    recipe = { data: TemplateData ->
+      valueResourceFileRecipe(data as ModuleTemplateData, fileName.value)
+    }
   }

@@ -50,7 +50,7 @@ object TSMethodPruner {
             match = queryCursor.nextMatch()
             continue
           }
-          
+
           // +1 and -1 to avoid removing the curly braces from the body
           eraseRegion(content, start + 1, end - 1)
           match = queryCursor.nextMatch()

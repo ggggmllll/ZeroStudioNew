@@ -19,10 +19,9 @@ package com.itsaky.androidide.xml.res
 
 import com.android.aaptcompiler.AaptResourceType
 
-/**
- * @author Akash Yadav
- */
+/** @author Akash Yadav */
 interface IResourceTablePackage {
   val name: String
+
   fun findGroup(type: AaptResourceType, groupId: Byte? = null): IResourceGroup?
 }

@@ -30,8 +30,7 @@ import io.github.rosemoe.sora.widget.SymbolPairMatch
  * @author android_zero
  */
 class TomlLanguage(context: Context) :
-  TreeSitterLanguage(context, lang = TSLanguageToml.getInstance(), langType = TOML_TYPE) {
-
+    TreeSitterLanguage(context, lang = TSLanguageToml.getInstance(), langType = TOML_TYPE) {
 
   companion object {
 
@@ -42,15 +41,15 @@ class TomlLanguage(context: Context) :
 
   override fun getSymbolPairs(): SymbolPairMatch {
     return return SymbolPairMatch().apply {
-        putPair('(', SymbolPairMatch.SymbolPair("(", ")"))
-        putPair('[', SymbolPairMatch.SymbolPair("[", "]"))
-        putPair('{', SymbolPairMatch.SymbolPair("{", "}"))
+      putPair('(', SymbolPairMatch.SymbolPair("(", ")"))
+      putPair('[', SymbolPairMatch.SymbolPair("[", "]"))
+      putPair('{', SymbolPairMatch.SymbolPair("{", "}"))
     }
   }
-  
+
   override fun checkIsCompletionChar(c: Char): Boolean {
     return MyCharacter.isJavaIdentifierPart(c) || c == '[' || c == '.' || c == '"'
-}
+  }
 
   override fun getInterruptionLevel(): Int {
     return INTERRUPTION_LEVEL_STRONG

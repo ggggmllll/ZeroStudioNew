@@ -17,7 +17,7 @@
 package com.itsaky.androidide.templates.impl.androidstudio.fragments.settingsFragment.res.values
 
 fun arraysXml() =
-  """
+    """
 <resources>
     <!-- Reply Preference -->
     <string-array name="reply_entries">

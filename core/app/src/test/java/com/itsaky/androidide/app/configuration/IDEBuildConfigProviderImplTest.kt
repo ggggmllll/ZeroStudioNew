@@ -19,18 +19,16 @@ package com.itsaky.androidide.app.configuration
 
 import com.android.SdkConstants.ABI_ARM64_V8A
 import com.android.SdkConstants.ABI_ARMEABI_V7A
+import com.android.SdkConstants.ABI_INTEL_ATOM64 as ABI_X86_64
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
-import com.android.SdkConstants.ABI_INTEL_ATOM64 as ABI_X86_64
 
-/**
- * @author Akash Yadav
- */
+/** @author Akash Yadav */
 class IDEBuildConfigProviderImplTest {
 
   class TestBuildConfigProvider(
-    override val cpuAbiName: String,
-    val deviceArchs: Array<String>,
+      override val cpuAbiName: String,
+      val deviceArchs: Array<String>,
   ) : IDEBuildConfigProviderImpl() {
 
     override val deviceArch: CpuArch

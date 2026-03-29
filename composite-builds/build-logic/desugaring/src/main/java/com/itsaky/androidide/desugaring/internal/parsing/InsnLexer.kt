@@ -22,18 +22,14 @@ package com.itsaky.androidide.desugaring.internal.parsing
  *
  * @author Akash Yadav
  */
-internal class InsnLexer(
-  private val input: CharSequence
-) {
+internal class InsnLexer(private val input: CharSequence) {
 
   private val currentWord = StringBuilder(64)
   private var position = 0
   private var line = 0
   private var column = 0
 
-  /**
-   * Returns all tokens from the input.
-   */
+  /** Returns all tokens from the input. */
   fun all(): List<Token> {
     val tokens = mutableListOf<Token>()
     while (true) {
@@ -46,7 +42,7 @@ internal class InsnLexer(
     return tokens
   }
 
-  fun peek() : Token {
+  fun peek(): Token {
     val pos = this.position
     val line = this.line
     val column = this.column
@@ -60,9 +56,7 @@ internal class InsnLexer(
     return next
   }
 
-  /**
-   * Returns the next token from the input.
-   */
+  /** Returns the next token from the input. */
   fun nextToken(): Token {
     currentWord.clear()
 
@@ -149,9 +143,7 @@ internal class InsnLexer(
       return null
     }
 
-    return input[position++].also {
-      ++column
-    }
+    return input[position++].also { ++column }
   }
 
   private fun peekInput(): Char? {
@@ -182,17 +174,16 @@ internal class InsnLexer(
   }
 
   data class Token(
-    val line: Int,
-    val column: Int,
-    val index: Int,
-    val type: TokenType,
-    val text: String
+      val line: Int,
+      val column: Int,
+      val index: Int,
+      val type: TokenType,
+      val text: String,
   ) {
 
     companion object {
 
-      @JvmField
-      val EOF = Token(-1, -1, -1, TokenType.EOF, "")
+      @JvmField val EOF = Token(-1, -1, -1, TokenType.EOF, "")
     }
 
     fun isEof() = type == TokenType.EOF
@@ -200,7 +191,8 @@ internal class InsnLexer(
     fun errDesc() = "token $type at line $line, column $column: $text"
   }
 
-  enum class TokenType { IDENTIFIER,
+  enum class TokenType {
+    IDENTIFIER,
     LPAR,
     RPAR,
     LBRAC,
@@ -210,6 +202,6 @@ internal class InsnLexer(
     RANGULAR,
     HYPHEN,
     UNKNOWN,
-    EOF
+    EOF,
   }
 }

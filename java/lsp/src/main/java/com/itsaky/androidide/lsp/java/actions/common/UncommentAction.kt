@@ -27,14 +27,14 @@ class UncommentAction : BaseJavaCodeAction() {
   override var label: String = ""
 
   override val titleTextRes: Int = R.string.action_uncomment_line
-  
+
   override var requiresUIThread: Boolean = true
-  
+
   override suspend fun execAction(data: ActionData): Boolean {
     val editor = data.requireEditor()
     val text = editor.text
     val cursor = editor.cursor
-    
+
     text.beginBatchEdit()
     for (line in cursor.leftLine..cursor.rightLine) {
       val l = text.getLineString(line)
@@ -47,6 +47,6 @@ class UncommentAction : BaseJavaCodeAction() {
 
     return true
   }
-  
+
   override fun dismissOnAction() = false
 }

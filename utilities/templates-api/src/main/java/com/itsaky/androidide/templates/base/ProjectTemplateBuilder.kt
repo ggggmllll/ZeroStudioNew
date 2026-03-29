@@ -62,7 +62,8 @@ class ProjectTemplateBuilder :
     get() = checkNotNull(_defModule) { "Module template data not set" }
 
   /**
-   * Set the template data that will be used to create the default application module in the project.
+   * Set the template data that will be used to create the default application module in the
+   * project.
    *
    * @param data The module template data to use.
    */
@@ -71,7 +72,8 @@ class ProjectTemplateBuilder :
   }
 
   /**
-   * Enable Compose support for the project. This will add the Compose Compiler plugin to the root build.gradle
+   * Enable Compose support for the project. This will add the Compose Compiler plugin to the root
+   * build.gradle
    */
   fun enableComposeSupport() {
     hasComposeModules = true
@@ -100,8 +102,9 @@ class ProjectTemplateBuilder :
     // Check multiple signals to robustly detect if any module uses Compose
     val composeMarkerFile = File(data.projectDir, ".compose_enabled")
     val composeDetectedByScan = checkForComposeInProject()
-    val shouldIncludeCompose = hasComposeModules || composeMarkerFile.exists() || composeDetectedByScan
-    
+    val shouldIncludeCompose =
+        hasComposeModules || composeMarkerFile.exists() || composeDetectedByScan
+
     return if (data.useKts) buildGradleSrcKts(shouldIncludeCompose)
     else buildGradleSrcGroovy(shouldIncludeCompose)
   }
@@ -189,8 +192,7 @@ class ProjectTemplateBuilder :
   /**
    * 动态生成 TOML 配置文件。
    *
-   * @author android_zero
-   * 功能：负责统一导出标准现代化的依赖版本集，解耦 build.gradle。
+   * @author android_zero 功能：负责统一导出标准现代化的依赖版本集，解耦 build.gradle。
    */
   fun generateToml() {
     if (!data.useToml) return
@@ -204,19 +206,21 @@ class ProjectTemplateBuilder :
     versions["kotlin"] = data.version.kotlin
     plugins["android-application"] = "{ id = \"com.android.application\", version.ref = \"agp\" }"
     plugins["android-library"] = "{ id = \"com.android.library\", version.ref = \"agp\" }"
-    
+
     if (data.language == Language.Kotlin) {
-        plugins["kotlin-android"] = "{ id = \"org.jetbrains.kotlin.android\", version.ref = \"kotlin\" }"
+      plugins["kotlin-android"] =
+          "{ id = \"org.jetbrains.kotlin.android\", version.ref = \"kotlin\" }"
     }
     if (hasComposeModules) {
-        plugins["kotlin-compose"] = "{ id = \"org.jetbrains.kotlin.plugin.compose\", version.ref = \"kotlin\" }"
+      plugins["kotlin-compose"] =
+          "{ id = \"org.jetbrains.kotlin.plugin.compose\", version.ref = \"kotlin\" }"
     }
 
     // 收集子模块注册的所有依赖项并去重
     val allDeps = mutableSetOf<Dependency>()
     moduleBuilders.forEach { builder ->
-        allDeps.addAll(builder.dependencies)
-        allDeps.addAll(builder.platforms)
+      allDeps.addAll(builder.dependencies)
+      allDeps.addAll(builder.platforms)
     }
 
     // 常见的通用顶级域名 (TLD)，在生成变量名时可以忽略它们，让命名更精简
@@ -224,45 +228,54 @@ class ProjectTemplateBuilder :
 
     // 将这些依赖项动态转化为 TOML 语法
     allDeps.forEach { dep ->
-        // 解析依赖的 Group 以获取有意义的名称部分
-        val groupParts = dep.group.split(".")
-        // 剔除无效的顶级域名如 "com", "org", "io" 等
-        val sigGroupParts = if (groupParts.size > 1 && groupParts[0] in commonTlds) {
+      // 解析依赖的 Group 以获取有意义的名称部分
+      val groupParts = dep.group.split(".")
+      // 剔除无效的顶级域名如 "com", "org", "io" 等
+      val sigGroupParts =
+          if (groupParts.size > 1 && groupParts[0] in commonTlds) {
             groupParts.drop(1)
-        } else {
+          } else {
             groupParts
+          }
+
+      // 生成库别名 alias
+      // 如果预设了 tomlAlias 则使用预设；如果没有则智能拼接 (如 google-android-material)
+      val alias =
+          dep.tomlAlias
+              ?: buildString {
+                append(sigGroupParts.joinToString("-"))
+                append("-")
+                append(dep.artifact.replace(".", "-"))
+              }
+
+      if (dep.version != null) {
+        // 生成 VersionRef 引用名称
+        // 转为小驼峰命名，如：androidxCore, googleAndroidMaterial, jetbrainsKotlinxCoroutines
+        var versionRef =
+            sigGroupParts
+                .mapIndexed { index, s ->
+                  if (index == 0) s else s.replaceFirstChar { it.uppercase() }
+                }
+                .joinToString("")
+
+        // 冲突处理 (Collision Resolution)：
+        // 如果生成的 versionRef 已经存在，并且记录的版本号与当前依赖版本不同，则附加 artifact 的名称以作区分
+        if (versions.containsKey(versionRef) && versions[versionRef] != dep.version) {
+          val artifactCamel =
+              dep.artifact
+                  .split("-", ".")
+                  .map { it.replaceFirstChar { c -> c.uppercase() } }
+                  .joinToString("")
+          versionRef += artifactCamel
         }
 
-        // 生成库别名 alias
-        // 如果预设了 tomlAlias 则使用预设；如果没有则智能拼接 (如 google-android-material)
-        val alias = dep.tomlAlias ?: buildString {
-            append(sigGroupParts.joinToString("-"))
-            append("-")
-            append(dep.artifact.replace(".", "-"))
-        }
-        
-        if (dep.version != null) {
-            // 生成 VersionRef 引用名称
-            // 转为小驼峰命名，如：androidxCore, googleAndroidMaterial, jetbrainsKotlinxCoroutines
-            var versionRef = sigGroupParts.mapIndexed { index, s ->
-                if (index == 0) s else s.replaceFirstChar { it.uppercase() }
-            }.joinToString("")
-            
-            // 冲突处理 (Collision Resolution)：
-            // 如果生成的 versionRef 已经存在，并且记录的版本号与当前依赖版本不同，则附加 artifact 的名称以作区分
-            if (versions.containsKey(versionRef) && versions[versionRef] != dep.version) {
-                val artifactCamel = dep.artifact.split("-", ".").map { 
-                    it.replaceFirstChar { c -> c.uppercase() } 
-                }.joinToString("")
-                versionRef += artifactCamel
-            }
-            
-            versions[versionRef] = dep.version
-            libraries[alias] = "{ group = \"${dep.group}\", name = \"${dep.artifact}\", version.ref = \"$versionRef\" }"
-        } else {
-            // 没有版本号（通常属于 BOM 平台依赖）
-            libraries[alias] = "{ group = \"${dep.group}\", name = \"${dep.artifact}\" }"
-        }
+        versions[versionRef] = dep.version
+        libraries[alias] =
+            "{ group = \"${dep.group}\", name = \"${dep.artifact}\", version.ref = \"$versionRef\" }"
+      } else {
+        // 没有版本号（通常属于 BOM 平台依赖）
+        libraries[alias] = "{ group = \"${dep.group}\", name = \"${dep.artifact}\" }"
+      }
     }
 
     val tomlBuilder = StringBuilder()
@@ -281,21 +294,21 @@ class ProjectTemplateBuilder :
   }
 
   /**
-   * 内部构建工程模板的核心方法。
-   * 此处运用匿名内部类拦截原生 recipe 执行机制，将根项目的依赖数据收集生成任务（TOML与根build.gradle）推迟到所有模块任务执行完毕之后执行。
+   * 内部构建工程模板的核心方法。 此处运用匿名内部类拦截原生 recipe 执行机制，将根项目的依赖数据收集生成任务（TOML与根build.gradle）推迟到所有模块任务执行完毕之后执行。
    */
   override fun buildInternal(): ProjectTemplate {
-    return object : ProjectTemplate(modules, templateName!!, thumb!!, description, widgets!!, recipe!!) {
+    return object :
+        ProjectTemplate(modules, templateName!!, thumb!!, description, widgets!!, recipe!!) {
       override val recipe: TemplateRecipe<ProjectTemplateRecipeResult>
         get() = TemplateRecipe { executor ->
           // 首先按框架既定流程完整执行父类的 recipe（这会先后执行项目自身的配置逻辑和所有注册的子模块的 recipe 构建过程）
           val result = super.recipe.execute(executor)
-          
+
           // 执行到此阶段时，所有的子模块已经跑完 recipe 并在构建期动态向 builder 完成了全面和完整的依赖配置注入（包含自动分辨是否带有 Compose 支持）
           // 此时方可准确无遗漏地执行全局统一数据的生成以确保 TOML 和 根目录 BuildGradle 集合不出现空白。
           generateToml()
           buildGradle()
-          
+
           result
         }
     }

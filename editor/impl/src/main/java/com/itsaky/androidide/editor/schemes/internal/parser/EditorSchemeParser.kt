@@ -27,7 +27,7 @@ import com.itsaky.androidide.editor.schemes.internal.parser.SchemeParser.EditorC
  * @author Akash Yadav
  */
 class EditorSchemeParser(private val reader: JsonReader) {
-  
+
   fun parse(scheme: IDEColorScheme) {
     scheme.apply {
       reader.beginObject()

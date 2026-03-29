@@ -16,12 +16,12 @@
 package com.itsaky.androidide.templates.impl.androidstudio.activities.archStarterActivity
 
 import com.itsaky.androidide.resources.R
-import com.itsaky.androidide.templates.ProjectTemplate
-import com.itsaky.androidide.templates.ParameterConstraint
-import com.itsaky.androidide.templates.TextFieldWidget
 import com.itsaky.androidide.templates.CheckBoxWidget
-import com.itsaky.androidide.templates.booleanParameter
+import com.itsaky.androidide.templates.ParameterConstraint
+import com.itsaky.androidide.templates.ProjectTemplate
+import com.itsaky.androidide.templates.TextFieldWidget
 import com.itsaky.androidide.templates.base.modules.android.defaultAppModule
+import com.itsaky.androidide.templates.booleanParameter
 import com.itsaky.androidide.templates.impl.baseProjectImpl
 import com.itsaky.androidide.templates.stringParameter
 
@@ -32,25 +32,26 @@ import com.itsaky.androidide.templates.stringParameter
  * @author android_zero
  */
 fun archStarterActivityTemplate(): ProjectTemplate {
-    val activityClass = stringParameter {
-        name = R.string.activity_name
-        default = "MainActivity"
-        constraints = listOf(ParameterConstraint.CLASS, ParameterConstraint.UNIQUE, ParameterConstraint.NONEMPTY)
-    }
+  val activityClass = stringParameter {
+    name = R.string.activity_name
+    default = "MainActivity"
+    constraints =
+        listOf(ParameterConstraint.CLASS, ParameterConstraint.UNIQUE, ParameterConstraint.NONEMPTY)
+  }
 
-    val isLauncher = booleanParameter {
-        name = R.string.is_launcher_activity
-        default = true
-    }
+  val isLauncher = booleanParameter {
+    name = R.string.is_launcher_activity
+    default = true
+  }
 
-    return baseProjectImpl {
-        templateName = R.string.template_basic
-        thumb = R.drawable.template_basic_activity
-        
-        widgets(TextFieldWidget(activityClass), CheckBoxWidget(isLauncher))
+  return baseProjectImpl {
+    templateName = R.string.template_basic
+    thumb = R.drawable.template_basic_activity
 
-        defaultAppModule {
-            archStarterActivityRecipe(activityClass.value, data.packageName, isLauncher.value)
-        }
+    widgets(TextFieldWidget(activityClass), CheckBoxWidget(isLauncher))
+
+    defaultAppModule {
+      archStarterActivityRecipe(activityClass.value, data.packageName, isLauncher.value)
     }
+  }
 }

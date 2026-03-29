@@ -20,7 +20,10 @@ import com.android.tools.idea.wizard.template.ModuleTemplateData
 import com.android.tools.idea.wizard.template.RecipeExecutor
 import com.android.tools.idea.wizard.template.TemplateKotlinSupport
 
-fun RecipeExecutor.addAllKotlinDependencies(data: ModuleTemplateData, revision: String = data.projectTemplateData.kotlinVersion) {
+fun RecipeExecutor.addAllKotlinDependencies(
+    data: ModuleTemplateData,
+    revision: String = data.projectTemplateData.kotlinVersion,
+) {
   val projectData = data.projectTemplateData
   if (!data.isNewModule && projectData.language == Language.Kotlin) {
     when (data.projectTemplateData.kotlinSupport) {
@@ -28,9 +31,17 @@ fun RecipeExecutor.addAllKotlinDependencies(data: ModuleTemplateData, revision: 
         /* Nothing to do */
       }
       TemplateKotlinSupport.LEGACY_KOTLIN_GRADLE_PLUGIN_BEFORE_AGP9 ->
-        addPlugin("org.jetbrains.kotlin.android", "org.jetbrains.kotlin:kotlin-gradle-plugin", revision)
+          addPlugin(
+              "org.jetbrains.kotlin.android",
+              "org.jetbrains.kotlin:kotlin-gradle-plugin",
+              revision,
+          )
       TemplateKotlinSupport.EXPLICIT_BUILT_IN_KOTLIN ->
-        addPlugin("com.android.built-in-kotlin", "com.android.tools.build:gradle-kotlin", data.projectTemplateData.agpVersion.toString())
+          addPlugin(
+              "com.android.built-in-kotlin",
+              "com.android.tools.build:gradle-kotlin",
+              data.projectTemplateData.agpVersion.toString(),
+          )
       TemplateKotlinSupport.IMPLICIT_BUILT_IN_KOTLIN -> {
         /* Also nothing to do */
       }
@@ -39,25 +50,37 @@ fun RecipeExecutor.addAllKotlinDependencies(data: ModuleTemplateData, revision: 
 }
 
 fun RecipeExecutor.addComposeDependencies(
-  data: ModuleTemplateData,
-  composeBomVersion: String = COMPOSE_BOM_VERSION,
-  composeUiVersion: String? = null,
+    data: ModuleTemplateData,
+    composeBomVersion: String = COMPOSE_BOM_VERSION,
+    composeUiVersion: String? = null,
 ) {
   addPlugin(
-    "org.jetbrains.kotlin.plugin.compose",
-    "org.jetbrains.kotlin:compose-compiler-gradle-plugin",
-    data.projectTemplateData.kotlinVersion,
+      "org.jetbrains.kotlin.plugin.compose",
+      "org.jetbrains.kotlin:compose-compiler-gradle-plugin",
+      data.projectTemplateData.kotlinVersion,
   )
   addPlatformDependency(mavenCoordinate = "androidx.compose:compose-bom:$composeBomVersion")
-  addPlatformDependency(mavenCoordinate = "androidx.compose:compose-bom:$composeBomVersion", "androidTestImplementation")
+  addPlatformDependency(
+      mavenCoordinate = "androidx.compose:compose-bom:$composeBomVersion",
+      "androidTestImplementation",
+  )
 
   val composeUiFormattedVersion = composeUiVersion?.let { ":$it" } ?: ""
   addDependency(mavenCoordinate = "androidx.compose.ui:ui$composeUiFormattedVersion")
   addDependency(mavenCoordinate = "androidx.compose.ui:ui-graphics")
-  addDependency(mavenCoordinate = "androidx.compose.ui:ui-tooling", configuration = "debugImplementation")
+  addDependency(
+      mavenCoordinate = "androidx.compose.ui:ui-tooling",
+      configuration = "debugImplementation",
+  )
   addDependency(mavenCoordinate = "androidx.compose.ui:ui-tooling-preview")
-  addDependency(mavenCoordinate = "androidx.compose.ui:ui-test-manifest", configuration = "debugImplementation")
-  addDependency(mavenCoordinate = "androidx.compose.ui:ui-test-junit4", configuration = "androidTestImplementation")
+  addDependency(
+      mavenCoordinate = "androidx.compose.ui:ui-test-manifest",
+      configuration = "debugImplementation",
+  )
+  addDependency(
+      mavenCoordinate = "androidx.compose.ui:ui-test-junit4",
+      configuration = "androidTestImplementation",
+  )
 }
 
 fun RecipeExecutor.addMaterialDependency(useAndroidX: Boolean) {

@@ -15,27 +15,24 @@
  *   along with AndroidIDE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 import com.itsaky.androidide.build.config.BuildConfig
 
 plugins {
-    id("com.android.library")
-    id("kotlin-android")
+  id("com.android.library")
+  id("kotlin-android")
 }
 
-
-
 android {
-    namespace = "com.termux.view"
-    ndkVersion = BuildConfig.ndkVersion
+  namespace = "com.termux.view"
+  ndkVersion = BuildConfig.ndkVersion
 }
 
 dependencies {
-    api(projects.termux.emulator)
+  api(projects.termux.emulator)
 
-    implementation(libs.androidx.annotation)
+  implementation(libs.androidx.annotation)
 
-    implementation(projects.core.resources)
+  implementation(projects.core.resources)
 
-    testImplementation(projects.testing.unitTest)
+  testImplementation(projects.testing.unitTest)
 }

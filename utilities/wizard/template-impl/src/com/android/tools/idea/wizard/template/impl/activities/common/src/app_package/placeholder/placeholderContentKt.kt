@@ -19,7 +19,7 @@ package com.android.tools.idea.wizard.template.impl.activities.common.src.app_pa
 import com.android.tools.idea.wizard.template.escapeKotlinIdentifier
 
 fun placeholderContentKt(packageName: String) =
-  """
+    """
 package ${escapeKotlinIdentifier(packageName)}.placeholder
 
 import java.util.ArrayList

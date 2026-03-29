@@ -45,7 +45,13 @@ val bottomNavigationActivityTemplate
     minApi = MIN_API
     category = Category.Activity
     formFactor = FormFactor.Mobile
-    screens = listOf(WizardUiContext.ActivityGallery, WizardUiContext.MenuEntry, WizardUiContext.NewProject, WizardUiContext.NewModule)
+    screens =
+        listOf(
+            WizardUiContext.ActivityGallery,
+            WizardUiContext.MenuEntry,
+            WizardUiContext.NewProject,
+            WizardUiContext.NewModule,
+        )
 
     lateinit var layoutName: StringParameter
     val activityClass = stringParameter {
@@ -79,24 +85,24 @@ val bottomNavigationActivityTemplate
     }
 
     widgets(
-      TextFieldWidget(activityClass),
-      TextFieldWidget(layoutName),
-      PackageNameWidget(packageName),
-      LanguageWidget(),
+        TextFieldWidget(activityClass),
+        TextFieldWidget(layoutName),
+        PackageNameWidget(packageName),
+        LanguageWidget(),
 
-      // Invisible widget. Defining this to impose constraints
-      TextFieldWidget(navGraphName),
+        // Invisible widget. Defining this to impose constraints
+        TextFieldWidget(navGraphName),
     )
 
     thumb { File("bottom-navigation-activity").resolve("template_bottom_navigation_activity.png") }
 
     recipe = { data: TemplateData ->
       bottomNavigationActivityRecipe(
-        moduleData = data as ModuleTemplateData,
-        activityClass = activityClass.value,
-        layoutName = layoutName.value,
-        packageName = packageName.value,
-        navGraphName = navGraphName.value,
+          moduleData = data as ModuleTemplateData,
+          activityClass = activityClass.value,
+          layoutName = layoutName.value,
+          packageName = packageName.value,
+          navGraphName = navGraphName.value,
       )
     }
   }

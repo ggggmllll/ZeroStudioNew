@@ -26,14 +26,14 @@ import com.itsaky.androidide.actions.ActionData
 import com.itsaky.androidide.actions.requireContext
 import com.itsaky.androidide.activities.PreferencesActivity
 import kotlin.reflect.KClass
-import com.itsaky.androidide.utils.getTintedDrawable 
 
 /**
  * A sidebar action to navigate the user to IDE Preferences.
  *
  * @author Akash Yadav
  */
-class PreferencesSidebarAction(context: Context, override val order: Int) : AbstractSidebarAction() {
+class PreferencesSidebarAction(context: Context, override val order: Int) :
+    AbstractSidebarAction() {
 
   override val id: String = "ide.editor.sidebar.preferences"
 

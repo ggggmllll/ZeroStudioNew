@@ -64,12 +64,10 @@ fun moduleNameToDirName(name: String): String {
         (i == 0 && !c.isLetter())
 
         // chars at other indices must be a letter, digit, hyphen or an underscore
-        ||
-            !(c.isDigit() || c.isLetter() || c == '-' || c == '_')
+        || !(c.isDigit() || c.isLetter() || c == '-' || c == '_')
 
             // must not include consecutive '-'
-            ||
-            (prev == '-' && c == '-')
+            || (prev == '-' && c == '-')
     ) {
 
       prev = c

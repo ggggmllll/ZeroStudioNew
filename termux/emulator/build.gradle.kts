@@ -15,51 +15,49 @@
  *   along with AndroidIDE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 import com.itsaky.androidide.build.config.BuildConfig
 
 plugins {
-    id("com.android.library")
-    id("kotlin-android")
+  id("com.android.library")
+  id("kotlin-android")
 }
 
-
-
 android {
-    namespace = "com.termux.emulator"
-    ndkVersion = BuildConfig.ndkVersion
+  namespace = "com.termux.emulator"
+  ndkVersion = BuildConfig.ndkVersion
 
-    defaultConfig {
-        externalNativeBuild {
-            ndkBuild {
-                cFlags += arrayOf("-std=c11", "-Wall", "-Wextra", "-Werror", "-Os", "-fno-stack-protector", "-Wl,--gc-sections")
-            }
-        }
-    }
-// externalNativeBuild {
-        // cmake {
-            // path = file("src/main/jni/CMakeLists.txt")
-            // version = "3.30.5"
-        // }
-    // }
+  defaultConfig {
     externalNativeBuild {
-        ndkBuild {
-            path = file("src/main/jni/Android.mk")
-        }
+      ndkBuild {
+        cFlags +=
+            arrayOf(
+                "-std=c11",
+                "-Wall",
+                "-Wextra",
+                "-Werror",
+                "-Os",
+                "-fno-stack-protector",
+                "-Wl,--gc-sections",
+            )
+      }
     }
+  }
+  // externalNativeBuild {
+  // cmake {
+  // path = file("src/main/jni/CMakeLists.txt")
+  // version = "3.30.5"
+  // }
+  // }
+  externalNativeBuild { ndkBuild { path = file("src/main/jni/Android.mk") } }
 
-    testOptions {
-        unitTests.isReturnDefaultValues = true
-    }
+  testOptions { unitTests.isReturnDefaultValues = true }
 }
 
 tasks.withType(Test::class.java) {
-    testLogging {
-        events("started", "passed", "skipped", "failed")
-    }
+  testLogging { events("started", "passed", "skipped", "failed") }
 }
 
 dependencies {
-    implementation(libs.androidx.annotation)
-    testImplementation(projects.testing.unitTest)
+  implementation(libs.androidx.annotation)
+  testImplementation(projects.testing.unitTest)
 }

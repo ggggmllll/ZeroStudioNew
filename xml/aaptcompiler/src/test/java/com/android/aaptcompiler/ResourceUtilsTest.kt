@@ -1,6 +1,5 @@
 package com.android.aaptcompiler
 
-import com.android.aapt.Resources
 import com.android.aapt.Resources.Attribute.FormatFlags
 import com.android.aaptcompiler.AaptResourceType.COLOR
 import com.android.aaptcompiler.AaptResourceType.ID
@@ -34,20 +33,17 @@ class ResourceUtilsTest {
   fun testParseResourceName() {
     var result = parseResourceName("android:color/foo")
     assertThat(result).isNotNull()
-    assertThat(result?.resourceName)
-      .isEqualTo(ResourceName("android", COLOR, "foo"))
+    assertThat(result?.resourceName).isEqualTo(ResourceName("android", COLOR, "foo"))
     assertThat(result?.isPrivate).isFalse()
 
     result = parseResourceName("color/foo")
     assertThat(result).isNotNull()
-    assertThat(result?.resourceName)
-      .isEqualTo(ResourceName("", COLOR, "foo"))
+    assertThat(result?.resourceName).isEqualTo(ResourceName("", COLOR, "foo"))
     assertThat(result?.isPrivate).isFalse()
 
     result = parseResourceName("*android:string/foo")
     assertThat(result).isNotNull()
-    assertThat(result?.resourceName)
-      .isEqualTo(ResourceName("android", STRING, "foo"))
+    assertThat(result?.resourceName).isEqualTo(ResourceName("android", STRING, "foo"))
     assertThat(result?.isPrivate).isTrue()
 
     result = parseResourceName("")
@@ -58,8 +54,7 @@ class ResourceUtilsTest {
   fun testParseReferenceWithNoPackage() {
     val result = parseReference("@color/bar")
     assertThat(result).isNotNull()
-    assertThat(result?.reference?.name)
-      .isEqualTo(ResourceName("", COLOR, "bar"))
+    assertThat(result?.reference?.name).isEqualTo(ResourceName("", COLOR, "bar"))
     assertThat(result?.createNew).isFalse()
     assertThat(result?.reference?.isPrivate).isFalse()
   }
@@ -68,8 +63,7 @@ class ResourceUtilsTest {
   fun testParseReferenceWithPackage() {
     val result = parseReference("@android:integer/foo")
     assertThat(result).isNotNull()
-    assertThat(result?.reference?.name)
-      .isEqualTo(ResourceName("android", INTEGER, "foo"))
+    assertThat(result?.reference?.name).isEqualTo(ResourceName("android", INTEGER, "foo"))
     assertThat(result?.createNew).isFalse()
     assertThat(result?.reference?.isPrivate).isFalse()
   }
@@ -78,8 +72,7 @@ class ResourceUtilsTest {
   fun testParseReferenceWithSurroundingWhitespace() {
     val result = parseReference("\t @android:integer/foo\n \n\t")
     assertThat(result).isNotNull()
-    assertThat(result?.reference?.name)
-      .isEqualTo(ResourceName("android", INTEGER, "foo"))
+    assertThat(result?.reference?.name).isEqualTo(ResourceName("android", INTEGER, "foo"))
     assertThat(result?.createNew).isFalse()
     assertThat(result?.reference?.isPrivate).isFalse()
   }
@@ -88,8 +81,7 @@ class ResourceUtilsTest {
   fun testParseAutoCreateIdReference() {
     val result = parseReference("@+android:id/foo")
     assertThat(result).isNotNull()
-    assertThat(result?.reference?.name)
-      .isEqualTo(ResourceName("android", ID, "foo"))
+    assertThat(result?.reference?.name).isEqualTo(ResourceName("android", ID, "foo"))
     assertThat(result?.createNew).isTrue()
     assertThat(result?.reference?.isPrivate).isFalse()
   }
@@ -98,8 +90,7 @@ class ResourceUtilsTest {
   fun testParsePrivateReference() {
     val result = parseReference("@*android:id/foo")
     assertThat(result).isNotNull()
-    assertThat(result?.reference?.name)
-      .isEqualTo(ResourceName("android", ID, "foo"))
+    assertThat(result?.reference?.name).isEqualTo(ResourceName("android", ID, "foo"))
     assertThat(result?.createNew).isFalse()
     assertThat(result?.reference?.isPrivate).isTrue()
   }
@@ -137,30 +128,23 @@ class ResourceUtilsTest {
 
   @Test
   fun testEmptyIsBinaryPrimitive() {
-    assertThat(makeEmpty())
-      .isEqualTo(BinaryPrimitive(ResValue(NULL, NullFormat.EMPTY)))
+    assertThat(makeEmpty()).isEqualTo(BinaryPrimitive(ResValue(NULL, NullFormat.EMPTY)))
     assertThat(tryParseNullOrEmpty("@empty"))
-      .isEqualTo(BinaryPrimitive(ResValue(NULL, NullFormat.EMPTY)))
+        .isEqualTo(BinaryPrimitive(ResValue(NULL, NullFormat.EMPTY)))
   }
 
   @Test
   fun testItemsWithWhitespaceAreParsedCorrectly() {
-    var result =
-      tryParseItemForAttribute("  12\n   ", FormatFlags.INTEGER_VALUE)
+    var result = tryParseItemForAttribute("  12\n   ", FormatFlags.INTEGER_VALUE)
     assertThat(result).isNotNull()
-    assertThat(result)
-      .isEqualTo(BinaryPrimitive(ResValue(INT_DEC, 12)))
-    result =
-      tryParseItemForAttribute("  true\n   ", FormatFlags.BOOLEAN_VALUE)
+    assertThat(result).isEqualTo(BinaryPrimitive(ResValue(INT_DEC, 12)))
+    result = tryParseItemForAttribute("  true\n   ", FormatFlags.BOOLEAN_VALUE)
     assertThat(result).isNotNull()
-    assertThat(result)
-      .isEqualTo(BinaryPrimitive(ResValue(INT_BOOLEAN, -1)))
+    assertThat(result).isEqualTo(BinaryPrimitive(ResValue(INT_BOOLEAN, -1)))
 
     val expectedFloat = 12.0f
-    result =
-      tryParseItemForAttribute("  12.0\n  ", FormatFlags.FLOAT_VALUE)
+    result = tryParseItemForAttribute("  12.0\n  ", FormatFlags.FLOAT_VALUE)
     assertThat(result).isNotNull()
-    assertThat(result)
-      .isEqualTo(BinaryPrimitive(ResValue(FLOAT, expectedFloat.toRawBits())))
+    assertThat(result).isEqualTo(BinaryPrimitive(ResValue(FLOAT, expectedFloat.toRawBits())))
   }
 }

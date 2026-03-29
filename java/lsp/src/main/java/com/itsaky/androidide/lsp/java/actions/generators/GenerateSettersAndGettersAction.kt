@@ -40,13 +40,13 @@ import com.itsaky.androidide.projects.IProjectManager
 import com.itsaky.androidide.resources.R
 import com.itsaky.androidide.utils.flashError
 import io.github.rosemoe.sora.widget.CodeEditor
+import java.util.concurrent.CompletableFuture
 import jdkx.lang.model.element.Modifier.FINAL
 import jdkx.lang.model.element.VariableElement
 import openjdk.source.tree.ClassTree
 import openjdk.source.util.TreePath
 import openjdk.source.util.Trees
 import org.slf4j.LoggerFactory
-import java.util.concurrent.CompletableFuture
 
 /**
  * Allows the user to select fields from the current class, then generates setters and getters for
@@ -70,28 +70,30 @@ class GenerateSettersAndGettersAction : FieldBasedAction() {
 
     showFieldSelector(fields, data) { checkedNames ->
       CompletableFuture.runAsync { generateForFields(data, checkedNames) }
-        .whenComplete {
-            _, error,
-          ->
-          if (error != null) {
-            log.error("Unable to generate setters and getters", error)
-            ThreadUtils.runOnUiThread {
-              flashError(
-                data[Context::class.java]!!.getString(R.string.msg_cannot_generate_setters_getters)
-              )
+          .whenComplete { _, error,
+            ->
+            if (error != null) {
+              log.error("Unable to generate setters and getters", error)
+              ThreadUtils.runOnUiThread {
+                flashError(
+                    data[Context::class.java]!!.getString(
+                        R.string.msg_cannot_generate_setters_getters
+                    )
+                )
+              }
+              return@whenComplete
             }
-            return@whenComplete
           }
-        }
     }
   }
 
   private fun generateForFields(data: ActionData, names: MutableSet<String>) {
     val compiler =
-      JavaCompilerProvider.get(
-        IProjectManager.getInstance().getWorkspace()?.findModuleForFile(data.requireFile(), false)
-          ?: return
-      )
+        JavaCompilerProvider.get(
+            IProjectManager.getInstance()
+                .getWorkspace()
+                ?.findModuleForFile(data.requireFile(), false) ?: return
+        )
     val range = data[com.itsaky.androidide.models.Range::class.java]!!
     val file = data.requirePath()
 
@@ -110,10 +112,10 @@ class GenerateSettersAndGettersAction : FieldBasedAction() {
   }
 
   private fun generateForFields(
-    data: ActionData,
-    task: CompileTask,
-    type: ClassTree,
-    paths: List<TreePath>,
+      data: ActionData,
+      task: CompileTask,
+      type: ClassTree,
+      paths: List<TreePath>,
   ) {
     val file = data.requirePath()
     val editor = data[CodeEditor::class.java]!!
@@ -144,9 +146,9 @@ class GenerateSettersAndGettersAction : FieldBasedAction() {
   private fun createGetter(variable: VariableElement, indent: Int): String {
     val name = variable.simpleName.toString()
     val method =
-      createMethod(variable, "get", toType(variable.asType())) { _, body ->
-        body.addStatement(createReturnStmt(name))
-      }
+        createMethod(variable, "get", toType(variable.asType())) { _, body ->
+          body.addStatement(createReturnStmt(name))
+        }
     var text = "\n" + JavaParserUtils.prettyPrint(method) { false }
     text = text.replace("\n", "\n${indentationString(indent)}")
 
@@ -158,10 +160,10 @@ class GenerateSettersAndGettersAction : FieldBasedAction() {
   private fun createSetter(variable: VariableElement, indent: Int): String {
     val name: String = variable.simpleName.toString()
     val method =
-      createMethod(variable, "set", VoidType()) { method, body ->
-        method.addParameter(toType(variable.asType()), name)
-        body.addStatement(createAssignmentStmt(name))
-      }
+        createMethod(variable, "set", VoidType()) { method, body ->
+          method.addParameter(toType(variable.asType()), name)
+          body.addStatement(createAssignmentStmt(name))
+        }
 
     var text = "\n" + JavaParserUtils.prettyPrint(method) { false }
     text = text.replace("\n", "\n${indentationString(indent)}")
@@ -170,11 +172,11 @@ class GenerateSettersAndGettersAction : FieldBasedAction() {
   }
 
   private fun createMethod(
-    variable: VariableElement,
-    prefix: String,
-    returnType: Type,
-    vararg modifiers: Modifier.Keyword = arrayOf(Modifier.Keyword.PUBLIC),
-    block: (MethodDeclaration, BlockStmt) -> Unit
+      variable: VariableElement,
+      prefix: String,
+      returnType: Type,
+      vararg modifiers: Modifier.Keyword = arrayOf(Modifier.Keyword.PUBLIC),
+      block: (MethodDeclaration, BlockStmt) -> Unit,
   ): MethodDeclaration {
     val name = variable.simpleName.toString()
     val method = MethodDeclaration()
@@ -187,7 +189,7 @@ class GenerateSettersAndGettersAction : FieldBasedAction() {
   }
 
   private fun createAssignmentStmt(name: String) =
-    StaticJavaParser.parseStatement("this.$name = $name;")
+      StaticJavaParser.parseStatement("this.$name = $name;")
 
   private fun createName(name: String, prefix: String): String {
     val sb = StringBuilder(name)

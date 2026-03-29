@@ -38,7 +38,7 @@ class JavaDiagnosticUtils {
 
     @JvmStatic
     fun asUnwrapper(
-      diagnostic: Diagnostic<out JavaFileObject>
+        diagnostic: Diagnostic<out JavaFileObject>
     ): ClientCodeWrapper.DiagnosticSourceUnwrapper? {
       if (diagnostic is ClientCodeWrapper.DiagnosticSourceUnwrapper) {
         return diagnostic

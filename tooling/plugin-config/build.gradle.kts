@@ -15,12 +15,9 @@
  *   along with AndroidIDE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 plugins {
   //noinspection JavaPluginLanguageLevel
   id("java-library")
 }
-
-
 
 description = "Configuration options for the Tooling API and Gradle Plugin."

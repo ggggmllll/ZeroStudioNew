@@ -37,11 +37,11 @@ internal fun Activity.getStatusBarHeightInPx(): Int {
 
 internal fun Activity.getNavigationBarPosition(): NavigationBarPosition {
   val display =
-    if (Build.VERSION.SDK_INT >= 30) {
-      display
-    } else {
-      @Suppress("DEPRECATION") windowManager.defaultDisplay
-    }
+      if (Build.VERSION.SDK_INT >= 30) {
+        display
+      } else {
+        @Suppress("DEPRECATION") windowManager.defaultDisplay
+      }
   return when (display?.rotation) {
     ROTATION_0 -> BOTTOM
     ROTATION_90 -> RIGHT
@@ -81,11 +81,11 @@ internal fun Context.convertPxToDp(px: Int): Int {
 private fun Activity.getRealScreenSize(): Point {
   val windowManager = getSystemService(Context.WINDOW_SERVICE) as WindowManager
   val defaultDisplay =
-    if (Build.VERSION.SDK_INT >= 30) {
-      display
-    } else {
-      @Suppress("DEPRECATION") windowManager.defaultDisplay
-    }
+      if (Build.VERSION.SDK_INT >= 30) {
+        display
+      } else {
+        @Suppress("DEPRECATION") windowManager.defaultDisplay
+      }
 
   val size = Point()
   defaultDisplay?.getRealSize(size)
@@ -102,14 +102,14 @@ private fun Activity.getAppUsableScreenSize(): Point {
 
 inline fun <T : View> T.afterMeasured(crossinline f: T.() -> Unit) {
   viewTreeObserver.addOnGlobalLayoutListener(
-    object : ViewTreeObserver.OnGlobalLayoutListener {
-      override fun onGlobalLayout() {
-        if (measuredWidth > 0 && measuredHeight > 0) {
-          viewTreeObserver.removeOnGlobalLayoutListener(this)
-          f()
+      object : ViewTreeObserver.OnGlobalLayoutListener {
+        override fun onGlobalLayout() {
+          if (measuredWidth > 0 && measuredHeight > 0) {
+            viewTreeObserver.removeOnGlobalLayoutListener(this)
+            f()
+          }
         }
       }
-    }
   )
 }
 
@@ -117,5 +117,5 @@ internal enum class NavigationBarPosition {
   BOTTOM,
   RIGHT,
   LEFT,
-  TOP
+  TOP,
 }

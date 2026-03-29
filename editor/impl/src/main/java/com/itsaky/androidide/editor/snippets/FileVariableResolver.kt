@@ -26,7 +26,8 @@ import io.github.rosemoe.sora.widget.snippet.variable.FileBasedSnippetVariableRe
  *
  * @author Akash Yadav
  */
-class FileVariableResolver(editor: IDEEditor) : FileBasedSnippetVariableResolver(), AbstractSnippetVariableResolver {
+class FileVariableResolver(editor: IDEEditor) :
+    FileBasedSnippetVariableResolver(), AbstractSnippetVariableResolver {
 
   var editor: IDEEditor? = editor
     private set

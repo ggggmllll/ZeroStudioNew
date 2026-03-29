@@ -20,15 +20,13 @@ package com.itsaky.androidide.actions.sidebar
 import android.content.Context
 import android.graphics.drawable.Drawable
 import androidx.annotation.AttrRes
-import com.itsaky.androidide.R
 import androidx.annotation.DrawableRes
 import com.itsaky.androidide.actions.ActionData
 import com.itsaky.androidide.actions.ActionItem
 import com.itsaky.androidide.actions.SidebarActionItem
 import com.itsaky.androidide.utils.getTintedDrawable
-/**
- * @author Akash Yadav
- */
+
+/** @author Akash Yadav */
 abstract class AbstractSidebarAction : SidebarActionItem {
 
   // sidebar actions should always be executed on UI thread
@@ -43,17 +41,14 @@ abstract class AbstractSidebarAction : SidebarActionItem {
   // when the object instance is initialized
   override var icon: Drawable? = null
   override var label: String = ""
-  
-  @get:AttrRes
-  open val iconTintAttr: Int = 0 // 0 means not set
-  
-    /**
-   * 加载并着色图标。
-   */
+
+  @get:AttrRes open val iconTintAttr: Int = 0 // 0 means not set
+
+  /** 加载并着色图标。 */
   protected fun loadIcon(context: Context, @DrawableRes iconRes: Int) {
-      this.icon = context.getTintedDrawable(iconRes, this.iconTintAttr)
+    this.icon = context.getTintedDrawable(iconRes, this.iconTintAttr)
   }
-  
+
   override suspend fun execAction(data: ActionData): Any {
     return false
   }

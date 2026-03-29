@@ -32,11 +32,7 @@ class TestRecipeExecutor : RecipeExecutor {
   // Modules whose assets are queried from the templates API
   // order of the element matters!
   private val modulesWithAssets by lazy {
-    arrayOf(
-      "utilities/templates-api",
-      "utilities/templates-impl",
-      "core/app"
-    )
+    arrayOf("utilities/templates-api", "utilities/templates-impl", "core/app")
   }
 
   override fun copy(source: File, dest: File) {
@@ -53,16 +49,14 @@ class TestRecipeExecutor : RecipeExecutor {
   }
 
   override fun copyAsset(path: String, dest: File) {
-    openAsset(path).use {
-      it.copyTo(dest.outputStream())
-    }
+    openAsset(path).use { it.copyTo(dest.outputStream()) }
   }
 
   override fun copyAssetsRecursively(path: String, destDir: File) {
     findAsset(path, true).copyRecursively(destDir, true)
   }
 
-  private fun findAsset(path: String, isDir: Boolean = false) : File {
+  private fun findAsset(path: String, isDir: Boolean = false): File {
     for (module in modulesWithAssets) {
       val moduleDir = File(FileProvider.projectRoot().toFile(), module)
       if (!moduleDir.exists()) {

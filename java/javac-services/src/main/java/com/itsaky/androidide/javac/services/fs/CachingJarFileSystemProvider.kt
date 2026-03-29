@@ -19,12 +19,12 @@ package com.itsaky.androidide.javac.services.fs
 
 import com.itsaky.androidide.zipfs2.JarFileSystemProvider
 import com.itsaky.androidide.zipfs2.ZipFileSystem
-import org.slf4j.LoggerFactory
 import java.nio.file.FileSystem
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.io.path.pathString
+import org.slf4j.LoggerFactory
 
 /**
  * An implementation of [JarFileSystemProvider] that caches the created [CachedJarFileSystem] so
@@ -60,11 +60,11 @@ object CachingJarFileSystemProvider : JarFileSystemProvider() {
 
   fun clearCachesForPaths(predicate: (String) -> Boolean) {
     val toRemove =
-      this.cachedFs.keys.mapNotNull {
-        return@mapNotNull if (predicate(it)) {
-          it
-        } else null
-      }
+        this.cachedFs.keys.mapNotNull {
+          return@mapNotNull if (predicate(it)) {
+            it
+          } else null
+        }
 
     if (toRemove.isNotEmpty()) {
       toRemove.forEach(this::clearCache)

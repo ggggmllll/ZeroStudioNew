@@ -32,16 +32,16 @@ private const val generatedWarning = "DO NOT EDIT - Automatically generated file
  *   pair is `key -> value`, then `@@key@@` will be replaced with `value`.
  */
 fun File.replaceContents(
-  dest: File,
-  comment: String = "//",
-  vararg candidates: Pair<String, String>
+    dest: File,
+    comment: String = "//",
+    vararg candidates: Pair<String, String>,
 ) {
   val contents =
-    StringBuilder()
-      .append(comment)
-      .append(" ")
-      .append(generatedWarning)
-      .append(System.getProperty("line.separator").repeat(2))
+      StringBuilder()
+          .append(comment)
+          .append(" ")
+          .append(generatedWarning)
+          .append(System.getProperty("line.separator").repeat(2))
 
   bufferedReader().use { reader ->
     reader.readText().also { text ->
@@ -62,7 +62,7 @@ fun File.replaceContents(
       it.mkdirs()
     }
   }
-  
+
   dest.bufferedWriter().use { writer ->
     writer.write(contents.toString())
     writer.flush()

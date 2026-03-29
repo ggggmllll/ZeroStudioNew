@@ -88,11 +88,11 @@ class DefaultWidgetTable : WidgetTable {
 
   internal fun putWidget(line: String) {
     val widget =
-      WidgetParser.parse(line)
-        ?: run {
-          log.debug("Cannot parse widget from line: {}", line)
-          return
-        }
+        WidgetParser.parse(line)
+            ?: run {
+              log.debug("Cannot parse widget from line: {}", line)
+              return
+            }
 
     putWidget(widget)
   }
@@ -137,21 +137,21 @@ class DefaultWidgetTable : WidgetTable {
       }
 
       node =
-        if (createIfNotPresent) {
-          node.children.computeIfAbsent(segment) { WidgetNode(name = segment, isWidget = false) }
-        } else {
-          node.children[segment]
-        }
+          if (createIfNotPresent) {
+            node.children.computeIfAbsent(segment) { WidgetNode(name = segment, isWidget = false) }
+          } else {
+            node.children[segment]
+          }
     }
 
     return node
   }
 
   inner class WidgetNode(
-    val name: String,
-    val isWidget: Boolean,
-    val widget: DefaultWidget? = null,
-    val children: MutableMap<String, WidgetNode> = mutableMapOf()
+      val name: String,
+      val isWidget: Boolean,
+      val widget: DefaultWidget? = null,
+      val children: MutableMap<String, WidgetNode> = mutableMapOf(),
   ) {
 
     override fun toString(): String {

@@ -27,8 +27,7 @@ import com.itsaky.androidide.lookup.Lookup
 interface ApiVersions {
 
   companion object {
-    @JvmStatic
-    val COMPLETION_LOOKUP_KEY = Lookup.Key<ApiVersions>()
+    @JvmStatic val COMPLETION_LOOKUP_KEY = Lookup.Key<ApiVersions>()
   }
 
   /**
@@ -43,7 +42,7 @@ interface ApiVersions {
    *
    * @param className The fully qualified name of the class, in its internal form.
    * @param identifier The identifier of the member. This is the member name in case the member is a
-   * field. For method, this is the signature of the method without the return type.
+   *   field. For method, this is the signature of the method without the return type.
    */
   fun memberInfo(className: String, identifier: String): ApiVersion?
 }

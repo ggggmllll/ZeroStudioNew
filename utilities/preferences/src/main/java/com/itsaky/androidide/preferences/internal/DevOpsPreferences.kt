@@ -17,9 +17,7 @@
 
 package com.itsaky.androidide.preferences.internal
 
-/**
- * @author Akash Yadav
- */
+/** @author Akash Yadav */
 @Suppress("MemberVisibilityCanBePrivate")
 object DevOpsPreferences {
 

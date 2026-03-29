@@ -14,31 +14,30 @@ lateinit var application: ShizukuApplication
 
 class ShizukuApplication : Application() {
 
-    companion object {
+  companion object {
 
-        init {
-            logd("ShizukuApplication", "init")
+    init {
+      logd("ShizukuApplication", "init")
 
-            Shell.setDefaultBuilder(Shell.Builder.create().setFlags(Shell.FLAG_REDIRECT_STDERR))
-            if (Build.VERSION.SDK_INT >= 28) {
-                HiddenApiBypass.setHiddenApiExemptions("")
-            }
-            if (atLeast30) {
-                System.loadLibrary("adb")
-            }
-        }
+      Shell.setDefaultBuilder(Shell.Builder.create().setFlags(Shell.FLAG_REDIRECT_STDERR))
+      if (Build.VERSION.SDK_INT >= 28) {
+        HiddenApiBypass.setHiddenApiExemptions("")
+      }
+      if (atLeast30) {
+        System.loadLibrary("adb")
+      }
     }
+  }
 
-    private fun init(context: Context?) {
-        ShizukuSettings.initialize(context)
-        LocaleDelegate.defaultLocale = ShizukuSettings.getLocale()
-        AppCompatDelegate.setDefaultNightMode(ShizukuSettings.getNightMode())
-    }
+  private fun init(context: Context?) {
+    ShizukuSettings.initialize(context)
+    LocaleDelegate.defaultLocale = ShizukuSettings.getLocale()
+    AppCompatDelegate.setDefaultNightMode(ShizukuSettings.getNightMode())
+  }
 
-    override fun onCreate() {
-        super.onCreate()
-        application = this
-        init(this)
-    }
-
+  override fun onCreate() {
+    super.onCreate()
+    application = this
+    init(this)
+  }
 }

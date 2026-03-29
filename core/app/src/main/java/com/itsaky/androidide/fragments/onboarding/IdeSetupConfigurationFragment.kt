@@ -48,9 +48,7 @@ import com.itsaky.androidide.utils.Environment
 import com.itsaky.androidide.utils.flashError
 import com.itsaky.androidide.utils.getConnectionInfo
 
-/**
- * @author Akash Yadav
- */
+/** @author Akash Yadav */
 class IdeSetupConfigurationFragment : OnboardingFragment(), SlidePolicy {
 
   private var _content: LayoutOnboardngSetupConfigBinding? = null
@@ -65,14 +63,21 @@ class IdeSetupConfigurationFragment : OnboardingFragment(), SlidePolicy {
     @JvmStatic
     fun newInstance(context: Context): IdeSetupConfigurationFragment {
       return IdeSetupConfigurationFragment().also {
-        it.arguments = Bundle().apply {
-          putCharSequence(KEY_ONBOARDING_TITLE, context.getString(R.string.title_install_tools))
-          putCharSequence(KEY_ONBOARDING_SUBTITLE,
-            context.getString(R.string.subtitle_install_tools))
-          putCharSequence(KEY_ONBOARDING_EXTRA_INFO,
-            Html.fromHtml(context.getString(R.string.msg_install_tools),
-              Html.FROM_HTML_MODE_COMPACT))
-        }
+        it.arguments =
+            Bundle().apply {
+              putCharSequence(KEY_ONBOARDING_TITLE, context.getString(R.string.title_install_tools))
+              putCharSequence(
+                  KEY_ONBOARDING_SUBTITLE,
+                  context.getString(R.string.subtitle_install_tools),
+              )
+              putCharSequence(
+                  KEY_ONBOARDING_EXTRA_INFO,
+                  Html.fromHtml(
+                      context.getString(R.string.msg_install_tools),
+                      Html.FROM_HTML_MODE_COMPACT,
+                  ),
+              )
+            }
       }
     }
   }
@@ -88,7 +93,9 @@ class IdeSetupConfigurationFragment : OnboardingFragment(), SlidePolicy {
       backgroundDataRestricted.root.setText(R.string.msg_disable_background_data_restriction)
 
       autoInstallSwitch.setOnCheckedChangeListener { button, isChecked ->
-        button.setText(if (isChecked) R.string.action_auto_install else R.string.action_manual_install)
+        button.setText(
+            if (isChecked) R.string.action_auto_install else R.string.action_manual_install
+        )
         sdkVersionLayout.isEnabled = isChecked
         ndkVersionLayout.isEnabled = isChecked
         cmakeVersionLayout.isEnabled = isChecked
@@ -99,23 +106,43 @@ class IdeSetupConfigurationFragment : OnboardingFragment(), SlidePolicy {
 
       val sdkVersions = SdkVersion.entries.map { it.displayName }.reversed()
       sdkVersion.setText(sdkVersions[0], false)
-      sdkVersion.setAdapter(ArrayAdapter(requireContext(), 
-      com.google.android.material.R.layout.m3_auto_complete_simple_item, sdkVersions))
-      
+      sdkVersion.setAdapter(
+          ArrayAdapter(
+              requireContext(),
+              com.google.android.material.R.layout.m3_auto_complete_simple_item,
+              sdkVersions,
+          )
+      )
+
       val ndkVersions = NdkVersion.entries.map { it.displayName }.reversed()
       ndkVersion.setText(ndkVersions[0], false)
-      ndkVersion.setAdapter(ArrayAdapter(requireContext(), 
-      com.google.android.material.R.layout.m3_auto_complete_simple_item, ndkVersions))
-      
+      ndkVersion.setAdapter(
+          ArrayAdapter(
+              requireContext(),
+              com.google.android.material.R.layout.m3_auto_complete_simple_item,
+              ndkVersions,
+          )
+      )
+
       val cmakeVersions = CmakeVersion.entries.map { it.displayName }.reversed()
       cmakeVersion.setText(cmakeVersions[0], false)
-      cmakeVersion.setAdapter(ArrayAdapter(requireContext(),
-      com.google.android.material.R.layout.m3_auto_complete_simple_item, cmakeVersions))
+      cmakeVersion.setAdapter(
+          ArrayAdapter(
+              requireContext(),
+              com.google.android.material.R.layout.m3_auto_complete_simple_item,
+              cmakeVersions,
+          )
+      )
 
       val jdkVersions = JdkVersion.entries.map { it.displayName }
       jdkVersion.setText(jdkVersions[0], false)
-      jdkVersion.setAdapter(ArrayAdapter(requireContext(), 
-      com.google.android.material.R.layout.m3_auto_complete_simple_item, jdkVersions))
+      jdkVersion.setAdapter(
+          ArrayAdapter(
+              requireContext(),
+              com.google.android.material.R.layout.m3_auto_complete_simple_item,
+              jdkVersions,
+          )
+      )
     }
 
     updateConnectionStatus()
@@ -126,14 +153,22 @@ class IdeSetupConfigurationFragment : OnboardingFragment(), SlidePolicy {
   fun buildIdeSetupArguments(): Array<String> {
     val args = mutableListOf<String>()
     args.setArgument(IdeSetupArgument.INSTALL_DIR, Environment.HOME.absolutePath)
-    args.setArgument(IdeSetupArgument.SDK_VERSION,
-       SdkVersion.fromDisplayName(content.sdkVersion.text).version)
-    args.setArgument(IdeSetupArgument.NDK_VERSION, 
-      NdkVersion.fromDisplayName(content.ndkVersion.text).version)
-    args.setArgument(IdeSetupArgument.CMAKE_VERSION, 
-      CmakeVersion.fromDisplayName(content.cmakeVersion.text).version)
-    args.setArgument(IdeSetupArgument.JDK_VERSION,
-      JdkVersion.fromDisplayName(content.jdkVersion.text).version)
+    args.setArgument(
+        IdeSetupArgument.SDK_VERSION,
+        SdkVersion.fromDisplayName(content.sdkVersion.text).version,
+    )
+    args.setArgument(
+        IdeSetupArgument.NDK_VERSION,
+        NdkVersion.fromDisplayName(content.ndkVersion.text).version,
+    )
+    args.setArgument(
+        IdeSetupArgument.CMAKE_VERSION,
+        CmakeVersion.fromDisplayName(content.cmakeVersion.text).version,
+    )
+    args.setArgument(
+        IdeSetupArgument.JDK_VERSION,
+        JdkVersion.fromDisplayName(content.jdkVersion.text).version,
+    )
     args.setArgument(IdeSetupArgument.ASSUME_YES)
     if (content.installGit.isChecked) {
       args.setArgument(IdeSetupArgument.WITH_GIT)
@@ -166,7 +201,7 @@ class IdeSetupConfigurationFragment : OnboardingFragment(), SlidePolicy {
   }
 
   private fun updateConnectionStatus(networkCapabilities: NetworkCapabilities? = null) =
-    updateConnectionStatus(getConnectionInfo(requireContext(), networkCapabilities))
+      updateConnectionStatus(getConnectionInfo(requireContext(), networkCapabilities))
 
   private fun updateConnectionStatus(connectionInfo: ConnectionInfo) = runOnUiThread {
     content.noConnection.root.isVisible = false
@@ -216,15 +251,15 @@ class IdeSetupConfigurationFragment : OnboardingFragment(), SlidePolicy {
   private fun showNoConnectionWarning() {
     val msg = SpannableStringBuilder(getString(R.string.msg_no_internet))
     msg.append(" ")
-    msg.append(getString(R.string.action_open_settings), URLSpan(""),
-      Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+    msg.append(
+        getString(R.string.action_open_settings),
+        URLSpan(""),
+        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
     )
 
     content.noConnection.root.apply {
       isVisible = true
-      setOnClickListener {
-        it.context.startActivity(Intent(Settings.ACTION_WIFI_SETTINGS))
-      }
+      setOnClickListener { it.context.startActivity(Intent(Settings.ACTION_WIFI_SETTINGS)) }
     }
   }
 
@@ -243,47 +278,52 @@ class IdeSetupConfigurationFragment : OnboardingFragment(), SlidePolicy {
 
   private fun monitorNetworkState() {
     val connectivityManager = requireContext().getSystemService<ConnectivityManager>() ?: return
-    networkStateChangeCallback?.also {
-      connectivityManager.registerDefaultNetworkCallback(it)
-    }
+    networkStateChangeCallback?.also { connectivityManager.registerDefaultNetworkCallback(it) }
 
-    networkStateChangeCallback = object : NetworkCallback() {
+    networkStateChangeCallback =
+        object : NetworkCallback() {
 
-      override fun onCapabilitiesChanged(
-        network: Network,
-        networkCapabilities: NetworkCapabilities
-      ) {
-        updateConnectionStatus(networkCapabilities)
-      }
+          override fun onCapabilitiesChanged(
+              network: Network,
+              networkCapabilities: NetworkCapabilities,
+          ) {
+            updateConnectionStatus(networkCapabilities)
+          }
 
-      override fun onLost(network: Network) {
-        updateConnectionStatus(ConnectionInfo.UNKNOWN)
-      }
-    }
+          override fun onLost(network: Network) {
+            updateConnectionStatus(ConnectionInfo.UNKNOWN)
+          }
+        }
 
-    val networkRequest = NetworkRequest.Builder()
-      .addCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
-      .addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR)
-      .addTransportType(NetworkCapabilities.TRANSPORT_ETHERNET)
-      .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
-      .build()
+    val networkRequest =
+        NetworkRequest.Builder()
+            .addCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
+            .addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR)
+            .addTransportType(NetworkCapabilities.TRANSPORT_ETHERNET)
+            .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+            .build()
     connectivityManager.registerNetworkCallback(networkRequest, networkStateChangeCallback!!)
 
     backgroundDataRestrictionReceiver?.also {
       try {
         requireContext().unregisterReceiver(it)
-      } catch (err: Throwable) { /*ignored*/
+      } catch (err: Throwable) {
+        /*ignored*/
       }
     }
 
-    backgroundDataRestrictionReceiver = object : BroadcastReceiver() {
-      override fun onReceive(context: Context?, intent: Intent?) {
-        updateConnectionStatus()
-      }
-    }
+    backgroundDataRestrictionReceiver =
+        object : BroadcastReceiver() {
+          override fun onReceive(context: Context?, intent: Intent?) {
+            updateConnectionStatus()
+          }
+        }
 
-    requireContext().registerReceiver(backgroundDataRestrictionReceiver!!,
-      IntentFilter(ConnectivityManager.ACTION_RESTRICT_BACKGROUND_CHANGED))
+    requireContext()
+        .registerReceiver(
+            backgroundDataRestrictionReceiver!!,
+            IntentFilter(ConnectivityManager.ACTION_RESTRICT_BACKGROUND_CHANGED),
+        )
   }
 
   private fun removeNetworkMonitors() {
@@ -297,5 +337,4 @@ class IdeSetupConfigurationFragment : OnboardingFragment(), SlidePolicy {
       backgroundDataRestrictionReceiver = null
     }
   }
-
 }

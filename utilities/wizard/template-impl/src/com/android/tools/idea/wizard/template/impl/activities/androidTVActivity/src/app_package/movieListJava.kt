@@ -17,7 +17,7 @@
 package com.android.tools.idea.wizard.template.impl.activities.androidTVActivity.src.app_package
 
 fun movieListJava(packageName: String) =
-  """
+    """
 package ${packageName};
 
 import java.util.ArrayList;

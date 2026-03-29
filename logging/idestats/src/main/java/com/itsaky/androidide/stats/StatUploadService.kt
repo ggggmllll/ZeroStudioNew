@@ -28,6 +28,5 @@ import retrofit2.http.POST
  */
 internal interface StatUploadService {
 
-  @POST("/stats/")
-  fun uploadStats(@Body data: StatData): Call<StatUploadResponse>
+  @POST("/stats/") fun uploadStats(@Body data: StatData): Call<StatUploadResponse>
 }

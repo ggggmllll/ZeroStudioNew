@@ -43,7 +43,11 @@ open class FrameLayoutAdapter<T : FrameLayout> : ViewGroupAdapter<T>() {
 
   override fun createUiWidgets(): List<UiWidget> {
     return listOf(
-      UiWidget(FrameLayout::class.java, string.widget_frame_layout, drawable.ic_widget_frame_layout)
+        UiWidget(
+            FrameLayout::class.java,
+            string.widget_frame_layout,
+            drawable.ic_widget_frame_layout,
+        )
     )
   }
 }

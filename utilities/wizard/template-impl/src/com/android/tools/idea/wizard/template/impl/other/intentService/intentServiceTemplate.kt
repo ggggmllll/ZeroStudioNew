@@ -52,7 +52,8 @@ val intentServiceTemplate
     val includeHelper = booleanParameter {
       name = "Include helper start methods?"
       default = true
-      help = "Generate static helper methods to start the service e.g. MyIntentService.startAction()"
+      help =
+          "Generate static helper methods to start the service e.g. MyIntentService.startAction()"
     }
 
     widgets(TextFieldWidget(className), CheckBoxWidget(includeHelper), LanguageWidget())
@@ -62,5 +63,7 @@ val intentServiceTemplate
       File("no_activity.png")
     }
 
-    recipe = { data: TemplateData -> intentServiceRecipe(data as ModuleTemplateData, className.value, includeHelper.value) }
+    recipe = { data: TemplateData ->
+      intentServiceRecipe(data as ModuleTemplateData, className.value, includeHelper.value)
+    }
   }

@@ -17,9 +17,7 @@
 
 package com.itsaky.androidide.xml.res
 
-/**
- * @author Akash Yadav
- */
+/** @author Akash Yadav */
 interface ISearchResult {
 
   val tablePackage: IResourceTablePackage

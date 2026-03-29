@@ -24,8 +24,8 @@ package com.itsaky.androidide.templates.impl.androidstudio.activities.androidTVA
  */
 fun stringsXml(activityClass: String, isNewModule: Boolean): String {
   val labelBlock =
-    if (isNewModule) "<string name=\"app_name\">Leanback ${activityClass}</string>"
-    else "<string name=\"title_${activityClass}\">Leanback ${activityClass}</string>"
+      if (isNewModule) "<string name=\"app_name\">Leanback ${activityClass}</string>"
+      else "<string name=\"title_${activityClass}\">Leanback ${activityClass}</string>"
   return """
 <resources>
     $labelBlock

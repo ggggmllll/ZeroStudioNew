@@ -37,7 +37,6 @@ class SigningConfigPlugin : Plugin<Project> {
 
   override fun apply(target: Project) {
     target.run {
-
       if (isFDroidBuild) {
         logger.warn("!!! Do not apply ${javaClass.simpleName} when building or F-Droid.")
         return
@@ -59,19 +58,18 @@ class SigningConfigPlugin : Plugin<Project> {
         val keyPass = getEnvOrProp(KEY_PASS)
 
         if (alias != null && storePass != null && keyPass != null && signingKey.exists()) {
-          val config = extension.signingConfigs.create("common") {
-            storeFile = signingKey
-            keyAlias = alias
-            storePassword = storePass
-            keyPassword = keyPass
-          }
+          val config =
+              extension.signingConfigs.create("common") {
+                storeFile = signingKey
+                keyAlias = alias
+                storePassword = storePass
+                keyPassword = keyPass
+              }
 
-          extension.buildTypes.forEach { buildType ->
-            buildType.signingConfig = config
-          }
+          extension.buildTypes.forEach { buildType -> buildType.signingConfig = config }
         } else {
           logger.warn(
-            "Signing info not configured. keystoreFile=$signingKey[exists=${signingKey.exists()}]"
+              "Signing info not configured. keystoreFile=$signingKey[exists=${signingKey.exists()}]"
           )
           null
         }

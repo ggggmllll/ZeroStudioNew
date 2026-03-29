@@ -62,7 +62,6 @@ interface ILanguageServer {
    * Called by client to notify the server to shutdown. Language servers must release all the
    * resources in use.
    *
-   *
    * After this is called, clients must re-initialize the server.
    */
   fun shutdown()
@@ -90,10 +89,10 @@ interface ILanguageServer {
   fun applySettings(settings: IServerSettings?)
 
   /**
-   * Setup this language server with the given workspace. Servers are not expected to keep a reference
-   * to the provided workspace. Instead, use
-   * [getRootWorkspace()][com.itsaky.androidide.projects.IProjectManager.workspace] to
-   * obtain the workspace instance.
+   * Setup this language server with the given workspace. Servers are not expected to keep a
+   * reference to the provided workspace. Instead, use
+   * [getRootWorkspace()][com.itsaky.androidide.projects.IProjectManager.workspace] to obtain the
+   * workspace instance.
    *
    * @param workspace The initialized workspace.
    */
@@ -102,7 +101,7 @@ interface ILanguageServer {
   /**
    * Compute code completions for the given completion params.
    *
-   * @param params        The completion params.
+   * @param params The completion params.
    * @param cancelChecker
    * @return The completion provider.
    */
@@ -111,7 +110,7 @@ interface ILanguageServer {
   /**
    * Find references using the given params.
    *
-   * @param params        The params to use for computing references.
+   * @param params The params to use for computing references.
    * @param cancelChecker
    * @return The result of the computation.
    */
@@ -120,7 +119,7 @@ interface ILanguageServer {
   /**
    * Find definition using the given params.
    *
-   * @param params        The params to use for computing the definition.
+   * @param params The params to use for computing the definition.
    * @param cancelChecker
    * @return The result of the computation.
    */
@@ -146,8 +145,8 @@ interface ILanguageServer {
    * Analyze the given file and provide diagnostics from the analyze result.
    *
    * @param file The file to analyze.
-   * @return The diagnostic result. Points to [DiagnosticResult.NO_UPDATE] if no diagnotic
-   * items are available.
+   * @return The diagnostic result. Points to [DiagnosticResult.NO_UPDATE] if no diagnotic items are
+   *   available.
    */
   suspend fun analyze(file: Path): DiagnosticResult
 

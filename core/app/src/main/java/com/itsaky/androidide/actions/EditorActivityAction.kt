@@ -25,7 +25,6 @@ import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.plus
-import com.itsaky.androidide.actions.ActionStyle
 
 /** @author Akash Yadav */
 abstract class EditorActivityAction : ActionItem {
@@ -37,16 +36,12 @@ abstract class EditorActivityAction : ActionItem {
   override var location: ActionItem.Location = ActionItem.Location.EDITOR_TOOLBAR
 
   override var requiresUIThread: Boolean = false
-  
-  /**
-   * 自定义此Action的UI样式。
-   * UI渲染层会读取此对象来调整按钮的外观。
-   * 如果为 null，则使用默认的布局样式。
-   */
+
+  /** 自定义此Action的UI样式。 UI渲染层会读取此对象来调整按钮的外观。 如果为 null，则使用默认的布局样式。 */
   var style: ActionStyle? = null
 
-  protected val actionScope = CoroutineScope(Dispatchers.Default) +
-      CoroutineName("${javaClass.simpleName}Scope")
+  protected val actionScope =
+      CoroutineScope(Dispatchers.Default) + CoroutineName("${javaClass.simpleName}Scope")
 
   override fun prepare(data: ActionData) {
     super.prepare(data)

@@ -44,33 +44,34 @@ import com.itsaky.androidide.lsp.java.actions.generators.OverrideSuperclassMetho
 
 /**
  * Java code actions.
+ *
  * @author Akash Yadav
  */
 object JavaCodeActionsMenu : IActionsMenuProvider {
 
   override val actions: List<ActionItem> =
-    listOf(
-      CommentAction(),
-      UncommentAction(),
-      GoToDefinitionAction(),
-      FindReferencesAction(),
-      AddImportAction(),
-      AutoFixImportsAction(),
-      ImplementAbstractMethodsAction(),
-      VariableToStatementAction(),
-      FieldToBlockAction(),
-      RemoveClassAction(),
-      RemoveMethodAction(),
-      RemoveUnusedThrowsAction(),
-      CreateMissingMethodAction(),
-      SuppressUncheckedWarningAction(),
-      AddThrowsAction(),
-      GenerateSettersAndGettersAction(),
-      OverrideSuperclassMethodsAction(),
-      GenerateMissingConstructorAction(),
-      GenerateConstructorAction(),
-      GenerateToStringMethodAction(),
-      RemoveUnusedImportsAction(),
-      OrganizeImportsAction()
-    )
+      listOf(
+          CommentAction(),
+          UncommentAction(),
+          GoToDefinitionAction(),
+          FindReferencesAction(),
+          AddImportAction(),
+          AutoFixImportsAction(),
+          ImplementAbstractMethodsAction(),
+          VariableToStatementAction(),
+          FieldToBlockAction(),
+          RemoveClassAction(),
+          RemoveMethodAction(),
+          RemoveUnusedThrowsAction(),
+          CreateMissingMethodAction(),
+          SuppressUncheckedWarningAction(),
+          AddThrowsAction(),
+          GenerateSettersAndGettersAction(),
+          OverrideSuperclassMethodsAction(),
+          GenerateMissingConstructorAction(),
+          GenerateConstructorAction(),
+          GenerateToStringMethodAction(),
+          RemoveUnusedImportsAction(),
+          OrganizeImportsAction(),
+      )
 }

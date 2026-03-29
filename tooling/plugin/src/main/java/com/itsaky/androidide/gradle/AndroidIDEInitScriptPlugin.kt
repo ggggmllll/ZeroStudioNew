@@ -21,7 +21,6 @@ import com.itsaky.androidide.buildinfo.BuildInfo
 import com.itsaky.androidide.tooling.api.LogSenderConfig._PROPERTY_IS_TEST_ENV
 import com.itsaky.androidide.tooling.api.LogSenderConfig._PROPERTY_MAVEN_LOCAL_REPOSITORY
 import java.io.File
-import java.io.FileNotFoundException
 import java.net.URI
 import org.gradle.StartParameter
 import org.gradle.api.Plugin

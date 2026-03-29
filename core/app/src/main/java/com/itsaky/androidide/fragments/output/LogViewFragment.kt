@@ -30,24 +30,25 @@ import com.itsaky.androidide.editor.schemes.IDEColorScheme
 import com.itsaky.androidide.editor.schemes.IDEColorSchemeProvider
 import com.itsaky.androidide.fragments.EmptyStateFragment
 import com.itsaky.androidide.models.LogLine
+import com.itsaky.androidide.treesitter.TreeSitter
 import com.itsaky.androidide.utils.ILogger.Level
 import com.itsaky.androidide.utils.jetbrainsMono
 import io.github.rosemoe.sora.widget.style.CursorAnimator
-import org.slf4j.LoggerFactory
 import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 import kotlin.math.min
-import com.itsaky.androidide.treesitter.TreeSitter
+import org.slf4j.LoggerFactory
+
 /**
  * Fragment to show logs.
  *
  * @author Akash Yadav
  */
 abstract class LogViewFragment :
-  EmptyStateFragment<FragmentLogBinding>(R.layout.fragment_log, FragmentLogBinding::bind),
-  ShareableOutputFragment {
+    EmptyStateFragment<FragmentLogBinding>(R.layout.fragment_log, FragmentLogBinding::bind),
+    ShareableOutputFragment {
 
   companion object {
 
@@ -71,8 +72,8 @@ abstract class LogViewFragment :
     const val LOG_DELAY = 100L
 
     /**
-     * Trim the logs when the number of lines reaches this value. Only [MAX_LINE_COUNT]
-     * number of lines are kept in the logs.
+     * Trim the logs when the number of lines reaches this value. Only [MAX_LINE_COUNT] number of
+     * lines are kept in the logs.
      */
     const val TRIM_ON_LINE_COUNT = 5000
 
@@ -92,43 +93,45 @@ abstract class LogViewFragment :
   private val isTrimming = AtomicBoolean(false)
 
   private val logHandler = Handler(Looper.getMainLooper())
-  private val logRunnable = object : Runnable {
-    override fun run() {
-      cacheLock.withLock {
-        if (cacheLineTrack.size == MAX_LINE_COUNT) {
-          cache.delete(0, cacheLineTrack.poll()!!)
-        }
+  private val logRunnable =
+      object : Runnable {
+        override fun run() {
+          cacheLock.withLock {
+            if (cacheLineTrack.size == MAX_LINE_COUNT) {
+              cache.delete(0, cacheLineTrack.poll()!!)
+            }
 
-        cacheLineTrack.clear()
+            cacheLineTrack.clear()
 
-        if (cache.length < MAX_CHUNK_SIZE) {
-          append(cache)
-          cache.clear()
-        } else {
-          // Append the lines in chunks to avoid UI lags
-          val length = min(cache.length, MAX_CHUNK_SIZE)
-          append(cache.subSequence(0, length))
-          cache.delete(0, length)
-        }
+            if (cache.length < MAX_CHUNK_SIZE) {
+              append(cache)
+              cache.clear()
+            } else {
+              // Append the lines in chunks to avoid UI lags
+              val length = min(cache.length, MAX_CHUNK_SIZE)
+              append(cache.subSequence(0, length))
+              cache.delete(0, length)
+            }
 
-        if (cache.isNotEmpty()) {
-          // if we still have data left to append, resechedule this
-          logHandler.removeCallbacks(this)
-          logHandler.postDelayed(this, LOG_DELAY)
-        } else {
-          trimLinesAtStart()
+            if (cache.isNotEmpty()) {
+              // if we still have data left to append, resechedule this
+              logHandler.removeCallbacks(this)
+              logHandler.postDelayed(this, LOG_DELAY)
+            } else {
+              trimLinesAtStart()
+            }
+          }
         }
       }
-    }
-  }
 
   fun appendLog(line: LogLine) {
 
-    val lineString = if (isSimpleFormattingEnabled()) {
-      line.toSimpleString()
-    } else {
-      line.toString()
-    }
+    val lineString =
+        if (isSimpleFormattingEnabled()) {
+          line.toSimpleString()
+        } else {
+          line.toString()
+        }
 
     line.recycle()
 
@@ -141,7 +144,11 @@ abstract class LogViewFragment :
       lineStr += "\n"
     }
 
-    if (isTrimming.get() || cache.isNotEmpty() || System.currentTimeMillis() - lastLog <= LOG_FREQUENCY) {
+    if (
+        isTrimming.get() ||
+            cache.isNotEmpty() ||
+            System.currentTimeMillis() - lastLog <= LOG_FREQUENCY
+    ) {
       cacheLock.withLock {
         logHandler.removeCallbacks(logRunnable)
 
@@ -169,9 +176,7 @@ abstract class LogViewFragment :
   private fun append(chars: CharSequence?) {
     chars?.let {
       ThreadUtils.runOnUiThread {
-        _binding?.editor?.append(chars)?.also {
-          emptyStateViewModel.isEmpty.value = false
-        }
+        _binding?.editor?.append(chars)?.also { emptyStateViewModel.isEmpty.value = false }
       }
     }
   }
@@ -217,45 +222,52 @@ abstract class LogViewFragment :
     editor.setTextSize(12f)
     editor.typefaceText = jetbrainsMono()
     editor.isEnsurePosAnimEnabled = false
-    
+
     try {
-    //此处应用libandroid-tree-sitter.so是为了避免该文件不正常的加载导致找不到文件的bug修复
-     // System.loadLibrary("android-tree-sitter")
-     TreeSitter.loadLibrary()
-     log.debug("TreeSitter native library loaded successfully")
-   } catch (e: UnsatisfiedLinkError) {
-     log.error("Failed to load TreeSitter native library", e)
-   }
-   
-   
-    editor.cursorAnimator = object : CursorAnimator {
-      override fun markStartPos() {}
-      override fun markEndPos() {}
-      override fun start() {}
-      override fun cancel() {}
-      override fun isRunning(): Boolean {
-        return false
-      }
-
-      override fun animatedX(): Float {
-        return 0f
-      }
-
-      override fun animatedY(): Float {
-        return 0f
-      }
-
-      override fun animatedLineHeight(): Float {
-        return 0f
-      }
-
-      override fun animatedLineBottom(): Float {
-        return 0f
-      }
+      // 此处应用libandroid-tree-sitter.so是为了避免该文件不正常的加载导致找不到文件的bug修复
+      // System.loadLibrary("android-tree-sitter")
+      TreeSitter.loadLibrary()
+      log.debug("TreeSitter native library loaded successfully")
+    } catch (e: UnsatisfiedLinkError) {
+      log.error("Failed to load TreeSitter native library", e)
     }
 
-    IDEColorSchemeProvider.readSchemeAsync(context = requireContext(),
-      coroutineScope = editor.editorScope, type = LogLanguage.TS_TYPE) { scheme ->
+    editor.cursorAnimator =
+        object : CursorAnimator {
+          override fun markStartPos() {}
+
+          override fun markEndPos() {}
+
+          override fun start() {}
+
+          override fun cancel() {}
+
+          override fun isRunning(): Boolean {
+            return false
+          }
+
+          override fun animatedX(): Float {
+            return 0f
+          }
+
+          override fun animatedY(): Float {
+            return 0f
+          }
+
+          override fun animatedLineHeight(): Float {
+            return 0f
+          }
+
+          override fun animatedLineBottom(): Float {
+            return 0f
+          }
+        }
+
+    IDEColorSchemeProvider.readSchemeAsync(
+        context = requireContext(),
+        coroutineScope = editor.editorScope,
+        type = LogLanguage.TS_TYPE,
+    ) { scheme ->
       val language = TreeSitterLanguageProvider.forType(LogLanguage.TS_TYPE, requireContext())
       checkNotNull(language) { "No TreeSitterLanguage found for type ${LogLanguage.TS_TYPE}" }
 
@@ -278,8 +290,6 @@ abstract class LogViewFragment :
   }
 
   override fun clearOutput() {
-    _binding?.editor?.setText("")?.also {
-      emptyStateViewModel.isEmpty.value = true
-    }
+    _binding?.editor?.setText("")?.also { emptyStateViewModel.isEmpty.value = true }
   }
 }

@@ -22,15 +22,13 @@ import android.view.View
 import android.view.ViewGroup
 import com.itsaky.androidide.inflater.internal.LayoutFile
 
-/**
- * @author Akash Yadav
- */
+/** @author Akash Yadav */
 data class AttributeHandlerScope<T : View>(
-  val view: T,
-  val file: LayoutFile,
-  val context: Context,
-  val layoutParams: ViewGroup.LayoutParams,
-  val namespace: INamespace?,
-  val name: String,
-  val value: String
+    val view: T,
+    val file: LayoutFile,
+    val context: Context,
+    val layoutParams: ViewGroup.LayoutParams,
+    val namespace: INamespace?,
+    val name: String,
+    val value: String,
 )

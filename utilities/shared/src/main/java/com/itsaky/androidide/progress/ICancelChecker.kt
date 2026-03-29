@@ -27,9 +27,7 @@ import java.util.concurrent.atomic.AtomicBoolean
  */
 interface ICancelChecker {
 
-  /**
-   * Cancel this process.
-   */
+  /** Cancel this process. */
   fun cancel()
 
   /**
@@ -39,11 +37,8 @@ interface ICancelChecker {
    */
   fun isCancelled(): Boolean
 
-  /**
-   * Throw [CancellationException] if this process has been cancelled.
-   */
-  @Throws(CancellationException::class)
-  fun abortIfCancelled()
+  /** Throw [CancellationException] if this process has been cancelled. */
+  @Throws(CancellationException::class) fun abortIfCancelled()
 
   open class Default(cancelled: Boolean = false) : ICancelChecker {
 
@@ -66,16 +61,10 @@ interface ICancelChecker {
 
   companion object {
 
-    /**
-     * A no-op cancel checker. The task is never cancelled.
-     */
-    @JvmField
-    val NOOP = Default(false)
+    /** A no-op cancel checker. The task is never cancelled. */
+    @JvmField val NOOP = Default(false)
 
-    /**
-     * An already cancelled cancel checker.
-     */
-    @JvmField
-    val CANCELLED = Default(true)
+    /** An already cancelled cancel checker. */
+    @JvmField val CANCELLED = Default(true)
   }
 }

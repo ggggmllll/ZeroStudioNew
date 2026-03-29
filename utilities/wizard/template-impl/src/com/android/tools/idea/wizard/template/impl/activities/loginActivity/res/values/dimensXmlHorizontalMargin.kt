@@ -17,7 +17,7 @@
 package com.android.tools.idea.wizard.template.impl.activities.loginActivity.res.values
 
 fun dimensXmlHorizontalMargin(horizontalMargin: Int) =
-  """<resources>
+    """<resources>
  <dimen name="activity_horizontal_margin">${horizontalMargin}dp</dimen>
 </resources>
 """

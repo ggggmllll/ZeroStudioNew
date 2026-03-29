@@ -42,12 +42,12 @@ object InstallationResultHandler {
     val intent = Intent(context, InstallationResultReceiver::class.java)
     intent.action = INSTALL_PACKAGE_ACTION
     return PendingIntent.getBroadcast(
-      context,
-      INSTALL_PACKAGE_REQ_CODE,
-      intent,
-      PendingIntent.FLAG_UPDATE_CURRENT
-    )
-      .intentSender
+            context,
+            INSTALL_PACKAGE_REQ_CODE,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT,
+        )
+        .intentSender
   }
 
   @JvmStatic
@@ -58,11 +58,11 @@ object InstallationResultHandler {
     }
 
     val extras =
-      intent.extras
-        ?: run {
-          log.warn("Invalid intent received in broadcast")
-          return null
-        }
+        intent.extras
+            ?: run {
+              log.warn("Invalid intent received in broadcast")
+              return null
+            }
 
     val packageName = extras.getString(PackageInstaller.EXTRA_PACKAGE_NAME)
     val status = extras.getInt(PackageInstaller.EXTRA_STATUS)

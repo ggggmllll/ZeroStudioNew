@@ -37,10 +37,17 @@ val composeTvActivityTemplate
     name = "Empty Activity"
     description = "Create a new empty activity with Compose for TV"
     minApi = 21
-    constraints = listOf(TemplateConstraint.AndroidX, TemplateConstraint.Kotlin, TemplateConstraint.Compose)
+    constraints =
+        listOf(TemplateConstraint.AndroidX, TemplateConstraint.Kotlin, TemplateConstraint.Compose)
     category = Category.TV
     formFactor = FormFactor.Tv
-    screens = listOf(WizardUiContext.ActivityGallery, WizardUiContext.MenuEntry, WizardUiContext.NewProject, WizardUiContext.NewModule)
+    screens =
+        listOf(
+            WizardUiContext.ActivityGallery,
+            WizardUiContext.MenuEntry,
+            WizardUiContext.NewProject,
+            WizardUiContext.NewModule,
+        )
 
     val activityClass = stringParameter {
       name = "Activity Name"
@@ -55,7 +62,8 @@ val composeTvActivityTemplate
     val isLauncher = booleanParameter {
       name = "Launcher Activity"
       default = true
-      help = "If true, this activity will have a CATEGORY_LAUNCHER intent filter, making it visible in the launcher"
+      help =
+          "If true, this activity will have a CATEGORY_LAUNCHER intent filter, making it visible in the launcher"
     }
 
     val greeting = stringParameter {
@@ -77,25 +85,25 @@ val composeTvActivityTemplate
     }
 
     widgets(
-      TextFieldWidget(activityClass),
-      PackageNameWidget(packageName),
-      CheckBoxWidget(isLauncher),
-      // Invisible widgets to pass data
-      TextFieldWidget(greeting),
-      TextFieldWidget(defaultPreview),
-      LanguageWidget(),
+        TextFieldWidget(activityClass),
+        PackageNameWidget(packageName),
+        CheckBoxWidget(isLauncher),
+        // Invisible widgets to pass data
+        TextFieldWidget(greeting),
+        TextFieldWidget(defaultPreview),
+        LanguageWidget(),
     )
 
     thumb { File("compose-tv-activity").resolve("template_compose_tv_empty_activity.png") }
 
     recipe = { data: TemplateData ->
       composeTvActivityRecipe(
-        moduleData = data as ModuleTemplateData,
-        activityClass = activityClass.value,
-        packageName = packageName.value,
-        isLauncher = isLauncher.value,
-        greeting = greeting.value,
-        defaultPreview = defaultPreview.value,
+          moduleData = data as ModuleTemplateData,
+          activityClass = activityClass.value,
+          packageName = packageName.value,
+          isLauncher = isLauncher.value,
+          greeting = greeting.value,
+          defaultPreview = defaultPreview.value,
       )
     }
   }

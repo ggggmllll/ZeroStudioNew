@@ -19,7 +19,7 @@ package com.android.tools.idea.wizard.template.impl.activities.androidTVActivity
 import com.android.tools.idea.wizard.template.escapeKotlinIdentifier
 
 fun browseErrorActivityKt(layoutName: String, packageName: String, mainFragment: String) =
-  """
+    """
 package ${escapeKotlinIdentifier(packageName)}
 
 import android.os.Bundle

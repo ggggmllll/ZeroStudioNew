@@ -17,30 +17,23 @@
 
 package com.itsaky.androidide.plugins.util
 
-import org.gradle.api.GradleException
-import org.gradle.api.logging.Logger
 import java.io.File
 import java.math.BigInteger
 import java.net.HttpURLConnection
 import java.net.URL
 import java.security.DigestInputStream
 import java.security.MessageDigest
+import org.gradle.api.GradleException
+import org.gradle.api.logging.Logger
 
-/**
- * @author Akash Yadav
- */
+/** @author Akash Yadav */
 object DownloadUtils {
 
   /**
    * Download the file at given [URL][remoteUrl] to the given [local file][file] and verify the
    * SHA-256 checksum of the downloaded file with the [expected checksum][expectedChecksum].
    */
-  fun doDownload(
-    file: File,
-    remoteUrl: String,
-    expectedChecksum: String,
-    logger: Logger
-  ) {
+  fun doDownload(file: File, remoteUrl: String, expectedChecksum: String, logger: Logger) {
 
     logger.info("Download $remoteUrl to $file having checksum ${expectedChecksum}...")
 
@@ -60,7 +53,8 @@ object DownloadUtils {
         return
       } else {
         logger.info(
-          "Deleting old $file with invalid checksum: $checksum expected: $expectedChecksum")
+            "Deleting old $file with invalid checksum: $checksum expected: $expectedChecksum"
+        )
         file.delete()
       }
     }
@@ -85,7 +79,8 @@ object DownloadUtils {
     if (checksum != expectedChecksum) {
       file.delete()
       throw GradleException(
-        "Wrong checksum for $remoteUrl: expected: $expectedChecksum, actual: $checksum")
+          "Wrong checksum for $remoteUrl: expected: $expectedChecksum, actual: $checksum"
+      )
     }
   }
 }

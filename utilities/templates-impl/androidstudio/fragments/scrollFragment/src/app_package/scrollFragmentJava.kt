@@ -18,8 +18,13 @@ package com.itsaky.androidide.templates.impl.androidstudio.fragments.scrollFragm
 
 import com.android.tools.idea.wizard.template.getMaterialComponentName
 
-fun scrollFragmentJava(fragmentClass: String, layoutName: String, packageName: String, useAndroidX: Boolean) =
-  """
+fun scrollFragmentJava(
+    fragmentClass: String,
+    layoutName: String,
+    packageName: String,
+    useAndroidX: Boolean,
+) =
+    """
 package ${packageName};
 
 import android.os.Bundle;

@@ -23,7 +23,7 @@ import com.itsaky.androidide.inflater.IViewGroup
 import com.itsaky.androidide.inflater.IViewGroup.OnHierarchyChangeListener
 
 open class ViewGroupImpl(file: LayoutFile, name: String, view: ViewGroup) :
-  ViewImpl(file = file, name = name, view = view), IViewGroup {
+    ViewImpl(file = file, name = name, view = view), IViewGroup {
 
   internal var childrenModifiable = true
 

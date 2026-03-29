@@ -274,7 +274,9 @@ class Flashbar private constructor(private var builder: Builder) {
      * infinite
      */
     fun duration(milliseconds: Long) = apply {
-      require(milliseconds == DURATION_INDEFINITE || milliseconds > 0) { "Duration can only be $DURATION_INDEFINITE or > 0" }
+      require(milliseconds == DURATION_INDEFINITE || milliseconds > 0) {
+        "Duration can only be $DURATION_INDEFINITE or > 0"
+      }
       this.duration = milliseconds
     }
 
@@ -384,7 +386,7 @@ class Flashbar private constructor(private var builder: Builder) {
     /** Specifies the primary action text string */
     fun primaryActionText(text: String) = apply {
       require(progressPosition != RIGHT) { "Cannot show action button if right progress is set" }
-        this.primaryActionText = text
+      this.primaryActionText = text
     }
 
     /** Specifies the primary action text string resource */
@@ -518,9 +520,9 @@ class Flashbar private constructor(private var builder: Builder) {
     @JvmOverloads
     fun showIcon(scale: Float = DEFAUT_ICON_SCALE, scaleType: ScaleType = CENTER_CROP) = apply {
       require(progressPosition != LEFT) { "Cannot show icon if left progress is set" }
-        require(scale > 0) { "Icon scale cannot be negative or zero" }
-    
-        this.showIcon = true
+      require(scale > 0) { "Icon scale cannot be negative or zero" }
+
+      this.showIcon = true
       this.iconScale = scale
       this.iconScaleType = scaleType
     }
@@ -563,7 +565,7 @@ class Flashbar private constructor(private var builder: Builder) {
 
       if (progressPosition == RIGHT && primaryActionText != null) {
         throw IllegalArgumentException(
-          "Cannot show progress at right if action button is already set"
+            "Cannot show progress at right if action button is already set"
         )
       }
     }
@@ -589,30 +591,30 @@ class Flashbar private constructor(private var builder: Builder) {
 
     private fun configureAnimation() {
       enterAnimBuilder =
-        if (enterAnimBuilder == null) {
-          when (gravity) {
-            TOP -> FlashAnim.with(activity).animateBar().enter().fromTop()
-            BOTTOM -> FlashAnim.with(activity).animateBar().enter().fromBottom()
+          if (enterAnimBuilder == null) {
+            when (gravity) {
+              TOP -> FlashAnim.with(activity).animateBar().enter().fromTop()
+              BOTTOM -> FlashAnim.with(activity).animateBar().enter().fromBottom()
+            }
+          } else {
+            when (gravity) {
+              TOP -> enterAnimBuilder!!.enter().fromTop()
+              BOTTOM -> enterAnimBuilder!!.enter().fromBottom()
+            }
           }
-        } else {
-          when (gravity) {
-            TOP -> enterAnimBuilder!!.enter().fromTop()
-            BOTTOM -> enterAnimBuilder!!.enter().fromBottom()
-          }
-        }
 
       exitAnimBuilder =
-        if (exitAnimBuilder == null) {
-          when (gravity) {
-            TOP -> FlashAnim.with(activity).animateBar().exit().fromTop()
-            BOTTOM -> FlashAnim.with(activity).animateBar().exit().fromBottom()
+          if (exitAnimBuilder == null) {
+            when (gravity) {
+              TOP -> FlashAnim.with(activity).animateBar().exit().fromTop()
+              BOTTOM -> FlashAnim.with(activity).animateBar().exit().fromBottom()
+            }
+          } else {
+            when (gravity) {
+              TOP -> exitAnimBuilder!!.exit().fromTop()
+              BOTTOM -> exitAnimBuilder!!.exit().fromBottom()
+            }
           }
-        } else {
-          when (gravity) {
-            TOP -> exitAnimBuilder!!.exit().fromTop()
-            BOTTOM -> exitAnimBuilder!!.exit().fromBottom()
-          }
-        }
     }
   }
 
@@ -624,24 +626,24 @@ class Flashbar private constructor(private var builder: Builder) {
 
   enum class Gravity {
     TOP,
-    BOTTOM
+    BOTTOM,
   }
 
   enum class DismissEvent {
     TIMEOUT,
     MANUAL,
     TAP_OUTSIDE,
-    SWIPE
+    SWIPE,
   }
 
   enum class Vibration {
     SHOW,
-    DISMISS
+    DISMISS,
   }
 
   enum class ProgressPosition {
     LEFT,
-    RIGHT
+    RIGHT,
   }
 
   fun interface OnActionTapListener {
@@ -650,7 +652,9 @@ class Flashbar private constructor(private var builder: Builder) {
 
   interface OnBarDismissListener {
     fun onDismissing(bar: Flashbar, isSwiped: Boolean)
+
     fun onDismissProgress(bar: Flashbar, progress: Float)
+
     fun onDismissed(bar: Flashbar, event: DismissEvent)
   }
 
@@ -660,7 +664,9 @@ class Flashbar private constructor(private var builder: Builder) {
 
   interface OnBarShowListener {
     fun onShowing(bar: Flashbar)
+
     fun onShowProgress(bar: Flashbar, progress: Float)
+
     fun onShown(bar: Flashbar)
   }
 }

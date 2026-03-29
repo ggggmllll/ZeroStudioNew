@@ -30,8 +30,8 @@ import com.itsaky.androidide.eventbus.events.Event
 import com.itsaky.androidide.events.ExpandTreeNodeRequestEvent
 import com.itsaky.androidide.events.ListProjectFilesRequestEvent
 import com.unnamed.b.atv.model.TreeNode
-import org.greenrobot.eventbus.EventBus
 import java.io.File
+import org.greenrobot.eventbus.EventBus
 
 /**
  * Base class for actions related to the file tree.
@@ -39,9 +39,9 @@ import java.io.File
  * @author Akash Yadav
  */
 abstract class BaseFileTreeAction(
-  context: Context,
-  @StringRes labelRes: Int? = null,
-  @DrawableRes iconRes: Int? = null
+    context: Context,
+    @StringRes labelRes: Int? = null,
+    @DrawableRes iconRes: Int? = null,
 ) : EditorActivityAction() {
 
   override var requiresUIThread: Boolean = true
@@ -67,11 +67,11 @@ abstract class BaseFileTreeAction(
     return hasRequiredData(Context::class.java, File::class.java, TreeNode::class.java)
   }
 
-  protected fun ActionData.getTreeNode() : TreeNode? {
+  protected fun ActionData.getTreeNode(): TreeNode? {
     return this[TreeNode::class.java]
   }
 
-  protected fun ActionData.requireTreeNode() : TreeNode {
+  protected fun ActionData.requireTreeNode(): TreeNode {
     return getTreeNode()!!
   }
 

@@ -57,15 +57,15 @@ import com.android.tools.idea.wizard.template.impl.activities.responsiveActivity
 import java.io.File
 
 fun RecipeExecutor.generateResponsiveActivity(
-  moduleTemplateData: ModuleTemplateData,
-  activityClass: String,
-  activityMainLayoutName: String,
-  appBarMainLayoutName: String,
-  isLauncher: Boolean,
-  packageName: PackageName,
-  navHeaderLayoutName: String,
-  contentLayoutName: String,
-  navGraphName: String,
+    moduleTemplateData: ModuleTemplateData,
+    activityClass: String,
+    activityMainLayoutName: String,
+    appBarMainLayoutName: String,
+    isLauncher: Boolean,
+    packageName: PackageName,
+    navHeaderLayoutName: String,
+    contentLayoutName: String,
+    navGraphName: String,
 ) {
   val (projectTemplateData, srcOut, resOut) = moduleTemplateData
   val apis = moduleTemplateData.apis
@@ -79,18 +79,18 @@ fun RecipeExecutor.generateResponsiveActivity(
   addViewBindingSupport(moduleTemplateData.viewBindingSupport, true)
 
   generateManifest(
-    moduleData = moduleTemplateData,
-    activityClass = activityClass,
-    packageName = packageName,
-    isLauncher = isLauncher,
-    hasNoActionBar = true,
-    generateActivityTitle = true,
-    isResizeable = true,
+      moduleData = moduleTemplateData,
+      activityClass = activityClass,
+      packageName = packageName,
+      isLauncher = isLauncher,
+      hasNoActionBar = true,
+      generateActivityTitle = true,
+      isResizeable = true,
   )
   generateNoActionBarStyles(
-    baseFeatureResOut = moduleTemplateData.baseFeature?.resDir,
-    resDir = moduleTemplateData.resDir,
-    themesData = moduleTemplateData.themesData,
+      baseFeatureResOut = moduleTemplateData.baseFeature?.resDir,
+      resDir = moduleTemplateData.resDir,
+      themesData = moduleTemplateData.themesData,
   )
 
   copy(File("responsive-activity").resolve("drawable"), resOut.resolve("drawable"))
@@ -102,166 +102,197 @@ fun RecipeExecutor.generateResponsiveActivity(
   mergeXml(navigationDrawerMenu(), resOut.resolve("menu/navigation_drawer.xml"))
   mergeXml(overflowMenu(), resOut.resolve("menu/overflow.xml"))
 
-  mergeXml(activityMainXml(appBarMainLayoutName), resOut.resolve("layout/$activityMainLayoutName.xml"))
   mergeXml(
-    activityMainXmlW600dp(appBarMainName = appBarMainLayoutName, navigationHeaderLayoutName = navHeaderLayoutName),
-    resOut.resolve("layout-w600dp/$activityMainLayoutName.xml"),
-  )
-  mergeXml(activityMainXmlW1240dp(appBarMainLayoutName), resOut.resolve("layout-w1240dp/$activityMainLayoutName.xml"))
-  mergeXml(
-    appBarMainXml(
-      activityClass = activityClass,
-      contentMainLayoutName = contentLayoutName,
-      packageName = packageName,
-      themesData = moduleTemplateData.themesData,
-    ),
-    resOut.resolve("layout/$appBarMainLayoutName.xml"),
+      activityMainXml(appBarMainLayoutName),
+      resOut.resolve("layout/$activityMainLayoutName.xml"),
   )
   mergeXml(
-    appBarMainXmlW600dp(
-      activityClass = activityClass,
-      contentMainLayoutName = contentLayoutName,
-      packageName = packageName,
-      themesData = moduleTemplateData.themesData,
-    ),
-    resOut.resolve("layout-w600dp/$appBarMainLayoutName.xml"),
+      activityMainXmlW600dp(
+          appBarMainName = appBarMainLayoutName,
+          navigationHeaderLayoutName = navHeaderLayoutName,
+      ),
+      resOut.resolve("layout-w600dp/$activityMainLayoutName.xml"),
   )
   mergeXml(
-    appBarMainXmlW1240dp(
-      activityClass = activityClass,
-      contentMainLayoutName = contentLayoutName,
-      packageName = packageName,
-      themesData = moduleTemplateData.themesData,
-    ),
-    resOut.resolve("layout-w1240dp/$appBarMainLayoutName.xml"),
+      activityMainXmlW1240dp(appBarMainLayoutName),
+      resOut.resolve("layout-w1240dp/$activityMainLayoutName.xml"),
+  )
+  mergeXml(
+      appBarMainXml(
+          activityClass = activityClass,
+          contentMainLayoutName = contentLayoutName,
+          packageName = packageName,
+          themesData = moduleTemplateData.themesData,
+      ),
+      resOut.resolve("layout/$appBarMainLayoutName.xml"),
+  )
+  mergeXml(
+      appBarMainXmlW600dp(
+          activityClass = activityClass,
+          contentMainLayoutName = contentLayoutName,
+          packageName = packageName,
+          themesData = moduleTemplateData.themesData,
+      ),
+      resOut.resolve("layout-w600dp/$appBarMainLayoutName.xml"),
+  )
+  mergeXml(
+      appBarMainXmlW1240dp(
+          activityClass = activityClass,
+          contentMainLayoutName = contentLayoutName,
+          packageName = packageName,
+          themesData = moduleTemplateData.themesData,
+      ),
+      resOut.resolve("layout-w1240dp/$appBarMainLayoutName.xml"),
   )
 
   // navHostFragmentId needs to be unique, thus appending contentLayoutName since it's
   // guaranteed to be unique
   val navHostFragmentId = "nav_host_fragment_${contentLayoutName}"
   mergeXml(
-    contentMainXml(appBarMainLayoutName = appBarMainLayoutName, navHostFragmentId = navHostFragmentId, navGraphName = navGraphName),
-    resOut.resolve("layout/$contentLayoutName.xml"),
+      contentMainXml(
+          appBarMainLayoutName = appBarMainLayoutName,
+          navHostFragmentId = navHostFragmentId,
+          navGraphName = navGraphName,
+      ),
+      resOut.resolve("layout/$contentLayoutName.xml"),
   )
   mergeXml(
-    contentMainXmlW600dp(appBarMainLayoutName = appBarMainLayoutName, navHostFragmentId = navHostFragmentId, navGraphName = navGraphName),
-    resOut.resolve("layout-w600dp/$contentLayoutName.xml"),
+      contentMainXmlW600dp(
+          appBarMainLayoutName = appBarMainLayoutName,
+          navHostFragmentId = navHostFragmentId,
+          navGraphName = navGraphName,
+      ),
+      resOut.resolve("layout-w600dp/$contentLayoutName.xml"),
   )
   mergeXml(
-    contentMainXmlW1240dp(
-      appBarMainLayoutName = appBarMainLayoutName,
-      navHostFragmentId = navHostFragmentId,
-      navHeaderLayoutName = navHeaderLayoutName,
-    ),
-    resOut.resolve("layout-w1240dp/$contentLayoutName.xml"),
+      contentMainXmlW1240dp(
+          appBarMainLayoutName = appBarMainLayoutName,
+          navHostFragmentId = navHostFragmentId,
+          navHeaderLayoutName = navHeaderLayoutName,
+      ),
+      resOut.resolve("layout-w1240dp/$contentLayoutName.xml"),
   )
-  mergeXml(fragmentTransformXml("TransformFragment"), resOut.resolve("layout/fragment_transform.xml"))
-  mergeXml(fragmentTransformXmlW600dp("TransformFragment"), resOut.resolve("layout-w600dp/fragment_transform.xml"))
+  mergeXml(
+      fragmentTransformXml("TransformFragment"),
+      resOut.resolve("layout/fragment_transform.xml"),
+  )
+  mergeXml(
+      fragmentTransformXmlW600dp("TransformFragment"),
+      resOut.resolve("layout-w600dp/fragment_transform.xml"),
+  )
   mergeXml(itemTransformXml(), resOut.resolve("layout/item_transform.xml"))
   mergeXml(itemTransformXmlW600dp(), resOut.resolve("layout-w600dp/item_transform.xml"))
   mergeXml(
-    navigationDrawerHeaderXml(
-      appCompatVersion = apis.appCompatVersion,
-      targetApi = apis.targetApi.apiLevel,
-      isLibraryProject = moduleTemplateData.isLibrary,
-    ),
-    resOut.resolve("layout/${navHeaderLayoutName}.xml"),
+      navigationDrawerHeaderXml(
+          appCompatVersion = apis.appCompatVersion,
+          targetApi = apis.targetApi.apiLevel,
+          isLibraryProject = moduleTemplateData.isLibrary,
+      ),
+      resOut.resolve("layout/${navHeaderLayoutName}.xml"),
   )
 
   val isViewBindingSupported = moduleTemplateData.viewBindingSupport.isViewBindingSupported()
 
   val ktOrJavaExt = projectTemplateData.language.extension
   save(
-    when (projectTemplateData.language) {
-      Language.Java ->
-        mainActivityJava(
-          packageName = packageName,
-          applicationPackage = moduleTemplateData.projectTemplateData.applicationPackage,
-          activityClass = activityClass,
-          appBarLayoutName = appBarMainLayoutName,
-          contentMainLayoutName = contentLayoutName,
-          layoutName = activityMainLayoutName,
-          navHostFragmentId = navHostFragmentId,
-          isViewBindingSupported = isViewBindingSupported,
-        )
-      Language.Kotlin ->
-        mainActivityKt(
-          packageName = packageName,
-          applicationPackage = moduleTemplateData.projectTemplateData.applicationPackage,
-          activityClass = activityClass,
-          appBarLayoutName = appBarMainLayoutName,
-          contentMainLayoutName = contentLayoutName,
-          layoutName = activityMainLayoutName,
-          navHostFragmentId = navHostFragmentId,
-          isViewBindingSupported = isViewBindingSupported,
-        )
-    },
-    srcOut.resolve("${activityClass}.${ktOrJavaExt}"),
+      when (projectTemplateData.language) {
+        Language.Java ->
+            mainActivityJava(
+                packageName = packageName,
+                applicationPackage = moduleTemplateData.projectTemplateData.applicationPackage,
+                activityClass = activityClass,
+                appBarLayoutName = appBarMainLayoutName,
+                contentMainLayoutName = contentLayoutName,
+                layoutName = activityMainLayoutName,
+                navHostFragmentId = navHostFragmentId,
+                isViewBindingSupported = isViewBindingSupported,
+            )
+        Language.Kotlin ->
+            mainActivityKt(
+                packageName = packageName,
+                applicationPackage = moduleTemplateData.projectTemplateData.applicationPackage,
+                activityClass = activityClass,
+                appBarLayoutName = appBarMainLayoutName,
+                contentMainLayoutName = contentLayoutName,
+                layoutName = activityMainLayoutName,
+                navHostFragmentId = navHostFragmentId,
+                isViewBindingSupported = isViewBindingSupported,
+            )
+      },
+      srcOut.resolve("${activityClass}.${ktOrJavaExt}"),
   )
 
   save(
-    when (projectTemplateData.language) {
-      Language.Java ->
-        transformFragmentJava(
-          packageName = packageName,
-          applicationPackage = moduleTemplateData.projectTemplateData.applicationPackage,
-          fragmentClassName = "TransformFragment",
-          navFragmentPrefix = "transform",
-          navViewModelClass = "TransformViewModel",
-          isViewBindingSupported = isViewBindingSupported,
-        )
-      Language.Kotlin ->
-        transformFragmentKt(
-          packageName = packageName,
-          applicationPackage = moduleTemplateData.projectTemplateData.applicationPackage,
-          fragmentClassName = "TransformFragment",
-          navFragmentPrefix = "transform",
-          navViewModelClass = "TransformViewModel",
-          isViewBindingSupported = isViewBindingSupported,
-        )
-    },
-    srcOut.resolve("ui/transform/TransformFragment.${ktOrJavaExt}"),
+      when (projectTemplateData.language) {
+        Language.Java ->
+            transformFragmentJava(
+                packageName = packageName,
+                applicationPackage = moduleTemplateData.projectTemplateData.applicationPackage,
+                fragmentClassName = "TransformFragment",
+                navFragmentPrefix = "transform",
+                navViewModelClass = "TransformViewModel",
+                isViewBindingSupported = isViewBindingSupported,
+            )
+        Language.Kotlin ->
+            transformFragmentKt(
+                packageName = packageName,
+                applicationPackage = moduleTemplateData.projectTemplateData.applicationPackage,
+                fragmentClassName = "TransformFragment",
+                navFragmentPrefix = "transform",
+                navViewModelClass = "TransformViewModel",
+                isViewBindingSupported = isViewBindingSupported,
+            )
+      },
+      srcOut.resolve("ui/transform/TransformFragment.${ktOrJavaExt}"),
   )
 
   save(
-    when (projectTemplateData.language) {
-      Language.Java ->
-        transformViewModelJava(packageName = packageName, navFragmentPrefix = "transform", navViewModelClass = "TransformViewModel")
-      Language.Kotlin ->
-        transformViewModelKt(packageName = packageName, navFragmentPrefix = "transform", navViewModelClass = "TransformViewModel")
-    },
-    srcOut.resolve("ui/transform/TransformViewModel.${ktOrJavaExt}"),
+      when (projectTemplateData.language) {
+        Language.Java ->
+            transformViewModelJava(
+                packageName = packageName,
+                navFragmentPrefix = "transform",
+                navViewModelClass = "TransformViewModel",
+            )
+        Language.Kotlin ->
+            transformViewModelKt(
+                packageName = packageName,
+                navFragmentPrefix = "transform",
+                navViewModelClass = "TransformViewModel",
+            )
+      },
+      srcOut.resolve("ui/transform/TransformViewModel.${ktOrJavaExt}"),
   )
 
   saveFragmentAndViewModel(
-    resOut = resOut,
-    srcOut = srcOut,
-    language = language,
-    packageName = packageName,
-    applicationPackage = moduleTemplateData.projectTemplateData.applicationPackage,
-    fragmentPrefix = "reflow",
-    useAndroidX = true,
-    isViewBindingSupported = isViewBindingSupported,
+      resOut = resOut,
+      srcOut = srcOut,
+      language = language,
+      packageName = packageName,
+      applicationPackage = moduleTemplateData.projectTemplateData.applicationPackage,
+      fragmentPrefix = "reflow",
+      useAndroidX = true,
+      isViewBindingSupported = isViewBindingSupported,
   )
   saveFragmentAndViewModel(
-    resOut = resOut,
-    srcOut = srcOut,
-    language = language,
-    packageName = packageName,
-    applicationPackage = moduleTemplateData.projectTemplateData.applicationPackage,
-    fragmentPrefix = "slideshow",
-    useAndroidX = true,
-    isViewBindingSupported = isViewBindingSupported,
+      resOut = resOut,
+      srcOut = srcOut,
+      language = language,
+      packageName = packageName,
+      applicationPackage = moduleTemplateData.projectTemplateData.applicationPackage,
+      fragmentPrefix = "slideshow",
+      useAndroidX = true,
+      isViewBindingSupported = isViewBindingSupported,
   )
   saveFragmentAndViewModel(
-    resOut = resOut,
-    srcOut = srcOut,
-    language = language,
-    packageName = packageName,
-    applicationPackage = moduleTemplateData.projectTemplateData.applicationPackage,
-    fragmentPrefix = "settings",
-    useAndroidX = true,
-    isViewBindingSupported = isViewBindingSupported,
+      resOut = resOut,
+      srcOut = srcOut,
+      language = language,
+      packageName = packageName,
+      applicationPackage = moduleTemplateData.projectTemplateData.applicationPackage,
+      fragmentPrefix = "settings",
+      useAndroidX = true,
+      isViewBindingSupported = isViewBindingSupported,
   )
   if (language == Language.Kotlin) {
     setJavaKotlinCompileOptions(true)
@@ -269,7 +300,10 @@ fun RecipeExecutor.generateResponsiveActivity(
   val generateKotlin = language == Language.Kotlin
   navigationDependencies(generateKotlin, true, apis.appCompatVersion)
 
-  save(mobileNavigation(navGraphName, packageName), resOut.resolve("navigation/${navGraphName}.xml"))
+  save(
+      mobileNavigation(navGraphName, packageName),
+      resOut.resolve("navigation/${navGraphName}.xml"),
+  )
   open(resOut.resolve("navigation/${navGraphName}.xml"))
   open(srcOut.resolve("${activityClass}.${language.extension}"))
   open(resOut.resolve("layout/${contentLayoutName}.xml"))

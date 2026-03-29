@@ -7,15 +7,16 @@ import com.android.aaptcompiler.AaptResourceType.STYLEABLE
 import com.android.aaptcompiler.android.ResTableConfig
 import com.android.aaptcompiler.android.ResValue
 import com.android.aaptcompiler.android.ResValue.DataType.INT_BOOLEAN
-import com.itsaky.androidide.layoutlib.resources.ResourceVisibility
 import com.google.common.truth.Truth
+import com.itsaky.androidide.layoutlib.resources.ResourceVisibility
 import org.junit.Test
 
 internal fun getValue(
-  table: ResourceTable,
-  resName: String,
-  config: ConfigDescription = ConfigDescription(),
-  productName: String = ""): Value? {
+    table: ResourceTable,
+    resName: String,
+    config: ConfigDescription = ConfigDescription(),
+    productName: String = "",
+): Value? {
 
   val name = parseResourceName(resName)!!.resourceName
 
@@ -38,32 +39,31 @@ class ResourceTableTest {
     id.source = Source("test.xml", 21)
 
     Truth.assertThat(
-      table.addResource(
-        ResourceName("android", ID, "hey,there"),
-        ConfigDescription(),
-        "",
-        id)).isFalse()
+            table.addResource(ResourceName("android", ID, "hey,there"), ConfigDescription(), "", id)
+        )
+        .isFalse()
 
     Truth.assertThat(
-      table.addResource(
-        ResourceName("android", ID, "hey:there"),
-        ConfigDescription(),
-        "",
-        id)).isFalse()
+            table.addResource(ResourceName("android", ID, "hey:there"), ConfigDescription(), "", id)
+        )
+        .isFalse()
   }
 
   @Test
   fun testAddResourceWithMangledNameHandlesWeirdNames() {
     val table = ResourceTable()
     val id = Id()
-    id.source = Source ("test.xml", 23)
+    id.source = Source("test.xml", 23)
 
     Truth.assertThat(
-      table.addResourceMangled(
-        parseResourceName("android:id/heythere       ")!!.resourceName,
-        ConfigDescription(),
-        "",
-        id)).isTrue()
+            table.addResourceMangled(
+                parseResourceName("android:id/heythere       ")!!.resourceName,
+                ConfigDescription(),
+                "",
+                id,
+            )
+        )
+        .isTrue()
   }
 
   @Test
@@ -74,11 +74,14 @@ class ResourceTableTest {
     id.source = Source("test.xml", 25)
 
     Truth.assertThat(
-      table.addResource(
-        parseResourceName("android:attr/id")!!.resourceName,
-        ConfigDescription(),
-        "",
-        id)).isTrue()
+            table.addResource(
+                parseResourceName("android:attr/id")!!.resourceName,
+                ConfigDescription(),
+                "",
+                id,
+            )
+        )
+        .isTrue()
 
     Truth.assertThat(getValue(table, "android:attr/id")).isNotNull()
   }
@@ -95,10 +98,13 @@ class ResourceTableTest {
 
     Truth.assertThat(
             table.addResource(
-                    ResourceName("", STYLEABLE, "styleable_parent_one"),
-                    ConfigDescription(),
-                    "",
-                    styleableOne)).isTrue()
+                ResourceName("", STYLEABLE, "styleable_parent_one"),
+                ConfigDescription(),
+                "",
+                styleableOne,
+            )
+        )
+        .isTrue()
 
     val styleableTwo = Styleable()
     styleableTwo.entries.add(0, Reference(ResourceName("", ATTR, "child_one")))
@@ -106,10 +112,13 @@ class ResourceTableTest {
 
     Truth.assertThat(
             table.addResource(
-                    ResourceName("", STYLEABLE, "styleable_parent_two"),
-                    ConfigDescription(),
-                    "",
-                    styleableTwo)).isTrue()
+                ResourceName("", STYLEABLE, "styleable_parent_two"),
+                ConfigDescription(),
+                "",
+                styleableTwo,
+            )
+        )
+        .isTrue()
 
     Truth.assertThat(getValue(table, "styleable/styleable_parent_one")).isNotNull()
     Truth.assertThat(getValue(table, "styleable/styleable_parent_two")).isNotNull()
@@ -143,7 +152,9 @@ class ResourceTableTest {
     val table = ResourceTable()
     val config = ConfigDescription()
     val languageConfig =
-      ConfigDescription(ResTableConfig(language = byteArrayOf('p'.code.toByte(), 'l'.code.toByte())))
+        ConfigDescription(
+            ResTableConfig(language = byteArrayOf('p'.code.toByte(), 'l'.code.toByte()))
+        )
 
     val id1 = Id()
     id1.source = Source("test/path/file.xml", 10)
@@ -152,35 +163,42 @@ class ResourceTableTest {
     val id3 = Id()
     id3.source = Source("test/path/file.xml", 14)
     val id4 = Id()
-    id4.source = Source ("test/path/file.xml", 20)
+    id4.source = Source("test/path/file.xml", 20)
 
     Truth.assertThat(
-      table.addResource(
-        parseResourceName("android:attr/layout_width")!!.resourceName,
-        config,
-        "",
-        id1)).isTrue()
+            table.addResource(
+                parseResourceName("android:attr/layout_width")!!.resourceName,
+                config,
+                "",
+                id1,
+            )
+        )
+        .isTrue()
 
     Truth.assertThat(
-      table.addResource(
-        parseResourceName("android:attr/id")!!.resourceName,
-          config,
-          "",
-          id2)).isTrue()
+            table.addResource(parseResourceName("android:attr/id")!!.resourceName, config, "", id2)
+        )
+        .isTrue()
 
     Truth.assertThat(
-      table.addResource(
-        parseResourceName("android:string/ok")!!.resourceName,
-        config,
-        "",
-        id3)).isTrue()
+            table.addResource(
+                parseResourceName("android:string/ok")!!.resourceName,
+                config,
+                "",
+                id3,
+            )
+        )
+        .isTrue()
 
     Truth.assertThat(
-      table.addResource(
-        parseResourceName("android:string/ok")!!.resourceName,
-        languageConfig,
-        "",
-        id4)).isTrue()
+            table.addResource(
+                parseResourceName("android:string/ok")!!.resourceName,
+                languageConfig,
+                "",
+                id4,
+            )
+        )
+        .isTrue()
 
     Truth.assertThat(getValue(table, "android:attr/layout_width")).isNotNull()
     Truth.assertThat(getValue(table, "android:attr/id")).isNotNull()
@@ -199,22 +217,28 @@ class ResourceTableTest {
     strongAttr.weak = false
 
     Truth.assertThat(
-      table.addResource(
-        parseResourceName("android:attr/foo")!!.resourceName,
-        config,
-        "",
-        weakAttr)).isTrue()
+            table.addResource(
+                parseResourceName("android:attr/foo")!!.resourceName,
+                config,
+                "",
+                weakAttr,
+            )
+        )
+        .isTrue()
 
     var attr = getValue(table, "android:attr/foo") as? AttributeResource
     Truth.assertThat(attr).isNotNull()
     Truth.assertThat(attr!!.weak).isTrue()
 
     Truth.assertThat(
-      table.addResource(
-        parseResourceName("android:attr/foo")!!.resourceName,
-        config,
-        "",
-        strongAttr)).isTrue()
+            table.addResource(
+                parseResourceName("android:attr/foo")!!.resourceName,
+                config,
+                "",
+                strongAttr,
+            )
+        )
+        .isTrue()
 
     attr = getValue(table, "android:attr/foo") as? AttributeResource
     Truth.assertThat(attr).isNotNull()
@@ -229,9 +253,7 @@ class ResourceTableTest {
     val name = parseResourceName("android:attr/foo")!!.resourceName
     val weak1 = AttributeResource(FormatFlags.STRING_VALUE)
     weak1.weak = true
-    val weak2 = AttributeResource(
-      FormatFlags.STRING_VALUE or
-        FormatFlags.REFERENCE_VALUE)
+    val weak2 = AttributeResource(FormatFlags.STRING_VALUE or FormatFlags.REFERENCE_VALUE)
     weak2.weak = true
 
     Truth.assertThat(table.addResource(name, config, "", weak1)).isTrue()
@@ -262,10 +284,11 @@ class ResourceTableTest {
   }
 
   private fun visibilityOfResourceTest(
-    table: ResourceTable,
-    name: ResourceName,
-    expected: ResourceVisibility,
-    expectedComment: String) {
+      table: ResourceTable,
+      name: ResourceName,
+      expected: ResourceVisibility,
+      expectedComment: String,
+  ) {
 
     val result = table.findResource(name)
     Truth.assertThat(result).isNotNull()
@@ -292,7 +315,6 @@ class ResourceTableTest {
     // Public visibility clashes with previously defined private visibility.
     visibility = Visibility(comment = "public", level = ResourceVisibility.PUBLIC)
     Truth.assertThat(table.setVisibility(name, visibility)).isFalse()
-
   }
 
   @Test
@@ -338,14 +360,15 @@ class ResourceTableTest {
   fun testSetOverlayable() {
     val table = ResourceTable()
     val overlayable =
-      Overlayable("Name", "overlay://theme", Source("res/values/overlayable.xml", 40))
+        Overlayable("Name", "overlay://theme", Source("res/values/overlayable.xml", 40))
 
-    val overlayableItem = OverlayableItem(
-      overlayable,
-      OverlayableItem.Policy.PRODUCT or OverlayableItem.Policy.VENDOR,
-      "comment",
-      Source("res/values/overlayable.xml", 42)
-    )
+    val overlayableItem =
+        OverlayableItem(
+            overlayable,
+            OverlayableItem.Policy.PRODUCT or OverlayableItem.Policy.VENDOR,
+            "comment",
+            Source("res/values/overlayable.xml", 42),
+        )
 
     val name = parseResourceName("android:string/foo")!!.resourceName
     table.setOverlayable(name, overlayableItem)
@@ -358,10 +381,10 @@ class ResourceTableTest {
     Truth.assertThat(entryOverlayable.overlayable.name).isEqualTo("Name")
     Truth.assertThat(entryOverlayable.overlayable.actor).isEqualTo("overlay://theme")
     Truth.assertThat(entryOverlayable.overlayable.source.path)
-      .isEqualTo("res/values/overlayable.xml")
+        .isEqualTo("res/values/overlayable.xml")
     Truth.assertThat(entryOverlayable.overlayable.source.line).isEqualTo(40)
     Truth.assertThat(entryOverlayable.policies)
-      .isEqualTo(OverlayableItem.Policy.PRODUCT or OverlayableItem.Policy.VENDOR)
+        .isEqualTo(OverlayableItem.Policy.PRODUCT or OverlayableItem.Policy.VENDOR)
     Truth.assertThat(entryOverlayable.comment).isEqualTo("comment")
     Truth.assertThat(entryOverlayable.source.path).isEqualTo("res/values/overlayable.xml")
     Truth.assertThat(entryOverlayable.source.line).isEqualTo(42)
@@ -436,29 +459,43 @@ class ResourceTableTest {
     val name = parseResourceName("android:bool/foo")!!.resourceName
 
     Truth.assertThat(
-      table.addResourceWithId(
-        name,
-        0x7f0100ff,
-        ConfigDescription(),
-        "",
-        BinaryPrimitive(ResValue(INT_BOOLEAN, 0))
-      )).isTrue()
+            table.addResourceWithId(
+                name,
+                0x7f0100ff,
+                ConfigDescription(),
+                "",
+                BinaryPrimitive(ResValue(INT_BOOLEAN, 0)),
+            )
+        )
+        .isTrue()
     Truth.assertThat(
-      table.addResourceWithId(
-        name,
-        0x7f010100,
-        ConfigDescription(),
-        "",
-        BinaryPrimitive(ResValue(INT_BOOLEAN, 1))
-      )).isTrue()
+            table.addResourceWithId(
+                name,
+                0x7f010100,
+                ConfigDescription(),
+                "",
+                BinaryPrimitive(ResValue(INT_BOOLEAN, 1)),
+            )
+        )
+        .isTrue()
 
     Truth.assertThat(
-      table.setVisibilityWithId(
-        name, Visibility(level = ResourceVisibility.PUBLIC), 0x7f0100ff)).isTrue()
+            table.setVisibilityWithId(
+                name,
+                Visibility(level = ResourceVisibility.PUBLIC),
+                0x7f0100ff,
+            )
+        )
+        .isTrue()
 
     Truth.assertThat(
-      table.setVisibilityWithId(
-        name, Visibility(level = ResourceVisibility.PRIVATE), 0x7f010100)).isTrue()
+            table.setVisibilityWithId(
+                name,
+                Visibility(level = ResourceVisibility.PRIVATE),
+                0x7f010100,
+            )
+        )
+        .isTrue()
 
     val tablePackage = table.findPackageById(0x7f)
     Truth.assertThat(tablePackage).isNotNull()

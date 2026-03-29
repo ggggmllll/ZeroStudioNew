@@ -29,7 +29,7 @@ import org.xmlpull.v1.XmlPullParser
  * @author Akash Yadav
  */
 open class LayerListParser protected constructor(parser: XmlPullParser?, minDepth: Int) :
-  IDrawableParser(parser, minDepth) {
+    IDrawableParser(parser, minDepth) {
   @Throws(Exception::class)
   public override fun parseDrawable(context: Context): Drawable {
     val layer = LayerDrawable(arrayOfNulls(0))
@@ -94,12 +94,12 @@ open class LayerListParser protected constructor(parser: XmlPullParser?, minDept
   }
 
   private fun addToLayer(
-    layer: LayerDrawable,
-    drawable: Drawable,
-    left: Int,
-    top: Int,
-    right: Int,
-    bottom: Int
+      layer: LayerDrawable,
+      drawable: Drawable,
+      left: Int,
+      top: Int,
+      right: Int,
+      bottom: Int,
   ) {
     val index = layer.addLayer(drawable)
     layer.setLayerInset(index, left, top, right, bottom)

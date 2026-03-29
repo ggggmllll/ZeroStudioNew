@@ -19,30 +19,33 @@ package com.itsaky.androidide.adapters.onboarding
 
 import android.content.res.ColorStateList
 import android.view.LayoutInflater
-import android.view.ViewGroup
 import android.view.View
+import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.blankj.utilcode.util.SizeUtils
 import com.google.android.material.button.MaterialButton
-import com.itsaky.androidide.resources.R
 import com.itsaky.androidide.databinding.LayoutOnboardingPermissionItemBinding
 import com.itsaky.androidide.models.OnboardingPermissionItem
+import com.itsaky.androidide.resources.R
 
-/**
- * @author Akash Yadav
- */
-class OnboardingPermissionsAdapter(private val permissions: List<OnboardingPermissionItem>,
-  private val requestPermission: (String) -> Unit) :
-  RecyclerView.Adapter<OnboardingPermissionsAdapter.ViewHolder>() {
+/** @author Akash Yadav */
+class OnboardingPermissionsAdapter(
+    private val permissions: List<OnboardingPermissionItem>,
+    private val requestPermission: (String) -> Unit,
+) : RecyclerView.Adapter<OnboardingPermissionsAdapter.ViewHolder>() {
 
   class ViewHolder(val binding: LayoutOnboardingPermissionItemBinding) :
-    RecyclerView.ViewHolder(binding.root)
+      RecyclerView.ViewHolder(binding.root)
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
     return ViewHolder(
-      LayoutOnboardingPermissionItemBinding.inflate(LayoutInflater.from(parent.context), parent,
-        false))
+        LayoutOnboardingPermissionItemBinding.inflate(
+            LayoutInflater.from(parent.context),
+            parent,
+            false,
+        )
+    )
   }
 
   override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -54,33 +57,30 @@ class OnboardingPermissionsAdapter(private val permissions: List<OnboardingPermi
       description.setText(permission.description)
     }
 
-    val clickListener = View.OnClickListener {
-        requestPermission(permission.permission)
-    }
+    val clickListener = View.OnClickListener { requestPermission(permission.permission) }
 
     binding.grantButton.setOnClickListener(clickListener)
     holder.itemView.setOnClickListener(clickListener)
 
     if (permission.isGranted) {
-        holder.itemView.isClickable = false
-        binding.grantButton.apply {
-            isEnabled = false
-            text = ""
-            icon = ContextCompat.getDrawable(binding.root.context, R.drawable.ic_ok)
-            iconTint = ColorStateList.valueOf(
-                ContextCompat.getColor(binding.root.context, R.color.green_500)
-            )
-            iconGravity = MaterialButton.ICON_GRAVITY_TEXT_TOP
-            iconPadding = 0
-            iconSize = SizeUtils.dp2px(28f)
-        }
+      holder.itemView.isClickable = false
+      binding.grantButton.apply {
+        isEnabled = false
+        text = ""
+        icon = ContextCompat.getDrawable(binding.root.context, R.drawable.ic_ok)
+        iconTint =
+            ColorStateList.valueOf(ContextCompat.getColor(binding.root.context, R.color.green_500))
+        iconGravity = MaterialButton.ICON_GRAVITY_TEXT_TOP
+        iconPadding = 0
+        iconSize = SizeUtils.dp2px(28f)
+      }
     } else {
-        holder.itemView.isClickable = true
-        binding.grantButton.apply {
-            isEnabled = true
-            setText(R.string.title_grant)
-            icon = null
-        }
+      holder.itemView.isClickable = true
+      binding.grantButton.apply {
+        isEnabled = true
+        setText(R.string.title_grant)
+        icon = null
+      }
     }
   }
 

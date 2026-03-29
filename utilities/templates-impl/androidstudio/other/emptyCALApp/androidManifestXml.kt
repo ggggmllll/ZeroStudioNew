@@ -16,7 +16,8 @@
 package com.itsaky.androidide.templates.impl.androidstudio.other.emptyCalApp
 
 fun androidManifestXml(carAppServiceName: String, packageName: String): String {
-  // Note: The service name is relative to the package name, so we don't need to provide the full path.
+  // Note: The service name is relative to the package name, so we don't need to provide the full
+  // path.
   return """
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application>

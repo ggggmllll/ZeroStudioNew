@@ -17,7 +17,7 @@
 package com.itsaky.androidide.templates.impl.androidstudio.other.appWidget.res.values
 
 fun dimensXml() =
-  """
+    """
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 

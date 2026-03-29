@@ -17,9 +17,7 @@
 
 package com.itsaky.androidide.lsp.java.utils
 
-/**
- * @author Akash Yadav
- */
+/** @author Akash Yadav */
 open class JavaType {
 
   var name: String? = null
@@ -28,9 +26,7 @@ open class JavaType {
 
   var arrayDims: Int = 0
 
-  /**
-   * Returns the internal representation of the type.
-   */
+  /** Returns the internal representation of the type. */
   fun internalForm(): String {
     val sb = StringBuilder()
     if (arrayDims > 0) {
@@ -50,41 +46,38 @@ open class JavaType {
     return sb.toString()
   }
 
-  /**
-   * Returns `true` if the type represents a primitive type.
-   */
+  /** Returns `true` if the type represents a primitive type. */
   fun isPrimitive(): Boolean {
     return when (kind) {
-      KIND_BOOLEAN, KIND_BYTE, KIND_CHAR, KIND_DOUBLE, KIND_FLOAT, KIND_INT, KIND_LONG, KIND_SHORT -> true
+      KIND_BOOLEAN,
+      KIND_BYTE,
+      KIND_CHAR,
+      KIND_DOUBLE,
+      KIND_FLOAT,
+      KIND_INT,
+      KIND_LONG,
+      KIND_SHORT -> true
 
       else -> false
     }
   }
 
-  /**
-   * Returns `true` if the type represents a void type.
-   */
+  /** Returns `true` if the type represents a void type. */
   fun isVoid(): Boolean {
     return kind == KIND_VOID
   }
 
-  /**
-   * Returns `true` if the type represents the `java.lang.String` type.
-   */
+  /** Returns `true` if the type represents the `java.lang.String` type. */
   fun isStringType(): Boolean {
     return name == STRING.name
   }
 
-  /**
-   * Returns `true` if the type represents the `java.lang.Object` type.
-   */
+  /** Returns `true` if the type represents the `java.lang.Object` type. */
   fun isObjectType(): Boolean {
     return name == OBJECT.name
   }
 
-  /**
-   * Returns `true` if the type represents the `java.lang.Class` type.
-   */
+  /** Returns `true` if the type represents the `java.lang.Class` type. */
   fun isClassType(): Boolean {
     return name == CLASS.name
   }
@@ -134,69 +127,59 @@ open class JavaType {
     const val TYPE_SHORT = 'S'
     const val TYPE_VOID = 'V'
 
-    @JvmStatic
-    val BOOLEAN = newInstance(name = TYPE_BOOLEAN, kind = KIND_BOOLEAN)
+    @JvmStatic val BOOLEAN = newInstance(name = TYPE_BOOLEAN, kind = KIND_BOOLEAN)
+
+    @JvmStatic val BYTE = newInstance(name = TYPE_BYTE, kind = KIND_BYTE)
+
+    @JvmStatic val CHAR = newInstance(name = TYPE_CHAR, kind = KIND_CHAR)
+
+    @JvmStatic val DOUBLE = newInstance(name = TYPE_DOUBLE, kind = KIND_DOUBLE)
+
+    @JvmStatic val FLOAT = newInstance(name = TYPE_FLOAT, kind = KIND_FLOAT)
+
+    @JvmStatic val INT = newInstance(name = TYPE_INT, kind = KIND_INT)
+
+    @JvmStatic val LONG = newInstance(name = TYPE_LONG, kind = KIND_LONG)
+
+    @JvmStatic val SHORT = newInstance(name = TYPE_SHORT, kind = KIND_SHORT)
+
+    @JvmStatic val VOID = newInstance(name = TYPE_VOID, kind = KIND_VOID)
+
+    @JvmStatic val STRING = newInstance(name = "java/lang/String", kind = KIND_REF)
+
+    @JvmStatic val OBJECT = newInstance(name = "java/lang/Object", kind = KIND_REF)
+
+    @JvmStatic val CLASS = newInstance(name = "java/lang/Class", kind = KIND_REF)
 
     @JvmStatic
-    val BYTE = newInstance(name = TYPE_BYTE, kind = KIND_BYTE)
+    fun kindForType(type: Char) =
+        when (type) {
+          TYPE_BOOLEAN -> KIND_BOOLEAN
+          TYPE_BYTE -> KIND_BYTE
+          TYPE_CHAR -> KIND_CHAR
+          TYPE_DOUBLE -> KIND_DOUBLE
+          TYPE_FLOAT -> KIND_FLOAT
+          TYPE_INT -> KIND_INT
+          TYPE_LONG -> KIND_LONG
+          TYPE_SHORT -> KIND_SHORT
+          TYPE_VOID -> KIND_VOID
+          else -> KIND_UNKNOWN
+        }
 
     @JvmStatic
-    val CHAR = newInstance(name = TYPE_CHAR, kind = KIND_CHAR)
-
-    @JvmStatic
-    val DOUBLE = newInstance(name = TYPE_DOUBLE, kind = KIND_DOUBLE)
-
-    @JvmStatic
-    val FLOAT = newInstance(name = TYPE_FLOAT, kind = KIND_FLOAT)
-
-    @JvmStatic
-    val INT = newInstance(name = TYPE_INT, kind = KIND_INT)
-
-    @JvmStatic
-    val LONG = newInstance(name = TYPE_LONG, kind = KIND_LONG)
-
-    @JvmStatic
-    val SHORT = newInstance(name = TYPE_SHORT, kind = KIND_SHORT)
-
-    @JvmStatic
-    val VOID = newInstance(name = TYPE_VOID, kind = KIND_VOID)
-
-    @JvmStatic
-    val STRING = newInstance(name = "java/lang/String", kind = KIND_REF)
-
-    @JvmStatic
-    val OBJECT = newInstance(name = "java/lang/Object", kind = KIND_REF)
-
-    @JvmStatic
-    val CLASS = newInstance(name = "java/lang/Class", kind = KIND_REF)
-
-    @JvmStatic
-    fun kindForType(type: Char) = when (type) {
-      TYPE_BOOLEAN -> KIND_BOOLEAN
-      TYPE_BYTE -> KIND_BYTE
-      TYPE_CHAR -> KIND_CHAR
-      TYPE_DOUBLE -> KIND_DOUBLE
-      TYPE_FLOAT -> KIND_FLOAT
-      TYPE_INT -> KIND_INT
-      TYPE_LONG -> KIND_LONG
-      TYPE_SHORT -> KIND_SHORT
-      TYPE_VOID -> KIND_VOID
-      else -> KIND_UNKNOWN
-    }
-
-    @JvmStatic
-    fun typeForKind(kind: Int) = when (kind) {
-      KIND_BOOLEAN -> TYPE_BOOLEAN
-      KIND_BYTE -> TYPE_BYTE
-      KIND_CHAR -> TYPE_CHAR
-      KIND_DOUBLE -> TYPE_DOUBLE
-      KIND_FLOAT -> TYPE_FLOAT
-      KIND_INT -> TYPE_INT
-      KIND_LONG -> TYPE_LONG
-      KIND_SHORT -> TYPE_SHORT
-      KIND_VOID -> TYPE_VOID
-      else -> TYPE_VOID
-    }
+    fun typeForKind(kind: Int) =
+        when (kind) {
+          KIND_BOOLEAN -> TYPE_BOOLEAN
+          KIND_BYTE -> TYPE_BYTE
+          KIND_CHAR -> TYPE_CHAR
+          KIND_DOUBLE -> TYPE_DOUBLE
+          KIND_FLOAT -> TYPE_FLOAT
+          KIND_INT -> TYPE_INT
+          KIND_LONG -> TYPE_LONG
+          KIND_SHORT -> TYPE_SHORT
+          KIND_VOID -> TYPE_VOID
+          else -> TYPE_VOID
+        }
 
     @JvmStatic
     fun primitiveFor(char: Char): JavaType? {

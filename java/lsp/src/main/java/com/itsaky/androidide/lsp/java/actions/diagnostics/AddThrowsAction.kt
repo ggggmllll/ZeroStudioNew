@@ -63,19 +63,20 @@ class AddThrowsAction : BaseJavaCodeAction() {
   override suspend fun execAction(data: ActionData): Any {
     val diagnostic = data[DiagnosticItem::class.java]!!
     val compiler =
-      JavaCompilerProvider.get(
-        IProjectManager.getInstance().getWorkspace()?.findModuleForFile(data.requireFile(), false)
-          ?: return Any()
-      )
+        JavaCompilerProvider.get(
+            IProjectManager.getInstance()
+                .getWorkspace()
+                ?.findModuleForFile(data.requireFile(), false) ?: return Any()
+        )
     val file = data.requirePath()
     return compiler.compile(file).get { task ->
       val needsThrow = CodeActionUtils.findMethod(task, diagnostic.range)
       val exceptionName = CodeActionUtils.extractExceptionName(diagnostic.message)
       return@get AddException(
-        needsThrow.className,
-        needsThrow.methodName,
-        needsThrow.erasedParameterTypes,
-        exceptionName
+          needsThrow.className,
+          needsThrow.methodName,
+          needsThrow.erasedParameterTypes,
+          exceptionName,
       )
     }
   }

@@ -24,7 +24,8 @@ import android.os.Bundle
  * Arguments passed to a connection observer from [LogReceiverImpl].
  *
  * @property clientId The unique identifier for the client that was connected or disconnected.
- * @property totalConnections The total number of connections after this client was connected/disconnected.
+ * @property totalConnections The total number of connections after this client was
+ *   connected/disconnected.
  * @author Akash Yadav
  */
 data class ConnectionObserverParams(val clientId: String, val totalConnections: Int) {

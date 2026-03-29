@@ -24,7 +24,6 @@ import com.itsaky.androidide.lsp.util.Logger
 import com.tang.vscode.LuaLanguageClient
 import com.tang.vscode.LuaLanguageServer
 import io.github.rosemoe.sora.lsp.client.connection.StreamConnectionProvider
-import org.eclipse.lsp4j.jsonrpc.Launcher
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
@@ -34,98 +33,103 @@ import java.io.PipedOutputStream
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.Future
+import org.eclipse.lsp4j.jsonrpc.Launcher
 
 /**
  * An implementation of [BaseLspServer] for Lua, porting the logic from `LspLanguageServerService`.
  *
  * This server runs the `com.tang.vscode.LuaLanguageServer` directly within the application process.
- * It uses in-memory pipes to communicate, avoiding the overhead of local sockets.
- * Initialization options, such as workspace library paths, are injected dynamically at runtime.
+ * It uses in-memory pipes to communicate, avoiding the overhead of local sockets. Initialization
+ * options, such as workspace library paths, are injected dynamically at runtime.
  *
  * @author android_zero
  */
 class LuaServer : BaseLspServer() {
 
-    override val id: String = "lua-lsp"
-    override val languageName: String = "Lua"
-    override val serverName: String = "sumneko-lua"
-    override val supportedExtensions: List<String> = listOf("lua", "luac")
+  override val id: String = "lua-lsp"
+  override val languageName: String = "Lua"
+  override val serverName: String = "sumneko-lua"
+  override val supportedExtensions: List<String> = listOf("lua", "luac")
 
-    private val LOG = Logger.instance("LuaServer")
+  private val LOG = Logger.instance("LuaServer")
 
-    override fun isInstalled(context: Context): Boolean = true
+  override fun isInstalled(context: Context): Boolean = true
 
-    override fun install(context: Context) {
-        // No installation needed as the server class is part of the APK code
+  override fun install(context: Context) {
+    // No installation needed as the server class is part of the APK code
+  }
+
+  override fun getConnectionFactory(): LspConnectionFactory {
+    return LspConnectionFactory { _ -> InProcessLuaStreamProvider() }
+  }
+
+  override fun isSupported(file: File): Boolean {
+    return supportedExtensions.contains(file.extension.lowercase())
+  }
+
+  /**
+   * A connection provider that pipes input/output directly to the Java-based LuaLanguageServer
+   * instance.
+   */
+  private inner class InProcessLuaStreamProvider : StreamConnectionProvider {
+    private var serverThread: Future<*>? = null
+    private val executorService: ExecutorService = Executors.newCachedThreadPool()
+
+    private val clientOutputStream = PipedOutputStream()
+    private val serverInputStream = PipedInputStream()
+
+    private val serverOutputStream = PipedOutputStream()
+    private val clientInputStream = PipedInputStream()
+
+    init {
+      try {
+        serverInputStream.connect(clientOutputStream)
+        clientInputStream.connect(serverOutputStream)
+      } catch (e: IOException) {
+        LOG.error("Failed to create pipes for Lua LSP", e)
+      }
     }
 
-    override fun getConnectionFactory(): LspConnectionFactory {
-        return LspConnectionFactory { _ ->
-            InProcessLuaStreamProvider()
+    override fun start() {
+      serverThread = executorService.submit {
+        try {
+          LOG.info("Starting LuaLanguageServer (In-Process)...")
+          val server = LuaLanguageServer()
+
+          val launcher =
+              Launcher.createLauncher<LuaLanguageClient>(
+                  server,
+                  LuaLanguageClient::class.java,
+                  serverInputStream as InputStream,
+                  serverOutputStream as OutputStream,
+              )
+
+          val remoteProxy = launcher.remoteProxy
+          server.connect(remoteProxy)
+
+          launcher.startListening().get()
+        } catch (e: Exception) {
+          LOG.error("LuaLanguageServer crashed or stopped", e)
         }
+      }
     }
 
-    override fun isSupported(file: File): Boolean {
-        return supportedExtensions.contains(file.extension.lowercase())
+    override val inputStream: InputStream
+      get() = clientInputStream
+
+    override val outputStream: OutputStream
+      get() = clientOutputStream
+
+    override fun close() {
+      serverThread?.cancel(true)
+      try {
+        clientInputStream.close()
+        clientOutputStream.close()
+        serverInputStream.close()
+        serverOutputStream.close()
+      } catch (e: IOException) {
+        /* Ignore */
+      }
     }
-
-    /**
-     * A connection provider that pipes input/output directly to the Java-based LuaLanguageServer instance.
-     */
-    private inner class InProcessLuaStreamProvider : StreamConnectionProvider {
-        private var serverThread: Future<*>? = null
-        private val executorService: ExecutorService = Executors.newCachedThreadPool()
-        
-        private val clientOutputStream = PipedOutputStream()
-        private val serverInputStream = PipedInputStream()
-        
-        private val serverOutputStream = PipedOutputStream()
-        private val clientInputStream = PipedInputStream()
-        
-        init {
-            try {
-                serverInputStream.connect(clientOutputStream)
-                clientInputStream.connect(serverOutputStream)
-            } catch (e: IOException) {
-                LOG.error("Failed to create pipes for Lua LSP", e)
-            }
-        }
-
-        override fun start() {
-            serverThread = executorService.submit {
-                try {
-                    LOG.info("Starting LuaLanguageServer (In-Process)...")
-                    val server = LuaLanguageServer()
-                    
-                    val launcher = Launcher.createLauncher<LuaLanguageClient>(
-                        server,
-                        LuaLanguageClient::class.java,
-                        serverInputStream as InputStream,
-                        serverOutputStream as OutputStream
-                    )
-                    
-                    val remoteProxy = launcher.remoteProxy
-                    server.connect(remoteProxy)
-                    
-                    launcher.startListening().get()
-                    
-                } catch (e: Exception) {
-                    LOG.error("LuaLanguageServer crashed or stopped", e)
-                }
-            }
-        }
-
-        override val inputStream: InputStream get() = clientInputStream
-        override val outputStream: OutputStream get() = clientOutputStream
-
-        override fun close() {
-            serverThread?.cancel(true)
-            try {
-                clientInputStream.close()
-                clientOutputStream.close()
-                serverInputStream.close()
-                serverOutputStream.close()
-            } catch (e: IOException) { /* Ignore */ }
-        }
-    }
+  }
 }

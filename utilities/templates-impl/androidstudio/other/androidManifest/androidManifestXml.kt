@@ -16,7 +16,7 @@
 package com.itsaky.androidide.templates.impl.androidstudio.other.androidManifest
 
 fun androidManifestXml() =
-  """
+    """
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <application>

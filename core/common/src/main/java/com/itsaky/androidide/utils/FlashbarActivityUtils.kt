@@ -17,6 +17,7 @@
 
 package com.itsaky.androidide.utils
 
+// import com.itsaky.androidide.common.R
 import android.app.Activity
 import android.graphics.Color
 import android.graphics.PorterDuff
@@ -29,11 +30,10 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.FloatRange
 import androidx.annotation.StringRes
 import com.blankj.utilcode.util.ThreadUtils
+import com.google.android.material.R.attr
 import com.itsaky.androidide.flashbar.Flashbar
 import com.itsaky.androidide.flashbar.Flashbar.Gravity.TOP
-// import com.itsaky.androidide.common.R
 import com.itsaky.androidide.resources.R
-import com.google.android.material.R.attr
 import com.itsaky.androidide.utils.FlashType.ERROR
 import com.itsaky.androidide.utils.FlashType.INFO
 import com.itsaky.androidide.utils.FlashType.SUCCESS
@@ -48,16 +48,16 @@ const val COLOR_INFO = Color.DKGRAY
 
 @JvmOverloads
 fun Activity.flashbarBuilder(
-  gravity: Flashbar.Gravity = TOP,
-  duration: Long = DURATION_SHORT,
-  backgroundColor: Int = resolveAttr(attr.colorPrimaryContainer),
-  messageColor: Int = resolveAttr(attr.colorOnPrimaryContainer)
+    gravity: Flashbar.Gravity = TOP,
+    duration: Long = DURATION_SHORT,
+    backgroundColor: Int = resolveAttr(attr.colorPrimaryContainer),
+    messageColor: Int = resolveAttr(attr.colorOnPrimaryContainer),
 ): Flashbar.Builder {
   return Flashbar.Builder(this)
-    .gravity(gravity)
-    .duration(duration)
-    .backgroundColor(backgroundColor)
-    .messageColor(messageColor)
+      .gravity(gravity)
+      .duration(duration)
+      .backgroundColor(backgroundColor)
+      .messageColor(messageColor)
 }
 
 fun Activity.flashMessage(msg: String?, type: FlashType) {
@@ -106,11 +106,12 @@ fun Activity.flashInfo(@StringRes msg: Int) {
 
 @JvmOverloads
 fun <R : Any?> Activity.flashProgress(
-  configure: (Flashbar.Builder.() -> Unit)? = null,
-  action: (Flashbar) -> R
-) : R {
-  val builder = flashbarBuilder(gravity = TOP, duration = DURATION_INDEFINITE)
-    .showProgress(Flashbar.ProgressPosition.LEFT)
+    configure: (Flashbar.Builder.() -> Unit)? = null,
+    action: (Flashbar) -> R,
+): R {
+  val builder =
+      flashbarBuilder(gravity = TOP, duration = DURATION_INDEFINITE)
+          .showProgress(Flashbar.ProgressPosition.LEFT)
 
   configure?.invoke(builder)
 
@@ -145,11 +146,11 @@ fun Flashbar.Builder.infoIcon(): Flashbar.Builder {
 }
 
 fun Flashbar.Builder.withIcon(
-  @DrawableRes icon: Int,
-  @FloatRange(from = 0.0, to = 1.0) scale: Float = 1.0f,
-  @ColorInt colorFilter: Int = -1,
-  colorFilterMode: PorterDuff.Mode = SRC_ATOP,
-  scaleType: ScaleType = FIT_CENTER
+    @DrawableRes icon: Int,
+    @FloatRange(from = 0.0, to = 1.0) scale: Float = 1.0f,
+    @ColorInt colorFilter: Int = -1,
+    colorFilterMode: PorterDuff.Mode = SRC_ATOP,
+    scaleType: ScaleType = FIT_CENTER,
 ): Flashbar.Builder {
   return showIcon(scale = scale, scaleType = scaleType).icon(icon).also {
     if (colorFilter != -1) {

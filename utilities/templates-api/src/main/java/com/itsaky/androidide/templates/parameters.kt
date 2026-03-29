@@ -26,7 +26,6 @@ import com.itsaky.androidide.templates.ParameterConstraint.PACKAGE
 import com.itsaky.androidide.templates.R.string
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
-import com.itsaky.androidide.preferences.internal.ProjectsPreferences
 
 enum class ParameterConstraint {
 
@@ -82,10 +81,8 @@ abstract class Parameter<T>(
     }
 
   var onVisibilityChanged: ((Boolean) -> Unit)? = null
-  
-  /**
-   * The value of this parameter.
-   */
+
+  /** The value of this parameter. */
   val value: T
     get() = _value ?: default
 
@@ -184,9 +181,7 @@ abstract class Parameter<T>(
     }
   }
 
-  /**
-   * An [Observer] observes changes to values of a [Parameter].
-   */
+  /** An [Observer] observes changes to values of a [Parameter]. */
   fun interface Observer<T> {
 
     /**
@@ -375,6 +370,7 @@ inline fun <T : Enum<*>> enumParameter(
 
 /**
  * 获取项目名称输入框参数
+ *
  * @author android_zero 优化：支持从偏好设置读取默认值
  */
 inline fun projectNameParameter(crossinline configure: StringParameterBuilder.() -> Unit = {}) =
@@ -386,9 +382,9 @@ inline fun projectNameParameter(crossinline configure: StringParameterBuilder.()
       configure()
     }
 
-
 /**
  * 获取包名输入框参数
+ *
  * @author android_zero 优化：支持从偏好设置读取默认值
  */
 inline fun packageNameParameter(crossinline configure: StringParameterBuilder.() -> Unit = {}) =
@@ -415,46 +411,48 @@ inline fun projectLanguageParameter(
     }
 
 enum class NdkVersion(val version: String) {
-    R38B("30.0.14904198-beta1"),
-    R29C("29.0.14206865"),
-    R29B("29.0.14033849"),
-    R29A("29.0.13113456-bate1"),
-    R28A1("28.2.13676358"),
-    R28A2("28.2.13676358"),
-    R27B("27.3.13750724"),
-    R27A("27.1.12297006"),
-    R26("26.3.11579264"),
-    R25("25.2.9519653"),
-    R24("24.0.8215888"),
-    R23("23.2.8568313"),
-    R22("22.1.7171670"),
-    R21("21.4.7075529"),
-    R20("20.1.5948944"),
-    R19("19.2.5345600"),
-    R18("18.1.50630455529"),
-    R17("17.2.4988734");
-    fun displayName(): String = version
+  R38B("30.0.14904198-beta1"),
+  R29C("29.0.14206865"),
+  R29B("29.0.14033849"),
+  R29A("29.0.13113456-bate1"),
+  R28A1("28.2.13676358"),
+  R28A2("28.2.13676358"),
+  R27B("27.3.13750724"),
+  R27A("27.1.12297006"),
+  R26("26.3.11579264"),
+  R25("25.2.9519653"),
+  R24("24.0.8215888"),
+  R23("23.2.8568313"),
+  R22("22.1.7171670"),
+  R21("21.4.7075529"),
+  R20("20.1.5948944"),
+  R19("19.2.5345600"),
+  R18("18.1.50630455529"),
+  R17("17.2.4988734");
+
+  fun displayName(): String = version
 }
 
 enum class CmakeVersion(val version: String) {
-    V4_1_2("4.1.2"), 
-    V4_1_1("4.1.1"), 
-    V4_1_0("4.1.0"), 
-    V4_0_3("4.0.3"), 
-    V4_0_2("4.0.2"), 
-    V3_31_6("3.31.6"), 
-    V3_31_5("3.31.5"), 
-    V3_31_4("3.31.4"), 
-    V3_31_1("3.31.1"), 
-    V3_31_0("3.31.0"), 
-    V3_30_5("3.30.5"), 
-    V3_30_4("3.30.4"), 
-    V3_30_3("3.30.3"), 
-    V3_25_1("3.25.1"), 
-    V3_22_1("3.22.1"), 
-    V3_18_1("3.18.1"), 
-    V3_10_2("3.10.2");
-    fun displayName(): String = version
+  V4_1_2("4.1.2"),
+  V4_1_1("4.1.1"),
+  V4_1_0("4.1.0"),
+  V4_0_3("4.0.3"),
+  V4_0_2("4.0.2"),
+  V3_31_6("3.31.6"),
+  V3_31_5("3.31.5"),
+  V3_31_4("3.31.4"),
+  V3_31_1("3.31.1"),
+  V3_31_0("3.31.0"),
+  V3_30_5("3.30.5"),
+  V3_30_4("3.30.4"),
+  V3_30_3("3.30.3"),
+  V3_25_1("3.25.1"),
+  V3_22_1("3.22.1"),
+  V3_18_1("3.18.1"),
+  V3_10_2("3.10.2");
+
+  fun displayName(): String = version
 }
 
 inline fun minSdkParameter(crossinline configure: EnumParameterBuilder<Sdk>.() -> Unit = {}) =
@@ -507,13 +505,12 @@ inline fun projectNdkVersionParameter(
     }
 
 inline fun projectCmakeVersionParameter(
-     crossinline configure: EnumParameterBuilder<CmakeVersion>.() -> Unit = {}
+    crossinline configure: EnumParameterBuilder<CmakeVersion>.() -> Unit = {}
 ) =
-      enumParameter<CmakeVersion> {
-        name = string.template_wizard_cmake_version
-        default = CmakeVersion.V3_22_1
-        displayName = CmakeVersion::displayName
-        startIcon = { R.drawable.ic_min_sdk }
-        configure()
+    enumParameter<CmakeVersion> {
+      name = string.template_wizard_cmake_version
+      default = CmakeVersion.V3_22_1
+      displayName = CmakeVersion::displayName
+      startIcon = { R.drawable.ic_min_sdk }
+      configure()
     }
-

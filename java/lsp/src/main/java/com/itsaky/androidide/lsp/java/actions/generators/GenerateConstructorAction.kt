@@ -35,6 +35,7 @@ import com.itsaky.androidide.projects.IProjectManager
 import com.itsaky.androidide.resources.R.string
 import com.itsaky.androidide.utils.flashError
 import io.github.rosemoe.sora.widget.CodeEditor
+import java.util.concurrent.CompletableFuture
 import openjdk.source.tree.ClassTree
 import openjdk.source.tree.VariableTree
 import openjdk.source.util.TreePath
@@ -46,7 +47,6 @@ import openjdk.tools.javac.tree.JCTree
 import openjdk.tools.javac.tree.TreeInfo
 import openjdk.tools.javac.util.ListBuffer
 import org.slf4j.LoggerFactory
-import java.util.concurrent.CompletableFuture
 
 /**
  * Allows the user to select fields and generate a constructor which has parameters same as the
@@ -70,21 +70,22 @@ class GenerateConstructorAction : FieldBasedAction() {
   override fun onGetFields(fields: List<String>, data: ActionData) {
     showFieldSelector(fields, data) { selected ->
       CompletableFuture.runAsync { generateConstructor(data, selected) }
-        .whenComplete { _, error ->
-          if (error != null) {
-            log.error("Unable to generate constructor for the selected fields", error)
-            flashError(string.msg_cannot_generate_constructor)
+          .whenComplete { _, error ->
+            if (error != null) {
+              log.error("Unable to generate constructor for the selected fields", error)
+              flashError(string.msg_cannot_generate_constructor)
+            }
           }
-        }
     }
   }
 
   private fun generateConstructor(data: ActionData, selected: MutableSet<String>) {
     val compiler =
-      JavaCompilerProvider.get(
-        IProjectManager.getInstance().getWorkspace()?.findModuleForFile(data.requireFile(), false)
-          ?: return
-      )
+        JavaCompilerProvider.get(
+            IProjectManager.getInstance()
+                .getWorkspace()
+                ?.findModuleForFile(data.requireFile(), false) ?: return
+        )
     val range = data[com.itsaky.androidide.models.Range::class.java]!!
     val file = data.requirePath()
 
@@ -103,10 +104,10 @@ class GenerateConstructorAction : FieldBasedAction() {
   }
 
   private fun generateForFields(
-    data: ActionData,
-    task: CompileTask,
-    type: ClassTree,
-    paths: List<TreePath>
+      data: ActionData,
+      task: CompileTask,
+      type: ClassTree,
+      paths: List<TreePath>,
   ) {
     val editor = data[CodeEditor::class.java]!!
     val trees = JavacTrees.instance(task.task)
@@ -116,7 +117,8 @@ class GenerateConstructorAction : FieldBasedAction() {
 
     if (paths.isEmpty() || trees.findConstructor(sym, varTypes) != null) {
       log.warn(
-        "A constructor with same parameter types is already available in class {}", type.simpleName
+          "A constructor with same parameter types is already available in class {}",
+          type.simpleName,
       )
       flashError(data[Context::class.java]!!.getString(string.msg_constructor_available))
       return
@@ -124,7 +126,7 @@ class GenerateConstructorAction : FieldBasedAction() {
 
     val stopWatch = com.itsaky.androidide.utils.StopWatch("generateConstructorForFields()")
     val constructor =
-      newConstructor(type.simpleName.toString(), varTypes.toTypedArray(), varNames.toTypedArray())
+        newConstructor(type.simpleName.toString(), varTypes.toTypedArray(), varNames.toTypedArray())
     val body = constructor.createBody()
     for (varName in varNames) {
       body.addStatement(StaticJavaParser.parseStatement("this.$varName = $varName;"))
@@ -147,9 +149,9 @@ class GenerateConstructorAction : FieldBasedAction() {
   }
 
   private fun newConstructor(
-    name: String,
-    paramTypes: Array<Type>,
-    paramNames: Array<String>
+      name: String,
+      paramTypes: Array<Type>,
+      paramNames: Array<String>,
   ): ConstructorDeclaration {
     val constructor = ConstructorDeclaration()
     constructor.setName(name)

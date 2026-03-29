@@ -17,11 +17,16 @@ package com.android.tools.idea.wizard.template.impl.activities.responsiveActivit
 
 import com.android.tools.idea.wizard.template.renderIf
 
-fun navigationDrawerHeaderXml(appCompatVersion: Int, targetApi: Int, isLibraryProject: Boolean = false): String {
-  val launcherIcon = renderIf(appCompatVersion >= 25 && targetApi >= 25) { "@mipmap/ic_launcher_round" }
+fun navigationDrawerHeaderXml(
+    appCompatVersion: Int,
+    targetApi: Int,
+    isLibraryProject: Boolean = false,
+): String {
+  val launcherIcon =
+      renderIf(appCompatVersion >= 25 && targetApi >= 25) { "@mipmap/ic_launcher_round" }
   val applicationProjectBlock =
-    renderIf(!isLibraryProject) {
-      """
+      renderIf(!isLibraryProject) {
+        """
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -30,7 +35,7 @@ fun navigationDrawerHeaderXml(appCompatVersion: Int, targetApi: Int, isLibraryPr
         android:contentDescription="@string/nav_header_desc"
         android:id="@+id/imageView" />
     """
-    }
+      }
 
   return """
 <?xml version="1.0" encoding="utf-8"?>

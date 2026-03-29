@@ -27,90 +27,83 @@ private const val TAG = "CommitMsgTemplateDialog"
 
 @Composable
 fun CommitMsgTemplateDialog(
-    stateKeyTag:String,
-    closeDialog: ()->Unit,
+    stateKeyTag: String,
+    closeDialog: () -> Unit,
 ) {
-    val stateKeyTag = Cache.getComponentKey(stateKeyTag, TAG)
+  val stateKeyTag = Cache.getComponentKey(stateKeyTag, TAG)
 
-    val settings = remember { SettingsUtil.getSettingsSnapshot() }
-    val template = mutableCustomStateOf(stateKeyTag, "template") { TextFieldValue(text = settings.commitMsgTemplate, selection = TextRange(settings.commitMsgTemplate.length)) }
+  val settings = remember { SettingsUtil.getSettingsSnapshot() }
+  val template =
+      mutableCustomStateOf(stateKeyTag, "template") {
+        TextFieldValue(
+            text = settings.commitMsgTemplate,
+            selection = TextRange(settings.commitMsgTemplate.length),
+        )
+      }
 
-    val autoType = {text:String ->
-        runCatching {
-            template.apply {
-                value = value.copy(
-                    //在光标处插入text
-                    text = value.text.replaceRange(value.selection.min, value.selection.max, text),
-                    //将光标移动到刚插入的text后面
-                    selection = TextRange(value.selection.min + text.length)
-                )
-            }
-        }
+  val autoType = { text: String ->
+    runCatching {
+      template.apply {
+        value =
+            value.copy(
+                // 在光标处插入text
+                text = value.text.replaceRange(value.selection.min, value.selection.max, text),
+                // 将光标移动到刚插入的text后面
+                selection = TextRange(value.selection.min + text.length),
+            )
+      }
     }
+  }
 
-    ConfirmDialog3(
-        requireShowTitleCompose = true,
-        titleCompose = {},
-        requireShowTextCompose = true,
-        textCompose = {
-            ScrollableColumn {
-                TextField(
-                    maxLines = MyStyleKt.defaultMultiLineTextFieldMaxLines,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(MyStyleKt.defaultHorizontalPadding),
-                    value = template.value,
-                    onValueChange = {
-                        template.value = it
-                    },
+  ConfirmDialog3(
+      requireShowTitleCompose = true,
+      titleCompose = {},
+      requireShowTextCompose = true,
+      textCompose = {
+        ScrollableColumn {
+          TextField(
+              maxLines = MyStyleKt.defaultMultiLineTextFieldMaxLines,
+              modifier = Modifier.fillMaxWidth().padding(MyStyleKt.defaultHorizontalPadding),
+              value = template.value,
+              onValueChange = { template.value = it },
+          )
 
-                )
+          Spacer(Modifier.height(15.dp))
 
-                Spacer(Modifier.height(15.dp))
+          MySelectionContainer {
+            Column {
+              CommitMsgTemplateUtil.apply {
+                val phListLastIndex = phList.size - 1
 
-                MySelectionContainer {
-                    Column {
-                        CommitMsgTemplateUtil.apply {
-                            val phListLastIndex = phList.size-1
+                phList.forEachIndexedBetter { idx, it ->
+                  PlaceHolder(it) { autoType(it.pattern) }
 
-                            phList.forEachIndexedBetter {idx, it ->
-                                PlaceHolder(it) {
-                                    autoType(it.pattern)
-                                }
-
-                                //加点间距
-                                if(idx != phListLastIndex) {
-                                    Spacer(Modifier.height(10.dp))
-                                }
-                            }
-
-                        }
-                    }
+                  // 加点间距
+                  if (idx != phListLastIndex) {
+                    Spacer(Modifier.height(10.dp))
+                  }
                 }
+              }
             }
-        },
-        onCancel = closeDialog
-    ) {
-        closeDialog()
-
-        doJobThenOffLoading {
-            SettingsUtil.update {
-                it.commitMsgTemplate = template.value.text
-            }
+          }
         }
-    }
+      },
+      onCancel = closeDialog,
+  ) {
+    closeDialog()
+
+    doJobThenOffLoading { SettingsUtil.update { it.commitMsgTemplate = template.value.text } }
+  }
 }
 
 @Composable
 private fun PlaceHolder(
     ph: PlaceHolder,
-    onClick:(ph: PlaceHolder)->Unit,
+    onClick: (ph: PlaceHolder) -> Unit,
 ) {
-    DefaultPaddingRow {
-        SingleLineClickableText(ph.pattern) {
-            onClick(ph)
-        }
+  DefaultPaddingRow {
+    SingleLineClickableText(ph.pattern) { onClick(ph) }
 
-        Text(": e.g. ${ph.example}", fontWeight = FontWeight.Light)
-    }
+    Text(": e.g. ${ph.example}", fontWeight = FontWeight.Light)
+  }
 }

@@ -20,10 +20,10 @@ import android.content.Context
 import com.itsaky.androidide.lsp.BaseLspServer
 import com.itsaky.androidide.lsp.connection.ProcessStreamProvider
 import com.itsaky.androidide.lsp.core.LspConnectionFactory
+import com.itsaky.androidide.lsp.util.Logger
 import com.itsaky.androidide.lsp.util.LspShellUtils
 import com.itsaky.androidide.utils.Environment
 import java.io.File
-import com.itsaky.androidide.lsp.util.Logger
 
 /**
  * An implementation of [BaseLspServer] for XML, utilizing the Lemminx language server.
@@ -33,51 +33,46 @@ import com.itsaky.androidide.lsp.util.Logger
  * @author android_zero
  */
 class XmlServer : BaseLspServer() {
-    override val id: String = "xml-lsp"
-    override val languageName: String = "XML"
-    override val serverName: String = "lemminx"
-    override val supportedExtensions: List<String> = listOf("xml", "xaml", "dtd", "plist", "ascx", "csproj", "wxi", "wxl", "wxs", "svg")
+  override val id: String = "xml-lsp"
+  override val languageName: String = "XML"
+  override val serverName: String = "lemminx"
+  override val supportedExtensions: List<String> =
+      listOf("xml", "xaml", "dtd", "plist", "ascx", "csproj", "wxi", "wxl", "wxs", "svg")
 
-    /**
-     * Path to the Lemminx executable JAR within the AndroidIDE environment.
-     */
-    private val jarFile: File
-        get() = File(Environment.ANDROIDIDE_HOME, "ideplugin/org.eclipse.lemminx.uber-jar.jar")
+  /** Path to the Lemminx executable JAR within the AndroidIDE environment. */
+  private val jarFile: File
+    get() = File(Environment.ANDROIDIDE_HOME, "ideplugin/org.eclipse.lemminx.uber-jar.jar")
 
-    /**
-     * Path to the Java executable.
-     */
-    private val javaBin: File
-        get() = Environment.JAVA
+  /** Path to the Java executable. */
+  private val javaBin: File
+    get() = Environment.JAVA
 
-    override fun isInstalled(context: Context): Boolean {
-        return LspShellUtils.isTerminalEnvironmentReady() && jarFile.exists() && javaBin.exists()
+  override fun isInstalled(context: Context): Boolean {
+    return LspShellUtils.isTerminalEnvironmentReady() && jarFile.exists() && javaBin.exists()
+  }
+
+  override fun install(context: Context) {
+    // Installation of Lemminx JAR is typically handled by ToolsManager or a similar setup utility.
+    // This method can be used to trigger a re-installation or verification if needed.
+    val installScript = File(Environment.HOME, ".androidide/local/bin/lsp/xml")
+    if (installScript.exists()) {
+      LspShellUtils.installPackage(installScript.absolutePath, "$id-installer")
+    } else {
+      Logger.instance(javaClass.simpleName)
+          .error("Installation script for XML LSP not found at ${installScript.path}")
     }
+  }
 
-    override fun install(context: Context) {
-        // Installation of Lemminx JAR is typically handled by ToolsManager or a similar setup utility.
-        // This method can be used to trigger a re-installation or verification if needed.
-        val installScript = File(Environment.HOME, ".androidide/local/bin/lsp/xml")
-        if (installScript.exists()) {
-             LspShellUtils.installPackage(installScript.absolutePath, "$id-installer")
-        } else {
-            Logger.instance(javaClass.simpleName).error("Installation script for XML LSP not found at ${installScript.path}")
-        }
+  override fun getConnectionFactory(): LspConnectionFactory {
+    return LspConnectionFactory { workingDir ->
+      ProcessStreamProvider(
+          command = listOf(javaBin.absolutePath, "-jar", jarFile.absolutePath),
+          workingDir = workingDir,
+      )
     }
+  }
 
-    override fun getConnectionFactory(): LspConnectionFactory {
-        return LspConnectionFactory { workingDir ->
-            ProcessStreamProvider(
-                command = listOf(
-                    javaBin.absolutePath,
-                    "-jar",
-                    jarFile.absolutePath
-                ),
-                workingDir = workingDir
-            )
-        }
-    }
-        override fun isSupported(file: File): Boolean {
-        return supportedExtensions.contains(file.getName().substringAfterLast("."))
-    }
+  override fun isSupported(file: File): Boolean {
+    return supportedExtensions.contains(file.getName().substringAfterLast("."))
+  }
 }

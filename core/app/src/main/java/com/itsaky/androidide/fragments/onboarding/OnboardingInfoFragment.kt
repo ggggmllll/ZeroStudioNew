@@ -26,11 +26,9 @@ import androidx.core.widget.ImageViewCompat
 import com.itsaky.androidide.databinding.FragmentOnboardingInfoBinding
 import com.itsaky.androidide.fragments.FragmentWithBinding
 
-/**
- * @author Akash Yadav
- */
+/** @author Akash Yadav */
 class OnboardingInfoFragment :
-  FragmentWithBinding<FragmentOnboardingInfoBinding>(FragmentOnboardingInfoBinding::inflate) {
+    FragmentWithBinding<FragmentOnboardingInfoBinding>(FragmentOnboardingInfoBinding::inflate) {
 
   companion object {
 
@@ -40,18 +38,19 @@ class OnboardingInfoFragment :
 
     @JvmStatic
     fun newInstance(
-      title: CharSequence,
-      info: CharSequence,
-      @DrawableRes icon: Int,
-      @ColorInt iconTint: Int
+        title: CharSequence,
+        info: CharSequence,
+        @DrawableRes icon: Int,
+        @ColorInt iconTint: Int,
     ): OnboardingInfoFragment {
       return OnboardingInfoFragment().apply {
-        arguments = Bundle().apply {
-          putCharSequence(OnboardingFragment.KEY_ONBOARDING_TITLE, title)
-          putCharSequence(KEY_INFO_TEXT, info)
-          putInt(KEY_INFO_ICON, icon)
-          putInt(KEY_INFO_ICON_TINT, iconTint)
-        }
+        arguments =
+            Bundle().apply {
+              putCharSequence(OnboardingFragment.KEY_ONBOARDING_TITLE, title)
+              putCharSequence(KEY_INFO_TEXT, info)
+              putInt(KEY_INFO_ICON, icon)
+              putInt(KEY_INFO_ICON_TINT, iconTint)
+            }
       }
     }
   }
@@ -59,13 +58,14 @@ class OnboardingInfoFragment :
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
-    binding.infoTitle.text = requireArguments().getCharSequence(
-      OnboardingFragment.KEY_ONBOARDING_TITLE)
+    binding.infoTitle.text =
+        requireArguments().getCharSequence(OnboardingFragment.KEY_ONBOARDING_TITLE)
 
     binding.infoMessage.text = requireArguments().getCharSequence(KEY_INFO_TEXT)
     binding.image.setImageResource(requireArguments().getInt(KEY_INFO_ICON))
-    ImageViewCompat.setImageTintList(binding.image,
-      ColorStateList.valueOf(requireArguments().getInt(
-        KEY_INFO_ICON_TINT)))
+    ImageViewCompat.setImageTintList(
+        binding.image,
+        ColorStateList.valueOf(requireArguments().getInt(KEY_INFO_ICON_TINT)),
+    )
   }
 }

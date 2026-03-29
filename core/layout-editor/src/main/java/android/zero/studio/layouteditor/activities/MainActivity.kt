@@ -1,6 +1,7 @@
 package android.zero.studio.layouteditor.activities
 
 import android.os.Bundle
+import android.zero.studio.layouteditor.ui.theme.AppTheme
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -10,29 +11,22 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import android.zero.studio.layouteditor.ui.theme.AppTheme
 
 class MainActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContent {
-            AppTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
-            }
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    enableEdgeToEdge()
+    setContent {
+      AppTheme {
+        Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+          Greeting(name = "Android", modifier = Modifier.padding(innerPadding))
         }
+      }
     }
+  }
 }
 
 @Composable
 fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
+  Text(text = "Hello $name!", modifier = modifier)
 }

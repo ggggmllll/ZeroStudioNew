@@ -49,14 +49,14 @@ import com.android.tools.idea.wizard.template.impl.activities.primaryDetailFlow.
 import com.android.tools.idea.wizard.template.impl.activities.primaryDetailFlow.src.app_package.contentListFragmentKt
 
 fun RecipeExecutor.primaryDetailFlowRecipe(
-  moduleData: ModuleTemplateData,
-  objectKind: String,
-  objectKindPlural: String,
-  isLauncher: Boolean,
-  mainNavGraphFile: String,
-  childNavGraphFile: String,
-  detailNameFragmentLayout: String,
-  packageName: String,
+    moduleData: ModuleTemplateData,
+    objectKind: String,
+    objectKindPlural: String,
+    isLauncher: Boolean,
+    mainNavGraphFile: String,
+    childNavGraphFile: String,
+    detailNameFragmentLayout: String,
+    packageName: String,
 ) {
   val (projectData, srcOut, resOut) = moduleData
   val appCompatVersion = moduleData.apis.appCompatVersion
@@ -81,13 +81,13 @@ fun RecipeExecutor.primaryDetailFlowRecipe(
   addViewBindingSupport(moduleData.viewBindingSupport, true)
 
   generateManifest(
-    moduleData,
-    "${collection}DetailHostActivity",
-    packageName,
-    isLauncher,
-    hasNoActionBar = false,
-    generateActivityTitle = true,
-    isResizeable = true,
+      moduleData,
+      "${collection}DetailHostActivity",
+      packageName,
+      isLauncher,
+      hasNoActionBar = false,
+      generateActivityTitle = true,
+      isResizeable = true,
   )
 
   navigationDependencies(generateKotlin, useAndroidX, moduleData.apis.appCompatVersion)
@@ -95,9 +95,20 @@ fun RecipeExecutor.primaryDetailFlowRecipe(
     setJavaKotlinCompileOptions(true)
   }
 
-  generateThemeStyles(moduleData.themesData.main, useAndroidX, moduleData.baseFeature?.resDir ?: resOut)
+  generateThemeStyles(
+      moduleData.themesData.main,
+      useAndroidX,
+      moduleData.baseFeature?.resDir ?: resOut,
+  )
 
-  val stringsXml = stringsXml(itemListLayout, detailNameLayout, moduleData.isNewModule, objectKind, objectKindPlural)
+  val stringsXml =
+      stringsXml(
+          itemListLayout,
+          detailNameLayout,
+          moduleData.isNewModule,
+          objectKind,
+          objectKindPlural,
+      )
   if (moduleData.isDynamic) {
     mergeXml(stringsXml, moduleData.baseFeature?.resDir!!.resolve("values/strings.xml"))
   } else {
@@ -114,130 +125,146 @@ fun RecipeExecutor.primaryDetailFlowRecipe(
   val navHostFragmentId = "nav_host_${detailNameFragmentLayout}"
 
   save(
-    fragmentItemDetailXml(detailName, detailNameLayout, packageName, useAndroidX),
-    resOut.resolve("layout/${detailNameFragmentLayout}.xml"),
+      fragmentItemDetailXml(detailName, detailNameLayout, packageName, useAndroidX),
+      resOut.resolve("layout/${detailNameFragmentLayout}.xml"),
   )
   save(
-    fragmentItemDetailTwoPaneXml(detailName, detailNameLayout, packageName, useAndroidX),
-    resOut.resolve("layout-sw600dp/${detailNameFragmentLayout}.xml"),
+      fragmentItemDetailTwoPaneXml(detailName, detailNameLayout, packageName, useAndroidX),
+      resOut.resolve("layout-sw600dp/${detailNameFragmentLayout}.xml"),
   )
   save(
-    fragmentItemListXml(collectionName, detailName, itemListLayout, itemListContentLayout, packageName, useAndroidX),
-    resOut.resolve("layout/fragment_${itemListLayout}.xml"),
+      fragmentItemListXml(
+          collectionName,
+          detailName,
+          itemListLayout,
+          itemListContentLayout,
+          packageName,
+          useAndroidX,
+      ),
+      resOut.resolve("layout/fragment_${itemListLayout}.xml"),
   )
   save(
-    fragmentItemListTwoPaneXml(
-      collectionName,
-      itemListLayout,
-      detailName,
-      detailNameLayout,
-      itemListContentLayout,
-      childNavGraphFile,
-      packageName,
-      useAndroidX,
-    ),
-    resOut.resolve("layout-sw600dp/fragment_${itemListLayout}.xml"),
+      fragmentItemListTwoPaneXml(
+          collectionName,
+          itemListLayout,
+          detailName,
+          detailNameLayout,
+          itemListContentLayout,
+          childNavGraphFile,
+          packageName,
+          useAndroidX,
+      ),
+      resOut.resolve("layout-sw600dp/fragment_${itemListLayout}.xml"),
   )
   save(itemListContentXml(), resOut.resolve("layout/${itemListContentLayout}.xml"))
   save(
-    activityMainXml(navHostFragmentId, detailNameFragmentLayout, mainNavGraphFile, useAndroidX),
-    resOut.resolve("layout/activity_${detailNameLayout}.xml"),
+      activityMainXml(navHostFragmentId, detailNameFragmentLayout, mainNavGraphFile, useAndroidX),
+      resOut.resolve("layout/activity_${detailNameLayout}.xml"),
   )
 
   val mainActivity =
-    when (projectData.language) {
-      Language.Java ->
-        contentListDetailHostActivityJava(
-          packageName = packageName,
-          applicationPackage = projectData.applicationPackage,
-          collection = collection,
-          activityLayout = detailNameLayout,
-          navHostFragmentId = navHostFragmentId,
-          useAndroidX = useAndroidX,
-          isViewBindingSupported = isViewBindingSupported,
-        )
-      Language.Kotlin ->
-        contentListDetailHostActivityKt(
-          packageName = packageName,
-          applicationPackage = projectData.applicationPackage,
-          collection = collection,
-          activityLayout = detailNameLayout,
-          navHostFragmentId = navHostFragmentId,
-          useAndroidX = useAndroidX,
-          isViewBindingSupported = isViewBindingSupported,
-        )
-    }
+      when (projectData.language) {
+        Language.Java ->
+            contentListDetailHostActivityJava(
+                packageName = packageName,
+                applicationPackage = projectData.applicationPackage,
+                collection = collection,
+                activityLayout = detailNameLayout,
+                navHostFragmentId = navHostFragmentId,
+                useAndroidX = useAndroidX,
+                isViewBindingSupported = isViewBindingSupported,
+            )
+        Language.Kotlin ->
+            contentListDetailHostActivityKt(
+                packageName = packageName,
+                applicationPackage = projectData.applicationPackage,
+                collection = collection,
+                activityLayout = detailNameLayout,
+                navHostFragmentId = navHostFragmentId,
+                useAndroidX = useAndroidX,
+                isViewBindingSupported = isViewBindingSupported,
+            )
+      }
   save(mainActivity, srcOut.resolve("${collection}DetailHostActivity.${ktOrJavaExt}"))
 
   val contentDetailFragment =
-    when (projectData.language) {
-      Language.Java ->
-        contentDetailFragmentJava(
-          collection = collection,
-          collectionName = collectionName,
-          applicationPackage = applicationPackage,
-          detailNameLayout = detailNameLayout,
-          objectKind = objectKind,
-          packageName = packageName,
-          useAndroidX = useAndroidX,
-          isViewBindingSupported = isViewBindingSupported,
-        )
-      Language.Kotlin ->
-        contentDetailFragmentKt(
-          collectionName = collectionName,
-          detailName = detailName,
-          applicationPackage = applicationPackage,
-          detailNameLayout = detailNameLayout,
-          objectKind = objectKind,
-          packageName = packageName,
-          useAndroidX = useAndroidX,
-          isViewBindingSupported = isViewBindingSupported,
-        )
-    }
+      when (projectData.language) {
+        Language.Java ->
+            contentDetailFragmentJava(
+                collection = collection,
+                collectionName = collectionName,
+                applicationPackage = applicationPackage,
+                detailNameLayout = detailNameLayout,
+                objectKind = objectKind,
+                packageName = packageName,
+                useAndroidX = useAndroidX,
+                isViewBindingSupported = isViewBindingSupported,
+            )
+        Language.Kotlin ->
+            contentDetailFragmentKt(
+                collectionName = collectionName,
+                detailName = detailName,
+                applicationPackage = applicationPackage,
+                detailNameLayout = detailNameLayout,
+                objectKind = objectKind,
+                packageName = packageName,
+                useAndroidX = useAndroidX,
+                isViewBindingSupported = isViewBindingSupported,
+            )
+      }
   save(contentDetailFragment, srcOut.resolve("${detailName}Fragment.${ktOrJavaExt}"))
 
   val contentListFragment =
-    when (projectData.language) {
-      Language.Java ->
-        contentListFragmentJava(
-          collectionName = collectionName,
-          detailName = detailName,
-          applicationPackage = applicationPackage,
-          detailNameLayout = detailNameLayout,
-          itemListContentLayout = itemListContentLayout,
-          itemListLayout = itemListLayout,
-          objectKindPlural = objectKindPlural,
-          packageName = packageName,
-          useAndroidX = useAndroidX,
-          isViewBindingSupported = isViewBindingSupported,
-        )
-      Language.Kotlin ->
-        contentListFragmentKt(
-          collectionName = collectionName,
-          detailName = detailName,
-          applicationPackage = applicationPackage,
-          detailNameLayout = detailNameLayout,
-          itemListContentLayout = itemListContentLayout,
-          itemListLayout = itemListLayout,
-          packageName = packageName,
-          useAndroidX = useAndroidX,
-          isViewBindingSupported = isViewBindingSupported,
-        )
-    }
+      when (projectData.language) {
+        Language.Java ->
+            contentListFragmentJava(
+                collectionName = collectionName,
+                detailName = detailName,
+                applicationPackage = applicationPackage,
+                detailNameLayout = detailNameLayout,
+                itemListContentLayout = itemListContentLayout,
+                itemListLayout = itemListLayout,
+                objectKindPlural = objectKindPlural,
+                packageName = packageName,
+                useAndroidX = useAndroidX,
+                isViewBindingSupported = isViewBindingSupported,
+            )
+        Language.Kotlin ->
+            contentListFragmentKt(
+                collectionName = collectionName,
+                detailName = detailName,
+                applicationPackage = applicationPackage,
+                detailNameLayout = detailNameLayout,
+                itemListContentLayout = itemListContentLayout,
+                itemListLayout = itemListLayout,
+                packageName = packageName,
+                useAndroidX = useAndroidX,
+                isViewBindingSupported = isViewBindingSupported,
+            )
+      }
   save(contentListFragment, srcOut.resolve("${collectionName}Fragment.${ktOrJavaExt}"))
 
   val placeholderContent =
-    when (projectData.language) {
-      Language.Java -> placeholderContentJava(packageName)
-      Language.Kotlin -> placeholderContentKt(packageName)
-    }
+      when (projectData.language) {
+        Language.Java -> placeholderContentJava(packageName)
+        Language.Kotlin -> placeholderContentKt(packageName)
+      }
   save(placeholderContent, srcOut.resolve("placeholder/PlaceholderContent.${ktOrJavaExt}"))
 
   save(
-    mobileNavigationXml(packageName, itemListLayout, collectionName, detailName, detailNameLayout),
-    resOut.resolve("navigation/${mainNavGraphFile}.xml"),
+      mobileNavigationXml(
+          packageName,
+          itemListLayout,
+          collectionName,
+          detailName,
+          detailNameLayout,
+      ),
+      resOut.resolve("navigation/${mainNavGraphFile}.xml"),
   )
-  save(tabletDetailsNavigationXml(packageName, detailName, detailNameLayout), resOut.resolve("navigation/${childNavGraphFile}.xml"))
+  save(
+      tabletDetailsNavigationXml(packageName, detailName, detailNameLayout),
+      resOut.resolve("navigation/${childNavGraphFile}.xml"),
+  )
 
   open(srcOut.resolve("${detailName}Fragment.${ktOrJavaExt}"))
   open(resOut.resolve("layout/fragment_${detailNameLayout}.xml"))

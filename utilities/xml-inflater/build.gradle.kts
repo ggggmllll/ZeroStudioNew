@@ -15,7 +15,6 @@
  *   along with AndroidIDE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 import com.itsaky.androidide.build.config.BuildConfig
 
 plugins {
@@ -24,8 +23,6 @@ plugins {
   id("kotlin-parcelize")
   id("com.google.devtools.ksp") version libs.versions.ksp
 }
-
-
 
 android { namespace = "${BuildConfig.packageName}.inflater" }
 

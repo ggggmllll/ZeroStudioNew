@@ -8,7 +8,7 @@ import com.intellij.build.events.impl.StartEventImpl
 class StartBuildEventImpl(private val descriptor: DefaultBuildDescriptor, message: String) :
     StartEventImpl(descriptor.id, null, descriptor.startTime, message), StartBuildEvent {
 
-    override fun getBuildDescriptor(): BuildDescriptor {
-        return descriptor
-    }
+  override fun getBuildDescriptor(): BuildDescriptor {
+    return descriptor
+  }
 }

@@ -24,7 +24,4 @@ package com.itsaky.androidide.models
  * @param javaHome The path to the installed JDK.
  * @author Akash Yadav
  */
-data class JdkDistribution(
-  val javaVersion: String,
-  val javaHome: String
-)
+data class JdkDistribution(val javaVersion: String, val javaHome: String)

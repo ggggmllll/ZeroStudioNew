@@ -17,7 +17,7 @@
 package com.android.tools.idea.wizard.template.impl.activities.googlePayActivity.res.values
 
 fun stringsXml(activityTitle: String, simpleName: String) =
-  """
+    """
 <resources>
 
     <!-- Checkout activity -->

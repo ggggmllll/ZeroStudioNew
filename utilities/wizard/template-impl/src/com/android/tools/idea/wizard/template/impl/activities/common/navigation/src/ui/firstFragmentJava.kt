@@ -23,26 +23,27 @@ import com.android.tools.idea.wizard.template.impl.activities.common.layoutToVie
 import com.android.tools.idea.wizard.template.renderIf
 
 fun firstFragmentJava(
-  packageName: String,
-  applicationPackage: String?,
-  firstFragmentClass: String,
-  navFragmentPrefix: String,
-  navViewModelClass: String,
-  useAndroidX: Boolean,
-  isViewBindingSupported: Boolean,
+    packageName: String,
+    applicationPackage: String?,
+    firstFragmentClass: String,
+    navFragmentPrefix: String,
+    navViewModelClass: String,
+    useAndroidX: Boolean,
+    isViewBindingSupported: Boolean,
 ): String {
   val viewModelInitializationBlock =
-    if (useAndroidX) "new ViewModelProvider(this).get(${navViewModelClass}.class);"
-    else "new ViewModelProvider(this, new ViewModelProvider.NewInstanceFactory()).get(${navViewModelClass}.class);"
+      if (useAndroidX) "new ViewModelProvider(this).get(${navViewModelClass}.class);"
+      else
+          "new ViewModelProvider(this, new ViewModelProvider.NewInstanceFactory()).get(${navViewModelClass}.class);"
 
   val layoutName = "fragment_${navFragmentPrefix}"
   val onCreateViewBlock =
-    if (isViewBindingSupported)
-      """
+      if (isViewBindingSupported)
+          """
     binding = ${layoutToViewBindingClass(layoutName)}.inflate(inflater, container, false);
     View root = binding.getRoot();
   """
-    else "View root = inflater.inflate(R.layout.$layoutName, container, false);"
+      else "View root = inflater.inflate(R.layout.$layoutName, container, false);"
 
   return """
 package ${packageName}.ui.${navFragmentPrefix};

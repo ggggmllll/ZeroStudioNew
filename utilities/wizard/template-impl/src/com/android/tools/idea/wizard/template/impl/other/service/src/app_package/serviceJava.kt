@@ -17,7 +17,7 @@
 package com.android.tools.idea.wizard.template.impl.other.service.src.app_package
 
 fun serviceJava(className: String, packageName: String) =
-  """
+    """
 package ${packageName};
 
 import android.app.Service;

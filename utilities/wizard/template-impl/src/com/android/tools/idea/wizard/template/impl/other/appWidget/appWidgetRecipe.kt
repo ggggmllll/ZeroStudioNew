@@ -43,13 +43,13 @@ import com.android.tools.idea.wizard.template.impl.other.appWidget.src.app_packa
 import java.io.File
 
 fun RecipeExecutor.appWidgetRecipe(
-  moduleData: ModuleTemplateData,
-  className: String,
-  placement: Placement,
-  resizable: Resizeable,
-  minWidth: MinimumCells,
-  minHeight: MinimumCells,
-  configurable: Boolean,
+    moduleData: ModuleTemplateData,
+    className: String,
+    placement: Placement,
+    resizable: Resizeable,
+    minWidth: MinimumCells,
+    minHeight: MinimumCells,
+    configurable: Boolean,
 ) {
   val (projectData, srcOut, resOut, manifestOut) = moduleData
   val ktOrJavaExt = projectData.language.extension
@@ -58,11 +58,17 @@ fun RecipeExecutor.appWidgetRecipe(
   addAllKotlinDependencies(moduleData)
   addViewBindingSupport(moduleData.viewBindingSupport, true)
 
-  mergeXml(androidManifestXml(className, configurable, layoutName, packageName), manifestOut.resolve("AndroidManifest.xml"))
+  mergeXml(
+      androidManifestXml(className, configurable, layoutName, packageName),
+      manifestOut.resolve("AndroidManifest.xml"),
+  )
 
   copy(File("app-widget").resolve("drawable-nodpi"), resOut.resolve("drawable-nodpi"))
   save(appWidgetBackgroundXml(), resOut.resolve("drawable-v21/app_widget_background.xml"))
-  save(appWidgetInnerViewBackgroundXml(), resOut.resolve("drawable-v21/app_widget_inner_view_background.xml"))
+  save(
+      appWidgetInnerViewBackgroundXml(),
+      resOut.resolve("drawable-v21/app_widget_inner_view_background.xml"),
+  )
   save(appwidgetXml(moduleData.themesData), resOut.resolve("layout/${layoutName}.xml"))
 
   if (configurable) {
@@ -74,20 +80,20 @@ fun RecipeExecutor.appWidgetRecipe(
   val minWidthDp = -30 + 70 * minWidthCells
   val minHeightDp = -30 + 70 * minHeightCells
   save(
-    appwidgetInfoXml(
-      minHeightDp = minHeightDp,
-      minWidthDp = minWidthDp,
-      minHeightCells = minHeightCells,
-      minWidthCells = minWidthCells,
-      className = className,
-      configurable = configurable,
-      layoutName = layoutName,
-      packageName = packageName,
-      placement = placement,
-      resizeable = resizable,
-      withSFeatures = moduleData.apis.targetApi.apiLevel >= 31,
-    ),
-    resOut.resolve("xml/${layoutName}_info.xml"),
+      appwidgetInfoXml(
+          minHeightDp = minHeightDp,
+          minWidthDp = minWidthDp,
+          minHeightCells = minHeightCells,
+          minWidthCells = minWidthCells,
+          className = className,
+          configurable = configurable,
+          layoutName = layoutName,
+          packageName = packageName,
+          placement = placement,
+          resizeable = resizable,
+          withSFeatures = moduleData.apis.targetApi.apiLevel >= 31,
+      ),
+      resOut.resolve("xml/${layoutName}_info.xml"),
   )
   mergeXml(stringsXml(configurable), resOut.resolve("values/strings.xml"))
   mergeXml(attrsXml(), resOut.resolve("values/attrs.xml"))
@@ -103,38 +109,58 @@ fun RecipeExecutor.appWidgetRecipe(
     // @android:dimen/system_app_widget_background_radius and
     // @android:dimen/system_app_widget_internal_padding are only available
     // with S SDK
-    mergeXml(themesXmlV31(moduleData.themesData, forDarkMode = false), resOut.resolve("values-v31/themes.xml"))
-    mergeXml(themesXmlV31(moduleData.themesData, forDarkMode = true), resOut.resolve("values-night-v31/themes.xml"))
+    mergeXml(
+        themesXmlV31(moduleData.themesData, forDarkMode = false),
+        resOut.resolve("values-v31/themes.xml"),
+    )
+    mergeXml(
+        themesXmlV31(moduleData.themesData, forDarkMode = true),
+        resOut.resolve("values-night-v31/themes.xml"),
+    )
   }
 
   val appWidget =
-    when (projectData.language) {
-      Language.Java -> appWidgetJava(projectData.applicationPackage, className, configurable, layoutName, packageName)
-      Language.Kotlin -> appWidgetKt(projectData.applicationPackage, className, configurable, layoutName, packageName)
-    }
+      when (projectData.language) {
+        Language.Java ->
+            appWidgetJava(
+                projectData.applicationPackage,
+                className,
+                configurable,
+                layoutName,
+                packageName,
+            )
+        Language.Kotlin ->
+            appWidgetKt(
+                projectData.applicationPackage,
+                className,
+                configurable,
+                layoutName,
+                packageName,
+            )
+      }
   save(appWidget, srcOut.resolve("${className}.${ktOrJavaExt}"))
 
   if (configurable) {
     val isViewBindingSupported = moduleData.viewBindingSupport.isViewBindingSupported()
     val appWidgetConfigureActivity =
-      when (projectData.language) {
-        Language.Java ->
-          appWidgetConfigureActivityJava(
-            applicationPackage = projectData.applicationPackage,
-            className = className,
-            layoutName = layoutName,
-            packageName = packageName,
-            isViewBindingSupported = isViewBindingSupported,
-          )
-        Language.Kotlin ->
-          appWidgetConfigureActivityKt(
-            applicationPackage = projectData.applicationPackage,
-            className = className,
-            layoutName = layoutName,
-            packageName = packageName,
-            isViewBindingSupported = isViewBindingSupported,
-          )
-      }
+        when (projectData.language) {
+          Language.Java ->
+              appWidgetConfigureActivityJava(
+                  applicationPackage = projectData.applicationPackage,
+                  className = className,
+                  layoutName = layoutName,
+                  packageName = packageName,
+                  isViewBindingSupported = isViewBindingSupported,
+              )
+          Language.Kotlin ->
+              appWidgetConfigureActivityKt(
+                  applicationPackage = projectData.applicationPackage,
+                  className = className,
+                  layoutName = layoutName,
+                  packageName = packageName,
+                  isViewBindingSupported = isViewBindingSupported,
+              )
+        }
     save(appWidgetConfigureActivity, srcOut.resolve("${className}ConfigureActivity.${ktOrJavaExt}"))
   }
 

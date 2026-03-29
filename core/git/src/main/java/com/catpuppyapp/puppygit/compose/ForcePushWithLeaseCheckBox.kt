@@ -19,33 +19,22 @@ import com.catpuppyapp.puppygit.style.MyStyleKt
 fun ForcePushWithLeaseCheckBox(
     forcePush_pushWithLease: MutableState<Boolean>,
     forcePush_expectedRefspecForLease: MutableState<String>,
-
 ) {
 
-    // push with lease
-    MyCheckBox(StrCons.withLease, forcePush_pushWithLease)
+  // push with lease
+  MyCheckBox(StrCons.withLease, forcePush_pushWithLease)
 
+  if (forcePush_pushWithLease.value) {
+    TextField(
+        modifier = Modifier.fillMaxWidth().padding(horizontal = MyStyleKt.defaultHorizontalPadding),
+        value = forcePush_expectedRefspecForLease.value,
+        singleLine = true,
+        onValueChange = { forcePush_expectedRefspecForLease.value = it },
+        label = { Text(stringResource(R.string.expected_refspec)) },
+    )
 
-    if(forcePush_pushWithLease.value) {
-        TextField(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = MyStyleKt.defaultHorizontalPadding),
-            value = forcePush_expectedRefspecForLease.value,
-            singleLine = true,
-            onValueChange = {
-                forcePush_expectedRefspecForLease.value = it
-            },
-            label = {
-                Text(stringResource(R.string.expected_refspec))
-            },
-        )
+    Spacer(Modifier.height(10.dp))
 
-        Spacer(Modifier.height(10.dp))
-
-        SelectionRow {
-            DefaultPaddingText(stringResource(R.string.push_force_with_lease_note))
-        }
-    }
+    SelectionRow { DefaultPaddingText(stringResource(R.string.push_force_with_lease_note)) }
+  }
 }
-

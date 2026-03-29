@@ -52,18 +52,17 @@ class LaunchAppAction(context: Context, override val order: Int) : EditorActivit
 
   override fun prepare(data: ActionData) {
     super.prepare(data)
-    data.getActivity() ?: run {
-      markInvisible()
-      return
-    }
+    data.getActivity()
+        ?: run {
+          markInvisible()
+          return
+        }
 
     visible = true
 
-    enabled = IProjectManager.getInstance()
-      .getWorkspace()
-      ?.androidAppProjects()
-      ?.iterator()
-      ?.hasNext() == true
+    enabled =
+        IProjectManager.getInstance().getWorkspace()?.androidAppProjects()?.iterator()?.hasNext() ==
+            true
   }
 
   override suspend fun execAction(data: ActionData) {

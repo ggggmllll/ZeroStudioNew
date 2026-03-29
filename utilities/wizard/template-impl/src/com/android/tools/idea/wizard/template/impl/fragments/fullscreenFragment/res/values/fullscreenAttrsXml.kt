@@ -16,7 +16,7 @@
 package com.android.tools.idea.wizard.template.impl.fragments.fullscreenFragment.res.values
 
 fun fullscreenAttrs() =
-  """<resources>
+    """<resources>
     <declare-styleable name="FullscreenAttrs">
         <attr name="fullscreenBackgroundColor" format="color" />
         <attr name="fullscreenTextColor" format="color" />

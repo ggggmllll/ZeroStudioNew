@@ -24,25 +24,25 @@ import com.android.tools.idea.wizard.template.impl.activities.common.layoutToVie
 import com.android.tools.idea.wizard.template.renderIf
 
 fun scrollActivityJava(
-  activityClass: String,
-  applicationPackage: String?,
-  isNewModule: Boolean,
-  layoutName: String,
-  menuName: String,
-  packageName: String,
-  useAndroidX: Boolean,
-  isViewBindingSupported: Boolean,
+    activityClass: String,
+    applicationPackage: String?,
+    isNewModule: Boolean,
+    layoutName: String,
+    menuName: String,
+    packageName: String,
+    useAndroidX: Boolean,
+    isViewBindingSupported: Boolean,
 ): String {
   val newModuleImportBlock =
-    renderIf(isNewModule) {
-      """
+      renderIf(isNewModule) {
+        """
 import android.view.Menu;
 import android.view.MenuItem;
   """
-    }
+      }
   val newModuleBlock =
-    renderIf(isNewModule) {
-      """
+      renderIf(isNewModule) {
+        """
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -64,16 +64,17 @@ import android.view.MenuItem;
         return super.onOptionsItemSelected(item);
     }
   """
-    }
-  val applicationPackageBlock = renderIf(applicationPackage != null) { "import ${applicationPackage}.R;" }
+      }
+  val applicationPackageBlock =
+      renderIf(applicationPackage != null) { "import ${applicationPackage}.R;" }
 
   val contentViewBlock =
-    if (isViewBindingSupported)
-      """
+      if (isViewBindingSupported)
+          """
      binding = ${layoutToViewBindingClass(layoutName)}.inflate(getLayoutInflater());
      setContentView(binding.getRoot());
   """
-    else "setContentView(R.layout.$layoutName);"
+      else "setContentView(R.layout.$layoutName);"
 
   return """package ${packageName};
 

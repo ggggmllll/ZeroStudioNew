@@ -17,7 +17,7 @@
 package com.android.tools.idea.wizard.template.impl.fragments.settingsFragment.res.values
 
 fun arraysXml() =
-  """
+    """
 <resources>
     <!-- Reply Preference -->
     <string-array name="reply_entries">

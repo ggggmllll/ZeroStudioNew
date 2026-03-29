@@ -22,25 +22,26 @@ import android.view.View
 import android.view.ViewGroup
 import com.itsaky.androidide.R
 
-/**
- * 代码审查页面。
- * 可能用于展示特定的 Diff 视图或待审查的补丁列表。
- */
+/** 代码审查页面。 可能用于展示特定的 Diff 视图或待审查的补丁列表。 */
 class GitCodeReviewFragment : BaseGitPageFragment() {
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return inflater.inflate(R.layout.fragment_git_branches, container, false)
+  override fun onCreateView(
+      inflater: LayoutInflater,
+      container: ViewGroup?,
+      savedInstanceState: Bundle?,
+  ): View {
+    return inflater.inflate(R.layout.fragment_git_branches, container, false)
+  }
+
+  override fun setupToolbar() {
+    // 批准 (Approve)
+    addToolbarAction(R.drawable.ic_check_24, "Approve") {
+      // TODO
     }
 
-    override fun setupToolbar() {
-        // 批准 (Approve)
-        addToolbarAction(R.drawable.ic_check_24, "Approve") {
-            // TODO
-        }
-        
-        // 请求更改 (Request Changes)
-        addToolbarAction(R.drawable.ic_warning_24, "Request Changes") {
-            // TODO
-        }
+    // 请求更改 (Request Changes)
+    addToolbarAction(R.drawable.ic_warning_24, "Request Changes") {
+      // TODO
     }
+  }
 }

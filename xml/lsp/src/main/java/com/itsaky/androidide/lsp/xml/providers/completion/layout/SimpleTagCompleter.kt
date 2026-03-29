@@ -37,15 +37,15 @@ import org.eclipse.lemminx.dom.DOMDocument
 class SimpleTagCompleter(provider: ICompletionProvider) : LayoutTagCompletionProvider(provider) {
 
   override fun doComplete(
-    params: CompletionParams,
-    pathData: ResourcePathData,
-    document: DOMDocument,
-    type: NodeType,
-    prefix: String
+      params: CompletionParams,
+      pathData: ResourcePathData,
+      document: DOMDocument,
+      type: NodeType,
+      prefix: String,
   ): CompletionResult {
     val widgets =
-      Lookup.getDefault().lookup(WidgetTable.COMPLETION_LOOKUP_KEY)?.getAllWidgets()
-        ?: return CompletionResult.EMPTY
+        Lookup.getDefault().lookup(WidgetTable.COMPLETION_LOOKUP_KEY)?.getAllWidgets()
+            ?: return CompletionResult.EMPTY
     val result = mutableListOf<CompletionItem>()
 
     // Complete all tags which do not require fully qualified name
@@ -56,7 +56,8 @@ class SimpleTagCompleter(provider: ICompletionProvider) : LayoutTagCompletionPro
 
     // Complete the root package names if possible
     val module =
-      Lookup.getDefault().lookup(ModuleProject.COMPLETION_MODULE_KEY) ?: return CompletionResult(result)
+        Lookup.getDefault().lookup(ModuleProject.COMPLETION_MODULE_KEY)
+            ?: return CompletionResult(result)
 
     // Add root packages from the compile classpath and source paths
     addFromTrie(module.compileClasspathClasses, prefix, result)

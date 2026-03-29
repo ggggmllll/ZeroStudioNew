@@ -19,9 +19,7 @@ package com.itsaky.androidide.utils
 
 import java.util.Locale
 
-/**
- * Capitalizes the string.
- */
+/** Capitalizes the string. */
 @JvmOverloads
 fun String.capitalizeString(locale: Locale = Locale.getDefault()): String {
   return replaceFirstChar { char ->

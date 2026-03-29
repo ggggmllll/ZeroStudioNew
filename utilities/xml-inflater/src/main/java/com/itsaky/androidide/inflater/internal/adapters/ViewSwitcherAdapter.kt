@@ -35,11 +35,11 @@ import com.itsaky.androidide.resources.R.string
 open class ViewSwitcherAdapter<T : ViewSwitcher> : ViewAnimatorAdapter<T>() {
   override fun createUiWidgets(): List<UiWidget> {
     return listOf(
-      UiWidget(
-        ViewSwitcher::class.java,
-        string.widget_viewswitcher,
-        drawable.ic_widget_viewswitcher
-      )
+        UiWidget(
+            ViewSwitcher::class.java,
+            string.widget_viewswitcher,
+            drawable.ic_widget_viewswitcher,
+        )
     )
   }
 }

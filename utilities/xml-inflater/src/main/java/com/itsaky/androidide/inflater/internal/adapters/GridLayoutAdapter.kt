@@ -37,32 +37,24 @@ import com.itsaky.androidide.resources.R.string
 @IncludeInDesigner(group = LAYOUTS)
 open class GridLayoutAdapter<T : GridLayout> : ViewGroupAdapter<T>() {
 
-  override fun createAttrHandlers(
-    create: (String, AttributeHandlerScope<T>.() -> Unit) -> Unit
-  ) {
+  override fun createAttrHandlers(create: (String, AttributeHandlerScope<T>.() -> Unit) -> Unit) {
     super.createAttrHandlers(create)
     create("alignmentMode") { view.alignmentMode = parseAlignmentMode(value) }
-    create("columnCount") {
-      view.columnCount = parseInteger(value, Int.MIN_VALUE)
-    }
-    create("columnOrderPreserved") {
-      view.isColumnOrderPreserved = parseBoolean(value)
-    }
+    create("columnCount") { view.columnCount = parseInteger(value, Int.MIN_VALUE) }
+    create("columnOrderPreserved") { view.isColumnOrderPreserved = parseBoolean(value) }
     create("orientation") { view.orientation = parseOrientation(value) }
     create("rowCount") { view.rowCount = parseInteger(value, Int.MIN_VALUE) }
-    create("rowOrderPreserved") {
-      view.isRowOrderPreserved = parseBoolean(value)
-    }
+    create("rowOrderPreserved") { view.isRowOrderPreserved = parseBoolean(value) }
     create("useDefaultMargins") { view.useDefaultMargins = parseBoolean(value) }
   }
 
   override fun createUiWidgets(): List<UiWidget> {
-    return listOf(UiWidget(GridLayout::class.java, string.widget_grid_layout,
-      drawable.ic_widget_grid_layout))
+    return listOf(
+        UiWidget(GridLayout::class.java, string.widget_grid_layout, drawable.ic_widget_grid_layout)
+    )
   }
 
-  override fun canAcceptChild(view: IViewGroup, child: IView?, name: String
-  ): Boolean {
+  override fun canAcceptChild(view: IViewGroup, child: IView?, name: String): Boolean {
     (view.view as GridLayout).run {
       if (childCount >= rowCount * columnCount) {
         // the maximum number of child views has been reached

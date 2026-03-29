@@ -19,7 +19,7 @@ package com.itsaky.androidide.templates.impl.androidstudio.fragments.googleMapsF
 import com.itsaky.androidide.templates.impl.androidstudio.activities.googleMapsActivity.geoApiKeyMetadataEntry
 
 fun androidManifestXml() =
-  """
+    """
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application>
 

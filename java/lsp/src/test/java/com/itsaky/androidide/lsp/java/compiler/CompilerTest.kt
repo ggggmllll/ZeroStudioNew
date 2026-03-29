@@ -19,12 +19,12 @@ package com.itsaky.androidide.lsp.java.compiler
 
 import com.google.common.truth.Truth.assertThat
 import com.itsaky.androidide.lsp.java.JavaLSPTest
+import java.time.Instant
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
-import java.time.Instant
 
 /** @author Akash Yadav */
 @RunWith(RobolectricTestRunner::class)
@@ -90,13 +90,13 @@ class CompilerTest {
       val threads = mutableListOf<Thread>()
       for (i in 1..10) {
         threads.add(
-          Thread {
-              task.run {
-                delay(100)
-                println(Thread.currentThread())
-              }
-            }
-            .apply { name = "CompileTask Acessor #$i" }
+            Thread {
+                  task.run {
+                    delay(100)
+                    println(Thread.currentThread())
+                  }
+                }
+                .apply { name = "CompileTask Acessor #$i" }
         )
       }
 

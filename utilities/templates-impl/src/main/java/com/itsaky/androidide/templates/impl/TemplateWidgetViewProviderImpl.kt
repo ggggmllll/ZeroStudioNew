@@ -22,6 +22,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.ArrayAdapter
 import androidx.core.content.ContextCompat
+import com.google.android.material.materialswitch.MaterialSwitch
 import com.google.android.material.textfield.TextInputLayout
 import com.google.auto.service.AutoService
 import com.itsaky.androidide.templates.BooleanParameter
@@ -33,6 +34,7 @@ import com.itsaky.androidide.templates.Parameter.DefaultObserver
 import com.itsaky.androidide.templates.ParameterWidget
 import com.itsaky.androidide.templates.SpinnerWidget
 import com.itsaky.androidide.templates.StringParameter
+import com.itsaky.androidide.templates.SwitchWidget
 import com.itsaky.androidide.templates.TextFieldParameter
 import com.itsaky.androidide.templates.TextFieldWidget
 import com.itsaky.androidide.templates.Widget
@@ -41,9 +43,6 @@ import com.itsaky.androidide.templates.impl.databinding.LayoutSpinnerBinding
 import com.itsaky.androidide.templates.impl.databinding.LayoutTextfieldBinding
 import com.itsaky.androidide.utils.ServiceLoader
 import com.itsaky.androidide.utils.SingleTextWatcher
-import com.google.android.material.materialswitch.MaterialSwitch
-import com.itsaky.androidide.templates.SwitchWidget
-
 
 /**
  * Default implementation of [ITemplateWidgetViewProvider].
@@ -112,25 +111,27 @@ class TemplateWidgetViewProviderImpl : ITemplateWidgetViewProvider {
         }
         .root
   }
-  
+
   private fun createSwitch(context: Context, widget: SwitchWidget): View {
     return MaterialSwitch(context).apply {
       setPadding(16, 16, 16, 16) // 与其他控件保持间距统一
       val param = widget.parameter as BooleanParameter
       text = context.getString(param.name)
       isChecked = param.value
-      
-      val observer = object : DefaultObserver<Boolean>() {
-        override fun onChanged(parameter: Parameter<Boolean>) {
-          disableAndRun { isChecked = param.value }
-        }
-      }
+
+      val observer =
+          object : DefaultObserver<Boolean>() {
+            override fun onChanged(parameter: Parameter<Boolean>) {
+              disableAndRun { isChecked = param.value }
+            }
+          }
       setOnCheckedChangeListener { _, isChecked ->
         observer.disableAndRun { param.setValue(isChecked) }
       }
       param.observe(observer)
     }
   }
+
   private fun createTextField(context: Context, widget: TextFieldWidget): View {
     return LayoutTextfieldBinding.inflate(LayoutInflater.from(context))
         .apply {

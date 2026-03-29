@@ -6,7 +6,7 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.LanguageSubstitutor
 
 class ClangdLanguageSubstitutor : LanguageSubstitutor() {
-    override fun getLanguage(virtualFile: VirtualFile, project: Project): Language? {
-        return Language.findLanguageByID("textmate")
-    }
+  override fun getLanguage(virtualFile: VirtualFile, project: Project): Language? {
+    return Language.findLanguageByID("textmate")
+  }
 }

@@ -12,15 +12,18 @@ import rikka.recyclerview.BaseViewHolder.Creator
 
 class LearnMoreViewHolder(binding: HomeLearnMoreBinding, root: View) : BaseViewHolder<Any?>(root) {
 
-    companion object {
-        val CREATOR = Creator<Any> { inflater: LayoutInflater, parent: ViewGroup? ->
-            val outer = HomeItemContainerBinding.inflate(inflater, parent, false)
-            val inner = HomeLearnMoreBinding.inflate(inflater, outer.root, true)
-            LearnMoreViewHolder(inner, outer.root)
+  companion object {
+    val CREATOR =
+        Creator<Any> { inflater: LayoutInflater, parent: ViewGroup? ->
+          val outer = HomeItemContainerBinding.inflate(inflater, parent, false)
+          val inner = HomeLearnMoreBinding.inflate(inflater, outer.root, true)
+          LearnMoreViewHolder(inner, outer.root)
         }
-    }
+  }
 
-    init {
-        root.setOnClickListener { v: View -> CustomTabsHelper.launchUrlOrCopy(v.context, Helps.HOME.get()) }
+  init {
+    root.setOnClickListener { v: View ->
+      CustomTabsHelper.launchUrlOrCopy(v.context, Helps.HOME.get())
     }
+  }
 }

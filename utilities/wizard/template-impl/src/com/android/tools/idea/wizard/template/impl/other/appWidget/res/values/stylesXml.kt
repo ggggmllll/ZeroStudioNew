@@ -18,7 +18,7 @@ package com.android.tools.idea.wizard.template.impl.other.appWidget.res.values
 import com.android.tools.idea.wizard.template.ThemesData
 
 fun stylesXml(themesData: ThemesData) =
-  """<resources>
+    """<resources>
     <style name="${getAppWidgetContainerStyleName(themesData.appName)}" parent="android:Widget">
         <item name="android:id">@android:id/background</item>
         <item name="android:background">?android:attr/colorBackground</item>

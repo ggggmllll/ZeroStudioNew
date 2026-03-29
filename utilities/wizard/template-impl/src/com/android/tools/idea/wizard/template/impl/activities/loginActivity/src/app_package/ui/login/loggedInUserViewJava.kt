@@ -17,7 +17,7 @@
 package com.android.tools.idea.wizard.template.impl.activities.loginActivity.src.app_package.ui.login
 
 fun loggedInUserViewJava(packageName: String) =
-  """package  ${packageName}.ui.login;
+    """package  ${packageName}.ui.login;
 
 /**
  * Class exposing authenticated user details to the UI.

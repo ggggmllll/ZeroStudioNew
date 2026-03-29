@@ -26,7 +26,7 @@ class MetadataElement {
   @SerializedName("versionCode") var versionCode = 0
   @SerializedName("versionName") var versionName: String? = null
   @SerializedName("outputFile") var outputFile: String? = null
-  
+
   override fun toString(): String {
     return "Element(type=$type, filters=$filters, attributes=$attributes, versionCode=$versionCode, versionName=$versionName, outputFile=$outputFile)"
   }

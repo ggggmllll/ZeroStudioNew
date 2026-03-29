@@ -53,7 +53,8 @@ val sliceProviderTemplate
     val authorities = stringParameter {
       name = "URI Authorities"
       default = ""
-      help = "A semicolon separated list of one or more URI authorities that identify data under the purview of the SliceProvider"
+      help =
+          "A semicolon separated list of one or more URI authorities that identify data under the purview of the SliceProvider"
       constraints = listOf(NONEMPTY, URI_AUTHORITY)
       suggest = { packageName }
       loggable = true
@@ -77,11 +78,11 @@ val sliceProviderTemplate
     }
 
     widgets(
-      TextFieldWidget(className),
-      TextFieldWidget(authorities),
-      TextFieldWidget(hostUrl),
-      TextFieldWidget(pathPrefix),
-      LanguageWidget(),
+        TextFieldWidget(className),
+        TextFieldWidget(authorities),
+        TextFieldWidget(hostUrl),
+        TextFieldWidget(pathPrefix),
+        LanguageWidget(),
     )
 
     thumb {
@@ -90,6 +91,12 @@ val sliceProviderTemplate
     }
 
     recipe = { data: TemplateData ->
-      sliceProviderRecipe(data as ModuleTemplateData, className.value, authorities.value, hostUrl.value, pathPrefix.value)
+      sliceProviderRecipe(
+          data as ModuleTemplateData,
+          className.value,
+          authorities.value,
+          hostUrl.value,
+          pathPrefix.value,
+      )
     }
   }

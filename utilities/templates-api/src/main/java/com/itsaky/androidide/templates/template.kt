@@ -193,7 +193,18 @@ class ProjectTemplateData(
     ndkVersion: String,
     useCmake: Boolean,
     cmakeVersion: String,
-) : BaseTemplateData(name, projectDir, language, useKts, useToml, useNdk, ndkVersion, useCmake, cmakeVersion)
+) :
+    BaseTemplateData(
+        name,
+        projectDir,
+        language,
+        useKts,
+        useToml,
+        useNdk,
+        ndkVersion,
+        useCmake,
+        cmakeVersion,
+    )
 
 /**
  * Data for creating module projects.
@@ -217,7 +228,18 @@ open class ModuleTemplateData(
     cmakeVersion: String,
     minSdk: Sdk,
     val versions: ModuleVersionData = ModuleVersionData(minSdk),
-) : BaseTemplateData(name, projectDir, language, useKts, useToml, useNdk, ndkVersion, useCmake, cmakeVersion) {
+) :
+    BaseTemplateData(
+        name,
+        projectDir,
+        language,
+        useKts,
+        useToml,
+        useNdk,
+        ndkVersion,
+        useCmake,
+        cmakeVersion,
+    ) {
 
   private val srcDirs = mutableMapOf<SrcSet, File>()
 
@@ -256,11 +278,9 @@ open class Template<R : TemplateRecipeResult>(
 
   companion object {
 
-    @JvmStatic
-    val EMPTY = Template(-1, -1, null, emptyList(), EMPTY_RECIPE)
+    @JvmStatic val EMPTY = Template(-1, -1, null, emptyList(), EMPTY_RECIPE)
   }
 }
-
 
 open class ProjectTemplate(
     val moduleTemplates: List<Template<*>>,
@@ -316,9 +336,7 @@ open class ModuleTemplate(
     recipe: TemplateRecipe<ModuleTemplateRecipeResult>,
 ) : Template<ModuleTemplateRecipeResult>(templateName, thumb, description, widgets, recipe)
 
-/**
- * Template for creating a file.
- */
+/** Template for creating a file. */
 open class FileTemplate<R : FileTemplateRecipeResult>(
     @StringRes name: Int,
     @DrawableRes thumb: Int,

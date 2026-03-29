@@ -38,13 +38,13 @@ abstract class AdapterViewAdapter<T : AdapterView<*>> : ViewGroupAdapter<T>() {
 
   override fun applyBasic(view: IView) {
     super.applyBasic(view)
-    //适用kt2.0以下版本
+    // 适用kt2.0以下版本
     // (view.view as AdapterView<*>).adapter = newSimpleAdapter(view.view.context)
-    
-    //适用2.0以上版本
-            @Suppress("UNCHECKED_CAST")
-        (view.view as AdapterView<Adapter>).adapter = newSimpleAdapter(view.view.context)
-        
+
+    // 适用2.0以上版本
+    @Suppress("UNCHECKED_CAST")
+    (view.view as AdapterView<Adapter>).adapter = newSimpleAdapter(view.view.context)
+
     if (view is ViewGroupImpl) {
       view.childrenModifiable = false
     }

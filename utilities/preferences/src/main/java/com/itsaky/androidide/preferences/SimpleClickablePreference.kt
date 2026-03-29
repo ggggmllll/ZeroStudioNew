@@ -18,8 +18,8 @@
 package com.itsaky.androidide.preferences
 
 import androidx.preference.Preference
-import kotlinx.parcelize.Parcelize
 import kotlinx.parcelize.IgnoredOnParcel
+import kotlinx.parcelize.Parcelize
 
 /**
  * A simple preference which is expected to be clickable only.
@@ -30,12 +30,12 @@ import kotlinx.parcelize.IgnoredOnParcel
 class SimpleClickablePreference
 @JvmOverloads
 constructor(
-  override val key: String,
-  override val title: Int,
-  override val summary: Int? = null,
-  override val icon: Int? = null,
-      @IgnoredOnParcel  //添加此注释用于解决关于界面等页面点击打开闪退问题
-  private val onClick: ((Preference) -> Boolean)? = { false }
+    override val key: String,
+    override val title: Int,
+    override val summary: Int? = null,
+    override val icon: Int? = null,
+    @IgnoredOnParcel // 添加此注释用于解决关于界面等页面点击打开闪退问题
+    private val onClick: ((Preference) -> Boolean)? = { false },
 ) : SimplePreference() {
 
   override fun onPreferenceClick(preference: Preference): Boolean {

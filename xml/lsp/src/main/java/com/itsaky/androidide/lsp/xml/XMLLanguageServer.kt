@@ -43,10 +43,10 @@ import com.itsaky.androidide.lsp.xml.providers.XmlCompletionProvider
 import com.itsaky.androidide.models.Range
 import com.itsaky.androidide.projects.IWorkspace
 import com.itsaky.androidide.utils.DocumentUtils
+import java.nio.file.Path
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
-import java.nio.file.Path
 
 /**
  * Language server implementation for XML files.
@@ -82,12 +82,14 @@ class XMLLanguageServer : ILanguageServer {
   }
 
   override fun setupWorkspace(workspace: IWorkspace) {}
+
   override fun complete(params: CompletionParams?): CompletionResult {
-    val completionProvider: ICompletionProvider = if (!getSettings().completionsEnabled()) {
-      NoCompletionsProvider()
-    } else {
-      XmlCompletionProvider(getSettings())
-    }
+    val completionProvider: ICompletionProvider =
+        if (!getSettings().completionsEnabled()) {
+          NoCompletionsProvider()
+        } else {
+          XmlCompletionProvider(getSettings())
+        }
     return completionProvider.complete(params)
   }
 

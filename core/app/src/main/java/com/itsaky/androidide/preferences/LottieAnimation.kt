@@ -27,8 +27,8 @@ val lottieAnimationPreference =
         key = KEY_LOTTIE_ANIMATION,
         title = string.pref_lottie_animation_title,
         summary = string.pref_lottie_animation_summary,
-        icon = R.drawable.ic_setting_lottie_animation
+        icon = R.drawable.ic_setting_lottie_animation,
     ) {
-        it.context.startActivity(Intent(it.context, LottieAnimationSelectorActivity::class.java))
-        true
+      it.context.startActivity(Intent(it.context, LottieAnimationSelectorActivity::class.java))
+      true
     }

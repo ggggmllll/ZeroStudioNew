@@ -32,16 +32,12 @@ dependencyResolutionManagement {
     google()
     mavenCentral()
   }
-  
-  versionCatalogs {
-    create("libs") {
-      from(files("../../gradle/libs.versions.toml"))
-    }
-  }
+
+  versionCatalogs { create("libs") { from(files("../../gradle/libs.versions.toml")) } }
 }
 
 include(
-  ":desugaring-core",
+    ":desugaring-core",
 )
 
 rootProject.name = "build-deps-common"
@@ -49,7 +45,8 @@ rootProject.name = "build-deps-common"
 gradle.rootProject {
 
   // required for setting SDK location for android modules
-  project.file("../../local.properties")
-    .takeIf { it.exists() }
-    ?.copyTo(project.file("local.properties"), overwrite = true)
+  project
+      .file("../../local.properties")
+      .takeIf { it.exists() }
+      ?.copyTo(project.file("local.properties"), overwrite = true)
 }

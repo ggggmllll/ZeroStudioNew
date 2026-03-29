@@ -16,13 +16,12 @@
  */
 package com.itsaky.androidide.app
 
+// import com.itsaky.androidide.common.R
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
-// import com.itsaky.androidide.common.R
-import com.itsaky.androidide.resources.R
 import com.google.android.material.R.attr
 import com.itsaky.androidide.eventbus.events.preferences.PreferenceChangeEvent
 import com.itsaky.androidide.tasks.cancelIfActive
@@ -36,12 +35,12 @@ import org.greenrobot.eventbus.ThreadMode
 
 abstract class BaseIDEActivity : AppCompatActivity() {
 
-companion object {
-      private const val KEY_UI_MODE = "idepref_general_uiMode"
-      private const val KEY_SELECTED_THEME = "idpref_general_theme"
+  companion object {
+    private const val KEY_UI_MODE = "idepref_general_uiMode"
+    private const val KEY_SELECTED_THEME = "idpref_general_theme"
   }
-  
-  // Default to true to ensure we catch theme events. 
+
+  // Default to true to ensure we catch theme events.
   // Subclasses can override to register custom events, but Base always listens.
   open val subscribeToEvents: Boolean = true
 
@@ -53,15 +52,13 @@ companion object {
   open val statusBarColor: Int
     get() = resolveAttr(attr.colorSurface)
 
-  /**
-   * [CoroutineScope] for executing tasks with the [Default][Dispatchers.Default] dispatcher.
-   */
+  /** [CoroutineScope] for executing tasks with the [Default][Dispatchers.Default] dispatcher. */
   val activityScope = CoroutineScope(Dispatchers.Default)
 
   override fun onCreate(savedInstanceState: Bundle?) {
     // Apply Theme BEFORE super.onCreate to ensure layout inflation uses correct styles
     IThemeManager.getInstance().applyTheme(this)
-    
+
     // System Bar Theming (for non-EdgeToEdge activities)
     if (enableSystemBarTheming) {
       window?.apply {
@@ -94,31 +91,27 @@ companion object {
     }
   }
 
-  /**
-   * Global Preference Listener for ALL Activities.
-   */
+  /** Global Preference Listener for ALL Activities. */
   @Subscribe(threadMode = ThreadMode.MAIN)
   open fun onBasePreferenceChanged(event: PreferenceChangeEvent) {
     when (event.key) {
-        KEY_UI_MODE -> {
-            val mode = event.value as? Int ?: AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
-            AppCompatDelegate.setDefaultNightMode(mode)
-            recreateActivitySafe()
-        }
-        KEY_SELECTED_THEME -> {
-            recreateActivitySafe()
-        }
+      KEY_UI_MODE -> {
+        val mode = event.value as? Int ?: AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+        AppCompatDelegate.setDefaultNightMode(mode)
+        recreateActivitySafe()
+      }
+      KEY_SELECTED_THEME -> {
+        recreateActivitySafe()
+      }
     }
   }
 
-  /**
-   * Recreates the activity with state preservation.
-   */
+  /** Recreates the activity with state preservation. */
   protected fun recreateActivitySafe() {
-      // Calling recreate() forces the Activity to destroy and create again with new Resources.
-      // This is necessary to load values-night or new style attributes.
-      // Android automatically restores savedInstanceState (Edit text content, scroll position, etc.)
-      recreate()
+    // Calling recreate() forces the Activity to destroy and create again with new Resources.
+    // This is necessary to load values-night or new style attributes.
+    // Android automatically restores savedInstanceState (Edit text content, scroll position, etc.)
+    recreate()
   }
 
   fun loadFragment(fragment: Fragment, id: Int) {

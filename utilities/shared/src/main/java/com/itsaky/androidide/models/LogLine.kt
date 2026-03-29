@@ -39,14 +39,19 @@ class LogLine private constructor() : DefaultRecyclable() {
   }
 
   fun toSimpleString(): String {
-    return if (formatted) String.format(
-      "%-25s %-2s %s", LogTagUtils.trimTagIfNeeded(tag, 25), level?.levelChar ?: 'U',
-      message) else unformatted!!
+    return if (formatted)
+        String.format(
+            "%-25s %-2s %s",
+            LogTagUtils.trimTagIfNeeded(tag, 25),
+            level?.levelChar ?: 'U',
+            message,
+        )
+    else unformatted!!
   }
 
   fun formattedTagAndMessage(): String {
-    return if (formatted) String.format("%-25s %-2s", LogTagUtils.trimTagIfNeeded(tag, 25),
-      message) else unformatted!!
+    return if (formatted) String.format("%-25s %-2s", LogTagUtils.trimTagIfNeeded(tag, 25), message)
+    else unformatted!!
   }
 
   private fun resetToDefault() {
@@ -67,10 +72,18 @@ class LogLine private constructor() : DefaultRecyclable() {
   }
 
   override fun toString(): String {
-    return if (formatted) String.format(
-      "%s %s %s %s %-2s %-25s %s",
-      date, time, pid, tid, level?.levelChar ?: 'U', LogTagUtils.trimTagIfNeeded(tag, 25),
-      message) else unformatted!!
+    return if (formatted)
+        String.format(
+            "%s %s %s %s %-2s %-25s %s",
+            date,
+            time,
+            pid,
+            tid,
+            level?.levelChar ?: 'U',
+            LogTagUtils.trimTagIfNeeded(tag, 25),
+            message,
+        )
+    else unformatted!!
   }
 
   override fun equals(other: Any?): Boolean {
@@ -107,15 +120,16 @@ class LogLine private constructor() : DefaultRecyclable() {
 
     // do not cache too many LogLine items
     // LogLines should be recycled as soon as they are appended to the log view
-    private val logLinePool = newRecyclableObjectPool(
-      capacity = 16,
-      factory = ::LogLine
-    )
+    private val logLinePool = newRecyclableObjectPool(capacity = 16, factory = ::LogLine)
 
     @JvmOverloads
     @JvmStatic
-    fun obtain(level: ILogger.Level?, tag: String?, message: String?,
-      formatted: Boolean = true): LogLine {
+    fun obtain(
+        level: ILogger.Level?,
+        tag: String?,
+        message: String?,
+        formatted: Boolean = true,
+    ): LogLine {
       val logLine = logLinePool.obtain()
       logLine.level = level
       logLine.tag = tag

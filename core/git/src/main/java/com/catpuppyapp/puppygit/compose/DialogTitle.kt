@@ -5,7 +5,7 @@ import androidx.compose.runtime.Composable
 
 @Composable
 fun DialogTitle(
-    text:String,
+    text: String,
 ) {
-    ScrollableRow { Text(text) }
+  ScrollableRow { Text(text) }
 }

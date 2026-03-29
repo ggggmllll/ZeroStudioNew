@@ -42,7 +42,13 @@ val responsiveActivityTemplate = template {
 
   category = Category.Activity
   formFactor = FormFactor.Mobile
-  screens = listOf(WizardUiContext.ActivityGallery, WizardUiContext.MenuEntry, WizardUiContext.NewProject, WizardUiContext.NewModule)
+  screens =
+      listOf(
+          WizardUiContext.ActivityGallery,
+          WizardUiContext.MenuEntry,
+          WizardUiContext.NewProject,
+          WizardUiContext.NewModule,
+      )
   constraints = listOf(TemplateConstraint.AndroidX)
 
   lateinit var layoutName: StringParameter
@@ -68,7 +74,8 @@ val responsiveActivityTemplate = template {
   val isLauncher = booleanParameter {
     name = "Launcher Activity"
     default = false
-    help = "If true, this activity will have a CATEGORY_LAUNCHER intent filter, making it visible in the launcher"
+    help =
+        "If true, this activity will have a CATEGORY_LAUNCHER intent filter, making it visible in the launcher"
   }
 
   val packageName = defaultPackageNameParameter
@@ -114,32 +121,32 @@ val responsiveActivityTemplate = template {
   }
 
   widgets(
-    TextFieldWidget(activityClass),
-    TextFieldWidget(layoutName),
-    CheckBoxWidget(isLauncher),
-    TextFieldWidget(packageName),
+      TextFieldWidget(activityClass),
+      TextFieldWidget(layoutName),
+      CheckBoxWidget(isLauncher),
+      TextFieldWidget(packageName),
 
-    // Below are invisible widgets. Defining as widgets to impose constraints
-    TextFieldWidget(appBarLayoutName),
-    TextFieldWidget(navHeaderLayoutName),
-    TextFieldWidget(contentLayoutName),
-    TextFieldWidget(navGraphName),
-    LanguageWidget(),
+      // Below are invisible widgets. Defining as widgets to impose constraints
+      TextFieldWidget(appBarLayoutName),
+      TextFieldWidget(navHeaderLayoutName),
+      TextFieldWidget(contentLayoutName),
+      TextFieldWidget(navGraphName),
+      LanguageWidget(),
   )
 
   thumb { File("responsive-activity").resolve("template_responsive_activity.png") }
 
   recipe = { data: TemplateData ->
     generateResponsiveActivity(
-      moduleTemplateData = data as ModuleTemplateData,
-      activityClass = activityClass.value,
-      activityMainLayoutName = layoutName.value,
-      isLauncher = isLauncher.value,
-      packageName = packageName.value,
-      appBarMainLayoutName = appBarLayoutName.value,
-      navHeaderLayoutName = navHeaderLayoutName.value,
-      contentLayoutName = contentLayoutName.value,
-      navGraphName = navGraphName.value,
+        moduleTemplateData = data as ModuleTemplateData,
+        activityClass = activityClass.value,
+        activityMainLayoutName = layoutName.value,
+        isLauncher = isLauncher.value,
+        packageName = packageName.value,
+        appBarMainLayoutName = appBarLayoutName.value,
+        navHeaderLayoutName = navHeaderLayoutName.value,
+        contentLayoutName = contentLayoutName.value,
+        navGraphName = navGraphName.value,
     )
   }
 }

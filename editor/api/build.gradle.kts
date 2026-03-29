@@ -15,7 +15,6 @@
  *   along with AndroidIDE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 import com.itsaky.androidide.build.config.BuildConfig
 
 plugins {
@@ -23,18 +22,14 @@ plugins {
   id("kotlin-android")
 }
 
-
-
-android {
-  namespace = "${BuildConfig.packageName}.editor.api"
-}
+android { namespace = "${BuildConfig.packageName}.editor.api" }
 
 dependencies {
   api(libs.androidide.ts)
 
   api(projects.core.lspApi)
   api(projects.core.lspModels)
-  
+
   implementation(projects.core.common)
   implementation(projects.logging.logger)
 }

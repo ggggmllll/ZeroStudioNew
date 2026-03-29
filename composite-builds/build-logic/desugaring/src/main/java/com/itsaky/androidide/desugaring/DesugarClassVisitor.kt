@@ -26,16 +26,25 @@ import org.objectweb.asm.MethodVisitor
  *
  * @author Akash Yadav
  */
-class DesugarClassVisitor(private val params: DesugarParams,
-                          private val classContext: ClassContext, api: Int,
-                          classVisitor: ClassVisitor
+class DesugarClassVisitor(
+    private val params: DesugarParams,
+    private val classContext: ClassContext,
+    api: Int,
+    classVisitor: ClassVisitor,
 ) : ClassVisitor(api, classVisitor) {
 
-  override fun visitMethod(access: Int, name: String?, descriptor: String?,
-                           signature: String?, exceptions: Array<out String>?
+  override fun visitMethod(
+      access: Int,
+      name: String?,
+      descriptor: String?,
+      signature: String?,
+      exceptions: Array<out String>?,
   ): MethodVisitor {
-    return DesugarMethodVisitor(params, classContext, api,
-      super.visitMethod(access, name, descriptor, signature, exceptions))
+    return DesugarMethodVisitor(
+        params,
+        classContext,
+        api,
+        super.visitMethod(access, name, descriptor, signature, exceptions),
+    )
   }
 }
-

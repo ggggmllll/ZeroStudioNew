@@ -17,7 +17,7 @@
 package com.android.tools.idea.wizard.template.impl.fragments.loginFragment.src.app_package.data.model
 
 fun loggedInUserJava(packageName: String) =
-  """
+    """
 package ${packageName}.data.model;
 
 /**

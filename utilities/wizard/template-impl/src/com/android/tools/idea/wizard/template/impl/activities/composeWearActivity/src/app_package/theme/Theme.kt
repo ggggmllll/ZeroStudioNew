@@ -19,7 +19,7 @@ package com.android.tools.idea.wizard.template.impl.activities.composeWearActivi
 import com.android.tools.idea.wizard.template.escapeKotlinIdentifier
 
 fun themeKt(packageName: String, themeName: String) =
-  """
+    """
 package ${escapeKotlinIdentifier(packageName)}.presentation.theme
 
 import androidx.compose.runtime.Composable

@@ -27,7 +27,6 @@ import com.itsaky.androidide.utils.Environment
 import com.tang.vscode.LuaLanguageClient
 import com.tang.vscode.LuaLanguageServer
 import io.github.rosemoe.sora.lsp.client.connection.StreamConnectionProvider
-import org.eclipse.lsp4j.jsonrpc.Launcher
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
@@ -38,128 +37,128 @@ import java.net.URI
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.Future
+import org.eclipse.lsp4j.jsonrpc.Launcher
 
 /**
  * An implementation of for Lua, utilizing `com.tang.vscode.LuaLanguageServer` (EmmyLua).
  *
- * This server runs directly within the application process.
- * It uses in-memory pipes to communicate, avoiding the overhead of local sockets.
+ * This server runs directly within the application process. It uses in-memory pipes to communicate,
+ * avoiding the overhead of local sockets.
  *
  * @author android_zero
  */
 class LuaServer : BaseLspServer() {
 
-    override val id: String = "lua-lsp"
-    override val languageName: String = "Lua"
-    override val serverName: String = "EmmyLua"
-    override val supportedExtensions: List<String> = listOf("lua", "luac")
+  override val id: String = "lua-lsp"
+  override val languageName: String = "Lua"
+  override val serverName: String = "EmmyLua"
+  override val supportedExtensions: List<String> = listOf("lua", "luac")
 
-    private val LOG = Logger.instance("LuaServer")
+  private val LOG = Logger.instance("LuaServer")
 
-    override fun isInstalled(context: Context): Boolean = true
+  override fun isInstalled(context: Context): Boolean = true
 
-    override fun install(context: Context) {
-        // In-process server, no installation needed
+  override fun install(context: Context) {
+    // In-process server, no installation needed
+  }
+
+  override fun getConnectionFactory(): LspConnectionFactory {
+    return LspConnectionFactory { _ -> InProcessLuaStreamProvider() }
+  }
+
+  override fun isSupported(file: File): Boolean {
+    return supportedExtensions.contains(file.extension.lowercase())
+  }
+
+  /** 为 EmmyLua 提供初始化选项，特别是标准库路径 `stdFolder`，以使其具备完整的 API 补全能力。 */
+  override fun getInitializationOptions(uri: URI?): Any? {
+    val options = JsonObject()
+    options.addProperty("client", "vsc") // 必需：让 EmmyLua 识别客户端类型
+
+    // 可选：指定 Lua 标准库（如果有打包解压到本地）
+    val stdFolder = File(Environment.HOME, ".androidide/local/share/emmylua/std")
+    if (stdFolder.exists()) {
+      options.addProperty("stdFolder", stdFolder.absolutePath)
     }
 
-    override fun getConnectionFactory(): LspConnectionFactory {
-        return LspConnectionFactory { _ ->
-            InProcessLuaStreamProvider()
-        }
+    options.add("configFiles", JsonArray())
+
+    return options
+  }
+
+  /** 管道通信连接提供器，专门配置来对接 In-Process 的 EmmyLua。 */
+  private inner class InProcessLuaStreamProvider : StreamConnectionProvider {
+    private var serverThread: Future<*>? = null
+    private val executorService: ExecutorService = Executors.newCachedThreadPool()
+
+    @Volatile private var _isClosed = true
+
+    private val clientOutputStream = PipedOutputStream()
+    private val serverInputStream = PipedInputStream()
+
+    private val serverOutputStream = PipedOutputStream()
+    private val clientInputStream = PipedInputStream()
+
+    init {
+      try {
+        serverInputStream.connect(clientOutputStream)
+        clientInputStream.connect(serverOutputStream)
+      } catch (e: IOException) {
+        LOG.error("Failed to create pipes for Lua LSP", e)
+      }
     }
 
-    override fun isSupported(file: File): Boolean {
-        return supportedExtensions.contains(file.extension.lowercase())
+    override fun start() {
+      _isClosed = false
+      serverThread = executorService.submit {
+        try {
+          LOG.info("Starting LuaLanguageServer (In-Process)...")
+          val server = LuaLanguageServer()
+
+          // 创建服务端Launcher，监听 serverInputStream 并向 serverOutputStream 写入 JSON-RPC
+          val launcher =
+              Launcher.createLauncher<LuaLanguageClient>(
+                  server,
+                  LuaLanguageClient::class.java,
+                  serverInputStream as InputStream,
+                  serverOutputStream as OutputStream,
+              )
+
+          val remoteProxy = launcher.remoteProxy
+          server.connect(remoteProxy)
+
+          // 启动监听 (阻塞线程)
+          launcher.startListening().get()
+        } catch (e: InterruptedException) {
+          LOG.info("LuaLanguageServer thread was interrupted.")
+        } catch (e: Exception) {
+          LOG.error("LuaLanguageServer crashed or stopped", e)
+        } finally {
+          _isClosed = true
+        }
+      }
     }
 
-    /**
-     * 为 EmmyLua 提供初始化选项，特别是标准库路径 `stdFolder`，以使其具备完整的 API 补全能力。
-     */
-    override fun getInitializationOptions(uri: URI?): Any? {
-        val options = JsonObject()
-        options.addProperty("client", "vsc") // 必需：让 EmmyLua 识别客户端类型
-        
-        // 可选：指定 Lua 标准库（如果有打包解压到本地）
-        val stdFolder = File(Environment.HOME, ".androidide/local/share/emmylua/std")
-        if (stdFolder.exists()) {
-            options.addProperty("stdFolder", stdFolder.absolutePath)
-        }
-        
-        options.add("configFiles", JsonArray())
-        
-        return options
+    override val inputStream: InputStream
+      get() = clientInputStream
+
+    override val outputStream: OutputStream
+      get() = clientOutputStream
+
+    override val isClosed: Boolean
+      get() = _isClosed
+
+    override fun close() {
+      _isClosed = true
+      serverThread?.cancel(true)
+      try {
+        clientInputStream.close()
+        clientOutputStream.close()
+        serverInputStream.close()
+        serverOutputStream.close()
+      } catch (e: IOException) {
+        /* Ignore */
+      }
     }
-
-    /**
-     * 管道通信连接提供器，专门配置来对接 In-Process 的 EmmyLua。
-     */
-    private inner class InProcessLuaStreamProvider : StreamConnectionProvider {
-        private var serverThread: Future<*>? = null
-        private val executorService: ExecutorService = Executors.newCachedThreadPool()
-        
-        @Volatile
-        private var _isClosed = true
-
-        private val clientOutputStream = PipedOutputStream()
-        private val serverInputStream = PipedInputStream()
-        
-        private val serverOutputStream = PipedOutputStream()
-        private val clientInputStream = PipedInputStream()
-        
-        init {
-            try {
-                serverInputStream.connect(clientOutputStream)
-                clientInputStream.connect(serverOutputStream)
-            } catch (e: IOException) {
-                LOG.error("Failed to create pipes for Lua LSP", e)
-            }
-        }
-
-        override fun start() {
-            _isClosed = false
-            serverThread = executorService.submit {
-                try {
-                    LOG.info("Starting LuaLanguageServer (In-Process)...")
-                    val server = LuaLanguageServer()
-                    
-                    // 创建服务端Launcher，监听 serverInputStream 并向 serverOutputStream 写入 JSON-RPC
-                    val launcher = Launcher.createLauncher<LuaLanguageClient>(
-                        server,
-                        LuaLanguageClient::class.java,
-                        serverInputStream as InputStream,
-                        serverOutputStream as OutputStream
-                    )
-                    
-                    val remoteProxy = launcher.remoteProxy
-                    server.connect(remoteProxy)
-                    
-                    // 启动监听 (阻塞线程)
-                    launcher.startListening().get()
-                    
-                } catch (e: InterruptedException) {
-                    LOG.info("LuaLanguageServer thread was interrupted.")
-                } catch (e: Exception) {
-                    LOG.error("LuaLanguageServer crashed or stopped", e)
-                } finally {
-                    _isClosed = true
-                }
-            }
-        }
-
-        override val inputStream: InputStream get() = clientInputStream
-        override val outputStream: OutputStream get() = clientOutputStream
-        
-        override val isClosed: Boolean get() = _isClosed
-
-        override fun close() {
-            _isClosed = true
-            serverThread?.cancel(true)
-            try {
-                clientInputStream.close()
-                clientOutputStream.close()
-                serverInputStream.close()
-                serverOutputStream.close()
-            } catch (e: IOException) { /* Ignore */ }
-        }
-    }
+  }
 }

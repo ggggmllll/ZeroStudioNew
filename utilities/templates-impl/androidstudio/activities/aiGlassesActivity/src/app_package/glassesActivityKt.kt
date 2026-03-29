@@ -22,8 +22,8 @@ package com.itsaky.androidide.templates.impl.androidstudio.activities.aiGlassesA
  * @author android_zero
  */
 fun glassesActivityKt(activityClass: String, packageName: String) =
-  // language=kotlin
-  """
+    // language=kotlin
+    """
 package $packageName
 
 import android.os.Bundle

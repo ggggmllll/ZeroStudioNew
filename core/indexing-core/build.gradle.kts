@@ -15,7 +15,6 @@
  *   along with AndroidIDE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 import com.itsaky.androidide.build.config.BuildConfig
 
 plugins {
@@ -24,9 +23,7 @@ plugins {
   id("kotlin-kapt")
 }
 
-android {
-  namespace = "${BuildConfig.packageName}.indexing.core"
-}
+android { namespace = "${BuildConfig.packageName}.indexing.core" }
 
 dependencies {
   kapt(libs.google.auto.service)

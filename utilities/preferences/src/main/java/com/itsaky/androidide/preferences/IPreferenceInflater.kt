@@ -25,9 +25,7 @@ import androidx.preference.Preference
  * @author Akash Yadav
  */
 interface IPreferenceInflater {
-  
-  /**
-   * Uses the given [IPreference] to create a [Preference] view.
-   */
-  fun inflate(preference: IPreference) : Preference
+
+  /** Uses the given [IPreference] to create a [Preference] view. */
+  fun inflate(preference: IPreference): Preference
 }

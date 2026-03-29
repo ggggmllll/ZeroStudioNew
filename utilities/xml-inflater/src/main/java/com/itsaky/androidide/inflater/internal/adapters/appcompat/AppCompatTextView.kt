@@ -17,8 +17,5 @@
 
 package com.itsaky.androidide.inflater.internal.adapters.appcompat
 
-/**
- * @author Akash Yadav
- */
-class AppCompatTextView {
-}
+/** @author Akash Yadav */
+class AppCompatTextView {}

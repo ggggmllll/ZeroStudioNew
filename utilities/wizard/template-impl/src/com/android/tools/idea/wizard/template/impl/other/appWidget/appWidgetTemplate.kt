@@ -75,31 +75,32 @@ val appWidgetTemplate
     }
 
     val placement =
-      enumParameter<Placement> {
-        name = "Placement"
-        default = Placement.Homescreen
-        help =
-          "Make the widget available on the Home-screen and/or on the Keyguard. Keyguard placement is only supported in Android 4.2 and above; this setting is ignored on earlier versions and defaults to Home-screen.>"
-      }
+        enumParameter<Placement> {
+          name = "Placement"
+          default = Placement.Homescreen
+          help =
+              "Make the widget available on the Home-screen and/or on the Keyguard. Keyguard placement is only supported in Android 4.2 and above; this setting is ignored on earlier versions and defaults to Home-screen.>"
+        }
 
     val resizable =
-      enumParameter<Resizeable> {
-        name = "Resizable"
-        default = Resizeable.Both
-        help = "Allow the user to resize the widget. Feature only available on Android 3.1 and above.>"
-      }
+        enumParameter<Resizeable> {
+          name = "Resizable"
+          default = Resizeable.Both
+          help =
+              "Allow the user to resize the widget. Feature only available on Android 3.1 and above.>"
+        }
 
     val minWidth =
-      enumParameter<MinimumCells> {
-        name = "Minimum Width (cells)"
-        default = MinimumCells.`1`
-      }
+        enumParameter<MinimumCells> {
+          name = "Minimum Width (cells)"
+          default = MinimumCells.`1`
+        }
 
     val minHeight =
-      enumParameter<MinimumCells> {
-        name = "Minimum Height (cells)"
-        default = MinimumCells.`1`
-      }
+        enumParameter<MinimumCells> {
+          name = "Minimum Height (cells)"
+          default = MinimumCells.`1`
+        }
 
     val configurable = booleanParameter {
       name = "Configuration Screen"
@@ -109,28 +110,36 @@ val appWidgetTemplate
 
     thumb {
       File("app-widget")
-        .resolve("template_widget_" + minWidth.value.name + "x" + minHeight.value.name + "_" + resizable.value.suffix + ".png")
+          .resolve(
+              "template_widget_" +
+                  minWidth.value.name +
+                  "x" +
+                  minHeight.value.name +
+                  "_" +
+                  resizable.value.suffix +
+                  ".png"
+          )
     }
 
     widgets(
-      TextFieldWidget(className),
-      EnumWidget(placement),
-      EnumWidget(resizable),
-      EnumWidget(minWidth),
-      EnumWidget(minHeight),
-      CheckBoxWidget(configurable),
-      LanguageWidget(),
+        TextFieldWidget(className),
+        EnumWidget(placement),
+        EnumWidget(resizable),
+        EnumWidget(minWidth),
+        EnumWidget(minHeight),
+        CheckBoxWidget(configurable),
+        LanguageWidget(),
     )
 
     recipe = { data: TemplateData ->
       appWidgetRecipe(
-        data as ModuleTemplateData,
-        className.value,
-        placement.value,
-        resizable.value,
-        minWidth.value,
-        minHeight.value,
-        configurable.value,
+          data as ModuleTemplateData,
+          className.value,
+          placement.value,
+          resizable.value,
+          minWidth.value,
+          minHeight.value,
+          configurable.value,
       )
     }
   }

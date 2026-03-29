@@ -23,7 +23,7 @@ package com.itsaky.androidide.templates.impl.androidstudio.activities.androidTVA
  * @author android_zero
  */
 fun browseErrorActivityKt(layoutName: String, packageName: String, mainFragment: String) =
-  """
+    """
 package ${packageName}
 
 import android.os.Bundle

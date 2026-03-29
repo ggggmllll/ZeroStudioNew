@@ -30,7 +30,7 @@ import com.itsaky.androidide.lsp.ui.LspSettingsScreen
 
 /**
  * Fragment that hosts the LSP Settings UI.
- * 
+ *
  * FIXES:
  * 1. Initializes LspManager (loads configs/external servers).
  * 2. Initializes LspBootstrap (loads built-in servers like Kotlin, Python, etc.).
@@ -39,33 +39,31 @@ import com.itsaky.androidide.lsp.ui.LspSettingsScreen
  */
 class LspSettingsFragment : Fragment() {
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        val context = requireContext()
-        
-        // 1. Initialize the Manager (Loads configurations and external servers from disk)
-        LspManager.init(context)
-        
-        // 2. CRITICAL: Bootstrap built-in servers (Registers Kotlin, Python, XML, etc. into LspManager)
-        // If this is not called, the built-in list will be empty.
-        LspBootstrap.init(context)
-    }
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    val context = requireContext()
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        return ComposeView(requireContext()).apply {
-            // Dispose the Composition when the view's LifecycleOwner is destroyed
-            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-            
-            setContent {
-                // Apply Material Theme for Compose UI
-                androidx.compose.material3.MaterialTheme {
-                     LspSettingsScreen()
-                }
-            }
-        }
+    // 1. Initialize the Manager (Loads configurations and external servers from disk)
+    LspManager.init(context)
+
+    // 2. CRITICAL: Bootstrap built-in servers (Registers Kotlin, Python, XML, etc. into LspManager)
+    // If this is not called, the built-in list will be empty.
+    LspBootstrap.init(context)
+  }
+
+  override fun onCreateView(
+      inflater: LayoutInflater,
+      container: ViewGroup?,
+      savedInstanceState: Bundle?,
+  ): View {
+    return ComposeView(requireContext()).apply {
+      // Dispose the Composition when the view's LifecycleOwner is destroyed
+      setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+
+      setContent {
+        // Apply Material Theme for Compose UI
+        androidx.compose.material3.MaterialTheme { LspSettingsScreen() }
+      }
     }
+  }
 }

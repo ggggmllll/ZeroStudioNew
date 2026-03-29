@@ -47,7 +47,12 @@ val scrollActivityTemplate
 
     category = Category.Activity
     formFactor = FormFactor.Mobile
-    screens = listOf(WizardUiContext.ActivityGallery, WizardUiContext.MenuEntry, WizardUiContext.NewModule)
+    screens =
+        listOf(
+            WizardUiContext.ActivityGallery,
+            WizardUiContext.MenuEntry,
+            WizardUiContext.NewModule,
+        )
 
     lateinit var layoutName: StringParameter
     val activityClass = stringParameter {
@@ -80,7 +85,8 @@ val scrollActivityTemplate
     val isLauncher = booleanParameter {
       name = "Launcher Activity"
       default = false
-      help = "If true, this activity will have a CATEGORY_LAUNCHER intent filter, making it visible in the launcher"
+      help =
+          "If true, this activity will have a CATEGORY_LAUNCHER intent filter, making it visible in the launcher"
     }
 
     val contentLayoutName = stringParameter {
@@ -96,25 +102,25 @@ val scrollActivityTemplate
     val packageName = defaultPackageNameParameter
 
     widgets(
-      TextFieldWidget(activityClass),
-      TextFieldWidget(layoutName),
-      TextFieldWidget(menuName),
-      CheckBoxWidget(isLauncher),
-      PackageNameWidget(packageName),
-      LanguageWidget(),
+        TextFieldWidget(activityClass),
+        TextFieldWidget(layoutName),
+        TextFieldWidget(menuName),
+        CheckBoxWidget(isLauncher),
+        PackageNameWidget(packageName),
+        LanguageWidget(),
     )
 
     thumb { File("scrolling-activity").resolve("template_scroll_activity.png") }
 
     recipe = { data: TemplateData ->
       scrollActivityRecipe(
-        data as ModuleTemplateData,
-        activityClass.value,
-        layoutName.value,
-        contentLayoutName.value,
-        menuName.value,
-        isLauncher.value,
-        packageName.value,
+          data as ModuleTemplateData,
+          activityClass.value,
+          layoutName.value,
+          contentLayoutName.value,
+          menuName.value,
+          isLauncher.value,
+          packageName.value,
       )
     }
   }

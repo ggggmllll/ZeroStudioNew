@@ -28,28 +28,29 @@ interface ICompletionData
  * @property isCompleteData Whether the data provided by this [ClassCompletionData] is complete.
  * @property isNested Whether the given class is a nested class or not.
  * @property topLevelClass If [isNested] is true, then this must be set to the fully qualified name
- * of the top-level class.
+ *   of the top-level class.
  * @property simpleName The simple name of the class.
  * @property nameWithoutTopLevel The name of this class without the fully qualified name of its top
- * level class. For example, the value of this property for class name
- * `com.my.pck.MyClass.Inner.InnerInner` will be `Inner.InnerInner`
+ *   level class. For example, the value of this property for class name
+ *   `com.my.pck.MyClass.Inner.InnerInner` will be `Inner.InnerInner`
  */
 data class ClassCompletionData
 @JvmOverloads
 constructor(
-  val className: String,
-  val isCompleteData: Boolean = false,
-  val flatName: String = className,
-  val simpleName: String = className.substringAfterLast(delimiter = '.'),
-  val isNested: Boolean = false,
-  val topLevelClass: String = ""
+    val className: String,
+    val isCompleteData: Boolean = false,
+    val flatName: String = className,
+    val simpleName: String = className.substringAfterLast(delimiter = '.'),
+    val isNested: Boolean = false,
+    val topLevelClass: String = "",
 ) : ICompletionData {
 
-  val nameWithoutTopLevel: String = if (isNested) {
-    className.substring(topLevelClass.length + 1)
-  } else {
-    className
-  }
+  val nameWithoutTopLevel: String =
+      if (isNested) {
+        className.substring(topLevelClass.length + 1)
+      } else {
+        className
+      }
 }
 
 /**
@@ -65,8 +66,8 @@ interface MemberCompletionData : ICompletionData {
 
 /** Information about a field-related completion item. */
 data class FieldCompletionData(
-  override val memberName: String,
-  override val classInfo: ClassCompletionData
+    override val memberName: String,
+    override val classInfo: ClassCompletionData,
 ) : MemberCompletionData
 
 /**
@@ -76,9 +77,9 @@ data class FieldCompletionData(
  * @property plusOverloads The number of existing overloaded versions of this method.
  */
 data class MethodCompletionData(
-  override val memberName: String,
-  override val classInfo: ClassCompletionData,
-  val parameterTypes: List<String>,
-  val erasedParameterTypes: List<String>,
-  val plusOverloads: Int
+    override val memberName: String,
+    override val classInfo: ClassCompletionData,
+    val parameterTypes: List<String>,
+    val erasedParameterTypes: List<String>,
+    val plusOverloads: Int,
 ) : MemberCompletionData

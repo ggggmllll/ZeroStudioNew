@@ -31,27 +31,26 @@ import com.itsaky.androidide.resources.R
  *
  * @author Akash Yadav
  */
-@com.itsaky.androidide.annotations.inflater.ViewAdapter(
-  HorizontalScrollView::class)
+@com.itsaky.androidide.annotations.inflater.ViewAdapter(HorizontalScrollView::class)
 @IncludeInDesigner(group = LAYOUTS)
-open class HorizontalScrollViewAdapter<T : HorizontalScrollView> :
-  FrameLayoutAdapter<T>() {
+open class HorizontalScrollViewAdapter<T : HorizontalScrollView> : FrameLayoutAdapter<T>() {
 
-  override fun createAttrHandlers(
-    create: (String, AttributeHandlerScope<T>.() -> Unit) -> Unit
-  ) {
+  override fun createAttrHandlers(create: (String, AttributeHandlerScope<T>.() -> Unit) -> Unit) {
     super.createAttrHandlers(create)
     create("fillViewPort") { view.isFillViewport = parseBoolean(value, false) }
   }
 
   override fun createUiWidgets(): List<UiWidget> {
-    return listOf(UiWidget(HorizontalScrollView::class.java,
-      R.string.widget_horizontal_scrollview,
-      R.drawable.ic_widget_horizontal_scroll_view))
+    return listOf(
+        UiWidget(
+            HorizontalScrollView::class.java,
+            R.string.widget_horizontal_scrollview,
+            R.drawable.ic_widget_horizontal_scroll_view,
+        )
+    )
   }
 
-  override fun canAcceptChild(view: IViewGroup, child: IView?, name: String
-  ): Boolean {
+  override fun canAcceptChild(view: IViewGroup, child: IView?, name: String): Boolean {
     // scrollview can have only one child
     return view.childCount == 0
   }

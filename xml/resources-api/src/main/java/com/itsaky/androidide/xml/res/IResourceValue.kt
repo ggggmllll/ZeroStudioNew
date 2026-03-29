@@ -19,9 +19,7 @@ package com.itsaky.androidide.xml.res
 
 import com.android.aaptcompiler.Source
 
-/**
- * @author Akash Yadav
- */
+/** @author Akash Yadav */
 interface IResourceValue {
   var source: Source
   var comment: String

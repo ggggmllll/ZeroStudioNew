@@ -21,15 +21,15 @@ import com.android.tools.idea.wizard.template.getMaterialComponentName
 import com.android.tools.idea.wizard.template.renderIf
 
 fun listFragmentKt(
-  adapterClassName: String,
-  applicationPackage: String?,
-  columnCount: Int,
-  fragmentClass: String,
-  fragment_layout_list: String,
-  packageName: String,
-  useAndroidX: Boolean,
+    adapterClassName: String,
+    applicationPackage: String?,
+    columnCount: Int,
+    fragmentClass: String,
+    fragment_layout_list: String,
+    packageName: String,
+    useAndroidX: Boolean,
 ) =
-  """
+    """
 package ${escapeKotlinIdentifier(packageName)}
 
 import android.os.Bundle

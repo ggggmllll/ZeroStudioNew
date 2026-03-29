@@ -27,59 +27,57 @@ import io.github.rosemoe.sora.util.MyCharacter
 /**
  * Tree Sitter language specification for CMake.
  *
- * Covers all official CMake file types including CMakeLists.txt, *.cmake, 
- * templates (*.cmake.in), CTest, and CPack scripts.
+ * Covers all official CMake file types including CMakeLists.txt, *.cmake, templates (*.cmake.in),
+ * CTest, and CPack scripts.
  *
  * @author android_zero
  */
 class CmakeLanguage(context: Context) :
     TreeSitterLanguage(context, TSLanguageCmake.getInstance(), TS_TYPE) {
 
-    companion object {
+  companion object {
 
-        const val TS_TYPE = "cmake"
-        const val TS_TYPE_CMAKE_IN = "cmake.in"     // configure_file() 的输入模板
-        const val TS_TYPE_CMAKE_CTEST =  "ctest"    // CTest 专项脚本
-        const val TS_TYPE_CMAKE_CPACK =   "cpack"   // CPack 专项脚本
-        // const val TS_TYPE_CMAKE_PRESETS = "cmake.presets"
-        // const val TS_TYPE_CMAKE_USER_PRESETS = "cmake.user.presets"
-        // const val TS_TYPE_CMAKE_PATCHS = "cmake.patch"    // 社区常见的 CMake 补丁文件
-        const val TS_TYPE_CMAKE_CBPS = "cbp"
-        
-        const val TS_TYPE_CMAKE_CMLISTSTXT = "CMakeLists.txt"
-        const val TS_TYPE_CMAKE_CMCACHE = "CMakeCache.txt"
-            
-        @JvmField
-        val FACTORY = Factory { CmakeLanguage(it) }
-    }
+    const val TS_TYPE = "cmake"
+    const val TS_TYPE_CMAKE_IN = "cmake.in" // configure_file() 的输入模板
+    const val TS_TYPE_CMAKE_CTEST = "ctest" // CTest 专项脚本
+    const val TS_TYPE_CMAKE_CPACK = "cpack" // CPack 专项脚本
+    // const val TS_TYPE_CMAKE_PRESETS = "cmake.presets"
+    // const val TS_TYPE_CMAKE_USER_PRESETS = "cmake.user.presets"
+    // const val TS_TYPE_CMAKE_PATCHS = "cmake.patch"    // 社区常见的 CMake 补丁文件
+    const val TS_TYPE_CMAKE_CBPS = "cbp"
 
-   fun isStandardHeader(fileName: String): Boolean {
-        val stdHeaders = setOf("CMakeLists.txt", "CMakeCache.txt")
-        return stdHeaders.contains(fileName)
-    }
+    const val TS_TYPE_CMAKE_CMLISTSTXT = "CMakeLists.txt"
+    const val TS_TYPE_CMAKE_CMCACHE = "CMakeCache.txt"
 
+    @JvmField val FACTORY = Factory { CmakeLanguage(it) }
+  }
 
-    /**
-     * Determines whether the given character should trigger code completion.
-     * CMake identifiers typically consist of letters, numbers, and underscores.
-     */
-    override fun checkIsCompletionChar(c: Char): Boolean {
-        return MyCharacter.isJavaIdentifierPart(c) || c == '_' || c == '-'
-    }
+  fun isStandardHeader(fileName: String): Boolean {
+    val stdHeaders = setOf("CMakeLists.txt", "CMakeCache.txt")
+    return stdHeaders.contains(fileName)
+  }
 
-    /**
-     * Set the interruption level.
-     * Determines how aggressively the editor responds to language typing events.
-     */
-    override fun getInterruptionLevel(): Int {
-        return INTERRUPTION_LEVEL_SLIGHT
-    }
+  /**
+   * Determines whether the given character should trigger code completion. CMake identifiers
+   * typically consist of letters, numbers, and underscores.
+   */
+  override fun checkIsCompletionChar(c: Char): Boolean {
+    return MyCharacter.isJavaIdentifierPart(c) || c == '_' || c == '-'
+  }
 
-    /**
-     * Define how newlines inside brackets are handled.
-     * CMake heavily uses parentheses `()` for commands, so standard C-style handling is perfect.
-     */
-    override fun createNewlineHandlers(): Array<TSBracketsHandler> {
-        return arrayOf(TSCStyleBracketsHandler(this))
-    }
+  /**
+   * Set the interruption level. Determines how aggressively the editor responds to language typing
+   * events.
+   */
+  override fun getInterruptionLevel(): Int {
+    return INTERRUPTION_LEVEL_SLIGHT
+  }
+
+  /**
+   * Define how newlines inside brackets are handled. CMake heavily uses parentheses `()` for
+   * commands, so standard C-style handling is perfect.
+   */
+  override fun createNewlineHandlers(): Array<TSBracketsHandler> {
+    return arrayOf(TSCStyleBracketsHandler(this))
+  }
 }

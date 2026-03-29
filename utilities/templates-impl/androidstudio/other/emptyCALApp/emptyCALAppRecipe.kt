@@ -30,11 +30,11 @@ import com.itsaky.androidide.templates.impl.androidstudio.other.emptyCalApp.src.
 import java.io.File
 
 fun RecipeExecutor.emptyCalAppRecipe(
-  moduleData: ModuleTemplateData,
-  carAppServiceName: String,
-  sessionName: String,
-  screenName: String,
-  packageName: String,
+    moduleData: ModuleTemplateData,
+    carAppServiceName: String,
+    sessionName: String,
+    screenName: String,
+    packageName: String,
 ) {
   val projectData = moduleData.projectTemplateData
   val useAndroidX = projectData.androidXSupport
@@ -62,33 +62,52 @@ fun RecipeExecutor.emptyCalAppRecipe(
     addIncludeToSettings(sharedModule)
     val sharedModuleDir = projectData.rootDir.resolve(sharedModule)
     serviceManifestOut = projectData.rootDir.resolve(sharedModule).resolve(relativeManifestDir)
-    serviceSrcOut = projectData.rootDir.resolve(sharedModule).resolve(relativeSrcDir).resolve(sharedModule)
+    serviceSrcOut =
+        projectData.rootDir.resolve(sharedModule).resolve(relativeSrcDir).resolve(sharedModule)
     sharedPackageName = "$packageName.$sharedModule"
     serviceResOut = projectData.rootDir.resolve(sharedModule).resolve(relativeResDir)
 
     save(
-      source =
-        buildGradle(
-          projectData = projectData,
-          packageName = sharedPackageName,
-          buildApi = apis.buildApi,
-          minApi = apis.minApi,
-          targetApi = apis.targetApi,
-        ),
-      to = sharedModuleDir.resolve("build.gradle"),
+        source =
+            buildGradle(
+                projectData = projectData,
+                packageName = sharedPackageName,
+                buildApi = apis.buildApi,
+                minApi = apis.minApi,
+                targetApi = apis.targetApi,
+            ),
+        to = sharedModuleDir.resolve("build.gradle"),
     )
     setJavaKotlinCompileOptions(projectData.language == Language.Kotlin, sharedModuleDir)
 
     projectData.includedFormFactorNames[FormFactor.Mobile]?.forEach { moduleName ->
       addModuleDependency("implementation", sharedModule, projectData.rootDir.resolve(moduleName))
-      addDependency("androidx.car.app:app-projected:1.4.0", moduleDir = projectData.rootDir.resolve(moduleName))
-      mergeXml(mobileManifestXml(), projectData.rootDir.resolve(moduleName).resolve(relativeManifestDir).resolve("AndroidManifest.xml"))
+      addDependency(
+          "androidx.car.app:app-projected:1.4.0",
+          moduleDir = projectData.rootDir.resolve(moduleName),
+      )
+      mergeXml(
+          mobileManifestXml(),
+          projectData.rootDir
+              .resolve(moduleName)
+              .resolve(relativeManifestDir)
+              .resolve("AndroidManifest.xml"),
+      )
     }
 
     projectData.includedFormFactorNames[FormFactor.Car]?.forEach { moduleName ->
       addModuleDependency("implementation", sharedModule, projectData.rootDir.resolve(moduleName))
-      addDependency("androidx.car.app:app-automotive:1.7.0", moduleDir = projectData.rootDir.resolve(moduleName))
-      mergeXml(automotiveManifestXml(), projectData.rootDir.resolve(moduleName).resolve(relativeManifestDir).resolve("AndroidManifest.xml"))
+      addDependency(
+          "androidx.car.app:app-automotive:1.7.0",
+          moduleDir = projectData.rootDir.resolve(moduleName),
+      )
+      mergeXml(
+          automotiveManifestXml(),
+          projectData.rootDir
+              .resolve(moduleName)
+              .resolve(relativeManifestDir)
+              .resolve("AndroidManifest.xml"),
+      )
     }
 
     addDependency("androidx.car.app:app:1.4.0", moduleDir = sharedModuleDir)
@@ -100,7 +119,10 @@ fun RecipeExecutor.emptyCalAppRecipe(
     addDependency("androidx.car.app:app:1.4.0")
   }
 
-  mergeXml(androidManifestXml(carAppServiceName, sharedPackageName), serviceManifestOut.resolve("AndroidManifest.xml"))
+  mergeXml(
+      androidManifestXml(carAppServiceName, sharedPackageName),
+      serviceManifestOut.resolve("AndroidManifest.xml"),
+  )
 
   mergeXml(automotiveAppDescXml(), serviceResOut.resolve("xml/automotive_app_desc.xml"))
 

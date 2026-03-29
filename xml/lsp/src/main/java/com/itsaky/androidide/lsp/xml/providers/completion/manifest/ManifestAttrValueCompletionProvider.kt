@@ -53,14 +53,14 @@ import org.eclipse.lemminx.dom.DOMDocument
  * @author Akash Yadav
  */
 class ManifestAttrValueCompletionProvider(provider: ICompletionProvider) :
-  AttrValueCompletionProvider(provider) {
+    AttrValueCompletionProvider(provider) {
 
   override fun doComplete(
-    params: CompletionParams,
-    pathData: ResourcePathData,
-    document: DOMDocument,
-    type: NodeType,
-    prefix: String
+      params: CompletionParams,
+      pathData: ResourcePathData,
+      document: DOMDocument,
+      type: NodeType,
+      prefix: String,
   ): CompletionResult {
     if (this.attrAtCursor.nodeName == /*android:name*/ "${ANDROID_NS_NAME_PREFIX}${ATTR_NAME}") {
       return when (this.nodeAtCursor.nodeName) {
@@ -89,7 +89,7 @@ class ManifestAttrValueCompletionProvider(provider: ICompletionProvider) :
       }
 
       val item =
-        createEnumOrFlagCompletionItem(ResourceTableRegistry.PCK_ANDROID, value.name, match)
+          createEnumOrFlagCompletionItem(ResourceTableRegistry.PCK_ANDROID, value.name, match)
       item.insertText = value.constant
       item.insertTextFormat = PLAIN_TEXT
       item.overrideTypeText = "Permission"
@@ -97,10 +97,10 @@ class ManifestAttrValueCompletionProvider(provider: ICompletionProvider) :
       // Show API information
       item.completionKind = FIELD
       item.data =
-        FieldCompletionData(
-          memberName = value.name,
-          classInfo = ClassCompletionData(className = SdkConstants.CLASS_MANIFEST_PERMISSION)
-        )
+          FieldCompletionData(
+              memberName = value.name,
+              classInfo = ClassCompletionData(className = SdkConstants.CLASS_MANIFEST_PERMISSION),
+          )
       result.add(item)
     }
     return CompletionResult(result)
@@ -162,17 +162,17 @@ class ManifestAttrValueCompletionProvider(provider: ICompletionProvider) :
   }
 
   private fun addMatches(
-    prefix: String,
-    entries: List<String>,
-    result: MutableList<CompletionItem>
+      prefix: String,
+      entries: List<String>,
+      result: MutableList<CompletionItem>,
   ) {
     for (entry in entries) {
       val match =
-        if (entry.contains('.')) {
-          match(entry.substringAfterLast('.'), entry, prefix)
-        } else {
-          matchLevel(entry, prefix)
-        }
+          if (entry.contains('.')) {
+            match(entry.substringAfterLast('.'), entry, prefix)
+          } else {
+            matchLevel(entry, prefix)
+          }
 
       if (match == NO_MATCH) {
         continue
@@ -187,7 +187,7 @@ class ManifestAttrValueCompletionProvider(provider: ICompletionProvider) :
 
   private fun getModule(): ModuleProject {
     return Lookup.getDefault().lookup(ModuleProject.COMPLETION_MODULE_KEY)
-      ?: throw IllegalStateException("No module project provided")
+        ?: throw IllegalStateException("No module project provided")
   }
 
   override fun findResourceTables(nsUri: String?): Set<IResourceTable> {

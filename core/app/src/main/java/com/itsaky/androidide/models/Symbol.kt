@@ -19,22 +19,20 @@ package com.itsaky.androidide.models
 import io.github.rosemoe.sora.widget.CodeEditor
 
 /**
- * A symbol that is shown in the [SymbolInputView][com.itsaky.androidide.ui.SymbolInputView].
- * @author：android_zero  New content: Addition onCommit，onLongCommit
+ * A symbol that is shown in the
+ * [SymbolInputView][com.itsaky.androidide.ui.SymbolInputView]. @author：android_zero New content:
+ * Addition onCommit，onLongCommit
+ *
  * @author Akash Yadav
  */
-open class Symbol @JvmOverloads constructor(
-  open val label: String,
-  open val commit: String,
-  open val offset: Int = 1
-) {
-  @JvmOverloads
-  constructor(both: String, offset: Int = 1) : this(both, both, offset)
+open class Symbol
+@JvmOverloads
+constructor(open val label: String, open val commit: String, open val offset: Int = 1) {
+  @JvmOverloads constructor(both: String, offset: Int = 1) : this(both, both, offset)
 
   /**
-   * Called when the symbol is clicked.
-   * Default behavior is to insert the `commit` text.
-   * This method is open and can be overridden by subclasses to provide custom behavior.
+   * Called when the symbol is clicked. Default behavior is to insert the `commit` text. This method
+   * is open and can be overridden by subclasses to provide custom behavior.
    *
    * @param editor The CodeEditor instance where the action should be performed.
    */
@@ -43,9 +41,8 @@ open class Symbol @JvmOverloads constructor(
   }
 
   /**
-   * Called when the symbol is long-clicked.
-   * Default behavior is the same as a single click.
-   * This method is open and can be overridden by subclasses.
+   * Called when the symbol is long-clicked. Default behavior is the same as a single click. This
+   * method is open and can be overridden by subclasses.
    *
    * @param editor The CodeEditor instance where the action should be performed.
    */

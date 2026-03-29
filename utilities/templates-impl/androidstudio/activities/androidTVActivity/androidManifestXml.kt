@@ -17,31 +17,33 @@
 package com.itsaky.androidide.templates.impl.androidstudio.activities.androidTVActivity
 
 /**
- * Creates the AndroidManifest for Android TV Leanback configuration explicitly setting touch and UI requirements.
+ * Creates the AndroidManifest for Android TV Leanback configuration explicitly setting touch and UI
+ * requirements.
  *
  * @author Historical contributors (The Android Open Source Project)
  * @author android_zero
  */
 fun androidManifestXml(
-  activityClass: String,
-  detailsActivity: String,
-  isLibrary: Boolean,
-  isNewModule: Boolean,
-  packageName: String,
-  themeName: String,
+    activityClass: String,
+    detailsActivity: String,
+    isLibrary: Boolean,
+    isNewModule: Boolean,
+    packageName: String,
+    themeName: String,
 ): String {
   val labelBlock =
-    if (isNewModule) "android:label=\"@string/app_name\"" else "android:label=\"@string/title_${activityClass}\""
+      if (isNewModule) "android:label=\"@string/app_name\""
+      else "android:label=\"@string/title_${activityClass}\""
   val launcher = !isLibrary
   val intentFilterBlock =
-    if (launcher) {
-      """
+      if (launcher) {
+        """
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
             </intent-filter>
   """
-    } else ""
+      } else ""
   return """
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">

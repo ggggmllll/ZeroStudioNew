@@ -15,24 +15,19 @@
  *   along with AndroidIDE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 import com.itsaky.androidide.build.config.BuildConfig
 
 plugins {
-    id("com.android.library")
-    id("kotlin-android")
+  id("com.android.library")
+  id("kotlin-android")
 }
 
-
-
-android {
-    namespace = "${BuildConfig.packageName}.eventbus.events"
-}
+android { namespace = "${BuildConfig.packageName}.eventbus.events" }
 
 dependencies {
-    implementation(libs.common.kotlin)
-    implementation(projects.logging.logger)
-    implementation(projects.utilities.shared)
+  implementation(libs.common.kotlin)
+  implementation(projects.logging.logger)
+  implementation(projects.utilities.shared)
 
-    api(projects.event.eventbus)
+  api(projects.event.eventbus)
 }

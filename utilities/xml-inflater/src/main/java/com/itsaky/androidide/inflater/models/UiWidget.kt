@@ -37,9 +37,9 @@ import com.itsaky.androidide.inflater.viewAdapter
 open class UiWidget(val name: String, @StringRes val label: Int, @DrawableRes val icon: Int) {
 
   constructor(
-    klass: Class<out View>,
-    @StringRes label: Int,
-    @DrawableRes icon: Int
+      klass: Class<out View>,
+      @StringRes label: Int,
+      @DrawableRes icon: Int,
   ) : this(klass.name, label, icon)
 
   /**
@@ -52,7 +52,7 @@ open class UiWidget(val name: String, @StringRes val label: Int, @DrawableRes va
     val v = ViewFactory.createViewInstance(name, context)
 
     val view: IView = createView(layoutFile, v)
-    
+
     (view as? IViewGroup)?.apply {
       val dp8 = SizeUtils.dp2px(8f)
       this.view.updatePaddingRelative(start = dp8, top = dp8, end = dp8, bottom = dp8)
@@ -60,17 +60,17 @@ open class UiWidget(val name: String, @StringRes val label: Int, @DrawableRes va
 
     view.view.layoutParams = generateLayoutParams(parent)
     val adapter =
-      view.viewAdapter
-        ?: throw IllegalStateException("No attribute adapter found for '${view.name}'")
+        view.viewAdapter
+            ?: throw IllegalStateException("No attribute adapter found for '${view.name}'")
     adapter.applyBasic(view)
     return view
   }
 
   private fun createView(layoutFile: LayoutFile, v: View) =
-    (lookupComponentFactory()?.createView(layoutFile, name, v)
-      ?: if (v is ViewGroup) {
-        ViewGroupImpl(layoutFile, name, v)
-      } else ViewImpl(layoutFile, name, v))
+      (lookupComponentFactory()?.createView(layoutFile, name, v)
+          ?: if (v is ViewGroup) {
+            ViewGroupImpl(layoutFile, name, v)
+          } else ViewImpl(layoutFile, name, v))
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true

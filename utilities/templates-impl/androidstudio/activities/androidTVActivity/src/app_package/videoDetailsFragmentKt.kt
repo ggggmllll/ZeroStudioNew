@@ -23,11 +23,11 @@ package com.itsaky.androidide.templates.impl.androidstudio.activities.androidTVA
  * @author android_zero
  */
 fun videoDetailsFragmentKt(
-  activityClass: String,
-  detailsActivity: String,
-  detailsFragment: String,
-  minApiLevel: Int,
-  packageName: String,
+    activityClass: String,
+    detailsActivity: String,
+    detailsFragment: String,
+    minApiLevel: Int,
+    packageName: String,
 ): String {
   val contextArgBlock = if (minApiLevel >= 23) "requireContext()" else "requireActivity()"
   return """

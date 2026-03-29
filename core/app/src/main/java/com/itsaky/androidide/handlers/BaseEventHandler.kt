@@ -33,8 +33,7 @@ abstract class BaseEventHandler : EventReceiver {
 
   companion object {
 
-    @JvmStatic
-    protected val log: Logger = LoggerFactory.getLogger(BaseEventHandler::class.java)
+    @JvmStatic protected val log: Logger = LoggerFactory.getLogger(BaseEventHandler::class.java)
   }
 
   protected open fun checkIsEditorActivity(event: Event): Boolean {

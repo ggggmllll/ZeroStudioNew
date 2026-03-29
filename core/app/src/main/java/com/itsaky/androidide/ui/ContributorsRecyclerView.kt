@@ -26,21 +26,24 @@ import com.google.android.flexbox.JustifyContent
 import com.itsaky.androidide.adapters.ContributorsGridAdapter
 import com.itsaky.androidide.utils.FlexboxUtils
 
-class ContributorsRecyclerView @JvmOverloads constructor(
-  context: Context,
-  attrs: AttributeSet? = null,
-  defStyleAttr: Int = 0
-) : RecyclerView(context, attrs, defStyleAttr) {
+class ContributorsRecyclerView
+@JvmOverloads
+constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) :
+    RecyclerView(context, attrs, defStyleAttr) {
 
-  private var globalLayoutListener = FlexboxUtils.createGlobalLayoutListenerToDistributeFlexboxItemsEvenly(
-    { adapter }, { layoutManager as FlexboxLayoutManager }) { adapter, extras ->
-    (adapter as ContributorsGridAdapter).fillDiff(extras)
-  }
+  private var globalLayoutListener =
+      FlexboxUtils.createGlobalLayoutListenerToDistributeFlexboxItemsEvenly(
+          { adapter },
+          { layoutManager as FlexboxLayoutManager },
+      ) { adapter, extras ->
+        (adapter as ContributorsGridAdapter).fillDiff(extras)
+      }
 
   init {
-    layoutManager = FlexboxLayoutManager(context, FlexDirection.ROW).apply {
-      justifyContent = JustifyContent.SPACE_EVENLY
-    }
+    layoutManager =
+        FlexboxLayoutManager(context, FlexDirection.ROW).apply {
+          justifyContent = JustifyContent.SPACE_EVENLY
+        }
     viewTreeObserver.addOnGlobalLayoutListener(globalLayoutListener)
   }
 }

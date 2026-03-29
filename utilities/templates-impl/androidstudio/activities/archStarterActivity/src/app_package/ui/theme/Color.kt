@@ -25,7 +25,7 @@ import com.itsaky.androidide.templates.impl.utils.MaterialColor
  * @author android_zero
  */
 fun ArchStarterActivityTemplateVariables.colorKt() =
-  """
+    """
 package $themePackage
 
 import androidx.compose.ui.graphics.Color

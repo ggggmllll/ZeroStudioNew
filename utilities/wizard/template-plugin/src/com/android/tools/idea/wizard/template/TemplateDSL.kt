@@ -18,27 +18,28 @@ package com.android.tools.idea.wizard.template
 import java.io.File
 
 internal data class TemplateImpl(
-  override val name: String,
-  override val description: String,
-  override val documentationUrl: String?,
-  override val minSdk: Int,
-  override val category: Category,
-  override val formFactor: FormFactor,
-  override val widgets: Collection<Widget<*>>,
-  private val _thumb: () -> Thumb,
-  override val recipe: Recipe,
-  override val uiContexts: Collection<WizardUiContext>,
-  override val constraints: Collection<TemplateConstraint>,
-  override val flags: Collection<TemplateFlag>,
-  override val useGenericInstrumentedTests: Boolean,
-  override val useGenericLocalTests: Boolean,
+    override val name: String,
+    override val description: String,
+    override val documentationUrl: String?,
+    override val minSdk: Int,
+    override val category: Category,
+    override val formFactor: FormFactor,
+    override val widgets: Collection<Widget<*>>,
+    private val _thumb: () -> Thumb,
+    override val recipe: Recipe,
+    override val uiContexts: Collection<WizardUiContext>,
+    override val constraints: Collection<TemplateConstraint>,
+    override val flags: Collection<TemplateFlag>,
+    override val useGenericInstrumentedTests: Boolean,
+    override val useGenericLocalTests: Boolean,
 ) : Template {
   override fun thumb(): Thumb = _thumb()
 }
 
 @DslMarker annotation class TemplateDSL
 
-inline fun template(block: TemplateBuilder.() -> Unit): Template = TemplateBuilder().apply(block).build()
+inline fun template(block: TemplateBuilder.() -> Unit): Template =
+    TemplateBuilder().apply(block).build()
 
 @TemplateDSL
 class TemplateBuilder {
@@ -64,7 +65,10 @@ class TemplateBuilder {
 
   @TemplateDSL class ThumbBuilder
 
-  /** A wrapper for collection of [Thumb]s with an optional [get]ter. Implementations usually use [Parameter.value] to choose [Thumb]. */
+  /**
+   * A wrapper for collection of [Thumb]s with an optional [get]ter. Implementations usually use
+   * [Parameter.value] to choose [Thumb].
+   */
   fun thumb(block: ThumbBuilder.() -> File) {
     thumb = { Thumb { findResource(this.javaClass, ThumbBuilder().block()) } }
   }
@@ -78,20 +82,20 @@ class TemplateBuilder {
     checkNotNull(recipe) { "Template must have a recipe to run." }
 
     return TemplateImpl(
-      name!!,
-      description!!,
-      documentationUrl,
-      minApi,
-      category!!,
-      formFactor!!,
-      widgets,
-      thumb,
-      recipe!!,
-      screens,
-      constraints,
-      flags,
-      useGenericAndroidTests,
-      useGenericLocalTests,
+        name!!,
+        description!!,
+        documentationUrl,
+        minApi,
+        category!!,
+        formFactor!!,
+        widgets,
+        thumb,
+        recipe!!,
+        screens,
+        constraints,
+        flags,
+        useGenericAndroidTests,
+        useGenericLocalTests,
     )
   }
 }

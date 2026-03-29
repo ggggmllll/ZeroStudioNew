@@ -17,7 +17,7 @@
 package com.itsaky.androidide.templates.impl.androidstudio.other.customView.res.values
 
 fun attrsXml(viewClass: String) =
-  """
+    """
 <resources>
     <declare-styleable name="${viewClass}">
         <attr name="exampleString" format="string" />

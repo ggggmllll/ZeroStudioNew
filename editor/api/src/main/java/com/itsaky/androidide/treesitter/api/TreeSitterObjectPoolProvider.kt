@@ -31,7 +31,8 @@ import java.util.concurrent.ConcurrentHashMap
  */
 internal object TreeSitterObjectPoolProvider {
 
-  private val caches = ConcurrentHashMap<Class<out RecyclableObjectPool.Recyclable>, RecyclableObjectPool<*>>()
+  private val caches =
+      ConcurrentHashMap<Class<out RecyclableObjectPool.Recyclable>, RecyclableObjectPool<*>>()
 
   init {
     putPool(capacity = CAPACITY_MINI, factory = ::TreeSitterInputEdit)
@@ -52,9 +53,7 @@ internal object TreeSitterObjectPoolProvider {
   }
 
   fun logMetrics() {
-    caches.forEach { (_, pool) ->
-      pool.logMetrics()
-    }
+    caches.forEach { (_, pool) -> pool.logMetrics() }
   }
 
   inline fun <reified T : RecyclableObjectPool.Recyclable> getPool(): RecyclableObjectPool<T>? {
@@ -74,9 +73,9 @@ internal object TreeSitterObjectPoolProvider {
   }
 
   private inline fun <reified T : RecyclableObjectPool.Recyclable> putPool(
-    capacity: Int = CAPACITY_DEFAULT,
-    fillFirst: Int = 0,
-    factory: RecyclableObjectPool.Factory<T>
+      capacity: Int = CAPACITY_DEFAULT,
+      fillFirst: Int = 0,
+      factory: RecyclableObjectPool.Factory<T>,
   ) {
     if (caches[T::class.java] != null) {
       throw IllegalArgumentException("Attempt to replace object pool for ${T::class.java}")

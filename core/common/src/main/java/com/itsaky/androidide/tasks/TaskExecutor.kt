@@ -16,16 +16,15 @@
  */
 package com.itsaky.androidide.tasks
 
+// import com.itsaky.androidide.common.R
 import android.app.ProgressDialog
 import android.content.Context
 import com.blankj.utilcode.util.ThreadUtils
-// import com.itsaky.androidide.common.R
 import com.itsaky.androidide.resources.R
-import com.google.android.material.R.attr
-import org.slf4j.LoggerFactory
 import java.util.concurrent.Callable
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CompletionException
+import org.slf4j.LoggerFactory
 
 object TaskExecutor {
 
@@ -34,37 +33,37 @@ object TaskExecutor {
   @JvmOverloads
   @JvmStatic
   fun <R> executeAsync(
-    callable: Callable<R>,
-    callback: Callback<R>? = null
+      callable: Callable<R>,
+      callback: Callback<R>? = null,
   ): CompletableFuture<R?> {
     return CompletableFuture.supplyAsync {
-        try {
-          return@supplyAsync callable.call()
-        } catch (th: Throwable) {
-          log.error("An error occurred while executing Callable in background thread.", th)
-          return@supplyAsync null
+          try {
+            return@supplyAsync callable.call()
+          } catch (th: Throwable) {
+            log.error("An error occurred while executing Callable in background thread.", th)
+            return@supplyAsync null
+          }
         }
-      }
-      .whenComplete { result, _ -> ThreadUtils.runOnUiThread { callback?.complete(result) } }
+        .whenComplete { result, _ -> ThreadUtils.runOnUiThread { callback?.complete(result) } }
   }
 
   @JvmOverloads
   @JvmStatic
   fun <R> executeAsyncProvideError(
-    callable: Callable<R>,
-    callback: CallbackWithError<R>? = null
+      callable: Callable<R>,
+      callback: CallbackWithError<R>? = null,
   ): CompletableFuture<R?> {
     return CompletableFuture.supplyAsync {
-        try {
-          return@supplyAsync callable.call()
-        } catch (th: Throwable) {
-          log.error("An error occurred while executing Callable in background thread.", th)
-          throw CompletionException(th)
+          try {
+            return@supplyAsync callable.call()
+          } catch (th: Throwable) {
+            log.error("An error occurred while executing Callable in background thread.", th)
+            throw CompletionException(th)
+          }
         }
-      }
-      .whenComplete { result, throwable ->
-        ThreadUtils.runOnUiThread { callback?.complete(result, throwable) }
-      }
+        .whenComplete { result, throwable ->
+          ThreadUtils.runOnUiThread { callback?.complete(result, throwable) }
+        }
   }
 
   fun interface Callback<R> {
@@ -83,8 +82,8 @@ fun <R : Any?> executeAsync(callable: () -> R?) {
 @JvmOverloads
 @Suppress("DEPRECATION")
 inline fun <T> Context.executeWithProgress(
-  cancellable: Boolean = false,
-  block: (ProgressDialog) -> T
+    cancellable: Boolean = false,
+    block: (ProgressDialog) -> T,
 ): T {
   val dialog = ProgressDialog(this)
   dialog.setMessage(getString(R.string.please_wait))
@@ -94,14 +93,13 @@ inline fun <T> Context.executeWithProgress(
 }
 
 fun <R : Any?> executeAsync(callable: () -> R?, callback: (R?) -> Unit): CompletableFuture<R?> =
-  TaskExecutor.executeAsync({ callable() }) { callback(it) }
+    TaskExecutor.executeAsync({ callable() }) { callback(it) }
 
 fun <R : Any?> executeAsyncProvideError(
-  callable: () -> R?,
-  callback: (R?, Throwable?) -> Unit
-): CompletableFuture<R?> =
-  TaskExecutor.executeAsyncProvideError(callable, callback)
+    callable: () -> R?,
+    callback: (R?, Throwable?) -> Unit,
+): CompletableFuture<R?> = TaskExecutor.executeAsyncProvideError(callable, callback)
 
-fun runOnUiThread(action : () -> Unit) {
+fun runOnUiThread(action: () -> Unit) {
   ThreadUtils.runOnUiThread(action)
 }

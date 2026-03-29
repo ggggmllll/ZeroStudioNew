@@ -36,11 +36,11 @@ import com.android.tools.idea.wizard.template.impl.activities.fullscreenActivity
 import com.android.tools.idea.wizard.template.impl.activities.fullscreenActivity.src.app_package.fullscreenActivityKt
 
 fun RecipeExecutor.fullscreenActivityRecipe(
-  moduleData: ModuleTemplateData,
-  activityClass: String,
-  isLauncher: Boolean,
-  layoutName: String,
-  packageName: String,
+    moduleData: ModuleTemplateData,
+    activityClass: String,
+    isLauncher: Boolean,
+    layoutName: String,
+    packageName: String,
 ) {
   val (projectData, srcOut, resOut, manifestOut) = moduleData
   val apis = moduleData.apis
@@ -54,11 +54,20 @@ fun RecipeExecutor.fullscreenActivityRecipe(
   addViewBindingSupport(moduleData.viewBindingSupport, true)
 
   val simpleName = activityToLayout(activityClass)
-  val superClassFqcn = getMaterialComponentName("android.support.v7.app.AppCompatActivity", useAndroidX)
+  val superClassFqcn =
+      getMaterialComponentName("android.support.v7.app.AppCompatActivity", useAndroidX)
   val themeName = moduleData.themesData.main.name
   mergeXml(
-    androidManifestXml(activityClass, packageName, simpleName, isLauncher, moduleData.isLibrary, moduleData.isNewModule, themeName),
-    manifestOut.resolve("AndroidManifest.xml"),
+      androidManifestXml(
+          activityClass,
+          packageName,
+          simpleName,
+          isLauncher,
+          moduleData.isLibrary,
+          moduleData.isNewModule,
+          themeName,
+      ),
+      manifestOut.resolve("AndroidManifest.xml"),
   )
 
   val finalResOut = moduleData.baseFeature?.resDir ?: resOut
@@ -68,35 +77,44 @@ fun RecipeExecutor.fullscreenActivityRecipe(
   mergeXml(fullscreenColors(), finalResOut.resolve("values/colors.xml"))
   mergeXml(fullscreenStyles(moduleData.themesData), finalResOut.resolve("values/styles.xml"))
   mergeXml(fullscreenThemes(moduleData.themesData), finalResOut.resolve("values/themes.xml"))
-  mergeXml(fullscreenThemesNight(moduleData.themesData), finalResOut.resolve("values-night/themes.xml"))
+  mergeXml(
+      fullscreenThemesNight(moduleData.themesData),
+      finalResOut.resolve("values-night/themes.xml"),
+  )
 
-  save(activityFullscreenXml(activityClass, packageName, moduleData.themesData), resOut.resolve("layout/${layoutName}.xml"))
-  mergeXml(stringsXml(activityClass, moduleData.isNewModule, simpleName), finalResOut.resolve("values/strings.xml"))
+  save(
+      activityFullscreenXml(activityClass, packageName, moduleData.themesData),
+      resOut.resolve("layout/${layoutName}.xml"),
+  )
+  mergeXml(
+      stringsXml(activityClass, moduleData.isNewModule, simpleName),
+      finalResOut.resolve("values/strings.xml"),
+  )
 
   val actionBarClassFqcn = getMaterialComponentName("android.support.v7.app.ActionBar", useAndroidX)
   val isViewBindingSupported = moduleData.viewBindingSupport.isViewBindingSupported()
   val fullscreenActivity =
-    when (projectData.language) {
-      Language.Java ->
-        fullscreenActivityJava(
-          actionBarClassFqcn = actionBarClassFqcn,
-          activityClass = activityClass,
-          applicationPackage = projectData.applicationPackage,
-          layoutName = layoutName,
-          packageName = packageName,
-          superClassFqcn = superClassFqcn,
-          isViewBindingSupported = isViewBindingSupported,
-        )
-      Language.Kotlin ->
-        fullscreenActivityKt(
-          activityClass = activityClass,
-          applicationPackage = projectData.applicationPackage,
-          layoutName = layoutName,
-          packageName = packageName,
-          superClassFqcn = superClassFqcn,
-          isViewBindingSupported = isViewBindingSupported,
-        )
-    }
+      when (projectData.language) {
+        Language.Java ->
+            fullscreenActivityJava(
+                actionBarClassFqcn = actionBarClassFqcn,
+                activityClass = activityClass,
+                applicationPackage = projectData.applicationPackage,
+                layoutName = layoutName,
+                packageName = packageName,
+                superClassFqcn = superClassFqcn,
+                isViewBindingSupported = isViewBindingSupported,
+            )
+        Language.Kotlin ->
+            fullscreenActivityKt(
+                activityClass = activityClass,
+                applicationPackage = projectData.applicationPackage,
+                layoutName = layoutName,
+                packageName = packageName,
+                superClassFqcn = superClassFqcn,
+                isViewBindingSupported = isViewBindingSupported,
+            )
+      }
   save(fullscreenActivity, srcOut.resolve("${activityClass}.${ktOrJavaExt}"))
 
   open(srcOut.resolve("${activityClass}.${ktOrJavaExt}"))

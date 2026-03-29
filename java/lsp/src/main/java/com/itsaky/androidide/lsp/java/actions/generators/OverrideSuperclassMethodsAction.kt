@@ -42,6 +42,9 @@ import com.itsaky.androidide.projects.IProjectManager
 import com.itsaky.androidide.resources.R
 import com.itsaky.androidide.utils.flashError
 import io.github.rosemoe.sora.widget.CodeEditor
+import java.util.Arrays
+import java.util.Optional
+import java.util.concurrent.CompletableFuture
 import jdkx.lang.model.element.ElementKind
 import jdkx.lang.model.element.ExecutableElement
 import jdkx.lang.model.element.Modifier
@@ -52,9 +55,6 @@ import jdkx.tools.JavaFileObject
 import openjdk.source.tree.MethodTree
 import openjdk.source.util.Trees
 import org.slf4j.LoggerFactory
-import java.util.Arrays
-import java.util.Optional
-import java.util.concurrent.CompletableFuture
 
 /**
  * Allows the user to override multiple methods from superclass at once.
@@ -77,11 +77,11 @@ class OverrideSuperclassMethodsAction : BaseJavaCodeAction() {
     super.prepare(data)
 
     if (
-      !visible ||
-      !data.hasRequiredData(
-        com.itsaky.androidide.models.Range::class.java,
-        CodeEditor::class.java
-      )
+        !visible ||
+            !data.hasRequiredData(
+                com.itsaky.androidide.models.Range::class.java,
+                CodeEditor::class.java,
+            )
     ) {
       markInvisible()
       return
@@ -94,10 +94,11 @@ class OverrideSuperclassMethodsAction : BaseJavaCodeAction() {
   override suspend fun execAction(data: ActionData): Any {
     val range = data[com.itsaky.androidide.models.Range::class.java]!!
     val compiler =
-      JavaCompilerProvider.get(
-        IProjectManager.getInstance().getWorkspace()?.findModuleForFile(data.requireFile(), false)
-          ?: return Any()
-      )
+        JavaCompilerProvider.get(
+            IProjectManager.getInstance()
+                .getWorkspace()
+                ?.findModuleForFile(data.requireFile(), false) ?: return Any()
+        )
     val file = data.requirePath()
 
     return compiler.compile(file).get { task ->
@@ -140,7 +141,7 @@ class OverrideSuperclassMethodsAction : BaseJavaCodeAction() {
         val method = member as ExecutableElement
         val methodSource = member.getEnclosingElement() as TypeElement
         if (
-          methodSource.qualifiedName.contentEquals("java.lang.Object") || methodSource == element
+            methodSource.qualifiedName.contentEquals("java.lang.Object") || methodSource == element
         ) {
           continue
         }
@@ -184,19 +185,18 @@ class OverrideSuperclassMethodsAction : BaseJavaCodeAction() {
       }
 
       CompletableFuture.runAsync { overrideMethods(data, checkedMethods) }
-        .whenComplete {
-            _, error,
-          ->
-          if (error != null) {
-            log.error("An error occurred overriding methods")
+          .whenComplete { _, error,
+            ->
+            if (error != null) {
+              log.error("An error occurred overriding methods")
 
-            ThreadUtils.runOnUiThread {
-              flashError(
-                data[Context::class.java]!!.getString(R.string.msg_cannot_override_methods)
-              )
+              ThreadUtils.runOnUiThread {
+                flashError(
+                    data[Context::class.java]!!.getString(R.string.msg_cannot_override_methods)
+                )
+              }
             }
           }
-        }
     }
     builder.setNegativeButton(android.R.string.cancel, null)
     builder.show()
@@ -204,10 +204,11 @@ class OverrideSuperclassMethodsAction : BaseJavaCodeAction() {
 
   private fun overrideMethods(data: ActionData, checkedMethods: MutableList<MethodPtr>) {
     val compiler =
-      JavaCompilerProvider.get(
-        IProjectManager.getInstance().getWorkspace()?.findModuleForFile(data.requireFile(), false)
-          ?: return
-      )
+        JavaCompilerProvider.get(
+            IProjectManager.getInstance()
+                .getWorkspace()
+                ?.findModuleForFile(data.requireFile(), false) ?: return
+        )
     val file = data.requirePath()
 
     compiler.compile(file).run { task ->
@@ -225,22 +226,22 @@ class OverrideSuperclassMethodsAction : BaseJavaCodeAction() {
 
       for (pointer in checkedMethods) {
         val superMethod =
-          FindHelper.findMethod(
-            task,
-            pointer.className,
-            pointer.methodName,
-            pointer.erasedParameterTypes
-          ) ?: continue
+            FindHelper.findMethod(
+                task,
+                pointer.className,
+                pointer.methodName,
+                pointer.erasedParameterTypes,
+            ) ?: continue
 
         val thisDeclaredType = thisClass.asType() as DeclaredType
         val executableType = types.asMemberOf(thisDeclaredType, superMethod) as ExecutableType
         val source = findSource(compiler, task, superMethod)
         val method =
-          if (source != null) {
-            JavaParserUtils.printMethod(superMethod, executableType, source)
-          } else {
-            JavaParserUtils.printMethod(superMethod, executableType, superMethod)
-          }
+            if (source != null) {
+              JavaParserUtils.printMethod(superMethod, executableType, source)
+            } else {
+              JavaParserUtils.printMethod(superMethod, executableType, superMethod)
+            }
 
         val newImports = JavaParserUtils.collectImports(executableType)
         sb.append("\n")
@@ -257,26 +258,27 @@ class OverrideSuperclassMethodsAction : BaseJavaCodeAction() {
 
       ThreadUtils.runOnUiThread {
         performEdits(
-          data,
-          sb,
-          imports,
-          EditHelper.insertAtEndOfClass(task.task, task.root(file), classTree)
+            data,
+            sb,
+            imports,
+            EditHelper.insertAtEndOfClass(task.task, task.root(file), classTree),
         )
       }
     }
   }
 
   private fun performEdits(
-    data: ActionData,
-    sb: StringBuilder,
-    imports: MutableSet<String>,
-    position: Position,
+      data: ActionData,
+      sb: StringBuilder,
+      imports: MutableSet<String>,
+      position: Position,
   ) {
     val compiler =
-      JavaCompilerProvider.get(
-        IProjectManager.getInstance().getWorkspace()?.findModuleForFile(data.requireFile(), false)
-          ?: return
-      )
+        JavaCompilerProvider.get(
+            IProjectManager.getInstance()
+                .getWorkspace()
+                ?.findModuleForFile(data.requireFile(), false) ?: return
+        )
     val editor = data[CodeEditor::class.java]!!
     val file = data.requirePath()
     val text = editor.text
@@ -297,11 +299,11 @@ class OverrideSuperclassMethodsAction : BaseJavaCodeAction() {
           text.insert(edit.range.start.line, edit.range.start.column, edit.newText)
         } else {
           text.replace(
-            edit.range.start.line,
-            edit.range.start.column,
-            edit.range.end.line,
-            edit.range.end.column,
-            edit.newText
+              edit.range.start.line,
+              edit.range.start.column,
+              edit.range.end.line,
+              edit.range.end.column,
+              edit.newText,
           )
         }
       }
@@ -313,22 +315,22 @@ class OverrideSuperclassMethodsAction : BaseJavaCodeAction() {
 
   private fun mapMethodPointers(methods: List<MethodPtr>): Array<CharSequence> {
     return methods
-      .map { Arrays.toString(it.simplifiedErasedParameterTypes) }
-      .map {
-        val arr = it.toCharArray()
-        arr[0] = '('
-        arr[arr.size - 1] = ')'
+        .map { Arrays.toString(it.simplifiedErasedParameterTypes) }
+        .map {
+          val arr = it.toCharArray()
+          arr[0] = '('
+          arr[arr.size - 1] = ')'
 
-        String(arr)
-      }
-      .mapIndexed { index, params -> "${methods[index].methodName}$params" }
-      .toTypedArray()
+          String(arr)
+        }
+        .mapIndexed { index, params -> "${methods[index].methodName}$params" }
+        .toTypedArray()
   }
 
   private fun findSource(
-    compiler: CompilerProvider,
-    task: CompileTask,
-    method: ExecutableElement,
+      compiler: CompilerProvider,
+      task: CompileTask,
+      method: ExecutableElement,
   ): MethodTree? {
     val superClass = method.enclosingElement as TypeElement
     val superClassName = superClass.qualifiedName.toString()

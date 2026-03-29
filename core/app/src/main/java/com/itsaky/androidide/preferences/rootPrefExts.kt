@@ -17,12 +17,12 @@
 
 package com.itsaky.androidide.preferences
 
-import com.itsaky.androidide.resources.R.string
-import kotlinx.parcelize.Parcelize
-import com.itsaky.androidide.activities.SdkManagerActivity
 import android.content.Intent
 import androidx.preference.Preference
 import com.itsaky.androidide.R
+import com.itsaky.androidide.activities.SdkManagerActivity
+import com.itsaky.androidide.resources.R.string
+import kotlinx.parcelize.Parcelize
 
 internal fun IDEPreferences.addRootPreferences() {
   addPreference(ConfigurationPreferences())
@@ -33,15 +33,15 @@ internal fun IDEPreferences.addRootPreferences() {
 
 @Parcelize
 class ConfigurationPreferences(
-  override val key: String = "idepref_configure",
-  override val title: Int = string.configure,
-  override val children: List<IPreference> = mutableListOf()
+    override val key: String = "idepref_configure",
+    override val title: Int = string.configure,
+    override val children: List<IPreference> = mutableListOf(),
 ) : IPreferenceGroup() {
 
   init {
     addPreference(GeneralPreferencesScreen())
     addPreference(EditorPreferencesScreen())
-    
+
     addPreference(ProjectSettingPreferencesScreen())
     addPreference(BuildAndRunPreferences())
     addPreference(SdkManagerPreference())
@@ -49,17 +49,16 @@ class ConfigurationPreferences(
   }
 }
 
-//Projects related settings
+// Projects related settings
 @Parcelize
 class ProjectSettingPreferencesScreen(
-  override val key: String = "idepref_general_project",
-  override val title: Int = R.string.title_settings_projects,
-  override val children: List<IPreference> = mutableListOf(),
+    override val key: String = "idepref_general_project",
+    override val title: Int = R.string.title_settings_projects,
+    override val children: List<IPreference> = mutableListOf(),
 ) : IPreferenceGroup() {
 
   init {
     addPreference(TemplateBasicSettingsScreen())
-
   }
 }
 
@@ -68,22 +67,20 @@ class SdkManagerPreference(
     override val key: String = "idepref_sdk_manager",
     override val title: Int = R.string.sdk_manager,
     override val summary: Int? = R.string.sdk_manager_summary,
-    override val icon: Int? = R.drawable.ic_tools_android_build_sdkmanager
+    override val icon: Int? = R.drawable.ic_tools_android_build_sdkmanager,
 ) : SimplePreference() {
 
-    override fun onPreferenceClick(preference: Preference): Boolean {
-        preference.context.startActivity(Intent(preference.context, SdkManagerActivity::class.java))
-        return true
-    }
+  override fun onPreferenceClick(preference: Preference): Boolean {
+    preference.context.startActivity(Intent(preference.context, SdkManagerActivity::class.java))
+    return true
+  }
 }
-
-
 
 @Parcelize
 class PrivacyPreferences(
-  override val key: String = "idepref_privacy",
-  override val title: Int = string.title_privacy,
-  override val children: List<IPreference> = mutableListOf()
+    override val key: String = "idepref_privacy",
+    override val title: Int = string.title_privacy,
+    override val children: List<IPreference> = mutableListOf(),
 ) : IPreferenceGroup() {
 
   init {
@@ -93,9 +90,9 @@ class PrivacyPreferences(
 
 @Parcelize
 class DeveloperOptionsPreferences(
-  override val key: String = "idepref_devOpts",
-  override val title: Int = string.title_developer_options,
-  override val children: List<IPreference> = mutableListOf()
+    override val key: String = "idepref_devOpts",
+    override val title: Int = string.title_developer_options,
+    override val children: List<IPreference> = mutableListOf(),
 ) : IPreferenceGroup() {
 
   init {
@@ -105,9 +102,9 @@ class DeveloperOptionsPreferences(
 
 @Parcelize
 class AboutPreferences(
-  override val key: String = "idepref_category_about",
-  override val title: Int = string.about,
-  override val children: List<IPreference> = mutableListOf()
+    override val key: String = "idepref_category_about",
+    override val title: Int = string.about,
+    override val children: List<IPreference> = mutableListOf(),
 ) : IPreferenceGroup() {
 
   init {

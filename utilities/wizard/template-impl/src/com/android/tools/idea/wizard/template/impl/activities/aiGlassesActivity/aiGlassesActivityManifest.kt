@@ -16,8 +16,8 @@
 package com.android.tools.idea.wizard.template.impl.activities.aiGlassesActivity
 
 fun aiGlassesActivityManifestXml(activityClass: String, packageName: String) =
-  // language=xml
-  """
+    // language=xml
+    """
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application>
         <activity

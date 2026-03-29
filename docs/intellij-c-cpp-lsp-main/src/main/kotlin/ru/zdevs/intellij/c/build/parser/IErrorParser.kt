@@ -5,5 +5,11 @@ import com.intellij.build.output.BuildOutputInstantReader
 import java.util.function.Consumer
 
 fun interface IErrorParser {
-    fun parse(build: BaseBuildParser, line: String, lineRaw: String, reader: BuildOutputInstantReader, consumer: Consumer<in BuildEvent>): Boolean
+  fun parse(
+      build: BaseBuildParser,
+      line: String,
+      lineRaw: String,
+      reader: BuildOutputInstantReader,
+      consumer: Consumer<in BuildEvent>,
+  ): Boolean
 }

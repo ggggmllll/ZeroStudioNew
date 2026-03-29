@@ -17,7 +17,7 @@
 package com.android.tools.idea.wizard.template.impl.fragments.settingsFragment.res.values
 
 fun stringsXml() =
-  """
+    """
 <resources>
     <!-- Preference Titles -->
     <string name="messages_header">Messages</string>

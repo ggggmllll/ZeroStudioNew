@@ -42,13 +42,18 @@ val googlePayActivityTemplate
   get() = template {
     name = "Google Pay Views Activity"
     description =
-      "Creates a new activity with Google Pay, so that your users can start payments quickly using the cards saved under their Google accounts"
+        "Creates a new activity with Google Pay, so that your users can start payments quickly using the cards saved under their Google accounts"
     minApi = MIN_API
     constraints = listOf(TemplateConstraint.AndroidX)
 
     category = Category.Google
     formFactor = FormFactor.Mobile
-    screens = listOf(WizardUiContext.ActivityGallery, WizardUiContext.MenuEntry, WizardUiContext.NewModule)
+    screens =
+        listOf(
+            WizardUiContext.ActivityGallery,
+            WizardUiContext.MenuEntry,
+            WizardUiContext.NewModule,
+        )
 
     val activityClass = stringParameter {
       name = "Activity Name"
@@ -78,30 +83,31 @@ val googlePayActivityTemplate
     val isLauncher = booleanParameter {
       name = "Launcher Activity"
       default = false
-      help = "If true, this activity will have a CATEGORY_LAUNCHER intent filter, making it visible in the launcher"
+      help =
+          "If true, this activity will have a CATEGORY_LAUNCHER intent filter, making it visible in the launcher"
     }
 
     val packageName = defaultPackageNameParameter
 
     widgets(
-      TextFieldWidget(activityClass),
-      TextFieldWidget(viewModelClass),
-      TextFieldWidget(layoutName),
-      CheckBoxWidget(isLauncher),
-      PackageNameWidget(packageName),
-      LanguageWidget(),
+        TextFieldWidget(activityClass),
+        TextFieldWidget(viewModelClass),
+        TextFieldWidget(layoutName),
+        CheckBoxWidget(isLauncher),
+        PackageNameWidget(packageName),
+        LanguageWidget(),
     )
 
     thumb { File("google-pay-activity").resolve("template_pay_activity.png") }
 
     recipe = { data: TemplateData ->
       googlePayActivityRecipe(
-        data as ModuleTemplateData,
-        activityClass.value,
-        viewModelClass.value,
-        layoutName.value,
-        isLauncher.value,
-        packageName.value,
+          data as ModuleTemplateData,
+          activityClass.value,
+          viewModelClass.value,
+          layoutName.value,
+          isLauncher.value,
+          packageName.value,
       )
     }
   }

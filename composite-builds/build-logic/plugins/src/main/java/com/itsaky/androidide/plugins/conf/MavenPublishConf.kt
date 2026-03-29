@@ -25,6 +25,7 @@ import com.vanniktech.maven.publish.JavaLibrary
 import com.vanniktech.maven.publish.JavadocJar
 import com.vanniktech.maven.publish.MavenPublishBaseExtension
 import com.vanniktech.maven.publish.SonatypeHost.Companion.S01
+import java.io.File
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.publish.PublishingExtension
@@ -33,7 +34,6 @@ import org.gradle.api.tasks.testing.Test
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.withType
-import java.io.File
 
 private val projectsRequiringMavenLocalForTests = arrayOf(":tooling:plugin")
 private val mavenLocalRepos = hashMapOf<String, String>()
@@ -55,7 +55,9 @@ fun Project.configureMavenPublish() {
         tasks.withType<Test> {
           for ((project, _) in mavenLocalRepos) {
             dependsOn(
-              project(project).tasks.getByName("publishAllPublicationsToBuildMavenLocalRepository")
+                project(project)
+                    .tasks
+                    .getByName("publishAllPublicationsToBuildMavenLocalRepository")
             )
           }
         }
@@ -70,7 +72,6 @@ fun Project.configureMavenPublish() {
   }
 
   configure<MavenPublishBaseExtension> {
-
     project.configureMavenLocal()
 
     pom {
@@ -128,9 +129,7 @@ private fun Project.configureMavenLocal() {
     }
   }
 
-  tasks.create<Delete>("deleteBuildMavenLocal") {
-    delete(mavenLocalPath)
-  }
+  tasks.create<Delete>("deleteBuildMavenLocal") { delete(mavenLocalPath) }
 
   if (project.path in projectsRequiringMavenLocalForTests) {
     tasks.withType<Test> {

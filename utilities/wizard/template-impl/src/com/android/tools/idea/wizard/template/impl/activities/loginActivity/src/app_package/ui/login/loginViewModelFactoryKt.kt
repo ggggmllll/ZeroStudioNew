@@ -20,7 +20,7 @@ import com.android.tools.idea.wizard.template.escapeKotlinIdentifier
 import com.android.tools.idea.wizard.template.getMaterialComponentName
 
 fun loginViewModelFactoryKt(packageName: String, useAndroidX: Boolean) =
-  """package ${escapeKotlinIdentifier(packageName)}.ui.login
+    """package ${escapeKotlinIdentifier(packageName)}.ui.login
 
 import ${getMaterialComponentName("android.arch.lifecycle.ViewModel", useAndroidX)}
 import ${getMaterialComponentName("android.arch.lifecycle.ViewModelProvider", useAndroidX)}

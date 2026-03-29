@@ -26,11 +26,17 @@ import com.itsaky.androidide.lsp.api.IServerSettings
  */
 open class DefaultServerSettings : IServerSettings {
   override fun completionsEnabled(): Boolean = true
+
   override fun codeActionsEnabled(): Boolean = true
+
   override fun smartSelectionsEnabled(): Boolean = true
+
   override fun signatureHelpEnabled(): Boolean = true
+
   override fun referencesEnabled(): Boolean = true
+
   override fun definitionsEnabled(): Boolean = true
+
   override fun codeAnalysisEnabled(): Boolean = true
 
   override fun shouldMatchAllLowerCase(): Boolean = false

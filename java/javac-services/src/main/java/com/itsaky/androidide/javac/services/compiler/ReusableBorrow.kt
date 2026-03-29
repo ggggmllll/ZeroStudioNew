@@ -21,8 +21,8 @@ import openjdk.tools.javac.api.JavacTaskImpl
 /** @author Akash Yadav */
 class ReusableBorrow
 internal constructor(
-  private val reusableCompiler: ReusableCompiler,
-  @JvmField val task: JavacTaskImpl
+    private val reusableCompiler: ReusableCompiler,
+    @JvmField val task: JavacTaskImpl,
 ) : AutoCloseable {
 
   private var closed = false

@@ -19,7 +19,7 @@ package com.android.tools.idea.wizard.template.impl.fragments.settingsFragment.s
 import com.android.tools.idea.wizard.template.escapeKotlinIdentifier
 
 fun singleScreenSettingsFragmentKt(fragmentClass: String, packageName: String) =
-  """
+    """
 package ${escapeKotlinIdentifier(packageName)}
 
 import android.os.Bundle

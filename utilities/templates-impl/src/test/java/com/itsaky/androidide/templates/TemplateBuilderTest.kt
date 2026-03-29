@@ -56,15 +56,15 @@ class TemplateBuilderTest {
 
   @Test
   fun `root project generator test`() {
-    val template = testTemplate("Root", generate = false) {
-      baseProject {
-        templateName = -123
-        thumb = -123
-      }
-    }
+    val template =
+        testTemplate("Root", generate = false) {
+          baseProject {
+            templateName = -123
+            thumb = -123
+          }
+        }
 
     template.apply {
-
       assertThat(templateName).isEqualTo(-123)
       assertThat(thumb).isEqualTo(-123)
       assertThat(recipe).isNotNull()
@@ -107,7 +107,6 @@ class TemplateBuilderTest {
   fun `test project with module`() {
     testTemplate("Test", generate = false) {
       baseProject {
-
         templateName = -123
         thumb = -123
 
@@ -115,8 +114,8 @@ class TemplateBuilderTest {
           manifest {
             addPermission(INTERNET)
             addActivity(
-              ManifestActivity(name = ".MainActivity", isExported = true,
-                isLauncher = true))
+                ManifestActivity(name = ".MainActivity", isExported = true, isLauncher = true)
+            )
           }
 
           recipe = createRecipe {
@@ -124,15 +123,17 @@ class TemplateBuilderTest {
               createClass("com.itsaky", "TestClass") {
                 createConstructor {
                   addModifiers(PRIVATE)
-                  addStatement("throw \$T()",
-                    TypeName.get(UnsupportedOperationException::class.java))
+                  addStatement(
+                      "throw \$T()",
+                      TypeName.get(UnsupportedOperationException::class.java),
+                  )
                 }
                 createMethod("main") {
                   addModifiers(PUBLIC, STATIC)
                   returns(TypeName.VOID)
                   addParameter(
-                    ParameterSpec.builder(ArrayTypeName.get(String::class.java),
-                      "args").build())
+                      ParameterSpec.builder(ArrayTypeName.get(String::class.java), "args").build()
+                  )
                   addStatement("System.out.println(\"Hello world!\")")
                 }
               }
@@ -147,68 +148,51 @@ class TemplateBuilderTest {
 
   @Test
   fun `test empty activity template`() {
-    testTemplate("EmptyActivity") {
-      emptyActivityProject()
-    }
+    testTemplate("EmptyActivity") { emptyActivityProject() }
   }
 
   @Test
   fun `test basic activity template`() {
-    testTemplate("BasicActivity") {
-      basicActivityProject()
-    }
+    testTemplate("BasicActivity") { basicActivityProject() }
   }
 
   @Test
   fun `test navigation drawer activity template`() {
-    testTemplate("NavigationDrawerActivity") {
-      navDrawerActivityProject()
-    }
+    testTemplate("NavigationDrawerActivity") { navDrawerActivityProject() }
   }
 
   @Test
   fun `test bottom navigation activity project`() {
-    testTemplate("BottomNavigationActivity") {
-      bottomNavActivityProject()
-    }
+    testTemplate("BottomNavigationActivity") { bottomNavActivityProject() }
   }
 
   @Test
   fun `test tabbed activity project`() {
-    testTemplate("TabbedActivity") {
-      tabbedActivityProject()
-    }
+    testTemplate("TabbedActivity") { tabbedActivityProject() }
   }
 
   @Test
   fun `test no activity project`() {
-    testTemplate("NoActivity") {
-      noActivityProjectTemplate()
-    }
+    testTemplate("NoActivity") { noActivityProjectTemplate() }
   }
 
   @Test
   fun `test no AndroidX activity template`() {
-    testTemplate("NoAndroidXActivity") {
-      noAndroidXActivityProject()
-    }
+    testTemplate("NoAndroidXActivity") { noAndroidXActivityProject() }
   }
 
   @Test
   fun `test compose activity template`() {
-    testTemplate("ComposeActivity", languages = arrayOf(Kotlin)) {
-      composeActivityProject()
-    }
+    testTemplate("ComposeActivity", languages = arrayOf(Kotlin)) { composeActivityProject() }
   }
 
   @Test()
   fun `test compose activity template with Java language should fail at generation`() {
-    assertThrows("Compose activity requires Kotlin language",
-      IllegalArgumentException::class.java) {
-
-      testTemplate("ComposeActivityJava", languages = arrayOf(Java)) {
-        composeActivityProject()
-      }
+    assertThrows(
+        "Compose activity requires Kotlin language",
+        IllegalArgumentException::class.java,
+    ) {
+      testTemplate("ComposeActivityJava", languages = arrayOf(Java)) { composeActivityProject() }
     }
   }
 }

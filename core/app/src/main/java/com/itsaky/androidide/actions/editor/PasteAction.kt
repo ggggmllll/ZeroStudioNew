@@ -19,8 +19,8 @@ package com.itsaky.androidide.actions.editor
 
 import android.content.Context
 import com.itsaky.androidide.actions.ActionData
-import com.itsaky.androidide.actions.BaseEditorAction
 import com.itsaky.androidide.actions.ActionStyle
+import com.itsaky.androidide.actions.BaseEditorAction
 
 /** @author Akash Yadav */
 class PasteAction(context: Context, override val order: Int) : BaseEditorAction() {
@@ -30,10 +30,7 @@ class PasteAction(context: Context, override val order: Int) : BaseEditorAction(
 
     icon = null
 
-    style = ActionStyle(
-        textSizeSp = 10f,
-        paddingHorizontalDp = 2
-    )
+    style = ActionStyle(textSizeSp = 10f, paddingHorizontalDp = 2)
   }
 
   override val id: String = "ide.editor.code.text.paste"

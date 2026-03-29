@@ -2,9 +2,7 @@ package dev.jeziellago.compose.markdowntext
 
 import android.util.TypedValue
 
-/**
- * Requires API Level 26 to apply auto size
- * */
+/** Requires API Level 26 to apply auto size */
 data class AutoSizeConfig(
     val autoSizeMinTextSize: Int,
     val autoSizeMaxTextSize: Int,

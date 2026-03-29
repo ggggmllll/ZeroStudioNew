@@ -18,52 +18,43 @@
 package com.itsaky.androidide.templates.impl.basicActivity
 
 import com.itsaky.androidide.resources.R.string
+import com.itsaky.androidide.templates.ProjectTemplate
 import com.itsaky.androidide.templates.base.AndroidModuleTemplateBuilder
 import com.itsaky.androidide.templates.base.modules.android.defaultAppModule
 import com.itsaky.androidide.templates.base.util.AndroidModuleResManager.ResourceType.LAYOUT
 import com.itsaky.androidide.templates.base.util.SourceWriter
+import com.itsaky.androidide.templates.impl.R
 import com.itsaky.androidide.templates.impl.base.createRecipe
 import com.itsaky.androidide.templates.impl.base.emptyThemesAndColors
 import com.itsaky.androidide.templates.impl.base.writeMainActivity
 import com.itsaky.androidide.templates.impl.baseProjectImpl
-import com.itsaky.androidide.templates.impl.R
-import com.itsaky.androidide.templates.ProjectTemplate
 
 /**
  * @author Akash Yadav
  * @author android_zero
  */
 fun basicActivityProject(): ProjectTemplate {
-	return baseProjectImpl {
-		templateName = R.string.template_basic
-		thumb = R.drawable.template_basic_activity
-		  description = string.title_template_description_basicactivity
-		defaultAppModule {
-			recipe = createRecipe {
-				sources {
-					writeBasicActivitySrc(this)
-				}
+  return baseProjectImpl {
+    templateName = R.string.template_basic
+    thumb = R.drawable.template_basic_activity
+    description = string.title_template_description_basicactivity
+    defaultAppModule {
+      recipe = createRecipe {
+        sources { writeBasicActivitySrc(this) }
 
-				res {
-					writeBasicActivityLayout()
-					emptyThemesAndColors()
-				}
-			}
-		}
-	}
+        res {
+          writeBasicActivityLayout()
+          emptyThemesAndColors()
+        }
+      }
+    }
+  }
 }
 
-private fun AndroidModuleTemplateBuilder.writeBasicActivitySrc(
-	writer: SourceWriter
-) {
-	writeMainActivity(
-		writer = writer, ktSrc = ::basicActivitySrcKt,
-		javaSrc = ::basicActivitySrcJava
-	)
+private fun AndroidModuleTemplateBuilder.writeBasicActivitySrc(writer: SourceWriter) {
+  writeMainActivity(writer = writer, ktSrc = ::basicActivitySrcKt, javaSrc = ::basicActivitySrcJava)
 }
 
 internal fun AndroidModuleTemplateBuilder.writeBasicActivityLayout() {
-	res.apply {
-		writeXmlResource("activity_main", LAYOUT, source = ::basicActivityLayout)
-	}
+  res.apply { writeXmlResource("activity_main", LAYOUT, source = ::basicActivityLayout) }
 }

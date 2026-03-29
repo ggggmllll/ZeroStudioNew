@@ -26,7 +26,7 @@ import io.github.rosemoe.sora.widget.snippet.variable.WorkspaceBasedSnippetVaria
  * @author Akash Yadav
  */
 class WorkspaceVariableResolver :
-  WorkspaceBasedSnippetVariableResolver(), AbstractSnippetVariableResolver {
+    WorkspaceBasedSnippetVariableResolver(), AbstractSnippetVariableResolver {
 
   companion object {
 

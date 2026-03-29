@@ -57,5 +57,7 @@ val settingsFragmentTemplate
 
     thumb { File("settings-fragment").resolve("template_settings_fragment.png") }
 
-    recipe = { data: TemplateData -> settingsFragmentRecipe(data as ModuleTemplateData, fragmentClass.value, packageName.value) }
+    recipe = { data: TemplateData ->
+      settingsFragmentRecipe(data as ModuleTemplateData, fragmentClass.value, packageName.value)
+    }
   }

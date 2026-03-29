@@ -26,9 +26,7 @@ import androidx.annotation.FloatRange
  */
 interface IProgressIndicator {
 
-  /**
-   * Called when the task begins its execution.
-   */
+  /** Called when the task begins its execution. */
   fun onStart()
 
   /**
@@ -38,8 +36,6 @@ interface IProgressIndicator {
    */
   fun onProgress(@FloatRange(from = 0.0, to = 1.0) progress: Float)
 
-  /**
-   * Called when the task finishes its execution.
-   */
+  /** Called when the task finishes its execution. */
   fun onFinish()
 }

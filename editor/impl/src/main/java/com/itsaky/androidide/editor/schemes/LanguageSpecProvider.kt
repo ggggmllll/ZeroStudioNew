@@ -27,8 +27,8 @@ import com.itsaky.androidide.editor.language.treesitter.predicates.NotMatchPredi
 import com.itsaky.androidide.treesitter.TSLanguage
 import io.github.rosemoe.sora.editor.ts.LocalsCaptureSpec
 import io.github.rosemoe.sora.editor.ts.TsLanguageSpec
-import org.slf4j.LoggerFactory
 import java.io.FileNotFoundException
+import org.slf4j.LoggerFactory
 
 /**
  * Provides language spec instances for tree sitter languages.
@@ -43,31 +43,31 @@ object LanguageSpecProvider {
   @JvmStatic
   @JvmOverloads
   fun getLanguageSpec(
-    context: Context,
-    type: String,
-    lang: TSLanguage,
-    localsCaptureSpec: LocalsCaptureSpec = LocalsCaptureSpec.DEFAULT
+      context: Context,
+      type: String,
+      lang: TSLanguage,
+      localsCaptureSpec: LocalsCaptureSpec = LocalsCaptureSpec.DEFAULT,
   ): TreeSitterLanguageSpec {
     val editorLangSpec =
-      TsLanguageSpec(
-        language = lang,
-        highlightScmSource = readScheme(context, type, "highlights"),
-        localsScmSource = readScheme(context, type, "locals"),
-        codeBlocksScmSource = readScheme(context, type, "blocks"),
-        bracketsScmSource = readScheme(context, type, "brackets"),
-        localsCaptureSpec = localsCaptureSpec,
-        predicates =
-        listOf(
-          MatchPredicate,
-          NotMatchPredicate,
-          EqualPredicate,
-          NotEqualPredicate,
-          AnyOfPredicate
+        TsLanguageSpec(
+            language = lang,
+            highlightScmSource = readScheme(context, type, "highlights"),
+            localsScmSource = readScheme(context, type, "locals"),
+            codeBlocksScmSource = readScheme(context, type, "blocks"),
+            bracketsScmSource = readScheme(context, type, "brackets"),
+            localsCaptureSpec = localsCaptureSpec,
+            predicates =
+                listOf(
+                    MatchPredicate,
+                    NotMatchPredicate,
+                    EqualPredicate,
+                    NotEqualPredicate,
+                    AnyOfPredicate,
+                ),
         )
-      )
     return TreeSitterLanguageSpec(
-      spec = editorLangSpec,
-      indentsQueryScm = readScheme(context, type, "indents")
+        spec = editorLangSpec,
+        indentsQueryScm = readScheme(context, type, "indents"),
     )
   }
 

@@ -22,7 +22,7 @@ package com.itsaky.androidide.templates.impl.androidstudio.activities.aiGlassesA
  * @author android_zero
  */
 fun stringsXml() =
-  """
+    """
 <resources>
     <string name="app_name">Basic AI Glasses Activity</string>
     <string name="hello_ai_glasses">Hello, AI Glasses!</string>

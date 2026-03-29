@@ -59,11 +59,11 @@ class FlashAnimIconBuilder(context: Context) : BaseFlashAnimBuilder(context) {
 
     if (pulse) {
       val scaleAnim =
-        ObjectAnimator.ofPropertyValuesHolder(
-          view,
-          PropertyValuesHolder.ofFloat("scaleX", pulseStart, pulseEnd),
-          PropertyValuesHolder.ofFloat("scaleY", pulseStart, pulseEnd)
-        )
+          ObjectAnimator.ofPropertyValuesHolder(
+              view,
+              PropertyValuesHolder.ofFloat("scaleX", pulseStart, pulseEnd),
+              PropertyValuesHolder.ofFloat("scaleY", pulseStart, pulseEnd),
+          )
 
       scaleAnim.repeatCount = INFINITE
       scaleAnim.repeatMode = REVERSE

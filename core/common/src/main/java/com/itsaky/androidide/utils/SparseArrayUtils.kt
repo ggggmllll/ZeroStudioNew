@@ -19,9 +19,7 @@ package com.itsaky.androidide.utils
 
 import android.util.SparseIntArray
 
-/**
- * Get the value associated with the given key or `null`.
- */
+/** Get the value associated with the given key or `null`. */
 fun SparseIntArray.getOrNull(key: Int): Int? {
   val keyIdx = indexOfKey(key)
   if (keyIdx >= 0) {

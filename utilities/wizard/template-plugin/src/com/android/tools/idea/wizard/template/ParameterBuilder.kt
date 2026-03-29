@@ -32,22 +32,28 @@ interface ParameterBuilder<T> {
   }
 }
 
-inline fun stringParameter(block: StringParameterBuilder.() -> Unit): StringParameter = StringParameterBuilder().apply(block).build()
+inline fun stringParameter(block: StringParameterBuilder.() -> Unit): StringParameter =
+    StringParameterBuilder().apply(block).build()
 
-inline fun booleanParameter(block: BooleanParameterBuilder.() -> Unit): BooleanParameter = BooleanParameterBuilder().apply(block).build()
+inline fun booleanParameter(block: BooleanParameterBuilder.() -> Unit): BooleanParameter =
+    BooleanParameterBuilder().apply(block).build()
 
-inline fun <reified T : Enum<T>> enumParameter(block: EnumParameterBuilder<T>.() -> Unit): EnumParameter<T> = enumParameter(T::class, block)
+inline fun <reified T : Enum<T>> enumParameter(
+    block: EnumParameterBuilder<T>.() -> Unit
+): EnumParameter<T> = enumParameter(T::class, block)
 
-inline fun <T : Enum<T>> enumParameter(klass: KClass<T>, block: EnumParameterBuilder<T>.() -> Unit): EnumParameter<T> =
-  EnumParameterBuilder(klass).apply(block).build()
+inline fun <T : Enum<T>> enumParameter(
+    klass: KClass<T>,
+    block: EnumParameterBuilder<T>.() -> Unit,
+): EnumParameter<T> = EnumParameterBuilder(klass).apply(block).build()
 
 @TemplateDSL
 data class BooleanParameterBuilder(
-  override var name: String? = null,
-  override var help: String? = null,
-  override var visible: WizardParameterData.() -> Boolean = { true },
-  override var enabled: WizardParameterData.() -> Boolean = { true },
-  override var default: Boolean? = null,
+    override var name: String? = null,
+    override var help: String? = null,
+    override var visible: WizardParameterData.() -> Boolean = { true },
+    override var enabled: WizardParameterData.() -> Boolean = { true },
+    override var default: Boolean? = null,
 ) : ParameterBuilder<Boolean> {
   override fun build(): BooleanParameter {
     validate()
@@ -57,41 +63,53 @@ data class BooleanParameterBuilder(
 
 @TemplateDSL
 data class StringParameterBuilder(
-  override var name: String? = null,
-  override var help: String? = null,
-  override var visible: WizardParameterData.() -> Boolean = { true },
-  override var enabled: WizardParameterData.() -> Boolean = { true },
-  override var default: String? = null,
-  var constraints: List<Constraint> = listOf(),
-  var suggest: WizardParameterData.() -> String? = { null },
-  var loggable: Boolean = false,
+    override var name: String? = null,
+    override var help: String? = null,
+    override var visible: WizardParameterData.() -> Boolean = { true },
+    override var enabled: WizardParameterData.() -> Boolean = { true },
+    override var default: String? = null,
+    var constraints: List<Constraint> = listOf(),
+    var suggest: WizardParameterData.() -> String? = { null },
+    var loggable: Boolean = false,
 ) : ParameterBuilder<String> {
-  /** This exists for (hopefully temporary) binary compatibility with JetBrains' Kotlin Multiplatform plugin */
+  /**
+   * This exists for (hopefully temporary) binary compatibility with JetBrains' Kotlin Multiplatform
+   * plugin
+   */
   @Deprecated("Specify loggable parameter")
   constructor(
-    name: String? = null,
-    help: String? = null,
-    visible: WizardParameterData.() -> Boolean = { true },
-    enabled: WizardParameterData.() -> Boolean = { true },
-    default: String? = null,
-    constraints: List<Constraint> = listOf(),
-    suggest: WizardParameterData.() -> String? = { null },
+      name: String? = null,
+      help: String? = null,
+      visible: WizardParameterData.() -> Boolean = { true },
+      enabled: WizardParameterData.() -> Boolean = { true },
+      default: String? = null,
+      constraints: List<Constraint> = listOf(),
+      suggest: WizardParameterData.() -> String? = { null },
   ) : this(name, help, visible, enabled, default, constraints, suggest, false)
 
   override fun build(): StringParameter {
     validate()
-    return StringParameter(name!!, help, visible, enabled, default!!, constraints, suggest, loggable)
+    return StringParameter(
+        name!!,
+        help,
+        visible,
+        enabled,
+        default!!,
+        constraints,
+        suggest,
+        loggable,
+    )
   }
 }
 
 @TemplateDSL
 data class EnumParameterBuilder<T : Enum<T>>(
-  val enum: KClass<T>,
-  override var name: String? = null,
-  override var help: String? = null,
-  override var visible: WizardParameterData.() -> Boolean = { true },
-  override var enabled: WizardParameterData.() -> Boolean = { true },
-  override var default: T? = null,
+    val enum: KClass<T>,
+    override var name: String? = null,
+    override var help: String? = null,
+    override var visible: WizardParameterData.() -> Boolean = { true },
+    override var enabled: WizardParameterData.() -> Boolean = { true },
+    override var default: T? = null,
 ) : ParameterBuilder<T> {
   override fun build(): EnumParameter<T> {
     validate()

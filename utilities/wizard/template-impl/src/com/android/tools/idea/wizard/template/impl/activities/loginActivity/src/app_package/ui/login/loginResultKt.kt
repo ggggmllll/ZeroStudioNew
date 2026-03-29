@@ -19,7 +19,7 @@ package com.android.tools.idea.wizard.template.impl.activities.loginActivity.src
 import com.android.tools.idea.wizard.template.escapeKotlinIdentifier
 
 fun loginResultKt(packageName: String) =
-  """package ${escapeKotlinIdentifier(packageName)}.ui.login
+    """package ${escapeKotlinIdentifier(packageName)}.ui.login
 
 /**
  * Authentication result : success (user details) or error message.

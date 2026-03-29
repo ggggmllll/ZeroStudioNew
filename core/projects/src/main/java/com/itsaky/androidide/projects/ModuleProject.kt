@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory
 
 /**
  * 模块项目的抽象基类 (Base class for [AndroidModule] and [JavaModule]).
- * 
+ *
  * <p>表示 Gradle 构建系统中的一个子项目（SubProject）。它管理了该模块的源代码目录、类路径（Classpaths）以及符号索引。</p>
  *
  * @param name 模块的显示名称（例如：`app`）。
@@ -48,7 +48,6 @@ import org.slf4j.LoggerFactory
  * @param buildDir 该模块的构建产出目录 (`build/` 目录)。
  * @param buildScript 该模块的 Gradle 构建脚本文件。
  * @param tasks 该模块可执行的 Gradle 任务列表。
- *
  * @author Akash Yadav
  */
 abstract class ModuleProject(
@@ -61,29 +60,21 @@ abstract class ModuleProject(
     tasks: List<GradleTask>,
 ) : GradleProject(name, description, path, projectDir, buildDir, buildScript, tasks) {
 
-  /**
-   * 模块的 Java 编译器配置（如 sourceCompatibility 和 targetCompatibility）。
-   */
+  /** 模块的 Java 编译器配置（如 sourceCompatibility 和 targetCompatibility）。 */
   abstract val compilerSettings: IJavaCompilerSettings
 
   companion object {
 
     private val log = LoggerFactory.getLogger(ModuleProject::class.java)
 
-    /**
-     * 用于在 [Lookup] 服务中注册和获取当前活跃模块的键值。
-     */
+    /** 用于在 [Lookup] 服务中注册和获取当前活跃模块的键值。 */
     @JvmStatic val COMPLETION_MODULE_KEY = Lookup.Key<ModuleProject>()
   }
 
-  /**
-   * 该模块的 Java/Kotlin 源文件类前缀树索引。用于快速查找类名和实现代码补全。
-   */
+  /** 该模块的 Java/Kotlin 源文件类前缀树索引。用于快速查找类名和实现代码补全。 */
   @JvmField val compileJavaSourceClasses = SourceClassTrie()
 
-  /**
-   * 该模块编译时依赖的类路径前缀树索引（包含第三方库的类结构）。
-   */
+  /** 该模块编译时依赖的类路径前缀树索引（包含第三方库的类结构）。 */
   @JvmField val compileClasspathClasses = ClassTrie()
 
   /**
@@ -122,9 +113,8 @@ abstract class ModuleProject(
   abstract fun getCompileClasspaths(): Set<File>
 
   /**
-   * 从 `b` 分支整合：获取中间编译产物类路径。
-   * 这包括从 `build/` 目录中未打包为 JAR 的 `.class` 文件。
-   * 
+   * 从 `b` 分支整合：获取中间编译产物类路径。 这包括从 `build/` 目录中未打包为 JAR 的 `.class` 文件。
+   *
    * <p><b>核心用途：</b>供 Compose 预览等功能使用。</p>
    *
    * @return 包含中间编译产物的 File 集合。默认实现返回空集合，具体逻辑由子类（如 AndroidModule）提供。
@@ -133,7 +123,7 @@ abstract class ModuleProject(
 
   /**
    * 从 `b` 分支整合：获取运行时生成的 DEX 文件。
-   * 
+   *
    * <p><b>核心用途：</b>为 Compose 预览的类加载器提供 Android 运行时环境。</p>
    *
    * @return 包含生成的 `.dex` 文件的 File 集合。默认实现返回空集合。
@@ -157,10 +147,7 @@ abstract class ModuleProject(
     return getCompileSourceDirectories().find { file.path.startsWith(it.path) }?.toPath()
   }
 
-  /** 
-   * 从源码目录和类路径中查找源文件和类结构，并建立内存索引（Trie树）。 
-   * 该方法在项目同步（Sync）或初始化时被调用。
-   */
+  /** 从源码目录和类路径中查找源文件和类结构，并建立内存索引（Trie树）。 该方法在项目同步（Sync）或初始化时被调用。 */
   @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
   fun indexSourcesAndClasspaths() {
     log.info("Indexing sources and classpaths for project: {}", path)
@@ -168,9 +155,7 @@ abstract class ModuleProject(
     indexClasspaths()
   }
 
-  /**
-   * 建立类路径索引（扫描 JAR 文件的内容）。
-   */
+  /** 建立类路径索引（扫描 JAR 文件的内容）。 */
   @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
   fun indexClasspaths() {
 
@@ -196,9 +181,7 @@ abstract class ModuleProject(
     }
   }
 
-  /**
-   * 建立源代码文件索引（扫描 `.java` 等文件）。
-   */
+  /** 建立源代码文件索引（扫描 `.java` 等文件）。 */
   @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
   fun indexSources() {
 
@@ -251,9 +234,7 @@ abstract class ModuleProject(
     return ""
   }
 
-  /**
-   * 使用相对路径逻辑在源码目录中搜索给定文件的源节点。
-   */
+  /** 使用相对路径逻辑在源码目录中搜索给定文件的源节点。 */
   private fun searchSourceFileRelatively(file: Path?): SourceNode? {
     for (source in getCompileSourceDirectories().map(File::toPath)) {
       val relative = source.relativize(file)
@@ -327,9 +308,9 @@ abstract class ModuleProject(
 
   /**
    * 检查给定的 [Path] 是否属于当前模块。
-   * 
-   * <p>（针对 <code>a</code> 分支中的 TODO 进行了优化，改为基于系统路径分隔符的严谨前缀匹配，
-   * 避免了类似 `/project/app` 匹配到 `/project/app_test` 的误判。）</p>
+   *
+   * <p>（针对 <code>a</code> 分支中的 TODO 进行了优化，改为基于系统路径分隔符的严谨前缀匹配， 避免了类似 `/project/app` 匹配到
+   * `/project/app_test` 的误判。）</p>
    *
    * @param file 要检查的路径。
    * @return 如果路径属于当前模块则返回 `true`，否则返回 `false`。

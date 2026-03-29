@@ -42,30 +42,27 @@ internal object WorkspaceModelBuilder {
 
   private val log = LoggerFactory.getLogger(WorkspaceModelBuilder::class.java)
 
-  fun build(
-    projectDir: File,
-    project: IProject
-  ): WorkspaceImpl? {
+  fun build(projectDir: File, project: IProject): WorkspaceImpl? {
     try {
       val allProjects = project.getProjects().get()
       val selectionResult = project.selectProject(StringParameter("")).get()
-      check(selectionResult.isSuccessful) {
-        "Cannot find root project"
-      }
+      check(selectionResult.isSuccessful) { "Cannot find root project" }
 
-      val rootProject = when (project.getType().get()) {
-        ProjectType.Gradle -> transform(project.asGradleProject())
-        ProjectType.Android -> transform(project.asAndroidProject())
-        else -> throw IllegalStateException(
-          "Root project must be either an Android project or a Gradle project"
-        )
-      }
+      val rootProject =
+          when (project.getType().get()) {
+            ProjectType.Gradle -> transform(project.asGradleProject())
+            ProjectType.Android -> transform(project.asAndroidProject())
+            else ->
+                throw IllegalStateException(
+                    "Root project must be either an Android project or a Gradle project"
+                )
+          }
 
       return WorkspaceImpl(
-        projectDir,
-        rootProject,
-        CopyOnWriteArrayList(transform(allProjects, project)),
-        project.getProjectSyncIssues().get()
+          projectDir,
+          rootProject,
+          CopyOnWriteArrayList(transform(allProjects, project)),
+          project.getProjectSyncIssues().get(),
       )
     } catch (error: Throwable) {
       log.error("Unable to transform project", error)
@@ -76,67 +73,65 @@ internal object WorkspaceModelBuilder {
   private fun transform(rootProject: IGradleProject): GradleProject {
     val metadata = rootProject.getMetadata().get()
     return GradleProject(
-      name = metadata.name ?: IProject.PROJECT_UNKNOWN,
-      description = metadata.description ?: "",
-      path = metadata.projectPath,
-      projectDir = metadata.projectDir,
-      buildDir = metadata.buildDir,
-      buildScript = metadata.buildScript,
+        name = metadata.name ?: IProject.PROJECT_UNKNOWN,
+        description = metadata.description ?: "",
+        path = metadata.projectPath,
+        projectDir = metadata.projectDir,
+        buildDir = metadata.buildDir,
+        buildScript = metadata.buildScript,
 
-      // The list will never change, we could make these thread-safe with
-      // CopyOnWriteArrayList
-      tasks = CopyOnWriteArrayList(rootProject.getTasks().get() ?: listOf()),
+        // The list will never change, we could make these thread-safe with
+        // CopyOnWriteArrayList
+        tasks = CopyOnWriteArrayList(rootProject.getTasks().get() ?: listOf()),
     )
   }
 
-  private fun transform(
-    project: IAndroidProject
-  ): AndroidModule {
+  private fun transform(project: IAndroidProject): AndroidModule {
     val metadata = project.getMetadata().get() as AndroidProjectMetadata
     val libraryMap = project.getLibraryMap().get()
     val variants = project.getVariants().get()
     val configuredVariant = project.getConfiguredVariant().get()
     return AndroidModule(
-      name = metadata.name ?: IProject.PROJECT_UNKNOWN,
-      description = metadata.description ?: "",
-      path = metadata.projectPath,
-      projectDir = metadata.projectDir,
-      buildDir = metadata.buildDir,
-      buildScript = metadata.buildScript,
-      tasks = project.getTasks().get(),
-      resourcePrefix = metadata.resourcePrefix,
-      namespace = metadata.namespace,
-      androidTestNamespace = metadata.androidTestNamespace,
-      testFixtureNamespace = metadata.testFixtureNamespace,
-      projectType = metadata.androidType,
-      mainSourceSet = project.getMainSourceSet().get(),
-      flags = metadata.flags,
-      compilerSettings = metadata.javaCompileOptions,
-      viewBindingOptions = metadata.viewBindingOptions,
-      bootClassPaths = project.getBootClasspaths().get(),
-      libraries = libraryMap.keys,
-      libraryMap = libraryMap,
-      lintCheckJars = project.getLintCheckJars().get(),
-      variants = variants,
-      configuredVariant = variants.find { it.name == configuredVariant },
-      classesJar = metadata.classesJar
+        name = metadata.name ?: IProject.PROJECT_UNKNOWN,
+        description = metadata.description ?: "",
+        path = metadata.projectPath,
+        projectDir = metadata.projectDir,
+        buildDir = metadata.buildDir,
+        buildScript = metadata.buildScript,
+        tasks = project.getTasks().get(),
+        resourcePrefix = metadata.resourcePrefix,
+        namespace = metadata.namespace,
+        androidTestNamespace = metadata.androidTestNamespace,
+        testFixtureNamespace = metadata.testFixtureNamespace,
+        projectType = metadata.androidType,
+        mainSourceSet = project.getMainSourceSet().get(),
+        flags = metadata.flags,
+        compilerSettings = metadata.javaCompileOptions,
+        viewBindingOptions = metadata.viewBindingOptions,
+        bootClassPaths = project.getBootClasspaths().get(),
+        libraries = libraryMap.keys,
+        libraryMap = libraryMap,
+        lintCheckJars = project.getLintCheckJars().get(),
+        variants = variants,
+        configuredVariant = variants.find { it.name == configuredVariant },
+        classesJar = metadata.classesJar,
     )
   }
 
   private fun transform(project: IJavaProject): JavaModule {
     val metadata = project.getMetadata().get() as JavaProjectMetadata
     return JavaModule(
-      name = metadata.name ?: IProject.PROJECT_UNKNOWN,
-      description = metadata.description ?: "",
-      path = metadata.projectPath,
-      projectDir = metadata.projectDir,
-      buildDir = metadata.buildDir,
-      buildScript = metadata.buildScript,
-      tasks = project.getTasks().get(),
-      contentRoots = project.getContentRoots().get(),
-      dependencies = project.getDependencies().get(),
-      compilerSettings = metadata.compilerSettings,
-      classesJar = metadata.classesJar
+        name = metadata.name ?: IProject.PROJECT_UNKNOWN,
+        description = metadata.description ?: "",
+        path = metadata.projectPath,
+        projectDir = metadata.projectDir,
+        buildDir = metadata.buildDir,
+        buildScript = metadata.buildScript,
+        tasks = project.getTasks().get(),
+        contentRoots = project.getContentRoots().get(),
+        dependencies = project.getDependencies().get(),
+        compilerSettings = metadata.compilerSettings,
+        classesJar = metadata.classesJar,
     )
   }
 

@@ -114,7 +114,6 @@ object ContentReadWrite {
                 insert(line, getColumnCount(line), "\r\n")
                 consumer(progress)
                 continue
-
               } else if (peek != -1) {
                 wrapper.setDataCount(count)
                 var line = lineCount - 1

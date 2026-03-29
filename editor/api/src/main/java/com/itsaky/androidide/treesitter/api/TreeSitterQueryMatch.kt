@@ -22,21 +22,25 @@ import com.itsaky.androidide.treesitter.TSQueryMatch
 import com.itsaky.androidide.utils.DefaultRecyclable
 import com.itsaky.androidide.utils.RecyclableObjectPool
 
-/**
- * @author Akash Yadav
- */
-class TreeSitterQueryMatch @JvmOverloads internal constructor(
-  id: Int = 0,
-  patternIndex: Int = 0,
-  captures: Array<out TSQueryCapture?>? = null
-) : TSQueryMatch(id, patternIndex, captures, null),
-  RecyclableObjectPool.Recyclable by DefaultRecyclable() {
+/** @author Akash Yadav */
+class TreeSitterQueryMatch
+@JvmOverloads
+internal constructor(
+    id: Int = 0,
+    patternIndex: Int = 0,
+    captures: Array<out TSQueryCapture?>? = null,
+) :
+    TSQueryMatch(id, patternIndex, captures, null),
+    RecyclableObjectPool.Recyclable by DefaultRecyclable() {
 
   companion object {
 
     @JvmStatic
-    fun obtain(id: Int, patternIndex: Int,
-      captures: Array<out TSQueryCapture?>?): TreeSitterQueryMatch {
+    fun obtain(
+        id: Int,
+        patternIndex: Int,
+        captures: Array<out TSQueryCapture?>?,
+    ): TreeSitterQueryMatch {
       return obtainFromPool<TreeSitterQueryMatch>().apply {
         this.id = id
         this.patternIndex = patternIndex

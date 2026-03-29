@@ -42,11 +42,11 @@ open class ToggleButtonAdapter<T : ToggleButton> : CompoundButtonAdapter<T>() {
 
   override fun createUiWidgets(): List<UiWidget> {
     return listOf(
-      UiWidget(
-        ToggleButton::class.java,
-        string.widget_togglebutton,
-        drawable.ic_widget_toggle_button
-      )
+        UiWidget(
+            ToggleButton::class.java,
+            string.widget_togglebutton,
+            drawable.ic_widget_toggle_button,
+        )
     )
   }
 }

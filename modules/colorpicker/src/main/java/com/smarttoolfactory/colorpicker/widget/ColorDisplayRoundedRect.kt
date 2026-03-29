@@ -11,8 +11,9 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 
 /**
- * Color display that displays both colors horizontally aligned with half [RoundedCornerShape]
- * with [Modifier.drawChecker] to display checker pattern when any color's alpha is less than 1.0f
+ * Color display that displays both colors horizontally aligned with half [RoundedCornerShape] with
+ * [Modifier.drawChecker] to display checker pattern when any color's alpha is less than 1.0f
+ *
  * @param initialColor color that should be static
  * @param currentColor color that is changed based on user actions
  */
@@ -20,35 +21,36 @@ import androidx.compose.ui.unit.dp
 fun ColorDisplayRoundedRect(
     modifier: Modifier = Modifier,
     initialColor: Color,
-    currentColor: Color
+    currentColor: Color,
 ) {
-    Row(modifier = modifier.height(40.dp)) {
-        Box(
-            modifier = Modifier
-                .weight(1f)
+  Row(modifier = modifier.height(40.dp)) {
+    Box(
+        modifier =
+            Modifier.weight(1f)
                 .fillMaxHeight()
                 .drawChecker(RoundedCornerShape(topStart = 8.dp, bottomStart = 8.dp))
                 .background(
                     initialColor,
-                    shape = RoundedCornerShape(topStart = 8.dp, bottomStart = 8.dp)
+                    shape = RoundedCornerShape(topStart = 8.dp, bottomStart = 8.dp),
                 )
-        )
-        Box(
-            modifier = Modifier
-                .weight(1f)
+    )
+    Box(
+        modifier =
+            Modifier.weight(1f)
                 .fillMaxHeight()
                 .drawChecker(RoundedCornerShape(topEnd = 8.dp, bottomEnd = 8.dp))
                 .background(
                     currentColor,
-                    shape = RoundedCornerShape(topEnd = 8.dp, bottomEnd = 8.dp)
+                    shape = RoundedCornerShape(topEnd = 8.dp, bottomEnd = 8.dp),
                 )
-        )
-    }
+    )
+  }
 }
 
 /**
- * Color display that displays both colors horizontally aligned with half [RoundedCornerShape]
- * with [Modifier.drawChecker] to display checker pattern when any color's alpha is less than 1.0f
+ * Color display that displays both colors horizontally aligned with half [RoundedCornerShape] with
+ * [Modifier.drawChecker] to display checker pattern when any color's alpha is less than 1.0f
+ *
  * @param boxSize size of left [Box] with [initialBrush] and size of right [Box] with [currentBrush]
  * @param initialBrush [Brush] that should be static
  * @param currentBrush [Brush] that is changed based on user actions
@@ -58,26 +60,26 @@ fun ColorDisplayRoundedRect(
     modifier: Modifier,
     boxSize: DpSize,
     initialBrush: Brush,
-    currentBrush: Brush
+    currentBrush: Brush,
 ) {
-    Row() {
-        Box(
-            modifier = Modifier
-                .size(boxSize)
+  Row() {
+    Box(
+        modifier =
+            Modifier.size(boxSize)
                 .drawChecker(RoundedCornerShape(topStart = 8.dp, bottomStart = 8.dp))
                 .background(
                     initialBrush,
-                    shape = RoundedCornerShape(topStart = 8.dp, bottomStart = 8.dp)
+                    shape = RoundedCornerShape(topStart = 8.dp, bottomStart = 8.dp),
                 )
-        )
-        Box(
-            modifier = Modifier
-                .size(boxSize)
+    )
+    Box(
+        modifier =
+            Modifier.size(boxSize)
                 .drawChecker(RoundedCornerShape(topEnd = 8.dp, bottomEnd = 8.dp))
                 .background(
                     currentBrush,
-                    shape = RoundedCornerShape(topEnd = 8.dp, bottomEnd = 8.dp)
+                    shape = RoundedCornerShape(topEnd = 8.dp, bottomEnd = 8.dp),
                 )
-        )
-    }
+    )
+  }
 }

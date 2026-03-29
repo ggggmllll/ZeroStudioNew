@@ -17,7 +17,7 @@
 package com.itsaky.androidide.templates.impl.androidstudio.other.sliceProvider.src.app_package
 
 fun sliceProviderJava(className: String, packageName: String, pathPrefix: String) =
-  """
+    """
 package ${packageName};
 
 import android.content.ContentResolver;

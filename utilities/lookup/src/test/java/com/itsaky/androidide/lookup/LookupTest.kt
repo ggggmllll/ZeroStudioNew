@@ -63,7 +63,7 @@ class LookupTest {
       assertThat(this).isNotNull()
       assertThat(this).isEqualTo(service)
     }
-  
+
     // Service not registered with the Class object. Must return null.
     lookup.lookup(TestService::class.java).apply { assertThat(this).isNull() }
 

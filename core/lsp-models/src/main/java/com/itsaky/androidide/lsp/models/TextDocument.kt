@@ -21,4 +21,5 @@ import com.itsaky.androidide.models.Range
 import java.nio.file.Path
 
 data class ShowDocumentParams(var file: Path, var selection: Range)
+
 data class ShowDocumentResult(var success: Boolean)

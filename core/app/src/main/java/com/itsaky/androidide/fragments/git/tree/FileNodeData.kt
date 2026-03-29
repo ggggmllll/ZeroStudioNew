@@ -21,22 +21,23 @@ import java.io.File
 
 /**
  * TreeView 节点数据模型
+ *
  * @author android_zero
  */
 data class FileNodeData(
     val file: File,
     var isHighlighted: Boolean = false,
-    var isLoading: Boolean = false
+    var isLoading: Boolean = false,
 ) {
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-        other as FileNodeData
-        return file.absolutePath == other.file.absolutePath
-    }
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (javaClass != other?.javaClass) return false
+    other as FileNodeData
+    return file.absolutePath == other.file.absolutePath
+  }
 
-    override fun hashCode(): Int {
-        return file.absolutePath.hashCode()
-    }
+  override fun hashCode(): Int {
+    return file.absolutePath.hashCode()
+  }
 }

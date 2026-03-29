@@ -17,7 +17,7 @@
 package com.android.tools.idea.wizard.template.impl.activities.composeWearActivity
 
 fun complicationServiceManifestXml(complicationServiceClass: String, packageName: String) =
-  """
+    """
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-feature android:name="android.hardware.type.watch" />
 

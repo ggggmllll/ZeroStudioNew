@@ -20,7 +20,7 @@ import com.itsaky.androidide.templates.impl.androidstudio.other.appWidget.res.va
 import com.itsaky.androidide.templates.impl.androidstudio.other.appWidget.res.values.getAppWidgetInnerViewStyleName
 
 fun stylesXml(themesData: ThemesData) =
-  """<resources>
+    """<resources>
     <style name="${getAppWidgetContainerStyleName(themesData.appName)}" parent="android:Widget">
         <item name="android:id">@android:id/background</item>
         <item name="android:padding">?attr/appWidgetPadding</item>

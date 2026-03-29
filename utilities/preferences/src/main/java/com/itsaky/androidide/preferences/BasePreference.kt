@@ -22,8 +22,8 @@ import android.graphics.PorterDuff.Mode.SRC_ATOP
 import android.graphics.PorterDuffColorFilter
 import androidx.core.content.ContextCompat
 import androidx.preference.Preference
-import com.itsaky.androidide.utils.resolveAttr
 import com.google.android.material.R.attr
+import com.itsaky.androidide.utils.resolveAttr
 
 /**
  * Base class for preferences.
@@ -43,10 +43,10 @@ abstract class BasePreference : IPreference() {
     pref.isIconSpaceReserved = this.icon != null
     this.icon?.let {
       pref.icon =
-        ContextCompat.getDrawable(context, it)?.apply {
-          colorFilter =
-            PorterDuffColorFilter(context.resolveAttr(attr.colorOnPrimaryContainer), SRC_ATOP)
-        }
+          ContextCompat.getDrawable(context, it)?.apply {
+            colorFilter =
+                PorterDuffColorFilter(context.resolveAttr(attr.colorOnPrimaryContainer), SRC_ATOP)
+          }
     }
 
     pref.setOnPreferenceClickListener { onPreferenceClick(pref) }

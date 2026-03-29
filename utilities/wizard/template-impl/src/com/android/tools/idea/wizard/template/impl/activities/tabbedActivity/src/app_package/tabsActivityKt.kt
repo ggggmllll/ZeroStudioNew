@@ -25,21 +25,21 @@ import com.android.tools.idea.wizard.template.impl.activities.common.layoutToVie
 import com.android.tools.idea.wizard.template.renderIf
 
 fun tabsActivityKt(
-  activityClass: String,
-  layoutName: String,
-  packageName: String,
-  applicationPackage: String?,
-  useAndroidX: Boolean,
-  isViewBindingSupported: Boolean,
+    activityClass: String,
+    layoutName: String,
+    packageName: String,
+    applicationPackage: String?,
+    useAndroidX: Boolean,
+    isViewBindingSupported: Boolean,
 ): String {
 
   val contentViewBlock =
-    if (isViewBindingSupported)
-      """
+      if (isViewBindingSupported)
+          """
      binding = ${layoutToViewBindingClass(layoutName)}.inflate(layoutInflater)
      setContentView(binding.root)
   """
-    else "setContentView(R.layout.$layoutName)"
+      else "setContentView(R.layout.$layoutName)"
 
   return """package ${escapeKotlinIdentifier(packageName)}
 

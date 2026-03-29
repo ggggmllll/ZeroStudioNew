@@ -18,10 +18,6 @@
 package com.itsaky.androidide.templates.impl.basicActivity
 
 import com.itsaky.androidide.templates.base.AndroidModuleTemplateBuilder
-import com.itsaky.androidide.templates.impl.base.baseLayoutContentMain
-import com.itsaky.androidide.templates.impl.base.materialAppBar
-import com.itsaky.androidide.templates.impl.base.materialFab
-import com.itsaky.androidide.templates.impl.indentToLevel
 
 internal fun AndroidModuleTemplateBuilder.basicActivitySrcKt() =
     """
@@ -50,7 +46,8 @@ class MainActivity : AppCompatActivity() {
         _binding = null
     }
 }
-  """.trim()
+  """
+        .trim()
 
 internal fun AndroidModuleTemplateBuilder.basicActivitySrcJava() =
     """
@@ -77,7 +74,8 @@ public class MainActivity extends AppCompatActivity {
         binding = null;
     }
 }
-""".trim()
+"""
+        .trim()
 
 internal fun basicActivityLayout() =
     """
@@ -102,6 +100,7 @@ internal fun basicActivityLayout() =
         app:layout_constraintTop_toTopOf="parent" />
         
 </androidx.constraintlayout.widget.ConstraintLayout>
-""".trim()
+"""
+        .trim()
 
 internal fun basicActivityContent() = ""

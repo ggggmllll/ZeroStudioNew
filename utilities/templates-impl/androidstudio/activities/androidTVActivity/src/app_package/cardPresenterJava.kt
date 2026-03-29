@@ -23,7 +23,7 @@ package com.itsaky.androidide.templates.impl.androidstudio.activities.androidTVA
  * @author android_zero
  */
 fun cardPresenterJava(packageName: String) =
-  """
+    """
 package ${packageName};
 
 import android.graphics.drawable.Drawable;

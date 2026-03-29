@@ -19,7 +19,7 @@ package com.android.tools.idea.wizard.template.impl.activities.loginActivity.src
 import com.android.tools.idea.wizard.template.escapeKotlinIdentifier
 
 fun loggedInUserKt(packageName: String) =
-  """package ${escapeKotlinIdentifier(packageName)}.data.model
+    """package ${escapeKotlinIdentifier(packageName)}.data.model
 
 /**
  * Data class that captures user information for logged in users retrieved from LoginRepository

@@ -34,17 +34,14 @@ package com.itsaky.androidide.lsp.java.compiler
 
 import com.itsaky.androidide.lsp.java.CompilationCancellationException
 import com.itsaky.androidide.lsp.java.utils.CancelChecker.Companion.isCancelled
-import org.slf4j.LoggerFactory
 import java.util.concurrent.Semaphore
+import org.slf4j.LoggerFactory
 
 class SynchronizedTask {
 
-  @Volatile
-  @PublishedApi
-  internal var isCompiling = false
+  @Volatile @PublishedApi internal var isCompiling = false
 
-  @PublishedApi
-  internal val semaphore = Semaphore(1)
+  @PublishedApi internal val semaphore = Semaphore(1)
 
   @PublishedApi
   internal var task: CompileTask? = null
@@ -52,8 +49,7 @@ class SynchronizedTask {
 
   companion object {
 
-    @PublishedApi
-    internal val log = LoggerFactory.getLogger(SynchronizedTask::class.java)
+    @PublishedApi internal val log = LoggerFactory.getLogger(SynchronizedTask::class.java)
   }
 
   inline fun run(crossinline taskConsumer: (CompileTask) -> Unit) {
@@ -125,11 +121,12 @@ class SynchronizedTask {
   val isBusy: Boolean
     get() = isCompiling || semaphore.availablePermits() == 0
 
-  /**
-   * **FOR INTERNAL USE ONLY!**
-   */
+  /** **FOR INTERNAL USE ONLY!** */
   fun logStats() {
-    log.warn("[SynchronizedTask] isCompiling={} queuedLength={}", isCompiling,
-      semaphore.queueLength)
+    log.warn(
+        "[SynchronizedTask] isCompiling={} queuedLength={}",
+        isCompiling,
+        semaphore.queueLength,
+    )
   }
 }

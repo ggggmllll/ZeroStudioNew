@@ -15,14 +15,11 @@
  *   along with AndroidIDE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 @Suppress("JavaPluginLanguageLevel")
 plugins {
   id("java-library")
   id("org.jetbrains.kotlin.jvm")
 }
-
-
 
 dependencies {
   api(libs.tooling.builderModel)

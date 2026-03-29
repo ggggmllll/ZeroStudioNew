@@ -41,11 +41,11 @@ open class ViewAnimatorAdapter<T : ViewAnimator> : FrameLayoutAdapter<T>() {
 
   override fun createUiWidgets(): List<UiWidget> {
     return listOf(
-      UiWidget(
-        ViewAnimator::class.java,
-        R.string.widget_viewanimator,
-        R.drawable.ic_widget_viewanimator
-      )
+        UiWidget(
+            ViewAnimator::class.java,
+            R.string.widget_viewanimator,
+            R.drawable.ic_widget_viewanimator,
+        )
     )
   }
 }

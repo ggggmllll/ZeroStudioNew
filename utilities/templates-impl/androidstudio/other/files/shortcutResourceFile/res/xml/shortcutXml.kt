@@ -17,7 +17,7 @@
 package com.itsaky.androidide.templates.impl.androidstudio.other.files.shortcutResourceFile.res.xml
 
 fun shortcutXml() =
-  """
+    """
 <?xml version ="1.0" encoding="utf-8"?>
 <shortcuts>
     <!-- Add shortcuts that launch your app to a specific screen or task. -->

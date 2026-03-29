@@ -20,9 +20,7 @@ package com.itsaky.androidide.preferences.internal
 import androidx.appcompat.app.AppCompatDelegate
 import com.itsaky.androidide.resources.localization.LocaleProvider
 
-/**
- * @author Akash Yadav
- */
+/** @author Akash Yadav */
 @Suppress("MemberVisibilityCanBePrivate")
 object GeneralPreferences {
 
@@ -34,13 +32,13 @@ object GeneralPreferences {
   const val CONFIRM_PROJECT_OPEN = "idepref_general_confirmProjectOpen"
   const val TERMINAL_USE_SYSTEM_SHELL = "idepref_general_terminalShell"
   const val LAST_OPENED_PROJECT = "ide_last_project"
-  
+
   const val PREF_LOTTIE_ANIMATION = "idepref_splash_lottie_animation"
   const val DEFAULT_LOTTIE_ANIMATION = "LottieAnimation/splash_screen.json"
-  
+
   const val NO_OPENED_PROJECT = "<NO_OPENED_PROJECT>"
   const val DYNAMIC_COLOR_ENABLED = "idepref_general_dynamic_color"
-  
+
   var uiMode: Int
     get() = prefManager.getInt(UI_MODE, AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
     set(value) {
@@ -54,16 +52,17 @@ object GeneralPreferences {
     }
 
   var selectedLocale: String?
-    get() = prefManager.getString(SELECTED_LOCALE, null).let { locale ->
+    get() =
+        prefManager.getString(SELECTED_LOCALE, null).let { locale ->
 
-      // if the locale is set to a locale key that is not supported,
-      // fall back to 'System default'
-      if (LocaleProvider.getLocale(locale) == null) {
-        null
-      } else {
-        locale
-      }
-    }
+          // if the locale is set to a locale key that is not supported,
+          // fall back to 'System default'
+          if (LocaleProvider.getLocale(locale) == null) {
+            null
+          } else {
+            locale
+          }
+        }
     set(value) {
       prefManager.putString(SELECTED_LOCALE, value)
     }
@@ -98,11 +97,10 @@ object GeneralPreferences {
       prefManager.putString(LAST_OPENED_PROJECT, value)
     }
 
-  //lottie Animation
+  // lottie Animation
   var lottieAnimation: String
-        get() = prefManager.getString(PREF_LOTTIE_ANIMATION, DEFAULT_LOTTIE_ANIMATION)
-        set(value) {
-            prefManager.putString(PREF_LOTTIE_ANIMATION, value)
-  }
-
+    get() = prefManager.getString(PREF_LOTTIE_ANIMATION, DEFAULT_LOTTIE_ANIMATION)
+    set(value) {
+      prefManager.putString(PREF_LOTTIE_ANIMATION, value)
+    }
 }

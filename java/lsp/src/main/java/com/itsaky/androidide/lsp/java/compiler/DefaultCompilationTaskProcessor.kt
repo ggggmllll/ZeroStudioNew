@@ -18,9 +18,9 @@
 package com.itsaky.androidide.lsp.java.compiler
 
 import com.itsaky.androidide.utils.StopWatch
+import java.util.function.Consumer
 import openjdk.source.tree.CompilationUnitTree
 import openjdk.tools.javac.api.JavacTaskImpl
-import java.util.function.Consumer
 
 /**
  * Default implementation of [CompilationTaskProcessor].
@@ -36,11 +36,11 @@ class DefaultCompilationTaskProcessor : CompilationTaskProcessor {
 
     trees.forEach(processCompilationUnit::accept)
     watch.lapFromLast("Processed trees")
-    
-//    val entered = JavacTaskUtil.enterTrees(task, trees)
-//    watch.lapFromLast("Entered trees")
-//
-//    val analyzed = JavacTaskUtil.analyze(task, entered)
+
+    //    val entered = JavacTaskUtil.enterTrees(task, trees)
+    //    watch.lapFromLast("Entered trees")
+    //
+    //    val analyzed = JavacTaskUtil.analyze(task, entered)
     task.analyze()
     watch.lapFromLast("Analyzed all trees")
   }

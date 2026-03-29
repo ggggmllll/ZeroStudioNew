@@ -27,16 +27,12 @@ import com.itsaky.androidide.desugaring.internal.parsing.InsnLexer.TokenType
  *
  * @author Akash Yadav
  */
-internal class InsnParser(
-  private val lexer: InsnLexer
-) {
+internal class InsnParser(private val lexer: InsnLexer) {
 
   private val cName = StringBuilder(128)
   private val md = StringBuilder(128)
 
-  /**
-   * Parse the input and return a list of [ReplaceMethodInsn].
-   */
+  /** Parse the input and return a list of [ReplaceMethodInsn]. */
   fun parse(): List<ReplaceMethodInsn> {
     val inss = mutableListOf<ReplaceMethodInsn>()
     while (true) {
@@ -71,15 +67,15 @@ internal class InsnParser(
     accept(TokenType.SEMICOLON)
 
     return ReplaceMethodInsn.builder()
-      .requireOpcode(opcode)
-      .fromClass(fromClass)
-      .methodName(methodName)
-      .methodDescriptor(methodDescriptor)
-      .toOpcode(toOpcode)
-      .toClass(toClass)
-      .toMethod(toMethod)
-      .toMethodDescriptor(toDescriptor)
-      .build()
+        .requireOpcode(opcode)
+        .fromClass(fromClass)
+        .methodName(methodName)
+        .methodDescriptor(methodDescriptor)
+        .toOpcode(toOpcode)
+        .toClass(toClass)
+        .toMethod(toMethod)
+        .toMethodDescriptor(toDescriptor)
+        .build()
   }
 
   private fun acceptOpcode(): MethodOpcode {
@@ -88,8 +84,7 @@ internal class InsnParser(
     val op = accept(TokenType.IDENTIFIER)
 
     val opcode = MethodOpcode.find("${invoke.text}${hyphen.text}${op.text}")
-    checkNotNull(opcode,
-      "Unknown opcode ${invoke.text}${hyphen.text}${op.text}")
+    checkNotNull(opcode, "Unknown opcode ${invoke.text}${hyphen.text}${op.text}")
     return opcode!!
   }
 
@@ -107,8 +102,7 @@ internal class InsnParser(
       if (token.type == TokenType.IDENTIFIER) {
         if (isFirst) {
           if (token.text[0] != 'L') {
-            throw ParseException(
-              "Invalid class name: ${token.text} (${token.errDesc()})")
+            throw ParseException("Invalid class name: ${token.text} (${token.errDesc()})")
           }
           if (binaryName) {
             cName.append(token.text)
@@ -134,8 +128,7 @@ internal class InsnParser(
         break
       }
 
-      throw ParseException(
-        "Error parsing class name. Unexpected ${token.errDesc()}")
+      throw ParseException("Error parsing class name. Unexpected ${token.errDesc()}")
     }
 
     return cName.toString()
@@ -210,9 +203,7 @@ internal class InsnParser(
     return md.toString()
   }
 
-  /**
-   * Advance to the next token and check if it has the given expected token type.
-   */
+  /** Advance to the next token and check if it has the given expected token type. */
   private fun accept(tokenType: TokenType): Token {
     val token = nextToken()
     if (token.type == TokenType.EOF) {
@@ -223,16 +214,12 @@ internal class InsnParser(
     return token
   }
 
-  /**
-   * Advance to the next token.
-   */
+  /** Advance to the next token. */
   private fun nextToken(): Token {
     return lexer.nextToken()
   }
 
-  /**
-   * Peek at the next token.
-   */
+  /** Peek at the next token. */
   private fun peekToken(): Token {
     return lexer.peek()
   }

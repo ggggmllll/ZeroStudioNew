@@ -29,10 +29,10 @@ import com.android.tools.idea.wizard.template.TemplateData
 import com.android.tools.idea.wizard.template.TextFieldWidget
 import com.android.tools.idea.wizard.template.WizardUiContext
 import com.android.tools.idea.wizard.template.fragmentToLayout
-import com.itsaky.androidide.templates.impl.androidstudio.activities.common.MIN_API
-import com.itsaky.androidide.templates.impl.androidstudio.defaultPackageNameParameter
 import com.android.tools.idea.wizard.template.stringParameter
 import com.android.tools.idea.wizard.template.template
+import com.itsaky.androidide.templates.impl.androidstudio.activities.common.MIN_API
+import com.itsaky.androidide.templates.impl.androidstudio.defaultPackageNameParameter
 import java.io.File
 
 val scrollFragmentTemplate
@@ -64,11 +64,21 @@ val scrollFragmentTemplate
 
     val packageName = defaultPackageNameParameter
 
-    widgets(TextFieldWidget(fragmentClass), TextFieldWidget(layoutName), PackageNameWidget(packageName), LanguageWidget())
+    widgets(
+        TextFieldWidget(fragmentClass),
+        TextFieldWidget(layoutName),
+        PackageNameWidget(packageName),
+        LanguageWidget(),
+    )
 
     thumb { File("scrolling-fragment").resolve("template_scroll_fragment.png") }
 
     recipe = { data: TemplateData ->
-      scrollFragmentRecipe(data as ModuleTemplateData, fragmentClass.value, layoutName.value, packageName.value)
+      scrollFragmentRecipe(
+          data as ModuleTemplateData,
+          fragmentClass.value,
+          layoutName.value,
+          packageName.value,
+      )
     }
   }

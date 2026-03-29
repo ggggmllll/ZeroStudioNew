@@ -7,11 +7,11 @@ import com.itsaky.androidide.fragments.sdk.SdkListFragment
 
 class SdkManagerPagerAdapter(activity: FragmentActivity) : FragmentStateAdapter(activity) {
 
-    override fun getItemCount(): Int = 3 // Platforms, Tools, Update Sites
+  override fun getItemCount(): Int = 3 // Platforms, Tools, Update Sites
 
-    override fun createFragment(position: Int): Fragment {
-        // For now, all tabs use the same fragment type.
-        // We can differentiate them later if needed.
-        return SdkListFragment()
-    }
+  override fun createFragment(position: Int): Fragment {
+    // For now, all tabs use the same fragment type.
+    // We can differentiate them later if needed.
+    return SdkListFragment()
+  }
 }

@@ -33,7 +33,7 @@ data class BuildVariantInfo(
     val versionCode: Int? = null,
     val minSdk: Int? = null,
     val targetSdk: Int? = null,
-    val compileSdk: Int? = null
+    val compileSdk: Int? = null,
 ) {
 
   companion object {
@@ -49,14 +49,14 @@ data class BuildVariantInfo(
         "'$newSelection' is not a valid variant name. Available variants: ${this.buildVariants}"
       }
       return BuildVariantInfo(
-          this.projectPath, 
-          this.buildVariants, 
+          this.projectPath,
+          this.buildVariants,
           newSelection,
           this.versionName,
           this.versionCode,
           this.minSdk,
           this.targetSdk,
-          this.compileSdk
+          this.compileSdk,
       )
     }
   }

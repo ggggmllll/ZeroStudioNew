@@ -35,12 +35,12 @@ import com.android.tools.idea.wizard.template.impl.activities.googlePayActivity.
 import java.io.File
 
 fun RecipeExecutor.googlePayActivityRecipe(
-  moduleData: ModuleTemplateData,
-  activityClass: String,
-  viewModelClass: String,
-  layoutName: String,
-  isLauncher: Boolean,
-  packageName: String,
+    moduleData: ModuleTemplateData,
+    activityClass: String,
+    viewModelClass: String,
+    layoutName: String,
+    isLauncher: Boolean,
+    packageName: String,
 ) {
   val (projectData, srcOut, resOut, manifestOut) = moduleData
 
@@ -58,16 +58,16 @@ fun RecipeExecutor.googlePayActivityRecipe(
   // Create manifest
   val simpleName = activityToLayout(activityClass)
   mergeXml(
-    androidManifestXml(
-      activityClass,
-      isLauncher,
-      moduleData.isLibrary,
-      packageName,
-      simpleName,
-      moduleData.isNewModule,
-      moduleData.themesData,
-    ),
-    manifestOut.resolve("AndroidManifest.xml"),
+      androidManifestXml(
+          activityClass,
+          isLauncher,
+          moduleData.isLibrary,
+          packageName,
+          simpleName,
+          moduleData.isNewModule,
+          moduleData.themesData,
+      ),
+      manifestOut.resolve("AndroidManifest.xml"),
   )
 
   // Copy static resources
@@ -76,33 +76,38 @@ fun RecipeExecutor.googlePayActivityRecipe(
 
   // Generated resources
   mergeXml(stringsXml(activityClass, simpleName), resLocation.resolve("values/strings.xml"))
-  save(activityCheckoutXml(activityClass, packageName), resLocation.resolve("layout/$layoutName.xml"))
+  save(
+      activityCheckoutXml(activityClass, packageName),
+      resLocation.resolve("layout/$layoutName.xml"),
+  )
 
   // Generate Constants class
   val ktOrJavaExt = projectData.language.extension
   val constants =
-    when (projectData.language) {
-      Language.Java -> constantsJava(packageName)
-      Language.Kotlin -> constantsKotlin(packageName)
-    }
+      when (projectData.language) {
+        Language.Java -> constantsJava(packageName)
+        Language.Kotlin -> constantsKotlin(packageName)
+      }
   val constantsOut = srcOut.resolve("Constants.$ktOrJavaExt")
   save(constants, constantsOut)
 
   // Generate payments utility class
   val paymentsUtil =
-    when (projectData.language) {
-      Language.Java -> paymentsUtilJava(packageName)
-      Language.Kotlin -> paymentsUtilKotlin(packageName)
-    }
+      when (projectData.language) {
+        Language.Java -> paymentsUtilJava(packageName)
+        Language.Kotlin -> paymentsUtilKotlin(packageName)
+      }
   val paymentsUtilOut = srcOut.resolve("util/PaymentsUtil.$ktOrJavaExt")
   save(paymentsUtil, paymentsUtilOut)
 
   // Add view model class
   val checkoutViewModel =
-    when (projectData.language) {
-      Language.Java -> checkoutViewModelJava(viewModelClass = viewModelClass, packageName = packageName)
-      Language.Kotlin -> checkoutViewModelKt(viewModelClass = viewModelClass, packageName = packageName)
-    }
+      when (projectData.language) {
+        Language.Java ->
+            checkoutViewModelJava(viewModelClass = viewModelClass, packageName = packageName)
+        Language.Kotlin ->
+            checkoutViewModelKt(viewModelClass = viewModelClass, packageName = packageName)
+      }
 
   val viewModelOut = srcOut.resolve("viewmodel")
   save(checkoutViewModel, viewModelOut.resolve("$viewModelClass.$ktOrJavaExt"))
@@ -110,26 +115,26 @@ fun RecipeExecutor.googlePayActivityRecipe(
   // Add activity class
   val isViewBindingSupported = moduleData.viewBindingSupport.isViewBindingSupported()
   val checkoutActivity =
-    when (projectData.language) {
-      Language.Java ->
-        checkoutActivityJava(
-          activityClass = activityClass,
-          viewModelClass = viewModelClass,
-          layoutName = layoutName,
-          packageName = packageName,
-          applicationPackage = projectData.applicationPackage,
-          isViewBindingSupported = isViewBindingSupported,
-        )
-      Language.Kotlin ->
-        checkoutActivityKt(
-          activityClass = activityClass,
-          viewModelClass = viewModelClass,
-          layoutName = layoutName,
-          packageName = packageName,
-          applicationPackage = projectData.applicationPackage,
-          isViewBindingSupported = isViewBindingSupported,
-        )
-    }
+      when (projectData.language) {
+        Language.Java ->
+            checkoutActivityJava(
+                activityClass = activityClass,
+                viewModelClass = viewModelClass,
+                layoutName = layoutName,
+                packageName = packageName,
+                applicationPackage = projectData.applicationPackage,
+                isViewBindingSupported = isViewBindingSupported,
+            )
+        Language.Kotlin ->
+            checkoutActivityKt(
+                activityClass = activityClass,
+                viewModelClass = viewModelClass,
+                layoutName = layoutName,
+                packageName = packageName,
+                applicationPackage = projectData.applicationPackage,
+                isViewBindingSupported = isViewBindingSupported,
+            )
+      }
 
   save(checkoutActivity, srcOut.resolve("$activityClass.$ktOrJavaExt"))
   open(srcOut.resolve("$activityClass.$ktOrJavaExt"))

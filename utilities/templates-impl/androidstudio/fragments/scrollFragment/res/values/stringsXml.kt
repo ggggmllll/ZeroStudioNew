@@ -17,7 +17,7 @@
 package com.itsaky.androidide.templates.impl.androidstudio.fragments.scrollFragment.res.values
 
 fun stringsXml() =
-  """
+    """
 <resources>
 <string name="large_text">
 "Material is the metaphor.\n\n"

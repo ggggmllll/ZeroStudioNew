@@ -23,7 +23,7 @@ package com.itsaky.androidide.templates.impl.androidstudio.activities.androidTVA
  * @author android_zero
  */
 fun movieJava(packageName: String) =
-  """
+    """
 package ${packageName};
 
 import java.io.Serializable;

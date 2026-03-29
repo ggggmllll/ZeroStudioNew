@@ -34,30 +34,22 @@ import org.gradle.api.tasks.TaskAction
  */
 abstract class AddFileToAssetsTask : DefaultTask() {
 
-  /**
-   * The input file that should be copied to the assets directory.
-   */
-  @get:InputFile
-  abstract val inputFile: RegularFileProperty
+  /** The input file that should be copied to the assets directory. */
+  @get:InputFile abstract val inputFile: RegularFileProperty
 
-  /**
-   * The base assets path. The file will be saved in assets to `base-path/file-name`.
-   */
-  @get:Input
-  abstract val baseAssetsPath: Property<String>
+  /** The base assets path. The file will be saved in assets to `base-path/file-name`. */
+  @get:Input abstract val baseAssetsPath: Property<String>
 
   /**
    * The file name of the file in assets. The file will be saved in assets to `base-path/file-name`.
    */
-  @get:Input
-  @get:Optional
-  abstract val fileName: Property<String>
+  @get:Input @get:Optional abstract val fileName: Property<String>
 
   /**
-   * The output assets directory. This should not be set manually, but provided to Android Gradle Plugin.
+   * The output assets directory. This should not be set manually, but provided to Android Gradle
+   * Plugin.
    */
-  @get:OutputDirectory
-  abstract val outputDirectory: DirectoryProperty
+  @get:OutputDirectory abstract val outputDirectory: DirectoryProperty
 
   @TaskAction
   fun copy() {
@@ -85,14 +77,11 @@ abstract class AddFileToAssetsTask : DefaultTask() {
       fileName = inFile.name
     }
 
-    val outFile = outputDirectory.file("$basePath/$fileName").get().asFile.also {
-      it.parentFile.mkdirs()
-    }
+    val outFile =
+        outputDirectory.file("$basePath/$fileName").get().asFile.also { it.parentFile.mkdirs() }
 
     inFile.inputStream().buffered().use { input ->
-      outFile.outputStream().buffered().use { output ->
-        input.transferTo(output)
-      }
+      outFile.outputStream().buffered().use { output -> input.transferTo(output) }
     }
   }
 }

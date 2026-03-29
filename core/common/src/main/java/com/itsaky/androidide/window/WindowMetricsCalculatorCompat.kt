@@ -38,56 +38,55 @@ import com.itsaky.androidide.window.DisplayCompatHelperApi28.safeInsetRight
 import com.itsaky.androidide.window.DisplayCompatHelperApi28.safeInsetTop
 import java.lang.reflect.InvocationTargetException
 
-/**
- * Helper class used to compute window metrics across Android versions.
- */
+/** Helper class used to compute window metrics across Android versions. */
 internal object WindowMetricsCalculatorCompat : WindowMetricsCalculator {
 
   private val TAG: String = WindowMetricsCalculatorCompat::class.java.simpleName
 
   /**
    * Computes the current [WindowMetrics] for a given [Activity]
+   *
    * @see WindowMetricsCalculator.computeCurrentWindowMetrics
    */
   override fun computeCurrentWindowMetrics(activity: Activity): WindowMetrics {
-    val bounds = if (Build.VERSION.SDK_INT >= VERSION_CODES.R) {
-      currentWindowBounds(activity)
-    } else if (Build.VERSION.SDK_INT >= VERSION_CODES.Q) {
-      computeWindowBoundsQ(activity)
-    } else if (Build.VERSION.SDK_INT >= VERSION_CODES.P) {
-      computeWindowBoundsP(activity)
-    } else
-      computeWindowBoundsN(activity)
+    val bounds =
+        if (Build.VERSION.SDK_INT >= VERSION_CODES.R) {
+          currentWindowBounds(activity)
+        } else if (Build.VERSION.SDK_INT >= VERSION_CODES.Q) {
+          computeWindowBoundsQ(activity)
+        } else if (Build.VERSION.SDK_INT >= VERSION_CODES.P) {
+          computeWindowBoundsP(activity)
+        } else computeWindowBoundsN(activity)
     return WindowMetrics(bounds)
   }
 
   /**
    * Computes the maximum [WindowMetrics] for a given [Activity]
+   *
    * @see WindowMetricsCalculator.computeMaximumWindowMetrics
    */
   override fun computeMaximumWindowMetrics(activity: Activity): WindowMetrics {
-    val bounds = if (Build.VERSION.SDK_INT >= VERSION_CODES.R) {
-      maximumWindowBounds(activity)
-    } else {
-      // [WindowManager#getDefaultDisplay] is deprecated but we have this for
-      // compatibility with older versions
-      @Suppress("DEPRECATION")
-      val display = activity.windowManager.defaultDisplay
-      val displaySize = getRealSizeForDisplay(display)
-      Rect(0, 0, displaySize.x, displaySize.y)
-    }
+    val bounds =
+        if (Build.VERSION.SDK_INT >= VERSION_CODES.R) {
+          maximumWindowBounds(activity)
+        } else {
+          // [WindowManager#getDefaultDisplay] is deprecated but we have this for
+          // compatibility with older versions
+          @Suppress("DEPRECATION") val display = activity.windowManager.defaultDisplay
+          val displaySize = getRealSizeForDisplay(display)
+          Rect(0, 0, displaySize.x, displaySize.y)
+        }
     return WindowMetrics(bounds)
   }
 
-  /** Computes the window bounds for [Build.VERSION_CODES.Q].  */
+  /** Computes the window bounds for [Build.VERSION_CODES.Q]. */
   @SuppressLint("BanUncheckedReflection", "BlockedPrivateApi")
   @RequiresApi(VERSION_CODES.Q)
   internal fun computeWindowBoundsQ(activity: Activity): Rect {
     var bounds: Rect
     val config = activity.resources.configuration
     try {
-      val windowConfigField =
-        Configuration::class.java.getDeclaredField("windowConfiguration")
+      val windowConfigField = Configuration::class.java.getDeclaredField("windowConfiguration")
       windowConfigField.isAccessible = true
       val windowConfig = windowConfigField[config]
       val getBoundsMethod = windowConfig.javaClass.getDeclaredMethod("getBounds")
@@ -113,11 +112,8 @@ internal object WindowMetricsCalculatorCompat : WindowMetricsCalculator {
   /**
    * Computes the window bounds for [Build.VERSION_CODES.P].
    *
-   *
-   * NOTE: This method may result in incorrect values if the [android.content.res.Resources]
-   * value stored at 'navigation_bar_height' does not match the true navigation bar inset on
-   * the window.
-   *
+   * NOTE: This method may result in incorrect values if the [android.content.res.Resources] value
+   * stored at 'navigation_bar_height' does not match the true navigation bar inset on the window.
    */
   @SuppressLint("BanUncheckedReflection", "BlockedPrivateApi")
   @RequiresApi(VERSION_CODES.P)
@@ -125,8 +121,7 @@ internal object WindowMetricsCalculatorCompat : WindowMetricsCalculator {
     val bounds = Rect()
     val config = activity.resources.configuration
     try {
-      val windowConfigField =
-        Configuration::class.java.getDeclaredField("windowConfiguration")
+      val windowConfigField = Configuration::class.java.getDeclaredField("windowConfiguration")
       windowConfigField.isAccessible = true
       val windowConfig = windowConfigField[config]
 
@@ -157,8 +152,7 @@ internal object WindowMetricsCalculatorCompat : WindowMetricsCalculator {
 
     // [WindowManager#getDefaultDisplay] is deprecated but we have this for
     // compatibility with older versions
-    @Suppress("DEPRECATION")
-    val currentDisplay = platformWindowManager.defaultDisplay
+    @Suppress("DEPRECATION") val currentDisplay = platformWindowManager.defaultDisplay
     val realDisplaySize = Point()
     // [Display#getRealSize] is deprecated but we have this for
     // compatibility with older versions
@@ -176,8 +170,9 @@ internal object WindowMetricsCalculatorCompat : WindowMetricsCalculator {
         bounds.left = 0
       }
     }
-    if ((bounds.width() < realDisplaySize.x || bounds.height() < realDisplaySize.y) &&
-      !isInMultiWindowMode(activity)
+    if (
+        (bounds.width() < realDisplaySize.x || bounds.height() < realDisplaySize.y) &&
+            !isInMultiWindowMode(activity)
     ) {
       // If the corrected bounds are not the same as the display size and the activity is
       // not in multi-window mode it is possible there are unreported cutouts inset-ing
@@ -205,39 +200,32 @@ internal object WindowMetricsCalculatorCompat : WindowMetricsCalculator {
   private fun getRectSizeFromDisplay(activity: Activity, bounds: Rect) {
     // [WindowManager#getDefaultDisplay] is deprecated but we have this for
     // compatibility with older versions
-    @Suppress("DEPRECATION")
-    val defaultDisplay = activity.windowManager.defaultDisplay
+    @Suppress("DEPRECATION") val defaultDisplay = activity.windowManager.defaultDisplay
     // [Display#getRectSize] is deprecated but we have this for
     // compatibility with older versions
-    @Suppress("DEPRECATION")
-    defaultDisplay.getRectSize(bounds)
+    @Suppress("DEPRECATION") defaultDisplay.getRectSize(bounds)
   }
 
   /**
-   * Computes the window bounds for platforms between [Build.VERSION_CODES.N]
-   * and [Build.VERSION_CODES.O_MR1], inclusive.
-   *
+   * Computes the window bounds for platforms between [Build.VERSION_CODES.N] and
+   * [Build.VERSION_CODES.O_MR1], inclusive.
    *
    * NOTE: This method may result in incorrect values under the following conditions:
    *
-   *  * If the activity is in multi-window mode the origin of the returned bounds will
-   * always be anchored at (0, 0).
-   *  * If the [android.content.res.Resources] value stored at 'navigation_bar_height' does
-   *  not match the true navigation bar size the returned bounds will not take into account
-   *  the navigation
-   * bar.
-   *
+   * * If the activity is in multi-window mode the origin of the returned bounds will always be
+   *   anchored at (0, 0).
+   * * If the [android.content.res.Resources] value stored at 'navigation_bar_height' does not match
+   *   the true navigation bar size the returned bounds will not take into account the navigation
+   *   bar.
    */
   private fun computeWindowBoundsN(activity: Activity): Rect {
     val bounds = Rect()
     // [WindowManager#getDefaultDisplay] is deprecated but we have this for
     // compatibility with older versions
-    @Suppress("DEPRECATION")
-    val defaultDisplay = activity.windowManager.defaultDisplay
+    @Suppress("DEPRECATION") val defaultDisplay = activity.windowManager.defaultDisplay
     // [Display#getRectSize] is deprecated but we have this for
     // compatibility with older versions
-    @Suppress("DEPRECATION")
-    defaultDisplay.getRectSize(bounds)
+    @Suppress("DEPRECATION") defaultDisplay.getRectSize(bounds)
     if (!isInMultiWindowMode(activity)) {
       // The activity is not in multi-window mode. Check if the addition of the
       // navigation bar size to Display#getSize() results in the real display size and
@@ -254,14 +242,12 @@ internal object WindowMetricsCalculatorCompat : WindowMetricsCalculator {
   }
 
   /**
-   * Returns the full (real) size of the display, in pixels, without subtracting any window
-   * decor or applying any compatibility scale factors.
-   *
+   * Returns the full (real) size of the display, in pixels, without subtracting any window decor or
+   * applying any compatibility scale factors.
    *
    * The size is adjusted based on the current rotation of the display.
    *
    * @return a point representing the real display size in pixels.
-   *
    * @see Display.getRealSize
    */
   @VisibleForTesting
@@ -274,10 +260,9 @@ internal object WindowMetricsCalculatorCompat : WindowMetricsCalculator {
   /**
    * Returns the [android.content.res.Resources] value stored as 'navigation_bar_height'.
    *
-   *
-   * Note: This is error-prone and is **not** the recommended way to determine the size
-   * of the overlapping region between the navigation bar and a given window. The best
-   * approach is to acquire the [android.view.WindowInsets].
+   * Note: This is error-prone and is **not** the recommended way to determine the size of the
+   * overlapping region between the navigation bar and a given window. The best approach is to
+   * acquire the [android.view.WindowInsets].
    */
   @SuppressLint("DiscouragedApi", "InternalInsetResource")
   private fun getNavigationBarHeight(context: Context): Int {
@@ -289,8 +274,8 @@ internal object WindowMetricsCalculatorCompat : WindowMetricsCalculator {
   }
 
   /**
-   * Returns the [DisplayCutout] for the given display. Note that display cutout returned
-   * here is for the display and the insets provided are in the display coordinate system.
+   * Returns the [DisplayCutout] for the given display. Note that display cutout returned here is
+   * for the display and the insets provided are in the display coordinate system.
    *
    * @return the display cutout for the given display.
    */
@@ -303,9 +288,8 @@ internal object WindowMetricsCalculatorCompat : WindowMetricsCalculator {
       val displayInfoConstructor = displayInfoClass.getConstructor()
       displayInfoConstructor.isAccessible = true
       val displayInfo = displayInfoConstructor.newInstance()
-      val getDisplayInfoMethod = display.javaClass.getDeclaredMethod(
-        "getDisplayInfo", displayInfo.javaClass
-      )
+      val getDisplayInfoMethod =
+          display.javaClass.getDeclaredMethod("getDisplayInfo", displayInfo.javaClass)
       getDisplayInfoMethod.isAccessible = true
       getDisplayInfoMethod.invoke(display, displayInfo)
       val displayCutoutField = displayInfo.javaClass.getDeclaredField("displayCutout")

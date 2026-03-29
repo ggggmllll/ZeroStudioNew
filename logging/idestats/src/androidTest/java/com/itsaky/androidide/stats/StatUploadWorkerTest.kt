@@ -32,24 +32,23 @@ import androidx.work.impl.utils.SynchronousExecutor
 import androidx.work.testing.WorkManagerTestInitHelper
 import com.google.common.truth.Truth.assertThat
 import com.itsaky.androidide.buildinfo.BuildInfo
+import java.util.concurrent.TimeUnit
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.util.concurrent.TimeUnit
 
-/**
- * @author Akash Yadav
- */
+/** @author Akash Yadav */
 @RunWith(AndroidJUnit4::class)
 class StatUploadWorkerTest {
 
   @Before
   fun setup() {
     val context = ApplicationProvider.getApplicationContext<Application>()
-    val config = Configuration.Builder()
-      .setMinimumLoggingLevel(Log.DEBUG)
-      .setExecutor(SynchronousExecutor())
-      .build()
+    val config =
+        Configuration.Builder()
+            .setMinimumLoggingLevel(Log.DEBUG)
+            .setExecutor(SynchronousExecutor())
+            .build()
 
     // Initialize WorkManager for instrumentation tests.
     WorkManagerTestInitHelper.initializeTestWorkManager(context, config)
@@ -59,18 +58,32 @@ class StatUploadWorkerTest {
   @Throws(Exception::class)
   fun testStatUploadWorker() {
     val context = ApplicationProvider.getApplicationContext<Application>()
-    val input = StatData("test_device_id", "test_device_name", "test_device_country", 33,
-      BuildInfo.VERSION_NAME_SIMPLE, "aarch64")
+    val input =
+        StatData(
+            "test_device_id",
+            "test_device_name",
+            "test_device_country",
+            33,
+            BuildInfo.VERSION_NAME_SIMPLE,
+            "aarch64",
+        )
     val constraints = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
-    val request = PeriodicWorkRequestBuilder<StatUploadWorker>(24, TimeUnit.HOURS)
-      .setInputData(input.toInputData())
-      .setConstraints(constraints)
-      .build()
+    val request =
+        PeriodicWorkRequestBuilder<StatUploadWorker>(24, TimeUnit.HOURS)
+            .setInputData(input.toInputData())
+            .setConstraints(constraints)
+            .build()
     val workManager = WorkManager.getInstance(context)
     val testDriver = WorkManagerTestInitHelper.getTestDriver(context)!!
 
-    workManager.enqueueUniquePeriodicWork(StatUploadWorker.WORKER_WORK_NAME,
-      ExistingPeriodicWorkPolicy.KEEP, request).result.get()
+    workManager
+        .enqueueUniquePeriodicWork(
+            StatUploadWorker.WORKER_WORK_NAME,
+            ExistingPeriodicWorkPolicy.KEEP,
+            request,
+        )
+        .result
+        .get()
     testDriver.setAllConstraintsMet(request.id)
     testDriver.setPeriodDelayMet(request.id)
 

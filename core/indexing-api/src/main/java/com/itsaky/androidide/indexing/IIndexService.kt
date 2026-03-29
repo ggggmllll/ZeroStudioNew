@@ -18,8 +18,8 @@
 package com.itsaky.androidide.indexing
 
 import com.itsaky.androidide.projects.IWorkspace
-import kotlinx.coroutines.Deferred
 import java.io.File
+import kotlinx.coroutines.Deferred
 
 /**
  * An index service is responsible for indexing symbols.
@@ -28,9 +28,7 @@ import java.io.File
  */
 interface IIndexService {
 
-  /**
-   * The display name of the service.
-   */
+  /** The display name of the service. */
   val displayName: String
 
   /**

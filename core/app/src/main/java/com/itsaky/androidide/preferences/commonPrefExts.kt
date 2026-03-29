@@ -38,10 +38,7 @@ internal abstract class PropertyBasedMultiChoicePreference : MultiChoicePreferen
     return entries
   }
 
-  override fun onChoicesConfirmed(
-    preference: Preference,
-    entries: Array<PreferenceChoices.Entry>
-  ) {
+  override fun onChoicesConfirmed(preference: Preference, entries: Array<PreferenceChoices.Entry>) {
     entries.forEach { entry ->
       uncheckedCast<KMutableProperty0<Boolean>>(entry.data).set(entry.isChecked)
     }

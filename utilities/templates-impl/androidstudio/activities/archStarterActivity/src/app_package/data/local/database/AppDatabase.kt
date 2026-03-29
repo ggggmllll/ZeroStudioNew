@@ -24,7 +24,7 @@ import com.itsaky.androidide.templates.impl.androidstudio.activities.archStarter
  * @author android_zero
  */
 fun ArchStarterActivityTemplateVariables.appDatabase() =
-  """
+    """
 package $databasePackage
 
 import androidx.room.Database

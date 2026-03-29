@@ -51,50 +51,47 @@ interface ITemplateProvider {
     @JvmStatic fun isLoaded() = provider != null
   }
 
-    /**
-     * Registers a template under a specific category. This allows for dynamic addition of templates.
-     *
-     * @param category The [TemplateCategory] under which to register the template.
-     * @param template The [Template] to register.
-     *
-     * Usage:
-     * ```kotlin
-     * val myTemplate = ... // create a template instance
-     * ITemplateProvider.getInstance().registerTemplate(TemplateCategory.Mobile, myTemplate)
-     * ```
-     */
-    fun registerTemplate(category: TemplateCategory, template: Template<*>)
+  /**
+   * Registers a template under a specific category. This allows for dynamic addition of templates.
+   *
+   * @param category The [TemplateCategory] under which to register the template.
+   * @param template The [Template] to register.
+   *
+   * Usage:
+   * ```kotlin
+   * val myTemplate = ... // create a template instance
+   * ITemplateProvider.getInstance().registerTemplate(TemplateCategory.Mobile, myTemplate)
+   * ```
+   */
+  fun registerTemplate(category: TemplateCategory, template: Template<*>)
 
-    /**
-     * Get all registered template categories.
-     *
-     * @return A list of [TemplateCategory]s that have at least one template registered.
-     */
-    fun getRegisteredCategories(): List<TemplateCategory>
+  /**
+   * Get all registered template categories.
+   *
+   * @return A list of [TemplateCategory]s that have at least one template registered.
+   */
+  fun getRegisteredCategories(): List<TemplateCategory>
 
-    /**
-     * Get all templates for a specific category.
-     *
-     * @param category The [TemplateCategory] to get templates for.
-     * @return A list of [Template]s for the given category. Returns an empty list if the category is not found or has no templates.
-     */
-    fun getTemplatesFor(category: TemplateCategory): List<Template<*>>
+  /**
+   * Get all templates for a specific category.
+   *
+   * @param category The [TemplateCategory] to get templates for.
+   * @return A list of [Template]s for the given category. Returns an empty list if the category is
+   *   not found or has no templates.
+   */
+  fun getTemplatesFor(category: TemplateCategory): List<Template<*>>
 
-    /**
-     * Get a specific template by its unique ID. It will search across all categories.
-     *
-     * @param templateId The ID for the template.
-     * @return The [Template] with the given [templateId] if any, or `null`.
-     */
-    fun getTemplate(templateId: String): Template<*>?
+  /**
+   * Get a specific template by its unique ID. It will search across all categories.
+   *
+   * @param templateId The ID for the template.
+   * @return The [Template] with the given [templateId] if any, or `null`.
+   */
+  fun getTemplate(templateId: String): Template<*>?
 
-    /**
-     * Reloads all templates from their sources.
-     */
-    fun reload()
+  /** Reloads all templates from their sources. */
+  fun reload()
 
-    /**
-     * Clears all registered templates and categories from the provider.
-     */
-    fun release()
+  /** Clears all registered templates and categories from the provider. */
+  fun release()
 }

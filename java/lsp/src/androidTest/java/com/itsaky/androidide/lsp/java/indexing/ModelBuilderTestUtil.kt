@@ -24,29 +24,31 @@ import com.itsaky.androidide.lsp.java.utils.JavaType
 import io.realm.RealmList
 import openjdk.tools.classfile.AccessFlags
 
-/**
- * @author Akash Yadav
- */
+/** @author Akash Yadav */
 object ModelBuilderTestUtil {
 
-  fun createTestClass() = JavaClass.newInstance(
-    fqn = "com/itsaky/androidide/indexing/TestClass",
-    name = "TestClass",
-    packageName = "com/itsaky/androidide/indexing",
-    accessFlags = AccessFlags.ACC_PUBLIC or AccessFlags.ACC_FINAL,
-    superClassFqn = "java/lang/Object",
-    superInterfacesFqn = RealmList(),
-    fields = RealmList<JavaField>().apply {
-      add(JavaField.newField("someString", JavaType.STRING, AccessFlags.ACC_PRIVATE))
-    },
-    methods = RealmList<JavaMethod>().apply {
-      add(
-        JavaMethod.newInstance(
-          name = "getSomeString",
-          paramsTypes = RealmList(),
-          returnType = JavaType.STRING,
-          accessFlags = AccessFlags.ACC_PUBLIC
-        )
+  fun createTestClass() =
+      JavaClass.newInstance(
+          fqn = "com/itsaky/androidide/indexing/TestClass",
+          name = "TestClass",
+          packageName = "com/itsaky/androidide/indexing",
+          accessFlags = AccessFlags.ACC_PUBLIC or AccessFlags.ACC_FINAL,
+          superClassFqn = "java/lang/Object",
+          superInterfacesFqn = RealmList(),
+          fields =
+              RealmList<JavaField>().apply {
+                add(JavaField.newField("someString", JavaType.STRING, AccessFlags.ACC_PRIVATE))
+              },
+          methods =
+              RealmList<JavaMethod>().apply {
+                add(
+                    JavaMethod.newInstance(
+                        name = "getSomeString",
+                        paramsTypes = RealmList(),
+                        returnType = JavaType.STRING,
+                        accessFlags = AccessFlags.ACC_PUBLIC,
+                    )
+                )
+              },
       )
-    })
 }

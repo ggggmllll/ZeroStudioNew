@@ -23,32 +23,34 @@ import com.itsaky.androidide.templates.base.models.Dependency
 
 /**
  * 注入标准库依赖 (用于普通视图项目)
+ *
  * @author android_zero
  */
 fun AndroidModuleTemplateBuilder.addStandardDependencies() {
-    if (data.language == Language.Kotlin) {
-        addDependency(Dependency.AndroidX.Core_Ktx)
-    } else {
-        addDependency(Dependency.AndroidX.Core)
-    }
-    addDependency(Dependency.AndroidX.AppCompat)
-    addDependency(Dependency.Google.Material)
-    addDependency(Dependency.AndroidX.ConstraintLayout)
+  if (data.language == Language.Kotlin) {
+    addDependency(Dependency.AndroidX.Core_Ktx)
+  } else {
+    addDependency(Dependency.AndroidX.Core)
+  }
+  addDependency(Dependency.AndroidX.AppCompat)
+  addDependency(Dependency.Google.Material)
+  addDependency(Dependency.AndroidX.ConstraintLayout)
 }
 
 /**
  * 注入 Jetpack Compose 全家桶依赖
+ *
  * @author android_zero
  */
 fun AndroidModuleTemplateBuilder.addComposeDependencies() {
-    addDependency(Dependency.AndroidX.Core_Ktx)
-    addDependency(Dependency.AndroidX.Compose.LifeCycle_Runtime_Ktx)
-    addDependency(Dependency.AndroidX.Compose.Activity)
-    addDependency(Dependency.AndroidX.Compose.BOM, isPlatform = true)
-    addDependency(Dependency.AndroidX.Compose.UI)
-    addDependency(Dependency.AndroidX.Compose.UI_Graphics)
-    addDependency(Dependency.AndroidX.Compose.UI_Tooling_Preview)
-    addDependency(Dependency.AndroidX.Compose.Material3)
-    addDependency(Dependency.AndroidX.Compose.UI_Tooling)
-    addDependency(Dependency.AndroidX.Compose.UI_Test_Manifest)
+  addDependency(Dependency.AndroidX.Core_Ktx)
+  addDependency(Dependency.AndroidX.Compose.LifeCycle_Runtime_Ktx)
+  addDependency(Dependency.AndroidX.Compose.Activity)
+  addDependency(Dependency.AndroidX.Compose.BOM, isPlatform = true)
+  addDependency(Dependency.AndroidX.Compose.UI)
+  addDependency(Dependency.AndroidX.Compose.UI_Graphics)
+  addDependency(Dependency.AndroidX.Compose.UI_Tooling_Preview)
+  addDependency(Dependency.AndroidX.Compose.Material3)
+  addDependency(Dependency.AndroidX.Compose.UI_Tooling)
+  addDependency(Dependency.AndroidX.Compose.UI_Test_Manifest)
 }

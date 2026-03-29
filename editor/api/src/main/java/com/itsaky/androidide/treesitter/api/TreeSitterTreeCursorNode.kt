@@ -21,22 +21,27 @@ import com.itsaky.androidide.treesitter.TSTreeCursorNode
 import com.itsaky.androidide.utils.DefaultRecyclable
 import com.itsaky.androidide.utils.RecyclableObjectPool
 
-/**
- * @author Akash Yadav
- */
-class TreeSitterTreeCursorNode @JvmOverloads internal constructor(
-  type: String? = null,
-  name: String? = null,
-  startByte: Int = 0,
-  endByte: Int = 0
-) : TSTreeCursorNode(type, name, startByte, endByte),
-  RecyclableObjectPool.Recyclable by DefaultRecyclable() {
+/** @author Akash Yadav */
+class TreeSitterTreeCursorNode
+@JvmOverloads
+internal constructor(
+    type: String? = null,
+    name: String? = null,
+    startByte: Int = 0,
+    endByte: Int = 0,
+) :
+    TSTreeCursorNode(type, name, startByte, endByte),
+    RecyclableObjectPool.Recyclable by DefaultRecyclable() {
 
   companion object {
 
     @JvmStatic
-    fun obtain(type: String?, name: String?, startByte: Int,
-      endByte: Int): TreeSitterTreeCursorNode {
+    fun obtain(
+        type: String?,
+        name: String?,
+        startByte: Int,
+        endByte: Int,
+    ): TreeSitterTreeCursorNode {
       return obtainFromPool<TreeSitterTreeCursorNode>().apply {
         this.type = type
         this.name = name

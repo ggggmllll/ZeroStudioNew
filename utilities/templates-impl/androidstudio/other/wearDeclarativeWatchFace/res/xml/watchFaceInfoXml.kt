@@ -16,8 +16,8 @@
 package com.itsaky.androidide.templates.impl.androidstudio.other.wearDeclarativeWatchFace.res.xml
 
 fun watchFaceInfoXml() =
-  // language=XML
-  """
+    // language=XML
+    """
 <WatchFaceInfo>
   <!--
     Preview is the only required element here.

@@ -14,13 +14,13 @@ class ContainerReader(input: File) {
 
   init {
     Preconditions.checkState(
-      inputStream.readFixed32() == Container.FORMAT_MAGIC,
-      "File has invalid format."
+        inputStream.readFixed32() == Container.FORMAT_MAGIC,
+        "File has invalid format.",
     )
 
     Preconditions.checkState(
-      inputStream.readFixed32() == Container.FORMAT_VERSION,
-      "File has invalid version."
+        inputStream.readFixed32() == Container.FORMAT_VERSION,
+        "File has invalid version.",
     )
 
     numEntries = inputStream.readFixed32()
@@ -28,10 +28,11 @@ class ContainerReader(input: File) {
 
     for (i in 0.until(numEntries)) {
       val entryType = inputStream.readFixed32()
-      val entry = when (entryType) {
-        Container.EntryType.RES_TABLE.value -> gatherTableEntry(inputStream)
-        else -> gatherFileEntry(inputStream)
-      }
+      val entry =
+          when (entryType) {
+            Container.EntryType.RES_TABLE.value -> gatherTableEntry(inputStream)
+            else -> gatherFileEntry(inputStream)
+          }
       tempEntries.add(entry)
     }
 
@@ -73,7 +74,7 @@ class ContainerReader(input: File) {
 
 open class ContainerEntry(val size: Long)
 
-class TableEntry(size: Long, val table: Resources.ResourceTable): ContainerEntry(size)
+class TableEntry(size: Long, val table: Resources.ResourceTable) : ContainerEntry(size)
 
-class FileEntry(size: Long, val header: ResourcesInternal.CompiledFile,val data: ByteArray):
-        ContainerEntry(size)
+class FileEntry(size: Long, val header: ResourcesInternal.CompiledFile, val data: ByteArray) :
+    ContainerEntry(size)

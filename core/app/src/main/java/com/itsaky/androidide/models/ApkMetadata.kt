@@ -20,30 +20,24 @@ package com.itsaky.androidide.models
 import com.google.gson.annotations.SerializedName
 import com.itsaky.androidide.utils.JSONUtility.gson
 import com.itsaky.androidide.utils.ListingFileRedirect.getListingFile
-import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileReader
+import org.slf4j.LoggerFactory
 
 class ApkMetadata {
 
-  @SerializedName("version")
-  var version = 0
+  @SerializedName("version") var version = 0
 
-  @SerializedName("artifactType")
-  var artifactType: ArtifactType? = null
+  @SerializedName("artifactType") var artifactType: ArtifactType? = null
 
-  @SerializedName("applicationId")
-  var applicationId: String? = null
+  @SerializedName("applicationId") var applicationId: String? = null
 
-  @SerializedName("variantName")
-  var variantName: String? = null
+  @SerializedName("variantName") var variantName: String? = null
 
-  @SerializedName("elements")
-  var elements: List<MetadataElement>? = null
+  @SerializedName("elements") var elements: List<MetadataElement>? = null
 
-  @SerializedName("elementType")
-  var elementType: String? = null
+  @SerializedName("elementType") var elementType: String? = null
 
   companion object {
 

@@ -46,6 +46,8 @@ import com.itsaky.androidide.utils.FileProvider
 import io.github.rosemoe.sora.text.Content
 import io.mockk.every
 import io.mockk.mockkStatic
+import java.io.File
+import java.nio.file.Path
 import kotlinx.coroutines.runBlocking
 import org.greenrobot.eventbus.EventBus
 import org.junit.Before
@@ -55,8 +57,6 @@ import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.io.File
-import java.nio.file.Path
 
 /**
  * Runs tests for a language server.
@@ -66,7 +66,7 @@ import java.nio.file.Path
 @RunWith(RobolectricTestRunner::class)
 @Config(manifest = Config.DEFAULT_VALUE_STRING)
 abstract class LSPTest(
-  private val sourceFileExt: String,
+    private val sourceFileExt: String,
 ) {
 
   protected lateinit var toolingServer: IToolingApiServer
@@ -78,11 +78,9 @@ abstract class LSPTest(
 
   companion object {
 
-    @JvmStatic
-    protected val log: Logger = LoggerFactory.getLogger(LSPTest::class.java)
+    @JvmStatic protected val log: Logger = LoggerFactory.getLogger(LSPTest::class.java)
 
-    @JvmStatic
-    protected var isInitialized: Boolean = false
+    @JvmStatic protected var isInitialized: Boolean = false
   }
 
   @Before
@@ -99,7 +97,6 @@ abstract class LSPTest(
 
     val params = ToolingApiTestLauncherParams()
     ToolingApiTestLauncher.launchServer(params) {
-
       assertThat(result?.isSuccessful).isTrue()
 
       this@LSPTest.toolingProject = project
@@ -124,15 +121,17 @@ abstract class LSPTest(
       // We need to manually setup the language server with the project here
       // ProjectManager.notifyProjectUpdate()
       ILanguageServerRegistry.getDefault()
-        .getServer(getServerId())!!
-        .setupWorkspace(projectManager.getWorkspace()!!)
+          .getServer(getServerId())!!
+          .setupWorkspace(projectManager.getWorkspace()!!)
 
       isInitialized = true
     }
   }
 
   protected abstract fun registerServer()
+
   protected abstract fun getServerId(): String
+
   abstract fun test()
 
   fun requireCursor(): Int {
@@ -148,15 +147,15 @@ abstract class LSPTest(
     // As the content has been changed, we have to
     // Update the content in language server
     dispatchEvent(
-      DocumentChangeEvent(
-        file!!,
-        contents.toString(),
-        contents.toString(),
-        1,
-        DELETE,
-        0,
-        Range.NONE
-      )
+        DocumentChangeEvent(
+            file!!,
+            contents.toString(),
+            contents.toString(),
+            1,
+            DELETE,
+            0,
+            Range.NONE,
+        )
     )
   }
 

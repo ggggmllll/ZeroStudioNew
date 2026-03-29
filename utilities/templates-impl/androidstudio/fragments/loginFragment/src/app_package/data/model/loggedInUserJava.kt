@@ -17,7 +17,7 @@
 package com.itsaky.androidide.templates.impl.androidstudio.fragments.loginFragment.src.app_package.data.model
 
 fun loggedInUserJava(packageName: String) =
-  """
+    """
 package ${packageName}.data.model;
 
 /**

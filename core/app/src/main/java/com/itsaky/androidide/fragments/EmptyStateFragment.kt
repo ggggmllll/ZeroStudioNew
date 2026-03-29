@@ -34,6 +34,7 @@ import com.itsaky.androidide.viewmodel.EmptyStateFragmentViewModel
 abstract class EmptyStateFragment<T : ViewBinding> : FragmentWithBinding<T> {
 
   constructor(layout: Int, bind: (View) -> T) : super(layout, bind)
+
   constructor(inflate: (LayoutInflater, ViewGroup?, Boolean) -> T) : super(inflate)
 
   protected var emptyStateBinding: FragmentEmptyStateBinding? = null
@@ -47,26 +48,29 @@ abstract class EmptyStateFragment<T : ViewBinding> : FragmentWithBinding<T> {
       emptyStateViewModel.isEmpty.value = value
     }
 
-  override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-    savedInstanceState: Bundle?): View {
+  override fun onCreateView(
+      inflater: LayoutInflater,
+      container: ViewGroup?,
+      savedInstanceState: Bundle?,
+  ): View {
 
-    return FragmentEmptyStateBinding.inflate(inflater, container, false).also { emptyStateBinding ->
-      this.emptyStateBinding = emptyStateBinding
+    return FragmentEmptyStateBinding.inflate(inflater, container, false)
+        .also { emptyStateBinding ->
+          this.emptyStateBinding = emptyStateBinding
 
-      // add the main fragment view
-      emptyStateBinding.root.addView(
-        super.onCreateView(inflater, emptyStateBinding.root, savedInstanceState)
-      )
-    }.root
+          // add the main fragment view
+          emptyStateBinding.root.addView(
+              super.onCreateView(inflater, emptyStateBinding.root, savedInstanceState)
+          )
+        }
+        .root
   }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
     emptyStateViewModel.isEmpty.observe(viewLifecycleOwner) { isEmpty ->
-      emptyStateBinding?.apply {
-        root.displayedChild = if (isEmpty) 0 else 1
-      }
+      emptyStateBinding?.apply { root.displayedChild = if (isEmpty) 0 else 1 }
     }
 
     emptyStateViewModel.emptyMessage.observe(viewLifecycleOwner) { message ->

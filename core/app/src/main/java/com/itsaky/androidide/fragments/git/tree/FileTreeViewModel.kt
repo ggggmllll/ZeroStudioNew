@@ -17,11 +17,11 @@
 
 package com.itsaky.androidide.fragments.git.tree
 
+import android.zero.studio.treeview.view.AndroidTreeView
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.itsaky.androidide.tasks.executeAsync
 import com.itsaky.androidide.tasks.runOnUiThread
-import android.zero.studio.treeview.view.AndroidTreeView
 
 /**
  * [ViewModel] for the file tree fragment.
@@ -42,9 +42,7 @@ internal class FileTreeViewModel : ViewModel() {
         // this could block teh UI thread
         return@executeAsync tree.saveState
       }) { result ->
-        runOnUiThread {
-          treeState.value = result
-        }
+        runOnUiThread { treeState.value = result }
       }
     }
   }

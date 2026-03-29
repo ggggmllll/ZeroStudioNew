@@ -28,17 +28,20 @@ import android.os.Parcelable
 data object IDEPreferences : BaseIDEPreferences() {
 
   override val children: List<IPreference> = mutableListOf()
+
   override fun describeContents(): Int = 0
+
   override fun writeToParcel(dest: Parcel, flags: Int) {}
-  
+
   @JvmField
-  val CREATOR = object : Parcelable.Creator<IDEPreferences> {
-    override fun createFromParcel(source: Parcel?): IDEPreferences {
-      return IDEPreferences
-    }
-  
-    override fun newArray(size: Int): Array<IDEPreferences> {
-      return Array(size) { IDEPreferences }
-    }
-  }
+  val CREATOR =
+      object : Parcelable.Creator<IDEPreferences> {
+        override fun createFromParcel(source: Parcel?): IDEPreferences {
+          return IDEPreferences
+        }
+
+        override fun newArray(size: Int): Array<IDEPreferences> {
+          return Array(size) { IDEPreferences }
+        }
+      }
 }

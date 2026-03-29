@@ -18,25 +18,22 @@
 package com.itsaky.androidide.utils
 
 /**
- * Represents an [Long] array whose indices are shifted by a specified number of positions. This class
- * provides methods to access and modify elements in the array based on the shifted indices. The
- * array is not cyclic; attempting to access indices outside the array bounds will result in an
+ * Represents an [Long] array whose indices are shifted by a specified number of positions. This
+ * class provides methods to access and modify elements in the array based on the shifted indices.
+ * The array is not cyclic; attempting to access indices outside the array bounds will result in an
  * [IndexOutOfBoundsException].
  *
  * Shift values are wrapped around. Therefore, a shift value of `array.size` effectively means no
- * shift (`size % size => 0`). Also, when the array is shifted by a negative value, then the indexing
- * starts from the end of the array (`array.size - 1`).
+ * shift (`size % size => 0`). Also, when the array is shifted by a negative value, then the
+ * indexing starts from the end of the array (`array.size - 1`).
  *
  * @property size The number of elements in the array.
  * @property shift The number of positions to shift the indices of the array. A negative value
- * represents a left shift.
+ *   represents a left shift.
  * @property normalizedShift The normalized shift value.
  * @author Akash Yadav
  */
-open class ShiftedLongArray(
-  protected val array: LongArray,
-  shift: Int = 0
-) : Collection<Long> {
+open class ShiftedLongArray(protected val array: LongArray, shift: Int = 0) : Collection<Long> {
 
   override val size: Int
     get() = array.size
@@ -54,34 +51,27 @@ open class ShiftedLongArray(
     }
   }
 
-  /**
-   * Get the corresponding shifted-index for the given index.
-   */
+  /** Get the corresponding shifted-index for the given index. */
   open fun getShiftedIndex(index: Int): Int {
     val size = this.size
-    val idx = if (shift < 0) {
-      size - index
-    } else index
+    val idx =
+        if (shift < 0) {
+          size - index
+        } else index
     return (idx + normalizedShift) % size
   }
 
-  /**
-   * Returns whether the contents of this array are equal to the specified array.
-   */
+  /** Returns whether the contents of this array are equal to the specified array. */
   fun contentEquals(array: ShiftedLongArray): Boolean {
     return contentEquals(array.array)
   }
 
-  /**
-   * Returns whether the contents of this array are equal to the specified array.
-   */
+  /** Returns whether the contents of this array are equal to the specified array. */
   fun contentEquals(array: LongArray): Boolean {
     return this.array.contentEquals(array)
   }
 
-  /**
-   * Returns the hash code value for the contents of this array.
-   */
+  /** Returns the hash code value for the contents of this array. */
   fun contentHashCode(): Int {
     return array.contentHashCode()
   }

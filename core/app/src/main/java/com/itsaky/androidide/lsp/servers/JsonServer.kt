@@ -21,53 +21,53 @@ import android.content.Context
 import com.itsaky.androidide.lsp.BaseLspServer
 import com.itsaky.androidide.lsp.connection.ProcessStreamProvider
 import com.itsaky.androidide.lsp.core.LspConnectionFactory
+import com.itsaky.androidide.lsp.util.Logger
 import com.itsaky.androidide.lsp.util.LspShellUtils
 import com.itsaky.androidide.utils.Environment
 import java.io.File
-import com.itsaky.androidide.lsp.util.Logger
 
 /**
  * An implementation of [BaseLspServer] for JSON, utilizing the `vscode-json-language-server`.
  *
- * This server provides schema-based validation, auto-completion, and hover information for JSON files.
+ * This server provides schema-based validation, auto-completion, and hover information for JSON
+ * files.
  *
  * @author android_zero
  */
 class JsonServer : BaseLspServer() {
-    override val id: String = "json-lsp"
-    override val languageName: String = "JSON"
-    override val serverName: String = "vscode-json-language-server"
-    override val supportedExtensions: List<String> = listOf("json", "jsonc", "jsonl")
+  override val id: String = "json-lsp"
+  override val languageName: String = "JSON"
+  override val serverName: String = "vscode-json-language-server"
+  override val supportedExtensions: List<String> = listOf("json", "jsonc", "jsonl")
 
-    private val serverPath: File
-        get() = File(Environment.PREFIX, "bin/vscode-json-language-server")
+  private val serverPath: File
+    get() = File(Environment.PREFIX, "bin/vscode-json-language-server")
 
-    override fun isInstalled(context: Context): Boolean {
-        return LspShellUtils.isTerminalEnvironmentReady() && serverPath.exists()
-    }
+  override fun isInstalled(context: Context): Boolean {
+    return LspShellUtils.isTerminalEnvironmentReady() && serverPath.exists()
+  }
 
-    override fun install(context: Context) {
-        val installScript = File(Environment.HOME, ".androidide/local/bin/lsp/json")
-        if (installScript.exists()) {
-            LspShellUtils.installPackage(installScript.absolutePath, "$id-installer")
-        } else {
-             Logger.instance(javaClass.simpleName).error("Installation script for JSON LSP not found at ${installScript.path}")
-        }
+  override fun install(context: Context) {
+    val installScript = File(Environment.HOME, ".androidide/local/bin/lsp/json")
+    if (installScript.exists()) {
+      LspShellUtils.installPackage(installScript.absolutePath, "$id-installer")
+    } else {
+      Logger.instance(javaClass.simpleName)
+          .error("Installation script for JSON LSP not found at ${installScript.path}")
     }
+  }
 
-    override fun getConnectionFactory(): LspConnectionFactory {
-        return LspConnectionFactory { workingDir ->
-            ProcessStreamProvider(
-                command = listOf(
-                    LspShellUtils.getNodeExecutablePath(),
-                    serverPath.absolutePath,
-                    "--stdio"
-                ),
-                workingDir = workingDir
-            )
-        }
+  override fun getConnectionFactory(): LspConnectionFactory {
+    return LspConnectionFactory { workingDir ->
+      ProcessStreamProvider(
+          command =
+              listOf(LspShellUtils.getNodeExecutablePath(), serverPath.absolutePath, "--stdio"),
+          workingDir = workingDir,
+      )
     }
-        override fun isSupported(file: File): Boolean {
-        return supportedExtensions.contains(file.getName().substringAfterLast("."))
-    }
+  }
+
+  override fun isSupported(file: File): Boolean {
+    return supportedExtensions.contains(file.getName().substringAfterLast("."))
+  }
 }

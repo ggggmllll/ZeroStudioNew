@@ -48,7 +48,12 @@ val tabbedActivityTemplate
 
     category = Category.Activity
     formFactor = FormFactor.Mobile
-    screens = listOf(WizardUiContext.ActivityGallery, WizardUiContext.MenuEntry, WizardUiContext.NewModule)
+    screens =
+        listOf(
+            WizardUiContext.ActivityGallery,
+            WizardUiContext.MenuEntry,
+            WizardUiContext.NewModule,
+        )
 
     lateinit var layoutName: StringParameter
     val activityClass = stringParameter {
@@ -81,30 +86,31 @@ val tabbedActivityTemplate
     val isLauncher = booleanParameter {
       name = "Launcher Activity"
       default = false
-      help = "If true, this activity will have a CATEGORY_LAUNCHER intent filter, making it visible in the launcher"
+      help =
+          "If true, this activity will have a CATEGORY_LAUNCHER intent filter, making it visible in the launcher"
     }
 
     val packageName = defaultPackageNameParameter
 
     widgets(
-      TextFieldWidget(activityClass),
-      TextFieldWidget(layoutName),
-      TextFieldWidget(fragmentLayoutName),
-      CheckBoxWidget(isLauncher),
-      PackageNameWidget(packageName),
-      LanguageWidget(),
+        TextFieldWidget(activityClass),
+        TextFieldWidget(layoutName),
+        TextFieldWidget(fragmentLayoutName),
+        CheckBoxWidget(isLauncher),
+        PackageNameWidget(packageName),
+        LanguageWidget(),
     )
 
     thumb { File("tabbed-activity").resolve("template_blank_activity_tabs.png") }
 
     recipe = { data: TemplateData ->
       tabbedActivityRecipe(
-        data as ModuleTemplateData,
-        activityClass.value,
-        layoutName.value,
-        fragmentLayoutName.value,
-        isLauncher.value,
-        packageName.value,
+          data as ModuleTemplateData,
+          activityClass.value,
+          layoutName.value,
+          fragmentLayoutName.value,
+          isLauncher.value,
+          packageName.value,
       )
     }
   }

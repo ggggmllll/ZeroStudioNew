@@ -29,15 +29,11 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-/**
- * @author Akash Yadav
- */
+/** @author Akash Yadav */
 @RunWith(AndroidJUnit4::class)
 class JavaClassCRUDTest {
 
-  @Rule
-  @JvmField
-  val dbTestRule = RealmDBTestRule(JavaIndexingRealmModule())
+  @Rule @JvmField val dbTestRule = RealmDBTestRule(JavaIndexingRealmModule())
 
   @Test
   fun testSimpleJavaClassCRUD() {
@@ -45,16 +41,15 @@ class JavaClassCRUDTest {
       val klass = ModelBuilderTestUtil.createTestClass()
 
       // CREATE
-      executeTransaction {
-        it.insert(klass)
-      }
+      executeTransaction { it.insert(klass) }
 
       var dbKlass: JavaClass? = null
       executeTransaction {
         // READ
-        dbKlass = where(JavaClass::class.java)
-          .equalTo("fqn", "com/itsaky/androidide/indexing/TestClass")
-          .findFirst()
+        dbKlass =
+            where(JavaClass::class.java)
+                .equalTo("fqn", "com/itsaky/androidide/indexing/TestClass")
+                .findFirst()
 
         assertThat(dbKlass).isNotNull()
         assertThat(dbKlass?.fqn).isEqualTo("com/itsaky/androidide/indexing/TestClass")
@@ -95,24 +90,25 @@ class JavaClassCRUDTest {
       // verify UPDATE
       executeTransaction {
         assertThat(
-          where(JavaClass::class.java)
-            .equalTo("fqn", "com/itsaky/androidide/indexing/TestClass")
-            .findFirst()?.accessFlags
-        ).isEqualTo(AccessFlags.ACC_PUBLIC or AccessFlags.ACC_ABSTRACT)
+                where(JavaClass::class.java)
+                    .equalTo("fqn", "com/itsaky/androidide/indexing/TestClass")
+                    .findFirst()
+                    ?.accessFlags
+            )
+            .isEqualTo(AccessFlags.ACC_PUBLIC or AccessFlags.ACC_ABSTRACT)
       }
 
       // DELETE
-      executeTransaction {
-        RealmObject.deleteFromRealm(dbKlass!!)
-      }
+      executeTransaction { RealmObject.deleteFromRealm(dbKlass!!) }
 
       // verify DELTE
       executeTransaction {
         assertThat(
-          where(JavaClass::class.java)
-            .equalTo("fqn", "com/itsaky/androidide/indexing/TestClass")
-            .findFirst()
-        ).isNull()
+                where(JavaClass::class.java)
+                    .equalTo("fqn", "com/itsaky/androidide/indexing/TestClass")
+                    .findFirst()
+            )
+            .isNull()
       }
     }
   }

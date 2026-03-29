@@ -28,5 +28,6 @@ import android.os.IBinder
  */
 class NoOpServiceConnection : ServiceConnection {
   override fun onServiceConnected(name: ComponentName?, service: IBinder?) {}
+
   override fun onServiceDisconnected(name: ComponentName?) {}
 }

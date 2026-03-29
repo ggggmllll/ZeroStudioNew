@@ -27,6 +27,7 @@ import com.itsaky.androidide.xml.registry.XmlRegistry
  * - Since
  * - Removed
  * - Deprecated
+ *
  * @author Akash Yadav
  */
 interface ApiVersionsRegistry : XmlRegistry<ApiVersions> {
@@ -39,8 +40,8 @@ interface ApiVersionsRegistry : XmlRegistry<ApiVersions> {
     @JvmStatic
     fun getInstance(): ApiVersionsRegistry {
       val klass = ApiVersionsRegistry::class.java
-      return sInstance ?: ServiceLoader.load(klass, klass.classLoader).findFirstOrThrow()
-        .also { sInstance = it }
+      return sInstance
+          ?: ServiceLoader.load(klass, klass.classLoader).findFirstOrThrow().also { sInstance = it }
     }
   }
 }

@@ -69,9 +69,9 @@ import com.itsaky.androidide.flashbar.util.getStatusBarHeightInPx
 class FlashbarView(context: Context) : LinearLayout(context) {
 
   private val compensationMarginTop =
-    resources.getDimension(R.dimen.fb_top_compensation_margin).toInt()
+      resources.getDimension(R.dimen.fb_top_compensation_margin).toInt()
   private val compensationMarginBottom =
-    resources.getDimension(R.dimen.fb_bottom_compensation_margin).toInt()
+      resources.getDimension(R.dimen.fb_bottom_compensation_margin).toInt()
 
   private lateinit var binding: FlashBarViewBinding
   private lateinit var parentFlashbarContainer: FlashbarContainerView
@@ -135,17 +135,18 @@ class FlashbarView(context: Context) : LinearLayout(context) {
     this.binding.root.apply {
       // add margin to the card view so that the card elevation is visible
       val dp16 = context.resources.getDimensionPixelSize(R.dimen.fb_card_elevation)
-      val (topIncr, bottomIncr) = when (gravity) {
-        TOP -> 0 to dp16
-        BOTTOM -> dp16 to 0
-      }
+      val (topIncr, bottomIncr) =
+          when (gravity) {
+            TOP -> 0 to dp16
+            BOTTOM -> dp16 to 0
+          }
 
       updateLayoutParams<MarginLayoutParams> {
         setMargins(
-          /* left = */ marginLeft,
-          /* top = */ marginTop + topIncr,
-          /* right = */ marginRight,
-          /* bottom = */ marginBottom + bottomIncr
+            /* left = */ marginLeft,
+            /* top = */ marginTop + topIncr,
+            /* right = */ marginRight,
+            /* bottom = */ marginBottom + bottomIncr,
         )
       }
     }
@@ -478,10 +479,10 @@ class FlashbarView(context: Context) : LinearLayout(context) {
     if (position == null || progressTint == null) return
 
     val progressBar =
-      when (position) {
-        LEFT -> fbLeftProgress
-        RIGHT -> fbRightProgress
-      }
+        when (position) {
+          LEFT -> fbLeftProgress
+          RIGHT -> fbRightProgress
+        }
 
     progressBar.progressTintList = ColorStateList.valueOf(progressTint)
   }

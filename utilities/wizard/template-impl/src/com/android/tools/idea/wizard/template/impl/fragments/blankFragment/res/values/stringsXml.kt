@@ -17,7 +17,7 @@
 package com.android.tools.idea.wizard.template.impl.fragments.blankFragment.res.values
 
 fun stringsXml() =
-  """
+    """
 <resources>
 <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

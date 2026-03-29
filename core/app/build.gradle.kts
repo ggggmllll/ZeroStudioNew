@@ -1,12 +1,9 @@
 @file:Suppress("UnstableApiUsage")
 
 import com.itsaky.androidide.build.config.BuildConfig
-import com.itsaky.androidide.desugaring.utils.JavaIOReplacements.applyJavaIOReplacements
 import com.itsaky.androidide.plugins.AndroidIDEAssetsPlugin
 import java.io.FileInputStream
 import java.util.Properties
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-
 
 plugins {
   id("com.itsaky.androidide.core-app")
@@ -21,15 +18,9 @@ plugins {
   id("com.google.firebase.firebase-perf")
 }
 
-apply {
-  plugin(AndroidIDEAssetsPlugin::class.java)
-}
+apply { plugin(AndroidIDEAssetsPlugin::class.java) }
 
-buildscript {
-  dependencies {
-    classpath(libs.logging.logback.core)
-  }
-}
+buildscript { dependencies { classpath(libs.logging.logback.core) } }
 
 android {
   namespace = BuildConfig.packageName
@@ -39,59 +30,72 @@ android {
     vectorDrawables.useSupportLibrary = true
   }
 
-  androidResources {
-    generateLocaleConfig = true
+  androidResources { generateLocaleConfig = true }
+
+  signingConfigs {
+    create("all") {
+      val localProperties = Properties()
+      val localPropertiesFile = rootProject.file("signing.properties")
+      enableV1Signing = true // 启用 V1 签名
+      enableV2Signing = true // 启用 V2 签名 (推荐，Android 7.0+)
+      enableV3Signing = true // 启用 V3 签名 (推荐，Android 9+)
+      enableV4Signing = true
+      if (localPropertiesFile.exists()) {
+        localProperties.load(FileInputStream(localPropertiesFile))
+        val storeFilePath = localProperties.getProperty("storeFile")
+        val storePasswordValue = localProperties.getProperty("storePassword")
+        val keyAliasValue = localProperties.getProperty("keyAlias")
+        val keyPasswordValue = localProperties.getProperty("keyPassword")
+        if (
+            storeFilePath != null &&
+                storePasswordValue != null &&
+                keyAliasValue != null &&
+                keyPasswordValue != null
+        ) {
+          storeFile = file(storeFilePath)
+          storePassword = storePasswordValue
+          keyAlias = keyAliasValue
+          keyPassword = keyPasswordValue
+        }
+      }
+    }
   }
 
-
-    signingConfigs { create("all") { val localProperties = Properties()
-            val localPropertiesFile = rootProject.file("signing.properties")
-            enableV1Signing = true // 启用 V1 签名
-            enableV2Signing = true // 启用 V2 签名 (推荐，Android 7.0+)
-            enableV3Signing = true // 启用 V3 签名 (推荐，Android 9+)
-            enableV4Signing = true
-            if (localPropertiesFile.exists()) { localProperties.load(FileInputStream(localPropertiesFile))
-                val storeFilePath = localProperties.getProperty("storeFile")
-                val storePasswordValue = localProperties.getProperty("storePassword")
-                val keyAliasValue = localProperties.getProperty("keyAlias")
-                val keyPasswordValue = localProperties.getProperty("keyPassword")
-                if (storeFilePath != null && storePasswordValue != null && keyAliasValue != null && keyPasswordValue != null) {
-                    storeFile = file(storeFilePath)
-                    storePassword = storePasswordValue
-                    keyAlias = keyAliasValue
-                    keyPassword = keyPasswordValue } } } }
-                    
   buildTypes {
-    all{ signingConfig = signingConfigs.getByName("all") }
-    debug{ isShrinkResources = false }
+    all { signingConfig = signingConfigs.getByName("all") }
+    debug { isShrinkResources = false }
     release { isMinifyEnabled = true }
   }
-  
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-        isCoreLibraryDesugaringEnabled = true
+
+  compileOptions {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+    isCoreLibraryDesugaringEnabled = true
+  }
+  composeOptions { kotlinCompilerExtensionVersion = "1.5.15" }
+  buildFeatures { compose = true }
+  packaging.resources.excludes +=
+      listOf(
+          "**/*.kotlin_builtins",
+          "kotlin/kotlin.kotlin_builtins",
+          "THIRD-PARTY",
+          "META-INF/DEPENDENCIES",
+          "META-INF/kotlin-stdlib.kotlin_module",
+          "META-INF/NOTICE.md",
+          "META-INF/plugin.xml",
+          "com/android/builder/model/version.properties",
+          "META-INF/versions/9/OSGI-INF/MANIFEST.MF",
+      )
+  packaging {
+    resources {
+      pickFirsts +=
+          setOf(
+              "messages/KotlinNJ2KServicesBundle.properties",
+              "META-INF/io.netty.versions.properties",
+              "META-INF/kotlinx_coroutines_core.version",
+          )
     }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.15"
-    }
-    buildFeatures {
-        compose = true
-    }
-    packaging.resources.excludes += listOf(
-    "**/*.kotlin_builtins", 
-    "kotlin/kotlin.kotlin_builtins", 
-    "THIRD-PARTY", 
-    "META-INF/DEPENDENCIES", 
-    "META-INF/kotlin-stdlib.kotlin_module", 
-    "META-INF/NOTICE.md", 
-    "META-INF/plugin.xml", 
-    "com/android/builder/model/version.properties", 
-    "META-INF/versions/9/OSGI-INF/MANIFEST.MF")
-    packaging { resources { pickFirsts += setOf(
-                "messages/KotlinNJ2KServicesBundle.properties",
-                "META-INF/io.netty.versions.properties",
-                "META-INF/kotlinx_coroutines_core.version" ) } }
+  }
 
   lint {
     abortOnError = false
@@ -99,30 +103,28 @@ android {
   }
 }
 
-kapt {  arguments { arg("eventBusIndex", "${BuildConfig.packageName}.events.AppEventsIndex")  } }
-
+kapt { arguments { arg("eventBusIndex", "${BuildConfig.packageName}.events.AppEventsIndex") } }
 
 configurations.all {
-    resolutionStrategy {
-        force(libs.hamcrest.all)
-        force(libs.tests.junit)
-        force(libs.common.lsp4j.jsonrpc)
-        force(libs.common.org.eclipse.lsp4j)
+  resolutionStrategy {
+    force(libs.hamcrest.all)
+    force(libs.tests.junit)
+    force(libs.common.lsp4j.jsonrpc)
+    force(libs.common.org.eclipse.lsp4j)
 
-        force(libs.org.jetbrains.kotlin.stdlib)
-        force(libs.org.jetbrains.kotlin.compiler)
-        force(libs.org.jetbrains.kotlin.kotlin.scripting.jvm.host)
-        force(libs.org.jetbrains.kotlin.ktscompiler)
-        force(libs.org.jetbrains.kotlin.sam.with.receiver.compiler.plugin)
-        force(libs.org.jetbrains.kotlin.reflect)
-        force(libs.org.jetbrains.kotlin.jvm)
-        
-        force(libs.google.protobuf)
-        
-    }
-    exclude(group = "com.google.firebase", module = "protolite-well-known-types")
-    exclude(group = "com.google.protobuf", module = "protobuf-java")
-    exclude(group = "com.android.tools.build", module = "builder-model")
+    force(libs.org.jetbrains.kotlin.stdlib)
+    force(libs.org.jetbrains.kotlin.compiler)
+    force(libs.org.jetbrains.kotlin.kotlin.scripting.jvm.host)
+    force(libs.org.jetbrains.kotlin.ktscompiler)
+    force(libs.org.jetbrains.kotlin.sam.with.receiver.compiler.plugin)
+    force(libs.org.jetbrains.kotlin.reflect)
+    force(libs.org.jetbrains.kotlin.jvm)
+
+    force(libs.google.protobuf)
+  }
+  exclude(group = "com.google.firebase", module = "protolite-well-known-types")
+  exclude(group = "com.google.protobuf", module = "protobuf-java")
+  exclude(group = "com.android.tools.build", module = "builder-model")
 }
 
 dependencies {
@@ -134,7 +136,7 @@ dependencies {
   kapt(libs.common.glide.ap)
   kapt(libs.google.auto.service)
   kapt(projects.annotation.processors)
-  
+
   implementation(libs.common.editor)
   implementation(libs.common.utilcode)
   implementation(libs.common.glide)
@@ -149,7 +151,7 @@ dependencies {
   implementation(libs.common.org.tukaani.tarxzip)
   implementation(libs.common.org.eclipse.lsp4j)
   implementation(libs.bundles.io.markwon)
-  
+
   implementation(libs.google.auto.service.annotations)
   implementation(libs.google.gson)
   implementation(libs.google.guava)
@@ -157,7 +159,7 @@ dependencies {
   // Add the dependency for the Performance Monitoring library
   // When using the BoM, you don't specify versions in Firebase library dependencies
   implementation("com.google.firebase:firebase-perf")
-  
+
   // AndroidX
   implementation(libs.androidx.splashscreen)
   implementation(libs.androidx.appcompat)
@@ -184,11 +186,11 @@ dependencies {
   implementation(libs.firebase.crashlytics)
   implementation(libs.firebase.config)
   implementation(libs.androidx.compose.material.icons.extended)
-  
-  //UI/UX
-  implementation(libs.bundles.compose) //androidx compose
+
+  // UI/UX
+  implementation(libs.bundles.compose) // androidx compose
   implementation(libs.androidx.core.ktx)
-  
+
   implementation(libs.common.kotlin)
 
   // Dependencies in composite build
@@ -196,12 +198,11 @@ dependencies {
   implementation(libs.composite.javapoet)
 
   // java格式化
-  implementation(libs.composite.googleJavaFormat){
+  implementation(libs.composite.googleJavaFormat) {
     exclude(group = "com.google.guava", module = "guava")
   }
   // kotlin格式化
   implementation(libs.com.github.fwcd.ktfmt)
-   
 
   // Local projects here
   implementation(projects.core.actions)
@@ -258,12 +259,10 @@ dependencies {
   // implementation(projects.modules.colorpicker)
   implementation(libs.common.soraLanguageTextmate)
 
-  
-  coreLibraryDesugaring(libs.androidx.libDesugaring) //脱糖
+  coreLibraryDesugaring(libs.androidx.libDesugaring) // 脱糖
   testImplementation("org.conscrypt:conscrypt-openjdk:2.5.2")
   testImplementation(projects.testing.unitTest)
   androidTestImplementation(projects.testing.androidTest)
   debugImplementation(libs.common.leakcanary)
   implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
-
 }

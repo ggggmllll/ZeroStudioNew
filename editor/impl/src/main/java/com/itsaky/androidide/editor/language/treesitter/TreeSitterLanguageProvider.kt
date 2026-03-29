@@ -27,7 +27,7 @@ import java.io.File
  */
 object TreeSitterLanguageProvider {
 
-  fun hasTsLanguage(file: File) : Boolean {
+  fun hasTsLanguage(file: File): Boolean {
     return TSLanguageRegistry.instance.hasLanguage(file.extension)
   }
 

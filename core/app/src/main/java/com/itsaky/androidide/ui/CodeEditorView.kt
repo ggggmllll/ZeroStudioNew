@@ -52,6 +52,9 @@ import io.github.rosemoe.sora.text.Content
 import io.github.rosemoe.sora.text.LineSeparator
 import io.github.rosemoe.sora.widget.CodeEditor
 import io.github.rosemoe.sora.widget.component.Magnifier
+import java.io.Closeable
+import java.io.File
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -66,9 +69,6 @@ import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import org.slf4j.LoggerFactory
-import java.io.Closeable
-import java.io.File
-import java.util.concurrent.TimeUnit
 
 /**
  * A view that handles opened code editor.
@@ -77,25 +77,22 @@ import java.util.concurrent.TimeUnit
  * @author android_zero
  */
 @SuppressLint("ViewConstructor")
-class CodeEditorView(
-  context: Context,
-  file: File,
-  selection: Range
-) : LinearLayoutCompat(context), Closeable {
+class CodeEditorView(context: Context, file: File, selection: Range) :
+    LinearLayoutCompat(context), Closeable {
 
   private var _binding: LayoutCodeEditorBinding? = null
   private var _searchLayout: EditorSearchLayout? = null
 
-  private val codeEditorScope = CoroutineScope(
-    Dispatchers.Default + CoroutineName("CodeEditorView"))
-    
+  private val codeEditorScope =
+      CoroutineScope(Dispatchers.Default + CoroutineName("CodeEditorView"))
+
   private var autoSaveJob: Job? = null
 
   /**
    * The [CoroutineContext][kotlin.coroutines.CoroutineContext] used to reading and writing the file
-   * in this editor. We use a separate, single-threaded context assuming that the file will be either
-   * read from or written to at a time, but not both. If in future we add support for anything like
-   * that, the number of thread should probably be increased.
+   * in this editor. We use a separate, single-threaded context assuming that the file will be
+   * either read from or written to at a time, but not both. If in future we add support for
+   * anything like that, the number of thread should probably be increased.
    */
   @OptIn(DelicateCoroutinesApi::class, ExperimentalCoroutinesApi::class)
   private val readWriteContext = newSingleThreadContext("CodeEditorView")
@@ -106,15 +103,11 @@ class CodeEditorView(
   private val searchLayout: EditorSearchLayout
     get() = checkNotNull(_searchLayout) { "Search layout has been destroyed" }
 
-  /**
-   * Get the file of this editor.
-   */
+  /** Get the file of this editor. */
   val file: File?
     get() = editor?.file
 
-  /**
-   * Get the [IDEEditor] instance of this editor view.
-   */
+  /** Get the [IDEEditor] instance of this editor view. */
   val editor: IDEEditor?
     get() = _binding?.editor
 
@@ -140,19 +133,17 @@ class CodeEditorView(
       dividerWidth = SizeUtils.dp2px(2f).toFloat()
       colorScheme = SchemeAndroidIDE.newInstance(context)
       lineSeparator = LineSeparator.LF
-      
+
       // Register content change listener for Auto-Save functionality (Delay based)
-      subscribeEvent(ContentChangeEvent::class.java) { _, _ ->
-          scheduleAutoSave()
-      }
-      
+      subscribeEvent(ContentChangeEvent::class.java) { _, _ -> scheduleAutoSave() }
+
       // Register focus change listener for Auto-Save on Focus Loss
       subscribeEvent(EditorFocusChangeEvent::class.java) { event, _ ->
-          if (!event.isGainFocus && EditorPreferences.autoSaveOnFocusLoss && isModified) {
-              log.debug("Focus lost. Performing auto-save for file: ${file?.name}")
-              // Use codeEditorScope directly to launch save task
-              codeEditorScope.launch { save() }
-          }
+        if (!event.isGainFocus && EditorPreferences.autoSaveOnFocusLoss && isModified) {
+          log.debug("Focus lost. Performing auto-save for file: ${file?.name}")
+          // Use codeEditorScope directly to launch save task
+          codeEditorScope.launch { save() }
+        }
       }
     }
 
@@ -166,53 +157,51 @@ class CodeEditorView(
 
     readFileAndApplySelection(file, selection)
   }
-  
+
   /**
-   * Schedules an auto-save operation if enabled.
-   * It cancels any pending auto-save job and starts a new one with the configured delay.
+   * Schedules an auto-save operation if enabled. It cancels any pending auto-save job and starts a
+   * new one with the configured delay.
    */
   private fun scheduleAutoSave() {
-      if (!EditorPreferences.autoSaveEnabled) return
+    if (!EditorPreferences.autoSaveEnabled) return
 
-      // Cancel previous job if active to debounce
-      autoSaveJob?.cancel()
+    // Cancel previous job if active to debounce
+    autoSaveJob?.cancel()
 
-      val delayTime = calculateAutoSaveDelayMillis()
-      
-      autoSaveJob = codeEditorScope.launch {
-          delay(delayTime)
-          
-          // Double check conditions before saving
-          if (isModified && EditorPreferences.autoSaveEnabled) {
-              log.debug("Performing delayed auto-save for file: ${file?.name}")
-              save()
-          }
+    val delayTime = calculateAutoSaveDelayMillis()
+
+    autoSaveJob = codeEditorScope.launch {
+      delay(delayTime)
+
+      // Double check conditions before saving
+      if (isModified && EditorPreferences.autoSaveEnabled) {
+        log.debug("Performing delayed auto-save for file: ${file?.name}")
+        save()
       }
+    }
   }
 
   private fun calculateAutoSaveDelayMillis(): Long {
-      val value = EditorPreferences.autoSaveDelayValue
-      val unitStr = EditorPreferences.autoSaveDelayUnit
-      // Assuming default is "Seconds" or "秒" if not matched to Minutes
-      val isMinutes = unitStr.contains("Minute", ignoreCase = true) || unitStr.contains("分")
-      
-      return if (isMinutes) {
-          TimeUnit.MINUTES.toMillis(value)
-      } else {
-          TimeUnit.SECONDS.toMillis(value)
-      }
+    val value = EditorPreferences.autoSaveDelayValue
+    val unitStr = EditorPreferences.autoSaveDelayUnit
+    // Assuming default is "Seconds" or "秒" if not matched to Minutes
+    val isMinutes = unitStr.contains("Minute", ignoreCase = true) || unitStr.contains("分")
+
+    return if (isMinutes) {
+      TimeUnit.MINUTES.toMillis(value)
+    } else {
+      TimeUnit.SECONDS.toMillis(value)
+    }
   }
 
-  /**
-   * Get the file of this editor. Throws [IllegalStateException] if no file is available.
-   */
+  /** Get the file of this editor. Throws [IllegalStateException] if no file is available. */
   fun requireFile(): File {
     return checkNotNull(file)
   }
 
   /**
-   * Update the file of this editor. This only updates the file reference of the editor and does
-   * not resets the content.
+   * Update the file of this editor. This only updates the file reference of the editor and does not
+   * resets the content.
    */
   fun updateFile(file: File) {
     val editor = _binding?.editor ?: return
@@ -220,31 +209,23 @@ class CodeEditorView(
     postRead(file)
   }
 
-  /**
-   * Called when the editor has been selected and is visible to the user.
-   */
+  /** Called when the editor has been selected and is visible to the user. */
   fun onEditorSelected() {
-    _binding?.editor?.onEditorSelected() ?: run {
-      log.warn("onEditorSelected() called but no editor instance is available")
-    }
+    _binding?.editor?.onEditorSelected()
+        ?: run { log.warn("onEditorSelected() called but no editor instance is available") }
   }
 
-  /**
-   * Begins search mode and shows the [search layout][EditorSearchLayout].
-   */
+  /** Begins search mode and shows the [search layout][EditorSearchLayout]. */
   fun beginSearch() {
     if (_binding == null || _searchLayout == null) {
-      log.warn(
-        "Editor layout is null content=$binding, searchLayout=$searchLayout")
+      log.warn("Editor layout is null content=$binding, searchLayout=$searchLayout")
       return
     }
 
     searchLayout.beginSearchMode()
   }
 
-  /**
-   * Mark this files as saved. Even if it not saved.
-   */
+  /** Mark this files as saved. Even if it not saved. */
   fun markAsSaved() {
     editor?.markUnmodified()
   }
@@ -252,9 +233,9 @@ class CodeEditorView(
   /**
    * Saves the content of the editor to the editor's file.
    *
-   * @return Whether the save operation was successfully completed or not. If this method returns `false`,
-   * it means that there was an error saving the file or the content of the file was not modified and
-   * hence the save operation was skipped.
+   * @return Whether the save operation was successfully completed or not. If this method returns
+   *   `false`, it means that there was an error saving the file or the content of the file was not
+   *   modified and hence the save operation was skipped.
    */
   suspend fun save(): Boolean {
     val file = this.file ?: return false
@@ -264,13 +245,16 @@ class CodeEditorView(
       return false
     }
 
-    val text = _binding?.editor?.text ?: run {
-      log.error("Failed to save file. Unable to retrieve the content of editor as it is null.")
-      return false
-    }
+    val text =
+        _binding?.editor?.text
+            ?: run {
+              log.error(
+                  "Failed to save file. Unable to retrieve the content of editor as it is null."
+              )
+              return false
+            }
 
     withContext(Dispatchers.Main.immediate) {
-
       withEditingDisabled {
         withContext(readWriteContext) {
           // Do not call suspend functions in this scope
@@ -290,26 +274,26 @@ class CodeEditorView(
 
     return true
   }
-  
+
   // private fun onSmoothCursorMovementChanged() {
-    // binding.editor.isCursorAnimationEnabled = EditorPreferences.smoothCursorMovement
-    
-    // val smooth = EditorPreferences.smoothCursorMovement
-    // val style = EditorPreferences.cursorStyle
-    
-    // if (smooth) {
-        // if (style == "Block") {
-            // binding.editor.setCursorAnimator(BlockCursorAnimator(binding.editor))
-        // } else { // "Underline" or default
-            // binding.editor.setCursorAnimator(MoveCursorAnimator(binding.editor))
-        // }
-    // } else {
-        // binding.editor.isCursorAnimationEnabled = false
-    // }
+  // binding.editor.isCursorAnimationEnabled = EditorPreferences.smoothCursorMovement
+
+  // val smooth = EditorPreferences.smoothCursorMovement
+  // val style = EditorPreferences.cursorStyle
+
+  // if (smooth) {
+  // if (style == "Block") {
+  // binding.editor.setCursorAnimator(BlockCursorAnimator(binding.editor))
+  // } else { // "Underline" or default
+  // binding.editor.setCursorAnimator(MoveCursorAnimator(binding.editor))
   // }
-  
-// private fun onAutoCompleteOnTypeChanged() {
-      // binding.editor.props.autoCompletionOnComposing = EditorPreferences.autoCompleteOnType
+  // } else {
+  // binding.editor.isCursorAnimationEnabled = false
+  // }
+  // }
+
+  // private fun onAutoCompleteOnTypeChanged() {
+  // binding.editor.props.autoCompletionOnComposing = EditorPreferences.autoCompleteOnType
   // }
 
   private fun updateReadWriteProgress(progress: Int) {
@@ -342,11 +326,11 @@ class CodeEditorView(
       updateReadWriteProgress(0)
 
       withEditingDisabled {
-
-        val content = withContext(readWriteContext) {
-          selection.validate()
-          file.readContent(this@CodeEditorView::updateReadWriteProgress)
-        }
+        val content =
+            withContext(readWriteContext) {
+              selection.validate()
+              file.readContent(this@CodeEditorView::updateReadWriteProgress)
+            }
 
         initializeContent(content, file, selection)
         _binding?.rwProgress?.isVisible = false
@@ -357,9 +341,7 @@ class CodeEditorView(
   private fun initializeContent(content: Content, file: File, selection: Range) {
     val ideEditor = binding.editor
     ideEditor.postInLifecycle {
-      val args = Bundle().apply {
-        putString(IEditor.KEY_FILE, file.absolutePath)
-      }
+      val args = Bundle().apply { putString(IEditor.KEY_FILE, file.absolutePath) }
 
       ideEditor.setText(content, args)
 
@@ -398,11 +380,12 @@ class CodeEditorView(
       return null
     }
 
-    val serverID: String = when (file.extension) {
-      "java" -> JavaLanguageServer.SERVER_ID
-      "xml" -> XMLLanguageServer.SERVER_ID
-      else -> return null
-    }
+    val serverID: String =
+        when (file.extension) {
+          "java" -> JavaLanguageServer.SERVER_ID
+          "xml" -> XMLLanguageServer.SERVER_ID
+          else -> return null
+        }
 
     return ILanguageServerRegistry.getDefault().getServer(serverID)
   }
@@ -499,7 +482,6 @@ class CodeEditorView(
   /**
    * For internal use only!
    *
-   *
    * Marks this editor as unmodified. Used only when the activity is being destroyed.
    */
   internal fun markUnmodified() {
@@ -508,7 +490,6 @@ class CodeEditorView(
 
   /**
    * For internal use only!
-   *
    *
    * Marks this editor as modified.
    */
@@ -543,26 +524,24 @@ class CodeEditorView(
       EditorPreferences.DELETE_TABS_ON_BACKSPACE -> onDeleteTabsPrefChanged()
       EditorPreferences.STICKY_SCROLL_ENABLED -> onStickyScrollEnabeldPrefChanged()
       EditorPreferences.PIN_LINE_NUMBERS -> onPinLineNumbersPrefChanged()
-      
+
       // Auto-Save Preference Changes
       EditorPreferences.AUTO_SAVE_ENABLED -> {
-          if (!EditorPreferences.autoSaveEnabled) {
-              autoSaveJob?.cancel()
-          }
+        if (!EditorPreferences.autoSaveEnabled) {
+          autoSaveJob?.cancel()
+        }
       }
       EditorPreferences.AUTO_SAVE_DELAY_VALUE,
       EditorPreferences.AUTO_SAVE_DELAY_UNIT -> {
-          // If currently running a delay, restart it with new value
-          if (autoSaveJob?.isActive == true) {
-              scheduleAutoSave()
-          }
+        // If currently running a delay, restart it with new value
+        if (autoSaveJob?.isActive == true) {
+          scheduleAutoSave()
+        }
       }
     }
   }
 
-  /**
-   * Notifies the editor that its content has been saved.
-   */
+  /** Notifies the editor that its content has been saved. */
   private fun notifySaved() {
     binding.editor.dispatchDocumentSaveEvent()
   }
@@ -583,12 +562,12 @@ class CodeEditorView(
   override fun close() {
     codeEditorScope.cancelIfActive("Cancellation was requested")
     autoSaveJob?.cancel()
-    
+
     _binding?.editor?.apply {
       notifyClose()
       release()
     }
 
-    readWriteContext.use { }
+    readWriteContext.use {}
   }
 }

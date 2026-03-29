@@ -17,7 +17,7 @@
 package com.itsaky.androidide.templates.impl.androidstudio.other.contentProvider.src.app_package
 
 fun contentProviderJava(className: String, packageName: String) =
-  """
+    """
 package ${packageName};
 
 import android.content.ContentProvider;

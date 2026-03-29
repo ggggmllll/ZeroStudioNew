@@ -36,6 +36,7 @@ import com.itsaky.androidide.resources.R
 import com.itsaky.androidide.resources.R.string
 import com.itsaky.androidide.utils.flashError
 import io.github.rosemoe.sora.widget.CodeEditor
+import java.util.concurrent.CompletableFuture
 import jdkx.lang.model.element.VariableElement
 import openjdk.source.tree.ClassTree
 import openjdk.source.tree.VariableTree
@@ -47,7 +48,6 @@ import openjdk.tools.javac.tree.JCTree
 import openjdk.tools.javac.tree.TreeInfo
 import openjdk.tools.javac.util.Names
 import org.slf4j.LoggerFactory
-import java.util.concurrent.CompletableFuture
 
 /**
  * Generates the `toString()` method for the current class.
@@ -67,26 +67,27 @@ class GenerateToStringMethodAction : FieldBasedAction() {
   override fun onGetFields(fields: List<String>, data: ActionData) {
     showFieldSelector(fields, data) { selected ->
       CompletableFuture.runAsync { generateToString(data, selected) }
-        .whenComplete { _, error ->
-          if (error != null) {
-            log.error("Unable to generate toString() implementation", error)
-            ThreadUtils.runOnUiThread {
-              flashError(
-                data[Context::class.java]!!.getString(R.string.msg_cannot_generate_toString)
-              )
+          .whenComplete { _, error ->
+            if (error != null) {
+              log.error("Unable to generate toString() implementation", error)
+              ThreadUtils.runOnUiThread {
+                flashError(
+                    data[Context::class.java]!!.getString(R.string.msg_cannot_generate_toString)
+                )
+              }
+              return@whenComplete
             }
-            return@whenComplete
           }
-        }
     }
   }
 
   private fun generateToString(data: ActionData, selected: MutableSet<String>) {
     val compiler =
-      JavaCompilerProvider.get(
-        IProjectManager.getInstance().getWorkspace()?.findModuleForFile(data.requireFile(), false)
-          ?: return
-      )
+        JavaCompilerProvider.get(
+            IProjectManager.getInstance()
+                .getWorkspace()
+                ?.findModuleForFile(data.requireFile(), false) ?: return
+        )
     val range = data[com.itsaky.androidide.models.Range::class.java]!!
     val file = data.requirePath()
 
@@ -105,10 +106,10 @@ class GenerateToStringMethodAction : FieldBasedAction() {
   }
 
   private fun generateForFields(
-    data: ActionData,
-    task: CompileTask,
-    type: ClassTree,
-    paths: List<TreePath>
+      data: ActionData,
+      task: CompileTask,
+      type: ClassTree,
+      paths: List<TreePath>,
   ) {
     if (isToStringOverridden(task, type)) {
       ThreadUtils.runOnUiThread {
@@ -169,9 +170,9 @@ class GenerateToStringMethodAction : FieldBasedAction() {
     val names = Names.instance(task.task.context)
     val sym = TreeInfo.symbolFor(type as JCTree) as ClassSymbol
     val toStrings =
-      sym.members().getSymbolsByName(names.toString).filterIsInstance<MethodSymbol>().filter {
-        it.params.isEmpty()
-      }
+        sym.members().getSymbolsByName(names.toString).filterIsInstance<MethodSymbol>().filter {
+          it.params.isEmpty()
+        }
 
     return toStrings.isNotEmpty()
   }

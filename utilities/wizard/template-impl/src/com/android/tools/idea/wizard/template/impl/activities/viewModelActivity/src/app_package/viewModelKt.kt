@@ -19,8 +19,13 @@ package com.android.tools.idea.wizard.template.impl.activities.viewModelActivity
 import com.android.tools.idea.wizard.template.escapeKotlinIdentifier
 import com.android.tools.idea.wizard.template.getMaterialComponentName
 
-fun viewModelKt(fragmentPackage: String, packageName: String, useAndroidX: Boolean, viewModelClass: String) =
-  """package ${escapeKotlinIdentifier(packageName)}.${escapeKotlinIdentifier(fragmentPackage)}
+fun viewModelKt(
+    fragmentPackage: String,
+    packageName: String,
+    useAndroidX: Boolean,
+    viewModelClass: String,
+) =
+    """package ${escapeKotlinIdentifier(packageName)}.${escapeKotlinIdentifier(fragmentPackage)}
 
 import ${getMaterialComponentName("android.arch.lifecycle.ViewModel", useAndroidX)}
 

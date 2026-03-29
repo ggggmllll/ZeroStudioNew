@@ -10,14 +10,14 @@ import com.android.aaptcompiler.android.ResTableConfig
  * @param firstChar The UTF-16 index into the string where this span starts.
  * @param lastChar The UTF-16 index into the string where this span ends, inclusive.
  */
-data class UnifiedSpan(
-  val tag: String?, var firstChar: Int, var lastChar: Int): Comparable<UnifiedSpan> {
+data class UnifiedSpan(val tag: String?, var firstChar: Int, var lastChar: Int) :
+    Comparable<UnifiedSpan> {
 
-  constructor(span: Span): this(span.name, span.firstChar, span.lastChar)
+  constructor(span: Span) : this(span.name, span.firstChar, span.lastChar)
 
-  constructor(span: StringPool.Span): this(span.name.value(), span.firstChar, span.lastChar)
+  constructor(span: StringPool.Span) : this(span.name.value(), span.firstChar, span.lastChar)
 
-  constructor(section: UntranslatableSection): this(null, section.startIndex, section.endIndex - 1)
+  constructor(section: UntranslatableSection) : this(null, section.startIndex, section.endIndex - 1)
 
   fun isSpan() = tag != null
 
@@ -26,27 +26,25 @@ data class UnifiedSpan(
   fun toSpan() = if (isSpan()) Span(tag!!, firstChar, lastChar) else null
 
   override fun compareTo(other: UnifiedSpan) =
-    when {
-      firstChar != other.firstChar -> firstChar.compareTo(other.firstChar)
-      lastChar != other.lastChar -> other.lastChar.compareTo(lastChar)
-      else -> 0
-    }
+      when {
+        firstChar != other.firstChar -> firstChar.compareTo(other.firstChar)
+        lastChar != other.lastChar -> other.lastChar.compareTo(lastChar)
+        else -> 0
+      }
 }
 
 internal fun mergeSpans(string: StyledString): List<UnifiedSpan> {
   val unifiedSpans = mutableListOf<UnifiedSpan>()
-  string.spans().forEach {
-    unifiedSpans.add(UnifiedSpan(it))
-  }
-  string.untranslatableSections.forEach {
-    unifiedSpans.add(UnifiedSpan(it))
-  }
+  string.spans().forEach { unifiedSpans.add(UnifiedSpan(it)) }
+  string.untranslatableSections.forEach { unifiedSpans.add(UnifiedSpan(it)) }
   unifiedSpans.sort()
   return unifiedSpans
 }
 
 internal fun pseudolocalizeStyledString(
-  original: StyledString, method: Pseudolocalizer.Method, pool: StringPool
+    original: StyledString,
+    method: Pseudolocalizer.Method,
+    pool: StringPool,
 ): StyledString {
 
   val localizer = Pseudolocalizer(method)
@@ -137,7 +135,9 @@ internal fun pseudolocalizeStyledString(
 }
 
 internal fun pseudolocalizeBasicString(
-  original: BasicString, method: Pseudolocalizer.Method, pool: StringPool
+    original: BasicString,
+    method: Pseudolocalizer.Method,
+    pool: StringPool,
 ): BasicString {
   try {
     val localizer = Pseudolocalizer(method)
@@ -172,7 +172,9 @@ internal fun pseudolocalizeBasicString(
 }
 
 internal fun pseudolocalizePlural(
-  original: Plural, method: Pseudolocalizer.Method, pool: StringPool
+    original: Plural,
+    method: Pseudolocalizer.Method,
+    pool: StringPool,
 ): Plural {
 
   val localizedPlural = Plural()
@@ -181,20 +183,23 @@ internal fun pseudolocalizePlural(
     val value = original.values[i]
 
     if (value != null) {
-      localizedPlural.values[i] = when (value) {
-        is BasicString -> pseudolocalizeBasicString(value, method, pool)
-        is StyledString -> pseudolocalizeStyledString(value, method, pool)
-        else -> value.clone(pool)
-      }
+      localizedPlural.values[i] =
+          when (value) {
+            is BasicString -> pseudolocalizeBasicString(value, method, pool)
+            is StyledString -> pseudolocalizeStyledString(value, method, pool)
+            else -> value.clone(pool)
+          }
     }
   }
   return localizedPlural
 }
 
-class PseudolocaleGenerator{
+class PseudolocaleGenerator {
 
   private fun modifyForLocale(
-    config: ConfigDescription, method: Pseudolocalizer.Method): ConfigDescription {
+      config: ConfigDescription,
+      method: Pseudolocalizer.Method,
+  ): ConfigDescription {
 
     val modified = ConfigDescription(config)
     when (method) {
@@ -226,20 +231,22 @@ class PseudolocaleGenerator{
   }
 
   private fun pseudolocalizeIfNeeded(
-    method: Pseudolocalizer.Method,
-    originalValue: ResourceConfigValue,
-    pool: StringPool,
-    entry: ResourceEntry) {
+      method: Pseudolocalizer.Method,
+      originalValue: ResourceConfigValue,
+      pool: StringPool,
+      entry: ResourceEntry,
+  ) {
 
     val valueToLocalize = originalValue.value
     valueToLocalize ?: return
 
-    val localizedValue = when (valueToLocalize) {
-      is BasicString -> pseudolocalizeBasicString(valueToLocalize, method, pool)
-      is StyledString -> pseudolocalizeStyledString(valueToLocalize, method, pool)
-      is Plural -> pseudolocalizePlural(valueToLocalize, method, pool)
-      else -> return
-    }
+    val localizedValue =
+        when (valueToLocalize) {
+          is BasicString -> pseudolocalizeBasicString(valueToLocalize, method, pool)
+          is StyledString -> pseudolocalizeStyledString(valueToLocalize, method, pool)
+          is Plural -> pseudolocalizePlural(valueToLocalize, method, pool)
+          else -> return
+        }
 
     localizedValue.source = valueToLocalize.source
     localizedValue.weak = valueToLocalize.weak
@@ -253,7 +260,7 @@ class PseudolocaleGenerator{
     }
   }
 
-  fun consume (table: ResourceTable) {
+  fun consume(table: ResourceTable) {
     for (resourcePackage in table.packages) {
       for (resourceGroup in resourcePackage.groups) {
         for (idToEntry in resourceGroup.entries.values) {

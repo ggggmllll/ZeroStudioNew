@@ -23,7 +23,7 @@ package com.itsaky.androidide.templates.impl.androidstudio.activities.androidTVA
  * @author android_zero
  */
 fun playbackActivityKt(packageName: String) =
-  """
+    """
 package ${packageName}
 
 import android.os.Bundle

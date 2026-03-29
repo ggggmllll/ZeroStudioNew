@@ -14,35 +14,32 @@ import androidx.compose.ui.unit.dp
 
 /**
  * [Box] that draws checker pattern behind its [content] using [Modifier.drawChecker]
- * @param size size of the checker. If size is [DpSize.Unspecified] **10.dp** is used by
- * default.
+ *
+ * @param size size of the checker. If size is [DpSize.Unspecified] **10.dp** is used by default.
  * @param shape shape of the checker.
- * @param content  The content of the Box.
+ * @param content The content of the Box.
  */
 @Composable
 private fun CheckeredBox(
     modifier: Modifier,
     shape: Shape,
     size: DpSize = DpSize.Unspecified,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
-    Box(modifier.drawChecker(shape, size)) {
-        content()
-    }
+  Box(modifier.drawChecker(shape, size)) { content() }
 }
 
 /**
- * Modify element to add checker with appearance specified with a [shape], and [size]
- * and clip it.
- * @param size size of the checker. If size is [DpSize.Unspecified] **10.dp** is used by
- * default.
+ * Modify element to add checker with appearance specified with a [shape], and [size] and clip it.
+ *
+ * @param size size of the checker. If size is [DpSize.Unspecified] **10.dp** is used by default.
  * @param shape shape of the checker.
  */
-fun Modifier.drawChecker(shape: Shape, size: DpSize = DpSize.Unspecified) = this
-    .clip(shape)
-    .then(
-        drawWithCache {
-            this.onDrawBehind {
+fun Modifier.drawChecker(shape: Shape, size: DpSize = DpSize.Unspecified) =
+    this.clip(shape)
+        .then(
+            drawWithCache {
+              this.onDrawBehind {
                 val width = this.size.width
                 val height = this.size.height
 
@@ -58,15 +55,15 @@ fun Modifier.drawChecker(shape: Shape, size: DpSize = DpSize.Unspecified) = this
                 val verticalSteps = (height / checkerHeight).toInt()
 
                 for (y in 0..verticalSteps) {
-                    for (x in 0..horizontalSteps) {
-                        val isGrayTile = ((x + y) % 2 == 1)
-                        drawRect(
-                            color = if (isGrayTile) Color.LightGray else Color.White,
-                            topLeft = Offset(x * checkerWidth, y * checkerHeight),
-                            size = Size(checkerWidth, checkerHeight)
-                        )
-                    }
+                  for (x in 0..horizontalSteps) {
+                    val isGrayTile = ((x + y) % 2 == 1)
+                    drawRect(
+                        color = if (isGrayTile) Color.LightGray else Color.White,
+                        topLeft = Offset(x * checkerWidth, y * checkerHeight),
+                        size = Size(checkerWidth, checkerHeight),
+                    )
+                  }
                 }
+              }
             }
-        }
-    )
+        )

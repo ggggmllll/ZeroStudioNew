@@ -20,7 +20,6 @@ import android.graphics.Rect
 /**
  * Metrics about a [android.view.Window], consisting of its bounds.
  *
- *
  * This is usually obtained from [WindowManager#getCurrentWindowMetrics] or
  * [WindowManager#getMaximumWindowMetrics].
  *
@@ -34,11 +33,9 @@ class WindowMetrics internal constructor(private val _bounds: Bounds) {
   /**
    * Returns a new [Rect] describing the bounds of the area the window occupies.
    *
-   *
-   * **Note that the size of the reported bounds can have different size than
-   * [Display#getSize].** This method reports the window size including all system
-   * decorations, while [Display#getSize] reports the area excluding navigation bars
-   * and display cutout areas.
+   * **Note that the size of the reported bounds can have different size than [Display#getSize].**
+   * This method reports the window size including all system decorations, while [Display#getSize]
+   * reports the area excluding navigation bars and display cutout areas.
    *
    * @return window bounds in pixels.
    */

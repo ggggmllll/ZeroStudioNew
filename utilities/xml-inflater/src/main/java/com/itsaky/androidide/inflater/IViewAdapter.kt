@@ -93,8 +93,7 @@ abstract class IViewAdapter<T : View> : AbstractParser() {
    * @param name The name of the attribute.
    * @param handler The attribute handler.
    */
-  protected fun putAttrHandler(name: String,
-    handler: AttributeHandlerScope<T>.() -> Unit) {
+  protected fun putAttrHandler(name: String, handler: AttributeHandlerScope<T>.() -> Unit) {
     this.attributeHandlers[name] = handler
   }
 
@@ -114,7 +113,7 @@ abstract class IViewAdapter<T : View> : AbstractParser() {
    */
   protected open fun createUiWidgets(): List<UiWidget> {
     throw UnsupportedOperationException(
-      "${javaClass.simpleName} is not a UI Designer widget adapter"
+        "${javaClass.simpleName} is not a UI Designer widget adapter"
     )
   }
 
@@ -177,9 +176,9 @@ abstract class IViewAdapter<T : View> : AbstractParser() {
    * attributes.
    */
   private fun doApply(
-    view: IView,
-    attribute: IAttribute,
-    apply: AttributeHandlerScope<T>.() -> Boolean,
+      view: IView,
+      attribute: IAttribute,
+      apply: AttributeHandlerScope<T>.() -> Boolean,
   ): Boolean {
 
     if (!canHandleNamespace(attribute.namespace)) {
@@ -190,15 +189,15 @@ abstract class IViewAdapter<T : View> : AbstractParser() {
     return (view.view as T).let {
       val file = (view as ViewImpl).file
       return@let AttributeHandlerScope(
-        it,
-        file,
-        it.context,
-        it.layoutParams,
-        attribute.namespace,
-        attribute.name,
-        attribute.value
-      )
-        .let(apply)
+              it,
+              file,
+              it.context,
+              it.layoutParams,
+              attribute.namespace,
+              attribute.name,
+              attribute.value,
+          )
+          .let(apply)
     }
   }
 
@@ -209,9 +208,8 @@ abstract class IViewAdapter<T : View> : AbstractParser() {
    * A subclass should call the `super` method and add only the view specific attribute handlers.
    */
   protected open fun createAttrHandlers(
-    create: (String, AttributeHandlerScope<T>.() -> Unit) -> Unit
-  ) {
-  }
+      create: (String, AttributeHandlerScope<T>.() -> Unit) -> Unit
+  ) {}
 
   /**
    * Called after the attribute handlers are created. Subclasses can use this to remove attribute
@@ -221,8 +219,8 @@ abstract class IViewAdapter<T : View> : AbstractParser() {
    * @see createAttrHandlers
    */
   protected open fun postCreateAttrHandlers(
-    handlers: MutableMap<String, AttributeHandlerScope<T>.() -> Unit>) {
-  }
+      handlers: MutableMap<String, AttributeHandlerScope<T>.() -> Unit>
+  ) {}
 
   /**
    * A hook that can be used by subclasses to create view instances for the given view [name].

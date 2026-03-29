@@ -19,7 +19,7 @@ package com.android.tools.idea.wizard.template.impl.other.automotiveMessagingSer
 import com.android.tools.idea.wizard.template.getMaterialComponentName
 
 fun messagingServiceJava(packageName: String, serviceName: String, useAndroidX: Boolean) =
-  """
+    """
 package ${packageName};
 
 import android.app.PendingIntent;

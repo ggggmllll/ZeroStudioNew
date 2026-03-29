@@ -39,12 +39,12 @@ object DocumentationReferenceProvider {
    * website.
    */
   private val availablePackages =
-    setOf(
-      "android", // Android APIs
-      "androidx", // AndroidX libraries
-      "com.google.android.material", // Material Components
-      "java" // Java APIs
-    )
+      setOf(
+          "android", // Android APIs
+          "androidx", // AndroidX libraries
+          "com.google.android.material", // Material Components
+          "java", // Java APIs
+      )
 
   /**
    * Get the documentation URL for given completion data.
@@ -54,16 +54,16 @@ object DocumentationReferenceProvider {
   @JvmStatic
   fun getUrl(data: ICompletionData): String? {
     val klass =
-      when (data) {
-        is ClassCompletionData -> data
-        is MemberCompletionData -> data.classInfo
-        else -> return null
-      }
+        when (data) {
+          is ClassCompletionData -> data
+          is MemberCompletionData -> data.classInfo
+          else -> return null
+        }
     val url = StringBuilder(DOCS_BASE_URL)
     val baseName =
-      if (klass.isNested) {
-        klass.topLevelClass
-      } else klass.className
+        if (klass.isNested) {
+          klass.topLevelClass
+        } else klass.className
 
     if (availablePackages.find { baseName.startsWith("$it.") } == null) {
       // This package is probably not listed on Android Developers documentation
@@ -88,8 +88,12 @@ object DocumentationReferenceProvider {
       url.append(')')
     }
 
-    log.debug("Documentation URL for {}#{} is {}", klass.className,
-      ((data as? MemberCompletionData?)?.memberName ?: "<self>"), url)
+    log.debug(
+        "Documentation URL for {}#{} is {}",
+        klass.className,
+        ((data as? MemberCompletionData?)?.memberName ?: "<self>"),
+        url,
+    )
 
     return url.toString()
   }

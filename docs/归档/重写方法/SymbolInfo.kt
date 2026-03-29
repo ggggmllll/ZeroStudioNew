@@ -11,7 +11,6 @@ import com.itsaky.androidide.resources.R
  * @property signature Detailed signature or description.
  * @property line The line number (0-based) where the symbol is defined.
  * @property iconRes Resource ID for the icon representing the symbol kind.
- *
  * @author android_zero
  */
 data class SymbolInfo(
@@ -19,5 +18,5 @@ data class SymbolInfo(
     val kind: String,
     val signature: String,
     val line: Int,
-    @DrawableRes val iconRes: Int = R.drawable.ic_code // Default icon
+    @DrawableRes val iconRes: Int = R.drawable.ic_code, // Default icon
 )

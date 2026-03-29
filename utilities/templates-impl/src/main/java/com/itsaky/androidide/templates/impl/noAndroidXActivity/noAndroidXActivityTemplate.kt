@@ -19,11 +19,11 @@ package com.itsaky.androidide.templates.impl.noAndroidXActivity
 
 import com.android.aaptcompiler.ConfigDescription
 import com.android.aaptcompiler.android.ResTableConfig
+import com.itsaky.androidide.resources.R.string
 import com.itsaky.androidide.templates.base.modules.android.defaultAppModule
 import com.itsaky.androidide.templates.base.util.AndroidModuleResManager.ResourceType.LAYOUT
 import com.itsaky.androidide.templates.base.util.AndroidModuleResManager.ResourceType.VALUES
 import com.itsaky.androidide.templates.impl.R
-import com.itsaky.androidide.resources.R.string
 import com.itsaky.androidide.templates.impl.base.createRecipe
 import com.itsaky.androidide.templates.impl.base.emptyValuesFile
 import com.itsaky.androidide.templates.impl.base.writeMainActivity
@@ -33,10 +33,8 @@ fun noAndroidXActivityProject() = baseProjectImpl {
   templateName = R.string.template_no_AndroidX
   thumb = R.drawable.template_empty_noandroidx
   description = string.title_test
-  
-  val configNight = ConfigDescription().apply {
-    uiMode = ResTableConfig.UI_MODE.NIGHT_YES
-  }
+
+  val configNight = ConfigDescription().apply { uiMode = ResTableConfig.UI_MODE.NIGHT_YES }
   defaultAppModule(addAndroidX = false) {
 
     // do not set a theme resource to the application

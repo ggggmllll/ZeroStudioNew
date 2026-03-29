@@ -34,9 +34,9 @@ class JavaPoetUtils {
   companion object {
     @JvmStatic
     fun print(
-      method: MethodSpec,
-      importsOut: MutableSet<String>,
-      qualifiedNames: Boolean = true,
+        method: MethodSpec,
+        importsOut: MutableSet<String>,
+        qualifiedNames: Boolean = true,
     ): String {
       val sb = StringBuilder()
       val writer = ImportCollectingCodeWriter(sb, indentationString, emptySet(), emptySet())
@@ -55,9 +55,9 @@ class JavaPoetUtils {
 
     @JvmStatic
     fun buildMethod(
-      method: ExecutableElement,
-      types: Types,
-      type: DeclaredType
+        method: ExecutableElement,
+        types: Types,
+        type: DeclaredType,
     ): MethodSpec.Builder {
       val builder = MethodSpec.overriding(method, type, types)
       val mirrors = method.annotationMirrors

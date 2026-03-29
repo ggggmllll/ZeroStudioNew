@@ -53,8 +53,9 @@ interface IView {
    *
    * @param attribute The attribute to apply.
    * @param apply Whether the attribute should be applied to the attribute. If this `false` then the
-   * attribute will be simply added to the attributes list.
-   * @param update Whether the attribute's value should be updated if the attribute is already applied to this view.
+   *   attribute will be simply added to the attributes list.
+   * @param update Whether the attribute's value should be updated if the attribute is already
+   *   applied to this view.
    */
   fun addAttribute(attribute: IAttribute, apply: Boolean = true, update: Boolean = false)
 
@@ -69,7 +70,7 @@ interface IView {
    * Updates the already-added attribute entry with the value of the given [attribute].
    *
    * @param attribute The attribute containing information about the attribute to update. This
-   * should contain the new value of the attribute.
+   *   should contain the new value of the attribute.
    */
   fun updateAttribute(attribute: IAttribute)
 
@@ -87,7 +88,7 @@ interface IView {
    * @param namespaceUri The namespace uri of the attribute.
    * @param name The name of the attribute to look for.
    * @return `true` if this view has an attribute entry with the given name namespace uri and name,
-   * `false` otherwise.
+   *   `false` otherwise.
    */
   fun hasAttribute(name: String, namespaceUri: String? = null): Boolean {
     return findAttribute(name, namespaceUri) != null
@@ -177,7 +178,7 @@ interface IView {
      *
      * @param view The view whose attribute was updated.
      * @param attribute The attribute that was updated. This contains the new value of the
-     * attribute.
+     *   attribute.
      * @param oldValue The old value of the attribute.
      */
     fun onAttributeUpdated(view: IView, attribute: IAttribute, oldValue: String)
@@ -186,10 +187,9 @@ interface IView {
   open class SingleAttributeChangeListener : AttributeChangeListener {
 
     override fun onAttributeAdded(view: IView, attribute: IAttribute) {}
+
     override fun onAttributeRemoved(view: IView, attribute: IAttribute) {}
-    override fun onAttributeUpdated(view: IView, attribute: IAttribute,
-      oldValue: String
-    ) {
-    }
+
+    override fun onAttributeUpdated(view: IView, attribute: IAttribute, oldValue: String) {}
   }
 }

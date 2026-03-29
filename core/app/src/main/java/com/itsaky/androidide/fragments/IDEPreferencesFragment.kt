@@ -33,9 +33,9 @@ class IDEPreferencesFragment : BasePreferenceFragment() {
   private var children: List<IPreference> = emptyList()
 
   override fun onCreateView(
-    inflater: LayoutInflater,
-    container: ViewGroup?,
-    savedInstanceState: Bundle?
+      inflater: LayoutInflater,
+      container: ViewGroup?,
+      savedInstanceState: Bundle?,
   ): View {
     enterTransition = MaterialSharedAxis(MaterialSharedAxis.X, true)
     reenterTransition = MaterialSharedAxis(MaterialSharedAxis.X, false)

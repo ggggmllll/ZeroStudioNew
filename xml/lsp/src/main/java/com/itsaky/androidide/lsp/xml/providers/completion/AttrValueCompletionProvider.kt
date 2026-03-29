@@ -60,36 +60,36 @@ import org.eclipse.lemminx.dom.DOMDocument
  * @author Akash Yadav
  */
 open class AttrValueCompletionProvider(provider: ICompletionProvider) :
-  IXmlCompletionProvider(provider) {
+    IXmlCompletionProvider(provider) {
 
   override fun canProvideCompletions(pathData: ResourcePathData, type: NodeType): Boolean {
     return super.canProvideCompletions(pathData, type) && type == ATTRIBUTE_VALUE
   }
 
   override fun doComplete(
-    params: CompletionParams,
-    pathData: ResourcePathData,
-    document: DOMDocument,
-    type: NodeType,
-    prefix: String
+      params: CompletionParams,
+      pathData: ResourcePathData,
+      document: DOMDocument,
+      type: NodeType,
+      prefix: String,
   ): CompletionResult {
     val attrName =
-      attrAtCursor.localName
-        ?: run {
-          log.warn("Cannot find attribute at index {}", params.position.index)
-          return EMPTY
-        }
+        attrAtCursor.localName
+            ?: run {
+              log.warn("Cannot find attribute at index {}", params.position.index)
+              return EMPTY
+            }
 
     // TODO Currently we do not support completing values for attributes without a namespace
     //  For example, completions will be provided for: 'android:textColor="@@cursor@@"' but
     //  not for 'textColor="@@cursor"'
 
     val namespace =
-      attrAtCursor.namespaceURI
-        ?: run {
-          log.warn("Unknown namespace for attribute: {}", attrAtCursor)
-          return EMPTY
-        }
+        attrAtCursor.namespaceURI
+            ?: run {
+              log.warn("Unknown namespace for attribute: {}", attrAtCursor)
+              return EMPTY
+            }
 
     return completeValue(namespace = namespace, prefix = prefix, attrName = attrName)
   }
@@ -99,10 +99,10 @@ open class AttrValueCompletionProvider(provider: ICompletionProvider) :
   }
 
   fun completeValue(
-    namespace: String?,
-    prefix: String,
-    attrName: String,
-    attrValue: String? = null
+      namespace: String?,
+      prefix: String,
+      attrName: String,
+      attrValue: String? = null,
   ): CompletionResult {
 
     if (namespace.isNullOrBlank()) {
@@ -118,14 +118,15 @@ open class AttrValueCompletionProvider(provider: ICompletionProvider) :
     val list = mutableListOf<CompletionItem>()
 
     val attr =
-      findAttr(tables, namespace, pck, attrName)
-        ?: run {
-          log.warn(
-            "No attribute found with name '{}' in package '{}'", attrName,
-            if (namespace == NAMESPACE_AUTO) "<auto>" else pck
-          )
-          return EMPTY
-        }
+        findAttr(tables, namespace, pck, attrName)
+            ?: run {
+              log.warn(
+                  "No attribute found with name '{}' in package '{}'",
+                  attrName,
+                  if (namespace == NAMESPACE_AUTO) "<auto>" else pck,
+              )
+              return EMPTY
+            }
 
     val value = attrValue ?: this.attrAtCursor.value
 
@@ -142,8 +143,8 @@ open class AttrValueCompletionProvider(provider: ICompletionProvider) :
       val valPck = matcher.group(1)
       val typeStr = matcher.group(3)
       val valType =
-        com.android.aaptcompiler.AaptResourceType.values().firstOrNull { it.tagName == typeStr }
-          ?: return EMPTY
+          com.android.aaptcompiler.AaptResourceType.values().firstOrNull { it.tagName == typeStr }
+              ?: return EMPTY
       val newPrefix = matcher.group(4) ?: ""
       addValues(valType, newPrefix, list) { it == valPck }
       return CompletionResult(list)
@@ -180,8 +181,8 @@ open class AttrValueCompletionProvider(provider: ICompletionProvider) :
       val typeStr = matcher.group(1)
       val newPrefix = matcher.group(2) ?: ""
       val valType =
-        com.android.aaptcompiler.AaptResourceType.values().firstOrNull { it.tagName == typeStr }
-          ?: return EMPTY
+          com.android.aaptcompiler.AaptResourceType.values().firstOrNull { it.tagName == typeStr }
+              ?: return EMPTY
       addValues(valType, newPrefix, list)
       return CompletionResult(list)
     }
@@ -191,9 +192,9 @@ open class AttrValueCompletionProvider(provider: ICompletionProvider) :
 
   private fun addPackages(incompletePck: String, list: MutableList<CompletionItem>) {
     val packages =
-      findResourceTables(ANDROID_URI).flatMap {
-        it.packages.filter { pck -> matchLevel(pck.name, incompletePck) != NO_MATCH }
-      }
+        findResourceTables(ANDROID_URI).flatMap {
+          it.packages.filter { pck -> matchLevel(pck.name, incompletePck) != NO_MATCH }
+        }
     packages.forEach {
       val match = matchLevel(it.name, incompletePck)
       val item = createEnumOrFlagCompletionItem(it.name, it.name, match)
@@ -203,9 +204,9 @@ open class AttrValueCompletionProvider(provider: ICompletionProvider) :
   }
 
   private fun addResourceTypes(
-    pck: String,
-    incompleteType: String,
-    list: MutableList<CompletionItem>
+      pck: String,
+      incompleteType: String,
+      list: MutableList<CompletionItem>,
   ) {
     listResTypes().forEach {
       val match = matchLevel(it, incompleteType)
@@ -220,26 +221,26 @@ open class AttrValueCompletionProvider(provider: ICompletionProvider) :
   }
 
   private fun listResTypes(): List<String> =
-    com.android.aaptcompiler.AaptResourceType.values().map { it.tagName }
+      com.android.aaptcompiler.AaptResourceType.values().map { it.tagName }
 
   protected open fun resTableForFindAttr() = platformResourceTable()
 
   private fun findAttr(
-    tables: Set<IResourceTable>,
-    namespace: String,
-    pck: String,
-    attr: String
+      tables: Set<IResourceTable>,
+      namespace: String,
+      pck: String,
+      attr: String,
   ): AttributeResource? {
     if (namespace != NAMESPACE_AUTO && pck == ResourceTableRegistry.PCK_ANDROID) {
       // AndroidX dependencies include attribute declarations with the 'android' package
       // Those must not be included when completing values
       val attrEntry =
-        resTableForFindAttr()!!
-          .findPackage(ResourceTableRegistry.PCK_ANDROID)
-          ?.findGroup(ATTR)
-          ?.findEntry(attr)
-          ?.findValue(ConfigDescription())
-          ?.value
+          resTableForFindAttr()!!
+              .findPackage(ResourceTableRegistry.PCK_ANDROID)
+              ?.findGroup(ATTR)
+              ?.findEntry(attr)
+              ?.findValue(ConfigDescription())
+              ?.value
       return if (attrEntry is AttributeResource) attrEntry else null
     }
 
@@ -251,12 +252,12 @@ open class AttrValueCompletionProvider(provider: ICompletionProvider) :
   }
 
   private fun findAttr(
-    packages: Collection<IResourceTablePackage>,
-    attr: String
+      packages: Collection<IResourceTablePackage>,
+      attr: String,
   ): AttributeResource? {
     for (pck in packages) {
       val entry =
-        pck.findGroup(ATTR)?.findEntry(attr)?.findValue(ConfigDescription())?.value ?: continue
+          pck.findGroup(ATTR)?.findEntry(attr)?.findValue(ConfigDescription())?.value ?: continue
       if (entry is AttributeResource) {
         return entry
       }
@@ -265,10 +266,10 @@ open class AttrValueCompletionProvider(provider: ICompletionProvider) :
   }
 
   private fun addValuesForAttr(
-    attr: AttributeResource,
-    pck: String,
-    prefix: String,
-    list: MutableList<CompletionItem>
+      attr: AttributeResource,
+      pck: String,
+      prefix: String,
+      list: MutableList<CompletionItem>,
   ) {
     if (attr.typeMask == FormatFlags.REFERENCE_VALUE) {
       completeReferences(prefix, list)
@@ -276,25 +277,25 @@ open class AttrValueCompletionProvider(provider: ICompletionProvider) :
       // Check for specific attribute formats
       if (attr.hasType(STRING)) {
         addValues(
-          type = com.android.aaptcompiler.AaptResourceType.STRING,
-          prefix = prefix,
-          result = list
+            type = com.android.aaptcompiler.AaptResourceType.STRING,
+            prefix = prefix,
+            result = list,
         )
       }
 
       if (attr.hasType(INTEGER)) {
         addValues(
-          type = com.android.aaptcompiler.AaptResourceType.INTEGER,
-          prefix = prefix,
-          result = list
+            type = com.android.aaptcompiler.AaptResourceType.INTEGER,
+            prefix = prefix,
+            result = list,
         )
       }
 
       if (attr.hasType(COLOR)) {
         addValues(
-          type = com.android.aaptcompiler.AaptResourceType.COLOR,
-          prefix = prefix,
-          result = list
+            type = com.android.aaptcompiler.AaptResourceType.COLOR,
+            prefix = prefix,
+            result = list,
         )
       }
 
@@ -310,9 +311,9 @@ open class AttrValueCompletionProvider(provider: ICompletionProvider) :
 
       if (attr.hasType(INTEGER)) {
         addValues(
-          type = com.android.aaptcompiler.AaptResourceType.INTEGER,
-          prefix = prefix,
-          result = list
+            type = com.android.aaptcompiler.AaptResourceType.INTEGER,
+            prefix = prefix,
+            result = list,
         )
       }
 
@@ -324,7 +325,11 @@ open class AttrValueCompletionProvider(provider: ICompletionProvider) :
           }
 
           list.add(
-            createEnumOrFlagCompletionItem(pck = pck, name = symbol.symbol.name.entry!!, matchLevel)
+              createEnumOrFlagCompletionItem(
+                  pck = pck,
+                  name = symbol.symbol.name.entry!!,
+                  matchLevel,
+              )
           )
         }
       }
@@ -362,40 +367,40 @@ open class AttrValueCompletionProvider(provider: ICompletionProvider) :
   }
 
   private fun addValues(
-    type: com.android.aaptcompiler.AaptResourceType,
-    prefix: String,
-    result: MutableList<CompletionItem>,
-    checkPck: (String) -> Boolean = { true }
+      type: com.android.aaptcompiler.AaptResourceType,
+      prefix: String,
+      result: MutableList<CompletionItem>,
+      checkPck: (String) -> Boolean = { true },
   ) {
     if (result.size >= MAX_ITEMS + 1) {
       return
     }
 
     val entries =
-      allNamespaces
-        .flatMap { findResourceTables(it.second) }
-        .flatMap { table ->
-          table.packages.mapNotNull { pck ->
-            if (!checkPck(pck.name)) {
-              return@mapNotNull null
-            }
-            pck.name to
-              pck.findGroup(type)?.findEntries { entryName ->
-                matchLevel(entryName, prefix) != NO_MATCH
+        allNamespaces
+            .flatMap { findResourceTables(it.second) }
+            .flatMap { table ->
+              table.packages.mapNotNull { pck ->
+                if (!checkPck(pck.name)) {
+                  return@mapNotNull null
+                }
+                pck.name to
+                    pck.findGroup(type)?.findEntries { entryName ->
+                      matchLevel(entryName, prefix) != NO_MATCH
+                    }
               }
-          }
-        }
-        .toHashSet()
+            }
+            .toHashSet()
 
     entries.forEach { pair ->
       pair.second?.forEach { entry ->
         result.add(
-          createAttrValueCompletionItem(
-            pair.first,
-            type.tagName,
-            entry.name,
-            matchLevel(entry.name, prefix)
-          )
+            createAttrValueCompletionItem(
+                pair.first,
+                type.tagName,
+                entry.name,
+                matchLevel(entry.name, prefix),
+            )
         )
       }
     }

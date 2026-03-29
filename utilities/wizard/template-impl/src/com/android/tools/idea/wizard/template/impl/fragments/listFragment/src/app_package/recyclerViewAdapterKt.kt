@@ -24,28 +24,28 @@ import com.android.tools.idea.wizard.template.impl.activities.common.layoutToVie
 import com.android.tools.idea.wizard.template.renderIf
 
 fun recyclerViewAdapterKt(
-  adapterClassName: String,
-  applicationPackage: String?,
-  fragmentLayout: String,
-  packageName: String,
-  useAndroidX: Boolean,
-  isViewBindingSupported: Boolean,
+    adapterClassName: String,
+    applicationPackage: String?,
+    fragmentLayout: String,
+    packageName: String,
+    useAndroidX: Boolean,
+    isViewBindingSupported: Boolean,
 ): String {
 
   val onCreateViewHolderBlock =
-    if (isViewBindingSupported)
-      """
+      if (isViewBindingSupported)
+          """
     return ViewHolder(${layoutToViewBindingClass(fragmentLayout)}.inflate(LayoutInflater.from(parent.context), parent, false))
   """
-    else
-      """
+      else
+          """
     val view = LayoutInflater.from(parent.context).inflate(R.layout.${fragmentLayout}, parent, false)
     return ViewHolder(view)
   """
 
   val viewHolderBlock =
-    if (isViewBindingSupported)
-      """
+      if (isViewBindingSupported)
+          """
     inner class ViewHolder(binding: ${layoutToViewBindingClass(fragmentLayout)}) : RecyclerView.ViewHolder(binding.root) {
         val idView: TextView = binding.itemNumber
         val contentView: TextView = binding.content
@@ -55,8 +55,8 @@ fun recyclerViewAdapterKt(
         }
     }
   """
-    else
-      """
+      else
+          """
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val idView: TextView = view.findViewById(R.id.item_number)
         val contentView: TextView = view.findViewById(R.id.content)

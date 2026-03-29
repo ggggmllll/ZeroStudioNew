@@ -21,60 +21,48 @@ fun ColorPickerRectHueValueHSV(
     modifier: Modifier = Modifier,
     selectionRadius: Dp = 8.dp,
     initialColor: Color,
-    onColorChange: (Color, String) -> Unit
+    onColorChange: (Color, String) -> Unit,
 ) {
 
-    val hsvArray = ColorUtil.colorToHSV(initialColor)
+  val hsvArray = ColorUtil.colorToHSV(initialColor)
 
-    var hue by remember { mutableStateOf(hsvArray[0]) }
-    var saturation by remember { mutableStateOf(hsvArray[1]) }
-    var value by remember { mutableStateOf(hsvArray[2]) }
-    var alpha by remember { mutableStateOf(initialColor.alpha) }
+  var hue by remember { mutableStateOf(hsvArray[0]) }
+  var saturation by remember { mutableStateOf(hsvArray[1]) }
+  var value by remember { mutableStateOf(hsvArray[2]) }
+  var alpha by remember { mutableStateOf(initialColor.alpha) }
 
-    val currentColor =
-        Color.hsv(hue = hue, saturation = saturation, value = value, alpha = alpha)
+  val currentColor = Color.hsv(hue = hue, saturation = saturation, value = value, alpha = alpha)
 
-    var colorModel by remember { mutableStateOf(ColorModel.HSV) }
+  var colorModel by remember { mutableStateOf(ColorModel.HSV) }
 
-    onColorChange(currentColor, ColorUtil.colorToHexAlpha(currentColor))
+  onColorChange(currentColor, ColorUtil.colorToHexAlpha(currentColor))
 
-    Column(
-        modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        SelectorRectHueValueHSV(
-            modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(4 / 3f),
-            hue = hue,
-            value = value,
-            selectionRadius = selectionRadius
-        ) { h, v ->
-            hue = h
-            value = v
-        }
-
-        Column(modifier = Modifier.padding(8.dp)) {
-            SliderCircleColorDisplaySaturationHSV(
-                hue = hue,
-                saturation = saturation,
-                value = value,
-                alpha = alpha,
-                onSaturationChange = {
-                    saturation = it
-                },
-                onAlphaChange = {
-                    alpha = it
-                }
-            )
-
-            ColorDisplayExposedSelectionMenu(
-                color = currentColor,
-                colorModel = colorModel,
-                onColorModelChange = {
-                    colorModel = it
-                }
-            )
-        }
+  Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
+    SelectorRectHueValueHSV(
+        modifier = Modifier.fillMaxWidth().aspectRatio(4 / 3f),
+        hue = hue,
+        value = value,
+        selectionRadius = selectionRadius,
+    ) { h, v ->
+      hue = h
+      value = v
     }
+
+    Column(modifier = Modifier.padding(8.dp)) {
+      SliderCircleColorDisplaySaturationHSV(
+          hue = hue,
+          saturation = saturation,
+          value = value,
+          alpha = alpha,
+          onSaturationChange = { saturation = it },
+          onAlphaChange = { alpha = it },
+      )
+
+      ColorDisplayExposedSelectionMenu(
+          color = currentColor,
+          colorModel = colorModel,
+          onColorModelChange = { colorModel = it },
+      )
+    }
+  }
 }

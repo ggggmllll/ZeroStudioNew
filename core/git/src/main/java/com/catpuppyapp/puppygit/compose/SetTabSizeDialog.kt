@@ -23,46 +23,35 @@ import com.catpuppyapp.puppygit.utils.state.CustomStateSaveable
 fun SetTabSizeDialog(
     tabSizeBuf: CustomStateSaveable<TextFieldValue>,
     onCancel: () -> Unit,
-    onOk: (newTabSize: String) -> Unit
+    onOk: (newTabSize: String) -> Unit,
 ) {
-    val scope = rememberCoroutineScope()
+  val scope = rememberCoroutineScope()
 
-    val focusRequester = remember { FocusRequester() }
+  val focusRequester = remember { FocusRequester() }
 
-    ConfirmDialog2(
-        title = stringResource(R.string.tab_size),
-        requireShowTextCompose = true,
-        textCompose = {
-            ScrollableColumn {
-                TextField(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .focusRequester(focusRequester),
+  ConfirmDialog2(
+      title = stringResource(R.string.tab_size),
+      requireShowTextCompose = true,
+      textCompose = {
+        ScrollableColumn {
+          TextField(
+              modifier = Modifier.fillMaxWidth().focusRequester(focusRequester),
+              keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+              value = tabSizeBuf.value,
+              singleLine = true,
+              onValueChange = { tabSizeBuf.value = it },
+              label = { Text(stringResource(R.string.tab_size)) },
+          )
 
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+          Spacer(Modifier.height(10.dp))
 
-                    value = tabSizeBuf.value,
-                    singleLine = true,
-                    onValueChange = {
-                        tabSizeBuf.value = it
-                    },
-                    label = {
-                        Text(stringResource(R.string.tab_size))
-                    },
-                )
+          MySelectionContainer { Text(stringResource(R.string.set_tab_size_note)) }
+        }
+      },
+      onCancel = onCancel,
+  ) {
+    onOk(tabSizeBuf.value.text)
+  }
 
-                Spacer(Modifier.height(10.dp))
-
-                MySelectionContainer {
-                    Text(stringResource(R.string.set_tab_size_note))
-                }
-
-            }
-        },
-        onCancel = onCancel
-    ) {
-        onOk(tabSizeBuf.value.text)
-    }
-
-    Focuser(focusRequester, scope)
+  Focuser(focusRequester, scope)
 }

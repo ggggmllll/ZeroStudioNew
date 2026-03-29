@@ -23,32 +23,22 @@ import android.net.Uri
 import android.os.StrictMode
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
-import androidx.lifecycle.Observer
-import androidx.work.Constraints
-import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.NetworkType
-import androidx.work.Operation
-import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkManager
 import com.blankj.utilcode.util.ThrowableUtils.getFullStackTrace
 import com.google.android.material.color.DynamicColors
 import com.itsaky.androidide.BuildConfig
 import com.itsaky.androidide.activities.CrashHandlerActivity
 import com.itsaky.androidide.activities.editor.IDELogcatReader
 import com.itsaky.androidide.buildinfo.BuildInfo
-import com.itsaky.androidide.managers.ToolsManager
 import com.itsaky.androidide.editor.schemes.IDEColorSchemeProvider
 import com.itsaky.androidide.eventbus.events.preferences.PreferenceChangeEvent
 import com.itsaky.androidide.events.AppEventsIndex
 import com.itsaky.androidide.events.EditorEventsIndex
 import com.itsaky.androidide.events.LspApiEventsIndex
 import com.itsaky.androidide.events.LspJavaEventsIndex
+import com.itsaky.androidide.managers.ToolsManager
 import com.itsaky.androidide.preferences.internal.DevOpsPreferences
 import com.itsaky.androidide.preferences.internal.GeneralPreferences
-import com.itsaky.androidide.preferences.internal.StatPreferences
 import com.itsaky.androidide.resources.localization.LocaleProvider
-import com.itsaky.androidide.stats.AndroidIDEStats
-import com.itsaky.androidide.stats.StatUploadWorker
 import com.itsaky.androidide.syntax.colorschemes.SchemeAndroidIDE
 import com.itsaky.androidide.treesitter.TreeSitter
 import com.itsaky.androidide.ui.themes.IDETheme
@@ -60,6 +50,8 @@ import com.itsaky.androidide.utils.flashError
 import com.termux.app.TermuxApplication
 import com.termux.shared.reflection.ReflectionUtils
 import io.github.rosemoe.sora.widget.schemes.EditorColorScheme
+import java.lang.Thread.UncaughtExceptionHandler
+import kotlin.system.exitProcess
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -67,14 +59,9 @@ import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import org.slf4j.LoggerFactory
-import java.lang.Thread.UncaughtExceptionHandler
-import java.time.Duration
-import kotlin.system.exitProcess
-import com.itsaky.androidide.ui.themes.ThemeManager
 
 /**
- * Main Application class for AndroidIDE.
- * Initializes global environment, tools, and event bus.
+ * Main Application class for AndroidIDE. Initializes global environment, tools, and event bus.
  *
  * @author android_zero
  */
@@ -93,20 +80,19 @@ class IDEApplication : TermuxApplication() {
 
   @OptIn(DelicateCoroutinesApi::class)
   override fun onCreate() {
-    Environment.init(this);
-    instance = this;
-    
+    Environment.init(this)
+    instance = this
+
     uncaughtExceptionHandler = Thread.getDefaultUncaughtExceptionHandler()
     Thread.setDefaultUncaughtExceptionHandler { thread, th -> handleCrash(thread, th) }
 
     super.onCreate()
-    
-    
+
     ToolsManager.init(this, null)
-    
+
     if (BuildConfig.DEBUG) {
       StrictMode.setVmPolicy(
-        StrictMode.VmPolicy.Builder(StrictMode.getVmPolicy()).penaltyLog().detectAll().build()
+          StrictMode.VmPolicy.Builder(StrictMode.getVmPolicy()).penaltyLog().detectAll().build()
       )
       if (DevOpsPreferences.dumpLogs) {
         startLogcatReader()
@@ -114,11 +100,11 @@ class IDEApplication : TermuxApplication() {
     }
 
     EventBus.builder()
-      .addIndex(AppEventsIndex())
-      .addIndex(EditorEventsIndex())
-      .addIndex(LspApiEventsIndex())
-      .addIndex(LspJavaEventsIndex())
-      .installDefaultEventBus(true)
+        .addIndex(AppEventsIndex())
+        .addIndex(EditorEventsIndex())
+        .addIndex(LspApiEventsIndex())
+        .addIndex(LspJavaEventsIndex())
+        .installDefaultEventBus(true)
 
     EventBus.getDefault().register(this)
 
@@ -131,9 +117,7 @@ class IDEApplication : TermuxApplication() {
     EditorColorScheme.setDefault(SchemeAndroidIDE.newInstance(null))
 
     ReflectionUtils.bypassHiddenAPIReflectionRestrictions()
-    GlobalScope.launch {
-      IDEColorSchemeProvider.init()
-    }
+    GlobalScope.launch { IDEColorSchemeProvider.init() }
   }
 
   fun showChangelog() {
@@ -154,38 +138,38 @@ class IDEApplication : TermuxApplication() {
 
   // fun reportStatsIfNecessary() {
 
-    // val constraints = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
-    // val request = PeriodicWorkRequestBuilder<StatUploadWorker>(Duration.ofHours(24)).setInputData(
-      // AndroidIDEStats.statData.toInputData()
-    // ).setConstraints(constraints)
-      // .addTag(StatUploadWorker.WORKER_WORK_NAME).build()
+  // val constraints = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
+  // val request = PeriodicWorkRequestBuilder<StatUploadWorker>(Duration.ofHours(24)).setInputData(
+  // AndroidIDEStats.statData.toInputData()
+  // ).setConstraints(constraints)
+  // .addTag(StatUploadWorker.WORKER_WORK_NAME).build()
 
-    // val workManager = WorkManager.getInstance(this)
+  // val workManager = WorkManager.getInstance(this)
 
-    // log.info("reportStatsIfNecessary: Enqueuing StatUploadWorker...")
-    // val operation = workManager.enqueueUniquePeriodicWork(
-      // StatUploadWorker.WORKER_WORK_NAME,
-      // ExistingPeriodicWorkPolicy.UPDATE, request
-    // )
+  // log.info("reportStatsIfNecessary: Enqueuing StatUploadWorker...")
+  // val operation = workManager.enqueueUniquePeriodicWork(
+  // StatUploadWorker.WORKER_WORK_NAME,
+  // ExistingPeriodicWorkPolicy.UPDATE, request
+  // )
 
-    // operation.state.observeForever(object : Observer<Operation.State> {
-      // override fun onChanged(value: Operation.State) {
-        // operation.state.removeObserver(this)
-        // log.debug("reportStatsIfNecessary: WorkManager enqueue result: {}", value)
-      // }
-    // })
+  // operation.state.observeForever(object : Observer<Operation.State> {
+  // override fun onChanged(value: Operation.State) {
+  // operation.state.removeObserver(this)
+  // log.debug("reportStatsIfNecessary: WorkManager enqueue result: {}", value)
+  // }
+  // })
   // }
 
   @Subscribe(threadMode = ThreadMode.MAIN)
   fun onPrefChanged(event: PreferenceChangeEvent) {
     val enabled = event.value as? Boolean?
     // if (event.key == StatPreferences.STAT_OPT_IN) {
-      // if (enabled == true) {
-        // reportStatsIfNecessary()
-      // } else {
-        // cancelStatUploadWorker()
-      // }
-    // } else 
+    // if (enabled == true) {
+    // reportStatsIfNecessary()
+    // } else {
+    // cancelStatUploadWorker()
+    // }
+    // } else
     if (event.key == DevOpsPreferences.KEY_DEVOPTS_DEBUGGING_DUMPLOGS) {
       if (enabled == true) {
         startLogcatReader()
@@ -197,15 +181,15 @@ class IDEApplication : TermuxApplication() {
       // Activities might also handle this locally to trigger recreate()
       val mode = GeneralPreferences.uiMode
       if (mode != AppCompatDelegate.getDefaultNightMode()) {
-          AppCompatDelegate.setDefaultNightMode(mode)
+        AppCompatDelegate.setDefaultNightMode(mode)
       }
     } else if (event.key == GeneralPreferences.SELECTED_LOCALE) {
 
       // Use empty locale list if the locale has been reset to 'System Default'
       val selectedLocale = GeneralPreferences.selectedLocale
-      val localeListCompat = selectedLocale?.let {
-        LocaleListCompat.create(LocaleProvider.getLocale(selectedLocale))
-      } ?: LocaleListCompat.getEmptyLocaleList()
+      val localeListCompat =
+          selectedLocale?.let { LocaleListCompat.create(LocaleProvider.getLocale(selectedLocale)) }
+              ?: LocaleListCompat.getEmptyLocaleList()
 
       AppCompatDelegate.setApplicationLocales(localeListCompat)
     }
@@ -232,15 +216,15 @@ class IDEApplication : TermuxApplication() {
   }
 
   // private fun cancelStatUploadWorker() {
-    // log.info("Opted-out of stat collection. Cancelling StatUploadWorker if enqueued...")
-    // val operation = WorkManager.getInstance(this)
-      // .cancelUniqueWork(StatUploadWorker.WORKER_WORK_NAME)
-    // operation.state.observeForever(object : Observer<Operation.State> {
-      // override fun onChanged(value: Operation.State) {
-        // operation.state.removeObserver(this)
-        // log.info("StatUploadWorker: Cancellation result state: {}", value)
-      // }
-    // })
+  // log.info("Opted-out of stat collection. Cancelling StatUploadWorker if enqueued...")
+  // val operation = WorkManager.getInstance(this)
+  // .cancelUniqueWork(StatUploadWorker.WORKER_WORK_NAME)
+  // operation.state.observeForever(object : Observer<Operation.State> {
+  // override fun onChanged(value: Operation.State) {
+  // operation.state.removeObserver(this)
+  // log.info("StatUploadWorker: Cancellation result state: {}", value)
+  // }
+  // })
   // }
 
   private fun startLogcatReader() {

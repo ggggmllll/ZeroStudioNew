@@ -14,12 +14,10 @@
  *  You should have received a copy of the GNU General Public License
  *   along with AndroidIDE.  If not, see <https://www.gnu.org/licenses/>.
  */
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-plugins {
-  `kotlin-dsl`
-}
+plugins { `kotlin-dsl` }
 
 dependencies {
   implementation(gradleApi())
@@ -30,13 +28,10 @@ dependencies {
   testImplementation(libs.tests.junit)
   testImplementation(libs.tests.google.truth)
 }
-kotlin {
-    jvmToolchain(17)
-}
 
-tasks.withType<KotlinCompile>().configureEach {
-    compilerOptions.jvmTarget.set(JvmTarget.JVM_17)
-}
+kotlin { jvmToolchain(17) }
+
+tasks.withType<KotlinCompile>().configureEach { compilerOptions.jvmTarget.set(JvmTarget.JVM_17) }
 
 gradlePlugin {
   plugins {

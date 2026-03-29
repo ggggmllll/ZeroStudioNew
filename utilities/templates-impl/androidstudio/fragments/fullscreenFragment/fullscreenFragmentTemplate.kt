@@ -29,17 +29,17 @@ import com.android.tools.idea.wizard.template.TemplateData
 import com.android.tools.idea.wizard.template.TextFieldWidget
 import com.android.tools.idea.wizard.template.WizardUiContext
 import com.android.tools.idea.wizard.template.fragmentToLayout
-import com.itsaky.androidide.templates.impl.androidstudio.activities.common.MIN_API
-import com.itsaky.androidide.templates.impl.androidstudio.defaultPackageNameParameter
 import com.android.tools.idea.wizard.template.stringParameter
 import com.android.tools.idea.wizard.template.template
+import com.itsaky.androidide.templates.impl.androidstudio.activities.common.MIN_API
+import com.itsaky.androidide.templates.impl.androidstudio.defaultPackageNameParameter
 import java.io.File
 
 val fullscreenFragmentTemplate
   get() = template {
     name = "Fullscreen Fragment"
     description =
-      "Creates a new fragment that toggles the visibility of the system UI (status and navigation bars) and action bar upon user interaction"
+        "Creates a new fragment that toggles the visibility of the system UI (status and navigation bars) and action bar upon user interaction"
     minApi = MIN_API
     category = Category.Fragment
     formFactor = FormFactor.Mobile
@@ -64,11 +64,21 @@ val fullscreenFragmentTemplate
 
     val packageName = defaultPackageNameParameter
 
-    widgets(TextFieldWidget(fragmentClass), TextFieldWidget(layoutName), PackageNameWidget(packageName), LanguageWidget())
+    widgets(
+        TextFieldWidget(fragmentClass),
+        TextFieldWidget(layoutName),
+        PackageNameWidget(packageName),
+        LanguageWidget(),
+    )
 
     thumb { File("fullscreen-fragment").resolve("template_fullscreen_fragment.png") }
 
     recipe = { data: TemplateData ->
-      fullscreenFragmentRecipe(data as ModuleTemplateData, fragmentClass.value, layoutName.value, packageName.value)
+      fullscreenFragmentRecipe(
+          data as ModuleTemplateData,
+          fragmentClass.value,
+          layoutName.value,
+          packageName.value,
+      )
     }
   }

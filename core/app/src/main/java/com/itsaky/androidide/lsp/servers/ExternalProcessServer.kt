@@ -29,7 +29,6 @@ import kotlin.random.Random
  * @param languageName User-defined name for this server configuration.
  * @param command The full shell command to execute.
  * @param supportedExtensions List of file extensions this server should handle.
- *
  * @author android_zero
  */
 class ExternalProcessServer(
@@ -38,45 +37,42 @@ class ExternalProcessServer(
     override val supportedExtensions: List<String>,
 ) : BaseLspServer() {
 
-    override val id: String = "ext_proc_${languageName}_${Random.nextInt()}"
-    override val serverName: String = command
+  override val id: String = "ext_proc_${languageName}_${Random.nextInt()}"
+  override val serverName: String = command
 
-    override fun isInstalled(context: Context): Boolean = true
+  override fun isInstalled(context: Context): Boolean = true
 
-    override fun install(context: Context) {}
+  override fun install(context: Context) {}
 
-    /**
-     * Creates a connection factory that executes the user-defined command
-     * wrapped in `bash -c "..."` to allow shell features.
-     */
-    override fun getConnectionFactory(): LspConnectionFactory {
-        return LspConnectionFactory { workingDir ->
-            ProcessStreamProvider(
-                command = listOf("bash", "-c", command),
-                workingDir = workingDir
-            )
-        }
+  /**
+   * Creates a connection factory that executes the user-defined command wrapped in `bash -c "..."`
+   * to allow shell features.
+   */
+  override fun getConnectionFactory(): LspConnectionFactory {
+    return LspConnectionFactory { workingDir ->
+      ProcessStreamProvider(command = listOf("bash", "-c", command), workingDir = workingDir)
     }
+  }
 
-    override fun isSupported(file: File): Boolean {
-        return supportedExtensions.contains(file.extension.lowercase())
-    }
+  override fun isSupported(file: File): Boolean {
+    return supportedExtensions.contains(file.extension.lowercase())
+  }
 
-    override fun toString(): String {
-        return serverName
-    }
+  override fun toString(): String {
+    return serverName
+  }
 
-    override fun equals(other: Any?): Boolean {
-        if (other !is ExternalProcessServer) return false
-        return other.command == command &&
-                other.supportedExtensions.toSet() == supportedExtensions.toSet()
-    }
+  override fun equals(other: Any?): Boolean {
+    if (other !is ExternalProcessServer) return false
+    return other.command == command &&
+        other.supportedExtensions.toSet() == supportedExtensions.toSet()
+  }
 
-    override fun hashCode(): Int {
-        var result = languageName.hashCode()
-        result = 31 * result + command.hashCode()
-        result = 31 * result + supportedExtensions.hashCode()
-        result = 31 * result + id.hashCode()
-        return result
-    }
+  override fun hashCode(): Int {
+    var result = languageName.hashCode()
+    result = 31 * result + command.hashCode()
+    result = 31 * result + supportedExtensions.hashCode()
+    result = 31 * result + id.hashCode()
+    return result
+  }
 }

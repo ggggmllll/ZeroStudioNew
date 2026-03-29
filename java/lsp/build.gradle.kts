@@ -15,7 +15,6 @@
  *   along with AndroidIDE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 import com.itsaky.androidide.build.config.BuildConfig
 
 plugins {
@@ -28,17 +27,11 @@ android {
   namespace = "${BuildConfig.packageName}.lsp.java"
 
   sourceSets {
-    getByName("androidTest") {
-      assets.srcDirs(rootProject.file("utilities/framework-stubs/libs"))
-    }
+    getByName("androidTest") { assets.srcDirs(rootProject.file("utilities/framework-stubs/libs")) }
   }
 }
 
-kapt {
-  arguments {
-    arg("eventBusIndex", "${BuildConfig.packageName}.events.LspJavaEventsIndex")
-  }
-}
+kapt { arguments { arg("eventBusIndex", "${BuildConfig.packageName}.events.LspJavaEventsIndex") } }
 
 dependencies {
   kapt(projects.annotation.processors)
@@ -75,7 +68,7 @@ dependencies {
 
   implementation(libs.androidx.core.ktx)
   implementation(libs.common.kotlin)
-  
+
   testImplementation(projects.testing.commonTest)
   testImplementation(projects.testing.lspTest)
 

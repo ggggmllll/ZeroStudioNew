@@ -23,24 +23,25 @@ import com.android.tools.idea.wizard.template.impl.activities.common.layoutToVie
 import com.android.tools.idea.wizard.template.renderIf
 
 fun fullscreenActivityJava(
-  actionBarClassFqcn: String,
-  activityClass: String,
-  applicationPackage: String?,
-  layoutName: String,
-  packageName: String,
-  superClassFqcn: String,
-  isViewBindingSupported: Boolean,
+    actionBarClassFqcn: String,
+    activityClass: String,
+    applicationPackage: String?,
+    layoutName: String,
+    packageName: String,
+    superClassFqcn: String,
+    isViewBindingSupported: Boolean,
 ): String {
 
-  val applicationPackageBlock = renderIf(applicationPackage != null) { "import ${applicationPackage}.R;" }
+  val applicationPackageBlock =
+      renderIf(applicationPackage != null) { "import ${applicationPackage}.R;" }
 
   val contentViewBlock =
-    if (isViewBindingSupported)
-      """
+      if (isViewBindingSupported)
+          """
      binding = ${layoutToViewBindingClass(layoutName)}.inflate(getLayoutInflater());
      setContentView(binding.getRoot());
   """
-    else "setContentView(R.layout.$layoutName);"
+      else "setContentView(R.layout.$layoutName);"
 
   return """package ${packageName};
 

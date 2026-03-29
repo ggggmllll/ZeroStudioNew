@@ -51,9 +51,7 @@ class TemplateRecipeExecutor : RecipeExecutor {
   }
 
   override fun copyAsset(path: String, dest: File) {
-    openAsset(path).use {
-      it.copyTo(dest.outputStream())
-    }
+    openAsset(path).use { it.copyTo(dest.outputStream()) }
   }
 
   override fun copyAssetsRecursively(path: String, destDir: File) {

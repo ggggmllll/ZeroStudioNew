@@ -22,24 +22,24 @@ import com.android.tools.idea.wizard.template.impl.activities.common.layoutToVie
 import com.android.tools.idea.wizard.template.renderIf
 
 fun checkoutActivityJava(
-  activityClass: String,
-  viewModelClass: String,
-  layoutName: String,
-  packageName: String,
-  applicationPackage: String?,
-  isViewBindingSupported: Boolean,
+    activityClass: String,
+    viewModelClass: String,
+    layoutName: String,
+    packageName: String,
+    applicationPackage: String?,
+    isViewBindingSupported: Boolean,
 ): String {
 
   val contentViewBlock =
-    if (isViewBindingSupported)
-      """layoutBinding = ${layoutToViewBindingClass(layoutName)}.inflate(getLayoutInflater());
+      if (isViewBindingSupported)
+          """layoutBinding = ${layoutToViewBindingClass(layoutName)}.inflate(getLayoutInflater());
      setContentView(layoutBinding.getRoot());
   """
-    else "setContentView(R.layout.$layoutName);"
+      else "setContentView(R.layout.$layoutName);"
 
   val googlePayButtonBlock =
-    if (isViewBindingSupported) "googlePayButton = layoutBinding.googlePayButton.getRoot();"
-    else "googlePayButton = findViewById(R.id.googlePayButton);"
+      if (isViewBindingSupported) "googlePayButton = layoutBinding.googlePayButton.getRoot();"
+      else "googlePayButton = findViewById(R.id.googlePayButton);"
 
   return """
 package $packageName;

@@ -44,7 +44,8 @@ abstract class DialogPreference : SimplePreference() {
     return true
   }
 
-  protected open fun onConfigureDialog(preference: Preference,
-    dialog: MaterialAlertDialogBuilder) {
-  }
+  protected open fun onConfigureDialog(
+      preference: Preference,
+      dialog: MaterialAlertDialogBuilder,
+  ) {}
 }

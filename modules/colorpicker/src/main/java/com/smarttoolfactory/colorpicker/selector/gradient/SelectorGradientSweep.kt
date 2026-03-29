@@ -12,35 +12,26 @@ import com.smarttoolfactory.colorpicker.widget.ExpandableColumnWithTitle
 @Composable
 internal fun SweepGradientSelection(
     gradientColorState: GradientColorState,
-    onCenterChange: (Offset) -> Unit
+    onCenterChange: (Offset) -> Unit,
 ) {
-    var centerX by remember { mutableStateOf(gradientColorState.centerFriction.x) }
-    var centerY by remember { mutableStateOf(gradientColorState.centerFriction.y) }
+  var centerX by remember { mutableStateOf(gradientColorState.centerFriction.x) }
+  var centerY by remember { mutableStateOf(gradientColorState.centerFriction.y) }
 
-    onCenterChange(Offset(centerX, centerY))
+  onCenterChange(Offset(centerX, centerY))
 
-    ExpandableColumnWithTitle(
-        title = "Gradient Center",
-        color = Pink400,
-        initialExpandState = false
-    ) {
-        Column {
-            SliderWithPercent(
-                modifier = Modifier.fillMaxWidth(),
-                title = "CenterX",
-                value = centerX
-            ) {
-                centerX = it
-            }
+  ExpandableColumnWithTitle(
+      title = "Gradient Center",
+      color = Pink400,
+      initialExpandState = false,
+  ) {
+    Column {
+      SliderWithPercent(modifier = Modifier.fillMaxWidth(), title = "CenterX", value = centerX) {
+        centerX = it
+      }
 
-            SliderWithPercent(
-                modifier = Modifier.fillMaxWidth(),
-                title = "CenterY",
-                value = centerY
-            ) {
-                centerY = it
-            }
-        }
+      SliderWithPercent(modifier = Modifier.fillMaxWidth(), title = "CenterY", value = centerY) {
+        centerY = it
+      }
     }
+  }
 }
-

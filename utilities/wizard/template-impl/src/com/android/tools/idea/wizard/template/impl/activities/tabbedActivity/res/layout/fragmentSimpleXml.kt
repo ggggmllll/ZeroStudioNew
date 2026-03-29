@@ -19,7 +19,7 @@ package com.android.tools.idea.wizard.template.impl.activities.tabbedActivity.re
 import com.android.tools.idea.wizard.template.getMaterialComponentName
 
 fun fragmentSimpleXml(packageName: String, useAndroidX: Boolean) =
-  """<${getMaterialComponentName("android.support.constraint.ConstraintLayout",
+    """<${getMaterialComponentName("android.support.constraint.ConstraintLayout",
                                  useAndroidX,)} xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"

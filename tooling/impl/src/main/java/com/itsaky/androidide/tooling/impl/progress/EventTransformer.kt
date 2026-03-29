@@ -146,7 +146,9 @@ class EventTransformer {
         com.itsaky.androidide.tooling.model.ProjectIdentifier(
             projectPath = project.projectPath,
             buildIdentifier =
-                com.itsaky.androidide.tooling.model.BuildIdentifier(project.buildIdentifier.rootDir),
+                com.itsaky.androidide.tooling.model.BuildIdentifier(
+                    project.buildIdentifier.rootDir
+                ),
         )
 
     // ---------------------- FILE DOWNLOAD ---------------------------------

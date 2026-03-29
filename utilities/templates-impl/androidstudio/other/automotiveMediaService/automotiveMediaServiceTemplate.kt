@@ -29,25 +29,28 @@ import com.android.tools.idea.wizard.template.TemplateData
 import com.android.tools.idea.wizard.template.TextFieldWidget
 import com.android.tools.idea.wizard.template.WizardUiContext
 import com.android.tools.idea.wizard.template.booleanParameter
-import com.itsaky.androidide.templates.impl.androidstudio.defaultPackageNameParameter
 import com.android.tools.idea.wizard.template.stringParameter
 import com.android.tools.idea.wizard.template.template
+import com.itsaky.androidide.templates.impl.androidstudio.defaultPackageNameParameter
 import java.io.File
 
 val automotiveMediaServiceTemplate
   get() = template {
     name = "Media Service"
-    description = "Create a MediaBrowserService and adds the required metadata for Android Automotive"
+    description =
+        "Create a MediaBrowserService and adds the required metadata for Android Automotive"
     minApi = 21
 
     category = Category.Car
     formFactor = FormFactor.Car
-    screens = listOf(WizardUiContext.NewProject, WizardUiContext.MenuEntry, WizardUiContext.NewModule)
+    screens =
+        listOf(WizardUiContext.NewProject, WizardUiContext.MenuEntry, WizardUiContext.NewModule)
 
     val mediaBrowserServiceName = stringParameter {
       name = "Class name"
       default = "MyMusicService"
-      help = "The name of the service that will extend MediaBrowserService and contain the logic to browse and playback media"
+      help =
+          "The name of the service that will extend MediaBrowserService and contain the logic to browse and playback media"
       constraints = listOf(CLASS, UNIQUE, NONEMPTY)
       loggable = true
     }
@@ -57,7 +60,8 @@ val automotiveMediaServiceTemplate
     val useCustomTheme = booleanParameter {
       name = "Use a custom theme for Android Auto colors?"
       default = false
-      help = "Android Auto apps can define a different set of colors that will be used exclusively when running on Android Auto"
+      help =
+          "Android Auto apps can define a different set of colors that will be used exclusively when running on Android Auto"
     }
 
     val customThemeName = stringParameter {
@@ -69,22 +73,22 @@ val automotiveMediaServiceTemplate
     }
 
     widgets(
-      TextFieldWidget(mediaBrowserServiceName),
-      PackageNameWidget(packageName),
-      CheckBoxWidget(useCustomTheme),
-      TextFieldWidget(customThemeName),
-      LanguageWidget(),
+        TextFieldWidget(mediaBrowserServiceName),
+        PackageNameWidget(packageName),
+        CheckBoxWidget(useCustomTheme),
+        TextFieldWidget(customThemeName),
+        LanguageWidget(),
     )
 
     thumb { File("automotive-media-service").resolve("automotive-media-service.png") }
 
     recipe = { data: TemplateData ->
       automotiveMediaServiceRecipe(
-        data as ModuleTemplateData,
-        mediaBrowserServiceName.value,
-        packageName.value,
-        useCustomTheme.value,
-        customThemeName.value,
+          data as ModuleTemplateData,
+          mediaBrowserServiceName.value,
+          packageName.value,
+          useCustomTheme.value,
+          customThemeName.value,
       )
     }
   }

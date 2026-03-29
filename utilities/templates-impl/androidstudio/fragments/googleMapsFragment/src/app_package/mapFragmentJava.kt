@@ -18,8 +18,13 @@ package com.itsaky.androidide.templates.impl.androidstudio.fragments.googleMapsF
 
 import com.android.tools.idea.wizard.template.getMaterialComponentName
 
-fun mapFragmentJava(fragmentClass: String, layoutName: String, packageName: String, useAndroidX: Boolean) =
-  """
+fun mapFragmentJava(
+    fragmentClass: String,
+    layoutName: String,
+    packageName: String,
+    useAndroidX: Boolean,
+) =
+    """
 package ${packageName};
 
 import ${getMaterialComponentName("android.support.annotation.NonNull", useAndroidX)};

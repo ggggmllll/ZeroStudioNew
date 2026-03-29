@@ -33,8 +33,8 @@ import com.itsaky.androidide.projects.util.BootClasspathProvider
 import com.itsaky.androidide.utils.EditorActivityActions
 import com.itsaky.androidide.utils.EditorSidebarActions
 import com.itsaky.androidide.utils.Environment
-import org.greenrobot.eventbus.EventBus
 import java.util.concurrent.CompletableFuture
+import org.greenrobot.eventbus.EventBus
 
 /**
  * Observes lifecycle events if [com.itsaky.androidide.EditorActivityKt].

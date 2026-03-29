@@ -42,11 +42,12 @@ class ConfigDescriptionTest {
     Truth.assertThat(frenchLandscape.toString()).isEqualTo("fr-land")
 
     val longConfig =
-      testParse("mcc310-pl-sw720dp-normal-long-port-night-xhdpi-keyssoft-qwerty-navexposed-nonav")
+        testParse("mcc310-pl-sw720dp-normal-long-port-night-xhdpi-keyssoft-qwerty-navexposed-nonav")
     Truth.assertThat(longConfig).isNotNull()
     Truth.assertThat(longConfig.toString())
-      .isEqualTo(
-        "mcc310-pl-sw720dp-normal-long-port-night-xhdpi-keyssoft-qwerty-navexposed-nonav-v13")
+        .isEqualTo(
+            "mcc310-pl-sw720dp-normal-long-port-night-xhdpi-keyssoft-qwerty-navexposed-nonav-v13"
+        )
   }
 
   @Test
@@ -86,14 +87,14 @@ class ConfigDescriptionTest {
     val roundConfig = testParse("round")
     Truth.assertThat(roundConfig).isNotNull()
     Truth.assertThat(roundConfig!!.layoutRound())
-      .isEqualTo(ResTableConfig.SCREEN_LAYOUT2.SCREENROUND_YES)
+        .isEqualTo(ResTableConfig.SCREEN_LAYOUT2.SCREENROUND_YES)
     Truth.assertThat(roundConfig.sdkVersion).isEqualTo(23)
     Truth.assertThat(roundConfig.toString()).isEqualTo("round-v23")
 
     val notRoundConfig = testParse("notround")
     Truth.assertThat(notRoundConfig).isNotNull()
     Truth.assertThat(notRoundConfig!!.layoutRound())
-      .isEqualTo(ResTableConfig.SCREEN_LAYOUT2.SCREENROUND_NO)
+        .isEqualTo(ResTableConfig.SCREEN_LAYOUT2.SCREENROUND_NO)
     Truth.assertThat(notRoundConfig.sdkVersion).isEqualTo(23)
     Truth.assertThat(notRoundConfig.toString()).isEqualTo("notround-v23")
   }
@@ -103,14 +104,14 @@ class ConfigDescriptionTest {
     val wideConfig = testParse("widecg")
     Truth.assertThat(wideConfig).isNotNull()
     Truth.assertThat(wideConfig!!.wideColorGamut())
-      .isEqualTo(ResTableConfig.COLOR_MODE.WIDE_GAMUT_YES)
+        .isEqualTo(ResTableConfig.COLOR_MODE.WIDE_GAMUT_YES)
     Truth.assertThat(wideConfig.sdkVersion).isEqualTo(26)
     Truth.assertThat(wideConfig.toString()).isEqualTo("widecg-v26")
 
     val noWideConfig = testParse("nowidecg")
     Truth.assertThat(noWideConfig).isNotNull()
     Truth.assertThat(noWideConfig!!.wideColorGamut())
-      .isEqualTo(ResTableConfig.COLOR_MODE.WIDE_GAMUT_NO)
+        .isEqualTo(ResTableConfig.COLOR_MODE.WIDE_GAMUT_NO)
     Truth.assertThat(noWideConfig.sdkVersion).isEqualTo(26)
     Truth.assertThat(noWideConfig.toString()).isEqualTo("nowidecg-v26")
   }

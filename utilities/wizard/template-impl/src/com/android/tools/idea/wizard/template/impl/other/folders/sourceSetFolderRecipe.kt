@@ -20,12 +20,12 @@ import com.android.tools.idea.wizard.template.RecipeExecutor
 import com.android.tools.idea.wizard.template.SourceSetType
 
 fun RecipeExecutor.generateResourcesFolder(
-  moduleData: ModuleTemplateData,
-  remapFolder: Boolean,
-  location: String, // TODO(qumeric): make it File
-  sourceProviderNameSupplier: () -> String,
-  sourceSetType: SourceSetType = SourceSetType.RESOURCES,
-  defaultDirName: String = "resources",
+    moduleData: ModuleTemplateData,
+    remapFolder: Boolean,
+    location: String, // TODO(qumeric): make it File
+    sourceProviderNameSupplier: () -> String,
+    sourceSetType: SourceSetType = SourceSetType.RESOURCES,
+    defaultDirName: String = "resources",
 ) {
   val sourceProviderName = sourceProviderNameSupplier()
   if (remapFolder) {

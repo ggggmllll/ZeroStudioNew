@@ -20,11 +20,10 @@ package com.itsaky.androidide.xml.res
 import com.android.aaptcompiler.ConfigDescription
 import com.android.aaptcompiler.ResourceConfigValue
 
-/**
- * @author Akash Yadav
- */
+/** @author Akash Yadav */
 interface IResourceEntry {
   val name: String
   val values: Collection<ResourceConfigValue>
+
   fun findValue(config: ConfigDescription, product: String = ""): ResourceConfigValue?
 }

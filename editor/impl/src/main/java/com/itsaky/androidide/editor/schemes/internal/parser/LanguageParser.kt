@@ -32,9 +32,7 @@ import com.itsaky.androidide.editor.schemes.StyleDef
 class LanguageParser(private var reader: JsonReader) {
 
   fun parseLang(scheme: IDEColorScheme): LanguageScheme {
-    return scheme.run {
-      doParseLang()
-    }
+    return scheme.run { doParseLang() }
   }
 
   private fun IDEColorScheme.doParseLang(): LanguageScheme {
@@ -89,7 +87,7 @@ class LanguageParser(private var reader: JsonReader) {
   private fun parseLangLocalScopes(lang: LanguageScheme) {
     addArrStrings(lang.localScopes)
   }
-  
+
   private fun parseLangLocalsMembersScopes(lang: LanguageScheme) {
     addArrStrings(lang.localMembersScopes)
   }

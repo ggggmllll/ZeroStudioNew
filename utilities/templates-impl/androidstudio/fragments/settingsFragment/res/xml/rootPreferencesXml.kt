@@ -17,7 +17,7 @@
 package com.itsaky.androidide.templates.impl.androidstudio.fragments.settingsFragment.res.xml
 
 fun rootPreferencesXml() =
-  """
+    """
 <PreferenceScreen
     xmlns:app="http://schemas.android.com/apk/res-auto">
 

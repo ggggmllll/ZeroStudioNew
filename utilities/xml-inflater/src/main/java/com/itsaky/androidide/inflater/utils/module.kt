@@ -27,15 +27,14 @@ var isParsing: Boolean = false
 
 val module: AndroidModule
   get() =
-    currentModule ?: throw IllegalStateException("You must call startParse(AndroidModule) first")
+      currentModule ?: throw IllegalStateException("You must call startParse(AndroidModule) first")
 
 fun startParse(file: File) {
   if (isParsing) {
     return
   }
-  (IProjectManager.getInstance().getWorkspace()?.findModuleForFile(file, false) as? AndroidModule)?.let {
-    startParse(it)
-  }
+  (IProjectManager.getInstance().getWorkspace()?.findModuleForFile(file, false) as? AndroidModule)
+      ?.let { startParse(it) }
 }
 
 fun startParse(m: AndroidModule) {

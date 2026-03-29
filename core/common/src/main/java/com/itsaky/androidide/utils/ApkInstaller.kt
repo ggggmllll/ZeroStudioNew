@@ -27,9 +27,9 @@ import android.content.pm.PackageInstaller.SessionCallback
 import android.text.TextUtils
 import androidx.core.content.FileProvider
 import com.itsaky.androidide.tasks.executeAsync
-import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.IOException
+import org.slf4j.LoggerFactory
 
 /**
  * Utility class for installing APKs.
@@ -60,7 +60,7 @@ object ApkInstaller {
 
     if (isMiui() || DEBUG_FALLBACK_INSTALLER) {
       log.warn(
-        "Cannot use session-based installer on this device. Falling back to intent-based installer."
+          "Cannot use session-based installer on this device. Falling back to intent-based installer."
       )
 
       @Suppress("DEPRECATION") val intent = Intent(Intent.ACTION_INSTALL_PACKAGE)
@@ -81,15 +81,15 @@ object ApkInstaller {
     var session: Session? = null
     try {
       val installer =
-        context.packageManager.packageInstaller.apply { registerSessionCallback(callback) }
+          context.packageManager.packageInstaller.apply { registerSessionCallback(callback) }
       val params = PackageInstaller.SessionParams(PackageInstaller.SessionParams.MODE_FULL_INSTALL)
       val sessionId = installer.createSession(params)
       session = installer.openSession(sessionId)
       executeAsync(
-        callable = {
-          addToSession(session, apk)
-          session
-        }
+          callable = {
+            addToSession(session, apk)
+            session
+          }
       ) {
         it?.let {
           it.commit(sender)
@@ -133,8 +133,8 @@ object ApkInstaller {
   fun getSystemProperty(key: String?): String? {
     return try {
       Class.forName("android.os.SystemProperties")
-        .getDeclaredMethod("get", String::class.java)
-        .invoke(null, key) as String
+          .getDeclaredMethod("get", String::class.java)
+          .invoke(null, key) as String
     } catch (e: Exception) {
       log.warn("Unable to use SystemProperties.get", e)
       null

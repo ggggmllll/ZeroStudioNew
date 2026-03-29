@@ -26,6 +26,7 @@ import com.itsaky.androidide.lsp.models.CompletionResult
 import com.itsaky.androidide.lsp.models.MatchLevel
 import com.itsaky.androidide.lsp.models.MatchLevel.NO_MATCH
 import com.itsaky.androidide.progress.ProgressManager.Companion.abortIfCancelled
+import java.nio.file.Path
 import jdkx.lang.model.element.ElementKind.CONSTRUCTOR
 import jdkx.lang.model.element.ElementKind.METHOD
 import jdkx.lang.model.element.ExecutableElement
@@ -39,7 +40,6 @@ import openjdk.source.tree.Scope
 import openjdk.source.util.TreePath
 import openjdk.source.util.Trees
 import openjdk.tools.javac.code.Symbol
-import java.nio.file.Path
 
 /**
  * Completions for member select.
@@ -47,25 +47,25 @@ import java.nio.file.Path
  * @author Akash Yadav
  */
 class MemberSelectCompletionProvider(
-  completingFile: Path,
-  cursor: Long,
-  compiler: JavaCompilerService,
-  settings: IServerSettings,
+    completingFile: Path,
+    cursor: Long,
+    compiler: JavaCompilerService,
+    settings: IServerSettings,
 ) : IJavaCompletionProvider(cursor, completingFile, compiler, settings) {
 
   override fun doComplete(
-    task: CompileTask,
-    path: TreePath,
-    partial: String,
-    endsWithParen: Boolean,
+      task: CompileTask,
+      path: TreePath,
+      partial: String,
+      endsWithParen: Boolean,
   ): CompletionResult {
     val trees = Trees.instance(task.task)
     val select =
-      path.leaf as? MemberSelectTree
-        ?: run {
-          log.error("A member select tree was expected but was {}", path.leaf.javaClass)
-          return CompletionResult.EMPTY
-        }
+        path.leaf as? MemberSelectTree
+            ?: run {
+              log.error("A member select tree was expected but was {}", path.leaf.javaClass)
+              return CompletionResult.EMPTY
+            }
 
     log.info("...complete members of {}", select.expression)
 
@@ -78,18 +78,18 @@ class MemberSelectCompletionProvider(
     return when (val type = trees.getTypeMirror(exprPath)) {
       is ArrayType -> completeArrayMemberSelect(isStatic, partial)
       is TypeVariable ->
-        completeTypeVariableMemberSelect(task, scope, type, isStatic, partial, endsWithParen)
+          completeTypeVariableMemberSelect(task, scope, type, isStatic, partial, endsWithParen)
 
       is DeclaredType ->
-        completeDeclaredTypeMemberSelect(task, scope, type, isStatic, partial, endsWithParen)
+          completeDeclaredTypeMemberSelect(task, scope, type, isStatic, partial, endsWithParen)
 
       else -> CompletionResult.EMPTY
     }
   }
 
   private fun completeArrayMemberSelect(
-    isStatic: Boolean,
-    partialName: CharSequence
+      isStatic: Boolean,
+      partialName: CharSequence,
   ): CompletionResult {
     return if (isStatic) {
       abortIfCancelled()
@@ -103,47 +103,47 @@ class MemberSelectCompletionProvider(
   }
 
   private fun completeTypeVariableMemberSelect(
-    task: CompileTask,
-    scope: Scope,
-    type: TypeVariable,
-    isStatic: Boolean,
-    partial: String,
-    endsWithParen: Boolean,
+      task: CompileTask,
+      scope: Scope,
+      type: TypeVariable,
+      isStatic: Boolean,
+      partial: String,
+      endsWithParen: Boolean,
   ): CompletionResult {
     abortIfCancelled()
     abortCompletionIfCancelled()
     return when (type.upperBound) {
       is DeclaredType ->
-        completeDeclaredTypeMemberSelect(
-          task,
-          scope,
-          type.upperBound as DeclaredType,
-          isStatic,
-          partial,
-          endsWithParen
-        )
+          completeDeclaredTypeMemberSelect(
+              task,
+              scope,
+              type.upperBound as DeclaredType,
+              isStatic,
+              partial,
+              endsWithParen,
+          )
 
       is TypeVariable ->
-        completeTypeVariableMemberSelect(
-          task,
-          scope,
-          type.upperBound as TypeVariable,
-          isStatic,
-          partial,
-          endsWithParen
-        )
+          completeTypeVariableMemberSelect(
+              task,
+              scope,
+              type.upperBound as TypeVariable,
+              isStatic,
+              partial,
+              endsWithParen,
+          )
 
       else -> CompletionResult.EMPTY
     }
   }
 
   private fun completeDeclaredTypeMemberSelect(
-    task: CompileTask,
-    scope: Scope,
-    type: DeclaredType,
-    isStatic: Boolean,
-    partial: String,
-    endsWithParen: Boolean,
+      task: CompileTask,
+      scope: Scope,
+      type: DeclaredType,
+      isStatic: Boolean,
+      partial: String,
+      endsWithParen: Boolean,
   ): CompletionResult {
     val trees = Trees.instance(task.task)
     val typeElement = type.asElement() as TypeElement
@@ -151,10 +151,11 @@ class MemberSelectCompletionProvider(
     val methods = mutableMapOf<String, MutableList<ExecutableElement>>()
     val matchLevels = mutableMapOf<String, MatchLevel>()
 
-    log.debug("DeclaredType {} with members {} in scope: {}",
-      typeElement,
-      (typeElement as Symbol).members(),
-      scope
+    log.debug(
+        "DeclaredType {} with members {} in scope: {}",
+        typeElement,
+        (typeElement as Symbol).members(),
+        scope,
     )
 
     abortIfCancelled()

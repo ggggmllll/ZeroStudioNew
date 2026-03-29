@@ -22,7 +22,7 @@ package com.itsaky.androidide.templates.impl.androidstudio.activities.basicActiv
  * @author android_zero
  */
 fun stringsXml() =
-  """<resources>
+    """<resources>
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">First Fragment</string>
     <string name="second_fragment_label">Second Fragment</string>

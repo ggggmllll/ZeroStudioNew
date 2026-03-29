@@ -20,7 +20,6 @@ package com.itsaky.androidide.lsp.ui
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
 import android.text.method.LinkMovementMethod
-import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
@@ -37,82 +36,86 @@ import org.eclipse.lsp4j.Hover
 
 /**
  * IDEA 风格悬停文档(Hover)窗口。
- * 
+ *
  * @author android_zero
  */
 class IdeaHoverLayout : HoverLayout {
 
-    private lateinit var window: HoverWindow
-    private lateinit var rootView: FrameLayout
-    private lateinit var scrollView: ScrollView
-    private lateinit var textView: TextView
+  private lateinit var window: HoverWindow
+  private lateinit var rootView: FrameLayout
+  private lateinit var scrollView: ScrollView
+  private lateinit var textView: TextView
 
-    private var highlightColor: Int = 0
-    private var codeTypeface: Typeface = Typeface.MONOSPACE
-    private var asyncRenderJob: Job? = null
+  private var highlightColor: Int = 0
+  private var codeTypeface: Typeface = Typeface.MONOSPACE
+  private var asyncRenderJob: Job? = null
 
-    override fun attach(window: HoverWindow) {
-        this.window = window
-    }
+  override fun attach(window: HoverWindow) {
+    this.window = window
+  }
 
-    override fun createView(inflater: android.view.LayoutInflater): View {
-        val context = window.editor.context
-        val dp = context.resources.displayMetrics.density
+  override fun createView(inflater: android.view.LayoutInflater): View {
+    val context = window.editor.context
+    val dp = context.resources.displayMetrics.density
 
-        rootView = FrameLayout(context)
-        scrollView = ScrollView(context).apply {
-            overScrollMode = View.OVER_SCROLL_NEVER
-            isVerticalScrollBarEnabled = false
+    rootView = FrameLayout(context)
+    scrollView =
+        ScrollView(context).apply {
+          overScrollMode = View.OVER_SCROLL_NEVER
+          isVerticalScrollBarEnabled = false
         }
-        textView = TextView(context).apply {
-            setPadding((8 * dp).toInt(), (8 * dp).toInt(), (8 * dp).toInt(), (8 * dp).toInt())
-            textSize = 13f
-            movementMethod = LinkMovementMethod()
+    textView =
+        TextView(context).apply {
+          setPadding((8 * dp).toInt(), (8 * dp).toInt(), (8 * dp).toInt(), (8 * dp).toInt())
+          textSize = 13f
+          movementMethod = LinkMovementMethod()
         }
 
-        scrollView.addView(textView, ViewGroup.LayoutParams(-1, -2))
-        rootView.addView(scrollView, ViewGroup.LayoutParams(-1, -1))
+    scrollView.addView(textView, ViewGroup.LayoutParams(-1, -2))
+    rootView.addView(scrollView, ViewGroup.LayoutParams(-1, -1))
 
-        return rootView
-    }
+    return rootView
+  }
 
-    override fun applyColorScheme(colorScheme: EditorColorScheme, typeface: Typeface) {
-        val dp = window.editor.context.resources.displayMetrics.density
-        textView.setTextColor(colorScheme.getColor(EditorColorScheme.HOVER_TEXT_NORMAL))
-        highlightColor = colorScheme.getColor(EditorColorScheme.HOVER_TEXT_HIGHLIGHTED)
-        codeTypeface = typeface
+  override fun applyColorScheme(colorScheme: EditorColorScheme, typeface: Typeface) {
+    val dp = window.editor.context.resources.displayMetrics.density
+    textView.setTextColor(colorScheme.getColor(EditorColorScheme.HOVER_TEXT_NORMAL))
+    highlightColor = colorScheme.getColor(EditorColorScheme.HOVER_TEXT_HIGHLIGHTED)
+    codeTypeface = typeface
 
-        val gd = GradientDrawable().apply {
-            cornerRadius = 6 * dp
-            setColor(colorScheme.getColor(EditorColorScheme.HOVER_BACKGROUND))
-            setStroke((1 * dp).toInt(), colorScheme.getColor(EditorColorScheme.HOVER_BORDER))
+    val gd =
+        GradientDrawable().apply {
+          cornerRadius = 6 * dp
+          setColor(colorScheme.getColor(EditorColorScheme.HOVER_BACKGROUND))
+          setStroke((1 * dp).toInt(), colorScheme.getColor(EditorColorScheme.HOVER_BORDER))
         }
-        rootView.background = gd
-    }
+    rootView.background = gd
+  }
 
-    override fun renderHover(hover: Hover) {
-        val hoverText = buildHoverText(hover)
-        // 使用 sora-editor-lsp 内部轻量级 Markdown 渲染器
-        textView.text = SimpleMarkdownRenderer.render(
+  override fun renderHover(hover: Hover) {
+    val hoverText = buildHoverText(hover)
+    // 使用 sora-editor-lsp 内部轻量级 Markdown 渲染器
+    textView.text =
+        SimpleMarkdownRenderer.render(
             markdown = hoverText,
             boldColor = highlightColor,
             inlineCodeColor = highlightColor,
             codeTypeface = codeTypeface,
-            linkColor = highlightColor
+            linkColor = highlightColor,
         )
-        scrollView.post { scrollView.scrollTo(0, 0) }
-    }
+    scrollView.post { scrollView.scrollTo(0, 0) }
+  }
 
-    override fun onTextSizeChanged(oldSize: Float, newSize: Float) {
-        // Option: Follow editor scale or keep fixed 13sp. IDEA usually keeps popup font fixed.
-    }
+  override fun onTextSizeChanged(oldSize: Float, newSize: Float) {
+    // Option: Follow editor scale or keep fixed 13sp. IDEA usually keeps popup font fixed.
+  }
 
-    private fun buildHoverText(hover: Hover): String {
-        val contents = hover.contents ?: return ""
-        return if (contents.isLeft) {
-            contents.left.orEmpty().joinToString("\n\n") { formatMarkedStringEither(it) ?: "" }
-        } else {
-            formatMarkupContent(contents.right) ?: ""
-        }
+  private fun buildHoverText(hover: Hover): String {
+    val contents = hover.contents ?: return ""
+    return if (contents.isLeft) {
+      contents.left.orEmpty().joinToString("\n\n") { formatMarkedStringEither(it) ?: "" }
+    } else {
+      formatMarkupContent(contents.right) ?: ""
     }
+  }
 }

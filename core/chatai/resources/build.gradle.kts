@@ -15,19 +15,11 @@
  *   along with AndroidIDE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
-import com.itsaky.androidide.build.config.BuildConfig
 import com.itsaky.androidide.plugins.tasks.ZeroAutoTranslateTask
 
-plugins {
-  id("com.android.library")
-}
+plugins { id("com.android.library") }
 
-
-
-android {
-  namespace = "me.rerere.rikkahub.resources"
-}
+android { namespace = "me.rerere.rikkahub.resources" }
 
 dependencies {
   implementation(libs.androidx.appcompat)
@@ -41,18 +33,18 @@ dependencies {
 // 运行 ./gradlew translateStrings 来执行翻译
 // @author android_zero  github：android-zeros
 tasks.register<ZeroAutoTranslateTask>("translateStrings") {
-    // 设置翻译源文件路径
-    sourceXmlPath = "core/resources/src/main/res/values/dev_test_res.xml"
+  // 设置翻译源文件路径
+  sourceXmlPath = "core/resources/src/main/res/values/dev_test_res.xml"
 
-     //注意：目前谷歌翻译并非常用官方API，所以可能会存在封ip/无响应等问题导致翻译失败
-    // 设置翻译引擎 (可选: GOOGLE_GTX, GOOGLE_WEB, BAIDU_WEB, YOUDAO_WEB, BING_WEB)
-    translationEngine = "BING_WEB"
+  // 注意：目前谷歌翻译并非常用官方API，所以可能会存在封ip/无响应等问题导致翻译失败
+  // 设置翻译引擎 (可选: GOOGLE_GTX, GOOGLE_WEB, BAIDU_WEB, YOUDAO_WEB, BING_WEB)
+  translationEngine = "BING_WEB"
 
-    // 设置输出目录
-    // 翻译结果会生成在: ＄Projects_Root_Dir/StringTranslation/values-xx/strings.xml
-    translationOutputDirName = "StringTranslation"
+  // 设置输出目录
+  // 翻译结果会生成在: ＄Projects_Root_Dir/StringTranslation/values-xx/strings.xml
+  translationOutputDirName = "StringTranslation"
 
-    // 设置原始文件备份目录
-    // 原始文件会备份在: 项目根目录/StringTranslation/backup/values-xx/strings.xml
-    originalFileBackupDirName = "StringTranslation/backup"
+  // 设置原始文件备份目录
+  // 原始文件会备份在: 项目根目录/StringTranslation/backup/values-xx/strings.xml
+  originalFileBackupDirName = "StringTranslation/backup"
 }

@@ -28,7 +28,7 @@ import org.xmlpull.v1.XmlPullParser
  * @author Akash Yadav
  */
 open class InsetDrawableParser protected constructor(parser: XmlPullParser?, minDepth: Int) :
-  IDrawableParser(parser, minDepth) {
+    IDrawableParser(parser, minDepth) {
   @Throws(Exception::class)
   public override fun parseDrawable(context: Context): Drawable {
     var index = attrIndex("drawable")

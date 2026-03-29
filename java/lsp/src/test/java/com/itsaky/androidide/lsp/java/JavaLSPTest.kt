@@ -18,8 +18,8 @@
 package com.itsaky.androidide.lsp.java
 
 import com.itsaky.androidide.lsp.api.ILanguageServerRegistry
-import com.itsaky.androidide.lsp.testing.LSPTest
 import com.itsaky.androidide.lsp.java.compiler.JavaCompilerService
+import com.itsaky.androidide.lsp.testing.LSPTest
 import com.itsaky.androidide.projects.util.findAppModule
 import org.junit.Before
 import org.junit.Ignore

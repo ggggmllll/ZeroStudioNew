@@ -44,11 +44,11 @@ internal object DrawableTagTransformer : ITagTransformer {
     }
 
     val prefix =
-      if (parent == "item" || parent.isNotEmpty()) {
-        toEntry(parent).run { if (startsWith('#')) toEntry(tag) else this }
-      } else tag
+        if (parent == "item" || parent.isNotEmpty()) {
+          toEntry(parent).run { if (startsWith('#')) toEntry(tag) else this }
+        } else tag
     val suffix =
-      if (parent.isNotEmpty() && !parent.startsWith('#')) transformToEntryName(tag) else ""
+        if (parent.isNotEmpty() && !parent.startsWith('#')) transformToEntryName(tag) else ""
 
     return "${prefix}Drawable${suffix}"
   }

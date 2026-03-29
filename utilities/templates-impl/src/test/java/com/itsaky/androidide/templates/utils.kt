@@ -31,9 +31,7 @@ import java.io.File
 import kotlin.reflect.KClass
 
 val testProjectsDir: File by lazy {
-  FileProvider.currentDir().resolve("build/templateTest").toFile().apply {
-    mkdirs()
-  }
+  FileProvider.currentDir().resolve("build/templateTest").toFile().apply { mkdirs() }
 }
 
 fun mockPrefManager(configure: PreferenceManager.() -> Unit = {}) {
@@ -57,23 +55,22 @@ fun unmockTemplateDatas() {
 }
 
 private inline fun <reified T : BaseTemplateData> mockTemplateDataConstructor(
-  kClass: KClass<T>, useKts: Boolean
+    kClass: KClass<T>,
+    useKts: Boolean,
 ) {
-  mockConstructors(klass = kClass) {
-    every { anyConstructed<T>().useKts } returns useKts
-  }
+  mockConstructors(klass = kClass) { every { anyConstructed<T>().useKts } returns useKts }
 }
 
-private fun <T : Any> mockConstructors(klass: KClass<T>,
-                                       configure: () -> Unit = {}
-) {
+private fun <T : Any> mockConstructors(klass: KClass<T>, configure: () -> Unit = {}) {
   mockkConstructor(klass)
   configure()
 }
 
-fun testTemplate(name: String, generate: Boolean = true,
-                 languages: Array<Language> = Language.values(),
-                 builder: () -> Template<*>
+fun testTemplate(
+    name: String,
+    generate: Boolean = true,
+    languages: Array<Language> = Language.values(),
+    builder: () -> Template<*>,
 ): Template<*> {
   mockPrefManager()
   Environment.PROJECTS_DIR = testProjectsDir
@@ -87,22 +84,25 @@ fun testTemplate(name: String, generate: Boolean = true,
   return template
 }
 
-private fun generateTemplateProject(name: String, languages: Array<Language>,
-                                    template: Template<*>
+private fun generateTemplateProject(
+    name: String,
+    languages: Array<Language>,
+    template: Template<*>,
 ) {
   for (language in languages) {
     val packageName = "com.itsaky.androidide.template.${language.lang}"
     run {
       val projectName = "${name}GradleProject${language.name}WithoutKts"
 
-      File(testProjectsDir, projectName).apply {
-        if (exists()) deleteRecursively()
-      }
+      File(testProjectsDir, projectName).apply { if (exists()) deleteRecursively() }
 
       // Test with language without Kotlin Script
       mockTemplateDatas(useKts = false)
-      template.setupRootProjectParams(name = projectName,
-        packageName = packageName, language = language)
+      template.setupRootProjectParams(
+          name = projectName,
+          packageName = packageName,
+          language = language,
+      )
       template.executeRecipe()
       unmockTemplateDatas()
     }
@@ -110,24 +110,26 @@ private fun generateTemplateProject(name: String, languages: Array<Language>,
     run {
       val projectName = "${name}GradleProject${language.name}WithKts"
 
-      File(testProjectsDir, projectName).apply {
-        if (exists()) deleteRecursively()
-      }
+      File(testProjectsDir, projectName).apply { if (exists()) deleteRecursively() }
 
       // Test with language + Kotlin Script
       mockTemplateDatas(useKts = true)
-      template.setupRootProjectParams(name = projectName,
-        packageName = "${packageName}.kts", language = language)
+      template.setupRootProjectParams(
+          name = projectName,
+          packageName = "${packageName}.kts",
+          language = language,
+      )
       template.executeRecipe()
       unmockTemplateDatas()
     }
   }
 }
 
-fun Template<*>.setupRootProjectParams(name: String = "TestTemplate",
-                                       packageName: String = "com.itsaky.androidide.template",
-                                       language: Language = Language.Kotlin,
-                                       minSdk: Sdk = Sdk.Lollipop
+fun Template<*>.setupRootProjectParams(
+    name: String = "TestTemplate",
+    packageName: String = "com.itsaky.androidide.template",
+    language: Language = Language.Kotlin,
+    minSdk: Sdk = Sdk.Lollipop,
 ) {
   val iterator = parameters.iterator()
 
@@ -156,17 +158,12 @@ fun Template<*>.executeRecipe() {
   recipe.execute(TestRecipeExecutor())
 }
 
-fun Collection<Parameter<*>>.assertParameterTypes(
-  checker: (Int) -> KClass<out Parameter<*>>
-) = assertTypes(checker)
+fun Collection<Parameter<*>>.assertParameterTypes(checker: (Int) -> KClass<out Parameter<*>>) =
+    assertTypes(checker)
 
-fun Collection<Widget<*>>.assertWidgetTypes(
-  checker: (Int) -> KClass<out Widget<*>>
-) = assertTypes(checker)
-
+fun Collection<Widget<*>>.assertWidgetTypes(checker: (Int) -> KClass<out Widget<*>>) =
+    assertTypes(checker)
 
 fun <T : Any> Collection<T>.assertTypes(checker: (Int) -> KClass<out T>) {
-  forEachIndexed { index, element ->
-    assertThat(element).isInstanceOf(checker(index).java)
-  }
+  forEachIndexed { index, element -> assertThat(element).isInstanceOf(checker(index).java) }
 }

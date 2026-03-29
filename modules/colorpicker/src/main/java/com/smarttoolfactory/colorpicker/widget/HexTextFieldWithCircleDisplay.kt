@@ -9,46 +9,41 @@ import androidx.compose.ui.unit.dp
 import com.smarttoolfactory.colorpicker.slider.CircleDisplay
 import com.smarttoolfactory.extendedcolors.util.ColorUtil
 
-
 @Composable
 fun HexTextFieldWithCircleDisplay(
     modifier: Modifier = Modifier,
     circleModifier: Modifier = Modifier,
     color: Color,
     useAlpha: Boolean = false,
-    onColorChange: (Color) -> Unit
+    onColorChange: (Color) -> Unit,
 ) {
 
-    var hexString by remember(color) {
+  var hexString by
+      remember(color) {
         mutableStateOf(
             if (useAlpha) {
-                ColorUtil.colorToHexAlpha(color)
+              ColorUtil.colorToHexAlpha(color)
             } else {
-                ColorUtil.colorToHex(color)
+              ColorUtil.colorToHex(color)
             }
         )
-    }
+      }
 
-    Row(
-        modifier = modifier.requiredHeightIn(min = 100.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-
-        CircleDisplay(
-            modifier = circleModifier
-                .widthIn(min = 70.dp)
-                .heightIn(min = 70.dp),
-            color = color
-        )
-        Spacer(modifier = Modifier.width(10.dp))
-        HexTextField(
-            modifier = Modifier.weight(1f),
-            useAlpha = useAlpha,
-            hexString = hexString,
-            onTextChange = {
-                hexString = it
-            },
-            onColorChange = onColorChange
-        )
-    }
+  Row(
+      modifier = modifier.requiredHeightIn(min = 100.dp),
+      verticalAlignment = Alignment.CenterVertically,
+  ) {
+    CircleDisplay(
+        modifier = circleModifier.widthIn(min = 70.dp).heightIn(min = 70.dp),
+        color = color,
+    )
+    Spacer(modifier = Modifier.width(10.dp))
+    HexTextField(
+        modifier = Modifier.weight(1f),
+        useAlpha = useAlpha,
+        hexString = hexString,
+        onTextChange = { hexString = it },
+        onColorChange = onColorChange,
+    )
+  }
 }

@@ -22,11 +22,10 @@ import android.graphics.drawable.Drawable
 import androidx.core.content.ContextCompat
 import com.itsaky.androidide.editor.ui.IDEEditor
 
-import com.itsaky.androidide.actions.ActionStyle
-
-/** @author Akash Yadav
-* @author android_zero > 新增ActionStyle
-*/
+/**
+ * @author Akash Yadav
+ * @author android_zero > 新增ActionStyle
+ */
 abstract class BaseEditorAction : EditorActionItem {
 
   override var label: String = ""
@@ -36,21 +35,17 @@ abstract class BaseEditorAction : EditorActionItem {
   override var requiresUIThread: Boolean = true // all editor actions must be executed on UI thread
   override var location: ActionItem.Location = ActionItem.Location.EDITOR_TEXT_ACTIONS
 
-  /**
-   * 自定义此Action的UI样式。
-   * UI渲染层会读取此对象来调整按钮的外观。
-   * 如果为 null，则使用默认的布局样式。
-   */
+  /** 自定义此Action的UI样式。 UI渲染层会读取此对象来调整按钮的外观。 如果为 null，则使用默认的布局样式。 */
   var style: ActionStyle? = null
 
   override fun prepare(data: ActionData) {
     super.prepare(data)
     getEditor(data)
-      ?: kotlin.run {
-        visible = false
-        enabled = false
-        return
-      }
+        ?: kotlin.run {
+          visible = false
+          enabled = false
+          return
+        }
 
     visible = true
     enabled = true
@@ -67,7 +62,7 @@ abstract class BaseEditorAction : EditorActionItem {
 
   fun tintDrawable(context: Context, drawable: Drawable): Drawable {
     drawable.setTint(
-      ContextCompat.getColor(context, com.itsaky.androidide.resources.R.color.primaryIconColor)
+        ContextCompat.getColor(context, com.itsaky.androidide.resources.R.color.primaryIconColor)
     )
     return drawable
   }

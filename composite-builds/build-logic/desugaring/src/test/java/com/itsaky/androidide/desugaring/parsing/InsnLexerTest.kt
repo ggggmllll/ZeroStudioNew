@@ -43,32 +43,34 @@ class InsnLexerTest {
   @Test
   fun `tokenizes single identifier`() {
     val lexer = InsnLexer("myIdentifier")
-    assertThat(lexer.all()).containsExactly(
-      Token(0, 0, 0, TokenType.IDENTIFIER, "myIdentifier"))
+    assertThat(lexer.all()).containsExactly(Token(0, 0, 0, TokenType.IDENTIFIER, "myIdentifier"))
   }
 
   @Test
   fun `tokenizes multiple identifiers`() {
     val lexer = InsnLexer("if else for")
-    assertThat(lexer.all()).containsExactly(
-      Token(0, 0, 0, TokenType.IDENTIFIER, "if"),
-      Token(0, 3, 3, TokenType.IDENTIFIER, "else"),
-      Token(0, 8, 8, TokenType.IDENTIFIER, "for"))
+    assertThat(lexer.all())
+        .containsExactly(
+            Token(0, 0, 0, TokenType.IDENTIFIER, "if"),
+            Token(0, 3, 3, TokenType.IDENTIFIER, "else"),
+            Token(0, 8, 8, TokenType.IDENTIFIER, "for"),
+        )
   }
 
   @Test
   fun `tokenizes known symbols`() {
     val lexer = InsnLexer("()[/;=>-")
-    assertThat(lexer.all()).containsExactly(
-      Token(0, 0, 0, TokenType.LPAR, "("),
-      Token(0, 1, 1, TokenType.RPAR, ")"),
-      Token(0, 2, 2, TokenType.LBRAC, "["),
-      Token(0, 3, 3, TokenType.SLASH, "/"),
-      Token(0, 4, 4, TokenType.SEMICOLON, ";"),
-      Token(0, 5, 5, TokenType.EQUALS, "="),
-      Token(0, 6, 6, TokenType.RANGULAR, ">"),
-      Token(0, 7, 7, TokenType.HYPHEN, "-"),
-    )
+    assertThat(lexer.all())
+        .containsExactly(
+            Token(0, 0, 0, TokenType.LPAR, "("),
+            Token(0, 1, 1, TokenType.RPAR, ")"),
+            Token(0, 2, 2, TokenType.LBRAC, "["),
+            Token(0, 3, 3, TokenType.SLASH, "/"),
+            Token(0, 4, 4, TokenType.SEMICOLON, ";"),
+            Token(0, 5, 5, TokenType.EQUALS, "="),
+            Token(0, 6, 6, TokenType.RANGULAR, ">"),
+            Token(0, 7, 7, TokenType.HYPHEN, "-"),
+        )
   }
 
   @Test
@@ -80,71 +82,73 @@ class InsnLexerTest {
   @Test
   fun `skips comments`() {
     val lexer = InsnLexer("# This is a comment\nname")
-    assertThat(lexer.all()).containsExactly(
-      Token(1, 0, 20, TokenType.IDENTIFIER, "name"),
-    )
+    assertThat(lexer.all())
+        .containsExactly(
+            Token(1, 0, 20, TokenType.IDENTIFIER, "name"),
+        )
   }
 
   @Test
   fun `tracks lines, columns and indices`() {
     val lexer = InsnLexer("foo\nbar\nbaz")
-    assertThat(lexer.all()).containsExactly(
-      Token(0, 0, 0, TokenType.IDENTIFIER, "foo"),
-      Token(1, 0, 4, TokenType.IDENTIFIER, "bar"),
-      Token(2, 0, 8, TokenType.IDENTIFIER, "baz"),
-    )
+    assertThat(lexer.all())
+        .containsExactly(
+            Token(0, 0, 0, TokenType.IDENTIFIER, "foo"),
+            Token(1, 0, 4, TokenType.IDENTIFIER, "bar"),
+            Token(2, 0, 8, TokenType.IDENTIFIER, "baz"),
+        )
   }
 
   @Test
   fun `handles unknown characters`() {
     val lexer = InsnLexer("foo@bar")
-    assertThat(lexer.all()).containsExactly(
-      Token(0, 0, 0, TokenType.IDENTIFIER, "foo"),
-      Token(0, 3, 3, TokenType.UNKNOWN, "@"),
-      Token(0, 4, 4, TokenType.IDENTIFIER, "bar"),
-    )
+    assertThat(lexer.all())
+        .containsExactly(
+            Token(0, 0, 0, TokenType.IDENTIFIER, "foo"),
+            Token(0, 3, 3, TokenType.UNKNOWN, "@"),
+            Token(0, 4, 4, TokenType.IDENTIFIER, "bar"),
+        )
   }
 
   @Test
   fun `test simple method invocation instruction tokenization`() {
-    val instruction = """
-      invoke-virtual Ljava/io/InputStream;->readNBytes(I)[B
-       =>
-      invoke-static Lcom/itsaky/androidide/desugaring/sample/java/io/DesugaredInputStream;->readNBytes([Ljava/io/InputStream;I)V
-      ;;
-    """.trimIndent()
+    val instruction =
+        """
+        invoke-virtual Ljava/io/InputStream;->readNBytes(I)[B
+         =>
+        invoke-static Lcom/itsaky/androidide/desugaring/sample/java/io/DesugaredInputStream;->readNBytes([Ljava/io/InputStream;I)V
+        ;;
+        """
+            .trimIndent()
 
     val lexer = InsnLexer(instruction)
     val tokens = lexer.all()
 
     assertThat(tokens).isNotEmpty()
-    assertThat(
-      tokens.find { it.type == TokenType.UNKNOWN || it == Token.EOF }).isNull()
+    assertThat(tokens.find { it.type == TokenType.UNKNOWN || it == Token.EOF }).isNull()
   }
 
   @Test
   fun `test tokenization for simple instruction with comments`() {
     val instruction =
-      "# comment\ninvoke-static Lcom/itsaky/androidide/desugaring/sample/java/io/DesugaredInputStream;->readNBytes([Ljava/io/InputStream;I)V"
+        "# comment\ninvoke-static Lcom/itsaky/androidide/desugaring/sample/java/io/DesugaredInputStream;->readNBytes([Ljava/io/InputStream;I)V"
 
     val lexer = InsnLexer(instruction)
     val tokens = lexer.all()
 
     assertThat(tokens).isNotEmpty()
-    assertThat(
-      tokens.find { it.type == TokenType.UNKNOWN || it == Token.EOF }).isNull()
+    assertThat(tokens.find { it.type == TokenType.UNKNOWN || it == Token.EOF }).isNull()
   }
 
   @Test
   fun `test tokenization for simple instruction with comments and CRLF line terminator`() {
     val instruction =
-      "# comment\r\ninvoke-static Lcom/itsaky/androidide/desugaring/sample/java/io/DesugaredInputStream;->readNBytes([Ljava/io/InputStream;I)V"
+        "# comment\r\ninvoke-static Lcom/itsaky/androidide/desugaring/sample/java/io/DesugaredInputStream;->readNBytes([Ljava/io/InputStream;I)V"
 
     val lexer = InsnLexer(instruction)
     val tokens = lexer.all()
 
     assertThat(tokens).isNotEmpty()
-    assertThat(
-      tokens.find { it.type == TokenType.UNKNOWN || it == Token.EOF }).isNull()
+    assertThat(tokens.find { it.type == TokenType.UNKNOWN || it == Token.EOF }).isNull()
   }
 }

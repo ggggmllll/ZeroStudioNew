@@ -34,48 +34,35 @@ fun ColorPickerRingDiamondGradientHSLDialog(
     ringBorderStrokeColor: Color = Color.Black,
     ringBorderStrokeWidth: Dp = 4.dp,
     selectionRadius: Dp = 8.dp,
-    onDismiss: (BrushColor) -> Unit
+    onDismiss: (BrushColor) -> Unit,
 ) {
 
-    var brushColor: BrushColor by remember { mutableStateOf(initialBrushColor.copy()) }
+  var brushColor: BrushColor by remember { mutableStateOf(initialBrushColor.copy()) }
 
-    Dialog(
-        onDismissRequest = {
-            onDismiss(brushColor)
-        }
-    ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            ColorPickerGradientRingDiamondHSL(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .background(Color(0xcc212121), shape = RoundedCornerShape(5.dp))
-                    .padding(horizontal = 10.dp, vertical = 2.dp),
-                initialBrushColor = initialBrushColor,
-                gradientColorState = gradientColorState,
-                ringOuterRadiusFraction = ringOuterRadiusFraction,
-                ringInnerRadiusFraction = ringInnerRadiusFraction,
-                ringBackgroundColor = ringBackgroundColor,
-                ringBorderStrokeColor = ringBorderStrokeColor,
-                ringBorderStrokeWidth = ringBorderStrokeWidth,
-                selectionRadius = selectionRadius,
-                onBrushColorChange = {
-                    brushColor = it
-                }
-            )
+  Dialog(onDismissRequest = { onDismiss(brushColor) }) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+      ColorPickerGradientRingDiamondHSL(
+          modifier =
+              Modifier.fillMaxWidth()
+                  .weight(1f)
+                  .background(Color(0xcc212121), shape = RoundedCornerShape(5.dp))
+                  .padding(horizontal = 10.dp, vertical = 2.dp),
+          initialBrushColor = initialBrushColor,
+          gradientColorState = gradientColorState,
+          ringOuterRadiusFraction = ringOuterRadiusFraction,
+          ringInnerRadiusFraction = ringInnerRadiusFraction,
+          ringBackgroundColor = ringBackgroundColor,
+          ringBorderStrokeColor = ringBorderStrokeColor,
+          ringBorderStrokeWidth = ringBorderStrokeWidth,
+          selectionRadius = selectionRadius,
+          onBrushColorChange = { brushColor = it },
+      )
 
-            FloatingActionButton(
-                onClick = { onDismiss(brushColor) },
-                backgroundColor = Color.Black
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Close,
-                    contentDescription = null,
-                    tint = Blue400
-                )
-            }
-        }
+      FloatingActionButton(onClick = { onDismiss(brushColor) }, backgroundColor = Color.Black) {
+        Icon(imageVector = Icons.Filled.Close, contentDescription = null, tint = Blue400)
+      }
     }
+  }
 }
 
 @Composable
@@ -88,48 +75,35 @@ fun ColorPickerRingRectGradientHSLDialog(
     ringBorderStrokeColor: Color = Color.Black,
     ringBorderStrokeWidth: Dp = 4.dp,
     selectionRadius: Dp = 8.dp,
-    onDismiss: (BrushColor) -> Unit
+    onDismiss: (BrushColor) -> Unit,
 ) {
 
-    var brushColor: BrushColor by remember { mutableStateOf(initialBrushColor.copy()) }
+  var brushColor: BrushColor by remember { mutableStateOf(initialBrushColor.copy()) }
 
-    Dialog(
-        onDismissRequest = {
-            onDismiss(brushColor)
-        }
-    ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            ColorPickerGradientRingRectHSL(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .background(Color(0xcc212121), shape = RoundedCornerShape(5.dp))
-                    .padding(horizontal = 10.dp, vertical = 2.dp),
-                initialBrushColor = initialBrushColor,
-                gradientColorState = gradientColorState,
-                ringOuterRadiusFraction = ringOuterRadiusFraction,
-                ringInnerRadiusFraction = ringInnerRadiusFraction,
-                ringBackgroundColor = ringBackgroundColor,
-                ringBorderStrokeColor = ringBorderStrokeColor,
-                ringBorderStrokeWidth = ringBorderStrokeWidth,
-                selectionRadius = selectionRadius,
-                onBrushColorChange = {
-                    brushColor = it
-                }
-            )
+  Dialog(onDismissRequest = { onDismiss(brushColor) }) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+      ColorPickerGradientRingRectHSL(
+          modifier =
+              Modifier.fillMaxWidth()
+                  .weight(1f)
+                  .background(Color(0xcc212121), shape = RoundedCornerShape(5.dp))
+                  .padding(horizontal = 10.dp, vertical = 2.dp),
+          initialBrushColor = initialBrushColor,
+          gradientColorState = gradientColorState,
+          ringOuterRadiusFraction = ringOuterRadiusFraction,
+          ringInnerRadiusFraction = ringInnerRadiusFraction,
+          ringBackgroundColor = ringBackgroundColor,
+          ringBorderStrokeColor = ringBorderStrokeColor,
+          ringBorderStrokeWidth = ringBorderStrokeWidth,
+          selectionRadius = selectionRadius,
+          onBrushColorChange = { brushColor = it },
+      )
 
-            FloatingActionButton(
-                onClick = { onDismiss(brushColor) },
-                backgroundColor = Color.Black
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Close,
-                    contentDescription = null,
-                    tint = Blue400
-                )
-            }
-        }
+      FloatingActionButton(onClick = { onDismiss(brushColor) }, backgroundColor = Color.Black) {
+        Icon(imageVector = Icons.Filled.Close, contentDescription = null, tint = Blue400)
+      }
     }
+  }
 }
 
 @Composable
@@ -142,46 +116,33 @@ fun ColorPickerRingRectGradientHSVDialog(
     ringBorderStrokeColor: Color = Color.Black,
     ringBorderStrokeWidth: Dp = 4.dp,
     selectionRadius: Dp = 8.dp,
-    onDismiss: (BrushColor) -> Unit
+    onDismiss: (BrushColor) -> Unit,
 ) {
 
-    var brushColor: BrushColor by remember { mutableStateOf(initialBrushColor.copy()) }
+  var brushColor: BrushColor by remember { mutableStateOf(initialBrushColor.copy()) }
 
-    Dialog(
-        onDismissRequest = {
-            onDismiss(brushColor)
-        }
-    ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            ColorPickerGradientRingRectHSV(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .background(Color(0xcc212121), shape = RoundedCornerShape(5.dp))
-                    .padding(horizontal = 10.dp, vertical = 2.dp),
-                initialBrushColor = initialBrushColor,
-                gradientColorState = gradientColorState,
-                ringOuterRadiusFraction = ringOuterRadiusFraction,
-                ringInnerRadiusFraction = ringInnerRadiusFraction,
-                ringBackgroundColor = ringBackgroundColor,
-                ringBorderStrokeColor = ringBorderStrokeColor,
-                ringBorderStrokeWidth = ringBorderStrokeWidth,
-                selectionRadius = selectionRadius,
-                onBrushColorChange = {
-                    brushColor = it
-                }
-            )
+  Dialog(onDismissRequest = { onDismiss(brushColor) }) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+      ColorPickerGradientRingRectHSV(
+          modifier =
+              Modifier.fillMaxWidth()
+                  .weight(1f)
+                  .background(Color(0xcc212121), shape = RoundedCornerShape(5.dp))
+                  .padding(horizontal = 10.dp, vertical = 2.dp),
+          initialBrushColor = initialBrushColor,
+          gradientColorState = gradientColorState,
+          ringOuterRadiusFraction = ringOuterRadiusFraction,
+          ringInnerRadiusFraction = ringInnerRadiusFraction,
+          ringBackgroundColor = ringBackgroundColor,
+          ringBorderStrokeColor = ringBorderStrokeColor,
+          ringBorderStrokeWidth = ringBorderStrokeWidth,
+          selectionRadius = selectionRadius,
+          onBrushColorChange = { brushColor = it },
+      )
 
-            FloatingActionButton(
-                onClick = { onDismiss(brushColor) },
-                backgroundColor = Color.Black
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Close,
-                    contentDescription = null,
-                    tint = Blue400
-                )
-            }
-        }
+      FloatingActionButton(onClick = { onDismiss(brushColor) }, backgroundColor = Color.Black) {
+        Icon(imageVector = Icons.Filled.Close, contentDescription = null, tint = Blue400)
+      }
     }
+  }
 }

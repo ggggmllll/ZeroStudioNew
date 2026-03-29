@@ -23,8 +23,8 @@ import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams
 import com.itsaky.androidide.inflater.InflateException
 import com.itsaky.androidide.inflater.internal.ViewAdapterIndexImpl
-import org.slf4j.LoggerFactory
 import java.lang.reflect.Method
+import org.slf4j.LoggerFactory
 
 /** @author Akash Yadav */
 object ViewFactory {

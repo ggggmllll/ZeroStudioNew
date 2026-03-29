@@ -15,8 +15,12 @@
  */
 package com.android.tools.idea.wizard.template.impl.activities.responsiveActivity.src.ui.transform
 
-fun transformViewModelJava(packageName: String, navFragmentPrefix: String, navViewModelClass: String) =
-  """
+fun transformViewModelJava(
+    packageName: String,
+    navFragmentPrefix: String,
+    navViewModelClass: String,
+) =
+    """
 package ${packageName}.ui.${navFragmentPrefix};
 
 import androidx.lifecycle.LiveData;

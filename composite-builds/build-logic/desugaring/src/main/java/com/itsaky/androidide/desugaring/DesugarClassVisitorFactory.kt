@@ -28,17 +28,16 @@ import org.slf4j.LoggerFactory
  *
  * @author Akash Yadav
  */
-abstract class DesugarClassVisitorFactory :
-  AsmClassVisitorFactory<DesugarParams> {
+abstract class DesugarClassVisitorFactory : AsmClassVisitorFactory<DesugarParams> {
 
   companion object {
 
-    private val log =
-      LoggerFactory.getLogger(DesugarClassVisitorFactory::class.java)
+    private val log = LoggerFactory.getLogger(DesugarClassVisitorFactory::class.java)
   }
 
-  override fun createClassVisitor(classContext: ClassContext,
-                                  nextClassVisitor: ClassVisitor
+  override fun createClassVisitor(
+      classContext: ClassContext,
+      nextClassVisitor: ClassVisitor,
   ): ClassVisitor {
     val params = parameters.orNull
     if (params == null) {
@@ -46,8 +45,12 @@ abstract class DesugarClassVisitorFactory :
       return nextClassVisitor
     }
 
-    return DesugarClassVisitor(params, classContext,
-      instrumentationContext.apiVersion.get(), nextClassVisitor)
+    return DesugarClassVisitor(
+        params,
+        classContext,
+        instrumentationContext.apiVersion.get(),
+        nextClassVisitor,
+    )
   }
 
   override fun isInstrumentable(classData: ClassData): Boolean {
@@ -57,9 +60,8 @@ abstract class DesugarClassVisitorFactory :
       return false
     }
 
-    val isEnabled = params.enabled.get().also { isEnabled ->
-      log.debug("Is desugaring enabled: $isEnabled")
-    }
+    val isEnabled =
+        params.enabled.get().also { isEnabled -> log.debug("Is desugaring enabled: $isEnabled") }
 
     if (!isEnabled) {
       return false

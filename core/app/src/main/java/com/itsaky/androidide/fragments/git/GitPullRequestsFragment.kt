@@ -22,37 +22,38 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.itsaky.androidide.R
-import com.itsaky.androidide.databinding.FragmentGitPullRequestsBinding
 
-/**
- * Pull Requests 列表页面。
- */
+/** Pull Requests 列表页面。 */
 class GitPullRequestsFragment : BaseGitPageFragment() {
 
-    // 这里复用一个简单的 RecyclerView 布局，实际开发建议创建 fragment_git_pull_requests.xml
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        // 暂时复用通用的列表布局骨架
-        return inflater.inflate(R.layout.fragment_git_branches, container, false)
+  // 这里复用一个简单的 RecyclerView 布局，实际开发建议创建 fragment_git_pull_requests.xml
+  override fun onCreateView(
+      inflater: LayoutInflater,
+      container: ViewGroup?,
+      savedInstanceState: Bundle?,
+  ): View {
+    // 暂时复用通用的列表布局骨架
+    return inflater.inflate(R.layout.fragment_git_branches, container, false)
+  }
+
+  override fun setupToolbar() {
+    // 新建 PR
+    addToolbarAction(R.drawable.ic_add_24, "New Pull Request") {
+      // TODO: Create PR Dialog
     }
 
-    override fun setupToolbar() {
-        // 新建 PR
-        addToolbarAction(R.drawable.ic_add_24, "New Pull Request") {
-            // TODO: Create PR Dialog
-        }
-        
-        // 过滤
-        addToolbarAction(R.drawable.ic_filter_list_24, "Filter") {
-            // TODO: Filter Open/Closed/Merged
-        }
+    // 过滤
+    addToolbarAction(R.drawable.ic_filter_list_24, "Filter") {
+      // TODO: Filter Open/Closed/Merged
     }
+  }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        // 查找 RecyclerView (ID 需与布局一致，这里假设复用了 fragment_git_branches 的 rv_branches)
-        view.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.rv_branches)?.apply {
-            layoutManager = LinearLayoutManager(context)
-            // adapter = PrAdapter(...)
-        }
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+    // 查找 RecyclerView (ID 需与布局一致，这里假设复用了 fragment_git_branches 的 rv_branches)
+    view.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.rv_branches)?.apply {
+      layoutManager = LinearLayoutManager(context)
+      // adapter = PrAdapter(...)
     }
+  }
 }

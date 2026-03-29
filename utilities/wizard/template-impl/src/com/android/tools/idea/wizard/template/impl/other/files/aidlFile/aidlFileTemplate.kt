@@ -56,5 +56,7 @@ val aidlFileTemplate
 
     widgets(TextFieldWidget(interfaceName))
 
-    recipe = { data: TemplateData -> aidlFileRecipe(data as ModuleTemplateData, interfaceName.value) }
+    recipe = { data: TemplateData ->
+      aidlFileRecipe(data as ModuleTemplateData, interfaceName.value)
+    }
   }

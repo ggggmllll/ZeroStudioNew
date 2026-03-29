@@ -27,59 +27,37 @@ import com.itsaky.androidide.utils.ServiceLoader
  */
 interface IDEBuildConfigProvider {
 
-  /**
-   * The current product flavor of the IDE.
-   */
+  /** The current product flavor of the IDE. */
   val cpuAbiName: String
 
-  /**
-   * Get the [CpuArch] for the build flavor.
-   */
+  /** Get the [CpuArch] for the build flavor. */
   val cpuArch: CpuArch
 
-  /**
-   * Get the primary CPU architecture of the device.
-   */
+  /** Get the primary CPU architecture of the device. */
   val deviceArch: CpuArch
 
-  /**
-   * The supported CPU architectures of the device.
-   */
+  /** The supported CPU architectures of the device. */
   val supportedAbis: Array<String>
 
-  /**
-   * @return Whether this build is the `arm64-v8a` variant of the IDE.
-   */
+  /** @return Whether this build is the `arm64-v8a` variant of the IDE. */
   fun isArm64v8aBuild(): Boolean = cpuArch == CpuArch.AARCH64
 
-  /**
-   * @return Whether the device supports `arm64-v8a` instructions.
-   */
+  /** @return Whether the device supports `arm64-v8a` instructions. */
   fun isArm64v8aDevice(): Boolean = deviceArch == CpuArch.AARCH64
 
-  /**
-   * @return Whether this build is the 32-bit variant of the IDE.
-   */
+  /** @return Whether this build is the 32-bit variant of the IDE. */
   fun isArmeabiv7aBuild(): Boolean = cpuArch == CpuArch.ARM
 
-  /**
-   * @return Whether the device supports `armeabi-v7a` instructions.
-   */
+  /** @return Whether the device supports `armeabi-v7a` instructions. */
   fun isArmeabiv7aDevice(): Boolean = deviceArch == CpuArch.ARM
 
-  /**
-   * @return Whether this build is the `x86_64` variant of the IDE.
-   */
+  /** @return Whether this build is the `x86_64` variant of the IDE. */
   fun isX86_64Build(): Boolean = cpuArch == CpuArch.X86_64
 
-  /**
-   * @return Whether the device supports `x86_64` instructions.
-   */
+  /** @return Whether the device supports `x86_64` instructions. */
   fun isX86_64Device(): Boolean = deviceArch == CpuArch.X86_64
 
-  /**
-   * @return Whether the IDE can be run on the device's CPU arch.
-   */
+  /** @return Whether the IDE can be run on the device's CPU arch. */
   fun supportsCpuAbi(): Boolean = Build.SUPPORTED_ABIS.contains(cpuAbiName)
 
   companion object {
@@ -88,9 +66,7 @@ interface IDEBuildConfigProvider {
       ServiceLoader.load(IDEBuildConfigProvider::class.java).findFirstOrThrow()
     }
 
-    /**
-     * Get instance of the [IDEBuildConfigProvider] implementation.
-     */
+    /** Get instance of the [IDEBuildConfigProvider] implementation. */
     @JvmStatic
     fun getInstance(): IDEBuildConfigProvider {
       return _instance

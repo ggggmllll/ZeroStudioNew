@@ -17,6 +17,7 @@
 package com.itsaky.androidide.lsp.java.visitors
 
 import com.itsaky.androidide.progress.ProgressManager.Companion.abortIfCancelled
+import java.util.Objects
 import jdkx.lang.model.element.Element
 import jdkx.lang.model.element.ExecutableElement
 import jdkx.lang.model.element.Modifier
@@ -45,10 +46,9 @@ import openjdk.source.util.TreePath
 import openjdk.source.util.TreeScanner
 import openjdk.source.util.Trees
 import openjdk.tools.javac.api.JavacTaskImpl
-import java.util.Objects
 
 class DiagnosticVisitor(task: JavacTaskImpl?) :
-  TreeScanner<Void?, MutableMap<TreePath?, String>>() {
+    TreeScanner<Void?, MutableMap<TreePath?, String>>() {
 
   private val trees = Trees.instance(task)
   private val privateDeclarations = mutableMapOf<Element, TreePath>()
@@ -210,8 +210,8 @@ class DiagnosticVisitor(task: JavacTaskImpl?) :
   }
 
   override fun visitCompilationUnit(
-    t: CompilationUnitTree,
-    notThrown: MutableMap<TreePath?, String>
+      t: CompilationUnitTree,
+      notThrown: MutableMap<TreePath?, String>,
   ): Void? {
     abortIfCancelled()
     return super.visitCompilationUnit(t, notThrown)
@@ -271,24 +271,24 @@ class DiagnosticVisitor(task: JavacTaskImpl?) :
   }
 
   override fun visitIdentifier(
-    t: IdentifierTree?,
-    notThrown: MutableMap<TreePath?, String>?
+      t: IdentifierTree?,
+      notThrown: MutableMap<TreePath?, String>?,
   ): Void? {
     foundReference()
     return super.visitIdentifier(t, notThrown)
   }
 
   override fun visitMemberSelect(
-    t: MemberSelectTree?,
-    notThrown: MutableMap<TreePath?, String>?
+      t: MemberSelectTree?,
+      notThrown: MutableMap<TreePath?, String>?,
   ): Void? {
     foundReference()
     return super.visitMemberSelect(t, notThrown)
   }
 
   override fun visitMemberReference(
-    t: MemberReferenceTree?,
-    notThrown: MutableMap<TreePath?, String>?
+      t: MemberReferenceTree?,
+      notThrown: MutableMap<TreePath?, String>?,
   ): Void? {
     foundReference()
     return super.visitMemberReference(t, notThrown)
@@ -312,8 +312,8 @@ class DiagnosticVisitor(task: JavacTaskImpl?) :
   }
 
   override fun visitMethodInvocation(
-    t: MethodInvocationTree?,
-    notThrown: MutableMap<TreePath?, String>?
+      t: MethodInvocationTree?,
+      notThrown: MutableMap<TreePath?, String>?,
   ): Void? {
     abortIfCancelled()
     val target = trees.getElement(path)
@@ -330,14 +330,14 @@ class DiagnosticVisitor(task: JavacTaskImpl?) :
     abortIfCancelled()
     if (node != null && node.statements.isEmpty()) {
       val name: String? =
-        when (val parent = path!!.parentPath.leaf) {
-          is IfTree -> fromIfTree(node, parent)
-          is TryTree -> fromTryTree(node, parent)
-          is ForLoopTree -> fromForTree(parent, node)
-          is WhileLoopTree -> fromWhileTree(parent, node)
-          is DoWhileLoopTree -> fromDoWhileTree(parent, node)
-          else -> null
-        }
+          when (val parent = path!!.parentPath.leaf) {
+            is IfTree -> fromIfTree(node, parent)
+            is TryTree -> fromTryTree(node, parent)
+            is ForLoopTree -> fromForTree(parent, node)
+            is WhileLoopTree -> fromWhileTree(parent, node)
+            is DoWhileLoopTree -> fromDoWhileTree(parent, node)
+            else -> null
+          }
 
       if (name != null) {
         emptyBlocks[path!!] = name
@@ -347,47 +347,47 @@ class DiagnosticVisitor(task: JavacTaskImpl?) :
   }
 
   private fun fromDoWhileTree(parent: DoWhileLoopTree, node: BlockTree?) =
-    if (parent.statement == node) {
-      "do"
-    } else {
-      null
-    }
+      if (parent.statement == node) {
+        "do"
+      } else {
+        null
+      }
 
   private fun fromWhileTree(parent: WhileLoopTree, node: BlockTree?) =
-    if (parent.statement == node) {
-      "while"
-    } else {
-      null
-    }
+      if (parent.statement == node) {
+        "while"
+      } else {
+        null
+      }
 
   private fun fromForTree(parent: ForLoopTree, node: BlockTree?) =
-    if (parent.statement == node) {
-      "for"
-    } else {
-      null
-    }
+      if (parent.statement == node) {
+        "for"
+      } else {
+        null
+      }
 
   private fun fromTryTree(node: BlockTree, parent: TryTree) =
-    when (node) {
-      parent.block -> "try"
-      parent.finallyBlock -> "finally"
-      else -> {
-        val catch =
-          if (parent.catches.find { it.block == node } != null) {
-            "catch"
-          } else {
-            null
-          }
-        catch
+      when (node) {
+        parent.block -> "try"
+        parent.finallyBlock -> "finally"
+        else -> {
+          val catch =
+              if (parent.catches.find { it.block == node } != null) {
+                "catch"
+              } else {
+                null
+              }
+          catch
+        }
       }
-    }
 
   private fun fromIfTree(node: BlockTree, parent: IfTree) =
-    when (node) {
-      parent.thenStatement -> "if"
-      parent.elseStatement -> "else"
-      else -> null
-    }
+      when (node) {
+        parent.thenStatement -> "if"
+        parent.elseStatement -> "else"
+        else -> null
+      }
 
   private fun addThrown(type: TypeMirror) {
     abortIfCancelled()

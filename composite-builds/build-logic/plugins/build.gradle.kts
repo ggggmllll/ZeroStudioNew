@@ -15,12 +15,10 @@
  *   along with AndroidIDE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-plugins {
-  `kotlin-dsl`
-}
+plugins { `kotlin-dsl` }
 
 repositories {
   google()
@@ -28,9 +26,7 @@ repositories {
   mavenCentral()
 }
 
-tasks.withType<KotlinCompile>().configureEach {
-    compilerOptions.jvmTarget.set(JvmTarget.JVM_17)
-}
+tasks.withType<KotlinCompile>().configureEach { compilerOptions.jvmTarget.set(JvmTarget.JVM_17) }
 
 dependencies {
   implementation(projects.buildLogic.common)
@@ -39,9 +35,9 @@ dependencies {
 
   implementation("com.android.tools.build:gradle:${libs.versions.agp.asProvider().get()}")
   implementation(libs.maven.publish)
-  
-  implementation(kotlin("gradle-plugin")) 
-  
+
+  implementation(kotlin("gradle-plugin"))
+
   implementation(libs.common.jkotlin)
   implementation(libs.common.antlr4)
   implementation(libs.google.gson)

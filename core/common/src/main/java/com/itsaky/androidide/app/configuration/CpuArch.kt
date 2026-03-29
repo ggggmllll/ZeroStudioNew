@@ -26,35 +26,25 @@ import com.itsaky.androidide.app.BaseConstants
  */
 enum class CpuArch(val abi: String) {
 
-  /**
-   * `arm64-v8a` (64-bit).
-   */
+  /** `arm64-v8a` (64-bit). */
   // AARCH64("arm64-v8a"),
   AARCH64(BaseConstants.ABI_ARM64_V8A),
 
-  /**
-   * `armeabi-v7a` flavor (32-bit).
-   */
+  /** `armeabi-v7a` flavor (32-bit). */
   // ARM("armeabi-v7a"),
   ARM(BaseConstants.ABI_ARMEABI_V7A),
 
-  /**
-   * `x86` (32-bit).
-   */
+  /** `x86` (32-bit). */
   // X86("x86"),
   X86(BaseConstants.ABI_X86),
 
-  /**
-   * `x86_64` (64-bit).
-   */
+  /** `x86_64` (64-bit). */
   // X86_64("x86_64");
   X86_64(BaseConstants.ABI_X86_64);
 
   companion object {
 
-    /**
-     * Get the [CpuArch] for the given ABI.
-     */
+    /** Get the [CpuArch] for the given ABI. */
     @JvmStatic
     fun forAbi(abi: String): CpuArch? {
       return entries.firstOrNull { it.abi == abi }

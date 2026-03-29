@@ -25,27 +25,27 @@ import com.android.tools.idea.wizard.template.impl.activities.common.layoutToVie
 import com.android.tools.idea.wizard.template.renderIf
 
 fun scrollActivityKt(
-  activityClass: String,
-  isNewModule: Boolean,
-  layoutName: String,
-  menuName: String,
-  packageName: String,
-  applicationPackage: String?,
-  useAndroidX: Boolean,
-  isViewBindingSupported: Boolean,
+    activityClass: String,
+    isNewModule: Boolean,
+    layoutName: String,
+    menuName: String,
+    packageName: String,
+    applicationPackage: String?,
+    useAndroidX: Boolean,
+    isViewBindingSupported: Boolean,
 ): String {
 
   val newModuleImportBlock =
-    renderIf(isNewModule) {
-      """
+      renderIf(isNewModule) {
+        """
 import android.view.Menu
 import android.view.MenuItem
   """
-    }
+      }
 
   val newModuleBlock =
-    renderIf(isNewModule) {
-      """
+      renderIf(isNewModule) {
+        """
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.${menuName}, menu)
@@ -63,15 +63,15 @@ import android.view.MenuItem
         }
     }
   """
-    }
+      }
 
   val contentViewBlock =
-    if (isViewBindingSupported)
-      """
+      if (isViewBindingSupported)
+          """
      binding = ${layoutToViewBindingClass(layoutName)}.inflate(layoutInflater)
      setContentView(binding.root)
   """
-    else "setContentView(R.layout.$layoutName)"
+      else "setContentView(R.layout.$layoutName)"
 
   return """package ${escapeKotlinIdentifier(packageName)}
 

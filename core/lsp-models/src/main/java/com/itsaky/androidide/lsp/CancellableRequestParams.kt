@@ -26,8 +26,6 @@ import com.itsaky.androidide.progress.ICancelChecker
  */
 interface CancellableRequestParams {
 
-  /**
-   * The cancel checker.
-   */
+  /** The cancel checker. */
   val cancelChecker: ICancelChecker
 }

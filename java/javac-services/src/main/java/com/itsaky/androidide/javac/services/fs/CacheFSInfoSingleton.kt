@@ -18,9 +18,9 @@
 package com.itsaky.androidide.javac.services.fs
 
 import com.itsaky.androidide.utils.VMUtils
+import java.nio.file.Path
 import openjdk.tools.javac.file.CacheFSInfo
 import org.slf4j.LoggerFactory
-import java.nio.file.Path
 
 /**
  * Singleton class for [CacheFSInfo] to avoid reading attributes of same file multiple times.
@@ -32,9 +32,7 @@ object CacheFSInfoSingleton : CacheFSInfo() {
   const val TEST_PROP_ENABLED_ON_JVM = "ide.testing.javac.fsCache.isEnabledOnJVM"
   private val log = LoggerFactory.getLogger(CacheFSInfoSingleton::class.java)
 
-  /**
-   * Caches information about the given [Path].
-   */
+  /** Caches information about the given [Path]. */
   @JvmOverloads
   fun cache(file: Path, cacheJarClasspath: Boolean = true) {
 

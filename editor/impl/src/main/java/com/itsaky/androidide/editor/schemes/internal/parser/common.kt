@@ -27,9 +27,10 @@ import java.io.File
 
 /** @author Akash Yadav */
 fun IDEColorScheme.parseEditorScheme(reader: JsonReader, resolveFileRef: (String) -> File) {
-  val newReader = if (reader.peek() == STRING) {
-    readerForFileRef(reader, "editor", resolveFileRef)
-  } else reader
+  val newReader =
+      if (reader.peek() == STRING) {
+        readerForFileRef(reader, "editor", resolveFileRef)
+      } else reader
 
   try {
     EditorSchemeParser(newReader).parse(this)
@@ -49,17 +50,17 @@ fun IDEColorScheme.parseColorValue(value: String?, colorId: Boolean = true): Int
   if (value[0] == '@') {
     val refName = value.substring(1)
     val refValue =
-      definitions[refName] ?: throw ParseException("Referenced color '$value' not found")
+        definitions[refName] ?: throw ParseException("Referenced color '$value' not found")
     return if (colorId) refValue else colorIds.getOrDefault(refValue, 0)
   }
 
   if (value[0] == '#') {
     val color =
-      try {
-        parseHexColor(value).toInt()
-      } catch (err: Throwable) {
-        throw ParseException("Invalid hex color code: '$value'", err)
-      }
+        try {
+          parseHexColor(value).toInt()
+        } catch (err: Throwable) {
+          throw ParseException("Invalid hex color code: '$value'", err)
+        }
     return if (colorId) putColor(color) else color
   }
 
@@ -88,13 +89,13 @@ fun IDEColorScheme.parseLanguages(reader: JsonReader, resolveFileRef: (String) -
 }
 
 fun IDEColorScheme.parseLanguage(
-  reader: JsonReader,
-  resolveFileRef: (String) -> File
+    reader: JsonReader,
+    resolveFileRef: (String) -> File,
 ): LanguageScheme {
   val newReader =
-    if (reader.peek() == STRING) {
-      readerForFileRef(reader, "language", resolveFileRef)
-    } else reader
+      if (reader.peek() == STRING) {
+        readerForFileRef(reader, "language", resolveFileRef)
+      } else reader
 
   return try {
     LanguageParser(newReader).parseLang(this)
@@ -105,8 +106,11 @@ fun IDEColorScheme.parseLanguage(
   }
 }
 
-private fun readerForFileRef(reader: JsonReader, scheme: String,
-  resolveFileRef: (String) -> File): JsonReader {
+private fun readerForFileRef(
+    reader: JsonReader,
+    scheme: String,
+    resolveFileRef: (String) -> File,
+): JsonReader {
   val value = reader.nextString()
   if (value.length <= 1 || value[0] != '@') {
     throw ParseException("Expected a $scheme scheme file reference but was '$value'")

@@ -23,9 +23,9 @@ import com.itsaky.androidide.lsp.java.utils.FindHelper
 import com.itsaky.androidide.models.Location
 import com.itsaky.androidide.models.Position
 import com.itsaky.androidide.progress.ICancelChecker
+import java.nio.file.Path
 import jdkx.lang.model.element.Element
 import openjdk.source.util.Trees
-import java.nio.file.Path
 
 /**
  * Provides definition for local elements.
@@ -33,10 +33,11 @@ import java.nio.file.Path
  * @author Akash Yadav
  */
 class LocalDefinitionProvider(
-  position: Position,
-  completingFile: Path,
-  compiler: JavaCompilerService,
-  settings: IServerSettings, cancelChecker: ICancelChecker,
+    position: Position,
+    completingFile: Path,
+    compiler: JavaCompilerService,
+    settings: IServerSettings,
+    cancelChecker: ICancelChecker,
 ) : IJavaDefinitionProvider(position, completingFile, compiler, settings, cancelChecker) {
 
   override fun doFindDefinition(element: Element): List<Location> {

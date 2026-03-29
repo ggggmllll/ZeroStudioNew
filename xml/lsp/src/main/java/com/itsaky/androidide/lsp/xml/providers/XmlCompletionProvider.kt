@@ -59,11 +59,11 @@ import com.itsaky.androidide.lsp.xml.utils.forTransitionAttr
 import com.itsaky.androidide.utils.CharSequenceReader
 import com.itsaky.androidide.utils.StopWatch
 import io.github.rosemoe.sora.text.ContentReference
+import java.io.Reader
+import kotlin.io.path.name
 import org.eclipse.lemminx.dom.DOMParser
 import org.eclipse.lemminx.uriresolver.URIResolverExtensionManager
 import org.slf4j.LoggerFactory
-import java.io.Reader
-import kotlin.io.path.name
 
 /**
  * Completion provider for XML files.
@@ -71,7 +71,7 @@ import kotlin.io.path.name
  * @author Akash Yadav
  */
 class XmlCompletionProvider(settings: IServerSettings) :
-  AbstractServiceProvider(), ICompletionProvider {
+    AbstractServiceProvider(), ICompletionProvider {
 
   companion object {
 
@@ -85,9 +85,9 @@ class XmlCompletionProvider(settings: IServerSettings) :
   override fun complete(params: CompletionParams): CompletionResult {
     return try {
       val watch =
-        StopWatch(
-          "Complete at ${params.file.name}:${params.position.line}:${params.position.column}"
-        )
+          StopWatch(
+              "Complete at ${params.file.name}:${params.position.line}:${params.position.column}"
+          )
       doComplete(params).also { watch.log() }
     } catch (error: Throwable) {
       log.error("An error occurred while computing XML completions", error)
@@ -98,8 +98,12 @@ class XmlCompletionProvider(settings: IServerSettings) :
   private fun doComplete(params: CompletionParams): CompletionResult {
     val contents = toString(contents = params.requireContents())
     val document =
-      DOMParser.getInstance().parse(contents, "http://schemas.android.com/apk/res/android",
-        URIResolverExtensionManager())
+        DOMParser.getInstance()
+            .parse(
+                contents,
+                "http://schemas.android.com/apk/res/android",
+                URIResolverExtensionManager(),
+            )
     val type = XmlUtils.getNodeType(document, params.position.requireIndex())
 
     if (type == UNKNOWN) {
@@ -115,13 +119,15 @@ class XmlCompletionProvider(settings: IServerSettings) :
     val pathData = extractPathData(params.file.toFile())
 
     val completer =
-      getCompleter(pathData, type)
-        ?: run {
-          log.error(
-            "No completer available for resource type '{}' and node type '{}'", pathData.type, type
-          )
-          return EMPTY
-        }
+        getCompleter(pathData, type)
+            ?: run {
+              log.error(
+                  "No completer available for resource type '{}' and node type '{}'",
+                  pathData.type,
+                  type,
+              )
+              return EMPTY
+            }
 
     return completer.complete(params, pathData, document, type, prefix)
   }
@@ -131,11 +137,11 @@ class XmlCompletionProvider(settings: IServerSettings) :
   }
 
   private fun getReader(contents: CharSequence): Reader =
-    if (contents is ContentReference) {
-      contents.createReader()
-    } else {
-      CharSequenceReader(contents)
-    }
+      if (contents is ContentReference) {
+        contents.createReader()
+      } else {
+        CharSequenceReader(contents)
+      }
 
   private fun getCompleter(pathData: ResourcePathData, type: NodeType): IXmlCompletionProvider? {
     return when (pathData.type) {
@@ -149,7 +155,7 @@ class XmlCompletionProvider(settings: IServerSettings) :
   private fun createTransitionCompleter(type: NodeType): IXmlCompletionProvider? {
     return when (type) {
       ATTRIBUTE ->
-        InheritingAttrCompletionProvider(::forTransitionAttr, TransitionTagTransformer, this)
+          InheritingAttrCompletionProvider(::forTransitionAttr, TransitionTagTransformer, this)
 
       ATTRIBUTE_VALUE -> AttrValueCompletionProvider(this)
       else -> null
@@ -157,8 +163,8 @@ class XmlCompletionProvider(settings: IServerSettings) :
   }
 
   private fun createCommonCompleter(
-    pathData: ResourcePathData,
-    type: NodeType
+      pathData: ResourcePathData,
+      type: NodeType,
   ): IXmlCompletionProvider? {
     return when (type) {
       ATTRIBUTE -> CommonAttrCompletionProvider(tagTransformerFor(pathData), this)
@@ -178,8 +184,8 @@ class XmlCompletionProvider(settings: IServerSettings) :
   }
 
   private fun createNullTypeCompleter(
-    pathData: ResourcePathData,
-    type: NodeType
+      pathData: ResourcePathData,
+      type: NodeType,
   ): IXmlCompletionProvider? {
 
     // In test cases

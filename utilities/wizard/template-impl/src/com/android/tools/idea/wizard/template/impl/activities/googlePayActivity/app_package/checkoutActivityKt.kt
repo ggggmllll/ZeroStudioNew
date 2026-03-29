@@ -23,26 +23,26 @@ import com.android.tools.idea.wizard.template.impl.activities.common.layoutToVie
 import com.android.tools.idea.wizard.template.renderIf
 
 fun checkoutActivityKt(
-  activityClass: String,
-  viewModelClass: String,
-  layoutName: String,
-  packageName: String,
-  applicationPackage: String?,
-  isViewBindingSupported: Boolean,
+    activityClass: String,
+    viewModelClass: String,
+    layoutName: String,
+    packageName: String,
+    applicationPackage: String?,
+    isViewBindingSupported: Boolean,
 ): String {
 
   val contentViewBlock =
-    if (isViewBindingSupported)
-      """
+      if (isViewBindingSupported)
+          """
       // Use view binding to access the UI elements
       layoutBinding = ${layoutToViewBindingClass(layoutName)}.inflate(layoutInflater)
       setContentView(layoutBinding.root)
   """
-    else "setContentView(R.layout.$layoutName)"
+      else "setContentView(R.layout.$layoutName)"
 
   val googlePayButtonBlock =
-    if (isViewBindingSupported) "googlePayButton = layoutBinding.googlePayButton.root"
-    else "googlePayButton = findViewById<View>(R.id.googlePayButton)"
+      if (isViewBindingSupported) "googlePayButton = layoutBinding.googlePayButton.root"
+      else "googlePayButton = findViewById<View>(R.id.googlePayButton)"
 
   return """
 package ${escapeKotlinIdentifier(packageName)}

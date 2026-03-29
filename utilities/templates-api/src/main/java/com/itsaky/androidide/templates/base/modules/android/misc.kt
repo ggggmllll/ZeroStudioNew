@@ -20,16 +20,12 @@ package com.itsaky.androidide.templates.base.modules.android
 import com.itsaky.androidide.templates.base.AndroidModuleTemplateBuilder
 import java.io.File
 
-/**
- * @return The `proguard-rules.pro` file in the module directory.
- */
+/** @return The `proguard-rules.pro` file in the module directory. */
 fun AndroidModuleTemplateBuilder.proguardRulesFile(): File {
   return File(data.projectDir, "proguard-rules.pro")
 }
 
-/**
- * Creates the `proguard-rules.pro` file in the module directory.
- */
+/** Creates the `proguard-rules.pro` file in the module directory. */
 fun AndroidModuleTemplateBuilder.proguardRules() {
   val file = proguardRulesFile()
   executor.copyAsset(baseAsset(file.name), file)

@@ -38,13 +38,13 @@ import com.android.tools.idea.wizard.template.impl.activities.scrollActivity.src
 import com.android.tools.idea.wizard.template.impl.activities.scrollActivity.src.app_package.scrollActivityKt
 
 fun RecipeExecutor.scrollActivityRecipe(
-  moduleData: ModuleTemplateData,
-  activityClass: String,
-  layoutName: String,
-  contentLayoutName: String,
-  menuName: String,
-  isLauncher: Boolean,
-  packageName: String,
+    moduleData: ModuleTemplateData,
+    activityClass: String,
+    layoutName: String,
+    contentLayoutName: String,
+    menuName: String,
+    isLauncher: Boolean,
+    packageName: String,
 ) {
   val (projectData, srcOut, resOut, _) = moduleData
   val apis = moduleData.apis
@@ -59,7 +59,14 @@ fun RecipeExecutor.scrollActivityRecipe(
   addMaterialDependency(useAndroidX)
   addViewBindingSupport(moduleData.viewBindingSupport, true)
 
-  generateManifest(moduleData, activityClass, packageName, isLauncher, true, generateActivityTitle = true)
+  generateManifest(
+      moduleData,
+      activityClass,
+      packageName,
+      isLauncher,
+      true,
+      generateActivityTitle = true,
+  )
   mergeXml(stringsXml(), resOut.resolve("values/strings.xml"))
   mergeXml(dimensXml(), resOut.resolve("values/dimens.xml"))
   mergeXml(dimensXmlLand(), resOut.resolve("values-land/dimens.xml"))
@@ -68,54 +75,57 @@ fun RecipeExecutor.scrollActivityRecipe(
   generateNoActionBarStyles(moduleData.baseFeature?.resDir, resOut, moduleData.themesData)
   generateSimpleMenu(packageName, activityClass, resOut, menuName)
   save(
-    appBarXml(
-      activityClass,
-      packageName,
-      contentLayoutName,
-      moduleData.themesData.appBarOverlay.name,
-      moduleData.themesData.popupOverlay.name,
-      useAndroidX,
-    ),
-    resOut.resolve("layout/${layoutName}.xml"),
-  )
-  save(contentScrollingXml(activityClass, layoutName, packageName, useAndroidX), resOut.resolve("layout/${contentLayoutName}.xml"))
-  save(
-    contentScrollingXmlW1240dp(activityClass, layoutName, packageName, useAndroidX),
-    resOut.resolve("layout-w1240dp/${contentLayoutName}.xml"),
+      appBarXml(
+          activityClass,
+          packageName,
+          contentLayoutName,
+          moduleData.themesData.appBarOverlay.name,
+          moduleData.themesData.popupOverlay.name,
+          useAndroidX,
+      ),
+      resOut.resolve("layout/${layoutName}.xml"),
   )
   save(
-    contentScrollingXmlW936dp(activityClass, layoutName, packageName, useAndroidX),
-    resOut.resolve("layout-w936dp/${contentLayoutName}.xml"),
+      contentScrollingXml(activityClass, layoutName, packageName, useAndroidX),
+      resOut.resolve("layout/${contentLayoutName}.xml"),
+  )
+  save(
+      contentScrollingXmlW1240dp(activityClass, layoutName, packageName, useAndroidX),
+      resOut.resolve("layout-w1240dp/${contentLayoutName}.xml"),
+  )
+  save(
+      contentScrollingXmlW936dp(activityClass, layoutName, packageName, useAndroidX),
+      resOut.resolve("layout-w936dp/${contentLayoutName}.xml"),
   )
 
   open(resOut.resolve("layout/${contentLayoutName}.xml"))
 
   val isViewBindingSupported = moduleData.viewBindingSupport.isViewBindingSupported()
   val scrollActivity =
-    when (projectData.language) {
-      Language.Java ->
-        scrollActivityJava(
-          activityClass = activityClass,
-          applicationPackage = moduleData.projectTemplateData.applicationPackage,
-          isNewModule = moduleData.isNewModule,
-          layoutName = layoutName,
-          menuName = menuName,
-          packageName = packageName,
-          useAndroidX = useAndroidX,
-          isViewBindingSupported = isViewBindingSupported,
-        )
-      Language.Kotlin ->
-        scrollActivityKt(
-          activityClass = activityClass,
-          isNewModule = moduleData.isNewModule,
-          layoutName = layoutName,
-          menuName = menuName,
-          packageName = packageName,
-          applicationPackage = projectData.applicationPackage,
-          useAndroidX = useAndroidX,
-          isViewBindingSupported = isViewBindingSupported,
-        )
-    }
+      when (projectData.language) {
+        Language.Java ->
+            scrollActivityJava(
+                activityClass = activityClass,
+                applicationPackage = moduleData.projectTemplateData.applicationPackage,
+                isNewModule = moduleData.isNewModule,
+                layoutName = layoutName,
+                menuName = menuName,
+                packageName = packageName,
+                useAndroidX = useAndroidX,
+                isViewBindingSupported = isViewBindingSupported,
+            )
+        Language.Kotlin ->
+            scrollActivityKt(
+                activityClass = activityClass,
+                isNewModule = moduleData.isNewModule,
+                layoutName = layoutName,
+                menuName = menuName,
+                packageName = packageName,
+                applicationPackage = projectData.applicationPackage,
+                useAndroidX = useAndroidX,
+                isViewBindingSupported = isViewBindingSupported,
+            )
+      }
   save(scrollActivity, srcOut.resolve("${activityClass}.${ktOrJavaExt}"))
 
   open(srcOut.resolve("${activityClass}.${ktOrJavaExt}"))

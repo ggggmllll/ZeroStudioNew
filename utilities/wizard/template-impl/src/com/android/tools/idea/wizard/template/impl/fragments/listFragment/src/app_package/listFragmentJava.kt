@@ -20,15 +20,15 @@ import com.android.tools.idea.wizard.template.getMaterialComponentName
 import com.android.tools.idea.wizard.template.renderIf
 
 fun listFragmentJava(
-  adapterClassName: String,
-  applicationPackage: String?,
-  columnCount: Int,
-  fragmentClass: String,
-  fragmentLayoutList: String,
-  packageName: String,
-  useAndroidX: Boolean,
+    adapterClassName: String,
+    applicationPackage: String?,
+    columnCount: Int,
+    fragmentClass: String,
+    fragmentLayoutList: String,
+    packageName: String,
+    useAndroidX: Boolean,
 ) =
-  """
+    """
 package ${packageName};
 
 import android.content.Context;

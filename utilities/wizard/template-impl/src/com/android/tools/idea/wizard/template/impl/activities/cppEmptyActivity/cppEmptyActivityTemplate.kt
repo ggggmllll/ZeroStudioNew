@@ -79,37 +79,38 @@ val cppEmptyActivityTemplate
       name = "Launcher Activity"
       visible = { !isNewModule }
       default = false
-      help = "If true, this activity will have a CATEGORY_LAUNCHER intent filter, making it visible in the launcher"
+      help =
+          "If true, this activity will have a CATEGORY_LAUNCHER intent filter, making it visible in the launcher"
     }
     val cppStandard =
-      enumParameter<CppStandardType> {
-        name = "C++ Standard"
-        default = CppStandardType.`Toolchain Default`
-        help = "C++ Standard version"
-      }
+        enumParameter<CppStandardType> {
+          name = "C++ Standard"
+          default = CppStandardType.`Toolchain Default`
+          help = "C++ Standard version"
+        }
     val packageName = defaultPackageNameParameter
 
     widgets(
-      TextFieldWidget(activityClass),
-      TextFieldWidget(layoutName),
-      CheckBoxWidget(isLauncher),
-      PackageNameWidget(packageName),
-      LanguageWidget(),
-      EnumWidget(cppStandard),
-      LabelWidget("C++ feature support depends on Android NDK version."),
-      UrlLinkWidget("See documentation", DOCUMENTATION_URL),
+        TextFieldWidget(activityClass),
+        TextFieldWidget(layoutName),
+        CheckBoxWidget(isLauncher),
+        PackageNameWidget(packageName),
+        LanguageWidget(),
+        EnumWidget(cppStandard),
+        LabelWidget("C++ feature support depends on Android NDK version."),
+        UrlLinkWidget("See documentation", DOCUMENTATION_URL),
     )
 
     thumb { File("cpp-empty-activity").resolve("cpp_configure.png") }
 
     recipe = { data ->
       generateCppEmptyActivity(
-        data as ModuleTemplateData,
-        activityClass.value,
-        layoutName.value,
-        isLauncher.value,
-        packageName.value,
-        cppStandard.value.toString(),
+          data as ModuleTemplateData,
+          activityClass.value,
+          layoutName.value,
+          isLauncher.value,
+          packageName.value,
+          cppStandard.value.toString(),
       )
     }
   }

@@ -25,24 +25,25 @@ import com.android.tools.idea.wizard.template.impl.activities.common.layoutToVie
 import com.android.tools.idea.wizard.template.renderIf
 
 fun placeholderFragmentKt(
-  fragmentLayoutName: String,
-  packageName: String,
-  applicationPackage: String?,
-  useAndroidX: Boolean,
-  isViewBindingSupported: Boolean,
+    fragmentLayoutName: String,
+    packageName: String,
+    applicationPackage: String?,
+    useAndroidX: Boolean,
+    isViewBindingSupported: Boolean,
 ): String {
 
   val viewModelInitializationBlock =
-    if (useAndroidX) "pageViewModel = ViewModelProvider(this).get(PageViewModel::class.java)"
-    else "pageViewModel = ViewModelProvider(this, ViewModelProvider.NewInstanceFactory()).get(PageViewModel::class.java)"
+      if (useAndroidX) "pageViewModel = ViewModelProvider(this).get(PageViewModel::class.java)"
+      else
+          "pageViewModel = ViewModelProvider(this, ViewModelProvider.NewInstanceFactory()).get(PageViewModel::class.java)"
 
   val onCreateViewBlock =
-    if (isViewBindingSupported)
-      """
+      if (isViewBindingSupported)
+          """
       _binding = ${layoutToViewBindingClass(fragmentLayoutName)}.inflate(inflater, container, false)
       val root = binding.root
   """
-    else "val root = inflater.inflate(R.layout.$fragmentLayoutName, container, false)"
+      else "val root = inflater.inflate(R.layout.$fragmentLayoutName, container, false)"
 
   return """package ${escapeKotlinIdentifier(packageName)}.ui.main
 

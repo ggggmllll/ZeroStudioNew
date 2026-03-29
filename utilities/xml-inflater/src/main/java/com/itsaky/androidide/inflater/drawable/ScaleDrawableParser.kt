@@ -29,17 +29,15 @@ import org.xmlpull.v1.XmlPullParser
  * @author Akash Yadav
  */
 open class ScaleDrawableParser protected constructor(parser: XmlPullParser?, minDepth: Int) :
-  IDrawableParser(parser, minDepth) {
+    IDrawableParser(parser, minDepth) {
   @Throws(Exception::class)
   public override fun parseDrawable(context: Context): Drawable {
     var index = attrIndex("drawable")
     if (index == -1) {
       throw InflateException("<scale> drawable must specify android:drawable attribute")
     }
-    val v =
-      value(index)
-    val drawable =
-      parseDrawable(context, v)
+    val v = value(index)
+    val drawable = parseDrawable(context, v)
     var gravity = Gravity.LEFT
     index = attrIndex("scaleGravity")
     if (index != -1) {

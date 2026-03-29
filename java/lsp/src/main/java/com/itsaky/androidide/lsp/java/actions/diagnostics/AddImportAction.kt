@@ -67,25 +67,25 @@ class AddImportAction : BaseJavaCodeAction() {
 
     val file = data.requireFile()
     val module =
-      IProjectManager.getInstance().getWorkspace()?.findModuleForFile(file, false)
-        ?: run {
-          markInvisible()
-          return
-        }
+        IProjectManager.getInstance().getWorkspace()?.findModuleForFile(file, false)
+            ?: run {
+              markInvisible()
+              return
+            }
 
     val compiler = JavaCompilerProvider.get(module)
 
     @Suppress("UNCHECKED_CAST")
     val jcDiagnostic =
-      JavaDiagnosticUtils.asJCDiagnostic(diagnostic.extra as Diagnostic<out JavaFileObject>)
+        JavaDiagnosticUtils.asJCDiagnostic(diagnostic.extra as Diagnostic<out JavaFileObject>)
     if (jcDiagnostic == null) {
       markInvisible()
       return
     }
 
     val found =
-      jcDiagnostic.args[1]?.toString()?.let { compiler.findQualifiedNames(it, true).isNotEmpty() }
-        ?: false
+        jcDiagnostic.args[1]?.toString()?.let { compiler.findQualifiedNames(it, true).isNotEmpty() }
+            ?: false
 
     visible = found
     enabled = found
@@ -94,16 +94,16 @@ class AddImportAction : BaseJavaCodeAction() {
   override suspend fun execAction(data: ActionData): Any {
     @Suppress("UNCHECKED_CAST")
     val diagnostic =
-      JavaDiagnosticUtils.asUnwrapper(
-        data.get(DiagnosticItem::class.java)!!.extra as Diagnostic<out JavaFileObject>
-      )!!
+        JavaDiagnosticUtils.asUnwrapper(
+            data.get(DiagnosticItem::class.java)!!.extra as Diagnostic<out JavaFileObject>
+        )!!
     val file = data.requireFile()
     val module =
-      IProjectManager.getInstance().getWorkspace()?.findModuleForFile(file, false)
-        ?: run {
-          markInvisible()
-          return Any()
-        }
+        IProjectManager.getInstance().getWorkspace()?.findModuleForFile(file, false)
+            ?: run {
+              markInvisible()
+              return Any()
+            }
 
     val compiler = JavaCompilerProvider.get(module)
 
@@ -140,11 +140,11 @@ class AddImportAction : BaseJavaCodeAction() {
 
     val file = data.requireFile()
     val module =
-      IProjectManager.getInstance().getWorkspace()?.findModuleForFile(file, false)
-        ?: run {
-          markInvisible()
-          return
-        }
+        IProjectManager.getInstance().getWorkspace()?.findModuleForFile(file, false)
+            ?: run {
+              markInvisible()
+              return
+            }
 
     val compiler = JavaCompilerProvider.get(module)
     val client = data.getLanguageClient() ?: return

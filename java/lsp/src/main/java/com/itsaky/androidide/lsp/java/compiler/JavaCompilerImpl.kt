@@ -26,10 +26,10 @@ import com.itsaky.androidide.utils.VMUtils
 import com.itsaky.androidide.utils.withStopWatch
 import jdkx.tools.JavaFileObject
 import jdkx.tools.JavaFileObject.Kind.SOURCE
+import kotlin.io.path.name
 import openjdk.tools.javac.api.ClientCodeWrapper
 import openjdk.tools.javac.tree.JCTree.JCCompilationUnit
 import openjdk.tools.javac.util.Context
-import kotlin.io.path.name
 
 class JavaCompilerImpl(context: Context?) : ReusableJavaCompiler(context) {
 
@@ -44,10 +44,10 @@ class JavaCompilerImpl(context: Context?) : ReusableJavaCompiler(context) {
 
     // Preconditions
     if (
-      content == null ||
-        compilerConfig.files == null ||
-        filename?.kind != SOURCE ||
-        compilerConfig.files?.contains(file) == false
+        content == null ||
+            compilerConfig.files == null ||
+            filename?.kind != SOURCE ||
+            compilerConfig.files?.contains(file) == false
     ) {
       return super.parse(filename, content)
     }
@@ -58,22 +58,24 @@ class JavaCompilerImpl(context: Context?) : ReusableJavaCompiler(context) {
       return super.parse(filename, content)
     }
 
-    val pruned = withStopWatch("${if(file is SourceFileObject) "[${file.path.name}] " else ""}Prune method bodies") { watch ->
-      val contentBuilder = StringBuilder(content)
+    val pruned =
+        withStopWatch(
+            "${if(file is SourceFileObject) "[${file.path.name}] " else ""}Prune method bodies"
+        ) { watch ->
+          val contentBuilder = StringBuilder(content)
 
-      return@withStopWatch TSJavaParser.parse(file).use { parseResult ->
+          return@withStopWatch TSJavaParser.parse(file).use { parseResult ->
+            prune(
+                contentBuilder,
+                parseResult.tree,
+                compilerConfig.completionInfo?.cursor?.index ?: -1,
+            )
 
-        prune(
-          contentBuilder,
-          parseResult.tree,
-          compilerConfig.completionInfo?.cursor?.index ?: -1
-        )
+            watch.log()
 
-        watch.log()
-
-        return@use contentBuilder
-      }
-    }
+            return@use contentBuilder
+          }
+        }
 
     return super.parse(filename, pruned)
   }

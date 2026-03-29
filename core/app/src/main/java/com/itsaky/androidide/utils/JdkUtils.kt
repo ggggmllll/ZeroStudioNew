@@ -23,9 +23,9 @@ import com.itsaky.androidide.app.IDEApplication
 import com.itsaky.androidide.models.JdkDistribution
 import com.itsaky.androidide.shell.executeProcessAsync
 import com.termux.shared.termux.shell.command.environment.TermuxShellEnvironment
-import org.slf4j.LoggerFactory
 import java.io.File
 import java.nio.file.Files
+import org.slf4j.LoggerFactory
 
 /**
  * Utilities related to JDK installations.
@@ -36,9 +36,7 @@ object JdkUtils {
 
   private val log = LoggerFactory.getLogger(JdkUtils::class.java)
 
-  /**
-   * Finds the available JDK installations and returns the JAVA_HOME for each installation.
-   */
+  /** Finds the available JDK installations and returns the JAVA_HOME for each installation. */
   @JvmStatic
   @WorkerThread
   fun findJavaInstallations(): List<JdkDistribution> {
@@ -65,10 +63,11 @@ object JdkUtils {
           }
 
           return@mapNotNull getDistFromJavaBin(java)
-        } ?: run {
-          log.error("Failed to list files in {}", optDir)
-          emptyList()
         }
+            ?: run {
+              log.error("Failed to list files in {}", optDir)
+              emptyList()
+            }
       }
     } catch (e: Exception) {
       log.error("Failed to list java alternatives", e)
@@ -81,44 +80,50 @@ object JdkUtils {
   }
 
   /**
-   * Returns a [JdkDistribution] instances representing the JDK installation of the given
-   * `java` binary executable. This binary file is executed to extract the actual `java.home`
-   * value.
+   * Returns a [JdkDistribution] instances representing the JDK installation of the given `java`
+   * binary executable. This binary file is executed to extract the actual `java.home` value.
    *
    * @param java The path to the `java` binary executable.
    * @return The [JdkDistribution] instance, or `null` if there was an error while getting required
-   * information from the installation.
+   *   information from the installation.
    */
   @JvmStatic
   fun getDistFromJavaBin(java: File): JdkDistribution? {
     if (!java.exists() || !java.isFile || !java.canExecute()) {
       log.error(
-        "Failed to lookup JDK installation. File '{}' does not exist or cannot be executed.", java)
+          "Failed to lookup JDK installation. File '{}' does not exist or cannot be executed.",
+          java,
+      )
       return null
     }
 
-    val properties = readProperties(java) ?: run {
-      log.error("Failed to retrieve Java properties from java binary: '{}'", java)
-      return null
-    }
+    val properties =
+        readProperties(java)
+            ?: run {
+              log.error("Failed to retrieve Java properties from java binary: '{}'", java)
+              return null
+            }
 
     return readDistFromProps(properties)
   }
 
   @VisibleForTesting
   internal fun readDistFromProps(properties: String): JdkDistribution? {
-    val javaHome = Regex("java\\.home\\s*=\\s*(.*)").find(properties)?.groupValues?.get(1) ?: run {
-      log.error("Failed to determine property 'java.home'. Properties: {}", properties)
-      return null
-    }
+    val javaHome =
+        Regex("java\\.home\\s*=\\s*(.*)").find(properties)?.groupValues?.get(1)
+            ?: run {
+              log.error("Failed to determine property 'java.home'. Properties: {}", properties)
+              return null
+            }
 
     log.debug("Found java.home=${javaHome}")
 
-    val javaVersion = Regex("java\\.version\\s*=\\s*(.*)").find(properties)?.groupValues?.get(1)
-      ?: run {
-        log.error("Failed to determine property 'java.version'. Properties: {}", properties)
-        return null
-      }
+    val javaVersion =
+        Regex("java\\.version\\s*=\\s*(.*)").find(properties)?.groupValues?.get(1)
+            ?: run {
+              log.error("Failed to determine property 'java.version'. Properties: {}", properties)
+              return null
+            }
 
     log.debug("Found java.version={}", javaVersion)
 
@@ -126,12 +131,11 @@ object JdkUtils {
   }
 
   /**
-   * Returns a [JdkDistribution] instance representing the JDK installation at the given
-   * location.
+   * Returns a [JdkDistribution] instance representing the JDK installation at the given location.
    *
    * @param javaHome The path to the installed JDK.
    * @return The [JdkDistribution] instance, or `null` if there was an error while getting required
-   * information from the installation.
+   *   information from the installation.
    */
   @JvmStatic
   fun getDistFromJavaHome(javaHome: File): JdkDistribution? {
@@ -150,8 +154,9 @@ object JdkUtils {
 
     if (!canExecute(shell)) {
       log.warn(
-        "Unable to determine JDK installations. Command {} not found or is not executable.",
-        shell.absolutePath)
+          "Unable to determine JDK installations. Command {} not found or is not executable.",
+          shell.absolutePath,
+      )
       return null
     }
 

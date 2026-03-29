@@ -28,9 +28,9 @@ import com.android.tools.idea.wizard.template.TemplateData
 import com.android.tools.idea.wizard.template.TextFieldWidget
 import com.android.tools.idea.wizard.template.WizardUiContext
 import com.android.tools.idea.wizard.template.booleanParameter
-import com.itsaky.androidide.templates.impl.androidstudio.activities.common.MIN_API
 import com.android.tools.idea.wizard.template.stringParameter
 import com.android.tools.idea.wizard.template.template
+import com.itsaky.androidide.templates.impl.androidstudio.activities.common.MIN_API
 import java.io.File
 
 val serviceTemplate
@@ -53,7 +53,8 @@ val serviceTemplate
     val isExported = booleanParameter {
       name = "Exported"
       default = true
-      help = "Whether or not components of other applications can invoke the service or interact with it"
+      help =
+          "Whether or not components of other applications can invoke the service or interact with it"
     }
 
     val isEnabled = booleanParameter {
@@ -62,12 +63,19 @@ val serviceTemplate
       help = "Whether or not the service can be instantiated by the system"
     }
 
-    widgets(TextFieldWidget(className), CheckBoxWidget(isExported), CheckBoxWidget(isEnabled), LanguageWidget())
+    widgets(
+        TextFieldWidget(className),
+        CheckBoxWidget(isExported),
+        CheckBoxWidget(isEnabled),
+        LanguageWidget(),
+    )
 
     thumb {
       // TODO(b/147126989)
       File("no_activity.png")
     }
 
-    recipe = { data: TemplateData -> serviceRecipe(data as ModuleTemplateData, className.value, isExported.value, isEnabled.value) }
+    recipe = { data: TemplateData ->
+      serviceRecipe(data as ModuleTemplateData, className.value, isExported.value, isEnabled.value)
+    }
   }

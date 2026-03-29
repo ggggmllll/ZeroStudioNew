@@ -19,10 +19,9 @@ package com.itsaky.androidide.ui.themes
 
 import androidx.annotation.StringRes
 import androidx.annotation.StyleRes
-import com.itsaky.androidide.resources.R
 import androidx.compose.material3.ColorScheme
-import com.itsaky.androidide.ui.themes.mTGlacialBlueLightColorScheme
-import com.itsaky.androidide.ui.themes.mTGlacialBlueDarkColorScheme
+import com.itsaky.androidide.resources.R
+
 /**
  * Themes in AndroidIDE.
  *
@@ -30,215 +29,233 @@ import com.itsaky.androidide.ui.themes.mTGlacialBlueDarkColorScheme
  * @author android_zero
  */
 enum class IDETheme(
-  @StyleRes val styleLight: Int,
-  @StyleRes val styleDark: Int,
-  @StringRes val title: Int,
-  val isDynamic: Boolean = false,
-  
-  val schemeLight: ColorScheme? = null,
-  val schemeDark: ColorScheme? = null
+    @StyleRes val styleLight: Int,
+    @StyleRes val styleDark: Int,
+    @StringRes val title: Int,
+    val isDynamic: Boolean = false,
+    val schemeLight: ColorScheme? = null,
+    val schemeDark: ColorScheme? = null,
 ) {
 
-  /**
-   * Blue Wave theme.
-   */
+  /** Blue Wave theme. */
   BLUE_WAVE(
-    R.style.Theme_AndroidIDE_BlueWave, 
-    R.style.Theme_AndroidIDE_BlueWave_Dark,
-    R.string.theme_blue_wave),
+      R.style.Theme_AndroidIDE_BlueWave,
+      R.style.Theme_AndroidIDE_BlueWave_Dark,
+      R.string.theme_blue_wave,
+  ),
 
-  /**
-   * Sunny Glow theme.
-   */
+  /** Sunny Glow theme. */
   SUNNY_GLOW(
-    R.style.Theme_AndroidIDE_SunnyGlow, 
-    R.style.Theme_AndroidIDE_SunnyGlow_Dark,
-    R.string.theme_sunny_glow),
-    
+      R.style.Theme_AndroidIDE_SunnyGlow,
+      R.style.Theme_AndroidIDE_SunnyGlow_Dark,
+      R.string.theme_sunny_glow,
+  ),
+
   /** VSCode theme. */
-   STYLE_VSCODE(
+  STYLE_VSCODE(
       R.style.Theme_AndroidIDE_VSCode,
       R.style.Theme_AndroidIDE_VSCode_Dark,
-      R.string.theme_vscode),
+      R.string.theme_vscode,
+  ),
 
   /** Crimson Red theme. */
   CRIMSON_RED(
       R.style.Theme_AndroidIDE_CrimsonRed,
       R.style.Theme_AndroidIDE_CrimsonRed_Dark,
-      R.string.theme_crimson_red),
+      R.string.theme_crimson_red,
+  ),
 
   /** Royal Amethyst theme. */
   ROYAL_AMETHYST(
       R.style.Theme_AndroidIDE_RoyalAmethyst,
       R.style.Theme_AndroidIDE_RoyalAmethyst_Dark,
-      R.string.theme_royal_amethyst),
+      R.string.theme_royal_amethyst,
+  ),
 
   /** Minty Fresh theme. */
   MINTY_FRESH(
       R.style.Theme_AndroidIDE_MintyFresh,
       R.style.Theme_AndroidIDE_MintyFresh_Dark,
-      R.string.theme_minty_fresh),
+      R.string.theme_minty_fresh,
+  ),
 
   /** Slate Grey theme. */
   SLATE_GREY(
       R.style.Theme_AndroidIDE_SlateGrey,
       R.style.Theme_AndroidIDE_SlateGrey_Dark,
-      R.string.theme_slate_grey),
+      R.string.theme_slate_grey,
+  ),
 
   /** Sakura Pink theme. */
   SAKURA_PINK(
       R.style.Theme_AndroidIDE_SakuraPink,
       R.style.Theme_AndroidIDE_SakuraPink_Dark,
-      R.string.theme_sakura_pink),
+      R.string.theme_sakura_pink,
+  ),
 
   /** Cyber Neon theme. */
   CYBER_NEON(
       R.style.Theme_AndroidIDE_CyberNeon,
       R.style.Theme_AndroidIDE_CyberNeon_Dark,
-      R.string.theme_cyber_neon),
+      R.string.theme_cyber_neon,
+  ),
 
   /** Autumn Breeze theme. */
   AUTUMN_BREEZE(
       R.style.Theme_AndroidIDE_AutumnBreeze,
       R.style.Theme_AndroidIDE_AutumnBreeze_Dark,
-      R.string.theme_autumn_breeze),
+      R.string.theme_autumn_breeze,
+  ),
 
   /** Nordic Frost theme. */
   NORDIC_FROST(
       R.style.Theme_AndroidIDE_NordicFrost,
       R.style.Theme_AndroidIDE_NordicFrost_Dark,
-      R.string.theme_nordic_frost),
-  
+      R.string.theme_nordic_frost,
+  ),
+
   /** Oceanic Abyss theme. */
   OCEANIC_ABYSS(
       R.style.Theme_AndroidIDE_OceanicAbyss,
       R.style.Theme_AndroidIDE_OceanicAbyss_Dark,
-      R.string.theme_oceanic_abyss),
+      R.string.theme_oceanic_abyss,
+  ),
 
   /** Volcanic Magma theme. */
   VOLCANIC_MAGMA(
       R.style.Theme_AndroidIDE_VolcanicMagma,
       R.style.Theme_AndroidIDE_VolcanicMagma_Dark,
-      R.string.theme_volcanic_magma),
+      R.string.theme_volcanic_magma,
+  ),
 
   /** Midnight Sun theme. */
   MIDNIGHT_SUN(
       R.style.Theme_AndroidIDE_MidnightSun,
       R.style.Theme_AndroidIDE_MidnightSun_Dark,
-      R.string.theme_midnight_sun),
+      R.string.theme_midnight_sun,
+  ),
 
   /** Forest Moss theme. */
   FOREST_MOSS(
       R.style.Theme_AndroidIDE_ForestMoss,
       R.style.Theme_AndroidIDE_ForestMoss_Dark,
-      R.string.theme_forest_moss),
-      /** Coffee Roast theme. */
+      R.string.theme_forest_moss,
+  ),
+  /** Coffee Roast theme. */
   COFFEE_ROAST(
       R.style.Theme_AndroidIDE_CoffeeRoast,
       R.style.Theme_AndroidIDE_CoffeeRoast_Dark,
-      R.string.theme_coffee_roast),
+      R.string.theme_coffee_roast,
+  ),
 
   /** Deep Space theme. */
   DEEP_SPACE(
       R.style.Theme_AndroidIDE_DeepSpace,
       R.style.Theme_AndroidIDE_DeepSpace_Dark,
-      R.string.theme_deep_space),
+      R.string.theme_deep_space,
+  ),
 
   /** Neon Synth theme. */
   NEON_SYNTH(
       R.style.Theme_AndroidIDE_NeonSynth,
       R.style.Theme_AndroidIDE_NeonSynth_Dark,
-      R.string.theme_neon_synth),
-      
-      /** Toxic Lime theme. */
+      R.string.theme_neon_synth,
+  ),
+
+  /** Toxic Lime theme. */
   TOXIC_LIME(
       R.style.Theme_AndroidIDE_ToxicLime,
       R.style.Theme_AndroidIDE_ToxicLime_Dark,
-      R.string.theme_toxic_lime),
+      R.string.theme_toxic_lime,
+  ),
 
   /** Lavender Blush theme. */
   LAVENDER_BLUSH(
       R.style.Theme_AndroidIDE_LavenderBlush,
       R.style.Theme_AndroidIDE_LavenderBlush_Dark,
-      R.string.theme_lavender_blush),
+      R.string.theme_lavender_blush,
+  ),
 
   /** Coral Reef theme. */
   CORAL_REEF(
       R.style.Theme_AndroidIDE_CoralReef,
       R.style.Theme_AndroidIDE_CoralReef_Dark,
-      R.string.theme_coral_reef),
+      R.string.theme_coral_reef,
+  ),
 
   /** Azure Sky theme. */
   AZURE_SKY(
       R.style.Theme_AndroidIDE_AzureSky,
       R.style.Theme_AndroidIDE_AzureSky_Dark,
-      R.string.theme_azure_sky),
+      R.string.theme_azure_sky,
+  ),
 
   /** Ink Paper theme. */
   INK_PAPER(
       R.style.Theme_AndroidIDE_InkPaper,
       R.style.Theme_AndroidIDE_InkPaper_Dark,
-      R.string.theme_ink_paper),
-      
+      R.string.theme_ink_paper,
+  ),
+
   /** Golden Hour theme. */
   GOLDEN_HOUR(
       R.style.Theme_AndroidIDE_GoldenHour,
       R.style.Theme_AndroidIDE_GoldenHour_Dark,
-      R.string.theme_golden_hour),
+      R.string.theme_golden_hour,
+  ),
 
   /** Electric Violet theme. */
   ELECTRIC_VIOLET(
       R.style.Theme_AndroidIDE_ElectricViolet,
       R.style.Theme_AndroidIDE_ElectricViolet_Dark,
-      R.string.theme_electric_violet),
+      R.string.theme_electric_violet,
+  ),
 
   /** Zen Matcha theme. */
   ZEN_MATCHA(
       R.style.Theme_AndroidIDE_ZenMatcha,
       R.style.Theme_AndroidIDE_ZenMatcha_Dark,
-      R.string.theme_zen_matcha),
+      R.string.theme_zen_matcha,
+  ),
 
   /** Arctic Ice theme. */
   ARCTIC_ICE(
       R.style.Theme_AndroidIDE_ArcticIce,
       R.style.Theme_AndroidIDE_ArcticIce_Dark,
-      R.string.theme_arctic_ice),
+      R.string.theme_arctic_ice,
+  ),
 
   /** Carbon Red theme. */
   CARBON_RED(
       R.style.Theme_AndroidIDE_CarbonRed,
       R.style.Theme_AndroidIDE_CarbonRed_Dark,
-      R.string.theme_carbon_red),
-      
+      R.string.theme_carbon_red,
+  ),
+
   /** MTGlacialBlue Theme */
   MTGLACIAlBLUE(
-     R.style.Theme_AndroidIDE_MTGlacialBlue,
-     R.style.Theme_AndroidIDE_MTGlacialBlue_Dark,
-     R.string.theme_mtglacial_blue,
-     isDynamic = false, // Explicitly set false
-     schemeLight = mTGlacialBlueLightColorScheme,
-     schemeDark = mTGlacialBlueDarkColorScheme),
-     
-  /**
-   * Material You theme (System Wallpaper).
-   */
+      R.style.Theme_AndroidIDE_MTGlacialBlue,
+      R.style.Theme_AndroidIDE_MTGlacialBlue_Dark,
+      R.string.theme_mtglacial_blue,
+      isDynamic = false, // Explicitly set false
+      schemeLight = mTGlacialBlueLightColorScheme,
+      schemeDark = mTGlacialBlueDarkColorScheme,
+  ),
+
+  /** Material You theme (System Wallpaper). */
   MATERIAL_YOU(-1, -1, R.string.theme_material_you, isDynamic = true);
-  
+
   companion object {
     /** The default theme. */
     val DEFAULT = MINTY_FRESH
 
     // Cache names map for O(1) lookup to avoid Enum.valueOf exceptions
-    private val map: Map<String, IDETheme> by lazy {
-        entries.associateBy { it.name }
-    }
+    private val map: Map<String, IDETheme> by lazy { entries.associateBy { it.name } }
 
-    /**
-     * Safe valueOf that doesn't throw exceptions and is faster.
-     */
+    /** Safe valueOf that doesn't throw exceptions and is faster. */
     fun safeValueOf(name: String?): IDETheme {
-        if (name.isNullOrBlank()) return DEFAULT
-        return map[name] ?: DEFAULT
+      if (name.isNullOrBlank()) return DEFAULT
+      return map[name] ?: DEFAULT
     }
   }
 }

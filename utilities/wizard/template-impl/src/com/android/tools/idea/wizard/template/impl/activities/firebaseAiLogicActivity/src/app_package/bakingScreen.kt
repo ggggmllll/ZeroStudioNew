@@ -18,7 +18,7 @@ package com.android.tools.idea.wizard.template.impl.activities.firebaseAiLogicAc
 import com.android.tools.idea.wizard.template.escapeKotlinIdentifier
 
 fun bakingScreen(packageName: String) =
-  """
+    """
 package ${escapeKotlinIdentifier(packageName)}
 
 import android.graphics.BitmapFactory

@@ -48,7 +48,12 @@ val googleMapsActivityTemplate
 
     category = Category.Google
     formFactor = FormFactor.Mobile
-    screens = listOf(WizardUiContext.ActivityGallery, WizardUiContext.MenuEntry, WizardUiContext.NewModule)
+    screens =
+        listOf(
+            WizardUiContext.ActivityGallery,
+            WizardUiContext.MenuEntry,
+            WizardUiContext.NewModule,
+        )
 
     lateinit var layoutName: StringParameter
     val activityClass = stringParameter {
@@ -71,22 +76,29 @@ val googleMapsActivityTemplate
     val isLauncher = booleanParameter {
       name = "Launcher Activity"
       default = false
-      help = "If true, this activity will have a CATEGORY_LAUNCHER intent filter, making it visible in the launcher"
+      help =
+          "If true, this activity will have a CATEGORY_LAUNCHER intent filter, making it visible in the launcher"
     }
 
     val packageName = defaultPackageNameParameter
 
     widgets(
-      TextFieldWidget(activityClass),
-      TextFieldWidget(layoutName),
-      CheckBoxWidget(isLauncher),
-      PackageNameWidget(packageName),
-      LanguageWidget(),
+        TextFieldWidget(activityClass),
+        TextFieldWidget(layoutName),
+        CheckBoxWidget(isLauncher),
+        PackageNameWidget(packageName),
+        LanguageWidget(),
     )
 
     thumb { File("google-maps-activity").resolve("template_map_activity.png") }
 
     recipe = { data: TemplateData ->
-      googleMapsActivityRecipe(data as ModuleTemplateData, activityClass.value, isLauncher.value, layoutName.value, packageName.value)
+      googleMapsActivityRecipe(
+          data as ModuleTemplateData,
+          activityClass.value,
+          isLauncher.value,
+          layoutName.value,
+          packageName.value,
+      )
     }
   }

@@ -31,11 +31,11 @@ import java.nio.file.Path
 import java.nio.file.Paths
 
 data class DiagnosticItem(
-  var message: String,
-  var code: String,
-  var range: Range,
-  var source: String,
-  var severity: DiagnosticSeverity
+    var message: String,
+    var code: String,
+    var range: Range,
+    var source: String,
+    var severity: DiagnosticSeverity,
 ) {
 
   var extra: Any = Any()
@@ -43,7 +43,7 @@ data class DiagnosticItem(
   companion object {
     @JvmField
     val START_COMPARATOR: Comparator<in DiagnosticItem> =
-      Comparator.comparing(DiagnosticItem::range)
+        Comparator.comparing(DiagnosticItem::range)
 
     private fun mapSeverity(severity: DiagnosticSeverity): Short {
       return when (severity) {
@@ -56,7 +56,7 @@ data class DiagnosticItem(
   }
 
   fun asDiagnosticRegion(): DiagnosticRegion =
-    DiagnosticRegion(range.start.requireIndex(), range.end.requireIndex(), mapSeverity(severity))
+      DiagnosticRegion(range.start.requireIndex(), range.end.requireIndex(), mapSeverity(severity))
 }
 
 data class DiagnosticResult(var file: Path, var diagnostics: List<DiagnosticItem>) {
@@ -69,5 +69,5 @@ enum class DiagnosticSeverity {
   ERROR,
   WARNING,
   INFO,
-  HINT
+  HINT,
 }

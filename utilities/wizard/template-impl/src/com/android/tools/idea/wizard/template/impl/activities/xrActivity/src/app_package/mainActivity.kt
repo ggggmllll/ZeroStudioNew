@@ -18,7 +18,7 @@ package com.android.tools.idea.wizard.template.impl.activities.xrActivity.src.ap
 import com.android.tools.idea.wizard.template.escapeKotlinIdentifier
 
 fun mainActivityKt(activityClass: String, packageName: String, themeName: String) =
-  """
+    """
 package ${escapeKotlinIdentifier(packageName)}
 
 import android.annotation.SuppressLint

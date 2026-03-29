@@ -43,9 +43,9 @@ import com.itsaky.androidide.tooling.api.messages.result.InitializeResult
 import com.itsaky.androidide.tooling.api.models.BuildVariantInfo
 import com.itsaky.androidide.utils.DocumentUtils
 import com.itsaky.androidide.utils.Environment
+import com.itsaky.androidide.utils.GradleFileParser
 import com.itsaky.androidide.utils.flashError
 import com.itsaky.androidide.utils.withStopWatch
-import com.itsaky.androidide.utils.GradleFileParser
 import java.io.File
 import java.util.Locale
 import kotlin.io.path.extension
@@ -66,7 +66,7 @@ import org.slf4j.LoggerFactory
 
 /**
  * 项目管理器内部实现类 ([IProjectManager])。
- * 
+ *
  * <p>该类负责真正执行项目配置的初始化（Setup），协调事件总线，执行代码生成（如 AGP DataBinding/AIDL 生成），并管理文件系统的变更通知。</p>
  *
  * @author Akash Yadav
@@ -78,11 +78,8 @@ class ProjectManagerImpl : IProjectManager, EventReceiver {
   private var _workspace: WorkspaceImpl? = null
   private var _projectDir: File? = null
 
-  /**
-   * 用于缓存判断当前项目是否为插件项目。
-   */
-  @Volatile
-  internal var pluginProjectCached: Boolean? = null
+  /** 用于缓存判断当前项目是否为插件项目。 */
+  @Volatile internal var pluginProjectCached: Boolean? = null
 
   var projectInitialized: Boolean = false
   var cachedInitResult: InitializeResult? = null
@@ -104,22 +101,21 @@ class ProjectManagerImpl : IProjectManager, EventReceiver {
     this.pluginProjectCached = null
   }
 
-  /**
-   * 提供给 UI 或其他服务判断是否需要进行 Gradle 同步。（来自 `b` 分支）
-   */
+  /** 提供给 UI 或其他服务判断是否需要进行 Gradle 同步。（来自 `b` 分支） */
   override suspend fun isGradleSyncNeeded(projectDir: File): Boolean {
-      // 兼容 a 分支现有逻辑，因为 a 分支中没有 ProjectSyncHelper，如果这里没有 ProjectSyncHelper 的引用，
-      // 我们暂以检查 build 目录和 .gradle 目录的基础手段作为平替（或者如果你有 ProjectSyncHelper，可以直接调用）。
-      return withContext(Dispatchers.IO) {
-          !File(projectDir, ".gradle").exists() || !File(projectDir, "build").exists()
-      }
+    // 兼容 a 分支现有逻辑，因为 a 分支中没有 ProjectSyncHelper，如果这里没有 ProjectSyncHelper 的引用，
+    // 我们暂以检查 build 目录和 .gradle 目录的基础手段作为平替（或者如果你有 ProjectSyncHelper，可以直接调用）。
+    return withContext(Dispatchers.IO) {
+      !File(projectDir, ".gradle").exists() || !File(projectDir, "build").exists()
+    }
   }
 
   override suspend fun setupProject(project: IProject) {
     // 缓存插件项目标志
-    pluginProjectCached = withContext(Dispatchers.IO) {
-        File(projectDir, Environment.PLUGIN_API_JAR_RELATIVE_PATH).exists()
-    }
+    pluginProjectCached =
+        withContext(Dispatchers.IO) {
+          File(projectDir, Environment.PLUGIN_API_JAR_RELATIVE_PATH).exists()
+        }
 
     this._workspace =
         withStopWatch("Transform project proxy") {
@@ -145,15 +141,14 @@ class ProjectManagerImpl : IProjectManager, EventReceiver {
         rootProject.getSubProjects().filterIsInstance<ModuleProject>().forEach { emit(it) }
       }
 
-      val jobs =
-          modulesFlow.map { module ->
-            indexerScope.async {
-              module.indexSourcesAndClasspaths()
-              if (module is AndroidModule) {
-                module.readResources()
-              }
-            }
+      val jobs = modulesFlow.map { module ->
+        indexerScope.async {
+          module.indexSourcesAndClasspaths()
+          if (module is AndroidModule) {
+            module.readResources()
           }
+        }
+      }
 
       // wait for the indexing to finish
       jobs.toList().awaitAll()
@@ -298,7 +293,7 @@ class ProjectManagerImpl : IProjectManager, EventReceiver {
                 versionCode = gradleInfo?.versionCode,
                 minSdk = gradleInfo?.minSdk,
                 targetSdk = gradleInfo?.targetSdk,
-                compileSdk = gradleInfo?.compileSdk
+                compileSdk = gradleInfo?.compileSdk,
             )
       }
     }

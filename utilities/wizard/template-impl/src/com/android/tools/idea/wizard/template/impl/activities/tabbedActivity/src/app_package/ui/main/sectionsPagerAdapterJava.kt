@@ -19,7 +19,7 @@ package com.android.tools.idea.wizard.template.impl.activities.tabbedActivity.sr
 import com.android.tools.idea.wizard.template.getMaterialComponentName
 
 fun sectionsPagerAdapterJava(packageName: String, useAndroidX: Boolean) =
-  """package ${packageName}.ui.main;
+    """package ${packageName}.ui.main;
 
 import android.content.Context;
 import ${getMaterialComponentName("android.support.annotation.Nullable", useAndroidX)};

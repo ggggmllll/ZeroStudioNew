@@ -10,31 +10,17 @@ import me.rerere.rikkahub.data.repository.MemoryRepository
 import org.koin.dsl.module
 
 val repositoryModule = module {
-    single {
-        ConversationRepository(get(), get(), get(), get(), get(), get())
-    }
+  single { ConversationRepository(get(), get(), get(), get(), get(), get()) }
 
-    single {
-        MemoryRepository(get())
-    }
+  single { MemoryRepository(get()) }
 
-    single {
-        GenMediaRepository(get())
-    }
+  single { GenMediaRepository(get()) }
 
-    single {
-        FilesRepository(get())
-    }
+  single { FilesRepository(get()) }
 
-    single {
-        FavoriteRepository(get())
-    }
+  single { FavoriteRepository(get()) }
 
-    single {
-        FilesManager(get(), get(), get())
-    }
+  single { FilesManager(get(), get(), get()) }
 
-    single {
-        SkillManager(get(), get())
-    }
+  single { SkillManager(get(), get()) }
 }

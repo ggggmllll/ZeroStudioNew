@@ -21,8 +21,14 @@ package com.itsaky.androidide.templates.impl.androidstudio.activities.aiStarter.
  * @author Historical contributors (The Android Open Source Project)
  * @author android_zero
  */
-fun mainActivityKt(activityClass: String, defaultPreview: String, greeting: String, packageName: String, themeName: String) =
-  """
+fun mainActivityKt(
+    activityClass: String,
+    defaultPreview: String,
+    greeting: String,
+    packageName: String,
+    themeName: String,
+) =
+    """
 package $packageName
 
 import android.os.Bundle

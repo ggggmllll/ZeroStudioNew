@@ -31,12 +31,12 @@ import com.android.tools.idea.wizard.template.impl.activities.composeActivityMat
 import com.android.tools.idea.wizard.template.impl.activities.composeNavigationUiActivityMaterial3.src.app_package.mainActivityKt
 
 fun RecipeExecutor.composeNavigationUiActivityRecipe(
-  moduleData: ModuleTemplateData,
-  activityClass: String,
-  packageName: String,
-  isLauncher: Boolean,
-  greeting: String,
-  defaultPreview: String,
+    moduleData: ModuleTemplateData,
+    activityClass: String,
+    packageName: String,
+    isLauncher: Boolean,
+    greeting: String,
+    defaultPreview: String,
 ) {
   val (_, srcOut, resOut, _) = moduleData
   addAllKotlinDependencies(moduleData)
@@ -51,13 +51,13 @@ fun RecipeExecutor.composeNavigationUiActivityRecipe(
   addDependency(mavenCoordinate = "androidx.compose.material3:material3-adaptive-navigation-suite")
 
   generateManifest(
-    moduleData = moduleData,
-    activityClass = activityClass,
-    activityThemeName = moduleData.themesData.main.name,
-    packageName = packageName,
-    isLauncher = isLauncher,
-    hasNoActionBar = true,
-    generateActivityTitle = true,
+      moduleData = moduleData,
+      activityClass = activityClass,
+      activityThemeName = moduleData.themesData.main.name,
+      packageName = packageName,
+      isLauncher = isLauncher,
+      hasNoActionBar = true,
+      generateActivityTitle = true,
   )
   // It doesn't have to create separate themes.xml for light and night because the default
   // status bar color is same between them at this moment
@@ -65,13 +65,23 @@ fun RecipeExecutor.composeNavigationUiActivityRecipe(
   // this themes.xml exists just for settings the status bar color.
   // Thus, themeName follows the non-Compose project convention.
   // (E.g. Theme.MyApplication) as opposed to the themeName variable below (E.g. MyApplicationTheme)
-  mergeXml(themesXml(themeName = moduleData.themesData.main.name), resOut.resolve("values/themes.xml"))
+  mergeXml(
+      themesXml(themeName = moduleData.themesData.main.name),
+      resOut.resolve("values/themes.xml"),
+  )
 
   val themeName = "${moduleData.themesData.appName}Theme"
   val appComposableName = "${moduleData.themesData.appName}App"
   save(
-    mainActivityKt(activityClass, defaultPreview, greeting, packageName, themeName, appComposableName),
-    srcOut.resolve("${activityClass}.kt"),
+      mainActivityKt(
+          activityClass,
+          defaultPreview,
+          greeting,
+          packageName,
+          themeName,
+          appComposableName,
+      ),
+      srcOut.resolve("${activityClass}.kt"),
   )
   val uiThemeFolder = "ui/theme"
   save(colorKt(packageName), srcOut.resolve("$uiThemeFolder/Color.kt"))

@@ -17,9 +17,9 @@
 
 package com.itsaky.androidide.lsp.java.compiler
 
+import java.util.function.*
 import openjdk.source.tree.CompilationUnitTree
 import openjdk.tools.javac.api.JavacTaskImpl
-import java.util.function.*
 
 /**
  * A compilation task processor process the [JavacTaskImpl]. Usually, a processor decides what files

@@ -18,57 +18,54 @@
 import com.itsaky.androidide.build.config.BuildConfig
 
 plugins {
-    id("com.android.library")
-    id("kotlin-android")
-    alias(libs.plugins.org.jetbrains.kotlin.plugin.compose)
-    
+  id("com.android.library")
+  id("kotlin-android")
+  alias(libs.plugins.org.jetbrains.kotlin.plugin.compose)
 }
 
 android {
-    namespace = "${BuildConfig.packageName}.compose.preview"
+  namespace = "${BuildConfig.packageName}.compose.preview"
 
-    buildFeatures {
-        compose = true
-        viewBinding = true
-    }
-    
-    defaultConfig {
-        consumerProguardFiles("proguard-rules.pro")
-    }
+  buildFeatures {
+    compose = true
+    viewBinding = true
+  }
 
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
+  defaultConfig { consumerProguardFiles("proguard-rules.pro") }
+
+  compileOptions {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+  }
 }
 
 dependencies {
-    implementation(platform(libs.androidx.compose.bom))
-    
-    // Compose 基础依赖
-    implementation(libs.androidx.compose.runtime)
-    implementation(libs.androidx.compose.ui)
-    implementation(libs.androidx.compose.ui.tooling.preview)
-    implementation(libs.androidx.compose.foundation)
-    implementation(libs.androidx.compose.material3)
-    implementation(libs.androidx.activity.compose)
-    debugImplementation(libs.androidx.compose.ui.tooling)
+  implementation(platform(libs.androidx.compose.bom))
 
-    // AndroidX & 基础 UI
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.google.material)
-    implementation(libs.androidx.constraintlayout)
-    implementation(libs.androidx.fragment.ktx)
-    implementation(libs.androidx.lifecycle.viewmodel.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.common.kotlin.coroutines.android)
+  // Compose 基础依赖
+  implementation(libs.androidx.compose.runtime)
+  implementation(libs.androidx.compose.ui)
+  implementation(libs.androidx.compose.ui.tooling.preview)
+  implementation(libs.androidx.compose.foundation)
+  implementation(libs.androidx.compose.material3)
+  implementation(libs.androidx.activity.compose)
+  debugImplementation(libs.androidx.compose.ui.tooling)
 
-    // AndroidIDE模块
-    implementation(projects.core.common)
-    implementation(projects.editor.impl)
-    implementation(projects.editor.api)
-    implementation(projects.core.resources)
-    implementation(projects.logging.logger)
-    implementation(projects.core.projects)
+  // AndroidX & 基础 UI
+  implementation(libs.androidx.core.ktx)
+  implementation(libs.androidx.appcompat)
+  implementation(libs.google.material)
+  implementation(libs.androidx.constraintlayout)
+  implementation(libs.androidx.fragment.ktx)
+  implementation(libs.androidx.lifecycle.viewmodel.ktx)
+  implementation(libs.androidx.lifecycle.runtime.ktx)
+  implementation(libs.common.kotlin.coroutines.android)
+
+  // AndroidIDE模块
+  implementation(projects.core.common)
+  implementation(projects.editor.impl)
+  implementation(projects.editor.api)
+  implementation(projects.core.resources)
+  implementation(projects.logging.logger)
+  implementation(projects.core.projects)
 }

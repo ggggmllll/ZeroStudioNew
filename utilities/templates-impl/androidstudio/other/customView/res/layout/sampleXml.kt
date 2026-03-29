@@ -19,7 +19,7 @@ package com.itsaky.androidide.templates.impl.androidstudio.other.customView.res.
 import com.itsaky.androidide.templates.impl.androidstudio.other.customView.res.values.getCustomViewStyle
 
 fun sampleXml(packageName: String, themeName: String, viewClass: String) =
-  """
+    """
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"

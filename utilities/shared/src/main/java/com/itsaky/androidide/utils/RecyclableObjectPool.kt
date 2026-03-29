@@ -17,11 +17,11 @@
 
 package com.itsaky.androidide.utils
 
-import org.slf4j.LoggerFactory
 import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicLong
 import kotlin.math.min
+import org.slf4j.LoggerFactory
 
 // TODO(itsaky): Automatically resize the pool based on the cache hit rate and the acess count
 
@@ -35,12 +35,14 @@ import kotlin.math.min
  * @param objFactory The factory which will be used to create new instances of the object.
  * @author Akash Yadav
  */
-class RecyclableObjectPool<RecyclableT : RecyclableObjectPool.Recyclable> @JvmOverloads constructor(
-  private val capacity: Int = CAPACITY_DEFAULT,
-  private val objFactory: Factory<RecyclableT>,
-  private val metricsEnabled: Boolean = true,
-  fillFirst: Int = 0,
-  klass: Class<RecyclableT>
+class RecyclableObjectPool<RecyclableT : RecyclableObjectPool.Recyclable>
+@JvmOverloads
+constructor(
+    private val capacity: Int = CAPACITY_DEFAULT,
+    private val objFactory: Factory<RecyclableT>,
+    private val metricsEnabled: Boolean = true,
+    fillFirst: Int = 0,
+    klass: Class<RecyclableT>,
 ) {
 
   private val lastMetricsLog = AtomicLong(0)
@@ -52,9 +54,7 @@ class RecyclableObjectPool<RecyclableT : RecyclableObjectPool.Recyclable> @JvmOv
 
     private const val CACHE_HIT_WARNING_THRESHOLD = 50f
 
-    private val log by lazy {
-      LoggerFactory.getLogger(RecyclableObjectPool::class.java)
-    }
+    private val log by lazy { LoggerFactory.getLogger(RecyclableObjectPool::class.java) }
 
     const val CAPACITY_DEFAULT: Int = 4096
     const val CAPACITY_LARGE: Int = CAPACITY_DEFAULT * 2
@@ -70,9 +70,7 @@ class RecyclableObjectPool<RecyclableT : RecyclableObjectPool.Recyclable> @JvmOv
    */
   private val accCount = AtomicLong(0)
 
-  /**
-   * The recycle count of this pool.
-   */
+  /** The recycle count of this pool. */
   private val recCount = AtomicInteger(0)
 
   private val cache = ArrayBlockingQueue<RecyclableT>(capacity)
@@ -92,9 +90,7 @@ class RecyclableObjectPool<RecyclableT : RecyclableObjectPool.Recyclable> @JvmOv
     }
   }
 
-  /**
-   * Recycle the given object.
-   */
+  /** Recycle the given object. */
   fun recycle(obj: RecyclableT): Boolean {
     if (obj.isRecycled) {
       log.warn("Trying to recyle already recycled object: {}", obj)
@@ -109,9 +105,7 @@ class RecyclableObjectPool<RecyclableT : RecyclableObjectPool.Recyclable> @JvmOv
     }
   }
 
-  /**
-   * Obtain an object from the pool or a new object if the pool is empty.
-   */
+  /** Obtain an object from the pool or a new object if the pool is empty. */
   fun obtain(): RecyclableT {
     val acc = accCount.get()
     var access = IntPair.getFirst(acc)
@@ -120,12 +114,13 @@ class RecyclableObjectPool<RecyclableT : RecyclableObjectPool.Recyclable> @JvmOv
     // increment the access count
     accCount.set(IntPair.pack(++access, cacheHit))
 
-    val result = this.cache.poll()?.also {
-      it.isRecycled = false
+    val result =
+        this.cache.poll()?.also {
+          it.isRecycled = false
 
-      // increment the cache hit
-      accCount.set(IntPair.pack(access, ++cacheHit))
-    } ?: objFactory.create()
+          // increment the cache hit
+          accCount.set(IntPair.pack(access, ++cacheHit))
+        } ?: objFactory.create()
 
     if (DEBUG && access % LOG_METRICS_ON_N_ACCESS == 0) {
       logMetrics()
@@ -135,7 +130,7 @@ class RecyclableObjectPool<RecyclableT : RecyclableObjectPool.Recyclable> @JvmOv
   }
 
   fun cacheHitRate(): Float {
-    val acc = accCount.get();
+    val acc = accCount.get()
     val access = IntPair.getFirst(acc).toFloat()
     val cacheHit = IntPair.getSecond(acc).toFloat()
     return (cacheHit / access) * 100F
@@ -184,7 +179,11 @@ class RecyclableObjectPool<RecyclableT : RecyclableObjectPool.Recyclable> @JvmOv
       // something might be wrong
       // log an error
       log.error("!!!!!!!!!!!!!!!!!!!!! CRITICAL ERROR !!!!!!!!!!!!!!!!!!!!!")
-      log.error("Cache-hit rate for '{}' is less than {}%!!", simpleName, CACHE_HIT_WARNING_THRESHOLD)
+      log.error(
+          "Cache-hit rate for '{}' is less than {}%!!",
+          simpleName,
+          CACHE_HIT_WARNING_THRESHOLD,
+      )
       log.error("Make sure that instances of {} are obtained using the object pool", objName)
       log.error("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
     }
@@ -201,7 +200,8 @@ class RecyclableObjectPool<RecyclableT : RecyclableObjectPool.Recyclable> @JvmOv
   interface Recyclable {
 
     /**
-     * Whether the object has been recycled. This property is supposed to be modified only by the pool.
+     * Whether the object has been recycled. This property is supposed to be modified only by the
+     * pool.
      */
     var isRecycled: Boolean
 
@@ -212,14 +212,10 @@ class RecyclableObjectPool<RecyclableT : RecyclableObjectPool.Recyclable> @JvmOv
     fun recycle()
   }
 
-  /**
-   * A [Factory] creates [Recyclable] objects.
-   */
+  /** A [Factory] creates [Recyclable] objects. */
   fun interface Factory<_RecyclableT : Recyclable> {
 
-    /**
-     * Create the [_RecyclableT] object.
-     */
+    /** Create the [_RecyclableT] object. */
     fun create(): _RecyclableT
   }
 }

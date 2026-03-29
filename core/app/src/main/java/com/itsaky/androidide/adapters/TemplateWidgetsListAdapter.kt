@@ -32,16 +32,19 @@ import com.itsaky.androidide.templates.Widget
  * @author Akash Yadav
  */
 class TemplateWidgetsListAdapter(private val widgets: List<Widget<*>>) :
-  RecyclerView.Adapter<WidgetViewHolder>() {
+    RecyclerView.Adapter<WidgetViewHolder>() {
 
-  class WidgetViewHolder(
-    internal val binding: LayoutTemplateWidgetlistItemBinding
-  ) : RecyclerView.ViewHolder(binding.root)
+  class WidgetViewHolder(internal val binding: LayoutTemplateWidgetlistItemBinding) :
+      RecyclerView.ViewHolder(binding.root)
 
-  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int
-  ): WidgetViewHolder {
-    return WidgetViewHolder(LayoutTemplateWidgetlistItemBinding.inflate(
-      LayoutInflater.from(parent.context), parent, false))
+  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WidgetViewHolder {
+    return WidgetViewHolder(
+        LayoutTemplateWidgetlistItemBinding.inflate(
+            LayoutInflater.from(parent.context),
+            parent,
+            false,
+        )
+    )
   }
 
   override fun getItemCount(): Int {
@@ -55,9 +58,13 @@ class TemplateWidgetsListAdapter(private val widgets: List<Widget<*>>) :
       val view = viewProvider.createView(root.context, widget)
 
       root.removeAllViews()
-      root.addView(view,
-        LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-          ViewGroup.LayoutParams.WRAP_CONTENT))
+      root.addView(
+          view,
+          LinearLayout.LayoutParams(
+              ViewGroup.LayoutParams.MATCH_PARENT,
+              ViewGroup.LayoutParams.WRAP_CONTENT,
+          ),
+      )
     }
   }
 }

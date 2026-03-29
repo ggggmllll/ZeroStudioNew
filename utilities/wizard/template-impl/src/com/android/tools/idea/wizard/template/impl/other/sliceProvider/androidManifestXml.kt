@@ -16,8 +16,14 @@
 
 package com.android.tools.idea.wizard.template.impl.other.sliceProvider
 
-fun androidManifestXml(authorities: String, className: String, hostUrl: String, packageName: String, pathPrefix: String) =
-  """
+fun androidManifestXml(
+    authorities: String,
+    className: String,
+    hostUrl: String,
+    packageName: String,
+    pathPrefix: String,
+) =
+    """
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <application>

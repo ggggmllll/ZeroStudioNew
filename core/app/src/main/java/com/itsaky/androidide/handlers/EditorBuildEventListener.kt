@@ -28,11 +28,12 @@ import com.itsaky.androidide.tooling.events.configuration.ProjectConfigurationSt
 import com.itsaky.androidide.tooling.events.task.TaskStartEvent
 import com.itsaky.androidide.utils.flashError
 import com.itsaky.androidide.utils.flashSuccess
-import org.slf4j.LoggerFactory
 import java.lang.ref.WeakReference
+import org.slf4j.LoggerFactory
 
 /**
  * Handles events received from [GradleBuildService] updates [EditorHandlerActivity].
+ *
  * @author Akash Yadav
  * @author android_zero
  */
@@ -48,7 +49,7 @@ class EditorBuildEventListener : GradleBuildService.EventListener {
 
   private val _activity: EditorHandlerActivity?
     get() = activityReference.get()
-    
+
   private val activity: EditorHandlerActivity
     get() = checkNotNull(activityReference.get()) { "Activity reference has been destroyed!" }
 
@@ -66,16 +67,14 @@ class EditorBuildEventListener : GradleBuildService.EventListener {
     val act = checkActivity("prepareBuild") ?: return
 
     val isFirstBuild = GeneralPreferences.isFirstBuild
-    act.setStatus(
-      act.getString(if (isFirstBuild) string.preparing_first else string.preparing)
-    )
+    act.setStatus(act.getString(if (isFirstBuild) string.preparing_first else string.preparing))
 
     if (isFirstBuild) {
       act.showFirstBuildNotice()
     }
 
     act.editorViewModel.isBuildInProgress = true
-    
+
     // 安全更新底栏
     act.clearBuildOutputSafely()
 
@@ -118,7 +117,7 @@ class EditorBuildEventListener : GradleBuildService.EventListener {
     val act = checkActivity("onOutput") ?: return
 
     line?.let { act.appendBuildOutput(it) }
-    
+
     if (line != null && (line.contains("BUILD SUCCESSFUL") || line.contains("BUILD FAILED"))) {
       act.setStatus(line)
     }
@@ -135,9 +134,9 @@ class EditorBuildEventListener : GradleBuildService.EventListener {
   }
 
   /**
-   * Safe getter: Verifies that the activity is neither null, nor finishing, nor destroyed.
-   * This is crucial for preventing IllegalStateException when trying to update UI bindings
-   * that have already been torn down by the system.
+   * Safe getter: Verifies that the activity is neither null, nor finishing, nor destroyed. This is
+   * crucial for preventing IllegalStateException when trying to update UI bindings that have
+   * already been torn down by the system.
    */
   private fun checkActivity(action: String): EditorHandlerActivity? {
     if (!enabled) return null

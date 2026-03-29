@@ -31,15 +31,15 @@ import com.itsaky.androidide.resources.R
 @com.itsaky.androidide.annotations.inflater.ViewAdapter(forView = MultiAutoCompleteTextView::class)
 @IncludeInDesigner(group = WIDGETS)
 open class MultiAutoCompleteTextViewAdapter<T : MultiAutoCompleteTextView> :
-  AutoCompleteTextViewAdapter<T>() {
+    AutoCompleteTextViewAdapter<T>() {
 
   override fun createUiWidgets(): List<UiWidget> {
     return listOf(
-      UiWidget(
-        MultiAutoCompleteTextView::class.java,
-        R.string.widget_multi_auto_complete_textview,
-        R.drawable.ic_widget_multi_auto_complete_textview
-      )
+        UiWidget(
+            MultiAutoCompleteTextView::class.java,
+            R.string.widget_multi_auto_complete_textview,
+            R.drawable.ic_widget_multi_auto_complete_textview,
+        )
     )
   }
 }

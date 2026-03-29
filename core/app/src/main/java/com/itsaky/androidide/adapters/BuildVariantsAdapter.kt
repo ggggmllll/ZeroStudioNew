@@ -37,16 +37,16 @@ import java.util.Objects
  * @author Akash Yadav
  */
 class BuildVariantsAdapter(
-  private val viewModel: BuildVariantsViewModel,
-  private var items: List<BuildVariantInfo>
+    private val viewModel: BuildVariantsViewModel,
+    private var items: List<BuildVariantInfo>,
 ) : RecyclerView.Adapter<BuildVariantsAdapter.ViewHolder>() {
 
   class ViewHolder(internal val binding: LayoutBuildVariantItemBinding) :
-    RecyclerView.ViewHolder(binding.root)
+      RecyclerView.ViewHolder(binding.root)
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-    val binding = LayoutBuildVariantItemBinding.inflate(LayoutInflater.from(parent.context), parent,
-      false)
+    val binding =
+        LayoutBuildVariantItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
     return ViewHolder(binding)
   }
 
@@ -61,13 +61,14 @@ class BuildVariantsAdapter(
     binding.moduleName.text = variantInfo.projectPath
 
     binding.variantName.apply {
-
       val viewModel = viewModel
 
       setAdapter(
-        ArrayAdapter(binding.root.context, R.layout.support_simple_spinner_dropdown_item,
-          variantInfo.buildVariants
-        )
+          ArrayAdapter(
+              binding.root.context,
+              R.layout.support_simple_spinner_dropdown_item,
+              variantInfo.buildVariants,
+          )
       )
 
       var listSelection = variantInfo.buildVariants.indexOf(variantInfo.selectedVariant)
@@ -80,20 +81,21 @@ class BuildVariantsAdapter(
 
       addTextChangedListener { editable ->
         // update the changed build variants map
-        viewModel.updatedBuildVariants = viewModel.updatedBuildVariants.also { variants ->
+        viewModel.updatedBuildVariants =
+            viewModel.updatedBuildVariants.also { variants ->
 
-          // the newly selected build variant
-          // if this is different that the variant that was used while initializing the project,
-          // then the user is notified to re-sync the project
-          // else the selection is cleared
-          val newSelection = editable?.toString() ?: IAndroidProject.DEFAULT_VARIANT
+              // the newly selected build variant
+              // if this is different that the variant that was used while initializing the project,
+              // then the user is notified to re-sync the project
+              // else the selection is cleared
+              val newSelection = editable?.toString() ?: IAndroidProject.DEFAULT_VARIANT
 
-          if (!Objects.equals(variantInfo.selectedVariant, newSelection)) {
-            variants[variantInfo.projectPath] = variantInfo.withSelection(newSelection)
-          } else {
-            variants.remove(variantInfo.projectPath)
-          }
-        }
+              if (!Objects.equals(variantInfo.selectedVariant, newSelection)) {
+                variants[variantInfo.projectPath] = variantInfo.withSelection(newSelection)
+              } else {
+                variants.remove(variantInfo.projectPath)
+              }
+            }
       }
     }
   }

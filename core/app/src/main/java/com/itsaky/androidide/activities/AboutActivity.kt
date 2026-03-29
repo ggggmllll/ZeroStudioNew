@@ -48,9 +48,7 @@ class AboutActivity : EdgeToEdgeIDEActivity() {
 
   private var _binding: ActivityAboutBinding? = null
   private val binding: ActivityAboutBinding
-    get() = checkNotNull(_binding) {
-      "Activity has been destroyed"
-    }
+    get() = checkNotNull(_binding) { "Activity has been destroyed" }
 
   override fun bindLayout(): View {
     _binding = ActivityAboutBinding.inflate(layoutInflater)
@@ -72,7 +70,6 @@ class AboutActivity : EdgeToEdgeIDEActivity() {
     super.onCreate(savedInstanceState)
 
     binding.apply {
-
       setSupportActionBar(toolbar)
       supportActionBar!!.setDisplayHomeAsUpEnabled(true)
       supportActionBar!!.setTitle(R.string.about)
@@ -104,10 +101,10 @@ class AboutActivity : EdgeToEdgeIDEActivity() {
   override fun onApplySystemBarInsets(insets: Insets) {
     binding.toolbar.apply {
       setPaddingRelative(
-        paddingStart + insets.left,
-        paddingTop,
-        paddingEnd + insets.right,
-        paddingBottom
+          paddingStart + insets.left,
+          paddingTop,
+          paddingEnd + insets.right,
+          paddingBottom,
       )
     }
   }
@@ -126,40 +123,40 @@ class AboutActivity : EdgeToEdgeIDEActivity() {
   private fun createSocialItems(): List<IconTitleDescriptionItem> {
     return mutableListOf<IconTitleDescriptionItem>().apply {
       add(
-        createSimpleIconTextItem(
-          this@AboutActivity,
-          ACTION_WEBSITE,
-          R.drawable.ic_website,
-          R.string.about_option_website,
-          BuildInfo.PROJECT_SITE
-        )
+          createSimpleIconTextItem(
+              this@AboutActivity,
+              ACTION_WEBSITE,
+              R.drawable.ic_website,
+              R.string.about_option_website,
+              BuildInfo.PROJECT_SITE,
+          )
       )
       add(
-        createSimpleIconTextItem(
-          this@AboutActivity,
-          ACTION_EMAIL,
-          R.drawable.ic_email,
-          R.string.about_option_email,
-          BaseApplication.EMAIL
-        )
+          createSimpleIconTextItem(
+              this@AboutActivity,
+              ACTION_EMAIL,
+              R.drawable.ic_email,
+              R.string.about_option_email,
+              BaseApplication.EMAIL,
+          )
       )
       add(
-        createSimpleIconTextItem(
-          this@AboutActivity,
-          ACTION_TG_GROUP,
-          R.drawable.ic_telegram,
-          R.string.discussions_on_telegram,
-          BaseApplication.TELEGRAM_GROUP_URL
-        )
+          createSimpleIconTextItem(
+              this@AboutActivity,
+              ACTION_TG_GROUP,
+              R.drawable.ic_telegram,
+              R.string.discussions_on_telegram,
+              BaseApplication.TELEGRAM_GROUP_URL,
+          )
       )
       add(
-        createSimpleIconTextItem(
-          this@AboutActivity,
-          ACTION_TG_CHANNEL,
-          R.drawable.ic_telegram,
-          R.string.official_tg_channel,
-          BaseApplication.TELEGRAM_CHANNEL_URL
-        )
+          createSimpleIconTextItem(
+              this@AboutActivity,
+              ACTION_TG_CHANNEL,
+              R.drawable.ic_telegram,
+              R.string.official_tg_channel,
+              BaseApplication.TELEGRAM_CHANNEL_URL,
+          )
       )
     }
   }
@@ -167,38 +164,38 @@ class AboutActivity : EdgeToEdgeIDEActivity() {
   private fun createMiscItems(): List<IconTitleDescriptionItem> {
     return mutableListOf<IconTitleDescriptionItem>().apply {
       add(
-        SimpleIconTitleDescriptionItem.create(
-          this@AboutActivity,
-          ACTION_CONTRIBUTE,
-          R.drawable.ic_code,
-          R.string.title_contribute,
-          R.string.summary_contribute
-        )
+          SimpleIconTitleDescriptionItem.create(
+              this@AboutActivity,
+              ACTION_CONTRIBUTE,
+              R.drawable.ic_code,
+              R.string.title_contribute,
+              R.string.summary_contribute,
+          )
       )
       add(
-        SimpleIconTitleDescriptionItem.create(
-          this@AboutActivity,
-          ACTION_CONTRIBUTORS,
-          R.drawable.ic_heart_outline,
-          R.string.title_contributors,
-          R.string.summary_contributors
-        )
+          SimpleIconTitleDescriptionItem.create(
+              this@AboutActivity,
+              ACTION_CONTRIBUTORS,
+              R.drawable.ic_heart_outline,
+              R.string.title_contributors,
+              R.string.summary_contributors,
+          )
       )
     }
   }
 
   private fun createSimpleIconTextItem(
-    context: Context,
-    id: Int,
-    @DrawableRes icon: Int,
-    @StringRes title: Int,
-    description: CharSequence
+      context: Context,
+      id: Int,
+      @DrawableRes icon: Int,
+      @StringRes title: Int,
+      description: CharSequence,
   ): SimpleIconTitleDescriptionItem {
     return SimpleIconTitleDescriptionItem(
-      id,
-      ContextCompat.getDrawable(context, icon),
-      ContextCompat.getString(context, title),
-      description
+        id,
+        ContextCompat.getDrawable(context, icon),
+        ContextCompat.getString(context, title),
+        description,
     )
   }
 
@@ -227,49 +224,45 @@ class AboutActivity : EdgeToEdgeIDEActivity() {
   }
 
   private fun appendBuildType(
-    builder: SpannableStringBuilder,
-    @ColorInt
-    colorPositive: Int,
-    @ColorInt
-    colorNegative: Int
+      builder: SpannableStringBuilder,
+      @ColorInt colorPositive: Int,
+      @ColorInt colorNegative: Int,
   ) {
     @Suppress("KotlinConstantConditions")
-    var color = if (BuildConfig.BUILD_TYPE != "release") {
-      colorNegative
-    } else {
-      colorPositive
-    }
+    var color =
+        if (BuildConfig.BUILD_TYPE != "release") {
+          colorNegative
+        } else {
+          colorPositive
+        }
 
     builder.append("(")
     appendForegroundSpan(builder, BuildConfig.BUILD_TYPE, color)
 
     val isOfficialBuild = BuildInfoUtils.isOfficialBuild(this)
 
-    color = if (isOfficialBuild) {
-      colorPositive
-    } else {
-      colorNegative
-    }
+    color =
+        if (isOfficialBuild) {
+          colorPositive
+        } else {
+          colorNegative
+        }
 
     builder.append("/")
-    appendForegroundSpan(
-      builder,
-      BuildInfoUtils.getBuildType(this).lowercase(),
-      color
-    )
+    appendForegroundSpan(builder, BuildInfoUtils.getBuildType(this).lowercase(), color)
 
     builder.append(")")
   }
 
   private fun appendForegroundSpan(
-    builder: SpannableStringBuilder,
-    text: CharSequence,
-    color: Int
+      builder: SpannableStringBuilder,
+      text: CharSequence,
+      color: Int,
   ) {
     builder.append(
-      text,
-      ForegroundColorSpan(color),
-      SpannableStringBuilder.SPAN_EXCLUSIVE_EXCLUSIVE
+        text,
+        ForegroundColorSpan(color),
+        SpannableStringBuilder.SPAN_EXCLUSIVE_EXCLUSIVE,
     )
   }
 
@@ -279,8 +272,8 @@ class AboutActivity : EdgeToEdgeIDEActivity() {
   }
 
   class AboutSocialItemsAdapter(
-    items: List<IconTitleDescriptionItem>,
-    private val onClickListener: (SimpleIconTitleDescriptionItem) -> Unit
+      items: List<IconTitleDescriptionItem>,
+      private val onClickListener: (SimpleIconTitleDescriptionItem) -> Unit,
   ) : SimpleIconTitleDescriptionAdapter(items) {
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -298,9 +291,7 @@ class AboutActivity : EdgeToEdgeIDEActivity() {
       binding.root.isClickable = true
       binding.root.isFocusable = true
       binding.root.setBackgroundResource(R.drawable.bg_ripple)
-      binding.root.setOnClickListener {
-        onClickListener(item)
-      }
+      binding.root.setOnClickListener { onClickListener(item) }
     }
   }
 }

@@ -15,7 +15,6 @@
  *   along with AndroidIDE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 import com.itsaky.androidide.build.config.BuildConfig
 
 plugins {
@@ -23,11 +22,7 @@ plugins {
   id("org.jetbrains.kotlin.android")
 }
 
-
-
-android {
-  namespace = "${BuildConfig.packageName}.stats"
-}
+android { namespace = "${BuildConfig.packageName}.stats" }
 
 dependencies {
   implementation(libs.androidx.work)

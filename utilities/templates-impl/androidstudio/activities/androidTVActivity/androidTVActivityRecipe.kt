@@ -19,7 +19,6 @@ package com.itsaky.androidide.templates.impl.androidstudio.activities.androidTVA
 import com.itsaky.androidide.templates.Language
 import com.itsaky.androidide.templates.base.AndroidModuleTemplateBuilder
 import com.itsaky.androidide.templates.base.util.AndroidModuleResManager.ResourceType
-import com.itsaky.androidide.templates.impl.base.createRecipe
 import com.itsaky.androidide.templates.impl.androidstudio.activities.androidTVActivity.res.layout.activityDetailsXml
 import com.itsaky.androidide.templates.impl.androidstudio.activities.androidTVActivity.res.layout.activityMainXml
 import com.itsaky.androidide.templates.impl.androidstudio.activities.androidTVActivity.res.values.colorsXml
@@ -49,69 +48,187 @@ import com.itsaky.androidide.templates.impl.androidstudio.activities.androidTVAc
 import com.itsaky.androidide.templates.impl.androidstudio.activities.androidTVActivity.src.app_package.playbackVideoFragmentKt
 import com.itsaky.androidide.templates.impl.androidstudio.activities.androidTVActivity.src.app_package.videoDetailsFragmentJava
 import com.itsaky.androidide.templates.impl.androidstudio.activities.androidTVActivity.src.app_package.videoDetailsFragmentKt
+import com.itsaky.androidide.templates.impl.base.createRecipe
 
 /**
- * Formats the recipe for Android TV Blank Views Activity containing leanback support library configurations.
+ * Formats the recipe for Android TV Blank Views Activity containing leanback support library
+ * configurations.
  *
  * @author Historical contributors (The Android Open Source Project)
  * @author android_zero
  */
 fun AndroidModuleTemplateBuilder.androidTVActivityRecipe(
-  activityClass: String,
-  layoutName: String,
-  mainFragmentClass: String,
-  detailsActivityClass: String,
-  detailsLayoutName: String,
-  detailsFragmentClass: String,
-  packageName: String,
-  isLauncher: Boolean = true
+    activityClass: String,
+    layoutName: String,
+    mainFragmentClass: String,
+    detailsActivityClass: String,
+    detailsLayoutName: String,
+    detailsFragmentClass: String,
+    packageName: String,
+    isLauncher: Boolean = true,
 ) {
-    addDependency("androidx.leanback", "leanback", "1.2.0")
-    addDependency("com.github.bumptech.glide", "glide", "4.11.0")
+  addDependency("androidx.leanback", "leanback", "1.2.0")
+  addDependency("com.github.bumptech.glide", "glide", "4.11.0")
 
-    val themeName = "${data.appName}Theme"
+  val themeName = "${data.appName}Theme"
 
-    recipe = createRecipe {
-        save(androidManifestXml(activityClass, detailsActivityClass, data.type.name.contains("Library"), true, packageName, "@style/$themeName"), manifestFile())
+  recipe = createRecipe {
+    save(
+        androidManifestXml(
+            activityClass,
+            detailsActivityClass,
+            data.type.name.contains("Library"),
+            true,
+            packageName,
+            "@style/$themeName",
+        ),
+        manifestFile(),
+    )
 
-        res {
-            writeXmlResource("strings", ResourceType.VALUES, source = { stringsXml(activityClass, true) })
-            writeXmlResource("colors", ResourceType.VALUES, source = { colorsXml() })
-            writeXmlResource("themes", ResourceType.VALUES, source = { themesXml(themeName) })
-            
-            writeXmlResource(layoutName, ResourceType.LAYOUT, source = { activityMainXml(activityClass, packageName) })
-            writeXmlResource(detailsLayoutName, ResourceType.LAYOUT, source = { activityDetailsXml(detailsActivityClass, packageName) })
-        }
+    res {
+      writeXmlResource("strings", ResourceType.VALUES, source = { stringsXml(activityClass, true) })
+      writeXmlResource("colors", ResourceType.VALUES, source = { colorsXml() })
+      writeXmlResource("themes", ResourceType.VALUES, source = { themesXml(themeName) })
 
-        sources {
-            val minApi = data.versions.minSdk.apiLevel()
-            if (data.language == Language.Java) {
-                writeJavaSrc(packageName, activityClass, source = { mainActivityJava(activityClass, layoutName, mainFragmentClass, packageName) })
-                writeJavaSrc(packageName, mainFragmentClass, source = { mainFragmentJava(detailsActivityClass, mainFragmentClass, minApi, packageName) })
-                writeJavaSrc(packageName, detailsActivityClass, source = { detailsActivityJava(detailsActivityClass, detailsFragmentClass, detailsLayoutName, packageName) })
-                writeJavaSrc(packageName, detailsFragmentClass, source = { videoDetailsFragmentJava(activityClass, detailsActivityClass, detailsFragmentClass, minApi, packageName) })
-                writeJavaSrc(packageName, "Movie", source = { movieJava(packageName) })
-                writeJavaSrc(packageName, "MovieList", source = { movieListJava(packageName) })
-                writeJavaSrc(packageName, "CardPresenter", source = { cardPresenterJava(packageName) })
-                writeJavaSrc(packageName, "DetailsDescriptionPresenter", source = { detailsDescriptionPresenterJava(packageName) })
-                writeJavaSrc(packageName, "PlaybackActivity", source = { playbackActivityJava(packageName) })
-                writeJavaSrc(packageName, "PlaybackVideoFragment", source = { playbackVideoFragmentJava(minApi, packageName) })
-                writeJavaSrc(packageName, "BrowseErrorActivity", source = { browseErrorActivityJava(layoutName, packageName, mainFragmentClass) })
-                writeJavaSrc(packageName, "ErrorFragment", source = { errorFragmentJava(minApi, packageName) })
-            } else {
-                writeKtSrc(packageName, activityClass, source = { mainActivityKt(activityClass, layoutName, mainFragmentClass, packageName) })
-                writeKtSrc(packageName, mainFragmentClass, source = { mainFragmentKt(detailsActivityClass, mainFragmentClass, minApi, packageName) })
-                writeKtSrc(packageName, detailsActivityClass, source = { detailsActivityKt(detailsActivityClass, detailsFragmentClass, detailsLayoutName, packageName) })
-                writeKtSrc(packageName, detailsFragmentClass, source = { videoDetailsFragmentKt(activityClass, detailsActivityClass, detailsFragmentClass, minApi, packageName) })
-                writeKtSrc(packageName, "Movie", source = { movieKt(packageName) })
-                writeKtSrc(packageName, "MovieList", source = { movieListKt(packageName) })
-                writeKtSrc(packageName, "CardPresenter", source = { cardPresenterKt(packageName) })
-                writeKtSrc(packageName, "DetailsDescriptionPresenter", source = { detailsDescriptionPresenterKt(packageName) })
-                writeKtSrc(packageName, "PlaybackActivity", source = { playbackActivityKt(packageName) })
-                writeKtSrc(packageName, "PlaybackVideoFragment", source = { playbackVideoFragmentKt(minApi, packageName) })
-                writeKtSrc(packageName, "BrowseErrorActivity", source = { browseErrorActivityKt(layoutName, packageName, mainFragmentClass) })
-                writeKtSrc(packageName, "ErrorFragment", source = { errorFragmentKt(minApi, packageName) })
-            }
-        }
+      writeXmlResource(
+          layoutName,
+          ResourceType.LAYOUT,
+          source = { activityMainXml(activityClass, packageName) },
+      )
+      writeXmlResource(
+          detailsLayoutName,
+          ResourceType.LAYOUT,
+          source = { activityDetailsXml(detailsActivityClass, packageName) },
+      )
     }
+
+    sources {
+      val minApi = data.versions.minSdk.apiLevel()
+      if (data.language == Language.Java) {
+        writeJavaSrc(
+            packageName,
+            activityClass,
+            source = { mainActivityJava(activityClass, layoutName, mainFragmentClass, packageName) },
+        )
+        writeJavaSrc(
+            packageName,
+            mainFragmentClass,
+            source = {
+              mainFragmentJava(detailsActivityClass, mainFragmentClass, minApi, packageName)
+            },
+        )
+        writeJavaSrc(
+            packageName,
+            detailsActivityClass,
+            source = {
+              detailsActivityJava(
+                  detailsActivityClass,
+                  detailsFragmentClass,
+                  detailsLayoutName,
+                  packageName,
+              )
+            },
+        )
+        writeJavaSrc(
+            packageName,
+            detailsFragmentClass,
+            source = {
+              videoDetailsFragmentJava(
+                  activityClass,
+                  detailsActivityClass,
+                  detailsFragmentClass,
+                  minApi,
+                  packageName,
+              )
+            },
+        )
+        writeJavaSrc(packageName, "Movie", source = { movieJava(packageName) })
+        writeJavaSrc(packageName, "MovieList", source = { movieListJava(packageName) })
+        writeJavaSrc(packageName, "CardPresenter", source = { cardPresenterJava(packageName) })
+        writeJavaSrc(
+            packageName,
+            "DetailsDescriptionPresenter",
+            source = { detailsDescriptionPresenterJava(packageName) },
+        )
+        writeJavaSrc(
+            packageName,
+            "PlaybackActivity",
+            source = { playbackActivityJava(packageName) },
+        )
+        writeJavaSrc(
+            packageName,
+            "PlaybackVideoFragment",
+            source = { playbackVideoFragmentJava(minApi, packageName) },
+        )
+        writeJavaSrc(
+            packageName,
+            "BrowseErrorActivity",
+            source = { browseErrorActivityJava(layoutName, packageName, mainFragmentClass) },
+        )
+        writeJavaSrc(
+            packageName,
+            "ErrorFragment",
+            source = { errorFragmentJava(minApi, packageName) },
+        )
+      } else {
+        writeKtSrc(
+            packageName,
+            activityClass,
+            source = { mainActivityKt(activityClass, layoutName, mainFragmentClass, packageName) },
+        )
+        writeKtSrc(
+            packageName,
+            mainFragmentClass,
+            source = {
+              mainFragmentKt(detailsActivityClass, mainFragmentClass, minApi, packageName)
+            },
+        )
+        writeKtSrc(
+            packageName,
+            detailsActivityClass,
+            source = {
+              detailsActivityKt(
+                  detailsActivityClass,
+                  detailsFragmentClass,
+                  detailsLayoutName,
+                  packageName,
+              )
+            },
+        )
+        writeKtSrc(
+            packageName,
+            detailsFragmentClass,
+            source = {
+              videoDetailsFragmentKt(
+                  activityClass,
+                  detailsActivityClass,
+                  detailsFragmentClass,
+                  minApi,
+                  packageName,
+              )
+            },
+        )
+        writeKtSrc(packageName, "Movie", source = { movieKt(packageName) })
+        writeKtSrc(packageName, "MovieList", source = { movieListKt(packageName) })
+        writeKtSrc(packageName, "CardPresenter", source = { cardPresenterKt(packageName) })
+        writeKtSrc(
+            packageName,
+            "DetailsDescriptionPresenter",
+            source = { detailsDescriptionPresenterKt(packageName) },
+        )
+        writeKtSrc(packageName, "PlaybackActivity", source = { playbackActivityKt(packageName) })
+        writeKtSrc(
+            packageName,
+            "PlaybackVideoFragment",
+            source = { playbackVideoFragmentKt(minApi, packageName) },
+        )
+        writeKtSrc(
+            packageName,
+            "BrowseErrorActivity",
+            source = { browseErrorActivityKt(layoutName, packageName, mainFragmentClass) },
+        )
+        writeKtSrc(packageName, "ErrorFragment", source = { errorFragmentKt(minApi, packageName) })
+      }
+    }
+  }
 }

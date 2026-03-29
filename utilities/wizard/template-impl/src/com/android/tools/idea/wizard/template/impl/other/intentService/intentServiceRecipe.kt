@@ -24,7 +24,11 @@ import com.android.tools.idea.wizard.template.impl.activities.common.addAllKotli
 import com.android.tools.idea.wizard.template.impl.other.intentService.src.app_package.intentServiceJava
 import com.android.tools.idea.wizard.template.impl.other.intentService.src.app_package.intentServiceKt
 
-fun RecipeExecutor.intentServiceRecipe(moduleData: ModuleTemplateData, className: String, includeHelper: Boolean) {
+fun RecipeExecutor.intentServiceRecipe(
+    moduleData: ModuleTemplateData,
+    className: String,
+    includeHelper: Boolean,
+) {
 
   val (projectData, srcOut, _, manifestOut) = moduleData
   val ktOrJavaExt = projectData.language.extension
@@ -33,10 +37,11 @@ fun RecipeExecutor.intentServiceRecipe(moduleData: ModuleTemplateData, className
 
   mergeXml(androidManifestXml(className, packageName), manifestOut.resolve("AndroidManifest.xml"))
   val intentService =
-    when (projectData.language) {
-      Language.Java -> intentServiceJava(className, includeHelper, packageName)
-      Language.Kotlin -> intentServiceKt(className, includeHelper, escapeKotlinIdentifier(packageName))
-    }
+      when (projectData.language) {
+        Language.Java -> intentServiceJava(className, includeHelper, packageName)
+        Language.Kotlin ->
+            intentServiceKt(className, includeHelper, escapeKotlinIdentifier(packageName))
+      }
   save(intentService, srcOut.resolve("${className}.${ktOrJavaExt}"))
 
   open(srcOut.resolve("${className}.${ktOrJavaExt}"))

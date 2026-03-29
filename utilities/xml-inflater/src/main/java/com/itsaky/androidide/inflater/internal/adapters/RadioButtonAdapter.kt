@@ -36,7 +36,11 @@ open class RadioButtonAdapter<T : RadioButton> : CompoundButtonAdapter<T>() {
 
   override fun createUiWidgets(): List<UiWidget> {
     return listOf(
-      UiWidget(RadioButton::class.java, string.widget_radio_button, drawable.ic_widget_radio_button)
+        UiWidget(
+            RadioButton::class.java,
+            string.widget_radio_button,
+            drawable.ic_widget_radio_button,
+        )
     )
   }
 }

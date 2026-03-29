@@ -28,6 +28,10 @@ import com.itsaky.androidide.models.Range
 import com.itsaky.androidide.progress.ProgressManager.Companion.abortIfCancelled
 import com.itsaky.androidide.projects.FileManager
 import com.itsaky.androidide.utils.DocumentUtils.isSameFile
+import java.nio.file.Path
+import java.nio.file.Paths
+import java.util.Locale
+import java.util.regex.Pattern
 import jdkx.lang.model.element.Element
 import jdkx.tools.Diagnostic
 import jdkx.tools.JavaFileObject
@@ -39,10 +43,6 @@ import openjdk.source.tree.MethodTree
 import openjdk.source.tree.VariableTree
 import openjdk.source.util.TreePath
 import openjdk.source.util.Trees
-import java.nio.file.Path
-import java.nio.file.Paths
-import java.util.Locale
-import java.util.regex.Pattern
 
 /**
  * Finds errors and warnings from a compilation task.
@@ -90,9 +90,9 @@ object DiagnosticsProvider {
   }
 
   private fun addDiagnosticsByVisiting(
-    task: CompileTask,
-    root: CompilationUnitTree,
-    result: MutableList<DiagnosticItem>
+      task: CompileTask,
+      root: CompilationUnitTree,
+      result: MutableList<DiagnosticItem>,
   ) {
     val notThrown = mutableMapOf<TreePath?, String>()
     val scanner = DiagnosticVisitor(task.task)
@@ -100,7 +100,7 @@ object DiagnosticsProvider {
     for (unusedEl in scanner.notUsed()) {
       warnUnused(task, unusedEl)?.also { result.add(it) }
     }
-    
+
     for (location in notThrown.keys) {
       result.add(warnNotThrown(task, notThrown[location], location!!))
     }
@@ -121,22 +121,22 @@ object DiagnosticsProvider {
     val start = positions.getStartPosition(root, thisTree)
     val end = positions.getEndPosition(root, thisTree)
     return DiagnosticItem(
-      source = "",
-      code = code.id,
-      message = "'$name' statement has empty body",
-      severity = WARNING,
-      range =
-        Range(getPosition(start, lines), getPosition(end, lines)).apply {
-          this.start.index = start.toInt()
-          this.end.index = end.toInt()
-        }
+        source = "",
+        code = code.id,
+        message = "'$name' statement has empty body",
+        severity = WARNING,
+        range =
+            Range(getPosition(start, lines), getPosition(end, lines)).apply {
+              this.start.index = start.toInt()
+              this.end.index = end.toInt()
+            },
     )
   }
 
   private fun addCompilerErrors(
-    task: CompileTask,
-    root: CompilationUnitTree,
-    result: MutableList<DiagnosticItem>
+      task: CompileTask,
+      root: CompilationUnitTree,
+      result: MutableList<DiagnosticItem>,
   ) {
     for (diagnostic in task.diagnostics) {
       if (diagnostic.source == null || diagnostic.source!!.toUri() != root.sourceFile.toUri()) {
@@ -157,15 +157,15 @@ object DiagnosticsProvider {
     val start = pos.getStartPosition(root, path.leaf)
     val end = pos.getEndPosition(root, path.leaf)
     return DiagnosticItem(
-      message = String.format("'%s' is not thrown in the body of the method", name),
-      range =
-        Range(getPosition(start, lines), getPosition(end, lines)).apply {
-          this.start.index = start.toInt()
-          this.end.index = end.toInt()
-        },
-      code = UNUSED_THROWS.id,
-      severity = DiagnosticSeverity.INFO,
-      source = ""
+        message = String.format("'%s' is not thrown in the body of the method", name),
+        range =
+            Range(getPosition(start, lines), getPosition(end, lines)).apply {
+              this.start.index = start.toInt()
+              this.end.index = end.toInt()
+            },
+        code = UNUSED_THROWS.id,
+        severity = DiagnosticSeverity.INFO,
+        source = "",
     )
   }
 
@@ -192,12 +192,13 @@ object DiagnosticsProvider {
       name = unusedEl.enclosingElement.simpleName
     }
 
-    val region = try {
-      contents.subSequence(start, end)
-    } catch (err: IndexOutOfBoundsException) {
-      // might happen if the file contents were changed after the file was compiled for analysis
-      return null
-    }
+    val region =
+        try {
+          contents.subSequence(start, end)
+        } catch (err: IndexOutOfBoundsException) {
+          // might happen if the file contents were changed after the file was compiled for analysis
+          return null
+        }
 
     val matcher = Pattern.compile("\\b$name\\b").matcher(region)
     if (matcher.find()) {
@@ -247,39 +248,39 @@ object DiagnosticsProvider {
   }
 
   private fun asDiagnosticItem(
-    severity: DiagnosticSeverity,
-    code: String,
-    message: String,
-    start: Long,
-    end: Long,
-    root: CompilationUnitTree
+      severity: DiagnosticSeverity,
+      code: String,
+      message: String,
+      start: Long,
+      end: Long,
+      root: CompilationUnitTree,
   ): DiagnosticItem {
     return DiagnosticItem(
-      message = message,
-      code = code,
-      severity = severity,
-      range =
-        Range(getPosition(start, root.lineMap), getPosition(end, root.lineMap)).apply {
-          this.start.index = start.toInt()
-          this.end.index = end.toInt()
-        },
-      source = ""
+        message = message,
+        code = code,
+        severity = severity,
+        range =
+            Range(getPosition(start, root.lineMap), getPosition(end, root.lineMap)).apply {
+              this.start.index = start.toInt()
+              this.end.index = end.toInt()
+            },
+        source = "",
     )
   }
 
   private fun asDiagnosticItem(
-    diagnostic: Diagnostic<out JavaFileObject?>,
-    lines: LineMap
+      diagnostic: Diagnostic<out JavaFileObject?>,
+      lines: LineMap,
   ): DiagnosticItem {
     abortIfCancelled()
     val result =
-      DiagnosticItem(
-        range = getDiagnosticRange(diagnostic, lines),
-        severity = severityFor(diagnostic.kind),
-        code = diagnostic.code,
-        message = diagnostic.getMessage(Locale.getDefault()),
-        source = ""
-      )
+        DiagnosticItem(
+            range = getDiagnosticRange(diagnostic, lines),
+            severity = severityFor(diagnostic.kind),
+            code = diagnostic.code,
+            message = diagnostic.getMessage(Locale.getDefault()),
+            source = "",
+        )
     result.range.start.index = diagnostic.startPosition.toInt()
     result.range.end.index = diagnostic.endPosition.toInt()
     result.extra = diagnostic
@@ -287,8 +288,8 @@ object DiagnosticsProvider {
   }
 
   private fun getDiagnosticRange(
-    diagnostic: Diagnostic<out JavaFileObject?>,
-    lines: LineMap
+      diagnostic: Diagnostic<out JavaFileObject?>,
+      lines: LineMap,
   ): Range {
     abortIfCancelled()
     val start = getPosition(diagnostic.startPosition, lines)

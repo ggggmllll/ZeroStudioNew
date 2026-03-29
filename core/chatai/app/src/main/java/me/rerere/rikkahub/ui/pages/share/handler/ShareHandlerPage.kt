@@ -1,7 +1,6 @@
 package me.rerere.rikkahub.ui.pages.share.handler
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -37,76 +36,63 @@ import org.koin.core.parameter.parametersOf
 
 @Composable
 fun ShareHandlerPage(text: String, image: String?) {
-    val vm: ShareHandlerVM = koinViewModel(parameters = { parametersOf(text) })
-    val settings by vm.settings.collectAsStateWithLifecycle()
-    val scope = rememberCoroutineScope()
-    val navController = LocalNavController.current
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(stringResource(R.string.share_handler_page_title))
-                }
-            )
-        }
+  val vm: ShareHandlerVM = koinViewModel(parameters = { parametersOf(text) })
+  val settings by vm.settings.collectAsStateWithLifecycle()
+  val scope = rememberCoroutineScope()
+  val navController = LocalNavController.current
+  Scaffold(
+      topBar = { TopAppBar(title = { Text(stringResource(R.string.share_handler_page_title)) }) }
+  ) {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = it + PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = it + PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            item {
-                Card {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp)
-                    ) {
-                        Text(
-                            text = vm.shareText,
-                            maxLines = 5,
-                            overflow = TextOverflow.Ellipsis,
-                            style = MaterialTheme.typography.bodySmall
-                        )
+      item {
+        Card {
+          Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+            Text(
+                text = vm.shareText,
+                maxLines = 5,
+                overflow = TextOverflow.Ellipsis,
+                style = MaterialTheme.typography.bodySmall,
+            )
 
-                        image?.let {
-                            AsyncImage(
-                                model = it,
-                                contentDescription = null,
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                        }
-                    }
-                }
+            image?.let {
+              AsyncImage(model = it, contentDescription = null, modifier = Modifier.fillMaxWidth())
             }
-
-            items(settings.assistants) { assistant ->
-                Surface(
-                    onClick = {
-                        scope.launch {
-                            vm.updateAssistant(assistant.id)
-                            navigateToChatPage(
-                                navigator = navController,
-                                initText = vm.shareText.base64Encode(),
-                                initFiles = image?.let { listOf(it.toUri()) } ?: emptyList()
-                            )
-                        }
-                    },
-                    tonalElevation = 4.dp,
-                    shape = MaterialTheme.shapes.medium
-                ) {
-                    ListItem(
-                        headlineContent = {
-                            Text(
-                                text = assistant.name.ifEmpty {
-                                    stringResource(R.string.assistant_page_default_assistant)
-                                },
-                                maxLines = 1
-                            )
-                        },
-                    )
-                }
-            }
+          }
         }
+      }
+
+      items(settings.assistants) { assistant ->
+        Surface(
+            onClick = {
+              scope.launch {
+                vm.updateAssistant(assistant.id)
+                navigateToChatPage(
+                    navigator = navController,
+                    initText = vm.shareText.base64Encode(),
+                    initFiles = image?.let { listOf(it.toUri()) } ?: emptyList(),
+                )
+              }
+            },
+            tonalElevation = 4.dp,
+            shape = MaterialTheme.shapes.medium,
+        ) {
+          ListItem(
+              headlineContent = {
+                Text(
+                    text =
+                        assistant.name.ifEmpty {
+                          stringResource(R.string.assistant_page_default_assistant)
+                        },
+                    maxLines = 1,
+                )
+              },
+          )
+        }
+      }
     }
+  }
 }

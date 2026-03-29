@@ -23,16 +23,18 @@ import com.itsaky.androidide.progress.ICancelChecker
 
 /** @author Akash Yadav */
 class CompletionHelperImpl : CompletionHelper {
-  override fun complete(transform: (CompletionItem) -> CharSequence): Pair<Boolean, List<CharSequence>> {
+  override fun complete(
+      transform: (CompletionItem) -> CharSequence
+  ): Pair<Boolean, List<CharSequence>> {
     return XMLLSPTest.run {
       val createCompletionParams = createCompletionParams()
       val result = server.complete(createCompletionParams)
       result.isIncomplete to
-        result.items
-          .filter { it.ideLabel.isNotBlank() }
-          .map { transform(it) }
-          .filter { it.isNotBlank() }
-          .toList()
+          result.items
+              .filter { it.ideLabel.isNotBlank() }
+              .map { transform(it) }
+              .filter { it.isNotBlank() }
+              .toList()
     }
   }
 

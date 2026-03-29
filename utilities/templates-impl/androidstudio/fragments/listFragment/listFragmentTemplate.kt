@@ -32,10 +32,10 @@ import com.android.tools.idea.wizard.template.WizardUiContext
 import com.android.tools.idea.wizard.template.enumParameter
 import com.android.tools.idea.wizard.template.extractLetters
 import com.android.tools.idea.wizard.template.fragmentToLayout
-import com.itsaky.androidide.templates.impl.androidstudio.activities.common.MIN_API
-import com.itsaky.androidide.templates.impl.androidstudio.defaultPackageNameParameter
 import com.android.tools.idea.wizard.template.stringParameter
 import com.android.tools.idea.wizard.template.template
+import com.itsaky.androidide.templates.impl.androidstudio.activities.common.MIN_API
+import com.itsaky.androidide.templates.impl.androidstudio.defaultPackageNameParameter
 import java.io.File
 
 @Suppress("EnumEntryName", "Unused")
@@ -49,7 +49,8 @@ enum class ColumnCount {
 val listFragmentTemplate
   get() = template {
     name = "Fragment (List)"
-    description = "Creates a new empty fragment containing a list that can be rendered as a grid. Compatible back to API level $MIN_API"
+    description =
+        "Creates a new empty fragment containing a list that can be rendered as a grid. Compatible back to API level $MIN_API"
     minApi = MIN_API
     category = Category.Fragment
     formFactor = FormFactor.Mobile
@@ -73,11 +74,11 @@ val listFragmentTemplate
     }
 
     val columnCount =
-      enumParameter<ColumnCount> {
-        name = "Column Count"
-        default = ColumnCount.`1 (List)`
-        help = "The number of columns in the grid"
-      }
+        enumParameter<ColumnCount> {
+          name = "Column Count"
+          default = ColumnCount.`1 (List)`
+          help = "The number of columns in the grid"
+        }
 
     val fragmentLayout = stringParameter {
       name = "Object content layout file name"
@@ -104,27 +105,27 @@ val listFragmentTemplate
     }
 
     widgets(
-      PackageNameWidget(packageName),
-      TextFieldWidget(objectKind),
-      TextFieldWidget(fragmentClass),
-      EnumWidget(columnCount),
-      TextFieldWidget(fragmentLayout),
-      TextFieldWidget(fragmentLayoutList),
-      TextFieldWidget(adapterClassName),
-      LanguageWidget(),
+        PackageNameWidget(packageName),
+        TextFieldWidget(objectKind),
+        TextFieldWidget(fragmentClass),
+        EnumWidget(columnCount),
+        TextFieldWidget(fragmentLayout),
+        TextFieldWidget(fragmentLayoutList),
+        TextFieldWidget(adapterClassName),
+        LanguageWidget(),
     )
 
     thumb { File("list-fragment").resolve("template_list_fragment.png") }
 
     recipe = { data: TemplateData ->
       listFragmentRecipe(
-        data as ModuleTemplateData,
-        packageName.value,
-        fragmentClass.value,
-        columnCount.value,
-        fragmentLayout.value,
-        fragmentLayoutList.value,
-        adapterClassName.value,
+          data as ModuleTemplateData,
+          packageName.value,
+          fragmentClass.value,
+          columnCount.value,
+          fragmentLayout.value,
+          fragmentLayoutList.value,
+          adapterClassName.value,
       )
     }
   }

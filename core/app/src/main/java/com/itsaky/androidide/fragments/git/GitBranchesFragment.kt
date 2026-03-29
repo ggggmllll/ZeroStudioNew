@@ -33,54 +33,55 @@ import com.itsaky.androidide.databinding.FragmentGitBranchesBinding
  */
 class GitBranchesFragment : BaseGitPageFragment() {
 
-    private var _binding: FragmentGitBranchesBinding? = null
-    private val binding get() = _binding!!
+  private var _binding: FragmentGitBranchesBinding? = null
+  private val binding
+    get() = _binding!!
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = FragmentGitBranchesBinding.inflate(inflater, container, false)
-        return binding.root
+  override fun onCreateView(
+      inflater: LayoutInflater,
+      container: ViewGroup?,
+      savedInstanceState: Bundle?,
+  ): View {
+    _binding = FragmentGitBranchesBinding.inflate(inflater, container, false)
+    return binding.root
+  }
+
+  override fun setupToolbar() {
+    // 实现 BaseGitPageFragment 的抽象方法
+    // 添加特定于分支管理的按钮
+
+    // 1. 刷新
+    addToolbarAction(R.drawable.ic_refresh_24, getString(R.string.refresh)) {
+      Toast.makeText(context, "Refreshing branches...", Toast.LENGTH_SHORT).show()
+      // TODO: Call ViewModel to refresh
     }
 
-    override fun setupToolbar() {
-        // 实现 BaseGitPageFragment 的抽象方法
-        // 添加特定于分支管理的按钮
-        
-        // 1. 刷新
-        addToolbarAction(R.drawable.ic_refresh_24, getString(R.string.refresh)) {
-            Toast.makeText(context, "Refreshing branches...", Toast.LENGTH_SHORT).show()
-            // TODO: Call ViewModel to refresh
-        }
-
-        // 2. 新建分支
-        addToolbarAction(R.drawable.ic_add_24, getString(R.string.new_branch)) {
-            // TODO: Show Create Branch Dialog
-        }
-        
-        // 3. 检出/切换 (Checkout)
-        addToolbarAction(R.drawable.ic_call_split_24, getString(R.string.checkout)) {
-            // Logic
-        }
+    // 2. 新建分支
+    addToolbarAction(R.drawable.ic_add_24, getString(R.string.new_branch)) {
+      // TODO: Show Create Branch Dialog
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        
-        setupRecyclerView()
+    // 3. 检出/切换 (Checkout)
+    addToolbarAction(R.drawable.ic_call_split_24, getString(R.string.checkout)) {
+      // Logic
     }
+  }
 
-    private fun setupRecyclerView() {
-        binding.rvBranches.layoutManager = LinearLayoutManager(context)
-        // TODO: 设置 Adapter，展示 Branch 数据
-        // val adapter = BranchAdapter(listOf(...))
-        // binding.rvBranches.adapter = adapter
-    }
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
+    setupRecyclerView()
+  }
+
+  private fun setupRecyclerView() {
+    binding.rvBranches.layoutManager = LinearLayoutManager(context)
+    // TODO: 设置 Adapter，展示 Branch 数据
+    // val adapter = BranchAdapter(listOf(...))
+    // binding.rvBranches.adapter = adapter
+  }
+
+  override fun onDestroyView() {
+    super.onDestroyView()
+    _binding = null
+  }
 }

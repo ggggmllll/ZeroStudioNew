@@ -19,7 +19,7 @@ package com.android.tools.idea.wizard.template.impl.fragments.googleMapsFragment
 import com.android.tools.idea.wizard.template.impl.activities.googleMapsActivity.geoApiKeyMetadataEntry
 
 fun androidManifestXml() =
-  """
+    """
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application>
 

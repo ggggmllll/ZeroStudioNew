@@ -31,13 +31,11 @@ object CrowdinTranslators {
 
   internal const val CROWDIN_CONTRIBUTORS_JSON = "crowdin-contributors.json"
 
-  /**
-   * Get all Crowdin translators.
-   */
+  /** Get all Crowdin translators. */
   suspend fun getAllTranslators(): List<CrowdinTranslator> {
     return Contributors.getAllContributors<CrowdinTranslatorsService, CrowdinTranslator>(
-      "${GITHUB_RAW_API_REPO_BRANCH_URL}/",
-      CrowdinTranslatorsService::getAllTranslators
+        "${GITHUB_RAW_API_REPO_BRANCH_URL}/",
+        CrowdinTranslatorsService::getAllTranslators,
     )
   }
 }
@@ -48,9 +46,9 @@ object CrowdinTranslators {
  * @author Akash Yadav
  */
 data class CrowdinTranslator(
-  @SerializedName("id") private val _id: String,
-  @SerializedName("username") override val username: String,
-  @SerializedName("picture") override val avatarUrl: String,
+    @SerializedName("id") private val _id: String,
+    @SerializedName("username") override val username: String,
+    @SerializedName("picture") override val avatarUrl: String,
 ) : Contributor {
 
   override val id: Int

@@ -20,14 +20,14 @@ import com.android.tools.idea.wizard.template.getMaterialComponentName
 import com.android.tools.idea.wizard.template.renderIf
 
 fun appBarXml(
-  activityClass: String,
-  packageName: String,
-  simpleLayoutName: String,
-  themeNameAppBarOverlay: String,
-  themeNamePopupOverlay: String,
-  useAndroidX: Boolean,
+    activityClass: String,
+    packageName: String,
+    simpleLayoutName: String,
+    themeNameAppBarOverlay: String,
+    themeNamePopupOverlay: String,
+    useAndroidX: Boolean,
 ) =
-  """<?xml version="1.0" encoding="utf-8"?>
+    """<?xml version="1.0" encoding="utf-8"?>
 <${getMaterialComponentName("android.support.design.widget.CoordinatorLayout", useAndroidX)}
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"

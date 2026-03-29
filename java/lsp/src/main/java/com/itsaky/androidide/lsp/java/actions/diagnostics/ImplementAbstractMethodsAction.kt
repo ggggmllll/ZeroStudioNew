@@ -62,10 +62,10 @@ class ImplementAbstractMethodsAction : BaseJavaCodeAction() {
     }
 
     JavaDiagnosticUtils.asJCDiagnostic(diagnostic.extra as Diagnostic<out JavaFileObject>)
-      ?: run {
-        markInvisible()
-        return
-      }
+        ?: run {
+          markInvisible()
+          return
+        }
 
     visible = true
     enabled = true
@@ -74,10 +74,10 @@ class ImplementAbstractMethodsAction : BaseJavaCodeAction() {
   @Suppress("UNCHECKED_CAST")
   override suspend fun execAction(data: ActionData): Any {
     val diagnostic =
-      JavaDiagnosticUtils.asJCDiagnostic(
-        data.get(
-          com.itsaky.androidide.lsp.models.DiagnosticItem::class.java)!!.extra as Diagnostic<out JavaFileObject>
-      )
+        JavaDiagnosticUtils.asJCDiagnostic(
+            data.get(com.itsaky.androidide.lsp.models.DiagnosticItem::class.java)!!.extra
+                as Diagnostic<out JavaFileObject>
+        )
     return ImplementAbstractMethods(diagnostic!!)
   }
 

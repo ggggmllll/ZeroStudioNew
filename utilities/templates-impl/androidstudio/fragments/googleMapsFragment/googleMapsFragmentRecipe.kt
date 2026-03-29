@@ -26,10 +26,10 @@ import com.itsaky.androidide.templates.impl.androidstudio.fragments.googleMapsFr
 import com.itsaky.androidide.templates.impl.androidstudio.fragments.googleMapsFragment.src.app_package.mapFragmentKt
 
 fun RecipeExecutor.googleMapsFragmentRecipe(
-  moduleData: ModuleTemplateData,
-  fragmentClass: String,
-  layoutName: String,
-  packageName: String,
+    moduleData: ModuleTemplateData,
+    fragmentClass: String,
+    layoutName: String,
+    packageName: String,
 ) {
   val (projectData, srcOut, resOut, manifestOut) = moduleData
   val appCompatVersion = moduleData.apis.appCompatVersion
@@ -45,10 +45,10 @@ fun RecipeExecutor.googleMapsFragmentRecipe(
 
   save(fragmentMapXml(fragmentClass, packageName), resOut.resolve("layout/${layoutName}.xml"))
   val mapFragment =
-    when (projectData.language) {
-      Language.Java -> mapFragmentJava(fragmentClass, layoutName, packageName, useAndroidX)
-      Language.Kotlin -> mapFragmentKt(fragmentClass, layoutName, packageName, useAndroidX)
-    }
+      when (projectData.language) {
+        Language.Java -> mapFragmentJava(fragmentClass, layoutName, packageName, useAndroidX)
+        Language.Kotlin -> mapFragmentKt(fragmentClass, layoutName, packageName, useAndroidX)
+      }
   save(mapFragment, srcOut.resolve("${fragmentClass}.${ktOrJavaExt}"))
 
   open(srcOut.resolve("${fragmentClass}.${ktOrJavaExt}"))

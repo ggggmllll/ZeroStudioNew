@@ -17,9 +17,9 @@
 
 package com.itsaky.androidide.fragments.git.tree
 
+import android.zero.studio.treeview.model.TreeNode
 import com.itsaky.androidide.eventbus.events.Event
 import com.itsaky.androidide.models.SheetOption
-import android.zero.studio.treeview.model.TreeNode
 
 internal data class FileContextMenuItemClickEvent(val option: SheetOption) : Event()
 

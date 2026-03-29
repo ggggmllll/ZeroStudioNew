@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory
  * @author Akash Yadav
  */
 class MethodRangeScanner(val task: JavacTaskImpl) :
-  TreePathScanner<Unit, MutableList<Pair<Range, TreePath>>>() {
+    TreePathScanner<Unit, MutableList<Pair<Range, TreePath>>>() {
 
   var root: CompilationUnitTree? = null
   var lines: LineMap? = null
@@ -47,8 +47,8 @@ class MethodRangeScanner(val task: JavacTaskImpl) :
   }
 
   override fun visitCompilationUnit(
-    node: CompilationUnitTree?,
-    p: MutableList<Pair<Range, TreePath>>?
+      node: CompilationUnitTree?,
+      p: MutableList<Pair<Range, TreePath>>?,
   ) {
     this.root = node
     this.lines = node?.lineMap

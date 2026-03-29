@@ -23,7 +23,7 @@ import com.itsaky.androidide.templates.impl.androidstudio.activities.archStarter
  * @author android_zero
  */
 fun ArchStarterActivityTemplateVariables.navigation() =
-  """
+    """
 ${packageDeclaration("ui")}
 
 import androidx.compose.foundation.layout.fillMaxSize

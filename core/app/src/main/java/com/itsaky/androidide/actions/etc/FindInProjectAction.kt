@@ -42,10 +42,10 @@ class FindInProjectAction() : EditorActivityAction() {
   override fun prepare(data: ActionData) {
     super.prepare(data)
     data.getActivity()
-      ?: run {
-        markInvisible()
-        return
-      }
+        ?: run {
+          markInvisible()
+          return
+        }
 
     val project = IProjectManager.getInstance().getWorkspace()
     if (project == null || project.getSubProjects().isEmpty()) {

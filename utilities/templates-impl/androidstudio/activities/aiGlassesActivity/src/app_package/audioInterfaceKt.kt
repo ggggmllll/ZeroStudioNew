@@ -16,14 +16,15 @@
 package com.itsaky.androidide.templates.impl.androidstudio.activities.aiGlassesActivity.src.app_package
 
 /**
- * Generates the AudioInterface class acting as an adapter for TextToSpeech capabilities inside AI Glasses.
+ * Generates the AudioInterface class acting as an adapter for TextToSpeech capabilities inside AI
+ * Glasses.
  *
  * @author Historical contributors (The Android Open Source Project)
  * @author android_zero
  */
 fun audioInterfaceKt(packageName: String) =
-  // language=kotlin
-  """
+    // language=kotlin
+    """
 package $packageName
 
 import android.content.Context

@@ -21,22 +21,15 @@ import com.itsaky.androidide.treesitter.TSParser
 import com.itsaky.androidide.utils.DefaultRecyclable
 import com.itsaky.androidide.utils.RecyclableObjectPool
 
-/**
- * @author Akash Yadav
- */
-class TreeSitterParser @JvmOverloads internal constructor(
-  pointer: Long = 0
-) : TSParser(pointer), RecyclableObjectPool.Recyclable by DefaultRecyclable() {
+/** @author Akash Yadav */
+class TreeSitterParser @JvmOverloads internal constructor(pointer: Long = 0) :
+    TSParser(pointer), RecyclableObjectPool.Recyclable by DefaultRecyclable() {
 
   companion object {
 
     @JvmStatic
-    fun obtain(
-      pointer: Long
-    ): TreeSitterParser {
-      return obtainFromPool<TreeSitterParser>().apply {
-        this.nativeObject = pointer
-      }
+    fun obtain(pointer: Long): TreeSitterParser {
+      return obtainFromPool<TreeSitterParser>().apply { this.nativeObject = pointer }
     }
   }
 

@@ -21,8 +21,9 @@ import java.util.concurrent.CancellationException
 
 /**
  * Thrown when a compilation process is cancelled.
+ *
  * @author Akash Yadav
  */
-class CompilationCancellationException @JvmOverloads constructor(
-  override val cause: Throwable? = null
-) : CancellationException()
+class CompilationCancellationException
+@JvmOverloads
+constructor(override val cause: Throwable? = null) : CancellationException()

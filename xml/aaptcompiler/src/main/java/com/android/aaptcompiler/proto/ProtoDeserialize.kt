@@ -47,7 +47,8 @@ import com.android.utils.ILogger
 import com.itsaky.androidide.layoutlib.resources.ResourceVisibility
 
 fun deserializeConfigFromPb(
-  config: ConfigurationOuterClass.Configuration, logger: ILogger?
+    config: ConfigurationOuterClass.Configuration,
+    logger: ILogger?,
 ): ConfigDescription? {
 
   val mcc = config.mcc.toShort()
@@ -62,245 +63,263 @@ fun deserializeConfigFromPb(
     }
   }
 
-  val screenLayoutDir = when (config.getLayoutDirection()) {
-    ConfigurationOuterClass.Configuration.LayoutDirection.LAYOUT_DIRECTION_LTR ->
-      ResTableConfig.SCREEN_LAYOUT.DIR_LTR
+  val screenLayoutDir =
+      when (config.getLayoutDirection()) {
+        ConfigurationOuterClass.Configuration.LayoutDirection.LAYOUT_DIRECTION_LTR ->
+            ResTableConfig.SCREEN_LAYOUT.DIR_LTR
 
-    ConfigurationOuterClass.Configuration.LayoutDirection.LAYOUT_DIRECTION_RTL ->
-      ResTableConfig.SCREEN_LAYOUT.DIR_RTL
+        ConfigurationOuterClass.Configuration.LayoutDirection.LAYOUT_DIRECTION_RTL ->
+            ResTableConfig.SCREEN_LAYOUT.DIR_RTL
 
-    else -> ResTableConfig.SCREEN_LAYOUT.DIR_ANY
-  }
+        else -> ResTableConfig.SCREEN_LAYOUT.DIR_ANY
+      }
 
   val smallestScreenWidthDp = config.smallestScreenWidthDp
   val screenWidthDp = config.screenWidthDp
   val screenHeightDp = config.screenHeightDp
 
-  val screenLayoutSize = when (config.getScreenLayoutSize()) {
-    ConfigurationOuterClass.Configuration.ScreenLayoutSize.SCREEN_LAYOUT_SIZE_SMALL ->
-      ResTableConfig.SCREEN_LAYOUT.SIZE_SMALL
+  val screenLayoutSize =
+      when (config.getScreenLayoutSize()) {
+        ConfigurationOuterClass.Configuration.ScreenLayoutSize.SCREEN_LAYOUT_SIZE_SMALL ->
+            ResTableConfig.SCREEN_LAYOUT.SIZE_SMALL
 
-    ConfigurationOuterClass.Configuration.ScreenLayoutSize.SCREEN_LAYOUT_SIZE_NORMAL ->
-      ResTableConfig.SCREEN_LAYOUT.SIZE_NORMAL
+        ConfigurationOuterClass.Configuration.ScreenLayoutSize.SCREEN_LAYOUT_SIZE_NORMAL ->
+            ResTableConfig.SCREEN_LAYOUT.SIZE_NORMAL
 
-    ConfigurationOuterClass.Configuration.ScreenLayoutSize.SCREEN_LAYOUT_SIZE_LARGE ->
-      ResTableConfig.SCREEN_LAYOUT.SIZE_LARGE
+        ConfigurationOuterClass.Configuration.ScreenLayoutSize.SCREEN_LAYOUT_SIZE_LARGE ->
+            ResTableConfig.SCREEN_LAYOUT.SIZE_LARGE
 
-    ConfigurationOuterClass.Configuration.ScreenLayoutSize.SCREEN_LAYOUT_SIZE_XLARGE ->
-      ResTableConfig.SCREEN_LAYOUT.SIZE_XLARGE
+        ConfigurationOuterClass.Configuration.ScreenLayoutSize.SCREEN_LAYOUT_SIZE_XLARGE ->
+            ResTableConfig.SCREEN_LAYOUT.SIZE_XLARGE
 
-    else -> ResTableConfig.SCREEN_LAYOUT.SIZE_ANY
-  }
+        else -> ResTableConfig.SCREEN_LAYOUT.SIZE_ANY
+      }
 
-  val screenLayoutLong = when (config.getScreenLayoutLong()) {
-    ConfigurationOuterClass.Configuration.ScreenLayoutLong.SCREEN_LAYOUT_LONG_LONG ->
-      ResTableConfig.SCREEN_LAYOUT.SCREENLONG_YES
+  val screenLayoutLong =
+      when (config.getScreenLayoutLong()) {
+        ConfigurationOuterClass.Configuration.ScreenLayoutLong.SCREEN_LAYOUT_LONG_LONG ->
+            ResTableConfig.SCREEN_LAYOUT.SCREENLONG_YES
 
-    ConfigurationOuterClass.Configuration.ScreenLayoutLong.SCREEN_LAYOUT_LONG_NOTLONG ->
-      ResTableConfig.SCREEN_LAYOUT.SCREENLONG_NO
+        ConfigurationOuterClass.Configuration.ScreenLayoutLong.SCREEN_LAYOUT_LONG_NOTLONG ->
+            ResTableConfig.SCREEN_LAYOUT.SCREENLONG_NO
 
-    else -> ResTableConfig.SCREEN_LAYOUT.SCREENLONG_ANY
-  }
+        else -> ResTableConfig.SCREEN_LAYOUT.SCREENLONG_ANY
+      }
 
-  val screenRound = when (config.getScreenRound()) {
-    ConfigurationOuterClass.Configuration.ScreenRound.SCREEN_ROUND_ROUND ->
-      ResTableConfig.SCREEN_LAYOUT2.SCREENROUND_YES
+  val screenRound =
+      when (config.getScreenRound()) {
+        ConfigurationOuterClass.Configuration.ScreenRound.SCREEN_ROUND_ROUND ->
+            ResTableConfig.SCREEN_LAYOUT2.SCREENROUND_YES
 
-    ConfigurationOuterClass.Configuration.ScreenRound.SCREEN_ROUND_NOTROUND ->
-      ResTableConfig.SCREEN_LAYOUT2.SCREENROUND_NO
+        ConfigurationOuterClass.Configuration.ScreenRound.SCREEN_ROUND_NOTROUND ->
+            ResTableConfig.SCREEN_LAYOUT2.SCREENROUND_NO
 
-    else -> ResTableConfig.SCREEN_LAYOUT2.SCREENROUND_ANY
-  }
+        else -> ResTableConfig.SCREEN_LAYOUT2.SCREENROUND_ANY
+      }
 
-  val wideGamutColor = when (config.getWideColorGamut()) {
-    ConfigurationOuterClass.Configuration.WideColorGamut.WIDE_COLOR_GAMUT_WIDECG ->
-      ResTableConfig.COLOR_MODE.WIDE_GAMUT_YES
+  val wideGamutColor =
+      when (config.getWideColorGamut()) {
+        ConfigurationOuterClass.Configuration.WideColorGamut.WIDE_COLOR_GAMUT_WIDECG ->
+            ResTableConfig.COLOR_MODE.WIDE_GAMUT_YES
 
-    ConfigurationOuterClass.Configuration.WideColorGamut.WIDE_COLOR_GAMUT_NOWIDECG ->
-      ResTableConfig.COLOR_MODE.WIDE_GAMUT_NO
+        ConfigurationOuterClass.Configuration.WideColorGamut.WIDE_COLOR_GAMUT_NOWIDECG ->
+            ResTableConfig.COLOR_MODE.WIDE_GAMUT_NO
 
-    else -> ResTableConfig.COLOR_MODE.WIDE_GAMUT_ANY
-  }
+        else -> ResTableConfig.COLOR_MODE.WIDE_GAMUT_ANY
+      }
 
-  val hdr = when (config.getHdr()) {
-    ConfigurationOuterClass.Configuration.Hdr.HDR_HIGHDR -> ResTableConfig.COLOR_MODE.HDR_YES
-    ConfigurationOuterClass.Configuration.Hdr.HDR_LOWDR -> ResTableConfig.COLOR_MODE.HDR_NO
-    else -> ResTableConfig.COLOR_MODE.HDR_ANY
-  }
+  val hdr =
+      when (config.getHdr()) {
+        ConfigurationOuterClass.Configuration.Hdr.HDR_HIGHDR -> ResTableConfig.COLOR_MODE.HDR_YES
+        ConfigurationOuterClass.Configuration.Hdr.HDR_LOWDR -> ResTableConfig.COLOR_MODE.HDR_NO
+        else -> ResTableConfig.COLOR_MODE.HDR_ANY
+      }
 
-  val orientation = when (config.getOrientation()) {
-    ConfigurationOuterClass.Configuration.Orientation.ORIENTATION_PORT ->
-      ResTableConfig.ORIENTATION.PORT
+  val orientation =
+      when (config.getOrientation()) {
+        ConfigurationOuterClass.Configuration.Orientation.ORIENTATION_PORT ->
+            ResTableConfig.ORIENTATION.PORT
 
-    ConfigurationOuterClass.Configuration.Orientation.ORIENTATION_LAND ->
-      ResTableConfig.ORIENTATION.LAND
+        ConfigurationOuterClass.Configuration.Orientation.ORIENTATION_LAND ->
+            ResTableConfig.ORIENTATION.LAND
 
-    ConfigurationOuterClass.Configuration.Orientation.ORIENTATION_SQUARE ->
-      ResTableConfig.ORIENTATION.SQUARE
+        ConfigurationOuterClass.Configuration.Orientation.ORIENTATION_SQUARE ->
+            ResTableConfig.ORIENTATION.SQUARE
 
-    else -> ResTableConfig.ORIENTATION.ANY
-  }
+        else -> ResTableConfig.ORIENTATION.ANY
+      }
 
-  val uiModeType = when (config.getUiModeType()) {
-    ConfigurationOuterClass.Configuration.UiModeType.UI_MODE_TYPE_NORMAL ->
-      ResTableConfig.UI_MODE.TYPE_NORMAL
+  val uiModeType =
+      when (config.getUiModeType()) {
+        ConfigurationOuterClass.Configuration.UiModeType.UI_MODE_TYPE_NORMAL ->
+            ResTableConfig.UI_MODE.TYPE_NORMAL
 
-    ConfigurationOuterClass.Configuration.UiModeType.UI_MODE_TYPE_DESK ->
-      ResTableConfig.UI_MODE.TYPE_DESK
+        ConfigurationOuterClass.Configuration.UiModeType.UI_MODE_TYPE_DESK ->
+            ResTableConfig.UI_MODE.TYPE_DESK
 
-    ConfigurationOuterClass.Configuration.UiModeType.UI_MODE_TYPE_CAR ->
-      ResTableConfig.UI_MODE.TYPE_CAR
+        ConfigurationOuterClass.Configuration.UiModeType.UI_MODE_TYPE_CAR ->
+            ResTableConfig.UI_MODE.TYPE_CAR
 
-    ConfigurationOuterClass.Configuration.UiModeType.UI_MODE_TYPE_TELEVISION ->
-      ResTableConfig.UI_MODE.TYPE_TELEVISION
+        ConfigurationOuterClass.Configuration.UiModeType.UI_MODE_TYPE_TELEVISION ->
+            ResTableConfig.UI_MODE.TYPE_TELEVISION
 
-    ConfigurationOuterClass.Configuration.UiModeType.UI_MODE_TYPE_APPLIANCE ->
-      ResTableConfig.UI_MODE.TYPE_APPLIANCE
+        ConfigurationOuterClass.Configuration.UiModeType.UI_MODE_TYPE_APPLIANCE ->
+            ResTableConfig.UI_MODE.TYPE_APPLIANCE
 
-    ConfigurationOuterClass.Configuration.UiModeType.UI_MODE_TYPE_WATCH ->
-      ResTableConfig.UI_MODE.TYPE_WATCH
+        ConfigurationOuterClass.Configuration.UiModeType.UI_MODE_TYPE_WATCH ->
+            ResTableConfig.UI_MODE.TYPE_WATCH
 
-    ConfigurationOuterClass.Configuration.UiModeType.UI_MODE_TYPE_VRHEADSET ->
-      ResTableConfig.UI_MODE.TYPE_VR_HEADSET
+        ConfigurationOuterClass.Configuration.UiModeType.UI_MODE_TYPE_VRHEADSET ->
+            ResTableConfig.UI_MODE.TYPE_VR_HEADSET
 
-    else -> ResTableConfig.UI_MODE.TYPE_ANY
-  }
+        else -> ResTableConfig.UI_MODE.TYPE_ANY
+      }
 
-  val uiModeNight = when (config.getUiModeNight()) {
-    ConfigurationOuterClass.Configuration.UiModeNight.UI_MODE_NIGHT_NIGHT ->
-      ResTableConfig.UI_MODE.NIGHT_YES
+  val uiModeNight =
+      when (config.getUiModeNight()) {
+        ConfigurationOuterClass.Configuration.UiModeNight.UI_MODE_NIGHT_NIGHT ->
+            ResTableConfig.UI_MODE.NIGHT_YES
 
-    ConfigurationOuterClass.Configuration.UiModeNight.UI_MODE_NIGHT_NOTNIGHT ->
-      ResTableConfig.UI_MODE.NIGHT_NO
+        ConfigurationOuterClass.Configuration.UiModeNight.UI_MODE_NIGHT_NOTNIGHT ->
+            ResTableConfig.UI_MODE.NIGHT_NO
 
-    else -> ResTableConfig.UI_MODE.NIGHT_ANY
-  }
+        else -> ResTableConfig.UI_MODE.NIGHT_ANY
+      }
 
   val density = config.density
 
-  val touchscreen = when (config.getTouchscreen()) {
-    ConfigurationOuterClass.Configuration.Touchscreen.TOUCHSCREEN_NOTOUCH ->
-      ResTableConfig.TOUCHSCREEN.NOTOUCH
+  val touchscreen =
+      when (config.getTouchscreen()) {
+        ConfigurationOuterClass.Configuration.Touchscreen.TOUCHSCREEN_NOTOUCH ->
+            ResTableConfig.TOUCHSCREEN.NOTOUCH
 
-    ConfigurationOuterClass.Configuration.Touchscreen.TOUCHSCREEN_STYLUS ->
-      ResTableConfig.TOUCHSCREEN.STYLUS
+        ConfigurationOuterClass.Configuration.Touchscreen.TOUCHSCREEN_STYLUS ->
+            ResTableConfig.TOUCHSCREEN.STYLUS
 
-    ConfigurationOuterClass.Configuration.Touchscreen.TOUCHSCREEN_FINGER ->
-      ResTableConfig.TOUCHSCREEN.FINGER
+        ConfigurationOuterClass.Configuration.Touchscreen.TOUCHSCREEN_FINGER ->
+            ResTableConfig.TOUCHSCREEN.FINGER
 
-    else -> ResTableConfig.TOUCHSCREEN.ANY
-  }
+        else -> ResTableConfig.TOUCHSCREEN.ANY
+      }
 
-  val keysHidden = when (config.getKeysHidden()) {
-    ConfigurationOuterClass.Configuration.KeysHidden.KEYS_HIDDEN_KEYSEXPOSED ->
-      ResTableConfig.INPUT_FLAGS.KEYSHIDDEN_NO
+  val keysHidden =
+      when (config.getKeysHidden()) {
+        ConfigurationOuterClass.Configuration.KeysHidden.KEYS_HIDDEN_KEYSEXPOSED ->
+            ResTableConfig.INPUT_FLAGS.KEYSHIDDEN_NO
 
-    ConfigurationOuterClass.Configuration.KeysHidden.KEYS_HIDDEN_KEYSHIDDEN ->
-      ResTableConfig.INPUT_FLAGS.KEYSHIDDEN_YES
+        ConfigurationOuterClass.Configuration.KeysHidden.KEYS_HIDDEN_KEYSHIDDEN ->
+            ResTableConfig.INPUT_FLAGS.KEYSHIDDEN_YES
 
-    ConfigurationOuterClass.Configuration.KeysHidden.KEYS_HIDDEN_KEYSSOFT ->
-      ResTableConfig.INPUT_FLAGS.KEYSHIDDEN_SOFT
+        ConfigurationOuterClass.Configuration.KeysHidden.KEYS_HIDDEN_KEYSSOFT ->
+            ResTableConfig.INPUT_FLAGS.KEYSHIDDEN_SOFT
 
-    else -> ResTableConfig.INPUT_FLAGS.KEYSHIDDEN_ANY
-  }
+        else -> ResTableConfig.INPUT_FLAGS.KEYSHIDDEN_ANY
+      }
 
-  val keyboard = when (config.getKeyboard()) {
-    ConfigurationOuterClass.Configuration.Keyboard.KEYBOARD_NOKEYS ->
-      ResTableConfig.KEYBOARD.NOKEYS
+  val keyboard =
+      when (config.getKeyboard()) {
+        ConfigurationOuterClass.Configuration.Keyboard.KEYBOARD_NOKEYS ->
+            ResTableConfig.KEYBOARD.NOKEYS
 
-    ConfigurationOuterClass.Configuration.Keyboard.KEYBOARD_QWERTY ->
-      ResTableConfig.KEYBOARD.QWERTY
+        ConfigurationOuterClass.Configuration.Keyboard.KEYBOARD_QWERTY ->
+            ResTableConfig.KEYBOARD.QWERTY
 
-    ConfigurationOuterClass.Configuration.Keyboard.KEYBOARD_TWELVEKEY ->
-      ResTableConfig.KEYBOARD.TWELVEKEY
+        ConfigurationOuterClass.Configuration.Keyboard.KEYBOARD_TWELVEKEY ->
+            ResTableConfig.KEYBOARD.TWELVEKEY
 
-    else -> ResTableConfig.KEYBOARD.ANY
-  }
+        else -> ResTableConfig.KEYBOARD.ANY
+      }
 
-  val navHidden = when (config.getNavHidden()) {
-    ConfigurationOuterClass.Configuration.NavHidden.NAV_HIDDEN_NAVHIDDEN ->
-      ResTableConfig.INPUT_FLAGS.NAVHIDDEN_YES
+  val navHidden =
+      when (config.getNavHidden()) {
+        ConfigurationOuterClass.Configuration.NavHidden.NAV_HIDDEN_NAVHIDDEN ->
+            ResTableConfig.INPUT_FLAGS.NAVHIDDEN_YES
 
-    ConfigurationOuterClass.Configuration.NavHidden.NAV_HIDDEN_NAVEXPOSED ->
-      ResTableConfig.INPUT_FLAGS.NAVHIDDEN_NO
+        ConfigurationOuterClass.Configuration.NavHidden.NAV_HIDDEN_NAVEXPOSED ->
+            ResTableConfig.INPUT_FLAGS.NAVHIDDEN_NO
 
-    else -> ResTableConfig.INPUT_FLAGS.NAVHIDDEN_ANY
-  }
+        else -> ResTableConfig.INPUT_FLAGS.NAVHIDDEN_ANY
+      }
 
-  val navigation = when (config.getNavigation()) {
-    ConfigurationOuterClass.Configuration.Navigation.NAVIGATION_NONAV ->
-      ResTableConfig.NAVIGATION.NONAV
+  val navigation =
+      when (config.getNavigation()) {
+        ConfigurationOuterClass.Configuration.Navigation.NAVIGATION_NONAV ->
+            ResTableConfig.NAVIGATION.NONAV
 
-    ConfigurationOuterClass.Configuration.Navigation.NAVIGATION_DPAD ->
-      ResTableConfig.NAVIGATION.DPAD
+        ConfigurationOuterClass.Configuration.Navigation.NAVIGATION_DPAD ->
+            ResTableConfig.NAVIGATION.DPAD
 
-    ConfigurationOuterClass.Configuration.Navigation.NAVIGATION_TRACKBALL ->
-      ResTableConfig.NAVIGATION.TRACKBALL
+        ConfigurationOuterClass.Configuration.Navigation.NAVIGATION_TRACKBALL ->
+            ResTableConfig.NAVIGATION.TRACKBALL
 
-    ConfigurationOuterClass.Configuration.Navigation.NAVIGATION_WHEEL ->
-      ResTableConfig.NAVIGATION.WHEEL
+        ConfigurationOuterClass.Configuration.Navigation.NAVIGATION_WHEEL ->
+            ResTableConfig.NAVIGATION.WHEEL
 
-    else -> ResTableConfig.NAVIGATION.ANY
-  }
+        else -> ResTableConfig.NAVIGATION.ANY
+      }
 
-  val grammaticalGender = when (config.grammaticalGender) {
-    ConfigurationOuterClass.Configuration.GrammaticalGender.GRAM_GENDER_NEUTER ->
-      ResTableConfig.GRAMMATICAL_GENDER.NEUTER
+  val grammaticalGender =
+      when (config.grammaticalGender) {
+        ConfigurationOuterClass.Configuration.GrammaticalGender.GRAM_GENDER_NEUTER ->
+            ResTableConfig.GRAMMATICAL_GENDER.NEUTER
 
-    ConfigurationOuterClass.Configuration.GrammaticalGender.GRAM_GENDER_FEMININE ->
-      ResTableConfig.GRAMMATICAL_GENDER.FEMININE
+        ConfigurationOuterClass.Configuration.GrammaticalGender.GRAM_GENDER_FEMININE ->
+            ResTableConfig.GRAMMATICAL_GENDER.FEMININE
 
-    ConfigurationOuterClass.Configuration.GrammaticalGender.GRAM_GENDER_MASCULINE ->
-      ResTableConfig.GRAMMATICAL_GENDER.MASCULINE
+        ConfigurationOuterClass.Configuration.GrammaticalGender.GRAM_GENDER_MASCULINE ->
+            ResTableConfig.GRAMMATICAL_GENDER.MASCULINE
 
-    else -> ResTableConfig.GRAMMATICAL_GENDER.ANY
-  }
+        else -> ResTableConfig.GRAMMATICAL_GENDER.ANY
+      }
 
   val screenWidth = config.screenWidth
   val screenHeight = config.screenHeight
   val sdkVersion = config.sdkVersion.toShort()
 
-  val configDescription = ConfigDescription(
-    ResTableConfig(
-      mcc = mcc,
-      mnc = mnc,
-      orientation = orientation,
-      touchscreen = touchscreen,
-      density = density,
-      keyboard = keyboard,
-      navigation = navigation,
-      grammaticalInflection = grammaticalGender,
-      inputFlags = (keysHidden.toInt() or navHidden.toInt()).toByte(),
-      screenWidth = screenWidth,
-      screenHeight = screenHeight,
-      sdkVersion = sdkVersion,
-      screenLayout = (screenLayoutDir.toInt() or
-        screenLayoutLong.toInt() or
-        screenLayoutSize.toInt()).toByte(),
-      uiMode = (uiModeType.toInt() or uiModeNight.toInt()).toByte(),
-      smallestScreenWidthDp = smallestScreenWidthDp,
-      screenWidthDp = screenWidthDp,
-      screenHeightDp = screenHeightDp,
-      screenLayout2 = screenRound,
-      colorMode = (wideGamutColor.toInt() or hdr.toInt()).toByte()
-    )
-  )
+  val configDescription =
+      ConfigDescription(
+          ResTableConfig(
+              mcc = mcc,
+              mnc = mnc,
+              orientation = orientation,
+              touchscreen = touchscreen,
+              density = density,
+              keyboard = keyboard,
+              navigation = navigation,
+              grammaticalInflection = grammaticalGender,
+              inputFlags = (keysHidden.toInt() or navHidden.toInt()).toByte(),
+              screenWidth = screenWidth,
+              screenHeight = screenHeight,
+              sdkVersion = sdkVersion,
+              screenLayout =
+                  (screenLayoutDir.toInt() or screenLayoutLong.toInt() or screenLayoutSize.toInt())
+                      .toByte(),
+              uiMode = (uiModeType.toInt() or uiModeNight.toInt()).toByte(),
+              smallestScreenWidthDp = smallestScreenWidthDp,
+              screenWidthDp = screenWidthDp,
+              screenHeightDp = screenHeightDp,
+              screenLayout2 = screenRound,
+              colorMode = (wideGamutColor.toInt() or hdr.toInt()).toByte(),
+          )
+      )
   localeValue.writeTo(configDescription)
 
   return configDescription
 }
 
-fun deserializeFileTypeFromPb(type: Resources.FileReference.Type) = when (type) {
-  Resources.FileReference.Type.BINARY_XML -> ResourceFile.Type.BinaryXml
-  Resources.FileReference.Type.PROTO_XML -> ResourceFile.Type.ProtoXml
-  Resources.FileReference.Type.PNG -> ResourceFile.Type.Png
-  else -> ResourceFile.Type.Unknown
-}
+fun deserializeFileTypeFromPb(type: Resources.FileReference.Type) =
+    when (type) {
+      Resources.FileReference.Type.BINARY_XML -> ResourceFile.Type.BinaryXml
+      Resources.FileReference.Type.PROTO_XML -> ResourceFile.Type.ProtoXml
+      Resources.FileReference.Type.PNG -> ResourceFile.Type.Png
+      else -> ResourceFile.Type.Unknown
+    }
 
-fun deserializeReferenceTypeFromPb(type: Resources.Reference.Type) = when (type) {
-  Resources.Reference.Type.ATTRIBUTE -> Reference.Type.ATTRIBUTE
-  else -> Reference.Type.RESOURCE
-}
+fun deserializeReferenceTypeFromPb(type: Resources.Reference.Type) =
+    when (type) {
+      Resources.Reference.Type.ATTRIBUTE -> Reference.Type.ATTRIBUTE
+      else -> Reference.Type.RESOURCE
+    }
 
 fun deserializeSourceFromPb(source: Resources.Source, sourcePool: ResStringPool): Source {
   val path = sourcePool.strings[source.pathIdx]
@@ -308,117 +327,124 @@ fun deserializeSourceFromPb(source: Resources.Source, sourcePool: ResStringPool)
   return Source(path, line)
 }
 
-fun deserializeVisibilityFromPb(level: Resources.Visibility.Level) = when (level) {
-  Resources.Visibility.Level.PRIVATE -> ResourceVisibility.PRIVATE
-  Resources.Visibility.Level.PUBLIC -> ResourceVisibility.PUBLIC
-  else -> ResourceVisibility.UNDEFINED
-}
+fun deserializeVisibilityFromPb(level: Resources.Visibility.Level) =
+    when (level) {
+      Resources.Visibility.Level.PRIVATE -> ResourceVisibility.PRIVATE
+      Resources.Visibility.Level.PUBLIC -> ResourceVisibility.PUBLIC
+      else -> ResourceVisibility.UNDEFINED
+    }
 
 fun deserializeOverlayableFromPb(
-  item: Resources.OverlayableItem,
-  overlayable: Overlayable,
-  sourcePool: ResStringPool,
-  logger: ILogger?
+    item: Resources.OverlayableItem,
+    overlayable: Overlayable,
+    sourcePool: ResStringPool,
+    logger: ILogger?,
 ): OverlayableItem? {
 
   var policies = 0
   for (policy in item.policyList) {
-    policies = policies or when (policy) {
-      Resources.OverlayableItem.Policy.PUBLIC -> OverlayableItem.Policy.PUBLIC
-      Resources.OverlayableItem.Policy.SYSTEM -> OverlayableItem.Policy.SYSTEM
-      Resources.OverlayableItem.Policy.VENDOR -> OverlayableItem.Policy.VENDOR
-      Resources.OverlayableItem.Policy.PRODUCT -> OverlayableItem.Policy.PRODUCT
-      Resources.OverlayableItem.Policy.SIGNATURE -> OverlayableItem.Policy.SIGNATURE
-      Resources.OverlayableItem.Policy.ODM -> OverlayableItem.Policy.ODM
-      Resources.OverlayableItem.Policy.OEM -> OverlayableItem.Policy.OEM
-      else -> {
-        logger?.error(null, "Unrecognized policy: %s.", policy)
-        return null
-      }
-    }
+    policies =
+        policies or
+            when (policy) {
+              Resources.OverlayableItem.Policy.PUBLIC -> OverlayableItem.Policy.PUBLIC
+              Resources.OverlayableItem.Policy.SYSTEM -> OverlayableItem.Policy.SYSTEM
+              Resources.OverlayableItem.Policy.VENDOR -> OverlayableItem.Policy.VENDOR
+              Resources.OverlayableItem.Policy.PRODUCT -> OverlayableItem.Policy.PRODUCT
+              Resources.OverlayableItem.Policy.SIGNATURE -> OverlayableItem.Policy.SIGNATURE
+              Resources.OverlayableItem.Policy.ODM -> OverlayableItem.Policy.ODM
+              Resources.OverlayableItem.Policy.OEM -> OverlayableItem.Policy.OEM
+              else -> {
+                logger?.error(null, "Unrecognized policy: %s.", policy)
+                return null
+              }
+            }
   }
 
-  val source = if (item.hasSource()) {
-    deserializeSourceFromPb(item.source, sourcePool)
-  } else {
-    Source.EMPTY
-  }
+  val source =
+      if (item.hasSource()) {
+        deserializeSourceFromPb(item.source, sourcePool)
+      } else {
+        Source.EMPTY
+      }
   val comment = item.comment
   return OverlayableItem(overlayable, policies, comment, source)
 }
 
 fun deserializeBinPrimitiveFromPb(
-  primitive: Resources.Primitive, logger: ILogger?
+    primitive: Resources.Primitive,
+    logger: ILogger?,
 ): BinaryPrimitive? {
 
-  val (type, deviceValue) = when (primitive.oneofValueCase) {
-    Resources.Primitive.OneofValueCase.NULL_VALUE ->
-      Pair(ResValue.DataType.NULL, ResValue.NullFormat.UNDEFINED)
+  val (type, deviceValue) =
+      when (primitive.oneofValueCase) {
+        Resources.Primitive.OneofValueCase.NULL_VALUE ->
+            Pair(ResValue.DataType.NULL, ResValue.NullFormat.UNDEFINED)
 
-    Resources.Primitive.OneofValueCase.EMPTY_VALUE ->
-      Pair(ResValue.DataType.NULL, ResValue.NullFormat.EMPTY)
+        Resources.Primitive.OneofValueCase.EMPTY_VALUE ->
+            Pair(ResValue.DataType.NULL, ResValue.NullFormat.EMPTY)
 
-    Resources.Primitive.OneofValueCase.FLOAT_VALUE -> {
-      val float = primitive.getFloatValue()
-      Pair(ResValue.DataType.FLOAT, float.toRawBits())
-    }
+        Resources.Primitive.OneofValueCase.FLOAT_VALUE -> {
+          val float = primitive.getFloatValue()
+          Pair(ResValue.DataType.FLOAT, float.toRawBits())
+        }
 
-    Resources.Primitive.OneofValueCase.DIMENSION_VALUE ->
-      Pair(ResValue.DataType.DIMENSION, primitive.getDimensionValue())
+        Resources.Primitive.OneofValueCase.DIMENSION_VALUE ->
+            Pair(ResValue.DataType.DIMENSION, primitive.getDimensionValue())
 
-    Resources.Primitive.OneofValueCase.FRACTION_VALUE ->
-      Pair(ResValue.DataType.FRACTION, primitive.getFractionValue())
+        Resources.Primitive.OneofValueCase.FRACTION_VALUE ->
+            Pair(ResValue.DataType.FRACTION, primitive.getFractionValue())
 
-    Resources.Primitive.OneofValueCase.INT_DECIMAL_VALUE ->
-      Pair(ResValue.DataType.INT_DEC, primitive.getIntDecimalValue())
+        Resources.Primitive.OneofValueCase.INT_DECIMAL_VALUE ->
+            Pair(ResValue.DataType.INT_DEC, primitive.getIntDecimalValue())
 
-    Resources.Primitive.OneofValueCase.INT_HEXADECIMAL_VALUE ->
-      Pair(ResValue.DataType.INT_HEX, primitive.getIntHexadecimalValue())
+        Resources.Primitive.OneofValueCase.INT_HEXADECIMAL_VALUE ->
+            Pair(ResValue.DataType.INT_HEX, primitive.getIntHexadecimalValue())
 
-    Resources.Primitive.OneofValueCase.BOOLEAN_VALUE -> {
-      val boolValue = if (primitive.getBooleanValue()) 0xffffffff.toInt() else 0
-      Pair(ResValue.DataType.INT_BOOLEAN, boolValue)
-    }
+        Resources.Primitive.OneofValueCase.BOOLEAN_VALUE -> {
+          val boolValue = if (primitive.getBooleanValue()) 0xffffffff.toInt() else 0
+          Pair(ResValue.DataType.INT_BOOLEAN, boolValue)
+        }
 
-    Resources.Primitive.OneofValueCase.COLOR_ARGB8_VALUE ->
-      Pair(ResValue.DataType.INT_COLOR_ARGB8, primitive.getColorArgb8Value())
+        Resources.Primitive.OneofValueCase.COLOR_ARGB8_VALUE ->
+            Pair(ResValue.DataType.INT_COLOR_ARGB8, primitive.getColorArgb8Value())
 
-    Resources.Primitive.OneofValueCase.COLOR_RGB8_VALUE ->
-      Pair(ResValue.DataType.INT_COLOR_RGB8, primitive.getColorRgb8Value())
+        Resources.Primitive.OneofValueCase.COLOR_RGB8_VALUE ->
+            Pair(ResValue.DataType.INT_COLOR_RGB8, primitive.getColorRgb8Value())
 
-    Resources.Primitive.OneofValueCase.COLOR_ARGB4_VALUE ->
-      Pair(ResValue.DataType.INT_COLOR_ARGB4, primitive.getColorArgb4Value())
+        Resources.Primitive.OneofValueCase.COLOR_ARGB4_VALUE ->
+            Pair(ResValue.DataType.INT_COLOR_ARGB4, primitive.getColorArgb4Value())
 
-    Resources.Primitive.OneofValueCase.COLOR_RGB4_VALUE ->
-      Pair(ResValue.DataType.INT_COLOR_RGB4, primitive.getColorRgb4Value())
+        Resources.Primitive.OneofValueCase.COLOR_RGB4_VALUE ->
+            Pair(ResValue.DataType.INT_COLOR_RGB4, primitive.getColorRgb4Value())
 
-    Resources.Primitive.OneofValueCase.DIMENSION_VALUE_DEPRECATED -> {
-      val float = primitive.getDimensionValueDeprecated()
-      Pair(ResValue.DataType.DIMENSION, float.toRawBits())
-    }
+        Resources.Primitive.OneofValueCase.DIMENSION_VALUE_DEPRECATED -> {
+          val float = primitive.getDimensionValueDeprecated()
+          Pair(ResValue.DataType.DIMENSION, float.toRawBits())
+        }
 
-    Resources.Primitive.OneofValueCase.FRACTION_VALUE_DEPRECATED -> {
-      val float = primitive.getFractionValueDeprecated()
-      Pair(ResValue.DataType.FRACTION, float.toRawBits())
-    }
+        Resources.Primitive.OneofValueCase.FRACTION_VALUE_DEPRECATED -> {
+          val float = primitive.getFractionValueDeprecated()
+          Pair(ResValue.DataType.FRACTION, float.toRawBits())
+        }
 
-    else -> {
-      val errorMsg = "Value case unrecognized for Primitive proto: %s"
-      logger?.error(null, errorMsg, primitive.oneofValueCase)
-      return null
-    }
-  }
+        else -> {
+          val errorMsg = "Value case unrecognized for Primitive proto: %s"
+          logger?.error(null, errorMsg, primitive.oneofValueCase)
+          return null
+        }
+      }
   return BinaryPrimitive(ResValue(type, deviceValue.deviceToHost()))
 }
 
 fun deserializeStringFromPb(string: Resources.String, valuePool: StringPool) =
-  BasicString(valuePool.makeRef(string.value))
+    BasicString(valuePool.makeRef(string.value))
 
 fun deserializeRawFromPb(string: Resources.RawString, valuePool: StringPool) =
-  RawString(valuePool.makeRef(string.value))
+    RawString(valuePool.makeRef(string.value))
 
 fun deserializeStyledStrFromPb(
-  string: Resources.StyledString, valuePool: StringPool
+    string: Resources.StyledString,
+    valuePool: StringPool,
 ): StyledString {
 
   val spans = mutableListOf<Span>()
@@ -429,17 +455,18 @@ fun deserializeStyledStrFromPb(
 }
 
 fun deserializeReferenceFromPb(ref: Resources.Reference, logger: ILogger?): Reference? {
-  val reference = if (ref.name.isNotEmpty()) {
-    val refName = parseResourceName(ref.name)
-    if (refName == null) {
-      val errorMsg = "%s cannot be parsed as a Resource Name."
-      logger?.error(null, errorMsg, ref.name)
-      return null
-    }
-    Reference(refName.resourceName)
-  } else {
-    Reference()
-  }
+  val reference =
+      if (ref.name.isNotEmpty()) {
+        val refName = parseResourceName(ref.name)
+        if (refName == null) {
+          val errorMsg = "%s cannot be parsed as a Resource Name."
+          logger?.error(null, errorMsg, ref.name)
+          return null
+        }
+        Reference(refName.resourceName)
+      } else {
+        Reference()
+      }
 
   reference.referenceType = deserializeReferenceTypeFromPb(ref.getType())
   reference.isPrivate = ref.private
@@ -451,22 +478,21 @@ fun deserializeReferenceFromPb(ref: Resources.Reference, logger: ILogger?): Refe
 }
 
 fun deserializeFileRefFromPb(
-  file: Resources.FileReference, valuePool: StringPool, config: ConfigDescription
+    file: Resources.FileReference,
+    valuePool: StringPool,
+    config: ConfigDescription,
 ): FileReference {
 
-  val fileRef = FileReference(
-    valuePool.makeRef(
-      file.path,
-      Context(HIGH.priority, config)
-    )
-  )
+  val fileRef = FileReference(valuePool.makeRef(file.path, Context(HIGH.priority, config)))
   fileRef.type = deserializeFileTypeFromPb(file.getType())
 
   return fileRef
 }
 
 fun deserializeAttrFromPb(
-  attr: Resources.Attribute, sourcePool: ResStringPool, logger: ILogger?
+    attr: Resources.Attribute,
+    sourcePool: ResStringPool,
+    logger: ILogger?,
 ): AttributeResource? {
 
   val attrResource = AttributeResource(attr.formatFlags)
@@ -483,7 +509,7 @@ fun deserializeAttrFromPb(
     reference.comment = symbol.comment
 
     attrResource.symbols.add(
-      AttributeResource.Symbol(reference, symbol.value, symbol.type.toByte())
+        AttributeResource.Symbol(reference, symbol.value, symbol.type.toByte())
     )
   }
 
@@ -491,11 +517,11 @@ fun deserializeAttrFromPb(
 }
 
 fun deserializeStyleFromPb(
-  style: Resources.Style,
-  valuePool: StringPool,
-  config: ConfigDescription,
-  sourcePool: ResStringPool,
-  logger: ILogger?
+    style: Resources.Style,
+    valuePool: StringPool,
+    config: ConfigDescription,
+    sourcePool: ResStringPool,
+    logger: ILogger?,
 ): Style? {
 
   val styleResource = Style()
@@ -503,11 +529,12 @@ fun deserializeStyleFromPb(
     val parentRef = deserializeReferenceFromPb(style.parent, logger)
     parentRef ?: return null
 
-    parentRef.source = if (style.hasParentSource()) {
-      deserializeSourceFromPb(style.parentSource, sourcePool)
-    } else {
-      Source.EMPTY
-    }
+    parentRef.source =
+        if (style.hasParentSource()) {
+          deserializeSourceFromPb(style.parentSource, sourcePool)
+        } else {
+          Source.EMPTY
+        }
     styleResource.parent = parentRef
   }
 
@@ -530,7 +557,9 @@ fun deserializeStyleFromPb(
 }
 
 fun deserializeStyleableFromPb(
-  styleable: Resources.Styleable, sourcePool: ResStringPool, logger: ILogger?
+    styleable: Resources.Styleable,
+    sourcePool: ResStringPool,
+    logger: ILogger?,
 ): Styleable? {
 
   val styleableResource = Styleable()
@@ -547,11 +576,11 @@ fun deserializeStyleableFromPb(
 }
 
 fun deserializeArrayFromPb(
-  array: Resources.Array,
-  valuePool: StringPool,
-  config: ConfigDescription,
-  sourcePool: ResStringPool,
-  logger: ILogger?
+    array: Resources.Array,
+    valuePool: StringPool,
+    config: ConfigDescription,
+    sourcePool: ResStringPool,
+    logger: ILogger?,
 ): ArrayResource? {
 
   val arrayResource = ArrayResource()
@@ -568,21 +597,22 @@ fun deserializeArrayFromPb(
   return arrayResource
 }
 
-fun deserializePluralTypeFromPb(type: Resources.Plural.Arity) = when (type) {
-  Resources.Plural.Arity.ZERO -> Plural.Type.ZERO
-  Resources.Plural.Arity.ONE -> Plural.Type.ONE
-  Resources.Plural.Arity.TWO -> Plural.Type.TWO
-  Resources.Plural.Arity.FEW -> Plural.Type.FEW
-  Resources.Plural.Arity.MANY -> Plural.Type.MANY
-  else -> Plural.Type.OTHER
-}
+fun deserializePluralTypeFromPb(type: Resources.Plural.Arity) =
+    when (type) {
+      Resources.Plural.Arity.ZERO -> Plural.Type.ZERO
+      Resources.Plural.Arity.ONE -> Plural.Type.ONE
+      Resources.Plural.Arity.TWO -> Plural.Type.TWO
+      Resources.Plural.Arity.FEW -> Plural.Type.FEW
+      Resources.Plural.Arity.MANY -> Plural.Type.MANY
+      else -> Plural.Type.OTHER
+    }
 
 fun deserializePluralFromPb(
-  plural: Resources.Plural,
-  valuePool: StringPool,
-  config: ConfigDescription,
-  sourcePool: ResStringPool,
-  logger: ILogger?
+    plural: Resources.Plural,
+    valuePool: StringPool,
+    config: ConfigDescription,
+    sourcePool: ResStringPool,
+    logger: ILogger?,
 ): Plural? {
 
   val pluralResource = Plural()
@@ -592,11 +622,12 @@ fun deserializePluralFromPb(
 
     item ?: return null
 
-    item.source = if (entry.hasSource()) {
-      deserializeSourceFromPb(entry.source, sourcePool)
-    } else {
-      Source.EMPTY
-    }
+    item.source =
+        if (entry.hasSource()) {
+          deserializeSourceFromPb(entry.source, sourcePool)
+        } else {
+          Source.EMPTY
+        }
     item.comment = entry.comment
 
     pluralResource.setValue(type, item)
@@ -606,11 +637,11 @@ fun deserializePluralFromPb(
 }
 
 fun deserializeMacroFromPb(
-  pbMacro: Resources.MacroBody,
-  valuePool: StringPool,
-  config: ConfigDescription,
-  sourcePool: ResStringPool,
-  logger: ILogger?
+    pbMacro: Resources.MacroBody,
+    valuePool: StringPool,
+    config: ConfigDescription,
+    sourcePool: ResStringPool,
+    logger: ILogger?,
 ): Macro {
 
   val macro = Macro()
@@ -627,9 +658,7 @@ fun deserializeMacroFromPb(
   val untranslatableList = ArrayList<UntranslatableSection>()
   for (untranslatable in pbMacro.untranslatableSectionsList) {
     untranslatableList.add(
-      UntranslatableSection(
-        untranslatable.startIndex.toInt(), untranslatable.endIndex.toInt()
-      )
+        UntranslatableSection(untranslatable.startIndex.toInt(), untranslatable.endIndex.toInt())
     )
   }
   macro.untranslatables = untranslatableList
@@ -637,7 +666,7 @@ fun deserializeMacroFromPb(
   val aliasNamespaces = ArrayList<Macro.Namespace>()
   for (namespace in pbMacro.namespaceStackList) {
     aliasNamespaces.add(
-      Macro.Namespace(namespace.prefix, namespace.packageName, namespace.isPrivate)
+        Macro.Namespace(namespace.prefix, namespace.packageName, namespace.isPrivate)
     )
   }
   macro.aliasNamespaces = aliasNamespaces
@@ -646,74 +675,99 @@ fun deserializeMacroFromPb(
 }
 
 fun deserializeItemFromPb(
-  item: Resources.Item,
-  valuePool: StringPool,
-  config: ConfigDescription,
-  logger: ILogger?
-): Item? = when (item.valueCase) {
+    item: Resources.Item,
+    valuePool: StringPool,
+    config: ConfigDescription,
+    logger: ILogger?,
+): Item? =
+    when (item.valueCase) {
+      Resources.Item.ValueCase.REF -> deserializeReferenceFromPb(item.getRef(), logger)
+      Resources.Item.ValueCase.STR -> deserializeStringFromPb(item.getStr(), valuePool)
+      Resources.Item.ValueCase.RAW_STR -> deserializeRawFromPb(item.getRawStr(), valuePool)
+      Resources.Item.ValueCase.STYLED_STR ->
+          deserializeStyledStrFromPb(item.getStyledStr(), valuePool)
 
-  Resources.Item.ValueCase.REF -> deserializeReferenceFromPb(item.getRef(), logger)
-  Resources.Item.ValueCase.STR -> deserializeStringFromPb(item.getStr(), valuePool)
-  Resources.Item.ValueCase.RAW_STR -> deserializeRawFromPb(item.getRawStr(), valuePool)
-  Resources.Item.ValueCase.STYLED_STR ->
-    deserializeStyledStrFromPb(item.getStyledStr(), valuePool)
-
-  Resources.Item.ValueCase.FILE -> deserializeFileRefFromPb(item.getFile(), valuePool, config)
-  Resources.Item.ValueCase.ID -> Id()
-  Resources.Item.ValueCase.PRIM -> deserializeBinPrimitiveFromPb(item.getPrim(), logger)
-  else -> {
-    val errorMsg = "Unrecognized value case for Item: %s."
-    logger?.error(null, errorMsg, item.valueCase)
-    null
-  }
-}
-
-fun deserializeValueFromPb(
-  value: Resources.Value,
-  valuePool: StringPool,
-  config: ConfigDescription,
-  sourcePool: ResStringPool,
-  logger: ILogger?
-): Value? {
-
-  val valueResource = when {
-    value.hasItem() -> deserializeItemFromPb(value.getItem(), valuePool, config, logger)
-    value.hasCompoundValue() -> {
-      val compoundValue = value.getCompoundValue()
-
-      when (compoundValue.valueCase) {
-        Resources.CompoundValue.ValueCase.ATTR ->
-          deserializeAttrFromPb(compoundValue.getAttr(), sourcePool, logger)
-
-        Resources.CompoundValue.ValueCase.STYLE ->
-          deserializeStyleFromPb(compoundValue.getStyle(), valuePool, config, sourcePool, logger)
-
-        Resources.CompoundValue.ValueCase.STYLEABLE ->
-          deserializeStyleableFromPb(compoundValue.getStyleable(), sourcePool, logger)
-
-        Resources.CompoundValue.ValueCase.ARRAY ->
-          deserializeArrayFromPb(compoundValue.getArray(), valuePool, config, sourcePool, logger)
-
-        Resources.CompoundValue.ValueCase.PLURAL ->
-          deserializePluralFromPb(compoundValue.getPlural(), valuePool, config, sourcePool, logger)
-
-        Resources.CompoundValue.ValueCase.MACRO ->
-          deserializeMacroFromPb(compoundValue.getMacro(), valuePool, config, sourcePool, logger)
-
-        else -> {
-          val errorMsg = "Unrecognized compoundValue value case %s"
-          logger?.error(null, errorMsg, compoundValue.valueCase)
-          null
-        }
+      Resources.Item.ValueCase.FILE -> deserializeFileRefFromPb(item.getFile(), valuePool, config)
+      Resources.Item.ValueCase.ID -> Id()
+      Resources.Item.ValueCase.PRIM -> deserializeBinPrimitiveFromPb(item.getPrim(), logger)
+      else -> {
+        val errorMsg = "Unrecognized value case for Item: %s."
+        logger?.error(null, errorMsg, item.valueCase)
+        null
       }
     }
 
-    else -> {
-      val errorMsg = "Unrecognized case for serialized value %s"
-      logger?.error(null, errorMsg, value.valueCase)
-      null
-    }
-  }
+fun deserializeValueFromPb(
+    value: Resources.Value,
+    valuePool: StringPool,
+    config: ConfigDescription,
+    sourcePool: ResStringPool,
+    logger: ILogger?,
+): Value? {
+
+  val valueResource =
+      when {
+        value.hasItem() -> deserializeItemFromPb(value.getItem(), valuePool, config, logger)
+        value.hasCompoundValue() -> {
+          val compoundValue = value.getCompoundValue()
+
+          when (compoundValue.valueCase) {
+            Resources.CompoundValue.ValueCase.ATTR ->
+                deserializeAttrFromPb(compoundValue.getAttr(), sourcePool, logger)
+
+            Resources.CompoundValue.ValueCase.STYLE ->
+                deserializeStyleFromPb(
+                    compoundValue.getStyle(),
+                    valuePool,
+                    config,
+                    sourcePool,
+                    logger,
+                )
+
+            Resources.CompoundValue.ValueCase.STYLEABLE ->
+                deserializeStyleableFromPb(compoundValue.getStyleable(), sourcePool, logger)
+
+            Resources.CompoundValue.ValueCase.ARRAY ->
+                deserializeArrayFromPb(
+                    compoundValue.getArray(),
+                    valuePool,
+                    config,
+                    sourcePool,
+                    logger,
+                )
+
+            Resources.CompoundValue.ValueCase.PLURAL ->
+                deserializePluralFromPb(
+                    compoundValue.getPlural(),
+                    valuePool,
+                    config,
+                    sourcePool,
+                    logger,
+                )
+
+            Resources.CompoundValue.ValueCase.MACRO ->
+                deserializeMacroFromPb(
+                    compoundValue.getMacro(),
+                    valuePool,
+                    config,
+                    sourcePool,
+                    logger,
+                )
+
+            else -> {
+              val errorMsg = "Unrecognized compoundValue value case %s"
+              logger?.error(null, errorMsg, compoundValue.valueCase)
+              null
+            }
+          }
+        }
+
+        else -> {
+          val errorMsg = "Unrecognized case for serialized value %s"
+          logger?.error(null, errorMsg, value.valueCase)
+          null
+        }
+      }
   valueResource ?: return null
 
   valueResource.weak = value.weak
@@ -726,20 +780,18 @@ fun deserializeValueFromPb(
 }
 
 fun deserializePackageFromPb(
-  original: Resources.Package,
-  sourcePool: ResStringPool,
-  overlayables: List<Overlayable>,
-  logger: ILogger?,
-  table: ResourceTable
+    original: Resources.Package,
+    sourcePool: ResStringPool,
+    overlayables: List<Overlayable>,
+    logger: ILogger?,
+    table: ResourceTable,
 ): Boolean {
 
-  val packageId =
-    if (original.hasPackageId()) original.packageId.id.toByte() else 0.toByte()
+  val packageId = if (original.hasPackageId()) original.packageId.id.toByte() else 0.toByte()
 
   val idIndex = mutableIntObjectMapOf<ResourceName>()
 
-  val resourcePackage =
-    table.createPackageAllowingDuplicateNames(original.packageName, packageId)
+  val resourcePackage = table.createPackageAllowingDuplicateNames(original.packageName, packageId)
   for (group in original.typeList) {
     val resType = resourceTypeFromTag(group.name)
 
@@ -778,11 +830,12 @@ fun deserializePackageFromPb(
           else -> {}
         }
 
-        val visibilitySource = if (visibility.hasSource()) {
-          deserializeSourceFromPb(visibility.source, sourcePool)
-        } else {
-          Source.EMPTY
-        }
+        val visibilitySource =
+            if (visibility.hasSource()) {
+              deserializeSourceFromPb(visibility.source, sourcePool)
+            } else {
+              Source.EMPTY
+            }
         val visibilityComment = visibility.comment
 
         resourceEntry.visibility = Visibility(visibilitySource, visibilityComment, visibilityLevel)
@@ -790,11 +843,12 @@ fun deserializePackageFromPb(
 
       if (entry.hasAllowNew()) {
         val allowNew = entry.allowNew
-        val allowNewSource = if (allowNew.hasSource()) {
-          deserializeSourceFromPb(allowNew.source, sourcePool)
-        } else {
-          Source.EMPTY
-        }
+        val allowNewSource =
+            if (allowNew.hasSource()) {
+              deserializeSourceFromPb(allowNew.source, sourcePool)
+            } else {
+              Source.EMPTY
+            }
         val allowNewComment = allowNew.comment
         resourceEntry.allowNew = AllowNew(allowNewSource, allowNewComment)
       }
@@ -803,31 +857,33 @@ fun deserializePackageFromPb(
         // Find the overlayable to which this item belongs.
         val overlayableItem = entry.overlayableItem
         if (overlayableItem.overlayableIdx >= overlayables.size) {
-          val errorMsg = "Illegal value for overlayable id '%s'. Because only '%s' overlayables" +
-            "exist in proto."
+          val errorMsg =
+              "Illegal value for overlayable id '%s'. Because only '%s' overlayables" +
+                  "exist in proto."
           logger?.error(null, errorMsg, overlayableItem.overlayableIdx, overlayables.size)
           return false
         }
         val resourceOverlayable =
-          deserializeOverlayableFromPb(
-            overlayableItem,
-            overlayables[overlayableItem.overlayableIdx],
-            sourcePool,
-            logger
-          )
+            deserializeOverlayableFromPb(
+                overlayableItem,
+                overlayables[overlayableItem.overlayableIdx],
+                sourcePool,
+                logger,
+            )
         resourceOverlayable ?: return false
 
         resourceEntry.overlayable = resourceOverlayable
       }
 
-      val resourceId = resourceIdFromParts(
-        original.packageId.id.toByte(),
-        group.typeId.id.toByte(),
-        entry.entryId.id.toShort()
-      )
+      val resourceId =
+          resourceIdFromParts(
+              original.packageId.id.toByte(),
+              group.typeId.id.toByte(),
+              entry.entryId.id.toShort(),
+          )
       if (resourceId.isValidId()) {
         idIndex[resourceId] =
-          ResourceName(resourcePackage.name, resourceGroup.type, resourceEntry.name)
+            ResourceName(resourcePackage.name, resourceGroup.type, resourceEntry.name)
       }
 
       for (configValue in entry.configValueList) {
@@ -836,24 +892,27 @@ fun deserializePackageFromPb(
         val resourceConfig = deserializeConfigFromPb(config, logger)
         resourceConfig ?: return false
 
-        val resourceConfigValue =
-          resourceEntry.findOrCreateValue(resourceConfig, config.product)
+        val resourceConfigValue = resourceEntry.findOrCreateValue(resourceConfig, config.product)
         if (resourceConfigValue.value.isTruthy()) {
           val errorMsg = "Value already exists for name %s, config %s, and product %s."
           logger?.error(
-            null,
-            errorMsg,
-            ResourceName(resourcePackage.name, resourceGroup.type, resourceEntry.name),
-            resourceConfig,
-            config.product
+              null,
+              errorMsg,
+              ResourceName(resourcePackage.name, resourceGroup.type, resourceEntry.name),
+              resourceConfig,
+              config.product,
           )
           return false
         }
 
         resourceConfigValue.value =
-          deserializeValueFromPb(
-            configValue.value, table.stringPool, resourceConfig, sourcePool, logger
-          )
+            deserializeValueFromPb(
+                configValue.value,
+                table.stringPool,
+                resourceConfig,
+                sourcePool,
+                logger,
+            )
 
         resourceConfigValue.value ?: return false
       }
@@ -883,22 +942,26 @@ fun deserializePackageFromPb(
 }
 
 fun deserializeTableFromPb(
-  table: Resources.ResourceTable, outTable: ResourceTable, logger: ILogger?
+    table: Resources.ResourceTable,
+    outTable: ResourceTable,
+    logger: ILogger?,
 ): Boolean {
 
-  val sourcePool = ResStringPool.get(
-    table.sourcePool.data.asReadOnlyByteBuffer(),
-    table.sourcePool.serializedSize
-  )
+  val sourcePool =
+      ResStringPool.get(
+          table.sourcePool.data.asReadOnlyByteBuffer(),
+          table.sourcePool.serializedSize,
+      )
 
   // Deserialize the overlayable groups of a table
   val overlayables = mutableListOf<Overlayable>()
   for (overlayable in table.overlayableList) {
-    val overlayableSource = if (overlayable.hasSource()) {
-      deserializeSourceFromPb(overlayable.source, sourcePool)
-    } else {
-      Source.EMPTY
-    }
+    val overlayableSource =
+        if (overlayable.hasSource()) {
+          deserializeSourceFromPb(overlayable.source, sourcePool)
+        } else {
+          Source.EMPTY
+        }
     overlayables.add(Overlayable(overlayable.name, overlayable.actor, overlayableSource))
   }
 

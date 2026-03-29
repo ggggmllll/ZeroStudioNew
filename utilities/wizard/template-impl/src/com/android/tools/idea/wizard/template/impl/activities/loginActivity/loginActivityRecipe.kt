@@ -52,7 +52,12 @@ import com.android.tools.idea.wizard.template.impl.activities.loginActivity.src.
 import com.android.tools.idea.wizard.template.impl.activities.loginActivity.src.app_package.ui.login.loginViewModelJava
 import com.android.tools.idea.wizard.template.impl.activities.loginActivity.src.app_package.ui.login.loginViewModelKt
 
-fun RecipeExecutor.loginActivityRecipe(moduleData: ModuleTemplateData, activityClass: String, layoutName: String, packageName: String) {
+fun RecipeExecutor.loginActivityRecipe(
+    moduleData: ModuleTemplateData,
+    activityClass: String,
+    layoutName: String,
+    packageName: String,
+) {
   val (projectData, srcOut, resOut, manifestOut) = moduleData
   val apis = moduleData.apis
   val appCompatVersion = apis.appCompatVersion
@@ -71,114 +76,128 @@ fun RecipeExecutor.loginActivityRecipe(moduleData: ModuleTemplateData, activityC
   val baseFeatureResOut = moduleData.baseFeature?.resDir
   val simpleName = activityToLayout(activityClass)
   generateThemeStyles(moduleData.themesData.main, useAndroidX, baseFeatureResOut ?: resOut)
-  generateManifestStrings(activityClass, baseFeatureResOut ?: resOut, moduleData.isNewModule, generateActivityTitle = true)
-  mergeXml(
-    androidManifestXml(
+  generateManifestStrings(
       activityClass,
-      simpleName,
-      isLauncher = moduleData.isNewModule,
-      isLibrary = moduleData.isLibrary,
-      isNewModule = moduleData.isNewModule,
-    ),
-    manifestOut.resolve("AndroidManifest.xml"),
+      baseFeatureResOut ?: resOut,
+      moduleData.isNewModule,
+      generateActivityTitle = true,
+  )
+  mergeXml(
+      androidManifestXml(
+          activityClass,
+          simpleName,
+          isLauncher = moduleData.isNewModule,
+          isLibrary = moduleData.isLibrary,
+          isNewModule = moduleData.isNewModule,
+      ),
+      manifestOut.resolve("AndroidManifest.xml"),
   )
   mergeXml(dimensXml(), resOut.resolve("values/dimens.xml"))
   mergeXml(dimensXmlHorizontalMargin(48), resOut.resolve("values-land/dimens.xml"))
   mergeXml(dimensXmlHorizontalMargin(48), resOut.resolve("values-w600dp/dimens.xml"))
   mergeXml(dimensXmlHorizontalMargin(200), resOut.resolve("values-w1240dp/dimens.xml"))
-  mergeXml(stringsXml(simpleName, activityClass, moduleData.isNewModule), resOut.resolve("values/strings.xml"))
-  save(activityLoginXml(activityClass, packageName, useAndroidX, apis.minApi.apiLevel), resOut.resolve("layout/${layoutName}.xml"))
-  // We can use the same layout in the layout and layout-w1240dp directories
-  save(activityLoginXml(activityClass, packageName, useAndroidX, apis.minApi.apiLevel), resOut.resolve("layout-w1240dp/${layoutName}.xml"))
+  mergeXml(
+      stringsXml(simpleName, activityClass, moduleData.isNewModule),
+      resOut.resolve("values/strings.xml"),
+  )
   save(
-    activityLoginXmlW936dp(activityClass, packageName, useAndroidX, apis.minApi.apiLevel),
-    resOut.resolve("layout-w936dp/${layoutName}.xml"),
+      activityLoginXml(activityClass, packageName, useAndroidX, apis.minApi.apiLevel),
+      resOut.resolve("layout/${layoutName}.xml"),
+  )
+  // We can use the same layout in the layout and layout-w1240dp directories
+  save(
+      activityLoginXml(activityClass, packageName, useAndroidX, apis.minApi.apiLevel),
+      resOut.resolve("layout-w1240dp/${layoutName}.xml"),
+  )
+  save(
+      activityLoginXmlW936dp(activityClass, packageName, useAndroidX, apis.minApi.apiLevel),
+      resOut.resolve("layout-w936dp/${layoutName}.xml"),
   )
 
   val isViewBindingSupported = moduleData.viewBindingSupport.isViewBindingSupported()
   val loginActivity =
-    when (projectData.language) {
-      Language.Java ->
-        loginActivityJava(
-          layoutName = layoutName,
-          packageName = packageName,
-          applicationPackage = projectData.applicationPackage,
-          useAndroidX = useAndroidX,
-          isViewBindingSupported = isViewBindingSupported,
-        )
-      Language.Kotlin ->
-        loginActivityKt(
-          activityClass = activityClass,
-          layoutName = layoutName,
-          packageName = packageName,
-          applicationPackage = projectData.applicationPackage,
-          useAndroidX = useAndroidX,
-          isViewBindingSupported = isViewBindingSupported,
-        )
-    }
+      when (projectData.language) {
+        Language.Java ->
+            loginActivityJava(
+                layoutName = layoutName,
+                packageName = packageName,
+                applicationPackage = projectData.applicationPackage,
+                useAndroidX = useAndroidX,
+                isViewBindingSupported = isViewBindingSupported,
+            )
+        Language.Kotlin ->
+            loginActivityKt(
+                activityClass = activityClass,
+                layoutName = layoutName,
+                packageName = packageName,
+                applicationPackage = projectData.applicationPackage,
+                useAndroidX = useAndroidX,
+                isViewBindingSupported = isViewBindingSupported,
+            )
+      }
   save(loginActivity, srcOut.resolve("ui/login/${activityClass}.${ktOrJavaExt}"))
 
   val loginViewModel =
-    when (projectData.language) {
-      Language.Java -> loginViewModelJava(packageName, useAndroidX)
-      Language.Kotlin -> loginViewModelKt(packageName, useAndroidX)
-    }
+      when (projectData.language) {
+        Language.Java -> loginViewModelJava(packageName, useAndroidX)
+        Language.Kotlin -> loginViewModelKt(packageName, useAndroidX)
+      }
   save(loginViewModel, srcOut.resolve("ui/login/LoginViewModel.${ktOrJavaExt}"))
 
   val loginViewModelFactory =
-    when (projectData.language) {
-      Language.Java -> loginViewModelFactoryJava(packageName, useAndroidX)
-      Language.Kotlin -> loginViewModelFactoryKt(packageName, useAndroidX)
-    }
+      when (projectData.language) {
+        Language.Java -> loginViewModelFactoryJava(packageName, useAndroidX)
+        Language.Kotlin -> loginViewModelFactoryKt(packageName, useAndroidX)
+      }
   save(loginViewModelFactory, srcOut.resolve("ui/login/LoginViewModelFactory.${ktOrJavaExt}"))
 
   val loggedInUser =
-    when (projectData.language) {
-      Language.Java -> loggedInUserJava(packageName)
-      Language.Kotlin -> loggedInUserKt(packageName)
-    }
+      when (projectData.language) {
+        Language.Java -> loggedInUserJava(packageName)
+        Language.Kotlin -> loggedInUserKt(packageName)
+      }
   save(loggedInUser, srcOut.resolve("data/model/LoggedInUser.${ktOrJavaExt}"))
 
   val loginDataSource =
-    when (projectData.language) {
-      Language.Java -> loginDataSourceJava(packageName)
-      Language.Kotlin -> loginDataSourceKt(packageName)
-    }
+      when (projectData.language) {
+        Language.Java -> loginDataSourceJava(packageName)
+        Language.Kotlin -> loginDataSourceKt(packageName)
+      }
   save(loginDataSource, srcOut.resolve("data/LoginDataSource.${ktOrJavaExt}"))
 
   val loginRepository =
-    when (projectData.language) {
-      Language.Java -> loginRepositoryJava(packageName)
-      Language.Kotlin -> loginRepositoryKt(packageName)
-    }
+      when (projectData.language) {
+        Language.Java -> loginRepositoryJava(packageName)
+        Language.Kotlin -> loginRepositoryKt(packageName)
+      }
   save(loginRepository, srcOut.resolve("data/LoginRepository.${ktOrJavaExt}"))
 
   val result =
-    when (projectData.language) {
-      Language.Java -> resultJava(packageName)
-      Language.Kotlin -> resultKt(packageName)
-    }
+      when (projectData.language) {
+        Language.Java -> resultJava(packageName)
+        Language.Kotlin -> resultKt(packageName)
+      }
   save(result, srcOut.resolve("data/Result.${ktOrJavaExt}"))
 
   val loginFormState =
-    when (projectData.language) {
-      Language.Java -> loginFormStateJava(packageName, useAndroidX)
-      Language.Kotlin -> loginFormStateKt(packageName)
-    }
+      when (projectData.language) {
+        Language.Java -> loginFormStateJava(packageName, useAndroidX)
+        Language.Kotlin -> loginFormStateKt(packageName)
+      }
   save(loginFormState, srcOut.resolve("ui/login/LoginFormState.${ktOrJavaExt}"))
 
   val loginResult =
-    when (projectData.language) {
-      Language.Java -> loginResultJava(packageName, useAndroidX)
-      Language.Kotlin -> loginResultKt(packageName)
-    }
+      when (projectData.language) {
+        Language.Java -> loginResultJava(packageName, useAndroidX)
+        Language.Kotlin -> loginResultKt(packageName)
+      }
   save(loginResult, srcOut.resolve("ui/login/LoginResult.${ktOrJavaExt}"))
 
   val loggedInUserView =
-    when (projectData.language) {
-      Language.Java -> loggedInUserViewJava(packageName)
-      Language.Kotlin -> loggedInUserViewKt(packageName)
-    }
+      when (projectData.language) {
+        Language.Java -> loggedInUserViewJava(packageName)
+        Language.Kotlin -> loggedInUserViewKt(packageName)
+      }
   save(loggedInUserView, srcOut.resolve("ui/login/LoggedInUserView.${ktOrJavaExt}"))
 
   open(srcOut.resolve("${activityClass}.${ktOrJavaExt}"))

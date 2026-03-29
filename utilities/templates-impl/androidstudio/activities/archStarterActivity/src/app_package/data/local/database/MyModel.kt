@@ -24,7 +24,7 @@ import com.itsaky.androidide.templates.impl.androidstudio.activities.archStarter
  * @author android_zero
  */
 fun ArchStarterActivityTemplateVariables.dataModel() =
-  """
+    """
 package $databasePackage
 
 import androidx.room.Dao

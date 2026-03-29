@@ -25,7 +25,7 @@ import com.itsaky.androidide.templates.impl.androidstudio.activities.archStarter
  * @author android_zero
  */
 fun ArchStarterActivityTemplateVariables.typeKt() =
-  """
+    """
 package $themePackage
 
 import androidx.compose.material3.Typography

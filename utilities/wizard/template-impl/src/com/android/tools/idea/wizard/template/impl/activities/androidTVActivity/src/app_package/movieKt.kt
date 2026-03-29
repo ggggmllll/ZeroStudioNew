@@ -19,7 +19,7 @@ package com.android.tools.idea.wizard.template.impl.activities.androidTVActivity
 import com.android.tools.idea.wizard.template.escapeKotlinIdentifier
 
 fun movieKt(packageName: String) =
-  """
+    """
 package ${escapeKotlinIdentifier(packageName)}
 
 import java.io.Serializable

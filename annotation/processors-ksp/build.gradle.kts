@@ -15,25 +15,17 @@
  *   along with AndroidIDE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
-import com.itsaky.androidide.build.config.BuildConfig
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
   kotlin("jvm")
   kotlin("kapt")
 }
 
+kotlin { jvmToolchain(17) }
 
-
-
-kotlin {
-    jvmToolchain(17)
-}
-
-tasks.withType<KotlinCompile>().configureEach {
-    compilerOptions.jvmTarget.set(JvmTarget.JVM_17)
-}
+tasks.withType<KotlinCompile>().configureEach { compilerOptions.jvmTarget.set(JvmTarget.JVM_17) }
 
 dependencies {
   kapt(libs.google.auto.service)
@@ -48,6 +40,4 @@ dependencies {
   implementation(libs.common.ksp)
 }
 
-sourceSets.main {
-  java.srcDirs("src/main/kotlin")
-}
+sourceSets.main { java.srcDirs("src/main/kotlin") }

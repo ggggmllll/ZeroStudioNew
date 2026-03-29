@@ -41,13 +41,19 @@ import java.io.File
 val googleWalletActivityTemplate
   get() = template {
     name = "Google Wallet Activity"
-    description = "Creates a new activity with Google Wallet, so that your users can add passes to their Google Wallet Account"
+    description =
+        "Creates a new activity with Google Wallet, so that your users can add passes to their Google Wallet Account"
     minApi = MIN_API
     constraints = listOf(TemplateConstraint.AndroidX)
 
     category = Category.Google
     formFactor = FormFactor.Mobile
-    screens = listOf(WizardUiContext.ActivityGallery, WizardUiContext.MenuEntry, WizardUiContext.NewModule)
+    screens =
+        listOf(
+            WizardUiContext.ActivityGallery,
+            WizardUiContext.MenuEntry,
+            WizardUiContext.NewModule,
+        )
 
     val activityClass = stringParameter {
       name = "Activity Name"
@@ -69,22 +75,29 @@ val googleWalletActivityTemplate
     val isLauncher = booleanParameter {
       name = "Launcher Activity"
       default = false
-      help = "If true, this activity will have a CATEGORY_LAUNCHER intent filter, making it visible in the launcher"
+      help =
+          "If true, this activity will have a CATEGORY_LAUNCHER intent filter, making it visible in the launcher"
     }
 
     val packageName = defaultPackageNameParameter
 
     widgets(
-      TextFieldWidget(activityClass),
-      TextFieldWidget(layoutName),
-      CheckBoxWidget(isLauncher),
-      PackageNameWidget(packageName),
-      LanguageWidget(),
+        TextFieldWidget(activityClass),
+        TextFieldWidget(layoutName),
+        CheckBoxWidget(isLauncher),
+        PackageNameWidget(packageName),
+        LanguageWidget(),
     )
 
     thumb { File("google-wallet-activity").resolve("template_wallet_activity.png") }
 
     recipe = { data: TemplateData ->
-      googleWalletActivityRecipe(data as ModuleTemplateData, activityClass.value, layoutName.value, isLauncher.value, packageName.value)
+      googleWalletActivityRecipe(
+          data as ModuleTemplateData,
+          activityClass.value,
+          layoutName.value,
+          isLauncher.value,
+          packageName.value,
+      )
     }
   }

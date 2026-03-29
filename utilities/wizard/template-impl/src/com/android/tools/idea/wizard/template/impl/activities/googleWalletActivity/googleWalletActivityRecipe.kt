@@ -31,11 +31,11 @@ import com.android.tools.idea.wizard.template.impl.activities.googleWalletActivi
 import java.io.File
 
 fun RecipeExecutor.googleWalletActivityRecipe(
-  moduleData: ModuleTemplateData,
-  activityClass: String,
-  layoutName: String,
-  isLauncher: Boolean,
-  packageName: String,
+    moduleData: ModuleTemplateData,
+    activityClass: String,
+    layoutName: String,
+    isLauncher: Boolean,
+    packageName: String,
 ) {
   val (projectData, srcOut, resOut, manifestOut) = moduleData
 
@@ -57,16 +57,16 @@ fun RecipeExecutor.googleWalletActivityRecipe(
   // Create manifest
   val simpleName = activityToLayout(activityClass)
   mergeXml(
-    androidManifestXml(
-      activityClass,
-      isLauncher,
-      moduleData.isLibrary,
-      packageName,
-      simpleName,
-      moduleData.isNewModule,
-      moduleData.themesData,
-    ),
-    manifestOut.resolve("AndroidManifest.xml"),
+      androidManifestXml(
+          activityClass,
+          isLauncher,
+          moduleData.isLibrary,
+          packageName,
+          simpleName,
+          moduleData.isNewModule,
+          moduleData.themesData,
+      ),
+      manifestOut.resolve("AndroidManifest.xml"),
   )
 
   // Copy static resources
@@ -80,34 +80,34 @@ fun RecipeExecutor.googleWalletActivityRecipe(
   //// Generate Constants class
   // val ktOrJavaExt = projectData.language.extension
   val samplePass =
-    when (projectData.language) {
-      Language.Java -> samplePassJava(packageName)
-      Language.Kotlin -> samplePassKt(packageName)
-    }
+      when (projectData.language) {
+        Language.Java -> samplePassJava(packageName)
+        Language.Kotlin -> samplePassKt(packageName)
+      }
   val samplePassOut = srcOut.resolve("SamplePass.$ktOrJavaExt")
   save(samplePass, samplePassOut)
 
   // Add activity class
   val isViewBindingSupported = moduleData.viewBindingSupport.isViewBindingSupported()
   val checkoutActivity =
-    when (projectData.language) {
-      Language.Java ->
-        walletActivityJava(
-          activityClass = activityClass,
-          layoutName = layoutName,
-          packageName = packageName,
-          applicationPackage = projectData.applicationPackage,
-          isViewBindingSupported = isViewBindingSupported,
-        )
-      Language.Kotlin ->
-        walletActivityKt(
-          activityClass = activityClass,
-          layoutName = layoutName,
-          packageName = packageName,
-          applicationPackage = projectData.applicationPackage,
-          isViewBindingSupported = isViewBindingSupported,
-        )
-    }
+      when (projectData.language) {
+        Language.Java ->
+            walletActivityJava(
+                activityClass = activityClass,
+                layoutName = layoutName,
+                packageName = packageName,
+                applicationPackage = projectData.applicationPackage,
+                isViewBindingSupported = isViewBindingSupported,
+            )
+        Language.Kotlin ->
+            walletActivityKt(
+                activityClass = activityClass,
+                layoutName = layoutName,
+                packageName = packageName,
+                applicationPackage = projectData.applicationPackage,
+                isViewBindingSupported = isViewBindingSupported,
+            )
+      }
 
   save(checkoutActivity, srcOut.resolve("$activityClass.$ktOrJavaExt"))
   open(srcOut.resolve("$activityClass.$ktOrJavaExt"))

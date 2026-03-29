@@ -27,8 +27,8 @@ import android.view.ViewConfiguration
 import kotlin.math.abs
 
 internal class SwipeDismissTouchListener(
-  private val view: View,
-  private val callbacks: DismissCallbacks
+    private val view: View,
+    private val callbacks: DismissCallbacks,
 ) : View.OnTouchListener {
 
   private val slop: Int
@@ -48,7 +48,7 @@ internal class SwipeDismissTouchListener(
     slop = vc.scaledTouchSlop
     minFlingVelocity = vc.scaledMinimumFlingVelocity * 16
     animationTime =
-      view.context.resources.getInteger(android.R.integer.config_shortAnimTime).toLong()
+        view.context.resources.getInteger(android.R.integer.config_shortAnimTime).toLong()
   }
 
   override fun onTouch(view: View, motionEvent: MotionEvent): Boolean {
@@ -85,24 +85,24 @@ internal class SwipeDismissTouchListener(
           }
           if (dismiss) {
             this.view
-              .animate()
-              .translationX(if (dismissRight) viewWidth.toFloat() else -viewWidth.toFloat())
-              .alpha(0f)
-              .setDuration(animationTime)
-              .setListener(
-                object : AnimatorListenerAdapter() {
-                  override fun onAnimationEnd(animation: Animator) {
-                    performDismiss()
-                  }
-                }
-              )
+                .animate()
+                .translationX(if (dismissRight) viewWidth.toFloat() else -viewWidth.toFloat())
+                .alpha(0f)
+                .setDuration(animationTime)
+                .setListener(
+                    object : AnimatorListenerAdapter() {
+                      override fun onAnimationEnd(animation: Animator) {
+                        performDismiss()
+                      }
+                    }
+                )
           } else if (swiping) {
             this.view
-              .animate()
-              .translationX(0f)
-              .alpha(1f)
-              .setDuration(animationTime)
-              .setListener(null)
+                .animate()
+                .translationX(0f)
+                .alpha(1f)
+                .setDuration(animationTime)
+                .setListener(null)
           }
           velocityTracker!!.recycle()
           velocityTracker = null
@@ -116,11 +116,11 @@ internal class SwipeDismissTouchListener(
       MotionEvent.ACTION_CANCEL -> {
         if (velocityTracker != null) {
           this.view
-            .animate()
-            .translationX(0f)
-            .alpha(1f)
-            .setDuration(animationTime)
-            .setListener(null)
+              .animate()
+              .translationX(0f)
+              .alpha(1f)
+              .setDuration(animationTime)
+              .setListener(null)
           velocityTracker!!.recycle()
           velocityTracker = null
           translationX = 0f
@@ -143,8 +143,8 @@ internal class SwipeDismissTouchListener(
 
             val cancelEvent = MotionEvent.obtain(motionEvent)
             cancelEvent.action =
-              MotionEvent.ACTION_CANCEL or
-                (motionEvent.actionIndex shl MotionEvent.ACTION_POINTER_INDEX_SHIFT)
+                MotionEvent.ACTION_CANCEL or
+                    (motionEvent.actionIndex shl MotionEvent.ACTION_POINTER_INDEX_SHIFT)
             this.view.onTouchEvent(cancelEvent)
             cancelEvent.recycle()
           }
@@ -172,15 +172,15 @@ internal class SwipeDismissTouchListener(
     val animator = ValueAnimator.ofInt(originalHeight, 1).setDuration(animationTime)
 
     animator.addListener(
-      object : AnimatorListenerAdapter() {
-        override fun onAnimationEnd(animation: Animator) {
-          callbacks.onDismiss(view)
-          view.alpha = 1f
-          view.translationX = 0f
-          lp.height = originalHeight
-          view.layoutParams = lp
+        object : AnimatorListenerAdapter() {
+          override fun onAnimationEnd(animation: Animator) {
+            callbacks.onDismiss(view)
+            view.alpha = 1f
+            view.translationX = 0f
+            lp.height = originalHeight
+            view.layoutParams = lp
+          }
         }
-      }
     )
 
     animator.addUpdateListener { valueAnimator ->

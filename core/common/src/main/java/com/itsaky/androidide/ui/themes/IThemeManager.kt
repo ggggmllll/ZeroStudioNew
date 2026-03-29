@@ -33,20 +33,13 @@ interface IThemeManager {
       val instance by lazy { ServiceLoader.load(IThemeManager::class.java).findFirstOrThrow() }
     }
 
-    /**
-     * Get the [IThemeManager] instance.
-     */
-    fun getInstance() : IThemeManager = Provider.instance
+    /** Get the [IThemeManager] instance. */
+    fun getInstance(): IThemeManager = Provider.instance
   }
 
-  /**
-   * Apply current theme to [activity].
-   * This handles both initial setup and dynamic switching.
-   */
+  /** Apply current theme to [activity]. This handles both initial setup and dynamic switching. */
   fun applyTheme(activity: Activity)
 
-  /**
-   * Get the current IDE theme enum.
-   */
+  /** Get the current IDE theme enum. */
   fun getCurrentTheme(): IDETheme
 }

@@ -15,9 +15,6 @@
  */
 package com.itsaky.androidide.templates.impl.androidstudio.activities.basicActivity.src
 
-import com.itsaky.androidide.templates.Language
-import com.itsaky.androidide.templates.impl.activities.common.layoutToViewBindingClass
-
 /**
  * Generates the Kotlin source code for the Basic Activity.
  *
@@ -25,18 +22,18 @@ import com.itsaky.androidide.templates.impl.activities.common.layoutToViewBindin
  * @author android_zero
  */
 fun basicActivityKt(
-  activityClass: String,
-  layoutName: String,
-  menuName: String,
-  isViewBindingSupported: Boolean,
+    activityClass: String,
+    layoutName: String,
+    menuName: String,
+    isViewBindingSupported: Boolean,
 ): String {
   val contentViewBlock =
-    if (isViewBindingSupported)
-      """
+      if (isViewBindingSupported)
+          """
      binding = ActivityMainBinding.inflate(layoutInflater)
      setContentView(binding.root)
   """
-    else "setContentView(R.layout.$layoutName)"
+      else "setContentView(R.layout.$layoutName)"
 
   return """
 import android.os.Bundle

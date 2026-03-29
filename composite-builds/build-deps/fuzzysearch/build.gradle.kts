@@ -15,7 +15,4 @@
  *   along with AndroidIDE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-plugins {
-    @Suppress("JavaPluginLanguageLevel")
-    id("java-library")
-}
+plugins { @Suppress("JavaPluginLanguageLevel") id("java-library") }

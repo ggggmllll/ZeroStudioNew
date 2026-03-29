@@ -30,7 +30,8 @@ import com.itsaky.androidide.services.log.lookupLogService
  *
  * @author Akash Yadav
  */
-class DisconnectLogSendersAction(context: Context, override val order: Int) : EditorActivityAction() {
+class DisconnectLogSendersAction(context: Context, override val order: Int) :
+    EditorActivityAction() {
 
   override val id: String = "ide.editor.service.logreceiver.disconnectSenders"
 
@@ -41,10 +42,11 @@ class DisconnectLogSendersAction(context: Context, override val order: Int) : Ed
 
   override fun prepare(data: ActionData) {
     super.prepare(data)
-    data.getActivity() ?: run {
-      markInvisible()
-      return
-    }
+    data.getActivity()
+        ?: run {
+          markInvisible()
+          return
+        }
 
     val receiverService = lookupLogService()
     if (receiverService == null) {

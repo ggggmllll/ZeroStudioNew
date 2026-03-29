@@ -23,16 +23,16 @@ import io.realm.RealmModel
 import io.realm.RealmResults
 
 inline fun <reified T : RealmModel> Realm.assertInsertion(
-  vararg models: T,
-  crossinline verify: Realm.(models: RealmResults<T>) -> Unit
+    vararg models: T,
+    crossinline verify: Realm.(models: RealmResults<T>) -> Unit,
 ) {
   assertInsertion(false, *models, verify = verify)
 }
 
 inline fun <reified T : RealmModel> Realm.assertInsertion(
-  allowUpdate: Boolean = false,
-  vararg models: T,
-  crossinline verify: Realm.(models: RealmResults<T>) -> Unit
+    allowUpdate: Boolean = false,
+    vararg models: T,
+    crossinline verify: Realm.(models: RealmResults<T>) -> Unit,
 ) {
   val modelList = models.toList()
   assertThat(modelList).isNotEmpty()
@@ -45,9 +45,7 @@ inline fun <reified T : RealmModel> Realm.assertInsertion(
     }
   }
 
-  executeTransaction {
-    verify(it.where(modelList[0].javaClass).findAll())
-  }
+  executeTransaction { verify(it.where(modelList[0].javaClass).findAll()) }
 }
 
 fun Realm.assertInsertSingle(model: RealmModel) {
@@ -68,5 +66,3 @@ fun Realm.assertInsertUnique(model: RealmModel) {
     assertThat(models[0]).isEqualTo(model)
   }
 }
-
-

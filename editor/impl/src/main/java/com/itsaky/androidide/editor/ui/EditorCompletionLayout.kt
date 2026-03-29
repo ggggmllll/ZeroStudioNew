@@ -36,17 +36,17 @@ class EditorCompletionLayout : DefaultCompletionLayout() {
   override fun onApplyColorScheme(colorScheme: EditorColorScheme) {
 
     val resources = completionList.context.resources
-    val cornerRadius = resources.getDimensionPixelSize(R.dimen.completion_window_corner_radius)
-      .toFloat()
+    val cornerRadius =
+        resources.getDimensionPixelSize(R.dimen.completion_window_corner_radius).toFloat()
 
-    val strokeWidth = resources
-      .getDimensionPixelSize(R.dimen.completion_window_stroke_width)
+    val strokeWidth = resources.getDimensionPixelSize(R.dimen.completion_window_stroke_width)
 
-    (completionList.parent as? ViewGroup?)?.background = GradientDrawable().apply {
-      setCornerRadius(cornerRadius)
-      setStroke(strokeWidth, colorScheme.getColor(EditorColorScheme.COMPLETION_WND_CORNER))
-      setColor(colorScheme.getColor(EditorColorScheme.COMPLETION_WND_BACKGROUND))
-    }
+    (completionList.parent as? ViewGroup?)?.background =
+        GradientDrawable().apply {
+          setCornerRadius(cornerRadius)
+          setStroke(strokeWidth, colorScheme.getColor(EditorColorScheme.COMPLETION_WND_CORNER))
+          setColor(colorScheme.getColor(EditorColorScheme.COMPLETION_WND_BACKGROUND))
+        }
 
     if (completionList.layoutParams is MarginLayoutParams) {
       completionList.updateLayoutParams<MarginLayoutParams> {

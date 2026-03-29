@@ -54,15 +54,14 @@ class AndroidIDEPlugin : Plugin<Project> {
       logger.warn("--- x --- x ---")
     }
 
-    val taskName = when {
-      isAndroidModule -> "testDebugUnitTest"
-      else -> "test"
-    }
+    val taskName =
+        when {
+          isAndroidModule -> "testDebugUnitTest"
+          else -> "test"
+        }
 
     logger.info("${project.path} will run task '$taskName' for tests in CI")
 
-    project.tasks.create("runTestsInCI") {
-      dependsOn(taskName)
-    }
+    project.tasks.create("runTestsInCI") { dependsOn(taskName) }
   }
 }

@@ -25,10 +25,10 @@ import com.itsaky.androidide.logsender.LogSender
 import com.itsaky.androidide.lookup.Lookup
 import com.itsaky.androidide.models.LogLine
 import com.itsaky.androidide.preferences.internal.DevOpsPreferences
-import org.slf4j.LoggerFactory
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
+import org.slf4j.LoggerFactory
 
 /**
  * Service for handling log lines that are sent by the client applications.
@@ -47,13 +47,14 @@ class LogReceiverService : Service() {
 
     private val log = LoggerFactory.getLogger(LogReceiverService::class.java)
 
-    internal const val ACTION_CONNECT_LOG_CONSUMER = "com.itsaky.androidide.logrecevier.CONNECT_LOG_CONSUMER"
-    internal const val ACTION_CONNECTION_UPDATE = "com.itsaky.androidide.logreceiver.CONNECTION_UPDATE"
+    internal const val ACTION_CONNECT_LOG_CONSUMER =
+        "com.itsaky.androidide.logrecevier.CONNECT_LOG_CONSUMER"
+    internal const val ACTION_CONNECTION_UPDATE =
+        "com.itsaky.androidide.logreceiver.CONNECTION_UPDATE"
 
     private const val LOG_CONSUMER_WAIT_DURATION = 10 // seconds
 
-    @JvmStatic
-    internal val LOOKUP_KEY = Lookup.Key<LogReceiverService>()
+    @JvmStatic internal val LOOKUP_KEY = Lookup.Key<LogReceiverService>()
   }
 
   override fun onCreate() {
@@ -136,18 +137,22 @@ class LogReceiverService : Service() {
 
   private fun listenForConsumer() {
     log.debug("Waiting for log consumer...")
-    scheduledExecutor.schedule({
-      if (!isBoundToConsumer.get()) {
-        // ask senders to disconnect
-        log.debug("No log consumer has been bound to the log receiver service")
-        binder.disconnectAll()
-      }
-    }, LOG_CONSUMER_WAIT_DURATION.toLong(), TimeUnit.SECONDS)
+    scheduledExecutor.schedule(
+        {
+          if (!isBoundToConsumer.get()) {
+            // ask senders to disconnect
+            log.debug("No log consumer has been bound to the log receiver service")
+            binder.disconnectAll()
+          }
+        },
+        LOG_CONSUMER_WAIT_DURATION.toLong(),
+        TimeUnit.SECONDS,
+    )
   }
 
   /**
-   * Disconnects all connected log senders. Disconnecting all senders will eventually lead
-   * to this service being destroyed.
+   * Disconnects all connected log senders. Disconnecting all senders will eventually lead to this
+   * service being destroyed.
    */
   internal fun disconnectAll() {
     if (started.get()) {

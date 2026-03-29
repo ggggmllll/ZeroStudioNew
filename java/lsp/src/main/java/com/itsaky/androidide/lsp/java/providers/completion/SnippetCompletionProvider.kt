@@ -28,11 +28,11 @@ import com.itsaky.androidide.lsp.models.MatchLevel
 import com.itsaky.androidide.lsp.snippets.ISnippet
 import com.itsaky.androidide.preferences.internal.EditorPreferences
 import io.github.rosemoe.sora.text.TextUtils
+import java.nio.file.Path
 import openjdk.source.tree.ClassTree
 import openjdk.source.tree.CompilationUnitTree
 import openjdk.source.tree.MethodTree
 import openjdk.source.util.TreePath
-import java.nio.file.Path
 
 /**
  * Provides snippet completion for Java files.
@@ -40,17 +40,17 @@ import java.nio.file.Path
  * @author Akash Yadav
  */
 class SnippetCompletionProvider(
-  cursor: Long,
-  completingFile: Path,
-  compiler: JavaCompilerService,
-  settings: IServerSettings
+    cursor: Long,
+    completingFile: Path,
+    compiler: JavaCompilerService,
+    settings: IServerSettings,
 ) : IJavaCompletionProvider(cursor, completingFile, compiler, settings) {
 
   override fun doComplete(
-    task: CompileTask,
-    path: TreePath,
-    partial: String,
-    endsWithParen: Boolean
+      task: CompileTask,
+      path: TreePath,
+      partial: String,
+      endsWithParen: Boolean,
   ): CompletionResult {
     val scope = findSnippetScope(path) ?: return CompletionResult.EMPTY
     val indent = spacesBeforeCursor(task.root().sourceFile.getCharContent(true))
@@ -60,12 +60,12 @@ class SnippetCompletionProvider(
     JavaSnippetRepository.snippets[JavaSnippetScope.GLOBAL]?.let { snippets.addAll(it) }
 
     val snippetScope =
-      when (scope.leaf) {
-        is CompilationUnitTree -> JavaSnippetScope.TOP_LEVEL
-        is ClassTree -> JavaSnippetScope.MEMBER
-        is MethodTree -> JavaSnippetScope.LOCAL
-        else -> null
-      }
+        when (scope.leaf) {
+          is CompilationUnitTree -> JavaSnippetScope.TOP_LEVEL
+          is ClassTree -> JavaSnippetScope.MEMBER
+          is MethodTree -> JavaSnippetScope.LOCAL
+          else -> null
+        }
 
     // add snippets for the current scope
     snippetScope?.let { JavaSnippetRepository.snippets[it]?.let { list -> snippets.addAll(list) } }
@@ -94,8 +94,10 @@ class SnippetCompletionProvider(
       }
       --start
     }
-    return TextUtils.countLeadingSpaceCount(charContent.substring(start, cursor.toInt()),
-      EditorPreferences.tabSize)
+    return TextUtils.countLeadingSpaceCount(
+        charContent.substring(start, cursor.toInt()),
+        EditorPreferences.tabSize,
+    )
   }
 
   private fun findSnippetScope(path: TreePath?): TreePath? {

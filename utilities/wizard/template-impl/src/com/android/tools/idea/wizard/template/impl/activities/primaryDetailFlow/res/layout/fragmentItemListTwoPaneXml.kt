@@ -19,16 +19,16 @@ package com.android.tools.idea.wizard.template.impl.activities.primaryDetailFlow
 import com.android.tools.idea.wizard.template.getMaterialComponentName
 
 fun fragmentItemListTwoPaneXml(
-  collectionName: String,
-  itemListLayout: String,
-  detailName: String,
-  detailNameLayout: String,
-  itemListContentLayout: String,
-  childNavGraphFileId: String,
-  packageName: String,
-  useAndroidX: Boolean,
+    collectionName: String,
+    itemListLayout: String,
+    detailName: String,
+    detailNameLayout: String,
+    itemListContentLayout: String,
+    childNavGraphFileId: String,
+    packageName: String,
+    useAndroidX: Boolean,
 ) =
-  """
+    """
   <${getMaterialComponentName("android.support.constraint.ConstraintLayout", useAndroidX)}
     android:id="@+id/${itemListLayout}_container"
     android:layout_width="match_parent"

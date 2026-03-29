@@ -114,44 +114,44 @@ open class LayoutInflaterImpl : ILayoutInflater {
   }
 
   protected open fun doInflate(
-    processor: XmlProcessor,
-    parent: ViewGroup,
-    module: AndroidModule,
+      processor: XmlProcessor,
+      parent: ViewGroup,
+      module: AndroidModule,
   ): List<IView> {
     return doInflate(processor, module) { wrap(parent) }
   }
 
   protected open fun doInflate(
-    processor: XmlProcessor,
-    parent: IViewGroup,
-    module: AndroidModule,
+      processor: XmlProcessor,
+      parent: IViewGroup,
+      module: AndroidModule,
   ): List<IView> {
     return doInflate(processor, module) { parent }
   }
 
   protected open fun doInflate(
-    processor: XmlProcessor,
-    module: AndroidModule,
-    parent: () -> IViewGroup,
+      processor: XmlProcessor,
+      module: AndroidModule,
+      parent: () -> IViewGroup,
   ): List<IView> {
     // TODO(itsaky) : Add test for multiple view as root layout
     //  The inflater should fail in such cases
     val (file, node) =
-      processor.xmlResources.find { it.file == processor.primaryFile }
-        ?: throw InflateException("Unable to find primary XML resource from XmlProcessor")
+        processor.xmlResources.find { it.file == processor.primaryFile }
+            ?: throw InflateException("Unable to find primary XML resource from XmlProcessor")
 
     this._currentLayoutFile = LayoutFile(this.primaryInflatingFile, file.name.entry!!)
 
     if (node.nodeCase != ELEMENT) {
       throw InflateException(
-        "Found ${node.nodeCase} but $ELEMENT was expected at ${node.source.lineCol()}"
+          "Found ${node.nodeCase} but $ELEMENT was expected at ${node.source.lineCol()}"
       )
     }
 
     // Store all IDs
     file.exportedSymbols
-      .filter { it.name.type == ID }
-      .forEach { IDTable.set(currentLayoutFile.resName, it.name.entry!!, View.generateViewId()) }
+        .filter { it.name.type == ID }
+        .forEach { IDTable.set(currentLayoutFile.resName, it.name.entry!!, View.generateViewId()) }
 
     val element = node.element
 
@@ -159,12 +159,12 @@ open class LayoutInflaterImpl : ILayoutInflater {
   }
 
   protected open fun onCreateView(
-    element: XmlElement,
-    parent: IViewGroup,
-    module: AndroidModule,
-    widgets: WidgetTable =
-      module.getWidgetTable()
-        ?: throw IllegalStateException("No widget table found for module $module"),
+      element: XmlElement,
+      parent: IViewGroup,
+      module: AndroidModule,
+      widgets: WidgetTable =
+          module.getWidgetTable()
+              ?: throw IllegalStateException("No widget table found for module $module"),
   ): List<IView> {
 
     val parentView = parent.view as ViewGroup
@@ -177,22 +177,22 @@ open class LayoutInflaterImpl : ILayoutInflater {
     }
 
     val widget =
-      if (element.name.contains('.')) widgets.getWidget(element.name)
-      else widgets.findWidgetWithSimpleName(element.name)
+        if (element.name.contains('.')) widgets.getWidget(element.name)
+        else widgets.findWidgetWithSimpleName(element.name)
 
     // TODO(itsaky): Handle views from libraries
     val view: ViewImpl =
-      (if (widget == null) {
-        onCreateUnsupportedView(
-          element.name,
-          element.childCount > 0,
-          "View with name '${element.name}' not found",
-          parentView
-        )
-      } else {
-        onCreatePlatformView(widget, parentView, module, widgets)
-      })
-          as ViewImpl
+        (if (widget == null) {
+          onCreateUnsupportedView(
+              element.name,
+              element.childCount > 0,
+              "View with name '${element.name}' not found",
+              parentView,
+          )
+        } else {
+          onCreatePlatformView(widget, parentView, module, widgets)
+        })
+            as ViewImpl
 
     addNamespaceDecls(element, view)
     applyAttributes(element, view, parent)
@@ -213,15 +213,16 @@ open class LayoutInflaterImpl : ILayoutInflater {
 
   @JvmOverloads
   protected open fun applyAttributes(
-    element: XmlElement,
-    view: ViewImpl,
-    parent: IViewGroup,
-    attachToParent: Boolean = true,
-    shouldApplyAttr: (XmlAttribute) -> Boolean = { true }
+      element: XmlElement,
+      view: ViewImpl,
+      parent: IViewGroup,
+      attachToParent: Boolean = true,
+      shouldApplyAttr: (XmlAttribute) -> Boolean = { true },
   ) {
     val parentView = parent.view as ViewGroup
     val adapter =
-      view.viewAdapter ?: throw InflateException("No attribute adapter found for view ${view.name}")
+        view.viewAdapter
+            ?: throw InflateException("No attribute adapter found for view ${view.name}")
 
     view.view.layoutParams = generateLayoutParams(parentView)
 
@@ -235,8 +236,8 @@ open class LayoutInflaterImpl : ILayoutInflater {
       for (xmlAttribute in element.attributeList) {
 
         val namespace =
-          if (xmlAttribute.namespaceUri.isNullOrBlank()) null
-          else view.findNamespaceByUri(xmlAttribute.namespaceUri)
+            if (xmlAttribute.namespaceUri.isNullOrBlank()) null
+            else view.findNamespaceByUri(xmlAttribute.namespaceUri)
 
         val attr = onCreateAttribute(view, namespace, xmlAttribute.name, xmlAttribute.value)
         view.addAttribute(attribute = attr, apply = shouldApplyAttr(xmlAttribute), update = true)
@@ -246,10 +247,10 @@ open class LayoutInflaterImpl : ILayoutInflater {
   }
 
   private fun onCreateMergedView(
-    element: XmlElement,
-    parent: IViewGroup,
-    module: AndroidModule,
-    widgets: WidgetTable,
+      element: XmlElement,
+      parent: IViewGroup,
+      module: AndroidModule,
+      widgets: WidgetTable,
   ): List<IView> {
     val views = mutableListOf<IView>()
     for (xmlNode in element.childList) {
@@ -265,8 +266,8 @@ open class LayoutInflaterImpl : ILayoutInflater {
 
   private fun onCreateIncludedView(element: XmlElement, parent: IViewGroup): List<IView> {
     val layout =
-      element.attributeList.find { it.namespaceUri.isNullOrBlank() && it.name == "layout" }
-        ?: throw InflateException("<include> tag must have 'layout' attribute")
+        element.attributeList.find { it.namespaceUri.isNullOrBlank() && it.name == "layout" }
+            ?: throw InflateException("<include> tag must have 'layout' attribute")
     val file = parseLayoutReference(layout.value)
     if (file == null || !file.exists() || !file.isFile || file.extension != EXT_XML) {
       throw InflateException("Invalid layout file reference; '${layout.value}'")
@@ -275,10 +276,9 @@ open class LayoutInflaterImpl : ILayoutInflater {
     val (processor, module) = processXmlFile(file)
 
     // we need to restore the layout file instance as well
-    val inflated =
-      currentLayoutFile.let { layoutFile ->
-        doInflate(processor, module) { parent }.also { _currentLayoutFile = layoutFile }
-      }
+    val inflated = currentLayoutFile.let { layoutFile ->
+      doInflate(processor, module) { parent }.also { _currentLayoutFile = layoutFile }
+    }
 
     if (inflated.isEmpty() || inflated.size > 1) {
       // probably a merged view or no views at all
@@ -307,35 +307,35 @@ open class LayoutInflaterImpl : ILayoutInflater {
   }
 
   protected open fun onCreatePlatformView(
-    widget: Widget,
-    parent: ViewGroup,
-    module: AndroidModule,
-    widgets: WidgetTable,
+      widget: Widget,
+      parent: ViewGroup,
+      module: AndroidModule,
+      widgets: WidgetTable,
   ): IView {
     return try {
       val v = createViewInstance(widget.qualifiedName, parent.context)
       return componentFactory.createView(currentLayoutFile, widget.qualifiedName, v)
     } catch (err: Throwable) {
       onCreateUnsupportedView(
-        widget.qualifiedName,
-        widget.type == WidgetType.LAYOUT,
-        "Unable to create view for widget ${widget.qualifiedName}",
-        parent
+          widget.qualifiedName,
+          widget.type == WidgetType.LAYOUT,
+          "Unable to create view for widget ${widget.qualifiedName}",
+          parent,
       )
     }
   }
 
   protected open fun onCreateAttribute(
-    view: ViewImpl,
-    namespace: INamespace?,
-    name: String,
-    value: String
+      view: ViewImpl,
+      namespace: INamespace?,
+      name: String,
+      value: String,
   ): IAttribute {
     return componentFactory.createAttr(
-      view = view,
-      namespace = namespace,
-      name = name,
-      value = value
+        view = view,
+        namespace = namespace,
+        name = name,
+        value = value,
     )
   }
 
@@ -352,10 +352,10 @@ open class LayoutInflaterImpl : ILayoutInflater {
   }
 
   private fun onCreateUnsupportedView(
-    name: String,
-    isLayout: Boolean,
-    message: String,
-    parent: ViewGroup
+      name: String,
+      isLayout: Boolean,
+      message: String,
+      parent: ViewGroup,
   ): IView {
     return if (isLayout) {
       ErrorLayout(file = currentLayoutFile, name = name, context = parent.context)

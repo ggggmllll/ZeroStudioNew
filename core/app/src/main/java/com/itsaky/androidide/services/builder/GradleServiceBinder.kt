@@ -19,8 +19,7 @@ package com.itsaky.androidide.services.builder
 import android.os.Binder
 
 /**
- * [Binder] implementation for [GradleBuildService] which provides instance of the
- * service.
+ * [Binder] implementation for [GradleBuildService] which provides instance of the service.
  *
  * @author Akash Yadav
  */

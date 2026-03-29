@@ -23,21 +23,21 @@ import com.android.tools.idea.wizard.template.impl.activities.common.layoutToVie
 import com.android.tools.idea.wizard.template.renderIf
 
 fun firstFragmentJava(
-  packageName: String,
-  applicationPackage: String?,
-  useAndroidX: Boolean,
-  firstFragmentClass: String,
-  secondFragmentClass: String,
-  firstFragmentLayoutName: String,
-  isViewBindingSupported: Boolean,
+    packageName: String,
+    applicationPackage: String?,
+    useAndroidX: Boolean,
+    firstFragmentClass: String,
+    secondFragmentClass: String,
+    firstFragmentLayoutName: String,
+    isViewBindingSupported: Boolean,
 ): String {
   val onCreateViewBlock =
-    if (isViewBindingSupported)
-      """
+      if (isViewBindingSupported)
+          """
       binding = ${layoutToViewBindingClass(firstFragmentLayoutName)}.inflate(inflater, container, false);
       return binding.getRoot();
   """
-    else "return inflater.inflate(R.layout.$firstFragmentLayoutName, container, false);"
+      else "return inflater.inflate(R.layout.$firstFragmentLayoutName, container, false);"
 
   return """package ${packageName};
 

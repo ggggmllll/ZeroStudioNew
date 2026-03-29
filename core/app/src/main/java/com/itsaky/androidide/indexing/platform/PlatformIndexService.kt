@@ -20,12 +20,10 @@ package com.itsaky.androidide.indexing.platform
 import com.google.auto.service.AutoService
 import com.itsaky.androidide.indexing.IIndexService
 import com.itsaky.androidide.projects.IWorkspace
-import org.slf4j.LoggerFactory
 import java.io.File
+import org.slf4j.LoggerFactory
 
-/**
- * @author Akash Yadav
- */
+/** @author Akash Yadav */
 @AutoService(IIndexService::class)
 internal class PlatformIndexService : IIndexService {
 
@@ -39,16 +37,14 @@ internal class PlatformIndexService : IIndexService {
   override fun scanFiles(workspace: IWorkspace): Collection<File> {
     return mutableListOf<File>().apply {
       workspace.androidProjects().forEach { androidModule ->
-        add(androidModule.getPlatformDir()?.also {
-          log.debug("Adding {} to the list of indexable paths", it)
-        } ?: return@forEach)
+        add(
+            androidModule.getPlatformDir()?.also {
+              log.debug("Adding {} to the list of indexable paths", it)
+            } ?: return@forEach
+        )
       }
     }
   }
 
-  override suspend fun indexFiles(
-    workspace: IWorkspace,
-    files: Collection<File>
-  ) {
-  }
+  override suspend fun indexFiles(workspace: IWorkspace, files: Collection<File>) {}
 }

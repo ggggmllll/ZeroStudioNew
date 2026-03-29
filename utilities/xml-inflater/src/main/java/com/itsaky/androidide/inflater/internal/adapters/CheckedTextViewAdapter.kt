@@ -43,11 +43,11 @@ open class CheckedTextViewAdapter<T : CheckedTextView> : TextViewAdapter<T>() {
 
   override fun createUiWidgets(): List<UiWidget> {
     return listOf(
-      UiWidget(
-        CheckedTextView::class.java,
-        string.widget_checked_textview,
-        drawable.ic_widget_checked_textview
-      )
+        UiWidget(
+            CheckedTextView::class.java,
+            string.widget_checked_textview,
+            drawable.ic_widget_checked_textview,
+        )
     )
   }
 }

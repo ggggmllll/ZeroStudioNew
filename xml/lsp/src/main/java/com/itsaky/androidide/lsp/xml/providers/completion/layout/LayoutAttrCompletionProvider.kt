@@ -29,7 +29,7 @@ import com.itsaky.androidide.lsp.xml.utils.XmlUtils.NodeType
  * @author Akash Yadav
  */
 class LayoutAttrCompletionProvider(provider: ICompletionProvider) :
-  AttrCompletionProvider(provider) {
+    AttrCompletionProvider(provider) {
 
   override fun canProvideCompletions(pathData: ResourcePathData, type: NodeType): Boolean {
     return super.canProvideCompletions(pathData, type) && canCompleteLayout(pathData, type)

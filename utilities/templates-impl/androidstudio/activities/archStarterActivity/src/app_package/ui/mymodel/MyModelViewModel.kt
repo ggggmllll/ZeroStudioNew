@@ -25,7 +25,7 @@ import com.itsaky.androidide.templates.impl.androidstudio.activities.archStarter
  * @author android_zero
  */
 fun ArchStarterActivityTemplateVariables.viewModel() =
-  """
+    """
 package $modelPackage
 
 import androidx.lifecycle.ViewModel

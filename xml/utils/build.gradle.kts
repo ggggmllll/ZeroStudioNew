@@ -15,35 +15,32 @@
  *   along with AndroidIDE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 import com.itsaky.androidide.build.config.BuildConfig
 
 plugins {
-    id("com.android.library")
-    id("kotlin-android")
-    id("kotlin-kapt")
+  id("com.android.library")
+  id("kotlin-android")
+  id("kotlin-kapt")
 }
 
-android {
-    namespace = "${BuildConfig.packageName}.xml.utils"
-}
+android { namespace = "${BuildConfig.packageName}.xml.utils" }
 
 dependencies {
-    kapt(libs.google.auto.service)
+  kapt(libs.google.auto.service)
 
-    api(projects.utilities.lookup)
-    api(projects.xml.resourcesApi)
+  api(projects.utilities.lookup)
+  api(projects.xml.resourcesApi)
 
-    implementation(libs.common.kotlin)
-    implementation(libs.composite.jdt)
-    implementation(libs.composite.jaxp)
-    implementation(libs.google.auto.service.annotations)
+  implementation(libs.common.kotlin)
+  implementation(libs.composite.jdt)
+  implementation(libs.composite.jaxp)
+  implementation(libs.google.auto.service.annotations)
 
-    implementation(projects.core.common)
-    implementation(projects.logging.logger)
-    implementation(projects.xml.aaptcompiler)
-    
-    testImplementation(libs.tests.junit)
-    testImplementation(libs.tests.robolectric)
-    testImplementation(libs.tests.google.truth)
+  implementation(projects.core.common)
+  implementation(projects.logging.logger)
+  implementation(projects.xml.aaptcompiler)
+
+  testImplementation(libs.tests.junit)
+  testImplementation(libs.tests.robolectric)
+  testImplementation(libs.tests.google.truth)
 }

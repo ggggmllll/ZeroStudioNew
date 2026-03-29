@@ -37,17 +37,17 @@ constructor(val async: Boolean = true, val action: CodeActionItem)
  *   performed in the currently opened editor, irrespective of the changes specified in [changes].
  */
 data class CodeActionItem(
-  var title: String,
-  var changes: List<DocumentChange>,
-  var kind: CodeActionKind,
-  var command: Command
+    var title: String,
+    var changes: List<DocumentChange>,
+    var kind: CodeActionKind,
+    var command: Command,
 ) {
   constructor() : this("", ArrayList(), None, Command("", ""))
 }
 
 enum class CodeActionKind {
   QuickFix,
-  None
+  None,
 }
 
 data class DocumentChange(var file: Path?, var edits: List<TextEdit>) {

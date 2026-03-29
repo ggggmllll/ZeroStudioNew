@@ -19,7 +19,7 @@ package com.itsaky.androidide.templates.impl.androidstudio.other.appWidget.res.v
 import com.android.tools.idea.wizard.template.MaterialColor.*
 
 fun colorsXml() =
-  """
+    """
 <resources>
     ${LIGHT_BLUE_50.xmlElement()}
     ${LIGHT_BLUE_200.xmlElement()}

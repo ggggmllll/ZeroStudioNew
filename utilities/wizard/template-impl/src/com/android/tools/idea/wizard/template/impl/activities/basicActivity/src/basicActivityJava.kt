@@ -23,28 +23,29 @@ import com.android.tools.idea.wizard.template.impl.activities.common.layoutToVie
 import com.android.tools.idea.wizard.template.renderIf
 
 fun basicActivityJava(
-  isNewProject: Boolean,
-  applicationPackage: String?,
-  packageName: String,
-  useAndroidX: Boolean,
-  activityClass: String,
-  layoutName: String,
-  menuName: String,
-  navHostFragmentId: String,
-  isViewBindingSupported: Boolean,
+    isNewProject: Boolean,
+    applicationPackage: String?,
+    packageName: String,
+    useAndroidX: Boolean,
+    activityClass: String,
+    layoutName: String,
+    menuName: String,
+    navHostFragmentId: String,
+    isViewBindingSupported: Boolean,
 ): String {
-  val applicationPackageBlock = renderIf(applicationPackage != null) { "import $applicationPackage.R;" }
+  val applicationPackageBlock =
+      renderIf(applicationPackage != null) { "import $applicationPackage.R;" }
   val newProjectImportBlock =
-    renderIf(isNewProject) {
-      """
+      renderIf(isNewProject) {
+        """
 import android.view.Menu;
 import android.view.MenuItem;
 """
-    }
+      }
 
   val newProjectBlock2 =
-    renderIf(isNewProject) {
-      """
+      renderIf(isNewProject) {
+        """
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -67,15 +68,15 @@ import android.view.MenuItem;
         return super.onOptionsItemSelected(item);
     }
     """
-    }
+      }
 
   val contentViewBlock =
-    if (isViewBindingSupported)
-      """
+      if (isViewBindingSupported)
+          """
      binding = ${layoutToViewBindingClass(layoutName)}.inflate(getLayoutInflater());
      setContentView(binding.getRoot());
   """
-    else "setContentView(R.layout.$layoutName);"
+      else "setContentView(R.layout.$layoutName);"
 
   return """
 package ${(packageName)};

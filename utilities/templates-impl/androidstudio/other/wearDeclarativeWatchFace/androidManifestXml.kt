@@ -17,8 +17,8 @@
 package com.itsaky.androidide.templates.impl.androidstudio.other.wearDeclarativeWatchFace
 
 fun androidManifestXml() =
-  // language=XML
-  """
+    // language=XML
+    """
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
   <uses-feature android:name="android.hardware.type.watch" />

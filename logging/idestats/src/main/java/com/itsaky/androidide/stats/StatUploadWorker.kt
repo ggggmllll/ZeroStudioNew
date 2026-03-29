@@ -29,8 +29,8 @@ import retrofit2.converter.gson.GsonConverterFactory
  *
  * @author Akash Yadav
  */
-class StatUploadWorker(context: Context, workerParams: WorkerParameters) : Worker(context,
-  workerParams) {
+class StatUploadWorker(context: Context, workerParams: WorkerParameters) :
+    Worker(context, workerParams) {
 
   companion object {
 
@@ -51,22 +51,29 @@ class StatUploadWorker(context: Context, workerParams: WorkerParameters) : Worke
     val data = StatData.fromInputData(inputData = inputData)
     log.debug("Uploading stats: {}", data)
 
-    val retrofit = Retrofit.Builder().baseUrl(STAT_UPLOAD_BASE_URL)
-      .addConverterFactory(GsonConverterFactory.create()).build()
+    val retrofit =
+        Retrofit.Builder()
+            .baseUrl(STAT_UPLOAD_BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
     val service = retrofit.create(StatUploadService::class.java)
 
-    val response = try {
-      service.uploadStats(data).execute()
-    } catch (err: Exception) {
-      log.error("Failed to upload stats to server", err)
-      return Result.retry()
-    }
+    val response =
+        try {
+          service.uploadStats(data).execute()
+        } catch (err: Exception) {
+          log.error("Failed to upload stats to server", err)
+          return Result.retry()
+        }
 
     val body = response.body()
     if (!response.isSuccessful || body == null) {
       log.error(
-        "Stat upload failed: responseCode: {}, responseBody: {}, errBody: {}", response.code(),
-        body, response.errorBody()?.string() ?: "(empty)")
+          "Stat upload failed: responseCode: {}, responseBody: {}, errBody: {}",
+          response.code(),
+          body,
+          response.errorBody()?.string() ?: "(empty)",
+      )
 
       // try again next time
       return Result.failure()

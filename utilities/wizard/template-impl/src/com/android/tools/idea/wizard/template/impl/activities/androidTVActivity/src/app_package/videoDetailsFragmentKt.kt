@@ -19,11 +19,11 @@ package com.android.tools.idea.wizard.template.impl.activities.androidTVActivity
 import com.android.tools.idea.wizard.template.escapeKotlinIdentifier
 
 fun videoDetailsFragmentKt(
-  activityClass: String,
-  detailsActivity: String,
-  detailsFragment: String,
-  minApiLevel: Int,
-  packageName: String,
+    activityClass: String,
+    detailsActivity: String,
+    detailsFragment: String,
+    minApiLevel: Int,
+    packageName: String,
 ): String {
   val contextArgBlock = if (minApiLevel >= 23) "context!!" else "activity!!"
   return """

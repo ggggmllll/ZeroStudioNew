@@ -19,10 +19,8 @@ package com.android.aaptcompiler
 
 import com.android.aaptcompiler.android.ResTableConfig
 
-/**
- * @author Akash Yadav
- */
-class ConfigDescription(base: ResTableConfig = ResTableConfig()): ResTableConfig(base) {
+/** @author Akash Yadav */
+class ConfigDescription(base: ResTableConfig = ResTableConfig()) : ResTableConfig(base) {
   override fun equals(other: Any?): Boolean {
     if (other is ConfigDescription) {
       return compareTo(other) == 0
@@ -218,27 +216,28 @@ fun parse(config: String): ConfigDescription {
 }
 
 private fun applyVersionForCompatibility(config: ConfigDescription): ConfigDescription {
-  val minSdk = when {
-    config.uiModeType() == ResTableConfig.UI_MODE.TYPE_VR_HEADSET ||
-      config.wideColorGamut() != ResTableConfig.COLOR_MODE.WIDE_GAMUT_ANY ||
-      config.hdr() != ResTableConfig.COLOR_MODE.HDR_ANY -> SDKConstants.SDK_O
+  val minSdk =
+      when {
+        config.uiModeType() == ResTableConfig.UI_MODE.TYPE_VR_HEADSET ||
+            config.wideColorGamut() != ResTableConfig.COLOR_MODE.WIDE_GAMUT_ANY ||
+            config.hdr() != ResTableConfig.COLOR_MODE.HDR_ANY -> SDKConstants.SDK_O
 
-    config.layoutRound() != 0.toByte() -> SDKConstants.SDK_MARSHMALLOW
-    config.density == ResTableConfig.DENSITY.ANY -> SDKConstants.SDK_LOLLIPOP
-    config.smallestScreenWidthDp != 0 ||
-      config.screenWidthDp != 0 ||
-      config.screenHeightDp != 0 -> SDKConstants.SDK_HONEYCOMB_MR2
+        config.layoutRound() != 0.toByte() -> SDKConstants.SDK_MARSHMALLOW
+        config.density == ResTableConfig.DENSITY.ANY -> SDKConstants.SDK_LOLLIPOP
+        config.smallestScreenWidthDp != 0 ||
+            config.screenWidthDp != 0 ||
+            config.screenHeightDp != 0 -> SDKConstants.SDK_HONEYCOMB_MR2
 
-    config.uiModeType() != ResTableConfig.UI_MODE.TYPE_ANY ||
-      config.uiModeNight() != ResTableConfig.UI_MODE.NIGHT_ANY -> SDKConstants.SDK_FROYO
+        config.uiModeType() != ResTableConfig.UI_MODE.TYPE_ANY ||
+            config.uiModeNight() != ResTableConfig.UI_MODE.NIGHT_ANY -> SDKConstants.SDK_FROYO
 
-    config.layoutSize() != ResTableConfig.SCREEN_LAYOUT.SIZE_ANY ||
-      config.layoutLong() != ResTableConfig.SCREEN_LAYOUT.SCREENLONG_ANY ||
-      config.density != ResTableConfig.DENSITY.DEFAULT -> SDKConstants.SDK_DONUT
+        config.layoutSize() != ResTableConfig.SCREEN_LAYOUT.SIZE_ANY ||
+            config.layoutLong() != ResTableConfig.SCREEN_LAYOUT.SCREENLONG_ANY ||
+            config.density != ResTableConfig.DENSITY.DEFAULT -> SDKConstants.SDK_DONUT
 
-    config.grammaticalInflection != ResTableConfig.GRAMMATICAL_GENDER.ANY -> SDKConstants.SDK_U
-    else -> 0
-  }
+        config.grammaticalInflection != ResTableConfig.GRAMMATICAL_GENDER.ANY -> SDKConstants.SDK_U
+        else -> 0
+      }
 
   if (minSdk > config.sdkVersion) {
     config.sdkVersion = minSdk

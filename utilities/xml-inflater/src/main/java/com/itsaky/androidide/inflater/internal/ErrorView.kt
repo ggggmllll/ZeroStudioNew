@@ -33,12 +33,12 @@ import com.itsaky.androidide.utils.resolveAttr
  * @author Akash Yadav
  */
 class ErrorView(file: LayoutFile, name: String, context: Context, message: String) :
-  ViewImpl(file = file, name = name, view = createErrView(context, message)) {
+    ViewImpl(file = file, name = name, view = createErrView(context, message)) {
   override val tag: String = name
 }
 
 class ErrorLayout(file: LayoutFile, name: String, context: Context) :
-  ViewGroupImpl(file = file, name = name, view = createErrLayout(context)) {
+    ViewGroupImpl(file = file, name = name, view = createErrLayout(context)) {
   override val tag: String = name
 }
 

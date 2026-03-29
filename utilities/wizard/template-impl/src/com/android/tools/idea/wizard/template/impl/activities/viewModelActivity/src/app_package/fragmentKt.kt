@@ -20,33 +20,33 @@ import com.android.tools.idea.wizard.template.escapeKotlinIdentifier
 import com.android.tools.idea.wizard.template.getMaterialComponentName
 
 fun fragmentKt(
-  fragmentClass: String,
-  fragmentLayout: String,
-  fragmentPackage: String,
-  packageName: String,
-  useAndroidX: Boolean,
-  viewModelClass: String,
+    fragmentClass: String,
+    fragmentLayout: String,
+    fragmentPackage: String,
+    packageName: String,
+    useAndroidX: Boolean,
+    viewModelClass: String,
 ): String {
   val viewModelImport =
-    if (useAndroidX) {
-      "import androidx.fragment.app.viewModels"
-    } else {
-      "import android.arch.lifecycle.ViewModelProvider"
-    }
+      if (useAndroidX) {
+        "import androidx.fragment.app.viewModels"
+      } else {
+        "import android.arch.lifecycle.ViewModelProvider"
+      }
 
   val viewModelDeclaration =
-    if (useAndroidX) {
-      "private val viewModel: $viewModelClass by viewModels()"
-    } else {
-      "private lateinit var viewModel: $viewModelClass"
-    }
+      if (useAndroidX) {
+        "private val viewModel: $viewModelClass by viewModels()"
+      } else {
+        "private lateinit var viewModel: $viewModelClass"
+      }
 
   val viewModelInitializationBlock =
-    if (useAndroidX) {
-      "" // The viewModel is initialized above
-    } else {
-      "viewModel = ViewModelProvider(this, ViewModelProvider.NewInstanceFactory())[${viewModelClass}::class.java]"
-    }
+      if (useAndroidX) {
+        "" // The viewModel is initialized above
+      } else {
+        "viewModel = ViewModelProvider(this, ViewModelProvider.NewInstanceFactory())[${viewModelClass}::class.java]"
+      }
 
   return """package ${escapeKotlinIdentifier(packageName)}.${
         escapeKotlinIdentifier(

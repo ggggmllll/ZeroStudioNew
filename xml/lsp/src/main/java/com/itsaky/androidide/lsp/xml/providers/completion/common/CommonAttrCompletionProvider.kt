@@ -29,21 +29,21 @@ import org.eclipse.lemminx.dom.DOMNode
  * Provides attribute completion for all other resource types.
  *
  * @property tagTransform A function which returns the styleable entry name for the given tag name
- * (first param) and its parent's tag name (second param).
+ *   (first param) and its parent's tag name (second param).
  * @author Akash Yadav
  */
 open class CommonAttrCompletionProvider(
-  protected val tagTransform: ITagTransformer,
-  provider: ICompletionProvider
+    protected val tagTransform: ITagTransformer,
+    provider: ICompletionProvider,
 ) : AttrCompletionProvider(provider) {
 
   override fun findNodeStyleables(node: DOMNode, styleables: IResourceGroup): Set<Styleable> {
     val name = node.nodeName
     val styleable =
-      styleables
-        .findEntry(tagTransform.transform(name, nodeAtCursor.parentNode?.nodeName ?: ""))
-        ?.findValue(ConfigDescription())
-        ?.value
+        styleables
+            .findEntry(tagTransform.transform(name, nodeAtCursor.parentNode?.nodeName ?: ""))
+            ?.findValue(ConfigDescription())
+            ?.value
     if (styleable != null && styleable is Styleable) {
       return setOf(styleable)
     }

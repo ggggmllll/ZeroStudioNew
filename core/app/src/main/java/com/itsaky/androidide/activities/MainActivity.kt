@@ -37,115 +37,124 @@ import com.itsaky.androidide.utils.flashError
 import com.itsaky.androidide.utils.flashInfo
 import com.itsaky.androidide.viewmodel.MainEvent
 import com.itsaky.androidide.viewmodel.MainViewModel
-import kotlinx.coroutines.launch
 import java.io.File
+import kotlinx.coroutines.launch
 
 /**
  * A modern MainActivity built with Compose + MVM architecture + Material3
+ *
  * @author android_zero
  */
 class MainActivity : EdgeToEdgeIDEActivity() {
 
-    private val viewModel by viewModels<MainViewModel>()
+  private val viewModel by viewModels<MainViewModel>()
 
-    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
+  private val onBackPressedCallback =
+      object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
-            viewModel.apply {
-                if (creatingProject.value == true) return@apply
+          viewModel.apply {
+            if (creatingProject.value == true) return@apply
 
-                val newScreen = when (currentScreen.value) {
-                    MainViewModel.SCREEN_TEMPLATE_DETAILS -> MainViewModel.SCREEN_TEMPLATE_LIST
-                    MainViewModel.SCREEN_TEMPLATE_LIST -> MainViewModel.SCREEN_MAIN
-                    else -> MainViewModel.SCREEN_MAIN
+            val newScreen =
+                when (currentScreen.value) {
+                  MainViewModel.SCREEN_TEMPLATE_DETAILS -> MainViewModel.SCREEN_TEMPLATE_LIST
+                  MainViewModel.SCREEN_TEMPLATE_LIST -> MainViewModel.SCREEN_MAIN
+                  else -> MainViewModel.SCREEN_MAIN
                 }
 
-                if (currentScreen.value != newScreen) {
-                    setScreen(newScreen)
-                } else {
-                    isEnabled = false
-                    onBackPressedDispatcher.onBackPressed()
-                }
+            if (currentScreen.value != newScreen) {
+              setScreen(newScreen)
+            } else {
+              isEnabled = false
+              onBackPressedDispatcher.onBackPressed()
             }
+          }
         }
+      }
+
+  override fun bindLayout(): View {
+    return FrameLayout(this).apply { id = android.R.id.content }
+  }
+
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+
+    if (savedInstanceState == null) {
+      supportFragmentManager
+          .beginTransaction()
+          .add(android.R.id.content, MainFragment(), "tag_main")
+          .add(android.R.id.content, TemplateListFragment(), "tag_list")
+          .add(android.R.id.content, TemplateDetailsFragment(), "tag_details")
+          .commitNowAllowingStateLoss()
     }
 
-    override fun bindLayout(): View {
-        return FrameLayout(this).apply {
-            id = android.R.id.content
-        }
-    }
+    viewModel.currentScreen.observe(this) { screen ->
+      if (screen == -1) return@observe
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        
-        if (savedInstanceState == null) {
-            supportFragmentManager.beginTransaction()
-                .add(android.R.id.content, MainFragment(), "tag_main")
-                .add(android.R.id.content, TemplateListFragment(), "tag_list")
-                .add(android.R.id.content, TemplateDetailsFragment(), "tag_details")
-                .commitNowAllowingStateLoss()
-        }
+      val mainFrag = supportFragmentManager.findFragmentByTag("tag_main")
+      val listFrag = supportFragmentManager.findFragmentByTag("tag_list")
+      val detailsFrag = supportFragmentManager.findFragmentByTag("tag_details")
 
-        viewModel.currentScreen.observe(this) { screen ->
-            if (screen == -1) return@observe
-            
-            val mainFrag = supportFragmentManager.findFragmentByTag("tag_main")
-            val listFrag = supportFragmentManager.findFragmentByTag("tag_list")
-            val detailsFrag = supportFragmentManager.findFragmentByTag("tag_details")
-
-            supportFragmentManager.beginTransaction().apply {
-                mainFrag?.let { if (screen == MainViewModel.SCREEN_MAIN) show(it) else hide(it) }
-                listFrag?.let { if (screen == MainViewModel.SCREEN_TEMPLATE_LIST) show(it) else hide(it) }
-                detailsFrag?.let { if (screen == MainViewModel.SCREEN_TEMPLATE_DETAILS) show(it) else hide(it) }
-            }.commitAllowingStateLoss()
-
-            onBackPressedCallback.isEnabled = screen != MainViewModel.SCREEN_MAIN
-        }
-
-        lifecycleScope.launch {
-            viewModel.mainEvents.collect { event ->
-                when (event) {
-                    is MainEvent.OpenProjectSuccess -> {
-                        val intent = Intent(this@MainActivity, EditorActivityKt::class.java).apply {
-                            addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
-                            addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                        }
-                        startActivity(intent)
-                    }
-                    is MainEvent.ShowMessage -> {
-                        if (event.isError) flashError(event.messageResId)
-                        else flashInfo(event.messageResId)
-                    }
-                    is MainEvent.RequestConfirmOpen -> askProjectOpenPermission(event.projectDir)
-                }
+      supportFragmentManager
+          .beginTransaction()
+          .apply {
+            mainFrag?.let { if (screen == MainViewModel.SCREEN_MAIN) show(it) else hide(it) }
+            listFrag?.let {
+              if (screen == MainViewModel.SCREEN_TEMPLATE_LIST) show(it) else hide(it)
             }
+            detailsFrag?.let {
+              if (screen == MainViewModel.SCREEN_TEMPLATE_DETAILS) show(it) else hide(it)
+            }
+          }
+          .commitAllowingStateLoss()
+
+      onBackPressedCallback.isEnabled = screen != MainViewModel.SCREEN_MAIN
+    }
+
+    lifecycleScope.launch {
+      viewModel.mainEvents.collect { event ->
+        when (event) {
+          is MainEvent.OpenProjectSuccess -> {
+            val intent =
+                Intent(this@MainActivity, EditorActivityKt::class.java).apply {
+                  addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
+                  addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                }
+            startActivity(intent)
+          }
+          is MainEvent.ShowMessage -> {
+            if (event.isError) flashError(event.messageResId) else flashInfo(event.messageResId)
+          }
+          is MainEvent.RequestConfirmOpen -> askProjectOpenPermission(event.projectDir)
         }
-
-        viewModel.checkAndOpenLastProject()
-
-        if (viewModel.currentScreen.value == -1 && viewModel.previousScreen == -1) {
-            viewModel.setScreen(MainViewModel.SCREEN_MAIN)
-        }
-
-        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
+      }
     }
 
-    private fun askProjectOpenPermission(root: File) {
-        DialogUtils.newMaterialDialogBuilder(this)
-            .setTitle(R.string.title_confirm_open_project)
-            .setMessage(getString(R.string.msg_confirm_open_project, root.absolutePath))
-            .setCancelable(false)
-            .setPositiveButton(R.string.yes) { _, _ -> openProject(root) }
-            .setNegativeButton(R.string.no, null)
-            .show()
+    viewModel.checkAndOpenLastProject()
+
+    if (viewModel.currentScreen.value == -1 && viewModel.previousScreen == -1) {
+      viewModel.setScreen(MainViewModel.SCREEN_MAIN)
     }
 
-    fun openProject(root: File) {
-        viewModel.openProject(this, root)
-    }
+    onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
+  }
 
-    override fun onDestroy() {
-        ITemplateProvider.getInstance().release()
-        super.onDestroy()
-    }
+  private fun askProjectOpenPermission(root: File) {
+    DialogUtils.newMaterialDialogBuilder(this)
+        .setTitle(R.string.title_confirm_open_project)
+        .setMessage(getString(R.string.msg_confirm_open_project, root.absolutePath))
+        .setCancelable(false)
+        .setPositiveButton(R.string.yes) { _, _ -> openProject(root) }
+        .setNegativeButton(R.string.no, null)
+        .show()
+  }
+
+  fun openProject(root: File) {
+    viewModel.openProject(this, root)
+  }
+
+  override fun onDestroy() {
+    ITemplateProvider.getInstance().release()
+    super.onDestroy()
+  }
 }

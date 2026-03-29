@@ -21,6 +21,11 @@ import com.itsaky.androidide.logsender.socket.SenderInfoCommand
 import com.itsaky.androidide.logsender.socket.SocketCommandParser
 import com.itsaky.androidide.models.LogLine
 import com.itsaky.androidide.tasks.cancelIfActive
+import java.lang.Thread.currentThread
+import java.net.ServerSocket
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicInteger
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -28,11 +33,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.slf4j.LoggerFactory
-import java.lang.Thread.currentThread
-import java.net.ServerSocket
-import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.atomic.AtomicBoolean
-import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * Handles clients that connect to the log receiver.
@@ -45,8 +45,8 @@ class MultiLogSenderHandler(consumer: ((LogLine) -> Unit)? = null) : AutoCloseab
   private val port = AtomicInteger(-1)
   private var isAlive = AtomicBoolean(false)
 
-  private var logHandlerScope = CoroutineScope(
-    Dispatchers.IO + CoroutineName("MultiLogSenderHandler"))
+  private var logHandlerScope =
+      CoroutineScope(Dispatchers.IO + CoroutineName("MultiLogSenderHandler"))
 
   internal var consumer: ((LogLine) -> Unit)? = consumer
     set(value) {
@@ -62,67 +62,66 @@ class MultiLogSenderHandler(consumer: ((LogLine) -> Unit)? = null) : AutoCloseab
     return port.get()
   }
 
-  private suspend fun startAsync() = withContext(Dispatchers.IO) {
-    val job = coroutineContext[Job]
-    val server = try {
-      ServerSocket(0)
-    } catch (err: Exception) {
-      log.error("Failed to start log receiver socket", err)
-      return@withContext
-    }
+  private suspend fun startAsync() =
+      withContext(Dispatchers.IO) {
+        val job = coroutineContext[Job]
+        val server =
+            try {
+              ServerSocket(0)
+            } catch (err: Exception) {
+              log.error("Failed to start log receiver socket", err)
+              return@withContext
+            }
 
-    try {
-      port.set(server.localPort)
-      log.info("Starting log receiver server socket at port {}", getPort())
+        try {
+          port.set(server.localPort)
+          log.info("Starting log receiver server socket at port {}", getPort())
 
-      while (job?.isCancelled != true && isAlive.get()) {
-        val clientSocket = server.accept()
+          while (job?.isCancelled != true && isAlive.get()) {
+            val clientSocket = server.accept()
 
-        val senderInfoLine = clientSocket.getInputStream().bufferedReader().readLine()
-        val command = SocketCommandParser.parse(senderInfoLine)
-        if (command == null || command !is SenderInfoCommand) {
-          log.error(
-            "Cannot accept log sender client. A sender must send the /sender command first.")
-          clientSocket.use {}
-          continue
+            val senderInfoLine = clientSocket.getInputStream().bufferedReader().readLine()
+            val command = SocketCommandParser.parse(senderInfoLine)
+            if (command == null || command !is SenderInfoCommand) {
+              log.error(
+                  "Cannot accept log sender client. A sender must send the /sender command first."
+              )
+              clientSocket.use {}
+              continue
+            }
+
+            val handler = LogSenderHandler(command, clientSocket, consumer, ::removeClient)
+
+            log.info("A log sender has been connected")
+
+            clients[command.senderId] = handler
+
+            handler.startAsync()
+          }
+        } catch (interrupt: InterruptedException) {
+          log.warn("MultiLogSenderHandler thread has been interrupted")
+          currentThread().interrupt()
+        } catch (err: Throwable) {
+          log.error("An error occurred while accept log client connections", err)
+        } finally {
+          this@MultiLogSenderHandler.close()
+          server.close()
         }
-
-        val handler = LogSenderHandler(command, clientSocket, consumer, ::removeClient)
-
-        log.info("A log sender has been connected")
-
-        clients[command.senderId] = handler
-
-        handler.startAsync()
       }
-    } catch (interrupt: InterruptedException) {
-      log.warn("MultiLogSenderHandler thread has been interrupted")
-      currentThread().interrupt()
-    } catch (err: Throwable) {
-      log.error("An error occurred while accept log client connections", err)
-    } finally {
-      this@MultiLogSenderHandler.close()
-      server.close()
-    }
-  }
 
   internal fun removeClient(senderId: String) {
     clients.remove(senderId)?.closeAndLogError()
   }
 
   private fun removeAllClients() {
-    this.clients.forEach { (_, handler) ->
-      handler.closeAndLogError()
-    }
+    this.clients.forEach { (_, handler) -> handler.closeAndLogError() }
 
     this.clients.clear()
   }
 
   fun start() {
     isAlive.set(true)
-    logHandlerScope.launch {
-      startAsync()
-    }
+    logHandlerScope.launch { startAsync() }
   }
 
   fun isAlive() = isAlive.get()

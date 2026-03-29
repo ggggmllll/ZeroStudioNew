@@ -34,8 +34,8 @@ import com.itsaky.androidide.lookup.Lookup
 import com.itsaky.androidide.managers.ToolsManager
 import com.itsaky.androidide.preferences.internal.BuildPreferences
 import com.itsaky.androidide.preferences.internal.DevOpsPreferences
-import com.itsaky.androidide.projects.internal.ProjectManagerImpl
 import com.itsaky.androidide.projects.builder.BuildService
+import com.itsaky.androidide.projects.internal.ProjectManagerImpl
 import com.itsaky.androidide.resources.R
 import com.itsaky.androidide.services.ToolingServerNotStartedException
 import com.itsaky.androidide.services.builder.ToolingServerRunner.OnServerStartListener
@@ -48,7 +48,6 @@ import com.itsaky.androidide.tooling.api.IToolingApiServer
 import com.itsaky.androidide.tooling.api.LogSenderConfig.PROPERTY_LOGSENDER_ENABLED
 import com.itsaky.androidide.tooling.api.messages.InitializeProjectParams
 import com.itsaky.androidide.tooling.api.messages.LogMessageParams
-import com.itsaky.androidide.tooling.api.messages.TaskExecutionMessage
 import com.itsaky.androidide.tooling.api.messages.result.BuildCancellationRequestResult
 import com.itsaky.androidide.tooling.api.messages.result.BuildInfo
 import com.itsaky.androidide.tooling.api.messages.result.BuildResult
@@ -59,12 +58,6 @@ import com.itsaky.androidide.tooling.api.models.ToolingServerMetadata
 import com.itsaky.androidide.tooling.events.ProgressEvent
 import com.itsaky.androidide.utils.Environment
 import com.termux.shared.termux.shell.command.environment.TermuxShellEnvironment
-import kotlinx.coroutines.CoroutineName
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
-import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
@@ -72,14 +65,20 @@ import java.util.Objects
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CompletionException
 import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import org.slf4j.LoggerFactory
 
 /**
  * A foreground service that handles interaction with the Gradle Tooling API.
  *
  * @author Akash Yadav
  */
-class GradleBuildService : Service(), BuildService, IToolingApiClient,
-  ToolingServerRunner.Observer {
+class GradleBuildService :
+    Service(), BuildService, IToolingApiClient, ToolingServerRunner.Observer {
 
   private var mBinder: GradleServiceBinder? = null
   private var isToolingServerStarted = false
@@ -100,8 +99,7 @@ class GradleBuildService : Service(), BuildService, IToolingApiClient,
   private var eventListener: EventListener? = null
   private var isReleaseVariant = false
 
-  @Volatile
-  private var currentBuildProcess: Process? = null
+  @Volatile private var currentBuildProcess: Process? = null
 
   private val buildServiceScope =
       CoroutineScope(Dispatchers.Default + CoroutineName("GradleBuildService"))
@@ -193,7 +191,7 @@ class GradleBuildService : Service(), BuildService, IToolingApiClient,
     // 因为在 performBuildTasks 方法中，CompletableFuture 可能会因为底层进程僵死或还在执行导致 get() 方法无尽等待。
     // 如果我们在销毁时没有杀掉进程，ForkJoinPool 工作线程将会持有这个 Service 对象并永远被阻塞。
     killGradlewProcesses()
-    
+
     mBinder?.release()
     mBinder = null
 
@@ -272,7 +270,7 @@ class GradleBuildService : Service(), BuildService, IToolingApiClient,
 
   /** Gets or creates the logger plugin directory. */
   private fun getLoggerPluginDir(): File {
-    val dir = File(Environment.PLUGIN_HOME , "logger")
+    val dir = File(Environment.PLUGIN_HOME, "logger")
     if (!dir.exists()) {
       dir.mkdirs()
     }
@@ -285,7 +283,6 @@ class GradleBuildService : Service(), BuildService, IToolingApiClient,
     if (!aar.exists()) {
       // Extract from assets
       if (
-      
           !ResourceUtils.copyFileFromAssets(
               "data/common/logger-runtime.aar",
               aar.absolutePath,
@@ -300,17 +297,14 @@ class GradleBuildService : Service(), BuildService, IToolingApiClient,
   /** Check if tasks include debug builds (not release-only). */
   private fun isDebugBuild(tasks: List<String>): Boolean {
     // Check if any task contains "Debug" or doesn't contain "Release"
-    val hasDebugTask =
-        tasks.any { task ->
-          task.contains("Debug", ignoreCase = true) ||
-              task.contains("assembleDebug", ignoreCase = true)
-        }
+    val hasDebugTask = tasks.any { task ->
+      task.contains("Debug", ignoreCase = true) || task.contains("assembleDebug", ignoreCase = true)
+    }
 
-    val hasOnlyRelease =
-        tasks.all { task ->
-          task.contains("Release", ignoreCase = true) ||
-              task.contains("assembleRelease", ignoreCase = true)
-        }
+    val hasOnlyRelease = tasks.all { task ->
+      task.contains("Release", ignoreCase = true) ||
+          task.contains("assembleRelease", ignoreCase = true)
+    }
 
     // If it's explicitly debug, or not explicitly release-only, treat as debug
     return hasDebugTask || !hasOnlyRelease
@@ -386,7 +380,7 @@ class GradleBuildService : Service(), BuildService, IToolingApiClient,
 
   override fun getBuildArguments(): CompletableFuture<List<String>> {
     val extraArgs = ArrayList<String>()
-    
+
     if (DevOpsPreferences.logsenderEnabled) {
       injectLoggerForCurrentBuild()
       if (!isReleaseVariant) {
@@ -509,33 +503,31 @@ class GradleBuildService : Service(), BuildService, IToolingApiClient,
     }
   }
 
-  /**
-   * Stops all Gradle daemons by executing gradlew --stop
-   */
+  /** Stops all Gradle daemons by executing gradlew --stop */
   private fun stopGradleDaemons(): CompletableFuture<Void> {
     return CompletableFuture.runAsync {
       try {
         val projectDir = ProjectManagerImpl.getInstance().projectDir
         val gradlewPath = File(projectDir, "gradlew").absolutePath
-        
+
         log.info("Stopping Gradle daemons...")
-        
+
         val command = listOf("sh", gradlewPath, "--stop")
         val processBuilder = ProcessBuilder(command)
         processBuilder.directory(projectDir)
-        
+
         // Set up environment
         val termuxEnv = TermuxShellEnvironment().getEnvironment(this@GradleBuildService, false)
         val customEnv = HashMap<String, String>()
         Environment.putEnvironment(customEnv, false)
-        
+
         val finalEnv = processBuilder.environment()
         finalEnv.putAll(termuxEnv)
         finalEnv.putAll(customEnv)
-        
+
         val process = processBuilder.start()
         val exitCode = process.waitFor()
-        
+
         if (exitCode == 0) {
           log.info("Gradle daemons stopped successfully")
           eventListener?.onOutput("Gradle daemons stopped")
@@ -671,23 +663,20 @@ class GradleBuildService : Service(), BuildService, IToolingApiClient,
           }
         }
     )
-    
   }
 
-  /**
-   * Kills any running gradlew processes forcefully
-   */
+  /** Kills any running gradlew processes forcefully */
   private fun killGradlewProcesses() {
     try {
       log.info("Attempting to kill running gradlew processes...")
-      
+
       // Use pkill to kill gradlew processes
       val command = listOf("pkill", "-f", "gradlew")
       val processBuilder = ProcessBuilder(command)
-      
+
       val process = processBuilder.start()
       val exitCode = process.waitFor()
-      
+
       if (exitCode == 0) {
         log.info("Gradlew processes killed successfully")
         eventListener?.onOutput("All Gradle build processes terminated")
@@ -701,9 +690,9 @@ class GradleBuildService : Service(), BuildService, IToolingApiClient,
 
   override fun cancelCurrentBuild(): CompletableFuture<BuildCancellationRequestResult> {
     checkServerStarted()
-    
+
     val cancellationFuture = server!!.cancelCurrentBuild()
-    
+
     buildServiceScope.launch {
       try {
         kotlinx.coroutines.delay(1000) // Wait 1 second for graceful cancellation
@@ -715,7 +704,7 @@ class GradleBuildService : Service(), BuildService, IToolingApiClient,
         log.error("Error during forced daemon shutdown", e)
       }
     }
-    
+
     return cancellationFuture
   }
 

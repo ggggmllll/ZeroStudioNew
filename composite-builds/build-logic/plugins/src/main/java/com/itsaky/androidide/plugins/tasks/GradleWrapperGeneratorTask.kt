@@ -17,16 +17,14 @@
 
 package com.itsaky.androidide.plugins.tasks
 
+import java.io.File
+import java.util.zip.ZipEntry
+import java.util.zip.ZipOutputStream
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.wrapper.Wrapper
-import java.io.File
-import java.util.zip.ZipEntry
-import java.util.zip.ZipOutputStream
-
-import com.itsaky.androidide.build.config.BuildConfig
 
 /**
  * Generates the `gradle-wrapper.zip` file.
@@ -35,15 +33,12 @@ import com.itsaky.androidide.build.config.BuildConfig
  */
 abstract class GradleWrapperGeneratorTask : DefaultTask() {
 
-  /**
-   * The output directory.
-   */
-  @get:OutputDirectory
-  abstract val outputDirectory: DirectoryProperty
+  /** The output directory. */
+  @get:OutputDirectory abstract val outputDirectory: DirectoryProperty
 
   companion object {
 
-    private const val GRADLE_VERSION =  "7.4.2"
+    private const val GRADLE_VERSION = "7.4.2"
   }
 
   @TaskAction
@@ -74,15 +69,14 @@ abstract class GradleWrapperGeneratorTask : DefaultTask() {
 
     // Archive all generated files
     ZipOutputStream(destFile.outputStream().buffered()).use { zipOut ->
-      stagingDir.walk(direction = FileWalkDirection.TOP_DOWN)
-        .filter { it.isFile }
-        .forEach { file ->
-          val entry = ZipEntry(file.relativeTo(stagingDir).path)
-          zipOut.putNextEntry(entry)
-          file.inputStream().buffered().use { fileInStream ->
-            fileInStream.transferTo(zipOut)
+      stagingDir
+          .walk(direction = FileWalkDirection.TOP_DOWN)
+          .filter { it.isFile }
+          .forEach { file ->
+            val entry = ZipEntry(file.relativeTo(stagingDir).path)
+            zipOut.putNextEntry(entry)
+            file.inputStream().buffered().use { fileInStream -> fileInStream.transferTo(zipOut) }
           }
-        }
 
       zipOut.flush()
     }

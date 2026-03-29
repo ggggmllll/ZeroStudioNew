@@ -24,28 +24,28 @@ import com.android.tools.idea.wizard.template.impl.activities.common.layoutToVie
 import com.android.tools.idea.wizard.template.renderIf
 
 fun placeholderFragmentJava(
-  fragmentLayoutName: String,
-  packageName: String,
-  applicationPackage: String?,
-  useAndroidX: Boolean,
-  isViewBindingSupported: Boolean,
+    fragmentLayoutName: String,
+    packageName: String,
+    applicationPackage: String?,
+    useAndroidX: Boolean,
+    isViewBindingSupported: Boolean,
 ): String {
 
   val viewModelInitializationBlock =
-    if (useAndroidX) {
-      "pageViewModel = new ViewModelProvider(this).get(PageViewModel.class);"
-    } else {
-      """pageViewModel = new ViewModelProvider(this,
+      if (useAndroidX) {
+        "pageViewModel = new ViewModelProvider(this).get(PageViewModel.class);"
+      } else {
+        """pageViewModel = new ViewModelProvider(this,
                new ViewModelProvider.NewInstanceFactory()).get(PageViewModel.class);"""
-    }
+      }
 
   val onCreateViewBlock =
-    if (isViewBindingSupported)
-      """
+      if (isViewBindingSupported)
+          """
       binding = ${layoutToViewBindingClass(fragmentLayoutName)}.inflate(inflater, container, false);
       View root = binding.getRoot();
   """
-    else "View root = inflater.inflate(R.layout.$fragmentLayoutName, container, false);"
+      else "View root = inflater.inflate(R.layout.$fragmentLayoutName, container, false);"
 
   return """package ${packageName}.ui.main;
 

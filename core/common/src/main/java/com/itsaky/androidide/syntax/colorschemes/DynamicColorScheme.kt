@@ -17,9 +17,8 @@
 
 package com.itsaky.androidide.syntax.colorschemes
 
-import android.content.Context
 // import com.itsaky.androidide.common.R
-import com.itsaky.androidide.resources.R
+import android.content.Context
 import com.google.android.material.R.attr
 import com.itsaky.androidide.utils.isSystemInDarkMode
 import com.itsaky.androidide.utils.resolveAttr

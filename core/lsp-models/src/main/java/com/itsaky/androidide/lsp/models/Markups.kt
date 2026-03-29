@@ -25,5 +25,5 @@ data class MarkupContent(var value: String, var kind: MarkupKind) {
 
 enum class MarkupKind {
   PLAIN,
-  MARKDOWN
+  MARKDOWN,
 }

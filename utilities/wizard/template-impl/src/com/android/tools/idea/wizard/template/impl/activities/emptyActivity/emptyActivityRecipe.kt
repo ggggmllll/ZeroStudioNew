@@ -27,12 +27,12 @@ import com.android.tools.idea.wizard.template.impl.activities.emptyActivity.src.
 import com.android.tools.idea.wizard.template.impl.activities.emptyActivity.src.emptyActivityKt
 
 fun RecipeExecutor.generateEmptyActivity(
-  moduleData: ModuleTemplateData,
-  activityClass: String,
-  generateLayout: Boolean,
-  layoutName: String,
-  isLauncher: Boolean,
-  packageName: PackageName,
+    moduleData: ModuleTemplateData,
+    activityClass: String,
+    generateLayout: Boolean,
+    layoutName: String,
+    isLauncher: Boolean,
+    packageName: PackageName,
 ) {
   val (projectData, srcOut) = moduleData
   val useAndroidX = projectData.androidXSupport
@@ -42,7 +42,14 @@ fun RecipeExecutor.generateEmptyActivity(
   addMaterial3Dependency()
   addDependency("androidx.activity:activity:+")
 
-  generateManifest(moduleData, activityClass, packageName, isLauncher, false, generateActivityTitle = false)
+  generateManifest(
+      moduleData,
+      activityClass,
+      packageName,
+      isLauncher,
+      false,
+      generateActivityTitle = false,
+  )
 
   addAllKotlinDependencies(moduleData)
 
@@ -51,10 +58,26 @@ fun RecipeExecutor.generateEmptyActivity(
   }
 
   val simpleActivity =
-    when (projectData.language) {
-      Language.Kotlin -> emptyActivityKt(packageName, moduleData.namespace, activityClass, layoutName, generateLayout, useAndroidX)
-      Language.Java -> emptyActivityJava(packageName, moduleData.namespace, activityClass, layoutName, generateLayout, useAndroidX)
-    }
+      when (projectData.language) {
+        Language.Kotlin ->
+            emptyActivityKt(
+                packageName,
+                moduleData.namespace,
+                activityClass,
+                layoutName,
+                generateLayout,
+                useAndroidX,
+            )
+        Language.Java ->
+            emptyActivityJava(
+                packageName,
+                moduleData.namespace,
+                activityClass,
+                layoutName,
+                generateLayout,
+                useAndroidX,
+            )
+      }
 
   val simpleActivityPath = srcOut.resolve("$activityClass.$ktOrJavaExt")
   save(simpleActivity, simpleActivityPath)

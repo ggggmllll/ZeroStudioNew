@@ -33,7 +33,7 @@ class GroovyAnalyzer : BaseIncrementalAnalyzeManager(GroovyLexer::class.java) {
   override fun getCodeBlockTokens() = intArrayOf(GroovyLexer.LBRACE, GroovyLexer.RBRACE)
 
   override fun generateSpans(
-    tokens: LineTokenizeResult<LineState, IncrementalToken>,
+      tokens: LineTokenizeResult<LineState, IncrementalToken>,
   ): List<Span> {
     val spans = mutableListOf<Span>()
     var previous = GroovyLexer.WS
@@ -100,12 +100,11 @@ class GroovyAnalyzer : BaseIncrementalAnalyzeManager(GroovyLexer::class.java) {
         GroovyLexer.BOOL_LITERAL,
         GroovyLexer.CHAR_LITERAL,
         GroovyLexer.NULL_LITERAL,
-        ->
-          spans.add(SpanFactory.obtain(offset, TextStyle.makeStyle(SchemeAndroidIDE.LITERAL)))
+        -> spans.add(SpanFactory.obtain(offset, TextStyle.makeStyle(SchemeAndroidIDE.LITERAL)))
 
         GroovyLexer.SINGLE_QUOTE_STRING,
-        GroovyLexer.STRING_LITERAL -> spans.add(
-          SpanFactory.obtain(offset, SchemeAndroidIDE.forString()))
+        GroovyLexer.STRING_LITERAL ->
+            spans.add(SpanFactory.obtain(offset, SchemeAndroidIDE.forString()))
 
         GroovyLexer.LPAREN,
         GroovyLexer.RPAREN,
@@ -153,8 +152,7 @@ class GroovyAnalyzer : BaseIncrementalAnalyzeManager(GroovyLexer::class.java) {
         GroovyLexer.LBRACE,
         GroovyLexer.RBRACE,
         GroovyLexer.DOT,
-        ->
-          spans.add(SpanFactory.obtain(offset, TextStyle.makeStyle(SchemeAndroidIDE.OPERATOR)))
+        -> spans.add(SpanFactory.obtain(offset, TextStyle.makeStyle(SchemeAndroidIDE.OPERATOR)))
 
         GroovyLexer.BOOLEAN,
         GroovyLexer.BYTE,
@@ -165,13 +163,12 @@ class GroovyAnalyzer : BaseIncrementalAnalyzeManager(GroovyLexer::class.java) {
         GroovyLexer.INT,
         GroovyLexer.LONG,
         GroovyLexer.SHORT,
-        ->
-          spans.add(SpanFactory.obtain(offset, TextStyle.makeStyle(SchemeAndroidIDE.TYPE_NAME)))
+        -> spans.add(SpanFactory.obtain(offset, TextStyle.makeStyle(SchemeAndroidIDE.TYPE_NAME)))
 
         GroovyLexer.COMMENT -> spans.add(SpanFactory.obtain(offset, SchemeAndroidIDE.forComment()))
         GroovyLexer.LINE_COMMENT -> handleLineCommentSpan(token, spans, offset)
         GroovyLexer.AT ->
-          spans.add(SpanFactory.obtain(offset, TextStyle.makeStyle(SchemeAndroidIDE.ANNOTATION)))
+            spans.add(SpanFactory.obtain(offset, TextStyle.makeStyle(SchemeAndroidIDE.ANNOTATION)))
 
         GroovyLexer.IDENTIFIER -> {
           var colorId = SchemeAndroidIDE.TEXT_NORMAL
@@ -181,8 +178,8 @@ class GroovyAnalyzer : BaseIncrementalAnalyzeManager(GroovyLexer::class.java) {
           spans.add(SpanFactory.obtain(offset, TextStyle.makeStyle(colorId)))
         }
 
-        else -> spans.add(
-          SpanFactory.obtain(offset, TextStyle.makeStyle(SchemeAndroidIDE.TEXT_NORMAL)))
+        else ->
+            spans.add(SpanFactory.obtain(offset, TextStyle.makeStyle(SchemeAndroidIDE.TEXT_NORMAL)))
       }
       previous = type
     }

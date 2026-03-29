@@ -2,31 +2,30 @@ package android.zero.studio.layouteditor.activities
 
 import android.os.Bundle
 import android.widget.ImageView
-import androidx.appcompat.app.ActionBar
 import android.zero.studio.layouteditor.BaseActivity
 import android.zero.studio.layouteditor.R
 import android.zero.studio.layouteditor.databinding.ActivityPreviewDrawableBinding
 import android.zero.studio.layouteditor.views.AlphaPatternDrawable
+import androidx.appcompat.app.ActionBar
 
 class PreviewDrawableActivity : BaseActivity() {
-    private lateinit var binding: ActivityPreviewDrawableBinding
+  private lateinit var binding: ActivityPreviewDrawableBinding
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivityPreviewDrawableBinding.inflate(layoutInflater)
-        setContentView(binding.getRoot())
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    binding = ActivityPreviewDrawableBinding.inflate(layoutInflater)
+    setContentView(binding.getRoot())
 
-        setSupportActionBar(binding.topAppBar)
-        supportActionBar!!.setTitle(R.string.preview_drawable)
+    setSupportActionBar(binding.topAppBar)
+    supportActionBar!!.setTitle(R.string.preview_drawable)
 
-        binding.topAppBar.setNavigationOnClickListener { onBackPressedDispatcher.onBackPressed() }
-        binding.background.setImageDrawable(AlphaPatternDrawable(24))
+    binding.topAppBar.setNavigationOnClickListener { onBackPressedDispatcher.onBackPressed() }
+    binding.background.setImageDrawable(AlphaPatternDrawable(24))
 
-        onLoad(binding.mainImage, supportActionBar)
-    }
+    onLoad(binding.mainImage, supportActionBar)
+  }
 
-    companion object {
-        @JvmStatic
-        var onLoad: (ImageView, ActionBar?) -> Unit = { _, _ -> }
-    }
+  companion object {
+    @JvmStatic var onLoad: (ImageView, ActionBar?) -> Unit = { _, _ -> }
+  }
 }

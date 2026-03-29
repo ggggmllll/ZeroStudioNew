@@ -22,35 +22,35 @@ import com.android.tools.idea.wizard.template.impl.activities.common.importViewB
 import com.android.tools.idea.wizard.template.impl.activities.common.layoutToViewBindingClass
 
 fun recyclerViewAdapterJava(
-  adapterClassName: String,
-  fragmentLayout: String,
-  packageName: String,
-  applicationPackage: String?,
-  useAndroidX: Boolean,
-  isViewBindingSupported: Boolean,
+    adapterClassName: String,
+    fragmentLayout: String,
+    packageName: String,
+    applicationPackage: String?,
+    useAndroidX: Boolean,
+    isViewBindingSupported: Boolean,
 ): String {
 
   val onCreateViewHolderBlock =
-    if (isViewBindingSupported)
-      """
+      if (isViewBindingSupported)
+          """
     return new ViewHolder(${layoutToViewBindingClass(fragmentLayout)}.inflate(LayoutInflater.from(parent.getContext()), parent, false));
   """
-    else
-      """
+      else
+          """
     return new ViewHolder(LayoutInflater.from(parent.getContext()), parent);
   """
 
   val viewHolderBlock =
-    if (isViewBindingSupported)
-      """
+      if (isViewBindingSupported)
+          """
     public ViewHolder(${layoutToViewBindingClass(fragmentLayout)} binding) {
       super(binding.getRoot());
       mIdView = binding.itemNumber;
       mContentView = binding.content;
     }
   """
-    else
-      """
+      else
+          """
     public ViewHolder(View view) {
       super(view);
       mIdView = (TextView) view.findViewById(R.id.item_number);

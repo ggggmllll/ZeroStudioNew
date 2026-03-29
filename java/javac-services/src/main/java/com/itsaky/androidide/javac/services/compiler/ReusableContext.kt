@@ -31,6 +31,7 @@ import com.itsaky.androidide.javac.services.fs.CacheFSInfoSingleton
 import com.itsaky.androidide.javac.services.fs.JarPackageProviderImpl
 import com.itsaky.androidide.utils.VMUtils
 import com.itsaky.androidide.zipfs2.JarPackageProvider
+import java.net.URI
 import jdkx.tools.DiagnosticListener
 import jdkx.tools.JavaFileManager
 import jdkx.tools.JavaFileObject
@@ -56,7 +57,6 @@ import openjdk.tools.javac.util.Context
 import openjdk.tools.javac.util.DefinedBy
 import openjdk.tools.javac.util.DefinedBy.Api.COMPILER_TREE
 import openjdk.tools.javac.util.Log
-import java.net.URI
 
 /**
  * Reusable [Context] for [ReusableCompiler].
@@ -64,16 +64,16 @@ import java.net.URI
  * @author Akash Yadav
  */
 class ReusableContext(cancelService: CancelService) : Context(), TaskListener {
-  
+
   private val flowCompleted = mutableSetOf<URI>()
-  
+
   init {
     put(Log.logKey, ReusableLog.factory)
     put(FSInfo::class.java, if (VMUtils.isJvm()) CacheFSInfo() else CacheFSInfoSingleton)
     put(JavaCompiler.compilerKey, ReusableJavaCompiler.factory)
     put(JavacFlowListener.flowListenerKey, JavacFlowListener { this.hasFlowCompleted(it) })
     put(JarPackageProvider::class.java, JarPackageProviderImpl)
-    
+
     NBAttr.preRegister(this)
     NBParserFactory.preRegister(this)
     NBTreeMaker.preRegister(this)
@@ -85,13 +85,13 @@ class ReusableContext(cancelService: CancelService) : Context(), TaskListener {
     NBClassReader.preRegister(this)
     CancelService.preRegister(this, cancelService)
   }
-  
+
   @DefinedBy(COMPILER_TREE)
   override fun started(e: TaskEvent) {
     //    log.debug("Started: $e")
     // Do nothing
   }
-  
+
   @DefinedBy(COMPILER_TREE)
   override fun finished(e: TaskEvent) {
     if (e.kind == ANALYZE) {
@@ -101,7 +101,7 @@ class ReusableContext(cancelService: CancelService) : Context(), TaskListener {
       }
     }
   }
-  
+
   fun clear() {
     drop(Arguments.argsKey)
     drop(DiagnosticListener::class.java)
@@ -111,7 +111,7 @@ class ReusableContext(cancelService: CancelService) : Context(), TaskListener {
     drop(JavacTask::class.java)
     drop(JavacTrees::class.java)
     drop(JavacElements::class.java)
-    
+
     if (ht[Log.logKey] is ReusableLog) {
       // log already init-ed - not first round
       (Log.instance(this) as ReusableLog).clear()
@@ -125,17 +125,17 @@ class ReusableContext(cancelService: CancelService) : Context(), TaskListener {
       MultiTaskListener.instance(this).clear()
     }
   }
-  
+
   /** **FOR INTERNAL USE ONLY!** */
   fun <T> drop(k: Key<T>?) {
     ht.remove(k)
   }
-  
+
   /** **FOR INTERNAL USE ONLY!** */
   fun <T> drop(c: Class<T>?) {
     drop(key(c))
   }
-  
+
   private fun hasFlowCompleted(fo: JavaFileObject?): Boolean {
     return if (fo == null) {
       false

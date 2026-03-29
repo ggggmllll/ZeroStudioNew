@@ -25,81 +25,81 @@ import java.io.InputStream
 import java.io.OutputStream
 
 /**
- * A wrapper around any [StreamConnectionProvider] that intercepts IO to provide
- * real-time traffic monitoring and logging for the [LspStatusMonitor].
+ * A wrapper around any [StreamConnectionProvider] that intercepts IO to provide real-time traffic
+ * monitoring and logging for the [LspStatusMonitor].
  *
  * @author android_zero
  */
 class MonitoringStreamProvider(
     private val delegate: StreamConnectionProvider,
     private val serverId: String,
-    private val serverName: String
+    private val serverName: String,
 ) : StreamConnectionProvider {
 
-    private val monitoredInput by lazy { 
-        MonitoredInputStream(delegate.inputStream) { bytes ->
-            LspStatusMonitor.updateTraffic(serverId, 0, bytes.toLong())
-        } 
+  private val monitoredInput by lazy {
+    MonitoredInputStream(delegate.inputStream) { bytes ->
+      LspStatusMonitor.updateTraffic(serverId, 0, bytes.toLong())
     }
-    
-    private val monitoredOutput by lazy { 
-        MonitoredOutputStream(delegate.outputStream) { bytes ->
-            LspStatusMonitor.updateTraffic(serverId, bytes.toLong(), 0)
-        } 
+  }
+
+  private val monitoredOutput by lazy {
+    MonitoredOutputStream(delegate.outputStream) { bytes ->
+      LspStatusMonitor.updateTraffic(serverId, bytes.toLong(), 0)
     }
+  }
 
-    override fun start() {
-        LspStatusMonitor.updateStatus(serverId, serverName, LspStatusMonitor.ServerStatus.STARTING)
-        try {
-            delegate.start()
-            LspStatusMonitor.updateStatus(serverId, serverName, LspStatusMonitor.ServerStatus.RUNNING)
-        } catch (e: Exception) {
-            LspStatusMonitor.logError(serverId, "Failed to start connection", e)
-            throw e
-        }
+  override fun start() {
+    LspStatusMonitor.updateStatus(serverId, serverName, LspStatusMonitor.ServerStatus.STARTING)
+    try {
+      delegate.start()
+      LspStatusMonitor.updateStatus(serverId, serverName, LspStatusMonitor.ServerStatus.RUNNING)
+    } catch (e: Exception) {
+      LspStatusMonitor.logError(serverId, "Failed to start connection", e)
+      throw e
     }
+  }
 
-    override val inputStream: InputStream get() = monitoredInput
-    
-    override val outputStream: OutputStream get() = monitoredOutput
+  override val inputStream: InputStream
+    get() = monitoredInput
 
-    override val isClosed: Boolean
-        get() = delegate.isClosed
+  override val outputStream: OutputStream
+    get() = monitoredOutput
 
-    override fun close() {
-        LspStatusMonitor.updateStatus(serverId, serverName, LspStatusMonitor.ServerStatus.STOPPED)
-        delegate.close()
-    }
+  override val isClosed: Boolean
+    get() = delegate.isClosed
 
-    // --- Inner Streams ---
+  override fun close() {
+    LspStatusMonitor.updateStatus(serverId, serverName, LspStatusMonitor.ServerStatus.STOPPED)
+    delegate.close()
+  }
 
-    private class MonitoredInputStream(
-        inStream: InputStream,
-        private val onRead: (Int) -> Unit
-    ) : FilterInputStream(inStream) {
-        override fun read(): Int {
-            val b = super.read()
-            if (b != -1) onRead(1)
-            return b
-        }
-        override fun read(b: ByteArray, off: Int, len: Int): Int {
-            val count = super.read(b, off, len)
-            if (count > 0) onRead(count)
-            return count
-        }
+  // --- Inner Streams ---
+
+  private class MonitoredInputStream(inStream: InputStream, private val onRead: (Int) -> Unit) :
+      FilterInputStream(inStream) {
+    override fun read(): Int {
+      val b = super.read()
+      if (b != -1) onRead(1)
+      return b
     }
 
-    private class MonitoredOutputStream(
-        outStream: OutputStream,
-        private val onWrite: (Int) -> Unit
-    ) : FilterOutputStream(outStream) {
-        override fun write(b: Int) {
-            super.write(b)
-            onWrite(1)
-        }
-        override fun write(b: ByteArray, off: Int, len: Int) {
-            super.write(b, off, len)
-            onWrite(len)
-        }
+    override fun read(b: ByteArray, off: Int, len: Int): Int {
+      val count = super.read(b, off, len)
+      if (count > 0) onRead(count)
+      return count
     }
+  }
+
+  private class MonitoredOutputStream(outStream: OutputStream, private val onWrite: (Int) -> Unit) :
+      FilterOutputStream(outStream) {
+    override fun write(b: Int) {
+      super.write(b)
+      onWrite(1)
+    }
+
+    override fun write(b: ByteArray, off: Int, len: Int) {
+      super.write(b, off, len)
+      onWrite(len)
+    }
+  }
 }

@@ -19,7 +19,7 @@ package com.android.tools.idea.wizard.template.impl.activities.loginActivity.src
 import com.android.tools.idea.wizard.template.getMaterialComponentName
 
 fun loginResultJava(packageName: String, useAndroidX: Boolean) =
-  """package  ${packageName}.ui.login;
+    """package  ${packageName}.ui.login;
 
 import ${getMaterialComponentName("android.support.annotation.Nullable", useAndroidX)};
 

@@ -23,24 +23,24 @@ import com.android.tools.idea.wizard.template.impl.activities.common.layoutToVie
 import com.android.tools.idea.wizard.template.renderIf
 
 fun walletActivityKt(
-  activityClass: String,
-  layoutName: String,
-  packageName: String,
-  applicationPackage: String?,
-  isViewBindingSupported: Boolean,
+    activityClass: String,
+    layoutName: String,
+    packageName: String,
+    applicationPackage: String?,
+    isViewBindingSupported: Boolean,
 ): String {
   val contentViewBlock =
-    if (isViewBindingSupported)
-      """
+      if (isViewBindingSupported)
+          """
       // Use view binding to access the UI elements
       layout = ${layoutToViewBindingClass(layoutName)}.inflate(layoutInflater)
       setContentView(layout.root)
   """
-    else "setContentView(R.layout.$layoutName)"
+      else "setContentView(R.layout.$layoutName)"
 
   val googleWalletButtonBlock =
-    if (isViewBindingSupported) "addToGoogleWalletButton = layout.addToGoogleWalletButton.root"
-    else "addToGoogleWalletButton = findViewById<View>(R.id.addToGoogleWalletButton)"
+      if (isViewBindingSupported) "addToGoogleWalletButton = layout.addToGoogleWalletButton.root"
+      else "addToGoogleWalletButton = findViewById<View>(R.id.addToGoogleWalletButton)"
 
   return """
 package ${escapeKotlinIdentifier(packageName)}

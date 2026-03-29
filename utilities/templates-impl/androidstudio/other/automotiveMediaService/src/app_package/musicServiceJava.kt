@@ -18,8 +18,12 @@ package com.itsaky.androidide.templates.impl.androidstudio.other.automotiveMedia
 
 import com.android.tools.idea.wizard.template.getMaterialComponentName
 
-fun musicServiceJava(mediaBrowserServiceName: String, sharedPackageName: String, useAndroidX: Boolean) =
-  """
+fun musicServiceJava(
+    mediaBrowserServiceName: String,
+    sharedPackageName: String,
+    useAndroidX: Boolean,
+) =
+    """
 package ${sharedPackageName};
 
 import android.os.Bundle;

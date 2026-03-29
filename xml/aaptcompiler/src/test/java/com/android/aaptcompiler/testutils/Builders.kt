@@ -13,8 +13,8 @@ import com.android.aaptcompiler.Source
 import com.android.aaptcompiler.Value
 import com.android.aaptcompiler.Visibility
 import com.android.aaptcompiler.parseResourceName
-import com.itsaky.androidide.layoutlib.resources.ResourceVisibility
 import com.google.common.truth.Truth
+import com.itsaky.androidide.layoutlib.resources.ResourceVisibility
 import java.io.File
 
 fun parseNameOrFail(name: String): ResourceName {
@@ -39,21 +39,25 @@ class ResourceTableBuilder {
   }
 
   fun addSimple(name: String, id: Int, config: ConfigDescription = ConfigDescription()) =
-    addValue(name, Id(), id, config)
+      addValue(name, Id(), id, config)
 
   fun addReference(name: String, ref: String, id: Int = 0) =
-    addValue(name, Reference(parseNameOrFail(ref)), id)
+      addValue(name, Reference(parseNameOrFail(ref)), id)
 
   fun addString(
-    name: String, value: String, id: Int = 0, config: ConfigDescription = ConfigDescription()) =
-    addValue(name, BasicString(table.stringPool.makeRef(value)), id, config)
+      name: String,
+      value: String,
+      id: Int = 0,
+      config: ConfigDescription = ConfigDescription(),
+  ) = addValue(name, BasicString(table.stringPool.makeRef(value)), id, config)
 
   fun addFileReference(
-    name: String,
-    path: String,
-    id: Int = 0,
-    config: ConfigDescription = ConfigDescription(),
-    file: File? = null): ResourceTableBuilder {
+      name: String,
+      path: String,
+      id: Int = 0,
+      config: ConfigDescription = ConfigDescription(),
+      file: File? = null,
+  ): ResourceTableBuilder {
 
     val fileRef = FileReference(table.stringPool.makeRef(path))
     fileRef.file = file
@@ -61,48 +65,35 @@ class ResourceTableBuilder {
   }
 
   fun addValue(
-    name: String,
-    value: Value,
-    id: Int = 0,
-    config: ConfigDescription = ConfigDescription()): ResourceTableBuilder {
+      name: String,
+      value: Value,
+      id: Int = 0,
+      config: ConfigDescription = ConfigDescription(),
+  ): ResourceTableBuilder {
 
-    Truth.assertThat(
-      table.addResourceWithIdMangled(
-        parseNameOrFail(name),
-        id,
-        config,
-        "",
-        value)).isTrue()
+    Truth.assertThat(table.addResourceWithIdMangled(parseNameOrFail(name), id, config, "", value))
+        .isTrue()
     return this
   }
 
   fun setSymbolState(
-    name: String,
-    level: ResourceVisibility,
-    id: Int,
-    allowNew: Boolean): ResourceTableBuilder {
+      name: String,
+      level: ResourceVisibility,
+      id: Int,
+      allowNew: Boolean,
+  ): ResourceTableBuilder {
 
     val resName = parseNameOrFail(name)
     val visibility = Visibility(level = level)
-    Truth.assertThat(
-      table.setVisibilityWithIdMangled(
-        resName,
-        visibility,
-        id)).isTrue()
+    Truth.assertThat(table.setVisibilityWithIdMangled(resName, visibility, id)).isTrue()
     if (allowNew) {
-      Truth.assertThat(
-        table.setAllowNewMangled(
-          resName,
-          AllowNew(Source(""), ""))).isTrue()
+      Truth.assertThat(table.setAllowNewMangled(resName, AllowNew(Source(""), ""))).isTrue()
     }
     return this
   }
 
   fun setOverlayable(name: String, overlayable: OverlayableItem): ResourceTableBuilder {
-    Truth.assertThat(
-      table.setOverlayable(
-        parseNameOrFail(name),
-        overlayable)).isTrue()
+    Truth.assertThat(table.setOverlayable(parseNameOrFail(name), overlayable)).isTrue()
     return this
   }
 }

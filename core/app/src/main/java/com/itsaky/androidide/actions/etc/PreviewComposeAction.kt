@@ -30,19 +30,19 @@ import com.itsaky.androidide.projects.IProjectManager
 import com.itsaky.androidide.projects.ModuleProject
 import com.itsaky.androidide.projects.android.AndroidModule
 import com.itsaky.androidide.resources.R
-import org.slf4j.LoggerFactory
 import java.io.File
+import org.slf4j.LoggerFactory
 
-/** 
+/**
  * Action menu item specifically for rendering Jetpack Compose Previews.
- * 
+ *
  * @author Akash Yadav
  * @author android_zero
  */
 class PreviewComposeAction(context: Context, override val order: Int) : EditorRelatedAction() {
 
   override val id: String = ID
-  
+
   override var requiresUIThread: Boolean = false
 
   companion object {
@@ -106,35 +106,27 @@ class PreviewComposeAction(context: Context, override val order: Int) : EditorRe
     val activity = data.requireActivity() as? EditorHandlerActivity ?: return
     val editor = data.getEditor() ?: return
     val file = editor.file ?: return
-    
+
     // 直接调用 ComposePreviewActivity 的启动方法
     ComposePreviewActivity.start(activity, editor.text.toString(), file.absolutePath)
   }
 
-  /**
-   * 检查整个工作区中是否有任何模块引入了 Compose
-   */
+  /** 检查整个工作区中是否有任何模块引入了 Compose */
   private fun moduleUsesCompose(): Boolean {
     val workspace = IProjectManager.getInstance().getWorkspace() ?: return false
-    return workspace.androidProjects().any { module ->
-      checkHasComposeDependency(module)
-    }
+    return workspace.androidProjects().any { module -> checkHasComposeDependency(module) }
   }
 
-  /**
-   * 检查指定文件所在的模块是否引入了 Compose
-   */
+  /** 检查指定文件所在的模块是否引入了 Compose */
   private fun moduleUsesCompose(file: File): Boolean {
     val module = IProjectManager.getInstance().findModuleForFile(file, false) ?: return false
     return checkHasComposeDependency(module)
   }
 
-  /**
-   * 依赖检查逻辑：
-   */
+  /** 依赖检查逻辑： */
   private fun checkHasComposeDependency(module: ModuleProject): Boolean {
     if (module !is AndroidModule) return false
-    
+
     // 检查当前模块的依赖映射表中是否包含 Compose 运行时的包名
     return module.libraryMap.keys.any { dependencyKey ->
       dependencyKey.contains("androidx.compose.runtime:runtime")

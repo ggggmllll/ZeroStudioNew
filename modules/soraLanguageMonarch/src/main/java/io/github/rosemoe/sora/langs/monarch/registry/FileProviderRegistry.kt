@@ -26,39 +26,33 @@ package io.github.rosemoe.sora.langs.monarch.registry
 import io.github.rosemoe.sora.langs.monarch.registry.provider.FileResolver
 import java.io.InputStream
 
-
 object FileProviderRegistry : FileResolver {
-    private val fileResolvers = mutableListOf<FileResolver>()
+  private val fileResolvers = mutableListOf<FileResolver>()
 
-    init {
-        fileResolvers.add(FileResolver.DEFAULT)
+  init {
+    fileResolvers.add(FileResolver.DEFAULT)
+  }
+
+  @Synchronized
+  fun addProvider(fileResolver: FileResolver) {
+    if (fileResolver !== FileResolver.DEFAULT) {
+      fileResolvers.add(fileResolver)
     }
+  }
 
-    @Synchronized
-    fun addProvider(fileResolver: FileResolver) {
-        if (fileResolver !== FileResolver.DEFAULT) {
-            fileResolvers.add(fileResolver)
-        }
+  @Synchronized
+  fun removeProvider(fileResolver: FileResolver) {
+    if (fileResolver !== FileResolver.DEFAULT) {
+      fileResolvers.remove(fileResolver)
     }
+  }
 
-    @Synchronized
-    fun removeProvider(fileResolver: FileResolver) {
-        if (fileResolver !== FileResolver.DEFAULT) {
-            fileResolvers.remove(fileResolver)
-        }
-    }
+  override fun resolve(path: String): InputStream? {
+    return fileResolvers.firstNotNullOfOrNull { it.resolve(path) }
+  }
 
-
-    override fun resolve(path: String): InputStream? {
-        return fileResolvers.firstNotNullOfOrNull { it.resolve(path) }
-    }
-
-    override fun dispose() {
-        fileResolvers.forEach {
-            it.dispose()
-        }
-        fileResolvers.clear()
-    }
-
-
+  override fun dispose() {
+    fileResolvers.forEach { it.dispose() }
+    fileResolvers.clear()
+  }
 }

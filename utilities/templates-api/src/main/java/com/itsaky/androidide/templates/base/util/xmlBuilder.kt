@@ -17,7 +17,6 @@
 
 package com.itsaky.androidide.templates.base.util
 
-import org.eclipse.lemminx.dom.builder.IndentedXmlBuilder
 import org.eclipse.lemminx.dom.builder.XmlBuilder
 
 /**

@@ -14,7 +14,7 @@
  *  You should have received a copy of the GNU General Public License
  *   along with AndroidIDE.  If not, see <https://www.gnu.org/licenses/>.
  */
- package com.itsaky.androidide.fragments.git
+package com.itsaky.androidide.fragments.git
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -31,45 +31,46 @@ import com.itsaky.androidide.databinding.FragmentGitHistoryBinding
  */
 class GitHistoryFragment : BaseGitPageFragment() {
 
-    private var _binding: FragmentGitHistoryBinding? = null
-    private val binding get() = _binding!!
+  private var _binding: FragmentGitHistoryBinding? = null
+  private val binding
+    get() = _binding!!
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = FragmentGitHistoryBinding.inflate(inflater, container, false)
-        return binding.root
+  override fun onCreateView(
+      inflater: LayoutInflater,
+      container: ViewGroup?,
+      savedInstanceState: Bundle?,
+  ): View {
+    _binding = FragmentGitHistoryBinding.inflate(inflater, container, false)
+    return binding.root
+  }
+
+  override fun setupToolbar() {
+    // --- History 页面工具栏 ---
+
+    // 1. 获取 (Fetch) - 更新远程引用
+    addToolbarAction(R.drawable.ic_cloud_download_24, getString(R.string.fetch)) {
+      // TODO: Git Fetch
     }
 
-    override fun setupToolbar() {
-        // --- History 页面工具栏 ---
-
-        // 1. 获取 (Fetch) - 更新远程引用
-        addToolbarAction(R.drawable.ic_cloud_download_24, getString(R.string.fetch)) {
-            // TODO: Git Fetch
-        }
-
-        // 2. 过滤 (Filter) - 按作者或分支
-        addToolbarAction(R.drawable.ic_filter_list_24, getString(R.string.filter)) {
-            // TODO: Show filter dialog
-        }
-        
-        // 3. 复制哈希 (Copy Hash) - 针对选中项，或者作为全局操作
-        addToolbarAction(R.drawable.ic_content_copy_24, getString(R.string.copy_hash)) {
-            // TODO: Copy selected commit hash
-        }
+    // 2. 过滤 (Filter) - 按作者或分支
+    addToolbarAction(R.drawable.ic_filter_list_24, getString(R.string.filter)) {
+      // TODO: Show filter dialog
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        binding.rvHistory.layoutManager = LinearLayoutManager(context)
-        // TODO: Setup CommitLogAdapter with Graph visualization
+    // 3. 复制哈希 (Copy Hash) - 针对选中项，或者作为全局操作
+    addToolbarAction(R.drawable.ic_content_copy_24, getString(R.string.copy_hash)) {
+      // TODO: Copy selected commit hash
     }
+  }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+    binding.rvHistory.layoutManager = LinearLayoutManager(context)
+    // TODO: Setup CommitLogAdapter with Graph visualization
+  }
+
+  override fun onDestroyView() {
+    super.onDestroyView()
+    _binding = null
+  }
 }

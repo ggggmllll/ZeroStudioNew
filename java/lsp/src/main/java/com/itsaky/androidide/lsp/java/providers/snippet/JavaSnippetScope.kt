@@ -39,5 +39,5 @@ enum class JavaSnippetScope(override val filename: String) : ISnippetScope {
   LOCAL("local"),
 
   /** Snippets that can be used anywhere in the code, irrespective of the current scope. */
-  GLOBAL("global")
+  GLOBAL("global"),
 }

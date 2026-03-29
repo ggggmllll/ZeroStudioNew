@@ -19,9 +19,7 @@ package com.itsaky.androidide.utils
 
 import java.util.concurrent.atomic.AtomicBoolean
 
-/**
- * @author Akash Yadav
- */
+/** @author Akash Yadav */
 open class DefaultRecyclable : RecyclableObjectPool.Recyclable {
 
   private val _isRecycled = AtomicBoolean(false)
@@ -34,6 +32,5 @@ open class DefaultRecyclable : RecyclableObjectPool.Recyclable {
       _isRecycled.set(value)
     }
 
-  override fun recycle() {
-  }
+  override fun recycle() {}
 }

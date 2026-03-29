@@ -74,36 +74,36 @@ private const val TRANSITION_TAG = "transition"
 private const val XML_TAG = "xml"
 
 fun resourceTypeFromTag(tag: String) =
-  when(tag) {
-    ANIM_TAG -> ANIM
-    ANIMATOR_TAG -> ANIMATOR
-    ARRAY_TAG -> ARRAY
-    ATTR_TAG -> ATTR
-    ATTR_PRIVATE_TAG -> ATTR_PRIVATE
-    BOOL_TAG -> BOOL
-    COLOR_TAG -> COLOR
-    CONFIG_VARYING_TAG -> CONFIG_VARYING
-    DIMEN_TAG -> DIMEN
-    DRAWABLE_TAG -> DRAWABLE
-    FONT_TAG -> FONT
-    FRACTION_TAG -> FRACTION
-    ID_TAG -> ID
-    INTEGER_TAG -> INTEGER
-    INTERPOLATOR_TAG -> INTERPOLATOR
-    LAYOUT_TAG -> LAYOUT
-    MACRO_TAG -> MACRO
-    MENU_TAG -> MENU
-    MIPMAP_TAG -> MIPMAP
-    NAVIGATION_TAG -> NAVIGATION
-    PLURALS_TAG -> PLURALS
-    RAW_TAG -> RAW
-    STRING_TAG -> STRING
-    STYLE_TAG -> STYLE
-    STYLEABLE_TAG -> STYLEABLE
-    TRANSITION_TAG -> TRANSITION
-    XML_TAG -> XML
-    else -> null
-  }
+    when (tag) {
+      ANIM_TAG -> ANIM
+      ANIMATOR_TAG -> ANIMATOR
+      ARRAY_TAG -> ARRAY
+      ATTR_TAG -> ATTR
+      ATTR_PRIVATE_TAG -> ATTR_PRIVATE
+      BOOL_TAG -> BOOL
+      COLOR_TAG -> COLOR
+      CONFIG_VARYING_TAG -> CONFIG_VARYING
+      DIMEN_TAG -> DIMEN
+      DRAWABLE_TAG -> DRAWABLE
+      FONT_TAG -> FONT
+      FRACTION_TAG -> FRACTION
+      ID_TAG -> ID
+      INTEGER_TAG -> INTEGER
+      INTERPOLATOR_TAG -> INTERPOLATOR
+      LAYOUT_TAG -> LAYOUT
+      MACRO_TAG -> MACRO
+      MENU_TAG -> MENU
+      MIPMAP_TAG -> MIPMAP
+      NAVIGATION_TAG -> NAVIGATION
+      PLURALS_TAG -> PLURALS
+      RAW_TAG -> RAW
+      STRING_TAG -> STRING
+      STYLE_TAG -> STYLE
+      STYLEABLE_TAG -> STYLEABLE
+      TRANSITION_TAG -> TRANSITION
+      XML_TAG -> XML
+      else -> null
+    }
 
 enum class AaptResourceType(val tagName: String) {
   ANIM(ANIM_TAG),
@@ -133,5 +133,5 @@ enum class AaptResourceType(val tagName: String) {
   STYLEABLE(STYLEABLE_TAG),
   TRANSITION(TRANSITION_TAG),
   UNKNOWN(""),
-  XML(XML_TAG)
+  XML(XML_TAG),
 }

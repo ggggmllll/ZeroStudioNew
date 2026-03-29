@@ -40,16 +40,16 @@ import com.android.tools.idea.wizard.template.impl.activities.common.generateSim
 import com.android.tools.idea.wizard.template.layoutToFragment
 
 fun RecipeExecutor.generateBasicActivity(
-  moduleData: ModuleTemplateData,
-  activityClass: String,
-  layoutName: String,
-  contentLayoutName: String,
-  packageName: PackageName,
-  menuName: String,
-  isLauncher: Boolean,
-  firstFragmentLayoutName: String,
-  secondFragmentLayoutName: String,
-  navGraphName: String,
+    moduleData: ModuleTemplateData,
+    activityClass: String,
+    layoutName: String,
+    contentLayoutName: String,
+    packageName: PackageName,
+    menuName: String,
+    isLauncher: Boolean,
+    firstFragmentLayoutName: String,
+    secondFragmentLayoutName: String,
+    navGraphName: String,
 ) {
   val (projectData, srcOut, resOut) = moduleData
   val appCompatVersion = moduleData.apis.appCompatVersion
@@ -65,7 +65,7 @@ fun RecipeExecutor.generateBasicActivity(
 
   // TODO: (b/272389296, b/272389537) put the xml in the values/themes.xml when minApi >= 23
   mergeXml(
-    """
+      """
 <resources xmlns:tools="http://schemas.android.com/tools">
   <style name="${moduleData.themesData.main.name}" parent="Base.${moduleData.themesData.main.name}">
     <!-- Transparent system bars for edge-to-edge. -->
@@ -74,19 +74,27 @@ fun RecipeExecutor.generateBasicActivity(
     <item name="android:windowLightStatusBar">?attr/isLightTheme</item>
   </style>
 </resources>""",
-    resOut.resolve("values-v23").resolve("themes.xml"),
+      resOut.resolve("values-v23").resolve("themes.xml"),
   )
 
   generateManifest(
-    moduleData = moduleData,
-    activityClass = activityClass,
-    packageName = packageName,
-    isLauncher = isLauncher,
-    hasNoActionBar = true,
-    activityThemeName = moduleData.themesData.main.name,
-    generateActivityTitle = false,
+      moduleData = moduleData,
+      activityClass = activityClass,
+      packageName = packageName,
+      isLauncher = isLauncher,
+      hasNoActionBar = true,
+      activityThemeName = moduleData.themesData.main.name,
+      generateActivityTitle = false,
   )
-  generateAppBar(moduleData, activityClass, packageName, contentLayoutName, layoutName, useAndroidX = useAndroidX, isMaterial3 = true)
+  generateAppBar(
+      moduleData,
+      activityClass,
+      packageName,
+      contentLayoutName,
+      layoutName,
+      useAndroidX = useAndroidX,
+      isMaterial3 = true,
+  )
   addViewBindingSupport(moduleData.viewBindingSupport, true)
   addDependency("com.android.support:appcompat-v7:$appCompatVersion.+")
   addDependency("com.android.support.constraint:constraint-layout:+")
@@ -95,8 +103,12 @@ fun RecipeExecutor.generateBasicActivity(
   // guaranteed to be unique
   val navHostFragmentId = "nav_host_fragment_${contentLayoutName}"
   save(
-    fragmentSimpleXml(navGraphName = navGraphName, navHostFragmentId = navHostFragmentId, useAndroidX = useAndroidX),
-    moduleData.resDir.resolve("layout/$contentLayoutName.xml"),
+      fragmentSimpleXml(
+          navGraphName = navGraphName,
+          navHostFragmentId = navHostFragmentId,
+          useAndroidX = useAndroidX,
+      ),
+      moduleData.resDir.resolve("layout/$contentLayoutName.xml"),
   )
   if (moduleData.isNewModule) {
     generateSimpleMenu(packageName, activityClass, moduleData.resDir, menuName)
@@ -107,82 +119,82 @@ fun RecipeExecutor.generateBasicActivity(
   val generateKotlin = projectData.language == Language.Kotlin
   val isViewBindingSupported = moduleData.viewBindingSupport.isViewBindingSupported()
   val simpleActivity =
-    when (projectData.language) {
-      Language.Java ->
-        basicActivityJava(
-          isNewProject = moduleData.isNewModule,
-          applicationPackage = projectData.applicationPackage,
-          packageName = packageName,
-          useAndroidX = useAndroidX,
-          activityClass = activityClass,
-          layoutName = layoutName,
-          menuName = menuName,
-          navHostFragmentId = navHostFragmentId,
-          isViewBindingSupported = isViewBindingSupported,
-        )
-      Language.Kotlin ->
-        basicActivityKt(
-          isNewProject = moduleData.isNewModule,
-          applicationPackage = projectData.applicationPackage,
-          packageName = packageName,
-          useAndroidX = useAndroidX,
-          activityClass = activityClass,
-          layoutName = layoutName,
-          menuName = menuName,
-          navHostFragmentId = navHostFragmentId,
-          isViewBindingSupported = isViewBindingSupported,
-        )
-    }
+      when (projectData.language) {
+        Language.Java ->
+            basicActivityJava(
+                isNewProject = moduleData.isNewModule,
+                applicationPackage = projectData.applicationPackage,
+                packageName = packageName,
+                useAndroidX = useAndroidX,
+                activityClass = activityClass,
+                layoutName = layoutName,
+                menuName = menuName,
+                navHostFragmentId = navHostFragmentId,
+                isViewBindingSupported = isViewBindingSupported,
+            )
+        Language.Kotlin ->
+            basicActivityKt(
+                isNewProject = moduleData.isNewModule,
+                applicationPackage = projectData.applicationPackage,
+                packageName = packageName,
+                useAndroidX = useAndroidX,
+                activityClass = activityClass,
+                layoutName = layoutName,
+                menuName = menuName,
+                navHostFragmentId = navHostFragmentId,
+                isViewBindingSupported = isViewBindingSupported,
+            )
+      }
 
   save(simpleActivity, simpleActivityPath)
 
   val firstFragmentClass = layoutToFragment(firstFragmentLayoutName)
   val secondFragmentClass = layoutToFragment(secondFragmentLayoutName)
   val firstFragmentClassContent =
-    when (projectData.language) {
-      Language.Java ->
-        firstFragmentJava(
-          packageName = packageName,
-          applicationPackage = projectData.applicationPackage,
-          useAndroidX = useAndroidX,
-          firstFragmentClass = firstFragmentClass,
-          secondFragmentClass = secondFragmentClass,
-          firstFragmentLayoutName = firstFragmentLayoutName,
-          isViewBindingSupported = isViewBindingSupported,
-        )
-      Language.Kotlin ->
-        firstFragmentKt(
-          packageName = packageName,
-          applicationPackage = projectData.applicationPackage,
-          firstFragmentClass = firstFragmentClass,
-          secondFragmentClass = secondFragmentClass,
-          firstFragmentLayoutName = firstFragmentLayoutName,
-          isViewBindingSupported = isViewBindingSupported,
-        )
-    }
+      when (projectData.language) {
+        Language.Java ->
+            firstFragmentJava(
+                packageName = packageName,
+                applicationPackage = projectData.applicationPackage,
+                useAndroidX = useAndroidX,
+                firstFragmentClass = firstFragmentClass,
+                secondFragmentClass = secondFragmentClass,
+                firstFragmentLayoutName = firstFragmentLayoutName,
+                isViewBindingSupported = isViewBindingSupported,
+            )
+        Language.Kotlin ->
+            firstFragmentKt(
+                packageName = packageName,
+                applicationPackage = projectData.applicationPackage,
+                firstFragmentClass = firstFragmentClass,
+                secondFragmentClass = secondFragmentClass,
+                firstFragmentLayoutName = firstFragmentLayoutName,
+                isViewBindingSupported = isViewBindingSupported,
+            )
+      }
   val secondFragmentClassContent =
-    when (projectData.language) {
-      Language.Java ->
-        secondFragmentJava(
-          packageName = packageName,
-          applicationPackage = projectData.applicationPackage,
-          useAndroidX = useAndroidX,
-          firstFragmentClass = firstFragmentClass,
-          secondFragmentClass = secondFragmentClass,
-          secondFragmentLayoutName = secondFragmentLayoutName,
-          isViewBindingSupported = isViewBindingSupported,
-        )
-      Language.Kotlin ->
-        secondFragmentKt(
-          packageName = packageName,
-          applicationPackage = projectData.applicationPackage,
-          firstFragmentClass = firstFragmentClass,
-          secondFragmentClass = secondFragmentClass,
-          secondFragmentLayoutName = secondFragmentLayoutName,
-          isViewBindingSupported = isViewBindingSupported,
-          useAndroidX = useAndroidX,
-        )
-    }
+      when (projectData.language) {
+        Language.Java ->
+            secondFragmentJava(
+                packageName = packageName,
+                applicationPackage = projectData.applicationPackage,
+                useAndroidX = useAndroidX,
+                firstFragmentClass = firstFragmentClass,
+                secondFragmentClass = secondFragmentClass,
+                secondFragmentLayoutName = secondFragmentLayoutName,
+                isViewBindingSupported = isViewBindingSupported,
+            )
+        Language.Kotlin ->
+            secondFragmentKt(
+                packageName = packageName,
+                applicationPackage = projectData.applicationPackage,
+                firstFragmentClass = firstFragmentClass,
+                secondFragmentClass = secondFragmentClass,
+                secondFragmentLayoutName = secondFragmentLayoutName,
+                isViewBindingSupported = isViewBindingSupported,
+                useAndroidX = useAndroidX,
+            )
+      }
   val firstFragmentLayoutContent = fragmentFirstLayout(useAndroidX, firstFragmentClass)
   val secondFragmentLayoutContent = fragmentSecondLayout(useAndroidX, secondFragmentClass)
   save(firstFragmentClassContent, srcOut.resolve("$firstFragmentClass.$ktOrJavaExt"))
@@ -191,14 +203,14 @@ fun RecipeExecutor.generateBasicActivity(
   save(secondFragmentLayoutContent, resOut.resolve("layout/$secondFragmentLayoutName.xml"))
 
   val navGraphContent =
-    navGraphXml(
-      packageName = packageName,
-      firstFragmentClass = firstFragmentClass,
-      secondFragmentClass = secondFragmentClass,
-      firstFragmentLayoutName = firstFragmentLayoutName,
-      secondFragmentLayoutName = secondFragmentLayoutName,
-      navGraphName = navGraphName,
-    )
+      navGraphXml(
+          packageName = packageName,
+          firstFragmentClass = firstFragmentClass,
+          secondFragmentClass = secondFragmentClass,
+          firstFragmentLayoutName = firstFragmentLayoutName,
+          secondFragmentLayoutName = secondFragmentLayoutName,
+          navGraphName = navGraphName,
+      )
   mergeXml(navGraphContent, resOut.resolve("navigation/${navGraphName}.xml"))
   mergeXml(stringsXml, resOut.resolve("values/strings.xml"))
 

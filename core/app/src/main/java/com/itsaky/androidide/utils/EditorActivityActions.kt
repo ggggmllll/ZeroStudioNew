@@ -16,15 +16,17 @@
  */
 package com.itsaky.androidide.utils
 
+// import com.itsaky.androidide.actions.lsp.*
 import android.content.Context
 import com.itsaky.androidide.actions.ActionItem.Location.EDITOR_FILE_TABS
 import com.itsaky.androidide.actions.ActionItem.Location.EDITOR_FILE_TREE
 import com.itsaky.androidide.actions.ActionItem.Location.EDITOR_TOOLBAR
-import com.itsaky.androidide.actions.ActionItem.Location.EDITOR_TEXT_ACTIONS
 import com.itsaky.androidide.actions.ActionsRegistry
 import com.itsaky.androidide.actions.build.ProjectSyncAction
 import com.itsaky.androidide.actions.build.QuickRunWithCancellationAction
 import com.itsaky.androidide.actions.build.RunTasksAction
+import com.itsaky.androidide.actions.code.CodeActionsMenu
+import com.itsaky.androidide.actions.cursor.*
 import com.itsaky.androidide.actions.editor.CopyAction
 import com.itsaky.androidide.actions.editor.CutAction
 import com.itsaky.androidide.actions.editor.ExpandSelectionAction
@@ -35,30 +37,27 @@ import com.itsaky.androidide.actions.editor.SystemTextMenuAction
 import com.itsaky.androidide.actions.etc.DisconnectLogSendersAction
 import com.itsaky.androidide.actions.etc.FindActionMenu
 import com.itsaky.androidide.actions.etc.LaunchAppAction
-import com.itsaky.androidide.actions.etc.PreviewLayoutAction
 import com.itsaky.androidide.actions.etc.PreviewComposeAction
+import com.itsaky.androidide.actions.etc.PreviewLayoutAction
 import com.itsaky.androidide.actions.etc.ReloadColorSchemesAction
 import com.itsaky.androidide.actions.file.CloseAllFilesAction
 import com.itsaky.androidide.actions.file.CloseFileAction
 import com.itsaky.androidide.actions.file.CloseOtherFilesAction
 import com.itsaky.androidide.actions.file.FormatCodeAction
 import com.itsaky.androidide.actions.file.SaveFileAction
+import com.itsaky.androidide.actions.filetree.ConvertPathToAction
 import com.itsaky.androidide.actions.filetree.CopyPathAction
 import com.itsaky.androidide.actions.filetree.DeleteAction
-import com.itsaky.androidide.actions.filetree.ConvertPathToAction
-import com.itsaky.androidide.actions.filetree.RefactorRenameAction
 import com.itsaky.androidide.actions.filetree.NewFileAction
+import com.itsaky.androidide.actions.filetree.NewFileOrFolderAction
 import com.itsaky.androidide.actions.filetree.NewFolderAction
 import com.itsaky.androidide.actions.filetree.OpenWithAction
+import com.itsaky.androidide.actions.filetree.RefactorRenameAction
 import com.itsaky.androidide.actions.filetree.RenameAction
+import com.itsaky.androidide.actions.menu.EditorEditLineMenuAction
+import com.itsaky.androidide.actions.search.*
 import com.itsaky.androidide.actions.text.RedoAction
 import com.itsaky.androidide.actions.text.UndoAction
-import com.itsaky.androidide.actions.menu.EditorEditLineMenuAction
-import com.itsaky.androidide.actions.filetree.NewFileOrFolderAction
-import com.itsaky.androidide.actions.code.CodeActionsMenu
-// import com.itsaky.androidide.actions.lsp.*
-import com.itsaky.androidide.actions.cursor.*
-import com.itsaky.androidide.actions.search.*
 
 /**
  * Takes care of registering actions to the actions registry for the editor activity.

@@ -22,10 +22,7 @@ import com.itsaky.androidide.lsp.api.ILanguageServerRegistry
 import com.itsaky.androidide.lsp.java.JavaLanguageServer
 import com.itsaky.androidide.lsp.xml.XMLLanguageServer
 
-/**
- *
- * @author Akash Yadav
- */
+/** @author Akash Yadav */
 object LspHandler {
 
   fun registerLanguageServers() {
@@ -34,7 +31,7 @@ object LspHandler {
       getServer(XMLLanguageServer.SERVER_ID) ?: register(XMLLanguageServer())
     }
   }
-  
+
   fun connectClient(client: ILanguageClient) {
     ILanguageServerRegistry.getDefault().connectClient(client)
   }

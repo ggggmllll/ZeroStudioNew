@@ -1,5 +1,3 @@
-import com.itsaky.androidide.build.config.BuildConfig
-
 /*
  *  This file is part of AndroidIDE.
  *
@@ -17,18 +15,15 @@ import com.itsaky.androidide.build.config.BuildConfig
  *   along with AndroidIDE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 @Suppress("JavaPluginLanguageLevel")
 plugins {
-    id("java-library")
-    id("org.jetbrains.kotlin.jvm")
+  id("java-library")
+  id("org.jetbrains.kotlin.jvm")
 }
 
-  
-
 dependencies {
-    implementation(libs.androidx.annotation)
-    implementation(libs.common.jkotlin)
-    compileOnly(projects.utilities.shared)
-    compileOnly(projects.utilities.frameworkStubs)
+  implementation(libs.androidx.annotation)
+  implementation(libs.common.jkotlin)
+  compileOnly(projects.utilities.shared)
+  compileOnly(projects.utilities.frameworkStubs)
 }

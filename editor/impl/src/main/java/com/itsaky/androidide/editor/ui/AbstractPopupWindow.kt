@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory
  * @author Akash Yadav
  */
 abstract class AbstractPopupWindow(editor: CodeEditor, features: Int) :
-  EditorPopupWindow(editor, features) {
+    EditorPopupWindow(editor, features) {
 
   companion object {
 
@@ -37,8 +37,10 @@ abstract class AbstractPopupWindow(editor: CodeEditor, features: Int) :
   override fun show() {
     (editor as? IDEEditor)?.ensureWindowsDismissed()
     if (!editor.isAttachedToWindow) {
-      log.error("Trying to show popup window '{}' when editor is not attached to window",
-        javaClass.name)
+      log.error(
+          "Trying to show popup window '{}' when editor is not attached to window",
+          javaClass.name,
+      )
       return
     }
 

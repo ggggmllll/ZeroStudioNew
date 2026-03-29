@@ -22,24 +22,24 @@ import openjdk.tools.javac.main.JavaCompiler
 import openjdk.tools.javac.util.Context
 
 /**
- * Reusable JavaCompiler; exposes a method to clean up the component from leftovers associated
- * with previous compilations.
+ * Reusable JavaCompiler; exposes a method to clean up the component from leftovers associated with
+ * previous compilations.
  */
 open class ReusableJavaCompiler(context: Context?) : NBJavaCompiler(context) {
-  
+
   companion object {
     val factory = Context.Factory<JavaCompiler> { ReusableJavaCompiler(it) }
   }
-  
+
   override fun checkReusable() {
     // Do nothing
   }
-  
+
   override fun close() {
     // Do nothing
   }
-  
-  fun clear()   {
+
+  fun clear() {
     newRound()
   }
 }

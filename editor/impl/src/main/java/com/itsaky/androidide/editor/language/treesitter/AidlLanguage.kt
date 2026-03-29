@@ -18,11 +18,8 @@
 package com.itsaky.androidide.editor.language.treesitter
 
 import android.content.Context
-import com.itsaky.androidide.editor.language.newline.TSBracketsHandler
-import com.itsaky.androidide.editor.language.newline.TSCStyleBracketsHandler
 import com.itsaky.androidide.treesitter.aidl.TSLanguageAidl
 import io.github.rosemoe.sora.lang.Language.INTERRUPTION_LEVEL_SLIGHT
-import io.github.rosemoe.sora.util.MyCharacter
 
 /**
  * Tree Sitter language specification for .aidl
@@ -32,21 +29,18 @@ import io.github.rosemoe.sora.util.MyCharacter
 class AidlLanguage(context: Context) :
     TreeSitterLanguage(context, TSLanguageAidl.getInstance(), TS_TYPE) {
 
-    companion object {
+  companion object {
 
-        const val TS_TYPE = "aidl"
-        
-        @JvmField
-        val FACTORY = Factory { AidlLanguage(it) }
-    }
+    const val TS_TYPE = "aidl"
 
+    @JvmField val FACTORY = Factory { AidlLanguage(it) }
+  }
 
-    /**
-     * Set the interruption level.
-     * Determines how aggressively the editor responds to language typing events.
-     */
-    override fun getInterruptionLevel(): Int {
-        return INTERRUPTION_LEVEL_SLIGHT
-    }
-
+  /**
+   * Set the interruption level. Determines how aggressively the editor responds to language typing
+   * events.
+   */
+  override fun getInterruptionLevel(): Int {
+    return INTERRUPTION_LEVEL_SLIGHT
+  }
 }

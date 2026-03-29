@@ -42,7 +42,7 @@ fun parseDependency(
     coordinates: String,
     configuration: DependencyConfiguration = Implementation,
     isPlatform: Boolean = false,
-    tomlAlias: String? = null
+    tomlAlias: String? = null,
 ): Dependency {
   val split = coordinates.split(':')
   if (isPlatform) {

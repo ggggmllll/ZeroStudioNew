@@ -45,7 +45,12 @@ val settingsActivityTemplate
 
     category = Category.Activity
     formFactor = FormFactor.Mobile
-    screens = listOf(WizardUiContext.ActivityGallery, WizardUiContext.MenuEntry, WizardUiContext.NewModule)
+    screens =
+        listOf(
+            WizardUiContext.ActivityGallery,
+            WizardUiContext.MenuEntry,
+            WizardUiContext.NewModule,
+        )
 
     val activityClass = stringParameter {
       name = "Activity Name"
@@ -58,16 +63,27 @@ val settingsActivityTemplate
     val multipleScreens = booleanParameter {
       name = "Split settings hierarchy into separate sub-screens"
       default = false
-      help = "If true, this activity will have a main settings screen that links to separate settings screens"
+      help =
+          "If true, this activity will have a main settings screen that links to separate settings screens"
     }
 
     val packageName = defaultPackageNameParameter
 
-    widgets(TextFieldWidget(activityClass), CheckBoxWidget(multipleScreens), PackageNameWidget(packageName), LanguageWidget())
+    widgets(
+        TextFieldWidget(activityClass),
+        CheckBoxWidget(multipleScreens),
+        PackageNameWidget(packageName),
+        LanguageWidget(),
+    )
 
     thumb { File("settings-activity").resolve("template_settings_activity.png") }
 
     recipe = { data: TemplateData ->
-      settingsActivityRecipe(data as ModuleTemplateData, activityClass.value, multipleScreens.value, packageName.value)
+      settingsActivityRecipe(
+          data as ModuleTemplateData,
+          activityClass.value,
+          multipleScreens.value,
+          packageName.value,
+      )
     }
   }

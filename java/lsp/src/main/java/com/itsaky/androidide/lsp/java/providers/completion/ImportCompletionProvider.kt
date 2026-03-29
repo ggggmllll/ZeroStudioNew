@@ -30,6 +30,7 @@ import com.itsaky.androidide.projects.ModuleProject
 import com.itsaky.androidide.projects.util.BootClasspathProvider
 import com.itsaky.androidide.utils.ClassTrie
 import com.itsaky.androidide.utils.ClassTrie.Node
+import java.nio.file.Path
 import jdkx.lang.model.element.Element
 import jdkx.lang.model.element.ElementKind
 import jdkx.lang.model.element.ElementKind.ANNOTATION_TYPE
@@ -49,7 +50,6 @@ import openjdk.tools.javac.api.JavacTrees
 import openjdk.tools.javac.code.Symbol.MethodSymbol
 import openjdk.tools.javac.model.JavacTypes
 import openjdk.tools.javac.tree.JCTree.JCImport
-import java.nio.file.Path
 
 /**
  * Provides completions for imports.
@@ -57,20 +57,20 @@ import java.nio.file.Path
  * @author Akash Yadav
  */
 class ImportCompletionProvider(
-  completingFile: Path,
-  cursor: Long,
-  compiler: JavaCompilerService,
-  settings: IServerSettings,
+    completingFile: Path,
+    cursor: Long,
+    compiler: JavaCompilerService,
+    settings: IServerSettings,
 ) : IJavaCompletionProvider(cursor, completingFile, compiler, settings) {
 
   lateinit var importPath: String
 
   // TODO add tests for this
   override fun doComplete(
-    task: CompileTask,
-    path: TreePath,
-    partial: String,
-    endsWithParen: Boolean,
+      task: CompileTask,
+      path: TreePath,
+      partial: String,
+      endsWithParen: Boolean,
   ): CompletionResult {
 
     val importTree = path.leaf
@@ -152,11 +152,11 @@ class ImportCompletionProvider(
   }
 
   private fun completeTypeMembers(
-    task: CompileTask,
-    path: TreePath,
-    pkgName: String,
-    incomplete: String,
-    list: MutableList<CompletionItem>
+      task: CompileTask,
+      path: TreePath,
+      pkgName: String,
+      incomplete: String,
+      list: MutableList<CompletionItem>,
   ): Boolean {
     abortIfCancelled()
     abortCompletionIfCancelled()
@@ -236,7 +236,10 @@ class ImportCompletionProvider(
    * @param pkgName The package name of the package to find node for.
    * @return The found package name. Or `null` if no package can be found.
    */
-  private fun collectPackageNode(trie: com.itsaky.androidide.utils.ClassTrie, pkgName: String): Node? {
+  private fun collectPackageNode(
+      trie: com.itsaky.androidide.utils.ClassTrie,
+      pkgName: String,
+  ): Node? {
     val segments = trie.segments(pkgName)
     var node: Node? = trie.root
     for (segment in segments) {
@@ -259,10 +262,10 @@ class ImportCompletionProvider(
   }
 
   private fun completeTypeMembers(
-    task: CompileTask,
-    type: TypeElement,
-    path: TreePath,
-    partial: String
+      task: CompileTask,
+      type: TypeElement,
+      path: TreePath,
+      partial: String,
   ): MutableList<CompletionItem> {
 
     abortIfCancelled()
@@ -284,7 +287,7 @@ class ImportCompletionProvider(
       abortIfCancelled()
       abortCompletionIfCancelled()
       if (
-        member.kind == CONSTRUCTOR || member.kind == STATIC_INIT || member.kind == INSTANCE_INIT
+          member.kind == CONSTRUCTOR || member.kind == STATIC_INIT || member.kind == INSTANCE_INIT
       ) {
         continue
       }
@@ -327,18 +330,18 @@ class ImportCompletionProvider(
 
   @Throws(RequireMemberCompletionException::class)
   private fun tryCompleteImport(
-    pkgName: String,
-    incomplete: String,
-    list: MutableList<CompletionItem>,
-    names: MutableSet<String>,
-    module: ModuleProject,
-    packageOnly: Boolean = false
+      pkgName: String,
+      incomplete: String,
+      list: MutableList<CompletionItem>,
+      names: MutableSet<String>,
+      module: ModuleProject,
+      packageOnly: Boolean = false,
   ) {
     abortIfCancelled()
     abortCompletionIfCancelled()
     val sourceNode =
-      if (pkgName.isEmpty()) module.compileJavaSourceClasses.root
-      else module.compileJavaSourceClasses.findNode(pkgName)
+        if (pkgName.isEmpty()) module.compileJavaSourceClasses.root
+        else module.compileJavaSourceClasses.findNode(pkgName)
     if (sourceNode != null) {
       if (sourceNode.isClass) {
         throw RequireMemberCompletionException()
@@ -350,8 +353,8 @@ class ImportCompletionProvider(
     abortIfCancelled()
     abortCompletionIfCancelled()
     val classpathNode =
-      if (pkgName.isEmpty()) module.compileClasspathClasses.root
-      else module.compileClasspathClasses.findNode(pkgName)
+        if (pkgName.isEmpty()) module.compileClasspathClasses.root
+        else module.compileClasspathClasses.findNode(pkgName)
     if (classpathNode != null) {
       if (classpathNode.isClass) {
         throw RequireMemberCompletionException()
@@ -364,9 +367,9 @@ class ImportCompletionProvider(
       abortIfCancelled()
       abortCompletionIfCancelled()
       val node =
-        if (pkgName.isEmpty()) {
-          it.root
-        } else it.findNode(pkgName)
+          if (pkgName.isEmpty()) {
+            it.root
+          } else it.findNode(pkgName)
       if (node != null) {
         if (node.isClass) {
           throw RequireMemberCompletionException()
@@ -377,21 +380,21 @@ class ImportCompletionProvider(
   }
 
   private fun addDirectChildNodes(
-    sourceNode: Node,
-    incomplete: String,
-    list: MutableList<CompletionItem>,
-    names: MutableSet<String>,
-    packageOnly: Boolean
+      sourceNode: Node,
+      incomplete: String,
+      list: MutableList<CompletionItem>,
+      names: MutableSet<String>,
+      packageOnly: Boolean,
   ) {
     for (child in sourceNode.children.values) {
       abortIfCancelled()
       abortCompletionIfCancelled()
       val match =
-        if (incomplete.isEmpty()) {
-          CASE_SENSITIVE_EQUAL
-        } else {
-          matchLevel(child.name, incomplete)
-        }
+          if (incomplete.isEmpty()) {
+            CASE_SENSITIVE_EQUAL
+          } else {
+            matchLevel(child.name, incomplete)
+          }
 
       if (match == NO_MATCH || names.contains(child.name)) {
         continue
@@ -412,9 +415,9 @@ class ImportCompletionProvider(
   }
 
   private fun legacyImportPathCompletion(
-    partial: String,
-    names: MutableSet<String>,
-    list: MutableList<CompletionItem>
+      partial: String,
+      names: MutableSet<String>,
+      list: MutableList<CompletionItem>,
   ) {
     abortIfCancelled()
     abortCompletionIfCancelled()

@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory
 
 /** @author Akash Yadav */
 class ApkInstallationSessionCallback(private var activity: BaseEditorActivity?) :
-  SingleSessionCallback() {
+    SingleSessionCallback() {
 
   private var sessionId = -1
 
@@ -64,14 +64,19 @@ class ApkInstallationSessionCallback(private var activity: BaseEditorActivity?) 
   fun destroy() {
     if (this.sessionId != -1) {
       this.activity?.packageManager?.packageInstaller?.let { packageInstaller ->
-        packageInstaller.mySessions.find { session -> session.sessionId == this.sessionId }
-          ?.also { info ->
-            try {
-              packageInstaller.abandonSession(info.sessionId)
-            } catch (ex: Exception) {
-              log.error("Failed to abandon session {} : {}", info.sessionId, ex.cause?.message ?: ex.message)
+        packageInstaller.mySessions
+            .find { session -> session.sessionId == this.sessionId }
+            ?.also { info ->
+              try {
+                packageInstaller.abandonSession(info.sessionId)
+              } catch (ex: Exception) {
+                log.error(
+                    "Failed to abandon session {} : {}",
+                    info.sessionId,
+                    ex.cause?.message ?: ex.message,
+                )
+              }
             }
-          }
       }
     }
     this.activity = null

@@ -60,14 +60,10 @@ class JavaModule(
 
   companion object {
 
-    /**
-     * 编译时依赖作用域常量。
-     */
+    /** 编译时依赖作用域常量。 */
     const val SCOPE_COMPILE = "COMPILE"
 
-    /**
-     * 运行时依赖作用域常量。
-     */
+    /** 运行时依赖作用域常量。 */
     const val SCOPE_RUNTIME = "RUNTIME"
   }
 
@@ -136,8 +132,8 @@ class JavaModule(
   /**
    * 获取模块编译过程中生成的中间类路径 (Intermediate Classpaths)。
    *
-   * <p><b>核心用途：</b>主要供 <b>Compose Preview</b> 等模块加载未打包为 JAR 的 <code>.class</code> 文件，
-   * 用于实时渲染自定义 Composable 函数。</p>
+   * <p><b>核心用途：</b>主要供 <b>Compose Preview</b> 等模块加载未打包为 JAR 的 <code>.class</code> 文件， 用于实时渲染自定义
+   * Composable 函数。</p>
    *
    * @return 包含 <code>.class</code> 目录的 <code>File</code> 集合。
    */
@@ -162,8 +158,8 @@ class JavaModule(
 
   /**
    * 获取运行时生成的 <b>DEX</b> 文件集合。
-   * <p>由于纯 Java/Kotlin 模块在标准流程中不直接生成 DEX，此处返回空集合。
-   * 如果该模块被打包入 Android 项目，它的字节码会被应用模块一并转化为 DEX。</p>
+   *
+   * <p>由于纯 Java/Kotlin 模块在标准流程中不直接生成 DEX，此处返回空集合。 如果该模块被打包入 Android 项目，它的字节码会被应用模块一并转化为 DEX。</p>
    *
    * @return 空的 <code>File</code> 集合。
    */
@@ -172,8 +168,8 @@ class JavaModule(
   /**
    * 检查给定的外部依赖是否存在于此模块中。
    *
-   * <p><b>核心用途：</b>用于特定功能（如 Compose 预览机制）探测项目中是否包含了所需的依赖库
-   * （如 <code>androidx.compose.ui:ui-tooling</code>）。</p>
+   * <p><b>核心用途：</b>用于特定功能（如 Compose 预览机制）探测项目中是否包含了所需的依赖库 （如
+   * <code>androidx.compose.ui:ui-tooling</code>）。</p>
    *
    * @param group 依赖的组名（如 <code>"com.google.guava"</code>）。
    * @param name 依赖的构件名（如 <code>"guava"</code>）。
@@ -182,11 +178,11 @@ class JavaModule(
   open fun hasExternalDependency(group: String, name: String): Boolean {
     return this.dependencies.any { dependency ->
       if (dependency is JavaModuleExternalDependency) {
-         val jarName = dependency.jarFile?.name ?: ""
-         // 通过分析文件名进行安全退级匹配，包含构件名即认为具有该依赖
-         jarName.contains(name)
+        val jarName = dependency.jarFile?.name ?: ""
+        // 通过分析文件名进行安全退级匹配，包含构件名即认为具有该依赖
+        jarName.contains(name)
       } else {
-         false
+        false
       }
     }
   }
@@ -209,6 +205,7 @@ class JavaModule(
 
   /**
    * 获取该模块的外部依赖类路径（JAR 文件）。
+   *
    * <p>此方法会自动过滤掉物理文件不存在的依赖项，以防引发 I/O 错误。</p>
    *
    * @return 外部依赖的 <code>File</code> 集合。

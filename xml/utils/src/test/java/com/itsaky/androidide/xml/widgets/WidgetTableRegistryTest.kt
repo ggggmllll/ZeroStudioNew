@@ -19,10 +19,10 @@ package com.itsaky.androidide.xml.widgets
 
 import com.google.common.truth.Truth.assertThat
 import com.itsaky.androidide.xml.findAndroidJar
+import java.io.File
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
-import java.io.File
 
 /** @author Akash Yadav */
 @RunWith(RobolectricTestRunner::class)
@@ -71,16 +71,16 @@ class WidgetTableRegistryTest {
   fun `test get all widgets list`() {
     val (_, _, table) = createTable()
     assertThat(table.getAllWidgets().map(Widget::simpleName))
-      .containsAtLeast(
-        "TextView",
-        "ImageView",
-        "Button",
-        "LinearLayout",
-        "RelativeLayout",
-        "FrameLayout",
-        "GestureOverlayView",
-        "CalendarView"
-      )
+        .containsAtLeast(
+            "TextView",
+            "ImageView",
+            "Button",
+            "LinearLayout",
+            "RelativeLayout",
+            "FrameLayout",
+            "GestureOverlayView",
+            "CalendarView",
+        )
   }
 
   private fun createTable(): Triple<File, WidgetTableRegistry, WidgetTable> {

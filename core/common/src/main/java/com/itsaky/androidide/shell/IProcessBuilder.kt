@@ -17,9 +17,9 @@
 
 package com.itsaky.androidide.shell
 
-import kotlinx.coroutines.Dispatchers
 import java.io.File
 import kotlin.coroutines.CoroutineContext
+import kotlinx.coroutines.Dispatchers
 
 /**
  * Process builder for executing commands.
@@ -28,14 +28,10 @@ import kotlin.coroutines.CoroutineContext
  */
 interface IProcessBuilder {
 
-  /**
-   * The command to execute.
-   */
+  /** The command to execute. */
   var command: List<String>
 
-  /**
-   * The environment variables.
-   */
+  /** The environment variables. */
   var environment: Map<String, String>
 
   /**
@@ -46,9 +42,7 @@ interface IProcessBuilder {
    */
   var workingDirectory: File?
 
-  /**
-   * Whether the error stream should be redirected to the output stream.
-   */
+  /** Whether the error stream should be redirected to the output stream. */
   var redirectErrorStream: Boolean
 }
 
@@ -59,7 +53,7 @@ internal interface IProcessBuilderInternal : IProcessBuilder {
    *
    * @return The [Process] instance.
    */
-  fun startAsync() : Process
+  fun startAsync(): Process
 
   /**
    * Start the process and suspend until the process finishes.

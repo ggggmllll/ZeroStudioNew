@@ -21,14 +21,14 @@ import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import com.google.gson.reflect.TypeToken
 import com.google.gson.stream.JsonReader
-import org.slf4j.LoggerFactory
 import java.io.Reader
+import org.slf4j.LoggerFactory
 
-/**
- * @author Akash Yadav
- */
-data class OpenedFilesCache(@SerializedName(KEY_SELECTED_FILE) val selectedFile: String,
-  @SerializedName(KEY_ALL_FILES) val allFiles: List<OpenedFile>) {
+/** @author Akash Yadav */
+data class OpenedFilesCache(
+    @SerializedName(KEY_SELECTED_FILE) val selectedFile: String,
+    @SerializedName(KEY_ALL_FILES) val allFiles: List<OpenedFile>,
+) {
 
   companion object {
 

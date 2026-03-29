@@ -14,5 +14,5 @@ data class SdkPackageItem(
     val isInstalled: Boolean = false,
     val isDownloading: Boolean = false,
     val downloadProgress: Int = 0,
-    val isUpdateAvailable: Boolean = false
+    val isUpdateAvailable: Boolean = false,
 )

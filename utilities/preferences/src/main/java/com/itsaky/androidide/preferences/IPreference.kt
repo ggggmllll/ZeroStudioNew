@@ -20,7 +20,6 @@ package com.itsaky.androidide.preferences
 import android.content.Context
 import android.os.Parcelable
 import androidx.preference.Preference
-import kotlinx.parcelize.Parcelize
 
 /**
  * A preference shown on the preference screen.

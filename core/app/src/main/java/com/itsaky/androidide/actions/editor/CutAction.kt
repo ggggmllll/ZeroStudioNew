@@ -19,8 +19,8 @@ package com.itsaky.androidide.actions.editor
 
 import android.content.Context
 import com.itsaky.androidide.actions.ActionData
-import com.itsaky.androidide.actions.BaseEditorAction
 import com.itsaky.androidide.actions.ActionStyle
+import com.itsaky.androidide.actions.BaseEditorAction
 
 /** @author Akash Yadav */
 class CutAction(context: Context, override val order: Int) : BaseEditorAction() {
@@ -30,10 +30,7 @@ class CutAction(context: Context, override val order: Int) : BaseEditorAction() 
 
     icon = null
 
-    style = ActionStyle(
-        textSizeSp = 10f,
-        paddingHorizontalDp = 2
-    )
+    style = ActionStyle(textSizeSp = 10f, paddingHorizontalDp = 2)
   }
 
   override fun prepare(data: ActionData) {
@@ -48,6 +45,7 @@ class CutAction(context: Context, override val order: Int) : BaseEditorAction() 
   }
 
   override val id: String = "ide.editor.code.text.cut"
+
   override suspend fun execAction(data: ActionData): Boolean {
     val editor = getEditor(data) ?: return false
     editor.cutText()

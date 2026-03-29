@@ -51,7 +51,8 @@ val broadcastReceiverTemplate
     val isExported = booleanParameter {
       name = "Exported"
       default = true
-      help = "Whether or not the broadcast receiver can receive messages from sources outside its application"
+      help =
+          "Whether or not the broadcast receiver can receive messages from sources outside its application"
     }
 
     val isEnabled = booleanParameter {
@@ -60,7 +61,12 @@ val broadcastReceiverTemplate
       help = "Whether or not the broadcast receiver can be instantiated by the system"
     }
 
-    widgets(TextFieldWidget(className), CheckBoxWidget(isExported), CheckBoxWidget(isEnabled), LanguageWidget())
+    widgets(
+        TextFieldWidget(className),
+        CheckBoxWidget(isExported),
+        CheckBoxWidget(isEnabled),
+        LanguageWidget(),
+    )
 
     thumb {
       // TODO(b/147126989)
@@ -68,6 +74,11 @@ val broadcastReceiverTemplate
     }
 
     recipe = { data: TemplateData ->
-      broadcastReceiverRecipe(data as ModuleTemplateData, className.value, isExported.value, isEnabled.value)
+      broadcastReceiverRecipe(
+          data as ModuleTemplateData,
+          className.value,
+          isExported.value,
+          isEnabled.value,
+      )
     }
   }

@@ -47,8 +47,8 @@ interface IViewGroup : IView, Iterable<IView> {
    *
    * @param name The fully qualified name of the [View][android.view.View] instance.
    * @return `true` if this view group can accept the child view, `false` otherwise. The default
-   * implementation returns `true` if and only if [canModifyChildViews] returns `true` and this
-   * view's [IViewGroupAdapter.canAcceptChild] returns `true`.
+   *   implementation returns `true` if and only if [canModifyChildViews] returns `true` and this
+   *   view's [IViewGroupAdapter.canAcceptChild] returns `true`.
    */
   fun canAcceptChild(name: String): Boolean {
     return canAcceptChild(name, null)
@@ -61,12 +61,12 @@ interface IViewGroup : IView, Iterable<IView> {
    * @param name The fully qualified name of the [View][android.view.View] instance.
    * @param child The child view which should be checked.
    * @return `true` if this view group can accept the child view, `false` otherwise. The default
-   * implementation returns `true` if and only if [canModifyChildViews] returns `true` and this
-   * view's [IViewGroupAdapter.canAcceptChild] returns `true`.
+   *   implementation returns `true` if and only if [canModifyChildViews] returns `true` and this
+   *   view's [IViewGroupAdapter.canAcceptChild] returns `true`.
    */
   fun canAcceptChild(name: String, child: IView?): Boolean {
-    return canModifyChildViews() && (this.viewAdapter as? IViewGroupAdapter)?.canAcceptChild(
-      this, child, name) == true
+    return canModifyChildViews() &&
+        (this.viewAdapter as? IViewGroupAdapter)?.canAcceptChild(this, child, name) == true
   }
 
   /**
@@ -134,11 +134,10 @@ interface IViewGroup : IView, Iterable<IView> {
    *
    * @param x The X coordinate.
    * @param y The Y coordinate.
-   * @param vertical Whether to compare the vertical or horizontal bounds of
-   * existing child views with the given coordinates.
+   * @param vertical Whether to compare the vertical or horizontal bounds of existing child views
+   *   with the given coordinates.
    */
-  fun findNearestChild(x: Float, y: Float, vertical: Boolean = true
-  ): Pair<IView, Int>? {
+  fun findNearestChild(x: Float, y: Float, vertical: Boolean = true): Pair<IView, Int>? {
     for (i in 0 until childCount) {
       val child = get(i)
       val rect = child.getViewRect()
@@ -208,6 +207,7 @@ interface IViewGroup : IView, Iterable<IView> {
   open class SingleOnHierarchyChangeListener : OnHierarchyChangeListener {
 
     override fun onViewAdded(group: IViewGroup, view: IView, index: Int) {}
+
     override fun onViewRemoved(group: IViewGroup, view: IView, index: Int) {}
   }
 }

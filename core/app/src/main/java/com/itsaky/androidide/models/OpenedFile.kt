@@ -28,8 +28,8 @@ import org.slf4j.LoggerFactory
  * @author Akash Yadav
  */
 data class OpenedFile(
-  @SerializedName(KEY_FILE) val filePath: String,
-  @SerializedName(KEY_SELECTION) var selection: Range
+    @SerializedName(KEY_FILE) val filePath: String,
+    @SerializedName(KEY_SELECTION) var selection: Range,
 ) {
 
   companion object {
@@ -40,20 +40,20 @@ data class OpenedFile(
 
     fun readFrom(reader: JsonReader): OpenedFile? {
       return try {
-//        reader.beginObject()
-//        var path = ""
-//        var selection = Range.NONE
-//        while(reader.hasNext()) {
-//          val name = reader.nextName()
-//          if (name == KEY_FILE) {
-//            path = reader.nextString()
-//          } else if (name == KEY_SELECTION) {
-//            selection = Gson().fromJson(reader, Range::class.java)
-//          }
-//        }
-//        reader.endObject()
-//
-//        OpenedFile(path, selection)
+        //        reader.beginObject()
+        //        var path = ""
+        //        var selection = Range.NONE
+        //        while(reader.hasNext()) {
+        //          val name = reader.nextName()
+        //          if (name == KEY_FILE) {
+        //            path = reader.nextString()
+        //          } else if (name == KEY_SELECTION) {
+        //            selection = Gson().fromJson(reader, Range::class.java)
+        //          }
+        //        }
+        //        reader.endObject()
+        //
+        //        OpenedFile(path, selection)
         Gson().fromJson(reader, OpenedFile::class.java)
       } catch (err: Exception) {
         log.error("Failed to read opened file", err)

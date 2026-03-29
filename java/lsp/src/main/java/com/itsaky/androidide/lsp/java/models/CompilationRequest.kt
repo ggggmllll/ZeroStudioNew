@@ -19,9 +19,9 @@ package com.itsaky.androidide.lsp.java.models
 
 import com.itsaky.androidide.lsp.java.compiler.CompilationTaskProcessor
 import com.itsaky.androidide.lsp.java.compiler.DefaultCompilationTaskProcessor
+import java.util.function.Consumer
 import jdkx.tools.JavaFileObject
 import openjdk.tools.javac.util.Context
-import java.util.function.Consumer
 
 /**
  * Data sent to compiler to request a compilation.
@@ -33,9 +33,9 @@ import java.util.function.Consumer
 data class CompilationRequest
 @JvmOverloads
 constructor(
-  @JvmField val sources: Collection<JavaFileObject>,
-  @JvmField val partialRequest: PartialReparseRequest? = null,
-  @JvmField
-  val compilationTaskProcessor: CompilationTaskProcessor = DefaultCompilationTaskProcessor(),
-  @JvmField var configureContext: Consumer<Context>? = null
+    @JvmField val sources: Collection<JavaFileObject>,
+    @JvmField val partialRequest: PartialReparseRequest? = null,
+    @JvmField
+    val compilationTaskProcessor: CompilationTaskProcessor = DefaultCompilationTaskProcessor(),
+    @JvmField var configureContext: Consumer<Context>? = null,
 )

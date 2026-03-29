@@ -23,31 +23,29 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
 
-/**
- * @author Akash Yadav
- */
+/** @author Akash Yadav */
 data class SimpleIconTitleDescriptionItem(
-  val id: Int,
-  override val icon: Drawable?,
-  override val title: CharSequence,
-  override val description: CharSequence
+    val id: Int,
+    override val icon: Drawable?,
+    override val title: CharSequence,
+    override val description: CharSequence,
 ) : IconTitleDescriptionItem {
 
   companion object {
 
     @JvmStatic
     fun create(
-      context: Context,
-      id: Int,
-      @DrawableRes icon: Int,
-      @StringRes title: Int,
-      @StringRes description: Int
+        context: Context,
+        id: Int,
+        @DrawableRes icon: Int,
+        @StringRes title: Int,
+        @StringRes description: Int,
     ): SimpleIconTitleDescriptionItem {
       return SimpleIconTitleDescriptionItem(
-        id,
-        ContextCompat.getDrawable(context, icon),
-        ContextCompat.getString(context, title),
-        ContextCompat.getString(context, description)
+          id,
+          ContextCompat.getDrawable(context, icon),
+          ContextCompat.getString(context, title),
+          ContextCompat.getString(context, description),
       )
     }
   }

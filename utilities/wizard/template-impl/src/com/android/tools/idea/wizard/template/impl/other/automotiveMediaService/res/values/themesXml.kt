@@ -17,7 +17,7 @@
 package com.android.tools.idea.wizard.template.impl.other.automotiveMediaService.res.values
 
 fun themesXml(customThemeName: String) =
-  """
+    """
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <style name="${customThemeName}" parent="android:Theme.Material.Light">

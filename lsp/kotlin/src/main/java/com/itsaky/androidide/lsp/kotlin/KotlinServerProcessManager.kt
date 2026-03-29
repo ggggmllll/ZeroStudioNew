@@ -23,13 +23,12 @@ import com.google.gson.JsonObject
 import com.itsaky.androidide.lsp.kotlin.events.LspEventBus
 import com.itsaky.androidide.lsp.kotlin.events.LspInstallRequestEvent
 import com.itsaky.androidide.lsp.models.DiagnosticResult
+import com.itsaky.androidide.utils.Environment
 import java.io.*
 import java.nio.charset.StandardCharsets
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
 import org.slf4j.LoggerFactory
-import com.itsaky.androidide.utils.Environment
-import com.itsaky.androidide.utils.executioncommand.AbstractSilentCommandRunner
 
 /*
  * @author Mohammed-baqer-null @ https://github.com/Mohammed-baqer-null
@@ -53,67 +52,68 @@ class KotlinServerProcessManager(context: Context) {
   private val notificationHandler = KotlinNotificationHandler()
 
   @Volatile private var isInstallPromptShowing = false
-  @Volatile private var userDeclinedInstall = false 
+  @Volatile private var userDeclinedInstall = false
 
   fun setDiagnosticsCallback(callback: (DiagnosticResult) -> Unit) {
     diagnosticsCallback = callback
     notificationHandler.setDiagnosticsCallback(callback)
   }
 
-  /**
-   * 检查安装是否就绪。由于我们通过网络下载，环境存在缺失的可能。
-   */
+  /** 检查安装是否就绪。由于我们通过网络下载，环境存在缺失的可能。 */
   fun isInstalled(): Boolean {
-      val serverHome = Environment.SERVERS_KOTLIN_DIR // 如果使用全局KOTLIN_LSP_HOME请替换
-      val libDir = File(serverHome, "lib")
-      return serverHome.exists() && libDir.exists() && libDir.listFiles()?.isNotEmpty() == true
+    val serverHome = Environment.SERVERS_KOTLIN_DIR // 如果使用全局KOTLIN_LSP_HOME请替换
+    val libDir = File(serverHome, "lib")
+    return serverHome.exists() && libDir.exists() && libDir.listFiles()?.isNotEmpty() == true
   }
 
-  /**
-   * 触发 UI 的安装弹窗 (基于 Kotlin SharedFlow)。
-   */
+  /** 触发 UI 的安装弹窗 (基于 Kotlin SharedFlow)。 */
   fun install(onComplete: () -> Unit) {
     if (isInstallPromptShowing || userDeclinedInstall) {
-        KslLogs.info("Installation skipped. Prompt is already showing or user declined it previously.")
-        return
+      KslLogs.info(
+          "Installation skipped. Prompt is already showing or user declined it previously."
+      )
+      return
     }
 
     isInstallPromptShowing = true
     KslLogs.info("Requesting KLS installation UI...")
 
-    val downloadUrl = "https://github.com/msmt2018/SDK-tool-for-Android-platform/releases/download/kotlin-lsp/kotlinLanguageServices.zip"
-    val installDir = Environment.SERVERS_KOTLIN_DIR 
+    val downloadUrl =
+        "https://github.com/msmt2018/SDK-tool-for-Android-platform/releases/download/kotlin-lsp/kotlinLanguageServices.zip"
+    val installDir = Environment.SERVERS_KOTLIN_DIR
 
-    val event = LspInstallRequestEvent(
-        serverId = "kotlin-lsp-manager",
-        serverName = "Kotlin Language Server (v1.3.13)",
-        dialogTitle = "Install Kotlin LSP",
-        dialogMessage = "Kotlin Language Server is required to provide full code completion, auto-import, and diagnostics for .kt/.kts files.\n\nIt will be installed to: ${installDir.absolutePath}",
-        downloadUrl = downloadUrl,
-        installPath = installDir,
-        isZipArchive = true,
-        confirmButtonText = "Install",
-        onInstallComplete = {
-          KslLogs.info("Kotlin LSP Installation Complete. Preparing server...")
-          isInstallPromptShowing = false
-          userDeclinedInstall = false // 重置状态，因为已经成功安装
-          
-          val launcher = File(installDir, "bin/kotlin-language-server")
-          if (launcher.exists()) {
-             launcher.setExecutable(true, false)
-          }
-          
-          // 执行回调，如：重试启动服务器
-          onComplete()
-        },
-        onInstallCancelled = {
-          KslLogs.warn("User cancelled the Kotlin LSP installation.")
-          isInstallPromptShowing = false
-          // 记录用户的拒绝，本次会话内不再触发烦人的连环弹窗
-          userDeclinedInstall = true
-        }
-    )
-    
+    val event =
+        LspInstallRequestEvent(
+            serverId = "kotlin-lsp-manager",
+            serverName = "Kotlin Language Server (v1.3.13)",
+            dialogTitle = "Install Kotlin LSP",
+            dialogMessage =
+                "Kotlin Language Server is required to provide full code completion, auto-import, and diagnostics for .kt/.kts files.\n\nIt will be installed to: ${installDir.absolutePath}",
+            downloadUrl = downloadUrl,
+            installPath = installDir,
+            isZipArchive = true,
+            confirmButtonText = "Install",
+            onInstallComplete = {
+              KslLogs.info("Kotlin LSP Installation Complete. Preparing server...")
+              isInstallPromptShowing = false
+              userDeclinedInstall = false // 重置状态，因为已经成功安装
+
+              val launcher = File(installDir, "bin/kotlin-language-server")
+              if (launcher.exists()) {
+                launcher.setExecutable(true, false)
+              }
+
+              // 执行回调，如：重试启动服务器
+              onComplete()
+            },
+            onInstallCancelled = {
+              KslLogs.warn("User cancelled the Kotlin LSP installation.")
+              isInstallPromptShowing = false
+              // 记录用户的拒绝，本次会话内不再触发烦人的连环弹窗
+              userDeclinedInstall = true
+            },
+        )
+
     // 通过 Flow 分发给 Activity 的收集器 (Collector) 去显示 Compose
     LspEventBus.postInstallRequest(event)
   }
@@ -125,11 +125,9 @@ class KotlinServerProcessManager(context: Context) {
     }
 
     if (!isInstalled()) {
-        KslLogs.warn("Kotlin LSP is not installed. Requesting install UI.")
-        install {
-            startServer(classpathProvider)
-        }
-        return
+      KslLogs.warn("Kotlin LSP is not installed. Requesting install UI.")
+      install { startServer(classpathProvider) }
+      return
     }
 
     KslLogs.info("Starting Kotlin Language Server...")
@@ -511,6 +509,4 @@ class KotlinServerProcessManager(context: Context) {
     process = null
     pendingRequests.clear()
   }
-  
-  
 }

@@ -41,11 +41,9 @@ class SchemeParser(private val resolveFileRef: (String) -> File) {
     LINE_NUMBER_PANEL_TEXT("line.num.panel.text", EditorColorScheme.LINE_NUMBER_PANEL_TEXT),
     TEXT_NORMAL("text.normal", EditorColorScheme.TEXT_NORMAL),
     TEXT_SELECTED("text.selected", EditorColorScheme.TEXT_SELECTED),
-    
     CURSOR("text.cursor", EditorColorScheme.SELECTION_INSERT),
     SELECTION_HANDLE("text.selection.handle", EditorColorScheme.SELECTION_HANDLE),
     UNDERLINE("text.underline", EditorColorScheme.UNDERLINE),
-    
     MATCHED_TEXT_BACKGROUND("text.matched.bg", EditorColorScheme.MATCHED_TEXT_BACKGROUND),
     SELECTED_TEXT_BACKGROUND("text.selected.bg", EditorColorScheme.SELECTED_TEXT_BACKGROUND),
     SNIPPET_BG_EDITING("snippet.bg.editing", EditorColorScheme.SNIPPET_BACKGROUND_EDITING),
@@ -60,41 +58,41 @@ class SchemeParser(private val resolveFileRef: (String) -> File) {
     COMPLETION_WINDOW_BG("completion.window.bg", EditorColorScheme.COMPLETION_WND_BACKGROUND),
     COMPLETION_WINDOW_OUTLINE("completion.window.outline", EditorColorScheme.COMPLETION_WND_CORNER),
     COMPLETION_WND_TEXT_LABEL(
-      "completion.window.text.label",
-      SchemeAndroidIDE.COMPLETION_WND_TEXT_LABEL
+        "completion.window.text.label",
+        SchemeAndroidIDE.COMPLETION_WND_TEXT_LABEL,
     ),
     COMPLETION_WND_TEXT_DETAIL(
-      "completion.window.text.detail",
-      SchemeAndroidIDE.COMPLETION_WND_TEXT_DETAIL
+        "completion.window.text.detail",
+        SchemeAndroidIDE.COMPLETION_WND_TEXT_DETAIL,
     ),
     COMPLETION_WND_TEXT_API("completion.window.text.api", SchemeAndroidIDE.COMPLETION_WND_TEXT_API),
     COMPLETION_WND_TEXT_TYPE(
-      "completion.window.text.type",
-      SchemeAndroidIDE.COMPLETION_WND_TEXT_TYPE
+        "completion.window.text.type",
+        SchemeAndroidIDE.COMPLETION_WND_TEXT_TYPE,
     ),
     COMPLETION_WND_BG_CURRENT_ITEM(
-      "completion.window.item.current",
-      SchemeAndroidIDE.COMPLETION_WND_BG_CURRENT_ITEM
+        "completion.window.item.current",
+        SchemeAndroidIDE.COMPLETION_WND_BG_CURRENT_ITEM,
     ),
     NON_PRINTABLE_CHAR("non_printable_char", EditorColorScheme.NON_PRINTABLE_CHAR),
     HIGHLIGHTED_DELIMITERS_UNDERLINE(
-      "highlighted.delimiters.underline",
-      EditorColorScheme.HIGHLIGHTED_DELIMITERS_UNDERLINE
+        "highlighted.delimiters.underline",
+        EditorColorScheme.HIGHLIGHTED_DELIMITERS_UNDERLINE,
     ),
     HIGHLIGHTED_DELIMITERS_BACKGROUND(
-      "highlighted.delimiters.bg",
-      EditorColorScheme.HIGHLIGHTED_DELIMITERS_BACKGROUND
+        "highlighted.delimiters.bg",
+        EditorColorScheme.HIGHLIGHTED_DELIMITERS_BACKGROUND,
     ),
     HIGHLIGHTED_DELIMITERS_FOREGROUND(
-      "highlighted.delimiters.fg",
-      EditorColorScheme.HIGHLIGHTED_DELIMITERS_FOREGROUND
+        "highlighted.delimiters.fg",
+        EditorColorScheme.HIGHLIGHTED_DELIMITERS_FOREGROUND,
     );
 
     companion object {
       @JvmStatic
       fun forKey(key: String): EditorColors {
         return values().find { it.key == key }
-          ?: throw IllegalArgumentException("No editor color scheme available for key: '$key'")
+            ?: throw IllegalArgumentException("No editor color scheme available for key: '$key'")
       }
     }
   }
@@ -113,7 +111,7 @@ class SchemeParser(private val resolveFileRef: (String) -> File) {
     load(scheme)
     return scheme
   }
-  
+
   internal fun load(scheme: IDEColorScheme) {
     JsonReader(scheme.file.reader()).use { reader ->
       reader.beginObject()
@@ -125,7 +123,7 @@ class SchemeParser(private val resolveFileRef: (String) -> File) {
         }
       }
       reader.endObject()
-  
+
       if (scheme.name.isBlank()) {
         throw ParseException("A color scheme must a valid name. Current name is '${scheme.name}'")
       }

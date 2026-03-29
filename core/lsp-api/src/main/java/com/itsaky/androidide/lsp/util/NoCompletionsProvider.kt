@@ -21,5 +21,8 @@ import com.itsaky.androidide.lsp.api.ICompletionProvider
 
 /** @author Akash Yadav */
 class NoCompletionsProvider : ICompletionProvider {
-  override fun complete(params: com.itsaky.androidide.lsp.models.CompletionParams?): com.itsaky.androidide.lsp.models.CompletionResult = com.itsaky.androidide.lsp.models.CompletionResult.EMPTY
+  override fun complete(
+      params: com.itsaky.androidide.lsp.models.CompletionParams?
+  ): com.itsaky.androidide.lsp.models.CompletionResult =
+      com.itsaky.androidide.lsp.models.CompletionResult.EMPTY
 }

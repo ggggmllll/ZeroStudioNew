@@ -33,16 +33,17 @@ import java.nio.file.Path
 abstract class AdvancedJavaEditHandler(protected val file: Path) : BaseJavaEditHandler() {
 
   override fun performEdits(
-    item: CompletionItem,
-    editor: CodeEditor,
-    text: Content,
-    line: Int,
-    column: Int,
-    index: Int
+      item: CompletionItem,
+      editor: CodeEditor,
+      text: Content,
+      line: Int,
+      column: Int,
+      index: Int,
   ) {
-    val compiler = JavaCompilerProvider.get(
-      IProjectManager.getInstance().getWorkspace()?.findModuleForFile(file, false) ?: return
-    )
+    val compiler =
+        JavaCompilerProvider.get(
+            IProjectManager.getInstance().getWorkspace()?.findModuleForFile(file, false) ?: return
+        )
     performEdits(compiler, editor, item)
 
     executeCommand(editor, item.command)
@@ -57,8 +58,8 @@ abstract class AdvancedJavaEditHandler(protected val file: Path) : BaseJavaEditH
    * @param completionItem The completion item which contains required data.
    */
   abstract fun performEdits(
-    compiler: JavaCompilerService,
-    editor: CodeEditor,
-    completionItem: CompletionItem
+      compiler: JavaCompilerService,
+      editor: CodeEditor,
+      completionItem: CompletionItem,
   )
 }

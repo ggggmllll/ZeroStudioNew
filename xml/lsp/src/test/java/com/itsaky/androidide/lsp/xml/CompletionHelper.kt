@@ -21,11 +21,12 @@ import com.itsaky.androidide.lsp.models.CompletionItem
 
 /**
  * Helps with providing completions.
+ *
  * @author Akash Yadav
  */
 interface CompletionHelper {
 
   fun complete(
-    transform: (CompletionItem) -> CharSequence = { it.ideLabel }
+      transform: (CompletionItem) -> CharSequence = { it.ideLabel }
   ): Pair<Boolean, List<CharSequence>>
 }

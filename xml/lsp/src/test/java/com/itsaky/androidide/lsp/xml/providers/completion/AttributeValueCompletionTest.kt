@@ -53,13 +53,13 @@ class AttributeValueCompletionTest : CompletionHelper by CompletionHelperImpl() 
 
       // Check if all the expected color values are present
       assertThat(items)
-        .containsAtLeast(
-          "@color/abc_background_cache_hint_selector_material_dark",
-          "@color/abc_background_cache_hint_selector_material_light",
-          "@color/abc_btn_colored_borderless_text_material",
-          "@color/abc_btn_colored_text_material",
-          "@color/abc_color_highlight_material"
-        )
+          .containsAtLeast(
+              "@color/abc_background_cache_hint_selector_material_dark",
+              "@color/abc_background_cache_hint_selector_material_light",
+              "@color/abc_btn_colored_borderless_text_material",
+              "@color/abc_btn_colored_text_material",
+              "@color/abc_color_highlight_material",
+          )
 
       // Check that we do not have any other type of values
       for (type in setOf(STRING, INTEGER, BOOL, DIMEN, INTEGER, MENU)) {
@@ -105,17 +105,17 @@ class AttributeValueCompletionTest : CompletionHelper by CompletionHelperImpl() 
       assertThat(incomplete).isFalse()
 
       assertThat(items)
-        .containsAtLeast(
-          "@string/app_name",
-          "@string/appbar_scrolling_view_behavior",
-          "@android:string/app_category_audio",
-          "@android:string/app_category_game",
-          "@android:string/app_category_image",
-          "@android:string/app_category_maps",
-          "@android:string/app_category_news",
-          "@android:string/app_category_social",
-          "@android:string/app_category_video"
-        )
+          .containsAtLeast(
+              "@string/app_name",
+              "@string/appbar_scrolling_view_behavior",
+              "@android:string/app_category_audio",
+              "@android:string/app_category_game",
+              "@android:string/app_category_image",
+              "@android:string/app_category_maps",
+              "@android:string/app_category_news",
+              "@android:string/app_category_social",
+              "@android:string/app_category_video",
+          )
     }
   }
 
@@ -130,15 +130,15 @@ class AttributeValueCompletionTest : CompletionHelper by CompletionHelperImpl() 
       assertThat(items).doesNotContain("@string/appbar_scrolling_view_behavior")
 
       assertThat(items)
-        .containsAtLeast(
-          "@android:string/app_category_audio",
-          "@android:string/app_category_game",
-          "@android:string/app_category_image",
-          "@android:string/app_category_maps",
-          "@android:string/app_category_news",
-          "@android:string/app_category_social",
-          "@android:string/app_category_video"
-        )
+          .containsAtLeast(
+              "@android:string/app_category_audio",
+              "@android:string/app_category_game",
+              "@android:string/app_category_image",
+              "@android:string/app_category_maps",
+              "@android:string/app_category_news",
+              "@android:string/app_category_social",
+              "@android:string/app_category_video",
+          )
     }
   }
 
@@ -153,15 +153,15 @@ class AttributeValueCompletionTest : CompletionHelper by CompletionHelperImpl() 
       assertThat(items).doesNotContain("@string/appbar_scrolling_view_behavior")
 
       arrayOf(
-          "@android:string/app_category_audio",
-          "@android:string/app_category_game",
-          "@android:string/app_category_image",
-          "@android:string/app_category_maps",
-          "@android:string/app_category_news",
-          "@android:string/app_category_social",
-          "@android:string/app_category_video"
-        )
-        .forEach { assertThat(items).doesNotContain(it) }
+              "@android:string/app_category_audio",
+              "@android:string/app_category_game",
+              "@android:string/app_category_image",
+              "@android:string/app_category_maps",
+              "@android:string/app_category_news",
+              "@android:string/app_category_social",
+              "@android:string/app_category_video",
+          )
+          .forEach { assertThat(items).doesNotContain(it) }
     }
   }
 
@@ -182,11 +182,11 @@ class AttributeValueCompletionTest : CompletionHelper by CompletionHelperImpl() 
       val (incomplete, items) = complete()
       assertThat(incomplete).isFalse()
       assertThat(items)
-        .containsAtLeast(
-          /*resource type*/ "color",
-          /*pck*/ "com.google.android.material",
-          /*pck*/ "com.itsaky.test.app"
-        )
+          .containsAtLeast(
+              /*resource type*/ "color",
+              /*pck*/ "com.google.android.material",
+              /*pck*/ "com.itsaky.test.app",
+          )
     }
   }
 
@@ -198,17 +198,17 @@ class AttributeValueCompletionTest : CompletionHelper by CompletionHelperImpl() 
       assertThat(incomplete).isFalse()
       assertThat(items).doesNotContain("color")
       assertThat(items)
-        .containsAtLeast(/*pck*/ "com.google.android.material", /*pck*/ "com.itsaky.test.app")
+          .containsAtLeast(/*pck*/ "com.google.android.material", /*pck*/ "com.itsaky.test.app")
     }
   }
-  
+
   @Test
   fun `test constant dimension values completion`() {
     XMLLSPTest.apply {
       openFile("../res/layout/ConstantDimensionTest")
       val (incomplete, items) = complete()
       assertThat(incomplete).isFalse()
-      
+
       val expected = dimensionUnits.map { "4${it}" }
       assertThat(items).containsAtLeastElementsIn(expected)
     }

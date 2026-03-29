@@ -20,9 +20,7 @@ package com.itsaky.androidide.services.builder
 import com.itsaky.androidide.preferences.internal.BuildPreferences
 import com.itsaky.androidide.tooling.api.messages.GradleDistributionParams
 
-/**
- * The distribution params. This considers [gradleInstallationDir] preference as well.
- */
+/** The distribution params. This considers [gradleInstallationDir] preference as well. */
 val gradleDistributionParams: GradleDistributionParams
   get() {
     if (BuildPreferences.gradleInstallationDir.isBlank()) {

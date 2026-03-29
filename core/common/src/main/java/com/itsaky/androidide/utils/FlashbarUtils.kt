@@ -60,18 +60,18 @@ fun flashInfo(@StringRes msg: Int) {
 
 @JvmOverloads
 fun <R> flashProgress(
-  configure: (Flashbar.Builder.() -> Unit)? = null,
-  action: (Flashbar) -> R?
-) : R? {
+    configure: (Flashbar.Builder.() -> Unit)? = null,
+    action: (Flashbar) -> R?,
+): R? {
   return withActivity { flashProgress(configure, action) }
 }
 
 private fun <T> withActivity(action: Activity.() -> T?): T? {
   return ActivityUtils.getTopActivity()?.let { it.action() }
-    ?: run {
-      ILogger.ROOT.warn("Cannot show flashbar message. Cannot get top activity.")
-      null
-    }
+      ?: run {
+        ILogger.ROOT.warn("Cannot show flashbar message. Cannot get top activity.")
+        null
+      }
 }
 
 /** The type of flashbar message. */
@@ -79,5 +79,5 @@ enum class FlashType {
 
   ERROR,
   INFO,
-  SUCCESS
+  SUCCESS,
 }

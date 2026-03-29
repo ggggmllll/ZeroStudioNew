@@ -29,9 +29,9 @@ import kotlin.math.max
  * <p> This class is primarily used to flatten StringPool blobs which do not their size, until after
  * it has been written.
  *
- * @property blockSize the minimum block size per block. If an entry to the BigBuffer through a
- * call to [nextBlock] would be larger than this, a block will be created large enough to fit the
- * entry.
+ * @property blockSize the minimum block size per block. If an entry to the BigBuffer through a call
+ *   to [nextBlock] would be larger than this, a block will be created large enough to fit the
+ *   entry.
  */
 class BigBuffer(val blockSize: Int = 1024) {
   var size: Int = 0
@@ -39,11 +39,9 @@ class BigBuffer(val blockSize: Int = 1024) {
 
   val blocks = mutableListOf<Block>()
 
-  class Block(
-    internal var size: Int, internal  val blockSize: Int, internal val data: ByteBuffer)
+  class Block(internal var size: Int, internal val blockSize: Int, internal val data: ByteBuffer)
 
-  data class BlockRef internal constructor(
-    val start: Int, val size: Int, val block: Block) {
+  data class BlockRef internal constructor(val start: Int, val size: Int, val block: Block) {
 
     fun writeByte(value: Byte, location: Int) {
       if (location + 1 > size) {
@@ -100,7 +98,7 @@ class BigBuffer(val blockSize: Int = 1024) {
    *
    * @param elementSize the size of the entry that needs to be created.
    * @return a reference to a portion of a block of the required size. Writing to this reference
-   * will modify the underlying [BigBuffer].
+   *   will modify the underlying [BigBuffer].
    */
   fun nextBlock(elementSize: Int): BlockRef {
     if (blocks.isNotEmpty()) {
@@ -115,10 +113,12 @@ class BigBuffer(val blockSize: Int = 1024) {
     }
 
     val actualSize = max(this.blockSize, elementSize)
-    val block = Block(
-      elementSize,
-      actualSize,
-      ByteBuffer.wrap(ByteArray(actualSize)).order(ByteOrder.nativeOrder()))
+    val block =
+        Block(
+            elementSize,
+            actualSize,
+            ByteBuffer.wrap(ByteArray(actualSize)).order(ByteOrder.nativeOrder()),
+        )
     blocks.add(block)
     size += elementSize
     return BlockRef(0, elementSize, block)
@@ -133,13 +133,11 @@ class BigBuffer(val blockSize: Int = 1024) {
     nextBlock(bytes)
   }
 
-  /**
-   * Pads the [BigBuffer] so that the next created entry is aligned to a 4 byte chunk.
-   */
+  /** Pads the [BigBuffer] so that the next created entry is aligned to a 4 byte chunk. */
   fun align4() {
     val unaligned = size % 4
     if (unaligned != 0) {
-      pad(4-unaligned)
+      pad(4 - unaligned)
     }
   }
 
@@ -150,8 +148,8 @@ class BigBuffer(val blockSize: Int = 1024) {
    * @return a reference to this block.
    *
    * <p> It is not guaranteed, nor is it expected that the {@code n}th block will be equivalent to
-   * the {@code n}th entry. This is because multiple entries, if small enough, will be collected
-   * to the same block.
+   * the {@code n}th entry. This is because multiple entries, if small enough, will be collected to
+   * the same block.
    */
   fun block(index: Int): BlockRef {
     return BlockRef(0, blocks[index].size, blocks[index])
@@ -162,7 +160,7 @@ class BigBuffer(val blockSize: Int = 1024) {
    * operation is complete.
    *
    * @param other the [BigBuffer] to be appended to the current buffer. This buffer will be empty,
-   * after this method is complete.
+   *   after this method is complete.
    */
   fun append(other: BigBuffer) {
     blocks.addAll(other.blocks)
@@ -172,9 +170,7 @@ class BigBuffer(val blockSize: Int = 1024) {
     other.size = 0
   }
 
-  /**
-   * Returns the contents of the [BigBuffer] as one cohesive array of bytes.
-   */
+  /** Returns the contents of the [BigBuffer] as one cohesive array of bytes. */
   fun toBytes(): ByteArray {
     val array = ByteArray(size)
     var currentLocation = 0

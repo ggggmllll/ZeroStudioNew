@@ -44,245 +44,269 @@ import com.itsaky.androidide.resources.R
  */
 @Composable
 fun LspSettingsScreen() {
-    // This state will automatically update when LspManager.allActiveServers changes
-    val allServers = LspManager.allActiveServers
-    
-    var showAddDialog by remember { mutableStateOf(false) }
-    var editingServer by remember { mutableStateOf<BaseLspServer?>(null) }
+  // This state will automatically update when LspManager.allActiveServers changes
+  val allServers = LspManager.allActiveServers
 
-    Scaffold(
-        floatingActionButton = {
-            FloatingActionButton(onClick = { showAddDialog = true }) {
-                Icon(Icons.Default.Add, contentDescription = "Add External Server")
-            }
+  var showAddDialog by remember { mutableStateOf(false) }
+  var editingServer by remember { mutableStateOf<BaseLspServer?>(null) }
+
+  Scaffold(
+      floatingActionButton = {
+        FloatingActionButton(onClick = { showAddDialog = true }) {
+          Icon(Icons.Default.Add, contentDescription = "Add External Server")
         }
-    ) { padding ->
-        if (allServers.isEmpty()) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "No LSP servers available.\nEnsure LspBootstrap.init() is called.",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.error
-                )
-            }
-        } else {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding)
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                item {
-                    Text(
-                        text = stringResource(R.string.lsp_settings_desc),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-
-                // Group 1: Built-in & Extension Servers (Start with standard ID, not "ext_")
-                val builtIn = allServers.filter { !it.id.startsWith("ext_") }
-                if (builtIn.isNotEmpty()) {
-                    item { SectionHeader(stringResource(R.string.lsp_group_builtin)) }
-                    items(builtIn, key = { it.id }) { server ->
-                        ServerItem(server, onEditExtensions = { editingServer = it })
-                    }
-                }
-
-                // Group 2: User-Added External Servers
-                val external = allServers.filter { it.id.startsWith("ext_") }
-                if (external.isNotEmpty()) {
-                    item { SectionHeader(stringResource(R.string.lsp_group_external)) }
-                    items(external, key = { it.id }) { server ->
-                        ServerItem(
-                            server = server,
-                            onEditExtensions = { editingServer = it },
-                            onDelete = { LspManager.removeExternalServer(it) }
-                        )
-                    }
-                }
-            }
-        }
-    }
-
-    if (showAddDialog) {
-        ExternalServerDialog(onDismiss = { showAddDialog = false }) { data ->
-            LspManager.addExternalServer(data)
-            showAddDialog = false
-        }
-    }
-
-    if (editingServer != null) {
-        EditExtensionsDialog(
-            server = editingServer!!,
-            onDismiss = { editingServer = null }
+      }
+  ) { padding ->
+    if (allServers.isEmpty()) {
+      Box(modifier = Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
+        Text(
+            text = "No LSP servers available.\nEnsure LspBootstrap.init() is called.",
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.error,
         )
+      }
+    } else {
+      LazyColumn(
+          modifier = Modifier.fillMaxSize().padding(padding).padding(16.dp),
+          verticalArrangement = Arrangement.spacedBy(16.dp),
+      ) {
+        item {
+          Text(
+              text = stringResource(R.string.lsp_settings_desc),
+              style = MaterialTheme.typography.bodyMedium,
+              color = MaterialTheme.colorScheme.onSurfaceVariant,
+          )
+        }
+
+        // Group 1: Built-in & Extension Servers (Start with standard ID, not "ext_")
+        val builtIn = allServers.filter { !it.id.startsWith("ext_") }
+        if (builtIn.isNotEmpty()) {
+          item { SectionHeader(stringResource(R.string.lsp_group_builtin)) }
+          items(builtIn, key = { it.id }) { server ->
+            ServerItem(server, onEditExtensions = { editingServer = it })
+          }
+        }
+
+        // Group 2: User-Added External Servers
+        val external = allServers.filter { it.id.startsWith("ext_") }
+        if (external.isNotEmpty()) {
+          item { SectionHeader(stringResource(R.string.lsp_group_external)) }
+          items(external, key = { it.id }) { server ->
+            ServerItem(
+                server = server,
+                onEditExtensions = { editingServer = it },
+                onDelete = { LspManager.removeExternalServer(it) },
+            )
+          }
+        }
+      }
     }
+  }
+
+  if (showAddDialog) {
+    ExternalServerDialog(onDismiss = { showAddDialog = false }) { data ->
+      LspManager.addExternalServer(data)
+      showAddDialog = false
+    }
+  }
+
+  if (editingServer != null) {
+    EditExtensionsDialog(server = editingServer!!, onDismiss = { editingServer = null })
+  }
 }
 
 @Composable
 fun SectionHeader(title: String) {
-    Text(
-        text = title,
-        style = MaterialTheme.typography.titleMedium,
-        color = MaterialTheme.colorScheme.primary,
-        modifier = Modifier.padding(vertical = 8.dp)
-    )
+  Text(
+      text = title,
+      style = MaterialTheme.typography.titleMedium,
+      color = MaterialTheme.colorScheme.primary,
+      modifier = Modifier.padding(vertical = 8.dp),
+  )
 }
 
 @Composable
 fun ServerItem(
     server: BaseLspServer,
     onEditExtensions: (BaseLspServer) -> Unit,
-    onDelete: ((BaseLspServer) -> Unit)? = null
+    onDelete: ((BaseLspServer) -> Unit)? = null,
 ) {
-    // Observe state from LspManager map
-    val isEnabled = LspManager.serverConfigs[server.id]?.enabled ?: true
-    val extensions = LspManager.getEffectiveExtensions(server).joinToString(", ")
+  // Observe state from LspManager map
+  val isEnabled = LspManager.serverConfigs[server.id]?.enabled ?: true
+  val extensions = LspManager.getEffectiveExtensions(server).joinToString(", ")
 
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+  Card(
+      modifier = Modifier.fillMaxWidth(),
+      colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+  ) {
+    Row(
+        modifier = Modifier.padding(16.dp).fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
-        Row(
-            modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(text = server.languageName, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                Text(text = server.serverName, style = MaterialTheme.typography.bodySmall)
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(text = "Extensions: $extensions", style = MaterialTheme.typography.labelSmall, color = Color.Gray)
-            }
-            
-            IconButton(onClick = { onEditExtensions(server) }) {
-                Icon(Icons.Default.Edit, contentDescription = "Edit Extensions", tint = MaterialTheme.colorScheme.primary)
-            }
+      Column(modifier = Modifier.weight(1f)) {
+        Text(
+            text = server.languageName,
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+        )
+        Text(text = server.serverName, style = MaterialTheme.typography.bodySmall)
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = "Extensions: $extensions",
+            style = MaterialTheme.typography.labelSmall,
+            color = Color.Gray,
+        )
+      }
 
-            if (onDelete != null) {
-                IconButton(onClick = { onDelete(server) }) {
-                    Icon(Icons.Default.Delete, contentDescription = "Delete Server", tint = MaterialTheme.colorScheme.error)
-                }
-            }
+      IconButton(onClick = { onEditExtensions(server) }) {
+        Icon(
+            Icons.Default.Edit,
+            contentDescription = "Edit Extensions",
+            tint = MaterialTheme.colorScheme.primary,
+        )
+      }
 
-            Switch(
-                checked = isEnabled,
-                onCheckedChange = {
-                    LspManager.setEnabled(server.id, it)
-                }
-            )
+      if (onDelete != null) {
+        IconButton(onClick = { onDelete(server) }) {
+          Icon(
+              Icons.Default.Delete,
+              contentDescription = "Delete Server",
+              tint = MaterialTheme.colorScheme.error,
+          )
         }
+      }
+
+      Switch(checked = isEnabled, onCheckedChange = { LspManager.setEnabled(server.id, it) })
     }
+  }
 }
 
 @Composable
 fun EditExtensionsDialog(server: BaseLspServer, onDismiss: () -> Unit) {
-    var text by remember {
-        mutableStateOf(LspManager.getEffectiveExtensions(server).joinToString(", "))
-    }
+  var text by remember {
+    mutableStateOf(LspManager.getEffectiveExtensions(server).joinToString(", "))
+  }
 
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("Edit Extensions for ${server.languageName}") },
-        text = {
-            OutlinedTextField(
-                value = text,
-                onValueChange = { text = it },
-                label = { Text("Extensions (comma separated)") },
-                modifier = Modifier.fillMaxWidth()
-            )
-        },
-        confirmButton = {
-            TextButton(onClick = {
-                val newExts = text.split(",").map { it.trim().removePrefix(".") }.filter { it.isNotEmpty() }
-                LspManager.updateUserExtensions(server.id, newExts)
-                onDismiss()
-            }) {
-                Text("Save")
+  AlertDialog(
+      onDismissRequest = onDismiss,
+      title = { Text("Edit Extensions for ${server.languageName}") },
+      text = {
+        OutlinedTextField(
+            value = text,
+            onValueChange = { text = it },
+            label = { Text("Extensions (comma separated)") },
+            modifier = Modifier.fillMaxWidth(),
+        )
+      },
+      confirmButton = {
+        TextButton(
+            onClick = {
+              val newExts =
+                  text.split(",").map { it.trim().removePrefix(".") }.filter { it.isNotEmpty() }
+              LspManager.updateUserExtensions(server.id, newExts)
+              onDismiss()
             }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancel") }
+        ) {
+          Text("Save")
         }
-    )
+      },
+      dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } },
+  )
 }
 
 @Composable
 fun ExternalServerDialog(onDismiss: () -> Unit, onAdd: (ExternalServerData) -> Unit) {
-    var name by remember { mutableStateOf("") }
-    var type by remember { mutableStateOf("socket") } // socket or process
-    var extensions by remember { mutableStateOf("") }
-    
-    // Socket fields
-    var host by remember { mutableStateOf("localhost") }
-    var port by remember { mutableStateOf("5000") }
-    
-    // Process fields
-    var command by remember { mutableStateOf("") }
-    var args by remember { mutableStateOf("") }
+  var name by remember { mutableStateOf("") }
+  var type by remember { mutableStateOf("socket") } // socket or process
+  var extensions by remember { mutableStateOf("") }
 
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.lsp_ext_dialog_title)) },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedTextField(value = name, onValueChange = { name = it }, label = { Text(stringResource(R.string.lsp_field_name)) })
-                OutlinedTextField(value = extensions, onValueChange = { extensions = it }, label = { Text(stringResource(R.string.lsp_field_extensions)) })
-                
-                Row {
-                    RadioButton(selected = type == "socket", onClick = { type = "socket" })
-                    Text("Socket", modifier = Modifier.align(Alignment.CenterVertically))
-                    Spacer(Modifier.width(16.dp))
-                    RadioButton(selected = type == "process", onClick = { type = "process" })
-                    Text("Process", modifier = Modifier.align(Alignment.CenterVertically))
-                }
+  // Socket fields
+  var host by remember { mutableStateOf("localhost") }
+  var port by remember { mutableStateOf("5000") }
 
-                if (type == "socket") {
-                    OutlinedTextField(value = host, onValueChange = { host = it }, label = { Text(stringResource(R.string.lsp_field_host)) })
-                    OutlinedTextField(value = port, onValueChange = { port = it }, label = { Text(stringResource(R.string.lsp_field_port)) })
-                } else {
-                    OutlinedTextField(value = command, onValueChange = { command = it }, label = { Text(stringResource(R.string.lsp_field_command)) })
-                    OutlinedTextField(value = args, onValueChange = { args = it }, label = { Text(stringResource(R.string.lsp_field_args)) })
-                }
-            }
-        },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    val exts = extensions.split(",").map { it.trim() }
-                    val data = if (type == "socket") {
-                        ExternalServerData(
-                            id = "ext_sock_${System.currentTimeMillis()}",
-                            name = name,
-                            type = "socket",
-                            extensions = exts,
-                            host = host,
-                            port = port.toIntOrNull() ?: 0
-                        )
-                    } else {
-                        ExternalServerData(
-                            id = "ext_proc_${System.currentTimeMillis()}",
-                            name = name,
-                            type = "process",
-                            extensions = exts,
-                            command = command,
-                            args = args.split(" ").filter { it.isNotEmpty() }
-                        )
-                    }
-                    onAdd(data)
-                },
-                enabled = name.isNotBlank() && extensions.isNotBlank()
-            ) {
-                Text(stringResource(R.string.lsp_btn_add_external))
-            }
+  // Process fields
+  var command by remember { mutableStateOf("") }
+  var args by remember { mutableStateOf("") }
+
+  AlertDialog(
+      onDismissRequest = onDismiss,
+      title = { Text(stringResource(R.string.lsp_ext_dialog_title)) },
+      text = {
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+          OutlinedTextField(
+              value = name,
+              onValueChange = { name = it },
+              label = { Text(stringResource(R.string.lsp_field_name)) },
+          )
+          OutlinedTextField(
+              value = extensions,
+              onValueChange = { extensions = it },
+              label = { Text(stringResource(R.string.lsp_field_extensions)) },
+          )
+
+          Row {
+            RadioButton(selected = type == "socket", onClick = { type = "socket" })
+            Text("Socket", modifier = Modifier.align(Alignment.CenterVertically))
+            Spacer(Modifier.width(16.dp))
+            RadioButton(selected = type == "process", onClick = { type = "process" })
+            Text("Process", modifier = Modifier.align(Alignment.CenterVertically))
+          }
+
+          if (type == "socket") {
+            OutlinedTextField(
+                value = host,
+                onValueChange = { host = it },
+                label = { Text(stringResource(R.string.lsp_field_host)) },
+            )
+            OutlinedTextField(
+                value = port,
+                onValueChange = { port = it },
+                label = { Text(stringResource(R.string.lsp_field_port)) },
+            )
+          } else {
+            OutlinedTextField(
+                value = command,
+                onValueChange = { command = it },
+                label = { Text(stringResource(R.string.lsp_field_command)) },
+            )
+            OutlinedTextField(
+                value = args,
+                onValueChange = { args = it },
+                label = { Text(stringResource(R.string.lsp_field_args)) },
+            )
+          }
         }
-    )
+      },
+      confirmButton = {
+        TextButton(
+            onClick = {
+              val exts = extensions.split(",").map { it.trim() }
+              val data =
+                  if (type == "socket") {
+                    ExternalServerData(
+                        id = "ext_sock_${System.currentTimeMillis()}",
+                        name = name,
+                        type = "socket",
+                        extensions = exts,
+                        host = host,
+                        port = port.toIntOrNull() ?: 0,
+                    )
+                  } else {
+                    ExternalServerData(
+                        id = "ext_proc_${System.currentTimeMillis()}",
+                        name = name,
+                        type = "process",
+                        extensions = exts,
+                        command = command,
+                        args = args.split(" ").filter { it.isNotEmpty() },
+                    )
+                  }
+              onAdd(data)
+            },
+            enabled = name.isNotBlank() && extensions.isNotBlank(),
+        ) {
+          Text(stringResource(R.string.lsp_btn_add_external))
+        }
+      },
+  )
 }

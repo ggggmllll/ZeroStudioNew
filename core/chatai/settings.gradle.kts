@@ -1,32 +1,33 @@
 pluginManagement {
-    repositories {
-        google {
-            content {
-                includeGroupByRegex("com\\.android.*")
-                includeGroupByRegex("com\\.google.*")
-                includeGroupByRegex("androidx.*")
-            }
-        }
-        mavenCentral()
-        gradlePluginPortal()
-        maven("https://repo.itextsupport.com/android")
+  repositories {
+    google {
+      content {
+        includeGroupByRegex("com\\.android.*")
+        includeGroupByRegex("com\\.google.*")
+        includeGroupByRegex("androidx.*")
+      }
     }
-    resolutionStrategy {
-        eachPlugin {
-            if (requested.id.id == "io.objectbox") {
-                useModule("io.objectbox:objectbox-gradle-plugin:${requested.version}")
-            }
-        }
+    mavenCentral()
+    gradlePluginPortal()
+    maven("https://repo.itextsupport.com/android")
+  }
+  resolutionStrategy {
+    eachPlugin {
+      if (requested.id.id == "io.objectbox") {
+        useModule("io.objectbox:objectbox-gradle-plugin:${requested.version}")
+      }
     }
+  }
 }
+
 dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-    repositories {
-        google()
-        mavenCentral()
-        maven("https://jitpack.io")
-        mavenLocal()
-    }
+  repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+  repositories {
+    google()
+    mavenCentral()
+    maven("https://jitpack.io")
+    mavenLocal()
+  }
 }
 
 // rootProject.name = "rikkahub"

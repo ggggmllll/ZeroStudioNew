@@ -21,34 +21,27 @@ import com.google.gson.annotations.SerializedName
 import retrofit2.Call
 import retrofit2.http.GET
 
-/**
- * @author Akash Yadav
- */
+/** @author Akash Yadav */
 interface GitHubContributorsService {
 
-  @GET("contributors")
-  fun getAllContributors(): Call<List<GitHubContributor>>
+  @GET("contributors") fun getAllContributors(): Call<List<GitHubContributor>>
 }
 
 object GitHubContributors {
 
-  /**
-   * Get all GitHub contributors.
-   */
+  /** Get all GitHub contributors. */
   suspend fun getAllContributors(): List<GitHubContributor> {
     return Contributors.getAllContributors<GitHubContributorsService, GitHubContributor>(
-      "${GITHUB_API_REPO_URL}/",
-      GitHubContributorsService::getAllContributors
+        "${GITHUB_API_REPO_URL}/",
+        GitHubContributorsService::getAllContributors,
     )
   }
 }
 
-/**
- * A GitHub contributor.
- */
+/** A GitHub contributor. */
 data class GitHubContributor(
-  @SerializedName("id") override val id: Int,
-  @SerializedName("login") override val username: String,
-  @SerializedName("avatar_url") override val avatarUrl: String,
-  @SerializedName("html_url") override val profileUrl: String
+    @SerializedName("id") override val id: Int,
+    @SerializedName("login") override val username: String,
+    @SerializedName("avatar_url") override val avatarUrl: String,
+    @SerializedName("html_url") override val profileUrl: String,
 ) : Contributor

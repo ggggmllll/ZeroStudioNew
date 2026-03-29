@@ -41,6 +41,7 @@ val indentationString: String
  * @return The indentation string.
  */
 fun indentationString(spaceCount: Int): String {
-  val count = if (EditorPreferences.useSoftTab) spaceCount else spaceCount / EditorPreferences.tabSize
+  val count =
+      if (EditorPreferences.useSoftTab) spaceCount else spaceCount / EditorPreferences.tabSize
   return indentationChar.toString().repeat(count)
 }

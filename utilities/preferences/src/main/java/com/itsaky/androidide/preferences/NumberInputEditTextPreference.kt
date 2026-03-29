@@ -31,9 +31,9 @@ import com.itsaky.androidide.preferences.databinding.LayoutDialogTextInputBindin
  * @author Akash Yadav
  */
 abstract class NumberInputEditTextPreference(
-  val hint: Int? = null,
-  val setValue: ((Int) -> Unit)? = null,
-  val getValue: (() -> Int)? = null
+    val hint: Int? = null,
+    val setValue: ((Int) -> Unit)? = null,
+    val getValue: (() -> Int)? = null,
 ) : DialogPreference() {
 
   override fun onConfigureDialog(preference: Preference, dialog: MaterialAlertDialogBuilder) {

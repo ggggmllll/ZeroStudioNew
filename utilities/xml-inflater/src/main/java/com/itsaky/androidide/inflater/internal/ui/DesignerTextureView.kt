@@ -29,9 +29,14 @@ import androidx.annotation.StyleRes
  *
  * @author Akash Yadav
  */
-class DesignerTextureView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null,
-  @StyleRes defStyleAttr: Int = 0, @StyleRes defStyleRes: Int = 0) :
-  TextureView(context, attrs, defStyleAttr, defStyleRes) {
+class DesignerTextureView
+@JvmOverloads
+constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+    @StyleRes defStyleAttr: Int = 0,
+    @StyleRes defStyleRes: Int = 0,
+) : TextureView(context, attrs, defStyleAttr, defStyleRes) {
 
   override fun setForeground(foreground: Drawable?) {
     // ignore

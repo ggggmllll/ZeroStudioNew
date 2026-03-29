@@ -28,7 +28,7 @@ import io.github.rosemoe.sora.lang.Language.INTERRUPTION_LEVEL_STRONG
  * @author Akash Yadav
  */
 class JsonLanguage(context: Context) :
-  TreeSitterLanguage(context, TSLanguageJson.getInstance(), TS_TYPE) {
+    TreeSitterLanguage(context, TSLanguageJson.getInstance(), TS_TYPE) {
 
   companion object {
 

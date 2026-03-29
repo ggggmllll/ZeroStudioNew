@@ -127,14 +127,14 @@ abstract class AbstractParser {
    */
   @JvmOverloads
   protected open fun parseDrawable(
-    context: Context,
-    value: String,
-    def: Drawable = unknownDrawable()
+      context: Context,
+      value: String,
+      def: Drawable = unknownDrawable(),
   ): Drawable {
     return com.itsaky.androidide.inflater.internal.utils.parseDrawable(
-      context = context,
-      value = value,
-      def = def
+        context = context,
+        value = value,
+        def = def,
     )
   }
 
@@ -172,9 +172,9 @@ abstract class AbstractParser {
   @JvmOverloads
   protected open fun parseDimensionF(context: Context, value: String, def: Float = 0f): Float {
     return com.itsaky.androidide.inflater.internal.utils.parseDimension(
-      context = context,
-      value = value,
-      def = def
+        context = context,
+        value = value,
+        def = def,
     )
   }
 
@@ -187,14 +187,14 @@ abstract class AbstractParser {
    */
   @JvmOverloads
   protected open fun parseColor(
-    context: Context,
-    value: String,
-    def: Int = Color.TRANSPARENT
+      context: Context,
+      value: String,
+      def: Int = Color.TRANSPARENT,
   ): Int {
     return com.itsaky.androidide.inflater.internal.utils.parseColor(
-      context = context,
-      value = value,
-      def = def
+        context = context,
+        value = value,
+        def = def,
     )
   }
 
@@ -207,14 +207,14 @@ abstract class AbstractParser {
    */
   @JvmOverloads
   protected open fun parseColorStateList(
-    context: Context,
-    value: String,
-    def: ColorStateList = ColorStateList.valueOf(Color.TRANSPARENT)
+      context: Context,
+      value: String,
+      def: ColorStateList = ColorStateList.valueOf(Color.TRANSPARENT),
   ): ColorStateList {
     return com.itsaky.androidide.inflater.internal.utils.parseColorStateList(
-      context = context,
-      value = value,
-      def = def
+        context = context,
+        value = value,
+        def = def,
     )
   }
 
@@ -228,9 +228,9 @@ abstract class AbstractParser {
   @JvmOverloads
   fun parseDate(value: String, format: String = "MM/dd/yyyy", def: Long = 0L): Long {
     return com.itsaky.androidide.inflater.internal.utils.parseDate(
-      value = value,
-      format = format,
-      def = def
+        value = value,
+        format = format,
+        def = def,
     )
   }
 }

@@ -45,6 +45,7 @@ import com.itsaky.androidide.lsp.models.MethodCompletionData
 import com.itsaky.androidide.lsp.snippets.ISnippet
 import com.itsaky.androidide.preferences.utils.indentationString
 import com.itsaky.androidide.progress.ProgressManager.Companion.abortIfCancelled
+import java.nio.file.Path
 import jdkx.lang.model.element.Element
 import jdkx.lang.model.element.ElementKind.ANNOTATION_TYPE
 import jdkx.lang.model.element.ElementKind.CLASS
@@ -71,7 +72,6 @@ import openjdk.source.tree.Tree
 import openjdk.source.util.TreePath
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.nio.file.Path
 
 /**
  * Completion provider for Java source code.
@@ -79,10 +79,10 @@ import java.nio.file.Path
  * @author Akash Yadav
  */
 abstract class IJavaCompletionProvider(
-  protected val cursor: Long,
-  completingFile: Path,
-  compiler: JavaCompilerService,
-  settings: IServerSettings,
+    protected val cursor: Long,
+    completingFile: Path,
+    compiler: JavaCompilerService,
+    settings: IServerSettings,
 ) : BaseJavaServiceProvider(completingFile, compiler, settings) {
   protected lateinit var filePackage: String
   protected lateinit var fileImports: Set<String>
@@ -93,10 +93,10 @@ abstract class IJavaCompletionProvider(
   }
 
   open fun complete(
-    task: CompileTask,
-    path: TreePath,
-    partial: String,
-    endsWithParen: Boolean,
+      task: CompileTask,
+      path: TreePath,
+      partial: String,
+      endsWithParen: Boolean,
   ): CompletionResult {
     val root = task.root(file)
     filePackage = root.`package`?.packageName?.toString() ?: ""
@@ -117,10 +117,10 @@ abstract class IJavaCompletionProvider(
    *   otherwise.
    */
   protected abstract fun doComplete(
-    task: CompileTask,
-    path: TreePath,
-    partial: String,
-    endsWithParen: Boolean,
+      task: CompileTask,
+      path: TreePath,
+      partial: String,
+      endsWithParen: Boolean,
   ): CompletionResult
 
   protected open fun matchLevel(candidate: CharSequence, partial: CharSequence): MatchLevel {
@@ -130,8 +130,8 @@ abstract class IJavaCompletionProvider(
   }
 
   protected open fun putMethod(
-    method: ExecutableElement,
-    methods: MutableMap<String, MutableList<ExecutableElement>>,
+      method: ExecutableElement,
+      methods: MutableMap<String, MutableList<ExecutableElement>>,
   ) {
     abortIfCancelled()
     abortCompletionIfCancelled()
@@ -143,16 +143,16 @@ abstract class IJavaCompletionProvider(
   }
 
   protected open fun keyword(
-    keyword: String,
-    partial: CharSequence,
-    matchRatio: Int,
+      keyword: String,
+      partial: CharSequence,
+      matchRatio: Int,
   ): CompletionItem =
-    keyword(keyword, partial, CompletionItem.matchLevel(keyword, partial.toString()))
+      keyword(keyword, partial, CompletionItem.matchLevel(keyword, partial.toString()))
 
   protected open fun keyword(
-    keyword: String,
-    partialName: CharSequence,
-    matchLevel: MatchLevel,
+      keyword: String,
+      partialName: CharSequence,
+      matchLevel: MatchLevel,
   ): CompletionItem {
     abortIfCancelled()
     abortCompletionIfCancelled()
@@ -166,11 +166,11 @@ abstract class IJavaCompletionProvider(
   }
 
   protected open fun method(
-    task: CompileTask,
-    overloads: List<ExecutableElement>,
-    addParens: Boolean,
-    matchLevel: MatchLevel,
-    partial: String
+      task: CompileTask,
+      overloads: List<ExecutableElement>,
+      addParens: Boolean,
+      matchLevel: MatchLevel,
+      partial: String,
   ): CompletionItem {
     abortIfCancelled()
     abortCompletionIfCancelled()
@@ -218,9 +218,9 @@ abstract class IJavaCompletionProvider(
   }
 
   protected open fun item(
-    task: CompileTask,
-    element: Element,
-    matchLevel: MatchLevel,
+      task: CompileTask,
+      element: Element,
+      matchLevel: MatchLevel,
   ): CompletionItem {
     if (element.kind == METHOD) throw RuntimeException("method")
 
@@ -249,10 +249,10 @@ abstract class IJavaCompletionProvider(
   }
 
   protected open fun classItem(
-    imports: Set<String>,
-    file: Path?,
-    className: String,
-    matchLevel: MatchLevel,
+      imports: Set<String>,
+      file: Path?,
+      className: String,
+      matchLevel: MatchLevel,
   ): CompletionItem {
     abortIfCancelled()
     abortCompletionIfCancelled()
@@ -263,7 +263,8 @@ abstract class IJavaCompletionProvider(
     item.ideSortText = item.ideLabel
     item.matchLevel = matchLevel
 
-    // TODO(itsaky): This will result in incorrect flatName if 'className' is a nested or local class
+    // TODO(itsaky): This will result in incorrect flatName if 'className' is a nested or local
+    // class
     item.data = ClassCompletionData(className)
 
     // If file is not provided, we are probably completing an import path
@@ -302,10 +303,10 @@ abstract class IJavaCompletionProvider(
   }
 
   protected open fun snippetItem(
-    snippet: ISnippet,
-    matchLevel: MatchLevel,
-    partial: String,
-    indent: Int
+      snippet: ISnippet,
+      matchLevel: MatchLevel,
+      partial: String,
+      indent: Int,
   ): CompletionItem {
     return JavaCompletionItem().apply {
       this.ideLabel = snippet.prefix
@@ -318,9 +319,9 @@ abstract class IJavaCompletionProvider(
       val indentation = indentationString(indent)
       this.insertTextFormat = SNIPPET
       this.insertText =
-        snippet.body.joinToString(separator = "\n").also {
-          it.replace("\t", indentationString).replace("\n", "\n${indentation}")
-        }
+          snippet.body.joinToString(separator = "\n").also {
+            it.replace("\t", indentationString).replace("\n", "\n${indentation}")
+          }
     }
   }
 
@@ -367,9 +368,9 @@ abstract class IJavaCompletionProvider(
   }
 
   protected open fun getMethodCompletionData(
-    task: CompileTask,
-    element: ExecutableElement,
-    overloads: Int
+      task: CompileTask,
+      element: ExecutableElement,
+      overloads: Int,
   ): MethodCompletionData {
     val types = task.task.types
     val elements = task.task.elements
@@ -384,24 +385,24 @@ abstract class IJavaCompletionProvider(
 
       if (p.kind == TypeKind.DECLARED) {
         erasedParameterTypes[i] =
-          elements.getBinaryName(types.asElement(p) as TypeElement).toString()
+            elements.getBinaryName(types.asElement(p) as TypeElement).toString()
       } else {
         erasedParameterTypes[i] = types.erasure(p).toString()
       }
     }
 
     return MethodCompletionData(
-      element.simpleName.toString(),
-      getClassCompletionData(task, type),
-      parameterTypes.toList(),
-      erasedParameterTypes.toList(),
-      plusOverloads
+        element.simpleName.toString(),
+        getClassCompletionData(task, type),
+        parameterTypes.toList(),
+        erasedParameterTypes.toList(),
+        plusOverloads,
     )
   }
 
   protected open fun getFieldCompletionData(
-    task: CompileTask,
-    element: Element
+      task: CompileTask,
+      element: Element,
   ): FieldCompletionData {
     val field = element as VariableElement
     val type = field.enclosingElement as TypeElement
@@ -409,17 +410,17 @@ abstract class IJavaCompletionProvider(
   }
 
   protected open fun getClassCompletionData(
-    task: CompileTask,
-    element: TypeElement
+      task: CompileTask,
+      element: TypeElement,
   ): ClassCompletionData {
     val elements = task.task.elements
     return ClassCompletionData(
-      className = element.qualifiedName.toString(),
-      isCompleteData = true,
-      flatName = elements.getBinaryName(element).toString(),
-      simpleName = element.simpleName.toString(),
-      isNested = element.enclosingElement.kind != PACKAGE,
-      topLevelClass = element.findTopLevelElement().qualifiedName.toString()
+        className = element.qualifiedName.toString(),
+        isCompleteData = true,
+        flatName = elements.getBinaryName(element).toString(),
+        simpleName = element.simpleName.toString(),
+        isNested = element.enclosingElement.kind != PACKAGE,
+        topLevelClass = element.findTopLevelElement().qualifiedName.toString(),
     )
   }
 

@@ -17,11 +17,9 @@
 
 package com.itsaky.androidide.xml.versions
 
-/**
- * @author Akash Yadav
- */
+/** @author Akash Yadav */
 class CollectingApiVersionsParser :
-  com.itsaky.androidide.xml.internal.versions.ApiVersionsParser() {
+    com.itsaky.androidide.xml.internal.versions.ApiVersionsParser() {
 
   private val apiInfo = mutableMapOf<String, Pair<ApiVersion, MutableMap<String, ApiVersion>>>()
 
@@ -38,35 +36,29 @@ class CollectingApiVersionsParser :
   }
 
   override fun consumeMemberVersionInfo(
-    className: String,
-    member: String,
-    memberType: String,
-    apiVersion: ApiVersion
+      className: String,
+      member: String,
+      memberType: String,
+      apiVersion: ApiVersion,
   ) {
     val (_, members) = apiInfo[className]!!
     val existing = members.put(member, apiVersion)
-    check(existing == null) {
-      "Duplicate $memberType entry in class $className: $member"
-    }
+    check(existing == null) { "Duplicate $memberType entry in class $className: $member" }
   }
 
-  /**
-   * Returns [ApiVersion] for the given class.
-   */
+  /** Returns [ApiVersion] for the given class. */
   fun getClassInfo(className: String): ApiVersion? {
     return apiInfo[className]?.first
   }
 
-  /**
-   * Returns [ApiVersion] for the given class and member.
-   */
+  /** Returns [ApiVersion] for the given class and member. */
   fun getMemberInfo(className: String, memberName: String): ApiVersion? {
     return apiInfo[className]?.second?.get(memberName)
   }
 
   /**
-   * Removes and returns the [ApiVersion] for the given class and member. This also removes the [ApiVersion]
-   * for the class if the all the members of the class have been removed.
+   * Removes and returns the [ApiVersion] for the given class and member. This also removes the
+   * [ApiVersion] for the class if the all the members of the class have been removed.
    */
   fun removeMemberInfo(className: String, memberName: String): ApiVersion? {
     return apiInfo[className]?.second?.remove(memberName).also {

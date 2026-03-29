@@ -22,7 +22,12 @@ package com.itsaky.androidide.templates.impl.androidstudio.activities.androidTVA
  * @author Historical contributors (The Android Open Source Project)
  * @author android_zero
  */
-fun mainFragmentJava(detailsActivity: String, mainFragment: String, minApiLevel: Int, packageName: String): String {
+fun mainFragmentJava(
+    detailsActivity: String,
+    mainFragment: String,
+    minApiLevel: Int,
+    packageName: String,
+): String {
   val contextArgBlock = if (minApiLevel >= 23) "getContext()" else "getActivity()"
   return """
 package ${packageName};

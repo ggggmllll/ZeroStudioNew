@@ -87,7 +87,7 @@ internal inline fun baseProjectImpl(
         ndkVersion = ndkVersion,
         cmakeVersion = cmakeVersion,
         projectVersionData = projectVersionData,
-        description = description
+        description = description,
     ) {
       block()
 

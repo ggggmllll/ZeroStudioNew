@@ -54,5 +54,7 @@ val valueResourceFileTemplate
 
     widgets(TextFieldWidget(fileName))
 
-    recipe = { data: TemplateData -> valueResourceFileRecipe(data as ModuleTemplateData, fileName.value) }
+    recipe = { data: TemplateData ->
+      valueResourceFileRecipe(data as ModuleTemplateData, fileName.value)
+    }
   }

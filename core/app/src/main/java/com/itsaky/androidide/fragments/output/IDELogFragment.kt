@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory
 
 /**
  * Fragment to show IDE logs.
+ *
  * @author Akash Yadav
  */
 class IDELogFragment : LogViewFragment() {
@@ -35,6 +36,7 @@ class IDELogFragment : LogViewFragment() {
   private val lifecycleAwareAppender = LifecycleAwareAppender(Lifecycle.State.CREATED)
 
   override fun isSimpleFormattingEnabled() = true
+
   override fun getFilename() = "ide_logs"
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

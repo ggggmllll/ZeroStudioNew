@@ -34,7 +34,7 @@ import com.itsaky.androidide.resources.R.string
 open class VideoViewAdapter<T : VideoView> : SurfaceViewAdapter<T>() {
   override fun createUiWidgets(): List<UiWidget> {
     return listOf(
-      UiWidget(VideoView::class.java, string.widget_videoview, drawable.ic_widget_videoview)
+        UiWidget(VideoView::class.java, string.widget_videoview, drawable.ic_widget_videoview)
     )
   }
 }

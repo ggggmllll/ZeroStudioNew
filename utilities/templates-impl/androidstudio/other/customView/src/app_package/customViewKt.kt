@@ -20,7 +20,7 @@ import com.android.tools.idea.wizard.template.escapeKotlinIdentifier
 import com.android.tools.idea.wizard.template.renderIf
 
 fun customViewKt(applicationPackage: String?, packageName: String, viewClass: String) =
-  """
+    """
 package ${escapeKotlinIdentifier(packageName)}
 
 import android.content.Context

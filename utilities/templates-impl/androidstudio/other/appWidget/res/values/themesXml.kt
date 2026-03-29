@@ -18,7 +18,7 @@ package com.itsaky.androidide.templates.impl.androidstudio.other.appWidget.res.v
 import com.android.tools.idea.wizard.template.ThemesData
 
 fun themesXml(themesData: ThemesData) =
-  """<resources>
+    """<resources>
     <style name="${getParentAppWidgetTheme(themesData.main.name)}" parent="@android:style/Theme.DeviceDefault">
         <!-- Radius of the outer bound of widgets to make the rounded corners -->
         <item name="appWidgetRadius">16dp</item>

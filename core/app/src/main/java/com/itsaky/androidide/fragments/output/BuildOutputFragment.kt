@@ -23,6 +23,7 @@ import com.itsaky.androidide.R
 
 class BuildOutputFragment : NonEditableEditorFragment() {
   private val unsavedLines: MutableList<String?> = ArrayList()
+
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
     emptyStateViewModel.emptyMessage.value = getString(R.string.msg_emptyview_buildoutput)
@@ -33,26 +34,25 @@ class BuildOutputFragment : NonEditableEditorFragment() {
       unsavedLines.clear()
     }
   }
-  
+
   override fun onDestroyView() {
     editor?.release()
     super.onDestroyView()
   }
-  
+
   fun appendOutput(output: String?) {
     if (editor == null) {
       unsavedLines.add(output)
       return
     }
     ThreadUtils.runOnUiThread {
-      val message = if (output == null || output.endsWith("\n")) {
-        output
-      } else {
-        "${output}\n"
-      }
-      editor!!.append(message).also {
-        emptyStateViewModel.isEmpty.value = false
-      }
+      val message =
+          if (output == null || output.endsWith("\n")) {
+            output
+          } else {
+            "${output}\n"
+          }
+      editor!!.append(message).also { emptyStateViewModel.isEmpty.value = false }
     }
   }
 }

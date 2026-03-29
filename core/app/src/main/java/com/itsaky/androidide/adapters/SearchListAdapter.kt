@@ -34,16 +34,16 @@ import java.io.File
 import java.util.concurrent.CompletableFuture
 
 class SearchListAdapter(
-  private val results: Map<File, List<SearchResult>?>,
-  private val onFileClick: (File) -> Unit,
-  private val onMatchClick: (SearchResult) -> Unit,
-  private val keys: List<File>
+    private val results: Map<File, List<SearchResult>?>,
+    private val onFileClick: (File) -> Unit,
+    private val onMatchClick: (SearchResult) -> Unit,
+    private val keys: List<File>,
 ) : Adapter<VH>() {
 
   constructor(
-    results: Map<File, List<SearchResult>?>,
-    onFileClick: (File) -> Unit,
-    onMatchClick: (SearchResult) -> Unit
+      results: Map<File, List<SearchResult>?>,
+      onFileClick: (File) -> Unit,
+      onMatchClick: (SearchResult) -> Unit,
   ) : this(results, onFileClick, onMatchClick, results.keys.toList())
 
   override fun onCreateViewHolder(p1: ViewGroup, p2: Int): VH {
@@ -94,5 +94,6 @@ class SearchListAdapter(
   }
 
   class VH(val binding: LayoutSearchResultGroupBinding) : ViewHolder(binding.root)
+
   class ChildVH(val binding: LayoutSearchResultItemBinding) : ViewHolder(binding.root)
 }

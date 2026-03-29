@@ -29,9 +29,11 @@ import com.itsaky.androidide.actions.requireFile
  *
  * @author Akash Yadav
  */
-abstract class BaseDirNodeAction(context: Context,
-  @StringRes labelRes: Int? = null,
-  @DrawableRes iconRes: Int? = null) : BaseFileTreeAction(context, labelRes, iconRes) {
+abstract class BaseDirNodeAction(
+    context: Context,
+    @StringRes labelRes: Int? = null,
+    @DrawableRes iconRes: Int? = null,
+) : BaseFileTreeAction(context, labelRes, iconRes) {
 
   override fun prepare(data: ActionData) {
     super.prepare(data)

@@ -41,11 +41,23 @@ val composeActivityMaterial3Template
     name = "Empty Activity"
     description = "Create a new empty activity with Jetpack Compose"
     minApi = 21
-    constraints = listOf(TemplateConstraint.AndroidX, TemplateConstraint.Kotlin, TemplateConstraint.Material3, TemplateConstraint.Compose)
+    constraints =
+        listOf(
+            TemplateConstraint.AndroidX,
+            TemplateConstraint.Kotlin,
+            TemplateConstraint.Material3,
+            TemplateConstraint.Compose,
+        )
 
     category = Category.Compose
     formFactor = FormFactor.Mobile
-    screens = listOf(WizardUiContext.ActivityGallery, WizardUiContext.MenuEntry, WizardUiContext.NewProject, WizardUiContext.NewModule)
+    screens =
+        listOf(
+            WizardUiContext.ActivityGallery,
+            WizardUiContext.MenuEntry,
+            WizardUiContext.NewProject,
+            WizardUiContext.NewModule,
+        )
 
     val activityClass = stringParameter {
       name = "Activity Name"
@@ -60,7 +72,8 @@ val composeActivityMaterial3Template
     val isLauncher = booleanParameter {
       name = "Launcher Activity"
       default = false
-      help = "If true, this activity will have a CATEGORY_LAUNCHER intent filter, making it visible in the launcher"
+      help =
+          "If true, this activity will have a CATEGORY_LAUNCHER intent filter, making it visible in the launcher"
     }
 
     val greeting = stringParameter {
@@ -82,25 +95,27 @@ val composeActivityMaterial3Template
     }
 
     widgets(
-      TextFieldWidget(activityClass),
-      PackageNameWidget(packageName),
-      CheckBoxWidget(isLauncher),
-      // Invisible widgets to pass data
-      TextFieldWidget(greeting),
-      TextFieldWidget(defaultPreview),
-      LanguageWidget(),
+        TextFieldWidget(activityClass),
+        PackageNameWidget(packageName),
+        CheckBoxWidget(isLauncher),
+        // Invisible widgets to pass data
+        TextFieldWidget(greeting),
+        TextFieldWidget(defaultPreview),
+        LanguageWidget(),
     )
 
-    thumb { File("compose-activity-material3").resolve("template_compose_empty_activity_material3.png") }
+    thumb {
+      File("compose-activity-material3").resolve("template_compose_empty_activity_material3.png")
+    }
 
     recipe = { data: TemplateData ->
       composeActivityRecipe(
-        data as ModuleTemplateData,
-        activityClass.value,
-        packageName.value,
-        isLauncher.value,
-        greeting.value,
-        defaultPreview.value,
+          data as ModuleTemplateData,
+          activityClass.value,
+          packageName.value,
+          isLauncher.value,
+          greeting.value,
+          defaultPreview.value,
       )
     }
   }

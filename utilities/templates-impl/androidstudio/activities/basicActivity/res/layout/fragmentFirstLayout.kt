@@ -20,7 +20,6 @@ package com.itsaky.androidide.templates.impl.androidstudio.activities.basicActiv
  *
  * @param firstFragmentClass The fully qualified class name of the fragment.
  * @return The XML content as a string.
- *
  * @author Historical contributors (The Android Open Source Project)
  * @author android_zero
  */

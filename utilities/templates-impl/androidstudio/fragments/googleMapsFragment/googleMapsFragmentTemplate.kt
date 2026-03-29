@@ -30,10 +30,10 @@ import com.android.tools.idea.wizard.template.TemplateData
 import com.android.tools.idea.wizard.template.TextFieldWidget
 import com.android.tools.idea.wizard.template.WizardUiContext
 import com.android.tools.idea.wizard.template.fragmentToLayout
-import com.itsaky.androidide.templates.impl.androidstudio.activities.common.MIN_API
-import com.itsaky.androidide.templates.impl.androidstudio.defaultPackageNameParameter
 import com.android.tools.idea.wizard.template.stringParameter
 import com.android.tools.idea.wizard.template.template
+import com.itsaky.androidide.templates.impl.androidstudio.activities.common.MIN_API
+import com.itsaky.androidide.templates.impl.androidstudio.defaultPackageNameParameter
 import java.io.File
 
 val googleMapsFragmentTemplate
@@ -66,11 +66,21 @@ val googleMapsFragmentTemplate
 
     val packageName = defaultPackageNameParameter
 
-    widgets(TextFieldWidget(fragmentClass), TextFieldWidget(layoutName), PackageNameWidget(packageName), LanguageWidget())
+    widgets(
+        TextFieldWidget(fragmentClass),
+        TextFieldWidget(layoutName),
+        PackageNameWidget(packageName),
+        LanguageWidget(),
+    )
 
     thumb { File("google-maps-fragment").resolve("template_map_fragment.png") }
 
     recipe = { data: TemplateData ->
-      googleMapsFragmentRecipe(data as ModuleTemplateData, fragmentClass.value, layoutName.value, packageName.value)
+      googleMapsFragmentRecipe(
+          data as ModuleTemplateData,
+          fragmentClass.value,
+          layoutName.value,
+          packageName.value,
+      )
     }
   }

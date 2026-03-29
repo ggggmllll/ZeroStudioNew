@@ -13,16 +13,12 @@ fun Tooltip(
     tooltip: @Composable () -> Unit,
     content: @Composable () -> Unit,
 ) {
-    TooltipBox(
-        modifier = modifier,
-        positionProvider = TooltipDefaults.rememberTooltipPositionProvider(),
-        tooltip = {
-            PlainTooltip {
-                tooltip()
-            }
-        },
-        state = rememberTooltipState()
-    ) {
-        content()
-    }
+  TooltipBox(
+      modifier = modifier,
+      positionProvider = TooltipDefaults.rememberTooltipPositionProvider(),
+      tooltip = { PlainTooltip { tooltip() } },
+      state = rememberTooltipState(),
+  ) {
+    content()
+  }
 }

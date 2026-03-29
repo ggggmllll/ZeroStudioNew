@@ -29,7 +29,11 @@ import com.android.tools.idea.wizard.template.impl.other.customView.res.values_n
 import com.android.tools.idea.wizard.template.impl.other.customView.src.app_package.customViewJava
 import com.android.tools.idea.wizard.template.impl.other.customView.src.app_package.customViewKt
 
-fun RecipeExecutor.customViewRecipe(moduleData: ModuleTemplateData, packageName: String, viewClass: String) {
+fun RecipeExecutor.customViewRecipe(
+    moduleData: ModuleTemplateData,
+    packageName: String,
+    viewClass: String,
+) {
   val (projectData, srcOut, resOut) = moduleData
   val ktOrJavaExt = projectData.language.extension
   addAllKotlinDependencies(moduleData)
@@ -40,13 +44,16 @@ fun RecipeExecutor.customViewRecipe(moduleData: ModuleTemplateData, packageName:
   mergeXml(colorsXml(), resOut.resolve("values/colors.xml"))
   mergeXml(stylesXml(themeName), resOut.resolve("values/styles.xml"))
   mergeXml(stylesXmlNight(themeName), resOut.resolve("values-night/styles.xml"))
-  save(sampleXml(packageName, themeName, viewClass), resOut.resolve("layout/sample_${snakeCaseViewClass}.xml"))
+  save(
+      sampleXml(packageName, themeName, viewClass),
+      resOut.resolve("layout/sample_${snakeCaseViewClass}.xml"),
+  )
 
   val customView =
-    when (projectData.language) {
-      Language.Java -> customViewJava(projectData.applicationPackage, packageName, viewClass)
-      Language.Kotlin -> customViewKt(projectData.applicationPackage, packageName, viewClass)
-    }
+      when (projectData.language) {
+        Language.Java -> customViewJava(projectData.applicationPackage, packageName, viewClass)
+        Language.Kotlin -> customViewKt(projectData.applicationPackage, packageName, viewClass)
+      }
   save(customView, srcOut.resolve("${viewClass}.${ktOrJavaExt}"))
 
   open(srcOut.resolve("${viewClass}.${ktOrJavaExt}"))

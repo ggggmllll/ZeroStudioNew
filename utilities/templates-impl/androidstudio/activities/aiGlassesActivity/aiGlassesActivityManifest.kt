@@ -17,13 +17,13 @@
 package com.itsaky.androidide.templates.impl.androidstudio.activities.aiGlassesActivity
 
 /**
- * Generates the AndroidManifest.xml configuration required for the AI Glasses Activity.
- * This configures the activity as an exported entry point and enforces the required 
- * display category for XR projection.
+ * Generates the AndroidManifest.xml configuration required for the AI Glasses Activity. This
+ * configures the activity as an exported entry point and enforces the required display category for
+ * XR projection.
  *
  * @author Historical contributors (The Android Open Source Project)
  * @author android_zero
- * 
+ *
  * Modifications:
  * - Migrated to AndroidIDE template system.
  * - Updated package namespace to align with AndroidIDE template hierarchy.
@@ -31,14 +31,14 @@ package com.itsaky.androidide.templates.impl.androidstudio.activities.aiGlassesA
 
 /**
  * Returns the XML string representation of the AndroidManifest.xml for AI Glasses Activity.
- * 
+ *
  * @param activityClass The class name of the target activity.
  * @param packageName The application's base package name.
  * @return Formatted XML string of the manifest.
  */
 fun aiGlassesActivityManifestXml(activityClass: String, packageName: String) =
-  // language=xml
-  """
+    // language=xml
+    """
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application>
         <activity

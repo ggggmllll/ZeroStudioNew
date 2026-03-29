@@ -41,11 +41,16 @@ val primaryDetailFlowTemplate
     name = "Primary/Detail Views Flow"
     minApi = MIN_API
     description =
-      "Creates a new primary/detail flow, allowing users to view a collection of objects as well as details for each object. This flow is presented using two columns on larger screen devices and one column on handsets and smaller screens. It also includes support for right click on the list items as well as two keyboard shortcuts. This template creates one activity, an item list fragment, and a detail fragment"
+        "Creates a new primary/detail flow, allowing users to view a collection of objects as well as details for each object. This flow is presented using two columns on larger screen devices and one column on handsets and smaller screens. It also includes support for right click on the list items as well as two keyboard shortcuts. This template creates one activity, an item list fragment, and a detail fragment"
 
     category = Category.Activity
     formFactor = FormFactor.Mobile
-    screens = listOf(WizardUiContext.ActivityGallery, WizardUiContext.MenuEntry, WizardUiContext.NewModule)
+    screens =
+        listOf(
+            WizardUiContext.ActivityGallery,
+            WizardUiContext.MenuEntry,
+            WizardUiContext.NewModule,
+        )
 
     val objectKind = stringParameter {
       name = "Object Kind"
@@ -66,7 +71,8 @@ val primaryDetailFlowTemplate
     val isLauncher = booleanParameter {
       name = "Launcher Activity"
       default = false
-      help = "If true, the primary activity in the flow will have a CATEGORY_LAUNCHER intent filter, making it visible in the launcher"
+      help =
+          "If true, the primary activity in the flow will have a CATEGORY_LAUNCHER intent filter, making it visible in the launcher"
     }
 
     val mainNavGraphFile = stringParameter {
@@ -93,7 +99,9 @@ val primaryDetailFlowTemplate
       name = "Detail layout name"
       constraints = listOf(Constraint.LAYOUT, Constraint.UNIQUE, NONEMPTY)
       default = "fragment_${extractLetters(objectKind.value.lowercase(Locale.getDefault()))}_detail"
-      suggest = { "fragment_${extractLetters(objectKind.value.lowercase(Locale.getDefault()))}_detail" }
+      suggest = {
+        "fragment_${extractLetters(objectKind.value.lowercase(Locale.getDefault()))}_detail"
+      }
       visible = { false }
       loggable = true
     }
@@ -101,28 +109,28 @@ val primaryDetailFlowTemplate
     val packageName = defaultPackageNameParameter
 
     widgets(
-      TextFieldWidget(objectKind),
-      TextFieldWidget(objectKindPlural),
-      CheckBoxWidget(isLauncher),
-      PackageNameWidget(packageName),
-      LanguageWidget(),
-      TextFieldWidget(mainNavGraphFile),
-      TextFieldWidget(childNavGraphFile),
-      TextFieldWidget(detailNameFragmentLayout),
+        TextFieldWidget(objectKind),
+        TextFieldWidget(objectKindPlural),
+        CheckBoxWidget(isLauncher),
+        PackageNameWidget(packageName),
+        LanguageWidget(),
+        TextFieldWidget(mainNavGraphFile),
+        TextFieldWidget(childNavGraphFile),
+        TextFieldWidget(detailNameFragmentLayout),
     )
 
     thumb { File("primary-detail-flow").resolve("template_primary_detail.png") }
 
     recipe = { data: TemplateData ->
       primaryDetailFlowRecipe(
-        data as ModuleTemplateData,
-        objectKind.value,
-        objectKindPlural.value,
-        isLauncher.value,
-        mainNavGraphFile.value,
-        childNavGraphFile.value,
-        detailNameFragmentLayout.value,
-        packageName.value,
+          data as ModuleTemplateData,
+          objectKind.value,
+          objectKindPlural.value,
+          isLauncher.value,
+          mainNavGraphFile.value,
+          childNavGraphFile.value,
+          detailNameFragmentLayout.value,
+          packageName.value,
       )
     }
   }

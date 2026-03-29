@@ -20,7 +20,7 @@ import com.android.tools.idea.wizard.template.escapeKotlinIdentifier
 import com.android.tools.idea.wizard.template.getMaterialComponentName
 
 fun blankViewModelKt(packageName: String, useAndroidX: Boolean, viewModelName: String) =
-  """
+    """
 package ${escapeKotlinIdentifier(packageName)}
 
 import ${getMaterialComponentName("android.arch.lifecycle.ViewModel", useAndroidX)}

@@ -19,30 +19,25 @@ package com.itsaky.androidide.actions
 
 import com.itsaky.androidide.editor.ui.IDEEditor
 import com.itsaky.androidide.ui.CodeEditorView
-import com.itsaky.androidide.actions.ActionStyle
 
 /** @author Akash Yadav */
 abstract class EditorRelatedAction : EditorActivityAction(), EditorActionItem {
 
   override var requiresUIThread: Boolean = true
-  
-    /**
-   * 自定义此Action的UI样式。
-   * UI渲染层会读取此对象来调整按钮的外观。
-   * 如果为 null，则使用默认的布局样式。
-   */
+
+  /** 自定义此Action的UI样式。 UI渲染层会读取此对象来调整按钮的外观。 如果为 null，则使用默认的布局样式。 */
   // override var style: ActionStyle? = null
 
   override fun prepare(data: ActionData) {
     super<EditorActionItem>.prepare(data)
     super<EditorActivityAction>.prepare(data)
     val editor =
-      data.getEditor()
-        ?: run {
-          visible = false
-          enabled = false
-          return
-        }
+        data.getEditor()
+            ?: run {
+              visible = false
+              enabled = false
+              return
+            }
 
     val file = editor.file
 
@@ -53,5 +48,4 @@ abstract class EditorRelatedAction : EditorActivityAction(), EditorActionItem {
   fun ActionData.getEditor(): IDEEditor? = get(IDEEditor::class.java)
 
   fun ActionData.getEditorView(): CodeEditorView? = get(CodeEditorView::class.java)
-
 }

@@ -36,9 +36,7 @@ class FileProvider {
 
   companion object {
 
-    private val projectRoot by lazy {
-      currentDir().findProjectRoot()?.absolute()?.normalize()
-    }
+    private val projectRoot by lazy { currentDir().findProjectRoot()?.absolute()?.normalize() }
 
     @JvmField
     val extension = run {
@@ -49,32 +47,25 @@ class FileProvider {
       }
     }
 
-    @JvmStatic
-    fun currentDir(): Path = Paths.get(System.getProperty("user.dir")!!)
+    @JvmStatic fun currentDir(): Path = Paths.get(System.getProperty("user.dir")!!)
 
-    @JvmStatic
-    fun implModule(): Path = projectRoot().resolve("tooling/impl")
+    @JvmStatic fun implModule(): Path = projectRoot().resolve("tooling/impl")
 
     @JvmStatic
     fun projectRoot(): Path =
-      checkNotNull(projectRoot) {
-        "Unable to file project root. Check if '${PROJECT_ROOT_FILE}' file exists in the project root directory."
-      }
+        checkNotNull(projectRoot) {
+          "Unable to file project root. Check if '${PROJECT_ROOT_FILE}' file exists in the project root directory."
+        }
 
-    @JvmStatic
-    private fun testingDir() = projectRoot().resolve("testing")
+    @JvmStatic private fun testingDir() = projectRoot().resolve("testing")
 
-    @JvmStatic
-    private fun testResourcesDir(): Path = testingDir().resolve("resources")
+    @JvmStatic private fun testResourcesDir(): Path = testingDir().resolve("resources")
 
-    @JvmStatic
-    fun testHomeDir(): Path = testResourcesDir().resolve("test-home")
+    @JvmStatic fun testHomeDir(): Path = testResourcesDir().resolve("test-home")
 
-    @JvmStatic
-    fun testProjectRoot(): Path = testResourcesDir().resolve("test-project")
+    @JvmStatic fun testProjectRoot(): Path = testResourcesDir().resolve("test-project")
 
-    @JvmStatic
-    fun sampleProjectRoot(): Path = testResourcesDir().resolve("sample-project")
+    @JvmStatic fun sampleProjectRoot(): Path = testResourcesDir().resolve("sample-project")
 
     /**
      * Get the path to the 'resources' directory.
@@ -97,8 +88,7 @@ class FileProvider {
       return resources().resolve("${name}_template.$extension").normalize()
     }
 
-    @JvmStatic
-    fun contents(file: Path): StringBuilder = StringBuilder(file.readText())
+    @JvmStatic fun contents(file: Path): StringBuilder = StringBuilder(file.readText())
   }
 }
 

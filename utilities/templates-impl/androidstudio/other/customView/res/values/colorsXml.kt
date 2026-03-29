@@ -19,7 +19,7 @@ package com.itsaky.androidide.templates.impl.androidstudio.other.customView.res.
 import com.android.tools.idea.wizard.template.MaterialColor.*
 
 fun colorsXml() =
-  """
+    """
 <resources>
     ${LIGHT_BLUE_400.xmlElement()}
     ${LIGHT_BLUE_600.xmlElement()}

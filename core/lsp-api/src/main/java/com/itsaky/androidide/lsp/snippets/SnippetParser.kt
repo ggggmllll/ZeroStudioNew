@@ -22,9 +22,9 @@ import com.google.gson.stream.JsonReader
 import com.itsaky.androidide.app.BaseApplication
 import com.itsaky.androidide.tasks.executeAsyncProvideError
 import com.itsaky.androidide.utils.VMUtils
-import org.slf4j.LoggerFactory
 import java.io.IOException
 import java.util.concurrent.ConcurrentHashMap
+import org.slf4j.LoggerFactory
 
 /**
  * Parser for parsing snippets from assets.
@@ -36,11 +36,11 @@ object SnippetParser {
   private val log = LoggerFactory.getLogger(SnippetParser::class.java)
 
   fun <S : ISnippetScope> parse(
-    lang: String,
-    scopes: Array<S>,
-    snippetFactory: (String, String, List<String>) -> ISnippet = { prefix, desc, body ->
-      DefaultSnippet(prefix, desc, body.toTypedArray())
-    }
+      lang: String,
+      scopes: Array<S>,
+      snippetFactory: (String, String, List<String>) -> ISnippet = { prefix, desc, body ->
+        DefaultSnippet(prefix, desc, body.toTypedArray())
+      },
   ): Map<S, List<ISnippet>> {
 
     // not supported for tests as assets cannot be accessed
@@ -51,30 +51,27 @@ object SnippetParser {
     return ConcurrentHashMap<S, List<ISnippet>>().apply {
       for (scope in scopes) {
         this[scope] =
-          mutableListOf<ISnippet>().apply {
-            readSnippets(lang, scope.filename, snippetFactory, this)
-          }
+            mutableListOf<ISnippet>().apply {
+              readSnippets(lang, scope.filename, snippetFactory, this)
+            }
       }
     }
   }
 
   private fun readSnippets(
-    lang: String,
-    type: String,
-    snippetFactory: (String, String, List<String>) -> ISnippet,
-    snippets: MutableList<ISnippet>
+      lang: String,
+      type: String,
+      snippetFactory: (String, String, List<String>) -> ISnippet,
+      snippets: MutableList<ISnippet>,
   ) {
     executeAsyncProvideError({
       val content =
-        try {
-          BaseApplication.getBaseInstance()
-            .assets
-            .open(assetsPath(lang, type))
-            .reader()
-        } catch (e: IOException) {
-          // snippet file probably does not exist
-          return@executeAsyncProvideError
-        }
+          try {
+            BaseApplication.getBaseInstance().assets.open(assetsPath(lang, type)).reader()
+          } catch (e: IOException) {
+            // snippet file probably does not exist
+            return@executeAsyncProvideError
+          }
 
       JsonReader(content).use {
         it.beginObject()
@@ -91,14 +88,13 @@ object SnippetParser {
     }
   }
 
-  fun assetsPath(lang: String, type: String) =
-    "data/editor/${lang}/snippets.${type}.json"
+  fun assetsPath(lang: String, type: String) = "data/editor/${lang}/snippets.${type}.json"
 
   private fun readSnippet(
-    prefix: String,
-    reader: JsonReader,
-    snippetFactory: (String, String, List<String>) -> ISnippet,
-    snippets: MutableList<ISnippet>
+      prefix: String,
+      reader: JsonReader,
+      snippetFactory: (String, String, List<String>) -> ISnippet,
+      snippets: MutableList<ISnippet>,
   ) {
     reader.beginObject()
     var desc: String? = null

@@ -8,11 +8,13 @@ import com.google.android.material.tabs.TabLayout
 // https://stackoverflow.com/a/65605542
 class ScalableTabLayout : TabLayout {
   constructor(context: Context) : super(context)
+
   constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
+
   constructor(
-    context: Context,
-    attrs: AttributeSet?,
-    defStyleAttr: Int
+      context: Context,
+      attrs: AttributeSet?,
+      defStyleAttr: Int,
   ) : super(context, attrs, defStyleAttr)
 
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {

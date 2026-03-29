@@ -45,9 +45,7 @@ import com.itsaky.androidide.resources.R.string
 @IncludeInDesigner(group = LAYOUTS)
 open class LinearLayoutAdapter<T : LinearLayout> : ViewGroupAdapter<T>() {
 
-  override fun createAttrHandlers(
-    create: (String, AttributeHandlerScope<T>.() -> Unit) -> Unit
-  ) {
+  override fun createAttrHandlers(create: (String, AttributeHandlerScope<T>.() -> Unit) -> Unit) {
     super.createAttrHandlers(create)
 
     create("baselineAligned") { view.isBaselineAligned = parseBoolean(value) }
@@ -64,16 +62,24 @@ open class LinearLayoutAdapter<T : LinearLayout> : ViewGroupAdapter<T>() {
 
   override fun createUiWidgets(): List<UiWidget> {
     val horizontal =
-      LinearLayoutWidget(title = string.widget_linear_layout_horz,
-        icon = drawable.ic_widget_linear_layout_horz, isVertical = false)
-    val vertical = LinearLayoutWidget(title = string.widget_linear_layout_vert,
-      icon = drawable.ic_widget_linear_layout_vert, isVertical = true)
+        LinearLayoutWidget(
+            title = string.widget_linear_layout_horz,
+            icon = drawable.ic_widget_linear_layout_horz,
+            isVertical = false,
+        )
+    val vertical =
+        LinearLayoutWidget(
+            title = string.widget_linear_layout_vert,
+            icon = drawable.ic_widget_linear_layout_vert,
+            isVertical = true,
+        )
     return listOf(horizontal, vertical)
   }
 
   override fun getLayoutStrategy(group: IViewGroup): LayoutStrategy {
     val orientation = group.findAttribute("orientation", INamespace.ANDROID.uri)
-    return if (orientation?.value == "vertical") LayoutStrategy.VERTICAL else LayoutStrategy.HORIZONTAL
+    return if (orientation?.value == "vertical") LayoutStrategy.VERTICAL
+    else LayoutStrategy.HORIZONTAL
   }
 
   protected open fun parseOrientation(value: String): Int {
@@ -84,9 +90,10 @@ open class LinearLayoutAdapter<T : LinearLayout> : ViewGroupAdapter<T>() {
     }
   }
 
-  private class LinearLayoutWidget(@StringRes title: Int,
-                                   @DrawableRes icon: Int,
-                                   private val isVertical: Boolean
+  private class LinearLayoutWidget(
+      @StringRes title: Int,
+      @DrawableRes icon: Int,
+      private val isVertical: Boolean,
   ) : UiWidget(LinearLayout::class.java, title, icon) {
 
     companion object {
@@ -95,12 +102,15 @@ open class LinearLayoutAdapter<T : LinearLayout> : ViewGroupAdapter<T>() {
       private const val VERTICAL = "vertical"
     }
 
-    override fun createView(context: Context, parent: ViewGroup,
-                            layoutFile: LayoutFile
-    ): IView {
+    override fun createView(context: Context, parent: ViewGroup, layoutFile: LayoutFile): IView {
       return super.createView(context, parent, layoutFile).apply {
-        addAttribute(newAttribute(this, name = "orientation",
-          value = if (isVertical) VERTICAL else HORIZONTAL))
+        addAttribute(
+            newAttribute(
+                this,
+                name = "orientation",
+                value = if (isVertical) VERTICAL else HORIZONTAL,
+            )
+        )
       }
     }
   }

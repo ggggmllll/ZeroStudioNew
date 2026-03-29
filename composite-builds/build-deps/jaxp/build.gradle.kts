@@ -15,12 +15,9 @@
  *   along with AndroidIDE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-@Suppress("JavaPluginLanguageLevel")
-plugins {
-    id("java-library")
-}
+@Suppress("JavaPluginLanguageLevel") plugins { id("java-library") }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+  sourceCompatibility = JavaVersion.VERSION_1_8
+  targetCompatibility = JavaVersion.VERSION_1_8
 }

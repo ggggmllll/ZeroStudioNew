@@ -26,22 +26,24 @@ import com.itsaky.androidide.fragments.FragmentWithBinding
  * @author Akash Yadav (Original Author)
  * @author android_zero (Modifier)
  *
- * This fragment displays a greeting screen with a Lottie animation.
- * The animation is loaded programmatically from the assets folder.
+ * This fragment displays a greeting screen with a Lottie animation. The animation is loaded
+ * programmatically from the assets folder.
  */
 class GreetingFragment :
-  FragmentWithBinding<FragmentOnboardingGreetingBinding>(FragmentOnboardingGreetingBinding::inflate) {
+    FragmentWithBinding<FragmentOnboardingGreetingBinding>(
+        FragmentOnboardingGreetingBinding::inflate
+    ) {
 
   /**
    * Called when the fragment's view has been created.
    *
    * @param view The View returned by onCreateView().
-   * @param savedInstanceState If non-null, this fragment is being re-constructed
-   * from a previous saved state as given here.
+   * @param savedInstanceState If non-null, this fragment is being re-constructed from a previous
+   *   saved state as given here.
    */
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-    
+
     binding.lottieAnimationview?.setAnimation("LottieAnimation/code.json")
   }
 }

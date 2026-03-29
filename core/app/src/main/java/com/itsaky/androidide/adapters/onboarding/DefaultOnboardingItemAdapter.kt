@@ -31,14 +31,15 @@ import com.itsaky.androidide.models.OnboardingItem
  * @author Akash Yadav
  */
 open class DefaultOnboardingItemAdapter<T : OnboardingItem>(
-  protected val items: List<T>,
-  protected val onItemClickListener: OnItemClickListener<T>? = null,
-  protected val onItemLongClickListener: OnItemLongClickListener<T>? = null
+    protected val items: List<T>,
+    protected val onItemClickListener: OnItemClickListener<T>? = null,
+    protected val onItemLongClickListener: OnItemLongClickListener<T>? = null,
 ) : RecyclerView.Adapter<DefaultOnboardingItemAdapter.ViewHolder>() {
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
     return ViewHolder(
-      LayoutOnboardingItemBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+        LayoutOnboardingItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+    )
   }
 
   override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -46,10 +47,10 @@ open class DefaultOnboardingItemAdapter<T : OnboardingItem>(
   }
 
   protected open fun doBindViewHolder(
-    holder: ViewHolder,
-    position: Int,
-    item: T,
-    binding: LayoutOnboardingItemBinding
+      holder: ViewHolder,
+      position: Int,
+      item: T,
+      binding: LayoutOnboardingItemBinding,
   ) {
     binding.content.title.text = item.title
 
@@ -76,7 +77,9 @@ open class DefaultOnboardingItemAdapter<T : OnboardingItem>(
     }
 
     if (item.isLongClickable && onItemLongClickListener != null) {
-      binding.root.setOnLongClickListener { onItemLongClickListener.onLongClick(item, position, binding) }
+      binding.root.setOnLongClickListener {
+        onItemLongClickListener.onLongClick(item, position, binding)
+      }
     }
   }
 
@@ -88,8 +91,7 @@ open class DefaultOnboardingItemAdapter<T : OnboardingItem>(
     return items[index]
   }
 
-  class ViewHolder(val binding: LayoutOnboardingItemBinding) :
-    RecyclerView.ViewHolder(binding.root)
+  class ViewHolder(val binding: LayoutOnboardingItemBinding) : RecyclerView.ViewHolder(binding.root)
 
   fun interface OnItemClickListener<T : OnboardingItem> {
 

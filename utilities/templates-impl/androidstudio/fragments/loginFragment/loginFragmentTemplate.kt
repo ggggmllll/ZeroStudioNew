@@ -29,17 +29,17 @@ import com.android.tools.idea.wizard.template.TemplateData
 import com.android.tools.idea.wizard.template.TextFieldWidget
 import com.android.tools.idea.wizard.template.WizardUiContext
 import com.android.tools.idea.wizard.template.fragmentToLayout
-import com.itsaky.androidide.templates.impl.androidstudio.activities.common.MIN_API
-import com.itsaky.androidide.templates.impl.androidstudio.defaultPackageNameParameter
 import com.android.tools.idea.wizard.template.stringParameter
 import com.android.tools.idea.wizard.template.template
+import com.itsaky.androidide.templates.impl.androidstudio.activities.common.MIN_API
+import com.itsaky.androidide.templates.impl.androidstudio.defaultPackageNameParameter
 import java.io.File
 
 val loginFragmentTemplate
   get() = template {
     name = "Login Fragment"
     description =
-      "Creates a new login fragment, allowing users to enter an email address and password to log in or to register with your application"
+        "Creates a new login fragment, allowing users to enter an email address and password to log in or to register with your application"
     minApi = MIN_API
     category = Category.Fragment
     formFactor = FormFactor.Mobile
@@ -64,11 +64,21 @@ val loginFragmentTemplate
 
     val packageName = defaultPackageNameParameter
 
-    widgets(TextFieldWidget(fragmentClass), TextFieldWidget(layoutName), PackageNameWidget(packageName), LanguageWidget())
+    widgets(
+        TextFieldWidget(fragmentClass),
+        TextFieldWidget(layoutName),
+        PackageNameWidget(packageName),
+        LanguageWidget(),
+    )
 
     thumb { File("login-fragment").resolve("template_login_fragment.png") }
 
     recipe = { data: TemplateData ->
-      loginFragmentRecipe(data as ModuleTemplateData, fragmentClass.value, layoutName.value, packageName.value)
+      loginFragmentRecipe(
+          data as ModuleTemplateData,
+          fragmentClass.value,
+          layoutName.value,
+          packageName.value,
+      )
     }
   }

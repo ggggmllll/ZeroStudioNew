@@ -41,7 +41,7 @@ class ManifestAttrCompletionProviderTest : CompletionHelper by CompletionHelperI
       val (incomplete, items) = complete()
       assertThat(incomplete).isFalse()
       assertThat(items)
-        .containsAtLeast("android:versionName", "android:versionCode", "android:versionCodeMajor")
+          .containsAtLeast("android:versionName", "android:versionCode", "android:versionCodeMajor")
     }
   }
 
@@ -52,13 +52,13 @@ class ManifestAttrCompletionProviderTest : CompletionHelper by CompletionHelperI
       val (incomplete, items) = complete()
       assertThat(incomplete).isFalse()
       assertThat(items)
-        .containsAtLeast(
-          "android:allowClearUserData",
-          "android:allowClearUserDataOnFailedRestore",
-          "android:allowAudioPlaybackCapture",
-          "android:allowNativeHeapPointerTagging",
-          "android:allowAutoRevokePermissionsExemption"
-        )
+          .containsAtLeast(
+              "android:allowClearUserData",
+              "android:allowClearUserDataOnFailedRestore",
+              "android:allowAudioPlaybackCapture",
+              "android:allowNativeHeapPointerTagging",
+              "android:allowAutoRevokePermissionsExemption",
+          )
     }
   }
 }

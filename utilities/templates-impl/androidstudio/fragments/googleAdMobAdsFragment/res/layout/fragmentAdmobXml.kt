@@ -19,11 +19,16 @@ package com.itsaky.androidide.templates.impl.androidstudio.fragments.googleAdMob
 import com.android.tools.idea.wizard.template.getMaterialComponentName
 import com.itsaky.androidide.templates.impl.androidstudio.fragments.googleAdMobAdsFragment.AdFormat
 
-fun fragmentAdmobXml(adFormat: AdFormat, fragmentClass: String, packageName: String, useAndroidX: Boolean): String {
+fun fragmentAdmobXml(
+    adFormat: AdFormat,
+    fragmentClass: String,
+    packageName: String,
+    useAndroidX: Boolean,
+): String {
   val formatSpecificLayout =
-    when (adFormat) {
-      AdFormat.Interstitial -> {
-        """
+      when (adFormat) {
+        AdFormat.Interstitial -> {
+          """
     <!-- view for AdMob Interstitial Ad -->
     <TextView
         android:id="@+id/app_title"
@@ -58,9 +63,9 @@ fun fragmentAdmobXml(adFormat: AdFormat, fragmentClass: String, packageName: Str
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
     """
-      }
-      AdFormat.Banner -> {
-        """
+        }
+        AdFormat.Banner -> {
+          """
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -83,8 +88,8 @@ fun fragmentAdmobXml(adFormat: AdFormat, fragmentClass: String, packageName: Str
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
     """
+        }
       }
-    }
   return """
 <${getMaterialComponentName("android.support.constraint.ConstraintLayout", useAndroidX)}
     xmlns:android="http://schemas.android.com/apk/res/android"

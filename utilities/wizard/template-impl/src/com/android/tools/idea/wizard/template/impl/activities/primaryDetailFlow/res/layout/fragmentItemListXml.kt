@@ -19,14 +19,14 @@ package com.android.tools.idea.wizard.template.impl.activities.primaryDetailFlow
 import com.android.tools.idea.wizard.template.getMaterialComponentName
 
 fun fragmentItemListXml(
-  collectionName: String,
-  detailName: String,
-  itemListLayout: String,
-  itemListContentLayout: String,
-  packageName: String,
-  useAndroidX: Boolean,
+    collectionName: String,
+    detailName: String,
+    itemListLayout: String,
+    itemListContentLayout: String,
+    packageName: String,
+    useAndroidX: Boolean,
 ) =
-  """
+    """
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Adding the same root's ID for view binding as other layout configurations -->
 <${getMaterialComponentName("android.support.constraint.ConstraintLayout", useAndroidX)}

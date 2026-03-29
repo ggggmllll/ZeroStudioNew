@@ -25,7 +25,7 @@ package com.android.aaptcompiler
  * @property value The actual Value.
  */
 data class ResourceConfigValue(
-  val config: ConfigDescription,
-  val product: String,
-  var value: Value? = null
+    val config: ConfigDescription,
+    val product: String,
+    var value: Value? = null,
 )

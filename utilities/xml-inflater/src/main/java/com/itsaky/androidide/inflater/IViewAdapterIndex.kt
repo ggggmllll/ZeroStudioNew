@@ -37,7 +37,7 @@ interface IViewAdapterIndex {
    *
    * @param view The fully qualified name of the view class.
    * @return The [IViewAdapter] for the given view name. If no adapter is found for the given view
-   * name, returns adapter for `android.view.View` if available or `null`.
+   *   name, returns adapter for `android.view.View` if available or `null`.
    */
   fun getAdapter(view: String): IViewAdapter<out View>?
 
@@ -63,7 +63,7 @@ interface IViewAdapterIndex {
  *
  * @param view The fully qualified name of the view class.
  * @return The [IViewAdapter] for the given view name. If no adapter is found for the given view
- * name, returns adapter for `android.view.View` if available or `null`.
+ *   name, returns adapter for `android.view.View` if available or `null`.
  */
 fun getAdapter(view: String): IViewAdapter<out View>? {
   return IViewAdapterIndex.instance.getAdapter(view)

@@ -29,17 +29,14 @@ import com.itsaky.androidide.app.IDEApplication
 import com.itsaky.androidide.contributors.Contributor
 import com.itsaky.androidide.databinding.LayoutContributorsItemBinding
 
-/**
- * @author Akash Yadav
- */
-class ContributorsGridAdapter(
-  contributors: List<Contributor>
-) : RecyclerView.Adapter<ContributorsGridAdapter.ViewHolder>() {
+/** @author Akash Yadav */
+class ContributorsGridAdapter(contributors: List<Contributor>) :
+    RecyclerView.Adapter<ContributorsGridAdapter.ViewHolder>() {
 
   private val contributors = contributors.toMutableList()
 
   class ViewHolder(val binding: LayoutContributorsItemBinding) :
-    RecyclerView.ViewHolder(binding.root)
+      RecyclerView.ViewHolder(binding.root)
 
   override fun getItemCount(): Int {
     return contributors.size
@@ -47,7 +44,8 @@ class ContributorsGridAdapter(
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
     return ViewHolder(
-      LayoutContributorsItemBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+        LayoutContributorsItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+    )
   }
 
   override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -60,23 +58,24 @@ class ContributorsGridAdapter(
     }
 
     Glide.with(binding.root)
-      .load(contributor.avatarUrl)
-      .placeholder(R.drawable.ic_account)
-      .transition(DrawableTransitionOptions.withCrossFade(100))
-      .into(binding.root)
+        .load(contributor.avatarUrl)
+        .placeholder(R.drawable.ic_account)
+        .transition(DrawableTransitionOptions.withCrossFade(100))
+        .into(binding.root)
 
-    binding.root.setOnClickListener {
-      IDEApplication.instance.openUrl(contributor.profileUrl)
-    }
+    binding.root.setOnClickListener { IDEApplication.instance.openUrl(contributor.profileUrl) }
   }
 
   object EmptyContributor : Contributor {
     override val id: Int
       get() = 0
+
     override val username: String
       get() = ""
+
     override val avatarUrl: String
       get() = ""
+
     override val profileUrl: String
       get() = ""
   }
@@ -87,23 +86,26 @@ class ContributorsGridAdapter(
       contributors.add(EmptyContributor)
     }
 
-    val diff = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
-      override fun getOldListSize(): Int {
-        return count
-      }
+    val diff =
+        DiffUtil.calculateDiff(
+            object : DiffUtil.Callback() {
+              override fun getOldListSize(): Int {
+                return count
+              }
 
-      override fun getNewListSize(): Int {
-        return count + extras
-      }
+              override fun getNewListSize(): Int {
+                return count + extras
+              }
 
-      override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-        return newItemPosition < count && oldItemPosition == newItemPosition
-      }
+              override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                return newItemPosition < count && oldItemPosition == newItemPosition
+              }
 
-      override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-        return areItemsTheSame(oldItemPosition, newItemPosition)
-      }
-    })
+              override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                return areItemsTheSame(oldItemPosition, newItemPosition)
+              }
+            }
+        )
 
     diff.dispatchUpdatesTo(this)
   }

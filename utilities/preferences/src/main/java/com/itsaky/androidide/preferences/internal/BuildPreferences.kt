@@ -99,18 +99,14 @@ object BuildPreferences {
       prefManager.putString(CUSTOM_GRADLE_INSTALLATION, value)
     }
 
-  /**
-   * Whether the app should be launched automatically after installation (after build).
-   */
+  /** Whether the app should be launched automatically after installation (after build). */
   var launchAppAfterInstall: Boolean
     get() = prefManager.getBoolean(LAUNCH_APP_AFTER_INSTALL, false)
     set(value) {
       prefManager.putBoolean(LAUNCH_APP_AFTER_INSTALL, value)
     }
 
-  /**
-   * The selected Java installation.
-   */
+  /** The selected Java installation. */
   var javaHome: String
     get() = prefManager.getString(PREF_JAVA_HOME, "")
     set(value) {

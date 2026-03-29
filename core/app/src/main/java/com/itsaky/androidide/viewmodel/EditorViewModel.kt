@@ -28,88 +28,106 @@ import com.itsaky.androidide.models.OpenedFilesCache
 import com.itsaky.androidide.projects.IProjectManager
 import com.itsaky.androidide.utils.Environment
 import com.itsaky.androidide.utils.ILogger
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import java.io.File
 import java.io.IOException
 import java.util.Collections
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 
 class EditorViewModel : ViewModel() {
 
   internal val _isBuildInProgress = MutableLiveData(false)
   internal val _isInitializing = MutableLiveData(false)
   internal val _statusText = MutableLiveData<Pair<CharSequence, Int>>("" to CENTER)
-  
+
   internal val _displayedFile = MutableLiveData(-1)
   internal val _startDrawerOpened = MutableLiveData(false)
   internal val _isSyncNeeded = MutableLiveData(false)
   internal val _filesModified = MutableLiveData(false)
   internal val _filesSaving = MutableLiveData(false)
 
-  @PublishedApi
-  internal val _openedFiles = MutableLiveData<OpenedFilesCache>()
-  @PublishedApi
-  internal val _isBoundToBuildService = MutableLiveData(false)
-  @PublishedApi
-  internal val _files = MutableLiveData<MutableList<File>>(ArrayList())
+  @PublishedApi internal val _openedFiles = MutableLiveData<OpenedFilesCache>()
+  @PublishedApi internal val _isBoundToBuildService = MutableLiveData(false)
+  @PublishedApi internal val _files = MutableLiveData<MutableList<File>>(ArrayList())
 
-  @PublishedApi
-  internal val mCurrentFile = MutableLiveData<Pair<Int, File?>?>(null)
+  @PublishedApi internal val mCurrentFile = MutableLiveData<Pair<Int, File?>?>(null)
 
-  @PublishedApi
-  internal val fileIoMutex = Mutex()
+  @PublishedApi internal val fileIoMutex = Mutex()
 
   var areFilesModified: Boolean
     get() = _filesModified.value ?: false
-    set(value) { _filesModified.value = value }
+    set(value) {
+      _filesModified.value = value
+    }
 
   var areFilesSaving: Boolean
     get() = _filesSaving.value ?: false
-    set(value) { _filesSaving.value = value }
+    set(value) {
+      _filesSaving.value = value
+    }
 
   var openedFilesCache: OpenedFilesCache?
     get() = _openedFiles.value
-    set(value) { this._openedFiles.value = value }
+    set(value) {
+      this._openedFiles.value = value
+    }
 
   var isBoundToBuildSerice: Boolean
     get() = _isBoundToBuildService.value ?: false
-    set(value) { _isBoundToBuildService.value = value }
+    set(value) {
+      _isBoundToBuildService.value = value
+    }
 
   var isBuildInProgress: Boolean
     get() = _isBuildInProgress.value ?: false
-    set(value) { _isBuildInProgress.value = value }
+    set(value) {
+      _isBuildInProgress.value = value
+    }
 
   var isInitializing: Boolean
     get() = _isInitializing.value ?: false
-    set(value) { _isInitializing.value = value }
+    set(value) {
+      _isInitializing.value = value
+    }
 
   var statusText: CharSequence
     get() = this._statusText.value?.first ?: ""
-    set(value) { _statusText.value = value to (_statusText.value?.second ?: 0) }
+    set(value) {
+      _statusText.value = value to (_statusText.value?.second ?: 0)
+    }
 
   var statusGravity: Int
     get() = this._statusText.value?.second ?: CENTER
-    set(value) { _statusText.value = (_statusText.value?.first ?: "") to value }
+    set(value) {
+      _statusText.value = (_statusText.value?.first ?: "") to value
+    }
 
   var displayedFileIndex: Int
     get() = _displayedFile.value!!
-    set(value) { _displayedFile.value = value }
+    set(value) {
+      _displayedFile.value = value
+    }
 
   var startDrawerOpened: Boolean
     get() = _startDrawerOpened.value ?: false
-    set(value) { _startDrawerOpened.value = value }
+    set(value) {
+      _startDrawerOpened.value = value
+    }
 
   var isSyncNeeded: Boolean
     get() = _isSyncNeeded.value ?: false
-    set(value) { _isSyncNeeded.value = value }
+    set(value) {
+      _isSyncNeeded.value = value
+    }
 
   internal var files: MutableList<File>
     get() = this._files.value ?: Collections.emptyList()
-    set(value) { this._files.value = value }
+    set(value) {
+      this._files.value = value
+    }
 
   private inline fun updateFiles(crossinline action: (files: MutableList<File>) -> Unit) {
     val currentFiles = this.files
@@ -119,12 +137,12 @@ class EditorViewModel : ViewModel() {
 
   fun addFile(file: File) = updateFiles { it.add(file) }
 
-  fun removeFile(index: Int) = updateFiles { 
+  fun removeFile(index: Int) = updateFiles {
     it.removeAt(index)
     if (it.isEmpty()) mCurrentFile.value = null
   }
 
-  fun removeAllFiles() = updateFiles { 
+  fun removeAllFiles() = updateFiles {
     it.clear()
     setCurrentFile(-1, null)
   }
@@ -135,19 +153,26 @@ class EditorViewModel : ViewModel() {
   }
 
   fun updateFile(index: Int, newFile: File) = updateFiles { it[index] = newFile }
+
   fun getOpenedFile(index: Int): File = files[index]
+
   fun getOpenedFileCount(): Int = files.size
+
   fun getOpenedFiles(): List<File> = Collections.unmodifiableList(files)
-  fun observeFiles(owner: LifecycleOwner?, obs: Observer<MutableList<File>?>?) = _files.observe(owner!!, obs!!)
+
+  fun observeFiles(owner: LifecycleOwner?, obs: Observer<MutableList<File>?>?) =
+      _files.observe(owner!!, obs!!)
+
   fun getCurrentFileIndex(): Int = mCurrentFile.value?.first ?: -1
+
   fun getCurrentFile(): File? = mCurrentFile.value?.second
 
   inline fun getOrReadOpenedFilesCache(crossinline result: (OpenedFilesCache?) -> Unit) {
-    openedFilesCache?.let { 
-        result(it) 
-        return 
+    openedFilesCache?.let {
+      result(it)
+      return
     }
-    
+
     viewModelScope.launch(Dispatchers.IO) {
       val cache = fileIoMutex.withLock {
         try {
@@ -155,7 +180,9 @@ class EditorViewModel : ViewModel() {
           if (cacheFile.exists() && cacheFile.length() > 0L) {
             cacheFile.bufferedReader().use(OpenedFilesCache::parse)
           } else null
-        } catch (err: IOException) { null }
+        } catch (err: IOException) {
+          null
+        }
       }
       withContext(Dispatchers.Main.immediate) { result(cache) }
     }
@@ -176,7 +203,6 @@ class EditorViewModel : ViewModel() {
 
           val gson = GsonBuilder().setPrettyPrinting().create()
           file.writeText(gson.toJson(cache))
-          
         } catch (e: Exception) {
           ILogger.ROOT.error("Error in writeOpenedFiles", e)
         }
@@ -190,7 +216,9 @@ class EditorViewModel : ViewModel() {
     val file = File(dir, "editor/openedFiles.json")
 
     if (file.exists() && forWrite) {
-      try { FileUtils.rename(file, "${file.name}.bak") } catch (e: Exception) {}
+      try {
+        FileUtils.rename(file, "${file.name}.bak")
+      } catch (e: Exception) {}
     }
     file.parentFile?.let { if (!it.exists()) it.mkdirs() }
     return file

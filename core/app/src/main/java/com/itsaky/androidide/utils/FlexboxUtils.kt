@@ -22,16 +22,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.flexbox.FlexboxLayoutManager
 import kotlin.math.ceil
 
-/**
- * @author Akash Yadav
- */
+/** @author Akash Yadav */
 object FlexboxUtils {
 
   @JvmStatic
-  inline fun <T: RecyclerView.Adapter<*>> createGlobalLayoutListenerToDistributeFlexboxItemsEvenly(
-    crossinline adapterProvider: () -> T?,
-    crossinline layoutManagerProvider: () -> FlexboxLayoutManager?,
-    crossinline fillDiff: (T, diff: Int) -> Unit
+  inline fun <T : RecyclerView.Adapter<*>> createGlobalLayoutListenerToDistributeFlexboxItemsEvenly(
+      crossinline adapterProvider: () -> T?,
+      crossinline layoutManagerProvider: () -> FlexboxLayoutManager?,
+      crossinline fillDiff: (T, diff: Int) -> Unit,
   ): ViewTreeObserver.OnGlobalLayoutListener {
 
     return object : ViewTreeObserver.OnGlobalLayoutListener {

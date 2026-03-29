@@ -26,7 +26,7 @@ import androidx.preference.Preference
  * @author Akash Yadav
  */
 abstract class IPreferenceScreen : IPreferenceGroup() {
-  
+
   override fun onCreatePreference(context: Context): Preference {
     return Preference(context)
   }

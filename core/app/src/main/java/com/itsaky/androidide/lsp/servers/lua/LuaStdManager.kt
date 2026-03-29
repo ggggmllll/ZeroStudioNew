@@ -26,44 +26,42 @@ import java.io.File
 /**
  * Manager for EmmyLua standard libraries (std).
  *
- * EmmyLua requires a set of standard definition files (.lua) to provide proper
- * code completion, hover, and signature help for global functions like `print`, `pairs`, etc.
- * If these are missing, the server will treat them as unknown global variables.
+ * EmmyLua requires a set of standard definition files (.lua) to provide proper code completion,
+ * hover, and signature help for global functions like `print`, `pairs`, etc. If these are missing,
+ * the server will treat them as unknown global variables.
  *
  * @author android_zero
  */
 object LuaStdManager {
 
-    private val LOG = Logger.instance("LuaStdManager")
+  private val LOG = Logger.instance("LuaStdManager")
 
-    /**
-     * The local directory where EmmyLua standard libraries should reside.
-     */
-    val stdDir: File
-        get() = File(Environment.HOME, ".androidide/emmylua/std")
+  /** The local directory where EmmyLua standard libraries should reside. */
+  val stdDir: File
+    get() = File(Environment.HOME, ".androidide/emmylua/std")
 
-    /**
-     * Ensures that the EmmyLua standard libraries are extracted from the APK assets
-     * to the local file system.
-     *
-     * @param context The application context.
-     */
-    fun ensureStdLibExtracted(context: Context) {
-        if (!stdDir.exists()) {
-            stdDir.mkdirs()
-        }
-
-        // We check a known marker file to determine if extraction is needed
-        val markerFile = File(stdDir, "Lua54/global.lua")
-        if (!markerFile.exists()) {
-            LOG.info("Extracting EmmyLua standard libraries to ${stdDir.absolutePath}...")
-            try {
-                // Assuming standard libraries are bundled in assets/emmylua/std
-                ResourceUtils.copyFileFromAssets("emmylua/std", stdDir.absolutePath)
-                LOG.info("EmmyLua standard libraries extracted successfully.")
-            } catch (e: Exception) {
-                LOG.error("Failed to extract EmmyLua standard libraries.", e)
-            }
-        }
+  /**
+   * Ensures that the EmmyLua standard libraries are extracted from the APK assets to the local file
+   * system.
+   *
+   * @param context The application context.
+   */
+  fun ensureStdLibExtracted(context: Context) {
+    if (!stdDir.exists()) {
+      stdDir.mkdirs()
     }
+
+    // We check a known marker file to determine if extraction is needed
+    val markerFile = File(stdDir, "Lua54/global.lua")
+    if (!markerFile.exists()) {
+      LOG.info("Extracting EmmyLua standard libraries to ${stdDir.absolutePath}...")
+      try {
+        // Assuming standard libraries are bundled in assets/emmylua/std
+        ResourceUtils.copyFileFromAssets("emmylua/std", stdDir.absolutePath)
+        LOG.info("EmmyLua standard libraries extracted successfully.")
+      } catch (e: Exception) {
+        LOG.error("Failed to extract EmmyLua standard libraries.", e)
+      }
+    }
+  }
 }

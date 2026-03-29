@@ -31,63 +31,71 @@ import com.itsaky.androidide.R
  */
 abstract class BaseGitPageFragment : Fragment() {
 
-    protected var toolbarContainer: LinearLayout? = null
+  protected var toolbarContainer: LinearLayout? = null
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        
-        val scrollView = view.findViewById<HorizontalScrollView>(R.id.git_mini_toolbar_scroll)
-        toolbarContainer = scrollView?.findViewById(R.id.git_mini_toolbar_container)
-        
-        setupToolbar()
-    }
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
 
-    /**
-     * 子类必须实现此方法来配置自己的工具栏按钮。
-     */
-    abstract fun setupToolbar()
+    val scrollView = view.findViewById<HorizontalScrollView>(R.id.git_mini_toolbar_scroll)
+    toolbarContainer = scrollView?.findViewById(R.id.git_mini_toolbar_container)
 
-    /**
-     * 向工具栏添加一个图标按钮。
-     * @param iconRes 图标资源 ID
-     * @param tooltip 提示文本
-     * @param onClick 点击回调
-     * @return 返回创建的按钮 View，以便设置长按监听等其他属性
-     */
-    protected fun addToolbarAction(iconRes: Int, tooltip: String, onClick: () -> Unit): View {
-        val context = requireContext()
-        
-        val button = ImageButton(context).apply {
-            layoutParams = LinearLayout.LayoutParams(
-                resources.getDimensionPixelSize(R.dimen.git_toolbar_icon_size),
-                resources.getDimensionPixelSize(R.dimen.git_toolbar_icon_size)
-            )
-            setImageResource(iconRes)
-            // background = null // 透明背景
-            val outValue = android.util.TypedValue()
-        context.theme.resolveAttribute(android.R.attr.selectableItemBackgroundBorderless, outValue, true)
-        setBackgroundResource(outValue.resourceId)
-        
-            contentDescription = tooltip
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                tooltipText = tooltip
-            }
-            setOnClickListener { onClick() }
-            
-            val padding = resources.getDimensionPixelSize(R.dimen.git_toolbar_icon_padding)
-            setPadding(padding, padding, padding, padding)
-            
-            val typedValue = android.util.TypedValue()
-        context.theme.resolveAttribute(com.google.android.material.R.attr.colorOnSurface, typedValue, true)
-        setColorFilter(typedValue.data) 
+    setupToolbar()
+  }
+
+  /** 子类必须实现此方法来配置自己的工具栏按钮。 */
+  abstract fun setupToolbar()
+
+  /**
+   * 向工具栏添加一个图标按钮。
+   *
+   * @param iconRes 图标资源 ID
+   * @param tooltip 提示文本
+   * @param onClick 点击回调
+   * @return 返回创建的按钮 View，以便设置长按监听等其他属性
+   */
+  protected fun addToolbarAction(iconRes: Int, tooltip: String, onClick: () -> Unit): View {
+    val context = requireContext()
+
+    val button =
+        ImageButton(context).apply {
+          layoutParams =
+              LinearLayout.LayoutParams(
+                  resources.getDimensionPixelSize(R.dimen.git_toolbar_icon_size),
+                  resources.getDimensionPixelSize(R.dimen.git_toolbar_icon_size),
+              )
+          setImageResource(iconRes)
+          // background = null // 透明背景
+          val outValue = android.util.TypedValue()
+          context.theme.resolveAttribute(
+              android.R.attr.selectableItemBackgroundBorderless,
+              outValue,
+              true,
+          )
+          setBackgroundResource(outValue.resourceId)
+
+          contentDescription = tooltip
+          if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            tooltipText = tooltip
+          }
+          setOnClickListener { onClick() }
+
+          val padding = resources.getDimensionPixelSize(R.dimen.git_toolbar_icon_padding)
+          setPadding(padding, padding, padding, padding)
+
+          val typedValue = android.util.TypedValue()
+          context.theme.resolveAttribute(
+              com.google.android.material.R.attr.colorOnSurface,
+              typedValue,
+              true,
+          )
+          setColorFilter(typedValue.data)
         }
-        
-        toolbarContainer?.addView(button)
-        return button
-    }
-    
-    protected fun addToolbarCustomView(view: View) {
-                 toolbarContainer?.addView(view)
-    }
 
+    toolbarContainer?.addView(button)
+    return button
+  }
+
+  protected fun addToolbarCustomView(view: View) {
+    toolbarContainer?.addView(view)
+  }
 }

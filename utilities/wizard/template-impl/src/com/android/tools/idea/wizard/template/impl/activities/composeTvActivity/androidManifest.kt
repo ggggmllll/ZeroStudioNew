@@ -19,19 +19,19 @@ import com.android.tools.idea.wizard.template.impl.activities.common.collapseEmp
 import com.android.tools.idea.wizard.template.renderIf
 
 fun androidManifestXml(
-  isNewModule: Boolean,
-  packageName: String,
-  activityClass: String,
-  isLauncher: Boolean,
-  activityThemeName: String,
+    isNewModule: Boolean,
+    packageName: String,
+    activityClass: String,
+    isLauncher: Boolean,
+    activityThemeName: String,
 ): String {
   val activityDescription =
-    activity(
-      packageName = packageName,
-      activityClass = activityClass,
-      themeName = activityThemeName,
-      isLauncherActivity = isLauncher || isNewModule,
-    )
+      activity(
+          packageName = packageName,
+          activityClass = activityClass,
+          themeName = activityThemeName,
+          isLauncherActivity = isLauncher || isNewModule,
+      )
   return """
 <manifest
     xmlns:android ="http://schemas.android.com/apk/res/android"
@@ -46,11 +46,16 @@ fun androidManifestXml(
     </application>
 </manifest>
     """
-    .collapseEmptyActivityTags()
+      .collapseEmptyActivityTags()
 }
 
-private fun activity(packageName: String, activityClass: String, isLauncherActivity: Boolean, themeName: String) =
-  """
+private fun activity(
+    packageName: String,
+    activityClass: String,
+    isLauncherActivity: Boolean,
+    themeName: String,
+) =
+    """
 <activity
     android:name ="${packageName}.${activityClass}"
     android:exported="$isLauncherActivity"
@@ -59,15 +64,16 @@ private fun activity(packageName: String, activityClass: String, isLauncherActiv
 </activity>
 """
 
-private fun theme(themeName: String) = renderIf(themeName.startsWith("@android:style/")) { """android:theme = "$themeName"""" }
+private fun theme(themeName: String) =
+    renderIf(themeName.startsWith("@android:style/")) { """android:theme = "$themeName"""" }
 
 private fun intentFilter(isLauncher: Boolean) =
-  renderIf(isLauncher) {
-    """
+    renderIf(isLauncher) {
+      """
     <intent-filter>
         <action android:name="android.intent.action.MAIN" />
         <category android:name="android.intent.category.LAUNCHER" />
         <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
     </intent-filter>
     """
-  }
+    }

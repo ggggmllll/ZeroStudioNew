@@ -26,7 +26,11 @@ import com.itsaky.androidide.templates.impl.androidstudio.fragments.settingsFrag
 import com.itsaky.androidide.templates.impl.androidstudio.fragments.settingsFragment.src.app_package.singleScreenSettingsFragmentJava
 import com.itsaky.androidide.templates.impl.androidstudio.fragments.settingsFragment.src.app_package.singleScreenSettingsFragmentKt
 
-fun RecipeExecutor.settingsFragmentRecipe(moduleData: ModuleTemplateData, fragmentClass: String, packageName: String) {
+fun RecipeExecutor.settingsFragmentRecipe(
+    moduleData: ModuleTemplateData,
+    fragmentClass: String,
+    packageName: String,
+) {
 
   val (projectData, srcOut, resOut, _) = moduleData
   val ktOrJavaExt = projectData.language.extension
@@ -38,10 +42,10 @@ fun RecipeExecutor.settingsFragmentRecipe(moduleData: ModuleTemplateData, fragme
   mergeXml(rootPreferencesXml(), resOut.resolve("xml/root_preferences.xml"))
 
   val singleScreenSettingsFragment =
-    when (projectData.language) {
-      Language.Java -> singleScreenSettingsFragmentJava(fragmentClass, packageName)
-      Language.Kotlin -> singleScreenSettingsFragmentKt(fragmentClass, packageName)
-    }
+      when (projectData.language) {
+        Language.Java -> singleScreenSettingsFragmentJava(fragmentClass, packageName)
+        Language.Kotlin -> singleScreenSettingsFragmentKt(fragmentClass, packageName)
+      }
   save(singleScreenSettingsFragment, srcOut.resolve("${fragmentClass}.${ktOrJavaExt}"))
 
   open(srcOut.resolve("${fragmentClass}.${ktOrJavaExt}"))

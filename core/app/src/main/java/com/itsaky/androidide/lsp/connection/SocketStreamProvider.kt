@@ -26,79 +26,71 @@ import java.net.InetSocketAddress
 import java.net.Socket
 
 /**
- * A [StreamConnectionProvider] for connecting to a Language Server over a TCP socket.
- * This is used for LSPs that listen on a specific network port, either locally or remotely.
+ * A [StreamConnectionProvider] for connecting to a Language Server over a TCP socket. This is used
+ * for LSPs that listen on a specific network port, either locally or remotely.
  *
  * ## Work-flow Diagram
- * [start()] -> Creates [Socket] -> [Socket.connect] -> Provides [InputStream] & [OutputStream] from the socket.
+ * [start()] -> Creates [Socket] -> [Socket.connect] -> Provides [InputStream] & [OutputStream] from
+ * the socket.
  *
  * @property port The port number on which the LSP server is listening.
  * @property host The hostname or IP address of the LSP server. Defaults to "localhost".
- *
  * @author android_zero
  */
-class SocketStreamProvider(
-    private val port: Int,
-    private val host: String = "localhost"
-) : StreamConnectionProvider {
+class SocketStreamProvider(private val port: Int, private val host: String = "localhost") :
+    StreamConnectionProvider {
 
-    private var socket: Socket? = null
-    private val LOG = Logger.instance("SocketStreamProvider")
+  private var socket: Socket? = null
+  private val LOG = Logger.instance("SocketStreamProvider")
 
-    /**
-     * @see StreamConnectionProvider.start
-     * @throws IOException if the socket connection fails.
-     */
-    @Throws(IOException::class)
-    override fun start() {
-        if (socket != null && socket?.isConnected == true && socket?.isClosed == false) {
-            LOG.warn("Socket connection to $host:$port already active.")
-            return
-        }
-
-        LOG.info("Connecting to LSP via Socket: $host:$port")
-        try {
-            val newSocket = Socket()
-            // Set a timeout for the connection attempt
-            newSocket.connect(InetSocketAddress(host, port), 5000) // 5-second timeout
-            newSocket.keepAlive = true
-            this.socket = newSocket
-            LOG.info("Socket connected successfully to $host:$port.")
-        } catch (e: Exception) {
-            LOG.error("Failed to connect to LSP socket at $host:$port", e)
-            throw IOException("Failed to connect to LSP socket at $host:$port", e)
-        }
+  /**
+   * @throws IOException if the socket connection fails.
+   * @see StreamConnectionProvider.start
+   */
+  @Throws(IOException::class)
+  override fun start() {
+    if (socket != null && socket?.isConnected == true && socket?.isClosed == false) {
+      LOG.warn("Socket connection to $host:$port already active.")
+      return
     }
 
-    /**
-     * @see StreamConnectionProvider.getInputStream
-     */
-    override val inputStream: InputStream
-        get() = socket?.inputStream ?: throw IOException("Socket is not connected or has been closed.")
-
-    /**
-     * @see StreamConnectionProvider.getOutputStream
-     */
-    override val outputStream: OutputStream
-        get() = socket?.outputStream ?: throw IOException("Socket is not connected or has been closed.")
-
-    /**
-     * Returns true if the socket is null or closed.
-     */
-    override val isClosed: Boolean
-        get() = socket?.isClosed ?: true
-
-    /**
-     * @see StreamConnectionProvider.close
-     * @author android_zero
-     */
-    override fun close() {
-        try {
-            socket?.close()
-        } catch (e: Exception) {
-            LOG.warn("Error closing socket connection to $host:$port: ${e.message}")
-        } finally {
-            socket = null
-        }
+    LOG.info("Connecting to LSP via Socket: $host:$port")
+    try {
+      val newSocket = Socket()
+      // Set a timeout for the connection attempt
+      newSocket.connect(InetSocketAddress(host, port), 5000) // 5-second timeout
+      newSocket.keepAlive = true
+      this.socket = newSocket
+      LOG.info("Socket connected successfully to $host:$port.")
+    } catch (e: Exception) {
+      LOG.error("Failed to connect to LSP socket at $host:$port", e)
+      throw IOException("Failed to connect to LSP socket at $host:$port", e)
     }
+  }
+
+  /** @see StreamConnectionProvider.getInputStream */
+  override val inputStream: InputStream
+    get() = socket?.inputStream ?: throw IOException("Socket is not connected or has been closed.")
+
+  /** @see StreamConnectionProvider.getOutputStream */
+  override val outputStream: OutputStream
+    get() = socket?.outputStream ?: throw IOException("Socket is not connected or has been closed.")
+
+  /** Returns true if the socket is null or closed. */
+  override val isClosed: Boolean
+    get() = socket?.isClosed ?: true
+
+  /**
+   * @see StreamConnectionProvider.close
+   * @author android_zero
+   */
+  override fun close() {
+    try {
+      socket?.close()
+    } catch (e: Exception) {
+      LOG.warn("Error closing socket connection to $host:$port: ${e.message}")
+    } finally {
+      socket = null
+    }
+  }
 }

@@ -44,21 +44,17 @@ object IntentUtils {
 
   @JvmStatic
   @JvmOverloads
-  fun imageIntent(
-    context: Context,
-    file: File,
-    intentAction: String = Intent.ACTION_SEND
-  ) {
+  fun imageIntent(context: Context, file: File, intentAction: String = Intent.ACTION_SEND) {
     val type = ImageUtils.getImageType(file)
     var typeString = type.value
     if (type == TYPE_UNKNOWN) {
       typeString = "*"
     }
     startIntent(
-      context = context,
-      file = file,
-      mimeType = "image/$typeString",
-      intentAction = intentAction
+        context = context,
+        file = file,
+        mimeType = "image/$typeString",
+        intentAction = intentAction,
     )
   }
 
@@ -70,21 +66,21 @@ object IntentUtils {
   @JvmStatic
   @JvmOverloads
   fun startIntent(
-    context: Context,
-    file: File,
-    mimeType: String = "*/*",
-    intentAction: String = Intent.ACTION_SEND
+      context: Context,
+      file: File,
+      mimeType: String = "*/*",
+      intentAction: String = Intent.ACTION_SEND,
   ) {
     val uri =
-      FileProvider.getUriForFile(context, "${context.packageName}.providers.fileprovider", file)
+        FileProvider.getUriForFile(context, "${context.packageName}.providers.fileprovider", file)
     val intent =
-      ShareCompat.IntentBuilder(context)
-        .setType(mimeType)
-        .setStream(uri)
-        .intent
-        .setAction(intentAction)
-        .setDataAndType(uri, mimeType)
-        .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        ShareCompat.IntentBuilder(context)
+            .setType(mimeType)
+            .setStream(uri)
+            .intent
+            .setAction(intentAction)
+            .setDataAndType(uri, mimeType)
+            .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
 
     context.startActivity(Intent.createChooser(intent, null))
   }
@@ -96,7 +92,7 @@ object IntentUtils {
    * @param packageName The package name of the application.
    */
   @JvmOverloads
-  fun launchApp(context: Context, packageName: String, logError: Boolean = true) : Boolean {
+  fun launchApp(context: Context, packageName: String, logError: Boolean = true): Boolean {
     if (Build.VERSION.SDK_INT >= 33) {
       return launchAppApi33(context, packageName, logError)
     }
@@ -104,7 +100,11 @@ object IntentUtils {
     return doLaunchApp(context, packageName, logError)
   }
 
-  private fun doLaunchApp(context: Context, packageName: String, logError: Boolean = true) : Boolean {
+  private fun doLaunchApp(
+      context: Context,
+      packageName: String,
+      logError: Boolean = true,
+  ): Boolean {
     try {
       val launchIntent = context.packageManager.getLaunchIntentForPackage(packageName)
       if (launchIntent == null) {
@@ -124,16 +124,14 @@ object IntentUtils {
   }
 
   @RequiresApi(33)
-  private fun launchAppApi33(context: Context, packageName: String, logError: Boolean = true) : Boolean {
+  private fun launchAppApi33(
+      context: Context,
+      packageName: String,
+      logError: Boolean = true,
+  ): Boolean {
     return try {
       val sender = context.packageManager.getLaunchIntentSenderForPackage(packageName)
-      sender.sendIntent(
-        context,
-        RESULT_LAUNCH_APP_INTENT_SENDER,
-        null,
-        null,
-        null
-      )
+      sender.sendIntent(context, RESULT_LAUNCH_APP_INTENT_SENDER, null, null, null)
       true
     } catch (e: Throwable) {
       flashError(R.string.msg_app_launch_failed)

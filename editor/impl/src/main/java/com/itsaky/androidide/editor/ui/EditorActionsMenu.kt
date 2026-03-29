@@ -74,9 +74,9 @@ import kotlin.math.min
  */
 @SuppressLint("RestrictedApi")
 open class EditorActionsMenu(val editor: IDEEditor) :
-  AbstractPopupWindow(editor, FEATURE_SHOW_OUTSIDE_VIEW_ALLOWED),
-  ActionsRegistry.ActionExecListener,
-  MenuBuilder.Callback {
+    AbstractPopupWindow(editor, FEATURE_SHOW_OUTSIDE_VIEW_ALLOWED),
+    ActionsRegistry.ActionExecListener,
+    MenuBuilder.Callback {
 
   companion object {
 
@@ -107,20 +107,15 @@ open class EditorActionsMenu(val editor: IDEEditor) :
       isVerticalFadingEdgeEnabled = true
       isVerticalScrollBarEnabled = true
       layoutParams =
-        ViewGroup.LayoutParams(
-          ViewGroup.LayoutParams.WRAP_CONTENT,
-          ViewGroup.LayoutParams.WRAP_CONTENT
-        )
+          ViewGroup.LayoutParams(
+              ViewGroup.LayoutParams.WRAP_CONTENT,
+              ViewGroup.LayoutParams.WRAP_CONTENT,
+          )
 
-            setFadingEdgeLength(SizeUtils.dp2px(42f))
-            setPaddingRelative(
-                SizeUtils.dp2px(6f),
-                paddingTop,
-                SizeUtils.dp2px(6f),
-                paddingBottom
-            )
-            addItemDecoration(CompactVerticalDivider())
-        }
+      setFadingEdgeLength(SizeUtils.dp2px(42f))
+      setPaddingRelative(SizeUtils.dp2px(6f), paddingTop, SizeUtils.dp2px(6f), paddingBottom)
+      addItemDecoration(CompactVerticalDivider())
+    }
 
     popup.contentView = this.list
     popup.animationStyle = R.style.PopupAnimation
@@ -131,46 +126,52 @@ open class EditorActionsMenu(val editor: IDEEditor) :
     }
   }
 
-    private inner class CompactVerticalDivider : RecyclerView.ItemDecoration() {
-        override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
-            val position = parent.getChildAdapterPosition(view)
-            if (position != parent.adapter?.itemCount?.minus(1)) {
-                outRect.right = SizeUtils.dp2px(1f)
-            }
-        }
-
-        override fun onDraw(c: Canvas, parent: RecyclerView, state: RecyclerView.State) {
-            val childCount = parent.childCount
-            val dividerHeight = SizeUtils.dp2px(32f)
-            val dividerWidth = SizeUtils.dp2px(1f)
-            val paint = android.graphics.Paint().apply {
-                color = parent.context.resolveAttr(R.attr.colorOutlineVariant)
-                alpha = 80
-            }
-
-            for (i in 0 until childCount - 1) {
-                val child = parent.getChildAt(i)
-                val params = child.layoutParams as RecyclerView.LayoutParams
-                val top = child.top + (child.height - dividerHeight) / 2
-                val bottom = top + dividerHeight
-                val left = child.right + params.rightMargin
-                val right = left + dividerWidth
-                c.drawRect(left.toFloat(), top.toFloat(), right.toFloat(), bottom.toFloat(), paint)
-            }
-        }
+  private inner class CompactVerticalDivider : RecyclerView.ItemDecoration() {
+    override fun getItemOffsets(
+        outRect: Rect,
+        view: View,
+        parent: RecyclerView,
+        state: RecyclerView.State,
+    ) {
+      val position = parent.getChildAdapterPosition(view)
+      if (position != parent.adapter?.itemCount?.minus(1)) {
+        outRect.right = SizeUtils.dp2px(1f)
+      }
     }
+
+    override fun onDraw(c: Canvas, parent: RecyclerView, state: RecyclerView.State) {
+      val childCount = parent.childCount
+      val dividerHeight = SizeUtils.dp2px(32f)
+      val dividerWidth = SizeUtils.dp2px(1f)
+      val paint =
+          android.graphics.Paint().apply {
+            color = parent.context.resolveAttr(R.attr.colorOutlineVariant)
+            alpha = 80
+          }
+
+      for (i in 0 until childCount - 1) {
+        val child = parent.getChildAt(i)
+        val params = child.layoutParams as RecyclerView.LayoutParams
+        val top = child.top + (child.height - dividerHeight) / 2
+        val bottom = top + dividerHeight
+        val left = child.right + params.rightMargin
+        val right = left + dividerWidth
+        c.drawRect(left.toFloat(), top.toFloat(), right.toFloat(), bottom.toFloat(), paint)
+      }
+    }
+  }
 
   open fun subscribe() {
     receipts.add(
-      editor.subscribeEvent(SelectionChangeEvent::class.java) { event, _ ->
-        this.onSelectionChanged(event)
-      }
+        editor.subscribeEvent(SelectionChangeEvent::class.java) { event, _ ->
+          this.onSelectionChanged(event)
+        }
     )
     receipts.add(editor.subscribeEvent(ScrollEvent::class.java) { _, _ -> this.onScrollEvent() })
     receipts.add(
-      editor.subscribeEvent(HandleStateChangeEvent::class.java) { event, _ ->
-        this.onHandleStateChanged(event)
-      }
+        editor.subscribeEvent(HandleStateChangeEvent::class.java) { event, _ ->
+          this.onHandleStateChanged(event)
+        }
     )
   }
 
@@ -198,10 +199,10 @@ open class EditorActionsMenu(val editor: IDEEditor) :
     } else {
       var show = false
       if (
-        event.cause == SelectionChangeEvent.CAUSE_TAP &&
-        event.left.index == mLastPosition &&
-        !isShowing &&
-        !editor.text.isInBatchEdit
+          event.cause == SelectionChangeEvent.CAUSE_TAP &&
+              event.left.index == mLastPosition &&
+              !isShowing &&
+              !editor.text.isInBatchEdit
       ) {
         editor.post(::displayWindow)
         show = true
@@ -209,11 +210,11 @@ open class EditorActionsMenu(val editor: IDEEditor) :
         dismiss()
       }
       mLastPosition =
-        if (event.cause == SelectionChangeEvent.CAUSE_TAP && !show) {
-          event.left.index
-        } else {
-          -1
-        }
+          if (event.cause == SelectionChangeEvent.CAUSE_TAP && !show) {
+            event.left.index
+          } else {
+            -1
+          }
     }
   }
 
@@ -226,7 +227,7 @@ open class EditorActionsMenu(val editor: IDEEditor) :
   }
 
   protected open fun onHandleStateChanged(
-    event: HandleStateChangeEvent,
+      event: HandleStateChangeEvent,
   ) {
     if (event.isHeld) {
       postDisplay()
@@ -236,7 +237,7 @@ open class EditorActionsMenu(val editor: IDEEditor) :
   protected open fun applyBackground() {
     val drawable = GradientDrawable()
     drawable.shape = GradientDrawable.RECTANGLE
-    drawable.cornerRadius = SizeUtils.dp2px(8f).toFloat() //四个角角度原始是28f，改为8f
+    drawable.cornerRadius = SizeUtils.dp2px(8f).toFloat() // 四个角角度原始是28f，改为8f
     drawable.color = ColorStateList.valueOf(editor.context.resolveAttr(R.attr.colorSurface))
     drawable.setStroke(SizeUtils.dp2px(1f), editor.context.resolveAttr(R.attr.colorOutline))
     list.background = drawable
@@ -251,20 +252,20 @@ open class EditorActionsMenu(val editor: IDEEditor) :
       return
     }
     editor.postDelayed(
-      object : Runnable {
-        override fun run() {
-          if (
-            !touchHandler.hasAnyHeldHandle() &&
-            System.currentTimeMillis() - mLastScroll > DELAY &&
-            touchHandler.scroller.isFinished
-          ) {
-            displayWindow()
-          } else {
-            editor.postDelayed(this, DELAY)
+        object : Runnable {
+          override fun run() {
+            if (
+                !touchHandler.hasAnyHeldHandle() &&
+                    System.currentTimeMillis() - mLastScroll > DELAY &&
+                    touchHandler.scroller.isFinished
+            ) {
+              displayWindow()
+            } else {
+              editor.postDelayed(this, DELAY)
+            }
           }
-        }
-      },
-      DELAY
+        },
+        DELAY,
     )
   }
 
@@ -284,15 +285,15 @@ open class EditorActionsMenu(val editor: IDEEditor) :
     var top: Int
     val cursor = editor.cursor
     top =
-      if (cursor.isSelected) {
-        val leftRect = editor.leftHandleDescriptor.position
-        val rightRect = editor.rightHandleDescriptor.position
-        val top1 = selectTop(leftRect)
-        val top2 = selectTop(rightRect)
-        min(top1, top2)
-      } else {
-        selectTop(editor.insertHandleDescriptor.position)
-      }
+        if (cursor.isSelected) {
+          val leftRect = editor.leftHandleDescriptor.position
+          val rightRect = editor.rightHandleDescriptor.position
+          val top1 = selectTop(leftRect)
+          val top2 = selectTop(rightRect)
+          min(top1, top2)
+        } else {
+          selectTop(editor.insertHandleDescriptor.position)
+        }
     top = max(0, min(top, editor.height - height - 5))
     val handleLeftX = editor.getOffset(editor.cursor.leftLine, editor.cursor.leftColumn)
     val handleRightX = editor.getOffset(editor.cursor.rightLine, editor.cursor.rightColumn)
@@ -340,21 +341,21 @@ open class EditorActionsMenu(val editor: IDEEditor) :
     data.put(Context::class.java, editor.context)
     data.put(IDEEditor::class.java, this.editor)
     data.put(
-      CodeEditor::class.java,
-      editor
+        CodeEditor::class.java,
+        editor,
     ) // For LSP actions, as they cannot access IDEEditor class
     data.put(File::class.java, editor.file)
     data.put(DiagnosticItem::class.java, getDiagnosticAtCursor())
     data.put(com.itsaky.androidide.models.Range::class.java, editor.cursorLSPRange)
     data.put(
-      JavaLanguageServer::class.java,
-      ILanguageServerRegistry.getDefault().getServer(JavaLanguageServer.SERVER_ID)
-          as? JavaLanguageServer?
+        JavaLanguageServer::class.java,
+        ILanguageServerRegistry.getDefault().getServer(JavaLanguageServer.SERVER_ID)
+            as? JavaLanguageServer?,
     )
     data.put(
-      XMLLanguageServer::class.java,
-      ILanguageServerRegistry.getDefault().getServer(XMLLanguageServer.SERVER_ID)
-          as? XMLLanguageServer?
+        XMLLanguageServer::class.java,
+        ILanguageServerRegistry.getDefault().getServer(XMLLanguageServer.SERVER_ID)
+            as? XMLLanguageServer?,
     )
     return data
   }
@@ -378,13 +379,13 @@ open class EditorActionsMenu(val editor: IDEEditor) :
     }
 
     this.list.layoutManager = LinearLayoutManager(editor.context, RecyclerView.HORIZONTAL, false)
-    
+
     if (this.list.itemDecorationCount == 0) {
       this.list.addItemDecoration(DividerItemDecoration(editor.context))
     }
-  
+
     fillMenu()
-        
+
     measureActionsList()
 
     val height = list.measuredHeight
@@ -397,9 +398,9 @@ open class EditorActionsMenu(val editor: IDEEditor) :
     val dp8 = SizeUtils.dp2px(8f)
     val dp16 = dp8 * 2
     this.list.measure(
-      MeasureSpec.makeMeasureSpec(editor.width - dp16 * 2, MeasureSpec.AT_MOST),
-      // MeasureSpec.makeMeasureSpec(maxWidth, MeasureSpec.AT_MOST),
-      MeasureSpec.makeMeasureSpec((260 * editor.dpUnit).toInt() - dp16 * 2, MeasureSpec.AT_MOST)
+        MeasureSpec.makeMeasureSpec(editor.width - dp16 * 2, MeasureSpec.AT_MOST),
+        // MeasureSpec.makeMeasureSpec(maxWidth, MeasureSpec.AT_MOST),
+        MeasureSpec.makeMeasureSpec((260 * editor.dpUnit).toInt() - dp16 * 2, MeasureSpec.AT_MOST),
     )
   }
 
@@ -407,8 +408,8 @@ open class EditorActionsMenu(val editor: IDEEditor) :
   private fun findWidestItem(): Int {
     var widest = 0
     val text =
-      LayoutInflater.from(editor.context).inflate(layout.layout_popup_menu_item, null)
-          as MaterialButton
+        LayoutInflater.from(editor.context).inflate(layout.layout_popup_menu_item, null)
+            as MaterialButton
     val dp30 = SizeUtils.dp2px(30f)
     val paddingHorizontal = text.paddingStart + text.paddingEnd
     val drawablePadding = text.iconPadding
@@ -430,16 +431,22 @@ open class EditorActionsMenu(val editor: IDEEditor) :
   }
 
   private class DividerItemDecoration(context: Context) : RecyclerView.ItemDecoration() {
-    
-    private val paint = Paint().apply {
-      color = context.resolveAttr(R.attr.colorOutlineVariant)
-      isAntiAlias = true
-    }
-    
+
+    private val paint =
+        Paint().apply {
+          color = context.resolveAttr(R.attr.colorOutlineVariant)
+          isAntiAlias = true
+        }
+
     private val dividerHeight = SizeUtils.dp2px(24f)
     private val itemSpacing = SizeUtils.dp2px(0f)
-  
-    override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
+
+    override fun getItemOffsets(
+        outRect: Rect,
+        view: View,
+        parent: RecyclerView,
+        state: RecyclerView.State,
+    ) {
       val position = parent.getChildAdapterPosition(view)
       if (position < parent.adapter!!.itemCount - 1) {
         outRect.right = itemSpacing
@@ -448,25 +455,25 @@ open class EditorActionsMenu(val editor: IDEEditor) :
         outRect.left = itemSpacing
       }
     }
-  
+
     override fun onDrawOver(c: Canvas, parent: RecyclerView, state: RecyclerView.State) {
       val childCount = parent.childCount
-      
+
       for (i in 0 until childCount - 1) {
         val child = parent.getChildAt(i)
         val params = child.layoutParams as RecyclerView.LayoutParams
-        
+
         val x = child.right + params.rightMargin + itemSpacing.toFloat()
         val top = child.top + (child.height - dividerHeight) / 2f
         val bottom = top + dividerHeight
-        
+
         c.drawLine(x, top, x, bottom, paint)
       }
     }
   }
-  
+
   private class ActionsListAdapter(val menu: Menu?, val forceShowTitle: Boolean = false) :
-    RecyclerView.Adapter<VH>() {
+      RecyclerView.Adapter<VH>() {
 
     override fun getItemCount(): Int {
       return menu?.size() ?: 0
@@ -476,32 +483,32 @@ open class EditorActionsMenu(val editor: IDEEditor) :
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
       return VH(
-        LayoutPopupMenuItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+          LayoutPopupMenuItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
       )
     }
 
     override fun onBindViewHolder(holder: VH, position: Int) {
       val item = getItem(position) ?: return
-      
+
       holder.binding.root.apply {
         text = if (forceShowTitle) item.title else ""
         tooltipText = item.title
-        icon = item.icon ?: run {
-          text = item.title
-          layoutParams.apply {
-            width = ViewGroup.LayoutParams.WRAP_CONTENT
-          }
-          null
-        }
-        
+        icon =
+            item.icon
+                ?: run {
+                  text = item.title
+                  layoutParams.apply { width = ViewGroup.LayoutParams.WRAP_CONTENT }
+                  null
+                }
+
         setOnClickListener { (item as MenuItemImpl).invoke() }
-        
+
         scaleX = 1f
         scaleY = 1f
-        
+
         iconSize = SizeUtils.dp2px(20f)
         iconTint = ColorStateList.valueOf(context.resolveAttr(R.attr.colorOnSurface))
-        
+
         cornerRadius = SizeUtils.dp2px(5f)
         rippleColor = ColorStateList.valueOf(context.resolveAttr(R.attr.colorControlHighlight))
       }

@@ -51,322 +51,405 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import com.itsaky.androidide.activities.MainActivity
 import com.itsaky.androidide.activities.PreferencesActivity
 import com.itsaky.androidide.activities.TerminalActivity
-import com.itsaky.androidide.resources.R
-import com.itsaky.androidide.viewmodel.MainViewModel
-import com.itsaky.androidide.utils.RecentProjectsManager
-import com.itsaky.androidide.utils.ProjectHistory
 import com.itsaky.androidide.fragments.git.function.ZeroCloneDialogBottomSheetFragment
-import kotlinx.coroutines.launch
+import com.itsaky.androidide.resources.R
+import com.itsaky.androidide.utils.ProjectHistory
+import com.itsaky.androidide.utils.RecentProjectsManager
+import com.itsaky.androidide.viewmodel.MainViewModel
 import java.io.File
+import kotlinx.coroutines.launch
 
 class MainFragment : BaseFragment() {
 
-    private val viewModel by viewModels<MainViewModel>(ownerProducer = { requireActivity() })
-    private val historyState = mutableStateListOf<ProjectHistory>()
+  private val viewModel by viewModels<MainViewModel>(ownerProducer = { requireActivity() })
+  private val historyState = mutableStateListOf<ProjectHistory>()
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        return ComposeView(requireContext()).apply {
-            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-            setContent {
-                MaterialTheme {
-                    Surface(color = Color.White, modifier = Modifier.fillMaxSize()) {
-                        ZeroStudioMainLayout()
-                    }
-                }
-            }
+  override fun onCreateView(
+      inflater: LayoutInflater,
+      container: ViewGroup?,
+      savedInstanceState: Bundle?,
+  ): View {
+    return ComposeView(requireContext()).apply {
+      setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+      setContent {
+        MaterialTheme {
+          Surface(color = Color.White, modifier = Modifier.fillMaxSize()) { ZeroStudioMainLayout() }
         }
+      }
     }
+  }
 
-    override fun onResume() {
-        super.onResume()
-        viewLifecycleScope.launch {
-            val list = RecentProjectsManager.getHistoryAsync(requireContext())
-            historyState.clear()
-            historyState.addAll(list)
-        }
+  override fun onResume() {
+    super.onResume()
+    viewLifecycleScope.launch {
+      val list = RecentProjectsManager.getHistoryAsync(requireContext())
+      historyState.clear()
+      historyState.addAll(list)
     }
+  }
 
-    @OptIn(ExperimentalMaterial3Api::class)
-    @Composable
-    private fun ZeroStudioMainLayout() {
-        val scrollState = rememberScrollState()
+  @OptIn(ExperimentalMaterial3Api::class)
+  @Composable
+  private fun ZeroStudioMainLayout() {
+    val scrollState = rememberScrollState()
 
-        Scaffold(
-            topBar = {
-                CenterAlignedTopAppBar(
-                    title = { Text(stringResource(R.string.app_name), fontWeight = FontWeight.ExtraBold, fontSize = 18.sp) },
-                    navigationIcon = {
-                        IconButton(onClick = { }) { Icon(Icons.Default.Menu, "Menu") }
-                    },
-                    actions = {
-                        IconButton(onClick = { }) { Icon(Icons.Default.Search, "Search") }
-                        IconButton(onClick = { }) {
-                            Box(modifier = Modifier.size(28.dp).clip(CircleShape).background(Color(0xFFEEEEEE))) {
-                                Icon(Icons.Outlined.Person, "User", modifier = Modifier.align(Alignment.Center))
-                            }
-                        }
-                    },
-                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color.White)
+    Scaffold(
+        topBar = {
+          CenterAlignedTopAppBar(
+              title = {
+                Text(
+                    stringResource(R.string.app_name),
+                    fontWeight = FontWeight.ExtraBold,
+                    fontSize = 18.sp,
                 )
-            },
-            bottomBar = {
-                NavigationBar(containerColor = Color.White, tonalElevation = 8.dp) {
-                    NavigationBarItem(selected = true, onClick = {}, icon = { Icon(Icons.Default.Home, null) }, label = { Text(stringResource(R.string.main_nav_home)) })
-                    NavigationBarItem(selected = false, onClick = {}, icon = { Icon(Icons.Default.History, null) }, label = { Text(stringResource(R.string.main_nav_history)) })
-                    NavigationBarItem(selected = false, onClick = {}, icon = { Icon(Icons.Default.Build, null) }, label = { Text(stringResource(R.string.main_nav_tools)) })
-                    NavigationBarItem(selected = false, onClick = {}, icon = { Icon(Icons.Default.Person, null) }, label = { Text(stringResource(R.string.main_nav_mine)) })
+              },
+              navigationIcon = { IconButton(onClick = {}) { Icon(Icons.Default.Menu, "Menu") } },
+              actions = {
+                IconButton(onClick = {}) { Icon(Icons.Default.Search, "Search") }
+                IconButton(onClick = {}) {
+                  Box(
+                      modifier =
+                          Modifier.size(28.dp).clip(CircleShape).background(Color(0xFFEEEEEE))
+                  ) {
+                    Icon(Icons.Outlined.Person, "User", modifier = Modifier.align(Alignment.Center))
+                  }
                 }
-            }
-        ) { padding ->
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding)
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .verticalScroll(scrollState)
-                        .padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 92.dp) 
-                ) {
-                    QuickStartGradientCard()
-                    
-                    Spacer(modifier = Modifier.height(20.dp))
+              },
+              colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color.White),
+          )
+        },
+        bottomBar = {
+          NavigationBar(containerColor = Color.White, tonalElevation = 8.dp) {
+            NavigationBarItem(
+                selected = true,
+                onClick = {},
+                icon = { Icon(Icons.Default.Home, null) },
+                label = { Text(stringResource(R.string.main_nav_home)) },
+            )
+            NavigationBarItem(
+                selected = false,
+                onClick = {},
+                icon = { Icon(Icons.Default.History, null) },
+                label = { Text(stringResource(R.string.main_nav_history)) },
+            )
+            NavigationBarItem(
+                selected = false,
+                onClick = {},
+                icon = { Icon(Icons.Default.Build, null) },
+                label = { Text(stringResource(R.string.main_nav_tools)) },
+            )
+            NavigationBarItem(
+                selected = false,
+                onClick = {},
+                icon = { Icon(Icons.Default.Person, null) },
+                label = { Text(stringResource(R.string.main_nav_mine)) },
+            )
+          }
+        },
+    ) { padding ->
+      Box(modifier = Modifier.fillMaxSize().padding(padding)) {
+        Column(
+            modifier =
+                Modifier.fillMaxSize()
+                    .verticalScroll(scrollState)
+                    .padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 92.dp)
+        ) {
+          QuickStartGradientCard()
 
-                    Row(modifier = Modifier.fillMaxWidth()) {
-                        Column(modifier = Modifier.weight(1.5f)) {
-                            SectionTitle(stringResource(R.string.main_recent_projects))
-                            if (historyState.isEmpty()) {
-                                Text(stringResource(R.string.main_empty_history), fontSize = 12.sp, color = Color.Gray, modifier = Modifier.padding(8.dp))
-                            } else {
-                                historyState.sortedByDescending { it.timestamp }.take(4).forEach { project ->
-                                    RecentProjectItem(project)
-                                }
-                            }
-                        }
-                        
-                        Spacer(modifier = Modifier.width(12.dp))
-                        
-                        Column(modifier = Modifier.weight(0.9f)) {
-                            SectionTitle(stringResource(R.string.main_frequent_projects))
-                            if (historyState.isNotEmpty()) {
-                                historyState.sortedByDescending { it.openCount }.take(3).forEach { project ->
-                                    FrequentProjectItem(project)
-                                }
-                            } else {
-                                Text(stringResource(R.string.main_empty_history), fontSize = 12.sp, color = Color.Gray)
-                            }
-                        }
-                    }
-                }
+          Spacer(modifier = Modifier.height(20.dp))
 
-                // 工具与服务区域
-                Column(
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .fillMaxWidth()
-                        // 全透明白色背景
-                        .background(Color.Transparent) 
-                        .padding(horizontal = 16.dp, vertical = 8.dp)
-                ) {
-                    SectionTitle(stringResource(R.string.main_tools_services))
-                    ToolsServiceGrid()
-                }
+          Row(modifier = Modifier.fillMaxWidth()) {
+            Column(modifier = Modifier.weight(1.5f)) {
+              SectionTitle(stringResource(R.string.main_recent_projects))
+              if (historyState.isEmpty()) {
+                Text(
+                    stringResource(R.string.main_empty_history),
+                    fontSize = 12.sp,
+                    color = Color.Gray,
+                    modifier = Modifier.padding(8.dp),
+                )
+              } else {
+                historyState
+                    .sortedByDescending { it.timestamp }
+                    .take(4)
+                    .forEach { project -> RecentProjectItem(project) }
+              }
             }
+
+            Spacer(modifier = Modifier.width(12.dp))
+
+            Column(modifier = Modifier.weight(0.9f)) {
+              SectionTitle(stringResource(R.string.main_frequent_projects))
+              if (historyState.isNotEmpty()) {
+                historyState
+                    .sortedByDescending { it.openCount }
+                    .take(3)
+                    .forEach { project -> FrequentProjectItem(project) }
+              } else {
+                Text(
+                    stringResource(R.string.main_empty_history),
+                    fontSize = 12.sp,
+                    color = Color.Gray,
+                )
+              }
+            }
+          }
         }
-    }
 
-    @Composable
-    private fun QuickStartGradientCard() {
-        val cardGradient = Brush.linearGradient(
+        // 工具与服务区域
+        Column(
+            modifier =
+                Modifier.align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+                    // 全透明白色背景
+                    .background(Color.Transparent)
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+        ) {
+          SectionTitle(stringResource(R.string.main_tools_services))
+          ToolsServiceGrid()
+        }
+      }
+    }
+  }
+
+  @Composable
+  private fun QuickStartGradientCard() {
+    val cardGradient =
+        Brush.linearGradient(
             colors = listOf(Color(0xFF3F1D9B), Color(0xFF00A79D)),
             start = Offset(0f, 0f),
-            end = Offset(1000f, 1000f)
+            end = Offset(1000f, 1000f),
         )
 
-        Card(
-            modifier = Modifier.fillMaxWidth().height(160.dp),
-            shape = RoundedCornerShape(20.dp),
-            elevation = CardDefaults.cardElevation(4.dp)
-        ) {
-            Box(modifier = Modifier.fillMaxSize().background(cardGradient).padding(20.dp)) {
-                Column(modifier = Modifier.fillMaxSize()) {
-                    Text(
-                        text = stringResource(R.string.main_quick_start), 
-                        color = Color.White, 
-                        fontSize = 22.sp, 
-                        fontWeight = FontWeight.Bold
-                    )
-                    
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp), // 按钮之间的间距
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            QuickActionButton(
-                                modifier = Modifier.weight(1f),
-                                icon = Icons.Default.Add, 
-                                label = stringResource(R.string.main_new_project)
-                            ) {
-                                viewModel.setScreen(MainViewModel.SCREEN_TEMPLATE_LIST)
-                            }
-                            
-                            QuickActionButton(
-                                modifier = Modifier.weight(1f),
-                                icon = Icons.Default.FolderOpen, 
-                                label = stringResource(R.string.main_open_project)
-                            ) {
-                                pickDirectory { openProject(it) }
-                            }
-                            
-                            QuickActionButton(
-                                modifier = Modifier.weight(1f),
-                                icon = Icons.Default.Share, 
-                                label = stringResource(R.string.main_clone_repo)
-                            ) {
-                                ZeroCloneDialogBottomSheetFragment.newInstance(repoId = "").show(childFragmentManager, "CloneBottomSheet")
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
+    Card(
+        modifier = Modifier.fillMaxWidth().height(160.dp),
+        shape = RoundedCornerShape(20.dp),
+        elevation = CardDefaults.cardElevation(4.dp),
+    ) {
+      Box(modifier = Modifier.fillMaxSize().background(cardGradient).padding(20.dp)) {
+        Column(modifier = Modifier.fillMaxSize()) {
+          Text(
+              text = stringResource(R.string.main_quick_start),
+              color = Color.White,
+              fontSize = 22.sp,
+              fontWeight = FontWeight.Bold,
+          )
 
-    @Composable
-    private fun QuickActionButton(modifier: Modifier = Modifier, icon: ImageVector, label: String, onClick: () -> Unit) {
-        Surface(
-            onClick = onClick,
-            color = Color.White.copy(alpha = 0.15f),
-            shape = RoundedCornerShape(10.dp),
-            modifier = modifier
-        ) {
+          Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Row(
-                modifier = Modifier.padding(vertical = 12.dp, horizontal = 4.dp), 
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp), // 按钮之间的间距
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                // 图标尺寸
-                Icon(icon, null, tint = Color.White, modifier = Modifier.size(18.dp))
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(
-                    text = label, 
-                    color = Color.White, 
-                    fontSize = 13.sp, 
-                    fontWeight = FontWeight.Medium,
-                    maxLines = 1, // 设置为不换行
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
-        }
-    }
+              QuickActionButton(
+                  modifier = Modifier.weight(1f),
+                  icon = Icons.Default.Add,
+                  label = stringResource(R.string.main_new_project),
+              ) {
+                viewModel.setScreen(MainViewModel.SCREEN_TEMPLATE_LIST)
+              }
 
-    /**
-     * 高度与文字减小的高对比度 UI
-     */
-    @Composable
-    private fun RecentProjectItem(project: ProjectHistory) {
-        Surface(
-            onClick = { openProject(File(project.path)) },
-            modifier = Modifier.fillMaxWidth().padding(vertical = 3.dp).height(40.dp),
-            color = Color(0xFFEBEFF5), // 深色对比底
-            shape = RoundedCornerShape(10.dp)
+              QuickActionButton(
+                  modifier = Modifier.weight(1f),
+                  icon = Icons.Default.FolderOpen,
+                  label = stringResource(R.string.main_open_project),
+              ) {
+                pickDirectory { openProject(it) }
+              }
+
+              QuickActionButton(
+                  modifier = Modifier.weight(1f),
+                  icon = Icons.Default.Share,
+                  label = stringResource(R.string.main_clone_repo),
+              ) {
+                ZeroCloneDialogBottomSheetFragment.newInstance(repoId = "")
+                    .show(childFragmentManager, "CloneBottomSheet")
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  @Composable
+  private fun QuickActionButton(
+      modifier: Modifier = Modifier,
+      icon: ImageVector,
+      label: String,
+      onClick: () -> Unit,
+  ) {
+    Surface(
+        onClick = onClick,
+        color = Color.White.copy(alpha = 0.15f),
+        shape = RoundedCornerShape(10.dp),
+        modifier = modifier,
+    ) {
+      Row(
+          modifier = Modifier.padding(vertical = 12.dp, horizontal = 4.dp),
+          horizontalArrangement = Arrangement.Center,
+          verticalAlignment = Alignment.CenterVertically,
+      ) {
+        // 图标尺寸
+        Icon(icon, null, tint = Color.White, modifier = Modifier.size(18.dp))
+        Spacer(modifier = Modifier.width(4.dp))
+        Text(
+            text = label,
+            color = Color.White,
+            fontSize = 13.sp,
+            fontWeight = FontWeight.Medium,
+            maxLines = 1, // 设置为不换行
+            overflow = TextOverflow.Ellipsis,
+        )
+      }
+    }
+  }
+
+  /** 高度与文字减小的高对比度 UI */
+  @Composable
+  private fun RecentProjectItem(project: ProjectHistory) {
+    Surface(
+        onClick = { openProject(File(project.path)) },
+        modifier = Modifier.fillMaxWidth().padding(vertical = 3.dp).height(40.dp),
+        color = Color(0xFFEBEFF5), // 深色对比底
+        shape = RoundedCornerShape(10.dp),
+    ) {
+      Row(
+          modifier = Modifier.padding(horizontal = 8.dp),
+          verticalAlignment = Alignment.CenterVertically,
+      ) {
+        Box(
+            modifier = Modifier.size(26.dp).clip(CircleShape).background(project.color),
+            contentAlignment = Alignment.Center,
         ) {
-            Row(modifier = Modifier.padding(horizontal = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-                Box(modifier = Modifier.size(26.dp).clip(CircleShape).background(project.color), contentAlignment = Alignment.Center) {
-                    Text(project.letter, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 12.sp)
-                }
-                Spacer(modifier = Modifier.width(8.dp))
-                Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.Center) {
-                    Text(project.name, fontWeight = FontWeight.Bold, fontSize = 12.sp, color = Color(0xFF1E1E1E), maxLines = 1, overflow = TextOverflow.Ellipsis)
-                    Text(project.path, fontSize = 8.sp, color = Color.Gray, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                }
-                Text(stringResource(R.string.main_action_open), color = Color(0xFF00897B), fontSize = 10.sp, fontWeight = FontWeight.Bold)
-            }
+          Text(project.letter, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 12.sp)
         }
+        Spacer(modifier = Modifier.width(8.dp))
+        Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.Center) {
+          Text(
+              project.name,
+              fontWeight = FontWeight.Bold,
+              fontSize = 12.sp,
+              color = Color(0xFF1E1E1E),
+              maxLines = 1,
+              overflow = TextOverflow.Ellipsis,
+          )
+          Text(
+              project.path,
+              fontSize = 8.sp,
+              color = Color.Gray,
+              maxLines = 1,
+              overflow = TextOverflow.Ellipsis,
+          )
+        }
+        Text(
+            stringResource(R.string.main_action_open),
+            color = Color(0xFF00897B),
+            fontSize = 10.sp,
+            fontWeight = FontWeight.Bold,
+        )
+      }
     }
+  }
 
-    @Composable
-    private fun FrequentProjectItem(project: ProjectHistory) {
-        Surface(
-            onClick = { openProject(File(project.path)) },
-            modifier = Modifier.fillMaxWidth().padding(vertical = 3.dp).height(34.dp),
-            color = Color(0xFFEBEFF5),
-            shape = RoundedCornerShape(8.dp)
+  @Composable
+  private fun FrequentProjectItem(project: ProjectHistory) {
+    Surface(
+        onClick = { openProject(File(project.path)) },
+        modifier = Modifier.fillMaxWidth().padding(vertical = 3.dp).height(34.dp),
+        color = Color(0xFFEBEFF5),
+        shape = RoundedCornerShape(8.dp),
+    ) {
+      Row(
+          modifier = Modifier.padding(horizontal = 6.dp),
+          verticalAlignment = Alignment.CenterVertically,
+      ) {
+        Box(
+            modifier = Modifier.size(18.dp).clip(CircleShape).background(project.color),
+            contentAlignment = Alignment.Center,
         ) {
-            Row(modifier = Modifier.padding(horizontal = 6.dp), verticalAlignment = Alignment.CenterVertically) {
-                Box(modifier = Modifier.size(18.dp).clip(CircleShape).background(project.color), contentAlignment = Alignment.Center) {
-                    Text(project.letter, color = Color.White, fontSize = 9.sp, fontWeight = FontWeight.Bold)
-                }
-                Spacer(modifier = Modifier.width(6.dp))
-                Text(project.name, fontSize = 10.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
-                Text("🔥${project.openCount}", fontSize = 9.sp, color = Color(0xFFFF5252))
-            }
+          Text(project.letter, color = Color.White, fontSize = 9.sp, fontWeight = FontWeight.Bold)
         }
+        Spacer(modifier = Modifier.width(6.dp))
+        Text(
+            project.name,
+            fontSize = 10.sp,
+            fontWeight = FontWeight.Medium,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.weight(1f),
+        )
+        Text("🔥${project.openCount}", fontSize = 9.sp, color = Color(0xFFFF5252))
+      }
     }
+  }
 
-    @Composable
-    private fun ToolsServiceGrid() {
-        val context = LocalContext.current
-        val tools = listOf(
+  @Composable
+  private fun ToolsServiceGrid() {
+    val context = LocalContext.current
+    val tools =
+        listOf(
             Triple(Icons.Default.Settings, Color(0xFFFFCCBC)) {
-                startActivity(Intent(requireActivity(), PreferencesActivity::class.java))
+              startActivity(Intent(requireActivity(), PreferencesActivity::class.java))
             },
             Triple(Icons.Default.Terminal, Color(0xFFC8E6C9)) {
-                startActivity(Intent(requireActivity(), TerminalActivity::class.java))
+              startActivity(Intent(requireActivity(), TerminalActivity::class.java))
             },
             Triple(Icons.Default.Code, Color(0xFFE1BEE7)) {
-                Toast.makeText(context, R.string.msg_unimplemented_feature, Toast.LENGTH_SHORT).show()
+              Toast.makeText(context, R.string.msg_unimplemented_feature, Toast.LENGTH_SHORT).show()
             },
             Triple(Icons.Default.Construction, Color(0xFFBBDEFB)) {
-                Toast.makeText(context, R.string.msg_unimplemented_feature, Toast.LENGTH_SHORT).show()
+              Toast.makeText(context, R.string.msg_unimplemented_feature, Toast.LENGTH_SHORT).show()
             },
             Triple(Icons.Default.CloudSync, Color(0xFFD1C4E9)) {
-                Toast.makeText(context, R.string.msg_unimplemented_feature, Toast.LENGTH_SHORT).show()
+              Toast.makeText(context, R.string.msg_unimplemented_feature, Toast.LENGTH_SHORT).show()
             },
             Triple(Icons.Default.BugReport, Color(0xFFFFF9C4)) {
-                Toast.makeText(context, R.string.msg_unimplemented_feature, Toast.LENGTH_SHORT).show()
-            }
+              Toast.makeText(context, R.string.msg_unimplemented_feature, Toast.LENGTH_SHORT).show()
+            },
         )
 
-        LazyRow(
-            horizontalArrangement = Arrangement.spacedBy(10.dp),
-            contentPadding = PaddingValues(vertical = 4.dp)
+    LazyRow(
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
+        contentPadding = PaddingValues(vertical = 4.dp),
+    ) {
+      items(tools) { (icon, color, action) ->
+        // 工具与服务按钮
+        Surface(
+            onClick = action,
+            modifier = Modifier.size(42.dp),
+            color = color,
+            shape = RoundedCornerShape(8.dp),
         ) {
-            items(tools) { (icon, color, action) ->
-                //工具与服务按钮
-                Surface(
-                    onClick = action,
-                    modifier = Modifier.size(42.dp),
-                    color = color,
-                    shape = RoundedCornerShape(8.dp)
-                ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        //工具与服务内部Icon的尺寸
-                        Icon(icon, null, tint = Color.DarkGray.copy(alpha = 0.8f), modifier = Modifier.size(24.dp))
-                    }
-                }
-            }
+          Box(contentAlignment = Alignment.Center) {
+            // 工具与服务内部Icon的尺寸
+            Icon(
+                icon,
+                null,
+                tint = Color.DarkGray.copy(alpha = 0.8f),
+                modifier = Modifier.size(24.dp),
+            )
+          }
         }
+      }
     }
+  }
 
-    @Composable
-    private fun SectionTitle(text: String) {
-        Text(text, fontSize = 13.sp, fontWeight = FontWeight.ExtraBold, color = Color(0xFF333333), modifier = Modifier.padding(bottom = 6.dp))
-    }
+  @Composable
+  private fun SectionTitle(text: String) {
+    Text(
+        text,
+        fontSize = 13.sp,
+        fontWeight = FontWeight.ExtraBold,
+        color = Color(0xFF333333),
+        modifier = Modifier.padding(bottom = 6.dp),
+    )
+  }
 
-    private fun openProject(root: File) {
-        (requireActivity() as MainActivity).openProject(root)
-    }
+  private fun openProject(root: File) {
+    (requireActivity() as MainActivity).openProject(root)
+  }
 }

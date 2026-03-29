@@ -30,9 +30,9 @@ import org.slf4j.LoggerFactory
 
 /** @author Akash Yadav */
 object XmlUtils {
-  
+
   private val log = LoggerFactory.getLogger(XmlUtils::class.java)
-  
+
   fun isTag(node: DOMNode, index: Int): Boolean {
     var name = node.nodeName
     if (name.isNullOrBlank()) {
@@ -75,26 +75,32 @@ object XmlUtils {
     val text = parsed.text
     return when (type) {
       TAG -> {
-        val nodeAt = parsed.findNodeAt(index) ?: run {
-          log.warn("Unable to find node at index {}", index)
-          return null
-        }
+        val nodeAt =
+            parsed.findNodeAt(index)
+                ?: run {
+                  log.warn("Unable to find node at index {}", index)
+                  return null
+                }
         text.substring(nodeAt.start, index)
       }
       ATTRIBUTE -> {
-        val attr = parsed.findAttrAt(index) ?: run {
-          log.warn("Unable to find attribute at index {}", index)
-          return null
-        }
-  
+        val attr =
+            parsed.findAttrAt(index)
+                ?: run {
+                  log.warn("Unable to find attribute at index {}", index)
+                  return null
+                }
+
         text.substring(attr.start, index)
       }
       ATTRIBUTE_VALUE -> {
-        val attrAt = parsed.findAttrAt(index) ?: run {
-          log.warn("Unable to find attribute at index {}", index)
-          return null
-        }
-  
+        val attrAt =
+            parsed.findAttrAt(index)
+                ?: run {
+                  log.warn("Unable to find attribute at index {}", index)
+                  return null
+                }
+
         var prefix = text.substring(attrAt.nodeAttrValue.start + 1, index)
         if (prefix.contains("|")) {
           prefix = prefix.substring(prefix.lastIndexOf('|') + 1)
@@ -106,12 +112,13 @@ object XmlUtils {
   }
 
   fun getNodeType(parsed: DOMDocument, cursor: Int): NodeType {
-    val nodeAt = parsed.findNodeAt(cursor) ?: run {
-      log.warn("Unable to find node at index {}", cursor)
-      return UNKNOWN
-    }
-  
-  
+    val nodeAt =
+        parsed.findNodeAt(cursor)
+            ?: run {
+              log.warn("Unable to find node at index {}", cursor)
+              return UNKNOWN
+            }
+
     if (isTag(nodeAt, cursor) || isEndTag(nodeAt, cursor)) {
       return TAG
     }
@@ -122,11 +129,11 @@ object XmlUtils {
       ATTRIBUTE
     }
   }
-  
+
   enum class NodeType {
     UNKNOWN,
     TAG,
     ATTRIBUTE,
-    ATTRIBUTE_VALUE
+    ATTRIBUTE_VALUE,
   }
 }

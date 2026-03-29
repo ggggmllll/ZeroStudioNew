@@ -29,16 +29,12 @@ import com.itsaky.androidide.databinding.ActivityContributorsBinding
 import com.itsaky.androidide.utils.getConnectionInfo
 import com.itsaky.androidide.viewmodel.ContributorsViewModel
 
-/**
- * @author Akash Yadav
- */
+/** @author Akash Yadav */
 class ContributorsActivity : EdgeToEdgeIDEActivity() {
 
   private var _binding: ActivityContributorsBinding? = null
   private val binding: ActivityContributorsBinding
-    get() = checkNotNull(_binding) {
-      "Activity has been destroyed"
-    }
+    get() = checkNotNull(_binding) { "Activity has been destroyed" }
 
   private val viewModel by viewModels<ContributorsViewModel>()
 
@@ -56,13 +52,9 @@ class ContributorsActivity : EdgeToEdgeIDEActivity() {
       supportActionBar!!.setDisplayHomeAsUpEnabled(true)
       toolbar.setNavigationOnClickListener { onBackPressedDispatcher.onBackPressed() }
 
-      githubContributors.apply {
-        sectionTitle.setText(R.string.title_github_contributors)
-      }
+      githubContributors.apply { sectionTitle.setText(R.string.title_github_contributors) }
 
-      translationContributors.apply {
-        sectionTitle.setText(R.string.title_crowdin_translators)
-      }
+      translationContributors.apply { sectionTitle.setText(R.string.title_crowdin_translators) }
 
       noConnection.root.setText(R.string.msg_no_internet)
       loadingProgress.isVisible = false
@@ -96,10 +88,10 @@ class ContributorsActivity : EdgeToEdgeIDEActivity() {
     super.onApplySystemBarInsets(insets)
     binding.toolbar.apply {
       setPaddingRelative(
-        paddingStart + insets.left,
-        paddingTop,
-        paddingEnd + insets.right,
-        paddingBottom
+          paddingStart + insets.left,
+          paddingTop,
+          paddingEnd + insets.right,
+          paddingBottom,
       )
     }
   }
@@ -108,5 +100,4 @@ class ContributorsActivity : EdgeToEdgeIDEActivity() {
     super.onDestroy()
     _binding = null
   }
-
 }

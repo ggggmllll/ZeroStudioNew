@@ -7,11 +7,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
 @Composable
-fun ListItemTrailingIconRow(content: @Composable ()->Unit) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.End
-    ) {
-        content()
-    }
+fun ListItemTrailingIconRow(content: @Composable () -> Unit) {
+  Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) { content() }
 }

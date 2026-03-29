@@ -15,7 +15,6 @@
  *   along with AndroidIDE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 import com.itsaky.androidide.build.config.BuildConfig
 
 plugins {
@@ -24,20 +23,14 @@ plugins {
   alias(libs.plugins.benchmark)
 }
 
-
-
 android {
   namespace = "${BuildConfig.packageName}.benchmark"
 
   sourceSets {
-    getByName("androidTest") {
-      assets.srcDirs(rootProject.file("utilities/framework-stubs/libs"))
-    }
+    getByName("androidTest") { assets.srcDirs(rootProject.file("utilities/framework-stubs/libs")) }
   }
 
-  defaultConfig {
-    testInstrumentationRunner = "androidx.benchmark.junit4.AndroidBenchmarkRunner"
-  }
+  defaultConfig { testInstrumentationRunner = "androidx.benchmark.junit4.AndroidBenchmarkRunner" }
 
   testBuildType = "release"
 
@@ -47,14 +40,12 @@ android {
       // it must be done in a manifest - see src/androidTest/AndroidManifest.xml
       isMinifyEnabled = true
       proguardFiles(
-        getDefaultProguardFile("proguard-android-optimize.txt"),
-        "benchmark-proguard-rules.pro"
+          getDefaultProguardFile("proguard-android-optimize.txt"),
+          "benchmark-proguard-rules.pro",
       )
     }
 
-    release {
-      isDefault = true
-    }
+    release { isDefault = true }
   }
 }
 
@@ -64,7 +55,7 @@ dependencies {
   androidTestImplementation(libs.tests.junit)
   androidTestImplementation(libs.tests.google.truth)
   androidTestImplementation(libs.androidx.benchmark.junit4)
-testImplementation("org.conscrypt:conscrypt-openjdk:2.5.2")
+  testImplementation("org.conscrypt:conscrypt-openjdk:2.5.2")
   androidTestImplementation(projects.core.common)
   androidTestImplementation(projects.core.indexingApi)
   androidTestImplementation(projects.java.lsp)

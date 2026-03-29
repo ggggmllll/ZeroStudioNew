@@ -25,49 +25,49 @@ import com.android.tools.idea.wizard.template.impl.activities.common.layoutToVie
 import com.android.tools.idea.wizard.template.renderIf
 
 fun contentListFragmentKt(
-  collectionName: String,
-  detailName: String,
-  applicationPackage: String?,
-  detailNameLayout: String,
-  itemListContentLayout: String,
-  itemListLayout: String,
-  packageName: String,
-  useAndroidX: Boolean,
-  isViewBindingSupported: Boolean,
+    collectionName: String,
+    detailName: String,
+    applicationPackage: String?,
+    detailNameLayout: String,
+    itemListContentLayout: String,
+    itemListLayout: String,
+    packageName: String,
+    useAndroidX: Boolean,
+    isViewBindingSupported: Boolean,
 ): String {
 
   val layoutName = "fragment_${itemListLayout}"
   val onCreateViewBlock =
-    if (isViewBindingSupported)
-      """
+      if (isViewBindingSupported)
+          """
       _binding = ${layoutToViewBindingClass(layoutName)}.inflate(inflater, container, false)
       return binding.root
   """
-    else "return inflater.inflate(R.layout.$layoutName, container, false)"
+      else "return inflater.inflate(R.layout.$layoutName, container, false)"
 
   val onCreateViewHolderBlock =
-    if (isViewBindingSupported)
-      """
+      if (isViewBindingSupported)
+          """
     val binding = ${layoutToViewBindingClass(itemListContentLayout)}.inflate(LayoutInflater.from(parent.context), parent, false)
     return ViewHolder(binding)
   """
-    else
-      """
+      else
+          """
     val view = LayoutInflater.from(parent.context)
       .inflate(R.layout.${itemListContentLayout}, parent, false)
     return ViewHolder(view)
   """
 
   val viewHolderBlock =
-    if (isViewBindingSupported)
-      """
+      if (isViewBindingSupported)
+          """
     inner class ViewHolder(binding: ${layoutToViewBindingClass(itemListContentLayout)}) : RecyclerView.ViewHolder(binding.root) {
       val idView: TextView = binding.idText
       val contentView: TextView = binding.content
     }
   """
-    else
-      """
+      else
+          """
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
       val idView: TextView = view.findViewById(R.id.id_text)
       val contentView: TextView = view.findViewById(R.id.content)

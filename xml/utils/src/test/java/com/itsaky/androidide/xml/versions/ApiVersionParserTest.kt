@@ -19,27 +19,30 @@ package com.itsaky.androidide.xml.versions
 
 import com.google.common.truth.Truth.assertThat
 import com.itsaky.androidide.xml.findAndroidHome
+import java.io.ByteArrayInputStream
+import java.io.File
 import jaxp.xml.stream.XMLStreamException
 import org.junit.Assert.assertThrows
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
-import java.io.ByteArrayInputStream
-import java.io.File
 
-/**
- * @author Akash Yadav
- */
+/** @author Akash Yadav */
 @RunWith(RobolectricTestRunner::class)
 class ApiVersionParserTest {
 
   val apiVersionXml by lazy {
     val platformsDir = File(findAndroidHome(), "platforms")
-    val platformDir = platformsDir.listFiles()!!.asSequence().sortedByDescending {
-      // android-30, android-31, android-32, android-33, etc
-      it.name.substring("android-".length).toIntOrNull() ?: 0
-    }.first()
+    val platformDir =
+        platformsDir
+            .listFiles()!!
+            .asSequence()
+            .sortedByDescending {
+              // android-30, android-31, android-32, android-33, etc
+              it.name.substring("android-".length).toIntOrNull() ?: 0
+            }
+            .first()
 
     platformDir.resolve("data/api-versions.xml")
   }
@@ -64,11 +67,13 @@ class ApiVersionParserTest {
 
   @Test
   fun testSingleClassParsing() {
-    val xml = """
-            <api version="34">
-                <class name="com.example.ClassA" since="1" deprecated="0" removed="0"/>
-            </api>
-        """.trimIndent()
+    val xml =
+        """
+        <api version="34">
+            <class name="com.example.ClassA" since="1" deprecated="0" removed="0"/>
+        </api>
+        """
+            .trimIndent()
     val inputStream = ByteArrayInputStream(xml.toByteArray())
 
     val parser = CollectingApiVersionsParser()
@@ -83,14 +88,16 @@ class ApiVersionParserTest {
 
   @Test
   fun testSingleClassWithMembersParsing() {
-    val xml = """
-            <api version="34">
-                <class name="com.example.ClassA" since="1" deprecated="0" removed="0">
-                    <field name="fieldA" since="2" deprecated="0" removed="0"/>
-                    <method name="methodA" since="3" deprecated="0" removed="0"/>
-                </class>
-            </api>
-        """.trimIndent()
+    val xml =
+        """
+        <api version="34">
+            <class name="com.example.ClassA" since="1" deprecated="0" removed="0">
+                <field name="fieldA" since="2" deprecated="0" removed="0"/>
+                <method name="methodA" since="3" deprecated="0" removed="0"/>
+            </class>
+        </api>
+        """
+            .trimIndent()
     val inputStream = ByteArrayInputStream(xml.toByteArray())
 
     val parser = CollectingApiVersionsParser()
@@ -111,12 +118,14 @@ class ApiVersionParserTest {
 
   @Test
   fun testMultipleClassesParsing() {
-    val xml = """
-            <api version="34">
-                <class name="com.example.ClassA" since="1" deprecated="0" removed="0"/>
-                <class name="com.example.ClassB" since="2" deprecated="0" removed="0"/>
-            </api>
-        """.trimIndent()
+    val xml =
+        """
+        <api version="34">
+            <class name="com.example.ClassA" since="1" deprecated="0" removed="0"/>
+            <class name="com.example.ClassB" since="2" deprecated="0" removed="0"/>
+        </api>
+        """
+            .trimIndent()
     val inputStream = ByteArrayInputStream(xml.toByteArray())
 
     val parser = CollectingApiVersionsParser()
@@ -133,11 +142,13 @@ class ApiVersionParserTest {
 
   @Test
   fun testClassWithDeprecatedAndRemovedAttributes() {
-    val xml = """
-            <api version="34">
-                <class name="com.example.ClassA" since="1" deprecated="30" removed="34"/>
-            </api>
-        """.trimIndent()
+    val xml =
+        """
+        <api version="34">
+            <class name="com.example.ClassA" since="1" deprecated="30" removed="34"/>
+        </api>
+        """
+            .trimIndent()
     val inputStream = ByteArrayInputStream(xml.toByteArray())
 
     val parser = CollectingApiVersionsParser()
@@ -152,11 +163,13 @@ class ApiVersionParserTest {
 
   @Test
   fun testClassWithInvalidAttributes() {
-    val xml = """
-            <api version="34">
-                <class name="com.example.ClassA" since="1" deprecated="256" removed="0"/>
-            </api>
-        """.trimIndent()
+    val xml =
+        """
+        <api version="34">
+            <class name="com.example.ClassA" since="1" deprecated="256" removed="0"/>
+        </api>
+        """
+            .trimIndent()
     val inputStream = ByteArrayInputStream(xml.toByteArray())
 
     val parser = CollectingApiVersionsParser()
@@ -170,11 +183,13 @@ class ApiVersionParserTest {
 
   @Test
   fun testMissingNameAttribute() {
-    val xml = """
-            <api version="34">
-                <class since="1" deprecated="0" removed="0"/>
-            </api>
-        """.trimIndent()
+    val xml =
+        """
+        <api version="34">
+            <class since="1" deprecated="0" removed="0"/>
+        </api>
+        """
+            .trimIndent()
     val inputStream = ByteArrayInputStream(xml.toByteArray())
 
     val parser = CollectingApiVersionsParser()
@@ -188,12 +203,14 @@ class ApiVersionParserTest {
 
   @Test
   fun testDuplicateClassEntry() {
-    val xml = """
-            <api version="34">
-                <class name="com.example.ClassA" since="1" deprecated="0" removed="0"/>
-                <class name="com.example.ClassA" since="2" deprecated="0" removed="0"/>
-            </api>
-        """.trimIndent()
+    val xml =
+        """
+        <api version="34">
+            <class name="com.example.ClassA" since="1" deprecated="0" removed="0"/>
+            <class name="com.example.ClassA" since="2" deprecated="0" removed="0"/>
+        </api>
+        """
+            .trimIndent()
     val inputStream = ByteArrayInputStream(xml.toByteArray())
 
     val parser = CollectingApiVersionsParser()
@@ -207,14 +224,16 @@ class ApiVersionParserTest {
 
   @Test
   fun testDuplicateMemberEntry() {
-    val xml = """
-            <api version="34">
-                <class name="com.example.ClassA" since="1" deprecated="0" removed="0">
-                    <field name="fieldA" since="2" deprecated="0" removed="0"/>
-                    <field name="fieldA" since="3" deprecated="0" removed="0"/>
-                </class>
-            </api>
-        """.trimIndent()
+    val xml =
+        """
+        <api version="34">
+            <class name="com.example.ClassA" since="1" deprecated="0" removed="0">
+                <field name="fieldA" since="2" deprecated="0" removed="0"/>
+                <field name="fieldA" since="3" deprecated="0" removed="0"/>
+            </class>
+        </api>
+        """
+            .trimIndent()
     val inputStream = ByteArrayInputStream(xml.toByteArray())
 
     val parser = CollectingApiVersionsParser()
@@ -228,20 +247,22 @@ class ApiVersionParserTest {
 
   @Test
   fun testMultipleApiElements() {
-    val xml = """
-            <api version="33">
-                <class name="com.example.ClassA" since="1" deprecated="0" removed="0"/>
-            </api>
-            <api version="34">
-                <class name="com.example.ClassB" since="2" deprecated="0" removed="0"/>
-            </api>
-        """.trimIndent()
+    val xml =
+        """
+        <api version="33">
+            <class name="com.example.ClassA" since="1" deprecated="0" removed="0"/>
+        </api>
+        <api version="34">
+            <class name="com.example.ClassB" since="2" deprecated="0" removed="0"/>
+        </api>
+        """
+            .trimIndent()
     val inputStream = ByteArrayInputStream(xml.toByteArray())
 
     val parser = CollectingApiVersionsParser()
     assertThrows(
-      "The markup in the document following the root element must be well-formed.",
-      XMLStreamException::class.java
+        "The markup in the document following the root element must be well-formed.",
+        XMLStreamException::class.java,
     ) {
       parser.parse(inputStream)
     }
@@ -249,13 +270,15 @@ class ApiVersionParserTest {
 
   @Test
   fun testNestedClassElements() {
-    val xml = """
-            <api version="34">
-                <class name="com.example.OuterClass" since="1" deprecated="0" removed="0">
-                    <class name="com.example.OuterClass.InnerClass" since="2" deprecated="0" removed="0"/>
-                </class>
-            </api>
-        """.trimIndent()
+    val xml =
+        """
+        <api version="34">
+            <class name="com.example.OuterClass" since="1" deprecated="0" removed="0">
+                <class name="com.example.OuterClass.InnerClass" since="2" deprecated="0" removed="0"/>
+            </class>
+        </api>
+        """
+            .trimIndent()
 
     val inputStream = ByteArrayInputStream(xml.toByteArray())
 
@@ -266,12 +289,14 @@ class ApiVersionParserTest {
 
   @Test
   fun testBoundaryAttributeValues() {
-    val xml = """
-            <api version="34">
-                <class name="com.example.ClassA" since="1" deprecated="255" removed="0"/>
-                <class name="com.example.ClassB" since="1" deprecated="0" removed="255"/>
-            </api>
-        """.trimIndent()
+    val xml =
+        """
+        <api version="34">
+            <class name="com.example.ClassA" since="1" deprecated="255" removed="0"/>
+            <class name="com.example.ClassB" since="1" deprecated="0" removed="255"/>
+        </api>
+        """
+            .trimIndent()
     val inputStream = ByteArrayInputStream(xml.toByteArray())
     parser.parse(inputStream)
 
@@ -286,12 +311,14 @@ class ApiVersionParserTest {
 
   @Test
   fun testOutOfBoundaryAttributeValues() {
-    val xml = """
-            <api version="34">
-                <class name="com.example.ClassA" since="1" deprecated="256" removed="0"/>
-                <class name="com.example.ClassB" since="1" deprecated="0" removed="256"/>
-            </api>
-        """.trimIndent()
+    val xml =
+        """
+        <api version="34">
+            <class name="com.example.ClassA" since="1" deprecated="256" removed="0"/>
+            <class name="com.example.ClassB" since="1" deprecated="0" removed="256"/>
+        </api>
+        """
+            .trimIndent()
     val inputStream = ByteArrayInputStream(xml.toByteArray())
     assertThrows("Invalid version: 1, 256, 0", IllegalStateException::class.java) {
       parser.parse(inputStream)
@@ -300,12 +327,14 @@ class ApiVersionParserTest {
 
   @Test
   fun testUnexpectedElements() {
-    val xml = """
-            <api version="34">
-                <unexpectedElement name="unexpected" since="1" deprecated="0" removed="0"/>
-                <class name="com.example.ClassA" since="1" deprecated="0" removed="0"/>
-            </api>
-        """.trimIndent()
+    val xml =
+        """
+        <api version="34">
+            <unexpectedElement name="unexpected" since="1" deprecated="0" removed="0"/>
+            <class name="com.example.ClassA" since="1" deprecated="0" removed="0"/>
+        </api>
+        """
+            .trimIndent()
     val inputStream = ByteArrayInputStream(xml.toByteArray())
     parser.parse(inputStream)
 

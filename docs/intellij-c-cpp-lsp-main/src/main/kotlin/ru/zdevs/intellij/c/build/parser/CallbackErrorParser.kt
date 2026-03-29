@@ -8,17 +8,23 @@ import java.util.regex.Pattern
 
 class CallbackErrorParser(
     regexp: String,
-    private val callback: (build: BaseBuildParser, matcher: Matcher) -> Unit
+    private val callback: (build: BaseBuildParser, matcher: Matcher) -> Unit,
 ) : IErrorParser {
 
-    private val pattern = Pattern.compile(regexp)
+  private val pattern = Pattern.compile(regexp)
 
-    override fun parse(build: BaseBuildParser, line: String, lineRaw: String, reader: BuildOutputInstantReader, consumer: Consumer<in BuildEvent>): Boolean {
-        val matcher = pattern.matcher(line)
-        if (matcher.find()) {
-            callback(build, matcher)
-            return true
-        }
-        return false
+  override fun parse(
+      build: BaseBuildParser,
+      line: String,
+      lineRaw: String,
+      reader: BuildOutputInstantReader,
+      consumer: Consumer<in BuildEvent>,
+  ): Boolean {
+    val matcher = pattern.matcher(line)
+    if (matcher.find()) {
+      callback(build, matcher)
+      return true
     }
+    return false
+  }
 }

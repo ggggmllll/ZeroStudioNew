@@ -19,8 +19,13 @@ package com.itsaky.androidide.templates.impl.androidstudio.fragments.googleMapsF
 import com.android.tools.idea.wizard.template.escapeKotlinIdentifier
 import com.android.tools.idea.wizard.template.getMaterialComponentName
 
-fun mapFragmentKt(fragmentClass: String, layoutName: String, packageName: String, useAndroidX: Boolean) =
-  """
+fun mapFragmentKt(
+    fragmentClass: String,
+    layoutName: String,
+    packageName: String,
+    useAndroidX: Boolean,
+) =
+    """
 package ${escapeKotlinIdentifier(packageName)}
 
 import ${getMaterialComponentName("android.support.v4.app.Fragment", useAndroidX)}

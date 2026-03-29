@@ -22,28 +22,31 @@ import com.itsaky.androidide.treesitter.TSPoint
 import com.itsaky.androidide.utils.DefaultRecyclable
 import com.itsaky.androidide.utils.RecyclableObjectPool
 
-class TreeSitterInputEdit @JvmOverloads internal constructor(
-  startByte: Int = 0,
-  oldEndByte: Int = 0,
-  newEndByte: Int = 0,
-  startPoint: TSPoint? = null,
-  oldEndPoint: TSPoint? = null,
-  newEndPoint: TSPoint? = null
-) : TSInputEdit(startByte, oldEndByte, newEndByte, startPoint, oldEndPoint, newEndPoint),
-  RecyclableObjectPool.Recyclable by DefaultRecyclable() {
+class TreeSitterInputEdit
+@JvmOverloads
+internal constructor(
+    startByte: Int = 0,
+    oldEndByte: Int = 0,
+    newEndByte: Int = 0,
+    startPoint: TSPoint? = null,
+    oldEndPoint: TSPoint? = null,
+    newEndPoint: TSPoint? = null,
+) :
+    TSInputEdit(startByte, oldEndByte, newEndByte, startPoint, oldEndPoint, newEndPoint),
+    RecyclableObjectPool.Recyclable by DefaultRecyclable() {
 
   companion object {
 
-    /**
-     * Obtain an instance of [TreeSitterInputEdit].
-     */
+    /** Obtain an instance of [TreeSitterInputEdit]. */
     @JvmStatic
-    fun obtain(startByte: Int,
-      oldEndByte: Int,
-      newEndByte: Int,
-      startPoint: TSPoint,
-      oldEndPoint: TSPoint,
-      newEndPoint: TSPoint): TreeSitterInputEdit {
+    fun obtain(
+        startByte: Int,
+        oldEndByte: Int,
+        newEndByte: Int,
+        startPoint: TSPoint,
+        oldEndPoint: TSPoint,
+        newEndPoint: TSPoint,
+    ): TreeSitterInputEdit {
 
       return obtainFromPool<TreeSitterInputEdit>().apply {
         this.startByte = startByte

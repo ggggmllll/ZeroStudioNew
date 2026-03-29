@@ -74,16 +74,22 @@ val viewModelFragmentTemplate
     val packageName = defaultPackageNameParameter
 
     widgets(
-      TextFieldWidget(fragmentClass),
-      TextFieldWidget(layoutName),
-      TextFieldWidget(viewModelName),
-      PackageNameWidget(packageName),
-      LanguageWidget(),
+        TextFieldWidget(fragmentClass),
+        TextFieldWidget(layoutName),
+        TextFieldWidget(viewModelName),
+        PackageNameWidget(packageName),
+        LanguageWidget(),
     )
 
     thumb { File("viewmodel-fragment").resolve("template_blank_fragment.png") }
 
     recipe = { data: TemplateData ->
-      viewModelFragmentRecipe(data as ModuleTemplateData, fragmentClass.value, layoutName.value, viewModelName.value, packageName.value)
+      viewModelFragmentRecipe(
+          data as ModuleTemplateData,
+          fragmentClass.value,
+          layoutName.value,
+          viewModelName.value,
+          packageName.value,
+      )
     }
   }

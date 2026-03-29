@@ -94,6 +94,7 @@ class LanguageScheme {
   internal val localRefs = TreeSet<String>()
 
   fun getFileTypes(): List<String> = files
+
   fun getStyles(): Map<String, StyleDef> = styles
 
   fun isLocalScope(capture: String): Boolean {
@@ -127,18 +128,18 @@ class LanguageScheme {
  * @property strikeThrough Whether the highlighted region should have strikethrough text.
  * @property completion Whether code completions can be performed in the highlighted region.
  * @property maybeHexColor Whether the node represented by this style can contain HEX color strings.
- * If this value is `true`, the node's text will be parsed to check if it represents a valid HEX color.
- * If it does, that color will be used as the node's background color. The foreground color of the node
- * will be automatically selected based on the HEX color's brightness.
+ *   If this value is `true`, the node's text will be parsed to check if it represents a valid HEX
+ *   color. If it does, that color will be used as the node's background color. The foreground color
+ *   of the node will be automatically selected based on the HEX color's brightness.
  */
 data class StyleDef(
-  var fg: Int = EditorColorScheme.TEXT_NORMAL,
-  var bg: Int = 0,
-  var bold: Boolean = false,
-  var italic: Boolean = false,
-  var strikeThrough: Boolean = false,
-  var completion: Boolean = true,
-  var maybeHexColor: Boolean = false
+    var fg: Int = EditorColorScheme.TEXT_NORMAL,
+    var bg: Int = 0,
+    var bold: Boolean = false,
+    var italic: Boolean = false,
+    var strikeThrough: Boolean = false,
+    var completion: Boolean = true,
+    var maybeHexColor: Boolean = false,
 ) {
 
   /**
@@ -151,18 +152,18 @@ data class StyleDef(
   }
 
   /**
-   * Make the static style for this style definition. The background color ID in the returned style is
-   * always [EditorColorScheme.STATIC_SPAN_BACKGROUND] and the foreground color ID is always
+   * Make the static style for this style definition. The background color ID in the returned style
+   * is always [EditorColorScheme.STATIC_SPAN_BACKGROUND] and the foreground color ID is always
    * [EditorColorScheme.STATIC_SPAN_FOREGROUND].
    */
   fun makeStaticStyle(): Long {
     return TextStyle.makeStyle(
-      EditorColorScheme.STATIC_SPAN_FOREGROUND,
-      EditorColorScheme.STATIC_SPAN_BACKGROUND,
-      bold,
-      italic,
-      strikeThrough,
-      !completion
+        EditorColorScheme.STATIC_SPAN_FOREGROUND,
+        EditorColorScheme.STATIC_SPAN_BACKGROUND,
+        bold,
+        italic,
+        strikeThrough,
+        !completion,
     )
   }
 }

@@ -22,9 +22,9 @@ import com.google.auto.service.AutoService
 import com.itsaky.androidide.xml.versions.ApiVersion
 import com.itsaky.androidide.xml.versions.ApiVersions
 import com.itsaky.androidide.xml.versions.ApiVersionsRegistry
-import org.slf4j.LoggerFactory
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
+import org.slf4j.LoggerFactory
 
 /**
  * Default implementation of [ApiVersionsRegistry].
@@ -77,9 +77,8 @@ class DefaultApiVersionsRegistry : ApiVersionsRegistry {
     versions.clear()
   }
 
-  private class ApiVersionsParserInternal(
-    private val currentApiVersions: DefaultApiVersions
-  ) : ApiVersionsParser() {
+  private class ApiVersionsParserInternal(private val currentApiVersions: DefaultApiVersions) :
+      ApiVersionsParser() {
     override fun isDuplicateClass(name: String): Boolean {
       return currentApiVersions.containsClass(name)
     }
@@ -96,10 +95,10 @@ class DefaultApiVersionsRegistry : ApiVersionsRegistry {
     }
 
     override fun consumeMemberVersionInfo(
-      className: String,
-      member: String,
-      memberType: String,
-      apiVersion: ApiVersion
+        className: String,
+        member: String,
+        memberType: String,
+        apiVersion: ApiVersion,
     ) {
       if (apiVersion.isSinceInception()) {
         return

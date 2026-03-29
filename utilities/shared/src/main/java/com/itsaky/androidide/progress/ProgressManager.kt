@@ -21,18 +21,14 @@ import com.itsaky.androidide.progress.ICancelChecker.Default
 import java.util.WeakHashMap
 import java.util.concurrent.CancellationException
 
-/**
- * @author Akash Yadav
- */
+/** @author Akash Yadav */
 class ProgressManager private constructor() {
 
   private val threads = WeakHashMap<Thread, ICancelChecker>()
 
   companion object {
 
-    val instance by lazy {
-      ProgressManager()
-    }
+    val instance by lazy { ProgressManager() }
 
     @JvmStatic
     fun abortIfCancelled() {

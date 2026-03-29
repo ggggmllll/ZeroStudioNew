@@ -28,8 +28,7 @@ interface TSLanguageRegistry {
 
   companion object {
 
-    @JvmStatic
-    val instance by lazy { TSLanguageRegistryImpl() }
+    @JvmStatic val instance by lazy { TSLanguageRegistryImpl() }
   }
 
   /**
@@ -66,10 +65,10 @@ interface TSLanguageRegistry {
   fun destroy()
 
   class AlreadyRegisteredException(type: String) :
-    IllegalStateException(
-      "An instance of TreeSitterLanguage.Factory is already registered for file type '$type'"
-    )
+      IllegalStateException(
+          "An instance of TreeSitterLanguage.Factory is already registered for file type '$type'"
+      )
 
   class NotRegisteredException(type: String) :
-    RuntimeException("No TreeSitterLanguage.Factory registered for file type '$type'")
+      RuntimeException("No TreeSitterLanguage.Factory registered for file type '$type'")
 }

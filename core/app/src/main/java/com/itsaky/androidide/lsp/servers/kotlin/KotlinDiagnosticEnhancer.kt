@@ -26,22 +26,21 @@ import io.github.rosemoe.sora.lang.diagnostic.DiagnosticRegion
 import io.github.rosemoe.sora.lang.diagnostic.Quickfix
 
 /**
- * Kotlin 诊断增强器。
- * 监听原生的 PublishDiagnosticsEvent，拦截 KLS 产生的 "Unresolved reference" 错误，
- * 并在其中注入 IDEA 风格的 QuickFix 修复动作（如自动导包）。
+ * Kotlin 诊断增强器。 监听原生的 PublishDiagnosticsEvent，拦截 KLS 产生的 "Unresolved reference" 错误， 并在其中注入 IDEA 风格的
+ * QuickFix 修复动作（如自动导包）。
  *
  * @author android_zero
  */
-class KotlinDiagnosticEnhancer(
-    private val connector: BaseLspConnector
-) : EventReceiver<PublishDiagnosticsEvent> {
+class KotlinDiagnosticEnhancer(private val connector: BaseLspConnector) :
+    EventReceiver<PublishDiagnosticsEvent> {
 
-    companion object {
-        private val LOG = Logger.instance("KotlinDiagnosticEnhancer")
-        
-        // 预设高频使用的 Android / Kotlin 类作为快速修复字典
-        // 在实际生产环境中，这部分数据通常来自于索引缓存
-        private val COMMON_IMPORTS = mapOf(
+  companion object {
+    private val LOG = Logger.instance("KotlinDiagnosticEnhancer")
+
+    // 预设高频使用的 Android / Kotlin 类作为快速修复字典
+    // 在实际生产环境中，这部分数据通常来自于索引缓存
+    private val COMMON_IMPORTS =
+        mapOf(
             "Toast" to "android.widget.Toast",
             "Context" to "android.content.Context",
             "Intent" to "android.content.Intent",
@@ -59,60 +58,61 @@ class KotlinDiagnosticEnhancer(
             "File" to "java.io.File",
             "ArrayList" to "java.util.ArrayList",
             "List" to "java.util.List",
-            "Map" to "java.util.Map"
+            "Map" to "java.util.Map",
         )
-    }
+  }
 
-    override fun onReceive(event: PublishDiagnosticsEvent, unsubscribe: Unsubscribe) {
-        val editor = event.editor
-        val diagnosticsContainer = editor.diagnostics ?: return
+  override fun onReceive(event: PublishDiagnosticsEvent, unsubscribe: Unsubscribe) {
+    val editor = event.editor
+    val diagnosticsContainer = editor.diagnostics ?: return
 
-        // 提取当前所有的诊断区域
-        val regions = mutableListOf<DiagnosticRegion>()
-        diagnosticsContainer.queryInRegion(regions, 0, editor.text.length)
+    // 提取当前所有的诊断区域
+    val regions = mutableListOf<DiagnosticRegion>()
+    diagnosticsContainer.queryInRegion(regions, 0, editor.text.length)
 
-        var enhancedCount = 0
+    var enhancedCount = 0
 
-        for (region in regions) {
-            val detail = region.detail ?: continue
-            val msg = detail.briefMessage.toString()
+    for (region in regions) {
+      val detail = region.detail ?: continue
+      val msg = detail.briefMessage.toString()
 
-            // 拦截 KLS 的未解析引用报错
-            // KLS 报错格式通常为: "Unresolved reference: ClassName"
-            if (msg.contains("Unresolved reference:")) {
-                // 提取类名
-                val className = msg.substringAfter("Unresolved reference:").trim().substringBefore(" ")
-                
-                // 查找完整包名
-                val fqn = COMMON_IMPORTS[className] 
+      // 拦截 KLS 的未解析引用报错
+      // KLS 报错格式通常为: "Unresolved reference: ClassName"
+      if (msg.contains("Unresolved reference:")) {
+        // 提取类名
+        val className = msg.substringAfter("Unresolved reference:").trim().substringBefore(" ")
 
-                if (fqn != null) {
-                    // 构建原生 Quickfix 动作
-                    // 这个 Runnable 会在用户点击悬浮窗的 "Import ..." 按钮时执行
-                    val importFix = Quickfix("Import $fqn", 0) {
-                        val success = KotlinImportQuickFix.applyImport(editor, fqn)
-                        if (success) {
-                            LOG.info("QuickFix executed: Imported $fqn")
-                        } else {
-                            LOG.info("Import skipped (already exists or failed)")
-                        }
-                    }
+        // 查找完整包名
+        val fqn = COMMON_IMPORTS[className]
 
-                    // 将 Quickfix 附加到该诊断的 detail 中
-                    // sora-editor 的 DiagnosticsContainer 是线程安全的，但修改 detail 需要拷贝对象
-                    val existingFixes = detail.quickfixes ?: emptyList()
-                    
-                    // 避免重复添加
-                    if (existingFixes.none { it.resolveTitle(editor.context).toString().contains(fqn) }) {
-                        region.detail = detail.copy(quickfixes = existingFixes + importFix)
-                        enhancedCount++
-                    }
+        if (fqn != null) {
+          // 构建原生 Quickfix 动作
+          // 这个 Runnable 会在用户点击悬浮窗的 "Import ..." 按钮时执行
+          val importFix =
+              Quickfix("Import $fqn", 0) {
+                val success = KotlinImportQuickFix.applyImport(editor, fqn)
+                if (success) {
+                  LOG.info("QuickFix executed: Imported $fqn")
+                } else {
+                  LOG.info("Import skipped (already exists or failed)")
                 }
-            }
+              }
+
+          // 将 Quickfix 附加到该诊断的 detail 中
+          // sora-editor 的 DiagnosticsContainer 是线程安全的，但修改 detail 需要拷贝对象
+          val existingFixes = detail.quickfixes ?: emptyList()
+
+          // 避免重复添加
+          if (existingFixes.none { it.resolveTitle(editor.context).toString().contains(fqn) }) {
+            region.detail = detail.copy(quickfixes = existingFixes + importFix)
+            enhancedCount++
+          }
         }
-        
-        if (enhancedCount > 0) {
-            LOG.debug("Enhanced $enhancedCount diagnostics with Auto-Import QuickFixes.")
-        }
+      }
     }
+
+    if (enhancedCount > 0) {
+      LOG.debug("Enhanced $enhancedCount diagnostics with Auto-Import QuickFixes.")
+    }
+  }
 }

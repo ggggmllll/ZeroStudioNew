@@ -34,8 +34,8 @@ import com.itsaky.androidide.tooling.api.models.GradleTask
 class RunTasksListAdapter
 @JvmOverloads
 constructor(
-  tasks: List<Checkable<GradleTask>>,
-  val onCheckChanged: (Checkable<GradleTask>) -> Unit = {}
+    tasks: List<Checkable<GradleTask>>,
+    val onCheckChanged: (Checkable<GradleTask>) -> Unit = {},
 ) : FilterableRecyclerViewAdapter<VH, Checkable<GradleTask>>(tasks) {
 
   data class VH(val binding: LayoutRunTaskItemBinding) : RecyclerView.ViewHolder(binding.root)

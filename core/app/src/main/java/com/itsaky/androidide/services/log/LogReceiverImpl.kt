@@ -22,10 +22,10 @@ import com.itsaky.androidide.logsender.ILogReceiver
 import com.itsaky.androidide.logsender.ILogSender
 import com.itsaky.androidide.models.LogLine
 import com.itsaky.androidide.tasks.executeAsyncProvideError
-import org.slf4j.LoggerFactory
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
+import org.slf4j.LoggerFactory
 
 /**
  * Handles IPC connections from other proceses.
@@ -66,9 +66,7 @@ class LogReceiverImpl(consumer: ((LogLine) -> Unit)? = null) : ILogReceiver.Stub
   }
 
   override fun ping() {
-    doAsync("ping") {
-      Log.d("LogRecevier", "ping: Received a ping request")
-    }
+    doAsync("ping") { Log.d("LogRecevier", "ping: Received a ping request") }
   }
 
   override fun connect(sender: ILogSender?) {
@@ -89,8 +87,9 @@ class LogReceiverImpl(consumer: ((LogLine) -> Unit)? = null) : ILogReceiver.Stub
 
       if (existingSender?.isAlive() == true) {
         log.warn(
-          "Client '${existingSender.packageName}' has been restarted with process ID '${caching.pid}'" +
-              " Previous connection with process ID '${existingSender.pid}' will be closed...")
+            "Client '${existingSender.packageName}' has been restarted with process ID '${caching.pid}'" +
+                " Previous connection with process ID '${existingSender.pid}' will be closed..."
+        )
         existingSender.onDisconnect()
       }
 
@@ -136,7 +135,8 @@ class LogReceiverImpl(consumer: ((LogLine) -> Unit)? = null) : ILogReceiver.Stub
 
       if (!senders.containsKey(packageName)) {
         log.warn(
-          "Received disconnect request from a log sender which is not connected: '${packageName}'")
+            "Received disconnect request from a log sender which is not connected: '${packageName}'"
+        )
         return@doAsync
       }
 

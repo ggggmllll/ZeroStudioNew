@@ -20,14 +20,14 @@ import com.android.tools.idea.wizard.template.PackageName
 import com.android.tools.idea.wizard.template.escapeKotlinIdentifier
 
 fun mainActivityKt(
-  applicationPackage: PackageName,
-  activityClass: String,
-  defaultPreview: String,
-  wearAppName: String,
-  packageName: String,
-  themeName: String,
+    applicationPackage: PackageName,
+    activityClass: String,
+    defaultPreview: String,
+    wearAppName: String,
+    packageName: String,
+    themeName: String,
 ) =
-  """
+    """
 
 /* While this template provides a good starting point for using Wear Compose, you can always
  * take a look at https://github.com/android/wear-os-samples/tree/main/ComposeStarter to find the

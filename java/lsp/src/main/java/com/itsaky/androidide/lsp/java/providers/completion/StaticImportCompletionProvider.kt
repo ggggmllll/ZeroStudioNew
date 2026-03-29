@@ -26,6 +26,7 @@ import com.itsaky.androidide.lsp.models.CompletionResult
 import com.itsaky.androidide.lsp.models.MatchLevel
 import com.itsaky.androidide.lsp.models.MatchLevel.NO_MATCH
 import com.itsaky.androidide.progress.ProgressManager.Companion.abortIfCancelled
+import java.nio.file.Path
 import jdkx.lang.model.element.Element
 import jdkx.lang.model.element.ElementKind.METHOD
 import jdkx.lang.model.element.ExecutableElement
@@ -36,7 +37,6 @@ import openjdk.source.tree.CompilationUnitTree
 import openjdk.source.tree.MemberSelectTree
 import openjdk.source.util.TreePath
 import openjdk.source.util.Trees
-import java.nio.file.Path
 
 /**
  * Completes static imports.
@@ -44,18 +44,18 @@ import java.nio.file.Path
  * @author Akash Yadav
  */
 class StaticImportCompletionProvider(
-  completingFile: Path,
-  cursor: Long,
-  compiler: JavaCompilerService,
-  settings: IServerSettings,
-  val root: CompilationUnitTree,
+    completingFile: Path,
+    cursor: Long,
+    compiler: JavaCompilerService,
+    settings: IServerSettings,
+    val root: CompilationUnitTree,
 ) : IJavaCompletionProvider(cursor, completingFile, compiler, settings) {
 
   override fun doComplete(
-    task: CompileTask,
-    path: TreePath,
-    partial: String,
-    endsWithParen: Boolean,
+      task: CompileTask,
+      path: TreePath,
+      partial: String,
+      endsWithParen: Boolean,
   ): CompletionResult {
     val list = mutableListOf<CompletionItem>()
     val trees = Trees.instance(task.task)

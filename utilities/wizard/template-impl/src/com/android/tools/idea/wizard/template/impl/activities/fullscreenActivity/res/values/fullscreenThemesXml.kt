@@ -37,4 +37,5 @@ fun fullscreenThemes(themesData: ThemesData): String {
 
 fun getFullscreenTheme(themeName: String) = "${themeName}.Fullscreen"
 
-fun getFullscreenContainerThemeOverlay(overlayThemeName: String) = "${overlayThemeName}.FullscreenContainer"
+fun getFullscreenContainerThemeOverlay(overlayThemeName: String) =
+    "${overlayThemeName}.FullscreenContainer"

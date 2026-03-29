@@ -25,6 +25,5 @@ import io.github.rosemoe.sora.widget.snippet.variable.ISnippetVariableResolver
  * @author Akash Yadav
  */
 interface AbstractSnippetVariableResolver : ISnippetVariableResolver, AutoCloseable {
-  override fun close() {
-  }
+  override fun close() {}
 }

@@ -20,13 +20,14 @@ import com.android.tools.idea.wizard.template.getMaterialComponentName
 import com.android.tools.idea.wizard.template.renderIf
 
 fun blankFragmentJava(
-  applicationPackage: String?,
-  className: String,
-  fragmentName: String,
-  packageName: String,
-  useAndroidX: Boolean,
+    applicationPackage: String?,
+    className: String,
+    fragmentName: String,
+    packageName: String,
+    useAndroidX: Boolean,
 ): String {
-  val applicationPackageBlock = renderIf(applicationPackage != null) { "import ${applicationPackage}.R;" }
+  val applicationPackageBlock =
+      renderIf(applicationPackage != null) { "import ${applicationPackage}.R;" }
   return """
 package ${packageName};
 

@@ -42,7 +42,7 @@ open class ViewFlipperAdapter<T : ViewFlipper> : ViewAnimatorAdapter<T>() {
 
   override fun createUiWidgets(): List<UiWidget> {
     return listOf(
-      UiWidget(ViewFlipper::class.java, string.widget_viewflipper, drawable.ic_widget_viewflipper)
+        UiWidget(ViewFlipper::class.java, string.widget_viewflipper, drawable.ic_widget_viewflipper)
     )
   }
 }

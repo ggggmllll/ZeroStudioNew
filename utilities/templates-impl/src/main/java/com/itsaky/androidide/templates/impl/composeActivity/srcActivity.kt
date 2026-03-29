@@ -78,4 +78,5 @@ fun GreetingPreview() {
         Greeting("Android")
     }
 }
-""".trimIndent()
+"""
+        .trimIndent()

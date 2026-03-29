@@ -26,9 +26,9 @@ import com.android.tools.idea.wizard.template.TemplateConstraint
 import com.android.tools.idea.wizard.template.TemplateData
 import com.android.tools.idea.wizard.template.TextFieldWidget
 import com.android.tools.idea.wizard.template.WizardUiContext
-import com.itsaky.androidide.templates.impl.androidstudio.activities.common.MIN_API
 import com.android.tools.idea.wizard.template.stringParameter
 import com.android.tools.idea.wizard.template.template
+import com.itsaky.androidide.templates.impl.androidstudio.activities.common.MIN_API
 import java.io.File
 
 val aidlFileTemplate
@@ -56,5 +56,7 @@ val aidlFileTemplate
 
     widgets(TextFieldWidget(interfaceName))
 
-    recipe = { data: TemplateData -> aidlFileRecipe(data as ModuleTemplateData, interfaceName.value) }
+    recipe = { data: TemplateData ->
+      aidlFileRecipe(data as ModuleTemplateData, interfaceName.value)
+    }
   }

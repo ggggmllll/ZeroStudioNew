@@ -23,7 +23,6 @@ import com.itsaky.androidide.lsp.connection.ProcessStreamProvider
 import com.itsaky.androidide.lsp.core.LspConnectionFactory
 import com.itsaky.androidide.lsp.util.Logger
 import com.itsaky.androidide.lsp.util.LspShellUtils
-import com.itsaky.androidide.models.FileExtension
 import com.itsaky.androidide.utils.Environment
 import java.io.File
 
@@ -36,42 +35,40 @@ import java.io.File
  * @author android_zero
  */
 class EmmetServer : BaseLspServer() {
-    override val id: String = "emmet-lsp"
-    override val languageName: String = "Emmet"
-    override val serverName: String = "emmet-language-server"
-    override val supportedExtensions: List<String> = listOf("html", "htm", "xhtml", "xht","htmx")
-    
-    private val LOG = Logger.instance("EmmetServer")
-    
-    private val serverBin: File
-        get() = File(Environment.PREFIX, "bin/emmet-language-server")
+  override val id: String = "emmet-lsp"
+  override val languageName: String = "Emmet"
+  override val serverName: String = "emmet-language-server"
+  override val supportedExtensions: List<String> = listOf("html", "htm", "xhtml", "xht", "htmx")
 
-    override fun isInstalled(context: Context): Boolean {
-        return LspShellUtils.isTerminalEnvironmentReady() && serverBin.exists()
-    }
+  private val LOG = Logger.instance("EmmetServer")
 
-    override fun install(context: Context) {
-        val installScript = File(Environment.HOME, ".androidide/local/bin/lsp/emmet")
-        if (installScript.exists()) {
-            LspShellUtils.installPackage(installScript.absolutePath, "$id-installer")
-        } else {
-            LOG.error("Emmet install script missing: ${installScript.absolutePath}")
-        }
-    }
+  private val serverBin: File
+    get() = File(Environment.PREFIX, "bin/emmet-language-server")
 
-    override fun getConnectionFactory(): LspConnectionFactory {
-        return LspConnectionFactory { workingDir ->
-            ProcessStreamProvider(
-                command = listOf(
-                    LspShellUtils.getNodeExecutablePath(),
-                    serverBin.absolutePath,
-                    "--stdio"
-                ),
-                workingDir = workingDir
-            )
-        }
+  override fun isInstalled(context: Context): Boolean {
+    return LspShellUtils.isTerminalEnvironmentReady() && serverBin.exists()
+  }
+
+  override fun install(context: Context) {
+    val installScript = File(Environment.HOME, ".androidide/local/bin/lsp/emmet")
+    if (installScript.exists()) {
+      LspShellUtils.installPackage(installScript.absolutePath, "$id-installer")
+    } else {
+      LOG.error("Emmet install script missing: ${installScript.absolutePath}")
     }
-    override fun isSupported(file: File): Boolean {
-        return supportedExtensions.contains(file.extension.lowercase())
+  }
+
+  override fun getConnectionFactory(): LspConnectionFactory {
+    return LspConnectionFactory { workingDir ->
+      ProcessStreamProvider(
+          command =
+              listOf(LspShellUtils.getNodeExecutablePath(), serverBin.absolutePath, "--stdio"),
+          workingDir = workingDir,
+      )
     }
+  }
+
+  override fun isSupported(file: File): Boolean {
+    return supportedExtensions.contains(file.extension.lowercase())
+  }
 }

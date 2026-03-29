@@ -22,9 +22,7 @@ import com.itsaky.androidide.templates.base.ProjectTemplateBuilder
 
 private const val compose_kotlinExtraPlugin = "org.jetbrains.kotlin.plugin.compose"
 
-/**
- * @author android_zero (优化：支持 TOML Version Catalogs 语法动态生成)
- */
+/** @author android_zero (优化：支持 TOML Version Catalogs 语法动态生成) */
 internal fun ProjectTemplateBuilder.buildGradleSrcKts(hasCompose: Boolean = false): String {
   if (data.useToml) {
     return """
@@ -39,7 +37,8 @@ plugins {
 tasks.register<Delete>("clean") {
     delete(rootProject.layout.buildDirectory)
 }
-    """.trimIndent()
+    """
+        .trimIndent()
   } else {
     return """
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
@@ -52,7 +51,8 @@ plugins {
 tasks.register<Delete>("clean") {
     delete(rootProject.buildDir)
 }
-    """.trimIndent()
+    """
+        .trimIndent()
   }
 }
 
@@ -70,7 +70,8 @@ plugins {
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
-    """.trimIndent()
+    """
+        .trimIndent()
   } else {
     return """
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
@@ -83,9 +84,11 @@ plugins {
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
-    """.trimIndent()
+    """
+        .trimIndent()
   }
 }
+
 private fun ProjectTemplateBuilder.ktPlugin(hasCompose: Boolean = false) =
     if (data.language == Language.Kotlin) {
       if (data.useKts) ktPluginKts(hasCompose) else ktPluginGroovy(hasCompose)
@@ -93,20 +96,24 @@ private fun ProjectTemplateBuilder.ktPlugin(hasCompose: Boolean = false) =
 
 private fun ProjectTemplateBuilder.ktPluginKts(hasCompose: Boolean = false): String {
   if (data.language != Language.Kotlin) return ""
-  val kotlinPlugin = """id("org.jetbrains.kotlin.android") version "${data.version.kotlin}" apply false"""
-  val composePlugin = if (hasCompose) {
-    "\n    id(\"$compose_kotlinExtraPlugin\") version \"${data.version.kotlin}\" apply false"
-  } else ""
+  val kotlinPlugin =
+      """id("org.jetbrains.kotlin.android") version "${data.version.kotlin}" apply false"""
+  val composePlugin =
+      if (hasCompose) {
+        "\n    id(\"$compose_kotlinExtraPlugin\") version \"${data.version.kotlin}\" apply false"
+      } else ""
 
   return kotlinPlugin + composePlugin
 }
 
 private fun ProjectTemplateBuilder.ktPluginGroovy(hasCompose: Boolean = false): String {
   if (data.language != Language.Kotlin) return ""
-  val kotlinPlugin = """id 'org.jetbrains.kotlin.android' version '${data.version.kotlin}' apply false"""
-  val composePlugin = if (hasCompose) {
-    "\n    id '$compose_kotlinExtraPlugin' version '${data.version.kotlin}' apply false"
-  } else ""
+  val kotlinPlugin =
+      """id 'org.jetbrains.kotlin.android' version '${data.version.kotlin}' apply false"""
+  val composePlugin =
+      if (hasCompose) {
+        "\n    id '$compose_kotlinExtraPlugin' version '${data.version.kotlin}' apply false"
+      } else ""
 
   return kotlinPlugin + composePlugin
 }

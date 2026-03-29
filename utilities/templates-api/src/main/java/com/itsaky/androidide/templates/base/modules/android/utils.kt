@@ -44,9 +44,9 @@ inline fun ProjectTemplateBuilder.defaultAppModule(
       AndroidModuleTemplateBuilder()
           .apply {
             projectBuilder = this@defaultAppModule
-            
-            this@defaultAppModule.moduleBuilders.add(this) 
-            
+
+            this@defaultAppModule.moduleBuilders.add(this)
+
             _name = name
             templateName = 0
             thumb = 0

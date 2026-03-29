@@ -53,11 +53,11 @@ object AnyOfPredicate : TreeSitterPredicate() {
   }
 
   override fun doPredicateInternal(
-    tsQuery: TSQuery,
-    text: CharSequence,
-    match: TSQueryMatch,
-    predicateSteps: List<TsClientPredicateStep>,
-    syntheticCaptures: TsSyntheticCaptureContainer
+      tsQuery: TSQuery,
+      text: CharSequence,
+      match: TSQueryMatch,
+      predicateSteps: List<TsClientPredicateStep>,
+      syntheticCaptures: TsSyntheticCaptureContainer,
   ): PredicateResult {
     val captured = getCaptureContent(tsQuery, match, predicateSteps[1].content, text)
     val toMatch = predicateSteps.subList(2, predicateSteps.lastIndex - 1).map { it.content }

@@ -24,9 +24,9 @@ import java.util.concurrent.CompletableFuture
 
 /**
  * A Gradle project model which is identical to
- * [IGradleProject][com.itsaky.androidide.tooling.api.IGradleProject]. This project module caches all the
- * data from an [IGradleProject][com.itsaky.androidide.tooling.api.IGradleProject] eliminating the use of
- * [CompletableFuture] s.
+ * [IGradleProject][com.itsaky.androidide.tooling.api.IGradleProject]. This project module caches
+ * all the data from an [IGradleProject][com.itsaky.androidide.tooling.api.IGradleProject]
+ * eliminating the use of [CompletableFuture] s.
  *
  * @param name The display name of the project.
  * @param description The project description.

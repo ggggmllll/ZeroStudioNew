@@ -17,15 +17,10 @@
 
 package com.itsaky.androidide.xml.res
 
-/**
- * @author Akash Yadav
- */
+/** @author Akash Yadav */
 interface IResourceGroup {
 
   fun findEntry(name: String, entryId: Short? = null): IResourceEntry?
 
-  fun findEntries(
-    entryId: Short? = null,
-    predicate: (String) -> Boolean
-  ): List<IResourceEntry>
+  fun findEntries(entryId: Short? = null, predicate: (String) -> Boolean): List<IResourceEntry>
 }

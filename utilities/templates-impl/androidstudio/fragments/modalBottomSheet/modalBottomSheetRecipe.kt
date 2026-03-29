@@ -29,13 +29,13 @@ import com.itsaky.androidide.templates.impl.androidstudio.fragments.modalBottomS
 import com.itsaky.androidide.templates.impl.androidstudio.fragments.modalBottomSheet.src.app_package.itemListDialogFragmentKt
 
 fun RecipeExecutor.modalBottomSheetRecipe(
-  moduleData: ModuleTemplateData,
-  packageName: String,
-  objectKind: String,
-  fragmentClass: String,
-  columnCount: ColumnCount,
-  itemLayout: String,
-  listLayout: String,
+    moduleData: ModuleTemplateData,
+    packageName: String,
+    objectKind: String,
+    fragmentClass: String,
+    columnCount: ColumnCount,
+    itemLayout: String,
+    listLayout: String,
 ) {
   val (projectData, srcOut, resOut, _) = moduleData
   val appCompatVersion = moduleData.apis.appCompatVersion
@@ -50,38 +50,41 @@ fun RecipeExecutor.modalBottomSheetRecipe(
   addMaterialDependency(useAndroidX)
   addViewBindingSupport(moduleData.viewBindingSupport, true)
 
-  save(fragmentItemListDialogXml(fragmentClass, itemLayout, packageName, useAndroidX), resOut.resolve("layout/${listLayout}.xml"))
+  save(
+      fragmentItemListDialogXml(fragmentClass, itemLayout, packageName, useAndroidX),
+      resOut.resolve("layout/${listLayout}.xml"),
+  )
   save(fragmentItemListDialogItemXml(), resOut.resolve("layout/${itemLayout}.xml"))
 
   val columnCountNumber = columnCount.ordinal + 1
   val isViewBindingSupported = moduleData.viewBindingSupport.isViewBindingSupported()
   val itemListDialogFragment =
-    when (projectData.language) {
-      Language.Java ->
-        itemListDialogFragmentJava(
-          applicationPackage = applicationPackage,
-          columnCount = columnCountNumber,
-          fragmentClass = fragmentClass,
-          itemLayout = itemLayout,
-          listLayout = listLayout,
-          objectKind = objectKind,
-          packageName = packageName,
-          useAndroidX = useAndroidX,
-          isViewBindingSupported = isViewBindingSupported,
-        )
-      Language.Kotlin ->
-        itemListDialogFragmentKt(
-          applicationPackage = applicationPackage,
-          columnCount = columnCountNumber,
-          fragmentClass = fragmentClass,
-          itemLayout = itemLayout,
-          listLayout = listLayout,
-          objectKind = objectKind,
-          packageName = packageName,
-          useAndroidX = useAndroidX,
-          isViewBindingSupported = isViewBindingSupported,
-        )
-    }
+      when (projectData.language) {
+        Language.Java ->
+            itemListDialogFragmentJava(
+                applicationPackage = applicationPackage,
+                columnCount = columnCountNumber,
+                fragmentClass = fragmentClass,
+                itemLayout = itemLayout,
+                listLayout = listLayout,
+                objectKind = objectKind,
+                packageName = packageName,
+                useAndroidX = useAndroidX,
+                isViewBindingSupported = isViewBindingSupported,
+            )
+        Language.Kotlin ->
+            itemListDialogFragmentKt(
+                applicationPackage = applicationPackage,
+                columnCount = columnCountNumber,
+                fragmentClass = fragmentClass,
+                itemLayout = itemLayout,
+                listLayout = listLayout,
+                objectKind = objectKind,
+                packageName = packageName,
+                useAndroidX = useAndroidX,
+                isViewBindingSupported = isViewBindingSupported,
+            )
+      }
   save(itemListDialogFragment, srcOut.resolve("${fragmentClass}.${ktOrJavaExt}"))
 
   open(resOut.resolve("layout/${listLayout}.xml"))

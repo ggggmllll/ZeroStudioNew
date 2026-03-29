@@ -46,10 +46,7 @@ import com.android.aaptcompiler.ConfigDescription
 import com.android.aaptcompiler.FileReference
 import com.android.aaptcompiler.RawString
 import com.android.aaptcompiler.Reference
-import com.android.aaptcompiler.ResourceEntry
 import com.android.aaptcompiler.ResourceName
-import com.android.aaptcompiler.ResourceTable
-import com.android.aaptcompiler.ResourceTablePackage
 import com.android.aaptcompiler.StyledString
 import com.android.aaptcompiler.Value
 import com.android.aaptcompiler.android.ResValue.DataType.DIMENSION
@@ -63,9 +60,9 @@ import com.itsaky.androidide.inflater.utils.module
 import com.itsaky.androidide.xml.res.IResourceEntry
 import com.itsaky.androidide.xml.res.IResourceTable
 import com.itsaky.androidide.xml.res.IResourceTablePackage
-import org.slf4j.LoggerFactory
 import java.io.File
 import java.text.SimpleDateFormat
+import org.slf4j.LoggerFactory
 
 private val log = LoggerFactory.getLogger("ParseUtilsKt")
 
@@ -73,30 +70,30 @@ private val log = LoggerFactory.getLogger("ParseUtilsKt")
 private const val DEFAULT_STRING_VALUE = "AndroidIDE"
 
 private val stringResolver =
-  fun(it: Value?): String? {
-    return when (it) {
-      is com.android.aaptcompiler.BasicString -> it.ref.value()
-      is com.android.aaptcompiler.RawString -> it.value.value()
-      is com.android.aaptcompiler.StyledString -> it.ref.value()
-      else -> null
+    fun(it: Value?): String? {
+      return when (it) {
+        is com.android.aaptcompiler.BasicString -> it.ref.value()
+        is com.android.aaptcompiler.RawString -> it.value.value()
+        is com.android.aaptcompiler.StyledString -> it.ref.value()
+        else -> null
+      }
     }
-  }
 
 private val intResolver =
-  fun(it: Value?): Int? {
-    return if (it is com.android.aaptcompiler.BinaryPrimitive) {
-      it.resValue.data
-    } else null
-  }
+    fun(it: Value?): Int? {
+      return if (it is com.android.aaptcompiler.BinaryPrimitive) {
+        it.resValue.data
+      } else null
+    }
 
 val colorResolver: (Value?) -> Int? =
-  fun(it): Int? {
-    // TODO(itsaky) : Implement color state list parser
-    if (it is com.android.aaptcompiler.BinaryPrimitive) {
-      return it.resValue.data
+    fun(it): Int? {
+      // TODO(itsaky) : Implement color state list parser
+      if (it is com.android.aaptcompiler.BinaryPrimitive) {
+        return it.resValue.data
+      }
+      return null
     }
-    return null
-  }
 
 inline fun <reified T> ((Value?) -> T?).arrayResolver(value: Value?): Array<T>? {
   return if (value is com.android.aaptcompiler.ArrayResource) {
@@ -110,10 +107,10 @@ fun parseString(value: String): String {
   }
   if (value[0] == '@') {
     return parseReference(
-      value = value,
-      expectedType = STRING,
-      def = value,
-      resolver = stringResolver
+        value = value,
+        expectedType = STRING,
+        def = value,
+        resolver = stringResolver,
     )
   }
   return value
@@ -129,9 +126,9 @@ fun parseIntegerArray(value: String, def: IntArray? = intArrayOf()): IntArray? {
 
 @JvmOverloads
 inline fun <reified T> parseArray(
-  value: String,
-  def: Array<T>? = emptyArray(),
-  noinline resolver: (Value?) -> T?
+    value: String,
+    def: Array<T>? = emptyArray(),
+    noinline resolver: (Value?) -> T?,
 ): Array<T>? {
   if (value.isEmpty()) {
     return emptyArray()
@@ -139,10 +136,10 @@ inline fun <reified T> parseArray(
 
   if (value[0] == '@') {
     return parseReference(
-      value = value,
-      expectedType = ARRAY,
-      def = emptyArray(),
-      resolver = resolver::arrayResolver
+        value = value,
+        expectedType = ARRAY,
+        def = emptyArray(),
+        resolver = resolver::arrayResolver,
     )
   }
   return def
@@ -178,11 +175,11 @@ fun parseBoolean(value: String, def: Boolean = false): Boolean {
 
   if (value[0] == '@') {
     val resolver: (Value?) -> Boolean? =
-      fun(resValue): Boolean {
-        return if (resValue is com.android.aaptcompiler.BinaryPrimitive) {
-          resValue.resValue.data == -1
-        } else def
-      }
+        fun(resValue): Boolean {
+          return if (resValue is com.android.aaptcompiler.BinaryPrimitive) {
+            resValue.resValue.data == -1
+          } else def
+        }
     return parseReference(value, BOOL, def, resolver)
   }
 
@@ -192,20 +189,20 @@ fun parseBoolean(value: String, def: Boolean = false): Boolean {
 @JvmOverloads
 fun parseDrawable(context: Context, value: String, def: Drawable = unknownDrawable()): Drawable {
   val drawableResolver: (Value?) -> Drawable? =
-    fun(it): Drawable? {
-      if (it is com.android.aaptcompiler.FileReference) {
-        val file = File(it.path.value())
-        if (!file.exists() || file.extension != EXT_XML) {
-          return null
+      fun(it): Drawable? {
+        if (it is com.android.aaptcompiler.FileReference) {
+          val file = File(it.path.value())
+          if (!file.exists() || file.extension != EXT_XML) {
+            return null
+          }
+          val parser = DrawableParserFactory.newParser(context, file) ?: return null
+          return parser.parse(context)
         }
-        val parser = DrawableParserFactory.newParser(context, file) ?: return null
-        return parser.parse(context)
-      }
-      // TODO(itsaky) : Drawable of any type other than a file?
+        // TODO(itsaky) : Drawable of any type other than a file?
 
-      // If this is a color int, return a color drawable
-      return colorResolver.invoke(it)?.let { newColorDrawable(it) }
-    }
+        // If this is a color int, return a color drawable
+        return colorResolver.invoke(it)?.let { newColorDrawable(it) }
+      }
 
   if (value.isEmpty()) {
     return def
@@ -216,10 +213,10 @@ fun parseDrawable(context: Context, value: String, def: Drawable = unknownDrawab
   } else if (value[0] == '@') {
     val type = parseResourceReference(value)?.second ?: return def
     return parseReference(
-      value = value,
-      expectedType = type,
-      def = def,
-      resolver = drawableResolver
+        value = value,
+        expectedType = type,
+        def = def,
+        resolver = drawableResolver,
     )
   }
   return def
@@ -231,11 +228,11 @@ fun parseLayoutReference(value: String): File? {
   }
 
   val layoutResolver: (Value?) -> File? =
-    fun(it): File? {
-      return if (it is com.android.aaptcompiler.FileReference) {
-        File(it.source.path)
-      } else null
-    }
+      fun(it): File? {
+        return if (it is com.android.aaptcompiler.FileReference) {
+          File(it.source.path)
+        } else null
+      }
   val type = parseResourceReference(value)?.second ?: return null
   if (type != LAYOUT) {
     log.warn("Layout file reference is expected but '{}' was found for value '{}'", type, value)
@@ -250,20 +247,23 @@ fun parseColorDrawable(context: Context, value: String, def: Int = Color.TRANSPA
 }
 
 @JvmOverloads
-fun parseColor(@Suppress("UNUSED_PARAMETER") context: Context, value: String,
-  def: Int = Color.TRANSPARENT): Int {
+fun parseColor(
+    @Suppress("UNUSED_PARAMETER") context: Context,
+    value: String,
+    def: Int = Color.TRANSPARENT,
+): Int {
   if (value.isEmpty()) {
     return def
   }
   when (value[0]) {
     '#' -> return parseHexColor(value, def)
     '@' ->
-      return parseReference(
-        value = value,
-        expectedType = COLOR,
-        def = def,
-        resolver = colorResolver
-      )
+        return parseReference(
+            value = value,
+            expectedType = COLOR,
+            def = def,
+            resolver = colorResolver,
+        )
   }
   return def
 }
@@ -286,18 +286,18 @@ fun newColorDrawable(color: Int): Drawable {
 }
 
 fun parseColorStateList(
-  context: Context,
-  value: String,
-  def: ColorStateList = ColorStateList.valueOf(Color.TRANSPARENT)
+    context: Context,
+    value: String,
+    def: ColorStateList = ColorStateList.valueOf(Color.TRANSPARENT),
 ): ColorStateList {
   return ColorStateList.valueOf(parseColor(context, value, def = def.defaultColor))
 }
 
 @JvmOverloads
 fun parseDimension(
-  context: Context,
-  value: String?,
-  def: Float = LayoutParams.WRAP_CONTENT.toFloat(),
+    context: Context,
+    value: String?,
+    def: Float = LayoutParams.WRAP_CONTENT.toFloat(),
 ): Float {
   if (value.isNullOrBlank()) {
     return def
@@ -369,128 +369,129 @@ fun defaultGravity(): Int {
 }
 
 fun <T> parseReference(
-  value: String,
-  expectedType: AaptResourceType,
-  def: T,
-  resolver: (Value?) -> T?
+    value: String,
+    expectedType: AaptResourceType,
+    def: T,
+    resolver: (Value?) -> T?,
 ): T {
   val (pck, type, name) = parseResourceReference(value) ?: return def
   if (type != expectedType) {
     log.warn(
-      "Reference of type '{}' is expected but '{}' was found for value '{}'",
-      expectedType,
-      type,
-      value
+        "Reference of type '{}' is expected but '{}' was found for value '{}'",
+        expectedType,
+        type,
+        value,
     )
     return def
   }
   return if (pck.isNullOrBlank()) {
     resolveUnqualifiedResourceReference(
-      type = type,
-      name = name,
-      value = value,
-      def = def,
-      resolver = resolver
+        type = type,
+        name = name,
+        value = value,
+        def = def,
+        resolver = resolver,
     )
   } else {
     resolveQualifiedResourceReference(
-      pck = pck,
-      type = type,
-      name = name,
-      def = def,
-      resolver = resolver
+        pck = pck,
+        type = type,
+        name = name,
+        def = def,
+        resolver = resolver,
     )
   }
 }
 
 fun <T> resolveUnqualifiedResourceReference(
-  type: AaptResourceType,
-  name: String,
-  value: String?,
-  def: T,
-  resolver: (Value?) -> T?
+    type: AaptResourceType,
+    name: String,
+    value: String?,
+    def: T,
+    resolver: (Value?) -> T?,
 ): T {
   val (table, _, pack, entry) = lookupUnqualifedResource(type, name, value) ?: return def
   return resolveResourceReference(
-    table = table,
-    pck = pack,
-    entry = entry,
-    type = type,
-    name = name,
-    def = def,
-    resolver = resolver
+      table = table,
+      pck = pack,
+      entry = entry,
+      type = type,
+      name = name,
+      def = def,
+      resolver = resolver,
   )
 }
 
 fun <T> resolveQualifiedResourceReference(
-  pck: String,
-  type: AaptResourceType,
-  name: String,
-  def: T,
-  resolver: (Value?) -> T?
+    pck: String,
+    type: AaptResourceType,
+    name: String,
+    def: T,
+    resolver: (Value?) -> T?,
 ): T {
   val table =
-    module.findResourceTableForPackage(pck, type)
-      ?: throw IllegalArgumentException("Resource table for package '$pck' not found.")
+      module.findResourceTableForPackage(pck, type)
+          ?: throw IllegalArgumentException("Resource table for package '$pck' not found.")
 
   return resolveResourceReference(
-    table = table,
-    type = type,
-    pck = pck,
-    name = name,
-    def = def,
-    resolver = resolver
+      table = table,
+      type = type,
+      pck = pck,
+      name = name,
+      def = def,
+      resolver = resolver,
   )
 }
 
 fun <T> resolveResourceReference(
-  table: IResourceTable,
-  type: AaptResourceType,
-  pck: String,
-  name: String,
-  def: T,
-  resolver: (Value?) -> T?
+    table: IResourceTable,
+    type: AaptResourceType,
+    pck: String,
+    name: String,
+    def: T,
+    resolver: (Value?) -> T?,
 ): T {
   val result =
-    table.findResource(com.android.aaptcompiler.ResourceName(pck = pck, type = type, entry = name))
-      ?: run { throw IllegalArgumentException("$type resource '$name' not found") }
+      table.findResource(
+          com.android.aaptcompiler.ResourceName(pck = pck, type = type, entry = name)
+      ) ?: run { throw IllegalArgumentException("$type resource '$name' not found") }
   return resolveResourceReference(
-    table,
-    result.tablePackage,
-    result.entry,
-    type,
-    name,
-    def,
-    resolver
+      table,
+      result.tablePackage,
+      result.entry,
+      type,
+      name,
+      def,
+      resolver,
   )
 }
 
 fun <T> resolveResourceReference(
-  table: IResourceTable,
-  pck: IResourceTablePackage,
-  entry: IResourceEntry,
-  type: AaptResourceType,
-  name: String,
-  def: T,
-  resolver: (Value?) -> T?
+    table: IResourceTable,
+    pck: IResourceTablePackage,
+    entry: IResourceEntry,
+    type: AaptResourceType,
+    name: String,
+    def: T,
+    resolver: (Value?) -> T?,
 ): T {
   val value = entry.findValue(ConfigDescription())!!.value
   if (value is Reference) {
     return resolveResourceReference(
-      table = table,
-      type = type,
-      pck = pck.name,
-      name = value.name.entry!!,
-      def = def,
-      resolver = resolver
+        table = table,
+        type = type,
+        pck = pck.name,
+        name = value.name.entry!!,
+        def = def,
+        resolver = resolver,
     )
   }
 
   return resolver(value)
-    ?: run {
-      log.warn("Unable to resolve dimension reference '$name'")
-      def
-    }
+      ?: run {
+        log.warn("Unable to resolve dimension reference '$name'")
+        def
+      }
 }
 
 internal fun parseResourceReference(value: String): Triple<String?, AaptResourceType, String>? {

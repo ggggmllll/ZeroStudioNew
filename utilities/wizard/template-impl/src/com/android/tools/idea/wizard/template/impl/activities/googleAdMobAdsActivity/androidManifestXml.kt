@@ -20,9 +20,16 @@ import com.android.tools.idea.wizard.template.activityToLayout
 import com.android.tools.idea.wizard.template.impl.activities.common.collapseEmptyActivityTags
 import com.android.tools.idea.wizard.template.impl.activities.common.commonActivityBody
 
-fun androidManifestXml(activityClass: String, isLauncher: Boolean, isLibrary: Boolean, isNewModule: Boolean, packageName: String): String {
+fun androidManifestXml(
+    activityClass: String,
+    isLauncher: Boolean,
+    isLibrary: Boolean,
+    isNewModule: Boolean,
+    packageName: String,
+): String {
   val labelBlock =
-    if (isNewModule) "android:label=\"@string/app_name\"" else "android:label=\"@string/title_${activityToLayout(activityClass)}\""
+      if (isNewModule) "android:label=\"@string/app_name\""
+      else "android:label=\"@string/title_${activityToLayout(activityClass)}\""
   val launcher = isLauncher || isNewModule
   val activityBody = commonActivityBody(launcher, isLibrary)
 
@@ -55,5 +62,5 @@ fun androidManifestXml(activityClass: String, isLauncher: Boolean, isLibrary: Bo
 
 </manifest>
 """
-    .collapseEmptyActivityTags()
+      .collapseEmptyActivityTags()
 }

@@ -21,14 +21,10 @@ import android.content.Context
 import androidx.annotation.StringRes
 import androidx.test.core.app.ApplicationProvider
 
-/**
- * Get the application context.
- */
+/** Get the application context. */
 fun <AppContext : Context> getApplicationContext(): AppContext =
-  ApplicationProvider.getApplicationContext()
+    ApplicationProvider.getApplicationContext()
 
-/**
- * Get the value of the string resource.
- */
+/** Get the value of the string resource. */
 fun stringRes(@StringRes resource: Int, vararg formatArgs: Any) =
-  ApplicationProvider.getApplicationContext<Context>().getString(resource, *formatArgs)
+    ApplicationProvider.getApplicationContext<Context>().getString(resource, *formatArgs)

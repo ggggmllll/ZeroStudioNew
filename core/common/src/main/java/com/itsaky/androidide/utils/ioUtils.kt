@@ -47,30 +47,26 @@ import java.io.InputStream
 import java.io.OutputStream
 
 /**
- * Reads all bytes from this input stream and writes the bytes to the
- * given output stream in the order that they are read. On return, this
- * input stream will be at end of stream. This method does not close either
- * stream.
+ * Reads all bytes from this input stream and writes the bytes to the given output stream in the
+ * order that they are read. On return, this input stream will be at end of stream. This method does
+ * not close either stream.
  *
- * This method may block indefinitely reading from the input stream, or
- * writing to the output stream. The behavior for the case where the input
- * and/or output stream is _asynchronously closed_, or the thread
- * interrupted during the transfer, is highly input and output stream
+ * This method may block indefinitely reading from the input stream, or writing to the output
+ * stream. The behavior for the case where the input and/or output stream is _asynchronously
+ * closed_, or the thread interrupted during the transfer, is highly input and output stream
  * specific, and therefore not specified.
  *
- * If an I/O error occurs reading from the input stream or writing to the
- * output stream, then it may do so after some bytes have been read or
- * written. Consequently the input stream may not be at end of stream and
- * one, or both, streams may be in an inconsistent state. It is strongly
- * recommended that both streams be promptly closed if an I/O error occurs.
+ * If an I/O error occurs reading from the input stream or writing to the output stream, then it may
+ * do so after some bytes have been read or written. Consequently the input stream may not be at end
+ * of stream and one, or both, streams may be in an inconsistent state. It is strongly recommended
+ * that both streams be promptly closed if an I/O error occurs.
  *
- * @param  output the output stream, non-null
+ * @param output the output stream, non-null
  * @return the number of bytes transferred
  * @throws IOException if an I/O error occurs when reading or writing
- *
  */
 @Throws(IOException::class, NullPointerException::class)
-fun InputStream.transferToStream(output: OutputStream) : Long {
+fun InputStream.transferToStream(output: OutputStream): Long {
   var transferred: Long = 0
   val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
   var read: Int

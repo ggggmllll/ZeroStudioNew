@@ -35,11 +35,11 @@ import org.slf4j.LoggerFactory
 open class ViewImpl
 @JvmOverloads
 constructor(
-  var file: LayoutFile,
-  override val name: String,
-  override val view: View,
-  override val simpleName: String = name.simpleName(),
-  override val tag: String = name.tagName()
+    var file: LayoutFile,
+    override val name: String,
+    override val view: View,
+    override val simpleName: String = name.simpleName(),
+    override val tag: String = name.tagName(),
 ) : IView {
 
   private var fg: Drawable? = null
@@ -52,6 +52,7 @@ constructor(
   override var parent: IViewGroup? = null
   override val namespaceDecls: Collection<INamespace>
     get() = this.namespaces.values
+
   override val attributes: List<IAttribute>
     get() = this._attributes
 
@@ -168,8 +169,8 @@ constructor(
 
   private fun updateAttributeInternal(attribute: IAttribute, notify: Boolean = true) {
     val existing =
-      findAttribute(attribute)
-        ?: throw IllegalArgumentException("Attribute '${attribute.name}' not found")
+        findAttribute(attribute)
+            ?: throw IllegalArgumentException("Attribute '${attribute.name}' not found")
 
     val oldVal = existing.value
     existing.value = attribute.value

@@ -21,55 +21,54 @@ import android.content.Context
 import com.itsaky.androidide.lsp.BaseLspServer
 import com.itsaky.androidide.lsp.connection.ProcessStreamProvider
 import com.itsaky.androidide.lsp.core.LspConnectionFactory
+import com.itsaky.androidide.lsp.util.Logger
 import com.itsaky.androidide.lsp.util.LspShellUtils
 import com.itsaky.androidide.utils.Environment
 import java.io.File
-import com.itsaky.androidide.lsp.util.Logger
 
 /**
  * An implementation of [BaseLspServer] for the Bash language, utilizing the `bash-language-server`.
  *
- * This server is started as a Node.js process. The startup command is `node <path-to-server-js> start`.
+ * This server is started as a Node.js process. The startup command is `node <path-to-server-js>
+ * start`.
  *
  * @author android_zero
  */
 class BashServer : BaseLspServer() {
-    override val id: String = "bash-lsp"
-    override val languageName: String = "Bash"
-    override val serverName: String = "bash-language-server"
-    override val supportedExtensions: List<String> = listOf("sh", "bash", "zsh")
+  override val id: String = "bash-lsp"
+  override val languageName: String = "Bash"
+  override val serverName: String = "bash-language-server"
+  override val supportedExtensions: List<String> = listOf("sh", "bash", "zsh")
 
-    private val serverBin: File
-        get() = File(Environment.PREFIX, "bin/bash-language-server")
+  private val serverBin: File
+    get() = File(Environment.PREFIX, "bin/bash-language-server")
 
-    override fun isInstalled(context: Context): Boolean {
-        return LspShellUtils.isTerminalEnvironmentReady() && serverBin.exists()
-    }
+  override fun isInstalled(context: Context): Boolean {
+    return LspShellUtils.isTerminalEnvironmentReady() && serverBin.exists()
+  }
 
-    override fun install(context: Context) {
-        // The installation script is expected to be located in a specific directory within the app's assets.
-        val installScript = File(Environment.HOME, ".androidide/local/bin/lsp/bash")
-        if (installScript.exists()) {
-             LspShellUtils.installPackage(installScript.absolutePath, "$id-installer")
-        } else {
-            Logger.instance(javaClass.simpleName).error("Installation script for Bash LSP not found at ${installScript.path}")
-        }
+  override fun install(context: Context) {
+    // The installation script is expected to be located in a specific directory within the app's
+    // assets.
+    val installScript = File(Environment.HOME, ".androidide/local/bin/lsp/bash")
+    if (installScript.exists()) {
+      LspShellUtils.installPackage(installScript.absolutePath, "$id-installer")
+    } else {
+      Logger.instance(javaClass.simpleName)
+          .error("Installation script for Bash LSP not found at ${installScript.path}")
     }
+  }
 
-    override fun getConnectionFactory(): LspConnectionFactory {
-        return LspConnectionFactory { workingDir ->
-            ProcessStreamProvider(
-                command = listOf(
-                    LspShellUtils.getNodeExecutablePath(),
-                    serverBin.absolutePath,
-                    "start"
-                ),
-                workingDir = workingDir
-            )
-        }
+  override fun getConnectionFactory(): LspConnectionFactory {
+    return LspConnectionFactory { workingDir ->
+      ProcessStreamProvider(
+          command = listOf(LspShellUtils.getNodeExecutablePath(), serverBin.absolutePath, "start"),
+          workingDir = workingDir,
+      )
     }
-    
-    override fun isSupported(file: File): Boolean {
-        return supportedExtensions.contains(file.getName().substringAfterLast("."))
-    }
+  }
+
+  override fun isSupported(file: File): Boolean {
+    return supportedExtensions.contains(file.getName().substringAfterLast("."))
+  }
 }

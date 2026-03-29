@@ -47,14 +47,14 @@ import com.unnamed.b.atv.model.TreeNode
 import com.unnamed.b.atv.model.TreeNode.TreeNodeClickListener
 import com.unnamed.b.atv.model.TreeNode.TreeNodeLongClickListener
 import com.unnamed.b.atv.view.AndroidTreeView
+import java.io.File
+import java.util.Arrays
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode.MAIN
-import java.io.File
-import java.util.Arrays
 
-class FileTreeFragment : BottomSheetDialogFragment(), TreeNodeClickListener,
-  TreeNodeLongClickListener {
+class FileTreeFragment :
+    BottomSheetDialogFragment(), TreeNodeClickListener, TreeNodeLongClickListener {
 
   private var binding: LayoutEditorFileTreeBinding? = null
   private var fileTreeView: AndroidTreeView? = null
@@ -62,9 +62,9 @@ class FileTreeFragment : BottomSheetDialogFragment(), TreeNodeClickListener,
   private val viewModel by viewModels<FileTreeViewModel>(ownerProducer = { requireActivity() })
 
   override fun onCreateView(
-    inflater: LayoutInflater,
-    container: ViewGroup?,
-    savedInstanceState: Bundle?
+      inflater: LayoutInflater,
+      container: ViewGroup?,
+      savedInstanceState: Bundle?,
   ): View {
     if (!EventBus.getDefault().isRegistered(this)) {
       EventBus.getDefault().register(this)
@@ -252,7 +252,9 @@ class FileTreeFragment : BottomSheetDialogFragment(), TreeNodeClickListener,
     if (!TextUtils.isEmpty(state) && fileTreeView != null) {
       fileTreeView!!.collapseAll()
       val openNodes =
-        state!!.split(AndroidTreeView.NODES_PATH_SEPARATOR.toRegex()).dropLastWhile { it.isEmpty() }
+          state!!.split(AndroidTreeView.NODES_PATH_SEPARATOR.toRegex()).dropLastWhile {
+            it.isEmpty()
+          }
       restoreNodeState(rootNode, HashSet(openNodes))
     }
 

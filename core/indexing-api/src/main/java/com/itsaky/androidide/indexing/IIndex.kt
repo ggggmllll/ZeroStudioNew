@@ -28,28 +28,20 @@ interface IIndex<IndexableT : IIndexable> {
 
     const val PATH_SEPARATOR = '/'
 
-    /**
-     * The default batch size for indexing.
-     */
+    /** The default batch size for indexing. */
     const val DEFAULT_PUT_BATCH_SIZE = 100
 
-    /**
-     * Base path for indices.
-     */
+    /** Base path for indices. */
     val INDEX_BASE_PATH = createIndexPath("", "index")
 
     private const val DEF_IS_ASYNC = true
 
-    /**
-     * Create an index path.
-     */
+    /** Create an index path. */
     fun createIndexPath(parentPath: String, name: String): String =
-      "${parentPath}${PATH_SEPARATOR}${name}"
+        "${parentPath}${PATH_SEPARATOR}${name}"
   }
 
-  /**
-   * The name of the index.
-   */
+  /** The name of the index. */
   val name: String
 
   /**
@@ -87,18 +79,15 @@ interface IIndex<IndexableT : IIndexable> {
   fun indexAllAsync(symbols: Collection<IndexableT>)
 
   /**
-   * Create a sub-index in this index. The default implementation will throw an [UnsupportedOperationException].
+   * Create a sub-index in this index. The default implementation will throw an
+   * [UnsupportedOperationException].
    *
    * @return The created sub-index.
    */
-  fun <I : IIndexable> createSubIndex(
-    params: IIndexParams? = null
-  ): IIndex<I> {
+  fun <I : IIndexable> createSubIndex(params: IIndexParams? = null): IIndex<I> {
     throw UnsupportedOperationException()
   }
 
-  /**
-   * Delete the index.
-   */
+  /** Delete the index. */
   fun delete()
 }

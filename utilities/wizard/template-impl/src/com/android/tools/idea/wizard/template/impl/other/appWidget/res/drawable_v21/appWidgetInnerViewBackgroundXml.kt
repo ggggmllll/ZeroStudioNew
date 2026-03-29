@@ -17,7 +17,7 @@
 package com.android.tools.idea.wizard.template.impl.other.appWidget.res.drawable_v21
 
 fun appWidgetInnerViewBackgroundXml() =
-  """
+    """
 <?xml version="1.0" encoding="utf-8"?>
 <!--
 Background for views inside widgets to make the rounded corners based on the

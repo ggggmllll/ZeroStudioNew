@@ -56,7 +56,7 @@ abstract class BaseJavaCodeAction : EditorActionItem {
   override fun prepare(data: ActionData) {
     super.prepare(data)
     if (
-      !data.hasRequiredData(Context::class.java, JavaLanguageServer::class.java, File::class.java)
+        !data.hasRequiredData(Context::class.java, JavaLanguageServer::class.java, File::class.java)
     ) {
       markInvisible()
       return
@@ -75,13 +75,13 @@ abstract class BaseJavaCodeAction : EditorActionItem {
     val compiler = data.requireCompiler()
 
     val actions =
-      try {
-        result.asCodeActions(compiler, label)
-      } catch (e: Exception) {
-        flashError(e.cause?.message ?: e.message)
-        ILogger.ROOT.error(e.cause?.message ?: e.message, e)
-        return
-      }
+        try {
+          result.asCodeActions(compiler, label)
+        } catch (e: Exception) {
+          flashError(e.cause?.message ?: e.message)
+          ILogger.ROOT.error(e.cause?.message ?: e.message, e)
+          return
+        }
 
     if (actions == null) {
       onPerformCodeActionFailed(data)
@@ -106,7 +106,7 @@ abstract class BaseJavaCodeAction : EditorActionItem {
 
   protected fun ActionData.requireCompiler(): JavaCompilerService {
     val module =
-      IProjectManager.getInstance().getWorkspace()?.findModuleForFile(requireFile(), false)
+        IProjectManager.getInstance().getWorkspace()?.findModuleForFile(requireFile(), false)
     requireNotNull(module) {
       "Cannot get compiler instance. Unable to find module for file: ${requireFile().name}"
     }

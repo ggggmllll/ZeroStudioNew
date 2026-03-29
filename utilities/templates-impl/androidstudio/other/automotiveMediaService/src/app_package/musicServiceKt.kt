@@ -19,8 +19,12 @@ package com.itsaky.androidide.templates.impl.androidstudio.other.automotiveMedia
 import com.android.tools.idea.wizard.template.escapeKotlinIdentifier
 import com.android.tools.idea.wizard.template.getMaterialComponentName
 
-fun musicServiceKt(mediaBrowserServiceName: String, sharedPackageName: String, useAndroidX: Boolean) =
-  """
+fun musicServiceKt(
+    mediaBrowserServiceName: String,
+    sharedPackageName: String,
+    useAndroidX: Boolean,
+) =
+    """
 package ${escapeKotlinIdentifier(sharedPackageName)}
 
 import android.os.Bundle

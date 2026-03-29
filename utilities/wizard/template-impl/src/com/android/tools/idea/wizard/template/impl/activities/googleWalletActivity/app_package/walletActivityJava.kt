@@ -22,23 +22,23 @@ import com.android.tools.idea.wizard.template.impl.activities.common.layoutToVie
 import com.android.tools.idea.wizard.template.renderIf
 
 fun walletActivityJava(
-  activityClass: String,
-  layoutName: String,
-  packageName: String,
-  applicationPackage: String?,
-  isViewBindingSupported: Boolean,
+    activityClass: String,
+    layoutName: String,
+    packageName: String,
+    applicationPackage: String?,
+    isViewBindingSupported: Boolean,
 ): String {
 
   val contentViewBlock =
-    if (isViewBindingSupported)
-      """layout = ${layoutToViewBindingClass(layoutName)}.inflate(getLayoutInflater());
+      if (isViewBindingSupported)
+          """layout = ${layoutToViewBindingClass(layoutName)}.inflate(getLayoutInflater());
      setContentView(layout.getRoot());
   """
-    else "setContentView(R.layout.$layoutName);"
+      else "setContentView(R.layout.$layoutName);"
 
   val addToWalletButtonBlock =
-    if (isViewBindingSupported) "addToWalletButton = layout.addToGoogleWalletButton.getRoot();"
-    else "addToWalletButton = findViewById(R.id.addToGoogleWalletButton);"
+      if (isViewBindingSupported) "addToWalletButton = layout.addToGoogleWalletButton.getRoot();"
+      else "addToWalletButton = findViewById(R.id.addToGoogleWalletButton);"
 
   return """
 package $packageName;

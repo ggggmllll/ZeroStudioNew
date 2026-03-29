@@ -20,7 +20,7 @@ package com.itsaky.androidide.services.log
 import android.os.RemoteException
 import com.itsaky.androidide.logsender.ILogSender
 
-fun ILogSender.isAlive() : Boolean {
+fun ILogSender.isAlive(): Boolean {
   return try {
     ping()
     true

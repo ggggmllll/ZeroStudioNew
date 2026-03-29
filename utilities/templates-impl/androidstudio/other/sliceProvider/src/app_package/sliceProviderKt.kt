@@ -19,7 +19,7 @@ package com.itsaky.androidide.templates.impl.androidstudio.other.sliceProvider.s
 import com.android.tools.idea.wizard.template.escapeKotlinIdentifier
 
 fun sliceProviderKt(className: String, packageName: String, pathPrefix: String) =
-  """
+    """
 package ${escapeKotlinIdentifier(packageName)}
 
 import android.content.ContentResolver

@@ -19,7 +19,7 @@ package com.android.tools.idea.wizard.template.impl.other.contentProvider.src.ap
 import com.android.tools.idea.wizard.template.escapeKotlinIdentifier
 
 fun contentProviderKt(className: String, packageName: String) =
-  """
+    """
 package ${escapeKotlinIdentifier(packageName)}
 
 import android.content.ContentProvider

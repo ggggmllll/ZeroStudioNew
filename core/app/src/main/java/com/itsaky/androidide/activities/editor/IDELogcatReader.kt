@@ -19,16 +19,16 @@ package com.itsaky.androidide.activities.editor
 import android.os.Process
 import com.itsaky.androidide.utils.Environment
 import com.itsaky.androidide.utils.transferToStream
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
-import java.io.File
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 /**
  * Reads the logs from AndroidIDE and saves it to a file in the projects directory.
@@ -45,24 +45,16 @@ class IDELogcatReader {
     private val log = LoggerFactory.getLogger(IDELogcatReader::class.java)
   }
 
-  /**
-   * Start reading the logs.
-   */
+  /** Start reading the logs. */
   fun start() {
     shouldRun = true
 
-    check(job == null) {
-      "Logcat reader is already running"
-    }
+    check(job == null) { "Logcat reader is already running" }
 
-    job = CoroutineScope(Dispatchers.IO).launch {
-      run()
-    }
+    job = CoroutineScope(Dispatchers.IO).launch { run() }
   }
 
-  /**
-   * Stop the log reader.
-   */
+  /** Stop the log reader. */
   fun stop() {
     shouldRun = false
     job?.cancel("User requested cancellation")
@@ -72,8 +64,8 @@ class IDELogcatReader {
   private fun run() {
     val date = Date()
     val dateFormat = SimpleDateFormat("yyyy-MM-dd_HH:mm:ss.SSS", Locale.US)
-    val outputFile = File(Environment.ANDROIDIDE_HOME,
-      "logs/AndroidIDE-LOG-${dateFormat.format(date)}.txt")
+    val outputFile =
+        File(Environment.ANDROIDIDE_HOME, "logs/AndroidIDE-LOG-${dateFormat.format(date)}.txt")
 
     log.debug("Creating output file: {}", outputFile)
 
@@ -87,15 +79,12 @@ class IDELogcatReader {
 
     outputFile.outputStream().buffered().use { writer ->
       try {
-        val process = ProcessBuilder(
-          "logcat",
-          "--pid=${Process.myPid()}",
-          "-v",
-          "threadtime"
-        ).let { builder ->
-          builder.redirectErrorStream(true)
-          builder.start()
-        }
+        val process =
+            ProcessBuilder("logcat", "--pid=${Process.myPid()}", "-v", "threadtime").let { builder
+              ->
+              builder.redirectErrorStream(true)
+              builder.start()
+            }
 
         process.inputStream.transferToStream(writer)
         writer.flush()

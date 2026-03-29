@@ -55,11 +55,15 @@ fun tryParseBool(string: String): BinaryPrimitive? {
 }
 
 fun parseAsBool(string: String): Boolean? =
-  when (string.trim()) {
-    "true", "True", "TRUE" -> true
-    "false", "False", "FALSE" -> false
-    else -> null
-  }
+    when (string.trim()) {
+      "true",
+      "True",
+      "TRUE" -> true
+      "false",
+      "False",
+      "FALSE" -> false
+      else -> null
+    }
 
 fun tryParseNullOrEmpty(value: String): Item? {
   val trimmedValue = value.trim()
@@ -86,9 +90,10 @@ fun tryParseInt(value: String): BinaryPrimitive? {
 
 fun parseResourceId(value: String): Int? {
   val resValue = stringToInt(value)
-  if (resValue != null &&
-    resValue.dataType == ResValue.DataType.INT_HEX &&
-    resValue.data.isValidDynamicId()
+  if (
+      resValue != null &&
+          resValue.dataType == ResValue.DataType.INT_HEX &&
+          resValue.data.isValidDynamicId()
   ) {
     return resValue.data
   }
@@ -165,10 +170,8 @@ fun tryParseColor(value: String): BinaryPrimitive? {
 
     else -> return null
   }
-  return if (error)
-    throw Exception("Unable to parse hex color '$value'.")
-  else
-    BinaryPrimitive(ResValue(dataType, data))
+  return if (error) throw Exception("Unable to parse hex color '$value'.")
+  else BinaryPrimitive(ResValue(dataType, data))
 }
 
 data class ReferenceInfo(val reference: Reference, val createNew: Boolean = false)
@@ -224,10 +227,7 @@ fun parseAttributeReference(value: String): ReferenceInfo? {
   }
 
   val reference = Reference()
-  reference.name =
-    ResourceName(
-      possibleResourceName.packageName, ATTR, possibleResourceName.entry
-    )
+  reference.name = ResourceName(possibleResourceName.packageName, ATTR, possibleResourceName.entry)
   reference.referenceType = ATTRIBUTE
   return ReferenceInfo(reference, false)
 }
@@ -252,9 +252,9 @@ fun parseAttributeReference(value: String): ReferenceInfo? {
  * @return A [ReferenceInfo] representing the reference, or {@code null} if the input was invalid.
  *
  * + [ReferenceInfo.createNew] will be set if and only if a '+' followed the '@' and the reference
- * had a type of id.
+ *   had a type of id.
  * + [ReferenceInfo.reference] will be set as private if and only if a '*' followed the '@' in the
- * input.
+ *   input.
  */
 fun parseReference(value: String): ReferenceInfo? {
   val trimmedValue = value.trim()
@@ -337,15 +337,17 @@ fun parseResourceName(value: String): ResourceNameInfo? {
   }
 
   return ResourceNameInfo(
-    ResourceName(possibleResourceName.packageName, resourceType, possibleResourceName.entry),
-    isPrivate
+      ResourceName(possibleResourceName.packageName, resourceType, possibleResourceName.entry),
+      isPrivate,
   )
 }
 
 data class PossibleResourceName(
-  val packageName: String, val typeName: String, val entry: String, val success: Boolean = true
+    val packageName: String,
+    val typeName: String,
+    val entry: String,
+    val success: Boolean = true,
 )
-
 
 fun extractResourceName(value: String): PossibleResourceName {
   var packageName = ""
@@ -377,16 +379,16 @@ fun extractResourceName(value: String): PossibleResourceName {
   }
   val entryName = value.substring(offsetCurrent)
 
-  val success = !(hasPackageSeparator && packageName.isEmpty()) &&
-    !((hasTypeSeparator) && typeName.isEmpty())
+  val success =
+      !(hasPackageSeparator && packageName.isEmpty()) && !((hasTypeSeparator) && typeName.isEmpty())
 
   return PossibleResourceName(packageName, typeName, entryName, success)
 }
 
 fun tryParseItemForAttribute(
-  value: String,
-  resourceTypeMask: Int,
-  onCreateReference: ((name: ResourceName) -> Boolean)? = null
+    value: String,
+    resourceTypeMask: Int,
+    onCreateReference: ((name: ResourceName) -> Boolean)? = null,
 ): Item? {
 
   val nullOrEmpty = tryParseNullOrEmpty(value)
@@ -427,13 +429,16 @@ fun tryParseItemForAttribute(
     }
   }
 
-  val floatMask = Resources.Attribute.FormatFlags.FLOAT_VALUE or
-    Resources.Attribute.FormatFlags.DIMENSION_VALUE or
-    Resources.Attribute.FormatFlags.FRACTION_VALUE
+  val floatMask =
+      Resources.Attribute.FormatFlags.FLOAT_VALUE or
+          Resources.Attribute.FormatFlags.DIMENSION_VALUE or
+          Resources.Attribute.FormatFlags.FRACTION_VALUE
   if ((resourceTypeMask and floatMask) != 0) {
     val floatingPoint = tryParseFloat(value)
-    if (floatingPoint != null &&
-      (androidTypeToAttributeTypeMask(floatingPoint.resValue.dataType) and resourceTypeMask) != 0
+    if (
+        floatingPoint != null &&
+            (androidTypeToAttributeTypeMask(floatingPoint.resValue.dataType) and
+                resourceTypeMask) != 0
     ) {
       return floatingPoint
     }
@@ -443,31 +448,31 @@ fun tryParseItemForAttribute(
 }
 
 fun androidTypeToAttributeTypeMask(type: ResValue.DataType) =
-  when (type) {
-    ResValue.DataType.NULL,
-    ResValue.DataType.REFERENCE,
-    ResValue.DataType.ATTRIBUTE,
-    ResValue.DataType.DYNAMIC_REFERENCE -> Resources.Attribute.FormatFlags.REFERENCE_VALUE
+    when (type) {
+      ResValue.DataType.NULL,
+      ResValue.DataType.REFERENCE,
+      ResValue.DataType.ATTRIBUTE,
+      ResValue.DataType.DYNAMIC_REFERENCE -> Resources.Attribute.FormatFlags.REFERENCE_VALUE
 
-    ResValue.DataType.STRING -> Resources.Attribute.FormatFlags.STRING_VALUE
-    ResValue.DataType.FLOAT -> Resources.Attribute.FormatFlags.FLOAT_VALUE
-    ResValue.DataType.DIMENSION -> Resources.Attribute.FormatFlags.DIMENSION_VALUE
-    ResValue.DataType.FRACTION -> Resources.Attribute.FormatFlags.FRACTION_VALUE
-    ResValue.DataType.INT_DEC,
-    ResValue.DataType.INT_HEX -> {
-      Resources.Attribute.FormatFlags.INTEGER_VALUE or
-        Resources.Attribute.FormatFlags.ENUM_VALUE or
-        Resources.Attribute.FormatFlags.FLAGS_VALUE
+      ResValue.DataType.STRING -> Resources.Attribute.FormatFlags.STRING_VALUE
+      ResValue.DataType.FLOAT -> Resources.Attribute.FormatFlags.FLOAT_VALUE
+      ResValue.DataType.DIMENSION -> Resources.Attribute.FormatFlags.DIMENSION_VALUE
+      ResValue.DataType.FRACTION -> Resources.Attribute.FormatFlags.FRACTION_VALUE
+      ResValue.DataType.INT_DEC,
+      ResValue.DataType.INT_HEX -> {
+        Resources.Attribute.FormatFlags.INTEGER_VALUE or
+            Resources.Attribute.FormatFlags.ENUM_VALUE or
+            Resources.Attribute.FormatFlags.FLAGS_VALUE
+      }
+
+      ResValue.DataType.INT_BOOLEAN -> Resources.Attribute.FormatFlags.BOOLEAN_VALUE
+      ResValue.DataType.INT_COLOR_ARGB8,
+      ResValue.DataType.INT_COLOR_RGB8,
+      ResValue.DataType.INT_COLOR_ARGB4,
+      ResValue.DataType.INT_COLOR_RGB4 -> Resources.Attribute.FormatFlags.COLOR_VALUE
+
+      else -> 0
     }
-
-    ResValue.DataType.INT_BOOLEAN -> Resources.Attribute.FormatFlags.BOOLEAN_VALUE
-    ResValue.DataType.INT_COLOR_ARGB8,
-    ResValue.DataType.INT_COLOR_RGB8,
-    ResValue.DataType.INT_COLOR_ARGB4,
-    ResValue.DataType.INT_COLOR_RGB4 -> Resources.Attribute.FormatFlags.COLOR_VALUE
-
-    else -> 0
-  }
 
 fun verifyJavaStringFormat(string: String): Boolean {
   var argumentCount = 0
@@ -611,13 +616,12 @@ fun parseStyleParentReference(str: String): ParsedParentInfo {
   }
 
   val resourceName =
-    ResourceName(
-      possibleResourceName.packageName, STYLE, possibleResourceName.entry
-    )
+      ResourceName(possibleResourceName.packageName, STYLE, possibleResourceName.entry)
 
-  if (!hasLeadingIdentifiers &&
-    resourceName.pck!!.isEmpty() &&
-    possibleResourceName.typeName.isNotEmpty()
+  if (
+      !hasLeadingIdentifiers &&
+          resourceName.pck!!.isEmpty() &&
+          possibleResourceName.typeName.isNotEmpty()
   ) {
     val errorString = "Invalid parent reference '$str'"
     return ParsedParentInfo(null, errorString)
@@ -627,10 +631,8 @@ fun parseStyleParentReference(str: String): ParsedParentInfo {
   result.name = resourceName
   result.isPrivate = privateRef
 
-
   return ParsedParentInfo(result, "")
 }
-
 
 fun parseXmlAttributeName(str: String): Reference {
   val name = str.trim()
@@ -652,8 +654,7 @@ fun parseXmlAttributeName(str: String): Reference {
     }
   }
 
-  result.name =
-    ResourceName(packageName, ATTR, if (entryName.isEmpty()) name else entryName)
+  result.name = ResourceName(packageName, ATTR, if (entryName.isEmpty()) name else entryName)
   return result
 }
 

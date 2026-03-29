@@ -17,7 +17,7 @@
 package com.android.tools.idea.wizard.template.impl.other.contentProvider.src.app_package
 
 fun contentProviderJava(className: String, packageName: String) =
-  """
+    """
 package ${packageName};
 
 import android.content.ContentProvider;

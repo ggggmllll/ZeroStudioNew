@@ -25,7 +25,7 @@ import org.eclipse.lsp4j.services.LanguageServer
 
 /**
  * Kotlin LSP 环境配置注入器。
- * 
+ *
  * 核心功能：
  * 1. 调用 [KotlinClasspathProvider] 获取全量依赖路径。
  * 2. 构造符合 KLS 配置规范的 JSON 对象。
@@ -36,67 +36,64 @@ import org.eclipse.lsp4j.services.LanguageServer
  */
 object KotlinWorkspaceSetup {
 
-    private val LOG = Logger.instance("KotlinWorkspaceSetup")
+  private val LOG = Logger.instance("KotlinWorkspaceSetup")
 
-    /**
-     * 配置已连接的服务器。
-     * 应在 LSP 初始化握手 (Initialized) 后立即调用。
-     */
-    fun configureServer(server: LanguageServer) {
-        LOG.info("Calculating and injecting workspace configuration...")
+  /** 配置已连接的服务器。 应在 LSP 初始化握手 (Initialized) 后立即调用。 */
+  fun configureServer(server: LanguageServer) {
+    LOG.info("Calculating and injecting workspace configuration...")
 
-        try {
-            val provider = KotlinClasspathProvider()
-            val classpathList = provider.getClasspathList()
+    try {
+      val provider = KotlinClasspathProvider()
+      val classpathList = provider.getClasspathList()
 
-            if (classpathList.isEmpty()) {
-                LOG.warn("Classpath list is empty! Code completion may be limited.")
-            }
+      if (classpathList.isEmpty()) {
+        LOG.warn("Classpath list is empty! Code completion may be limited.")
+      }
 
-            // 构造配置 JSON
-            // 结构参考: https://github.com/fwcd/kotlin-language-server/blob/main/shared/src/main/kotlin/org/javacs/kt/Configuration.kt
-            
-            val settingsRoot = JsonObject()
-            val kotlinSection = JsonObject()
-            val scriptsSection = JsonObject()
-            
-            // 1. 构建 Classpath 数组
-            val classpathArray = JsonArray()
-            classpathList.forEach { classpathArray.add(it) }
+      // 构造配置 JSON
+      // 结构参考:
+      // https://github.com/fwcd/kotlin-language-server/blob/main/shared/src/main/kotlin/org/javacs/kt/Configuration.kt
 
-            // 2. 配置 Scripts (.kts)
-            scriptsSection.addProperty("enabled", true)
-            scriptsSection.addProperty("buildScriptsEnabled", true)
-            val templates = JsonArray()
-            // 标准脚本模板，支持大多数 kts 文件
-            templates.add("kotlin.script.templates.standard.ScriptTemplateWithArgs")
-            scriptsSection.add("templates", templates)
-            
-            // 3. 核心配置
-            // 关键：indexing = auto, externalSources = auto
-            kotlinSection.addProperty("indexing", "auto")
-            kotlinSection.addProperty("externalSources", "auto") // 允许跳转到 jar 包内的反编译源码
-            
-            // 关键：强制使用外部提供的 Classpath
-            kotlinSection.addProperty("usePredefinedClasspath", true)
-            // 关键：禁用 KLS 自己的依赖解析器（极其重要，否则 KLS 会尝试运行 Gradle）
-            kotlinSection.addProperty("disableDependencyResolution", true)
-            
-            // 注入我们解析好的 Classpath
-            kotlinSection.add("classpath", classpathArray)
-            kotlinSection.add("scripts", scriptsSection)
+      val settingsRoot = JsonObject()
+      val kotlinSection = JsonObject()
+      val scriptsSection = JsonObject()
 
-            // 组装根对象
-            settingsRoot.add("kotlin", kotlinSection)
+      // 1. 构建 Classpath 数组
+      val classpathArray = JsonArray()
+      classpathList.forEach { classpathArray.add(it) }
 
-            // 4. 发送配置通知
-            val params = DidChangeConfigurationParams(settingsRoot)
-            server.workspaceService.didChangeConfiguration(params)
+      // 2. 配置 Scripts (.kts)
+      scriptsSection.addProperty("enabled", true)
+      scriptsSection.addProperty("buildScriptsEnabled", true)
+      val templates = JsonArray()
+      // 标准脚本模板，支持大多数 kts 文件
+      templates.add("kotlin.script.templates.standard.ScriptTemplateWithArgs")
+      scriptsSection.add("templates", templates)
 
-            LOG.info("Workspace configuration injected. Classpath entries: ${classpathList.size}")
-            
-        } catch (e: Exception) {
-            LOG.error("Failed to inject workspace configuration", e)
-        }
+      // 3. 核心配置
+      // 关键：indexing = auto, externalSources = auto
+      kotlinSection.addProperty("indexing", "auto")
+      kotlinSection.addProperty("externalSources", "auto") // 允许跳转到 jar 包内的反编译源码
+
+      // 关键：强制使用外部提供的 Classpath
+      kotlinSection.addProperty("usePredefinedClasspath", true)
+      // 关键：禁用 KLS 自己的依赖解析器（极其重要，否则 KLS 会尝试运行 Gradle）
+      kotlinSection.addProperty("disableDependencyResolution", true)
+
+      // 注入我们解析好的 Classpath
+      kotlinSection.add("classpath", classpathArray)
+      kotlinSection.add("scripts", scriptsSection)
+
+      // 组装根对象
+      settingsRoot.add("kotlin", kotlinSection)
+
+      // 4. 发送配置通知
+      val params = DidChangeConfigurationParams(settingsRoot)
+      server.workspaceService.didChangeConfiguration(params)
+
+      LOG.info("Workspace configuration injected. Classpath entries: ${classpathList.size}")
+    } catch (e: Exception) {
+      LOG.error("Failed to inject workspace configuration", e)
     }
+  }
 }

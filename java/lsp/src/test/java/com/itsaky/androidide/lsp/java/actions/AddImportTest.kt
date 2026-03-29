@@ -36,18 +36,17 @@ class AddImportTest {
   fun setup() {
     JavaLSPTest.setup()
   }
-  
+
   @Suppress("UNCHECKED_CAST")
   @Test
   fun addImport() {
     JavaLSPTest.apply {
       openFile("actions/AddImportAction")
-      val diagnostic =
-        runBlocking {
-          server.analyze(file!!).diagnostics.firstOrNull {
-            it.code == "compiler.err.cant.resolve.location"
-          }
+      val diagnostic = runBlocking {
+        server.analyze(file!!).diagnostics.firstOrNull {
+          it.code == "compiler.err.cant.resolve.location"
         }
+      }
 
       assertThat(diagnostic).isNotNull()
 

@@ -18,12 +18,11 @@
 package com.itsaky.androidide.actions.editor
 
 import android.content.Context
-import androidx.core.content.ContextCompat
 import com.itsaky.androidide.actions.ActionData
 import com.itsaky.androidide.actions.ActionItem
+import com.itsaky.androidide.actions.ActionStyle
 import com.itsaky.androidide.actions.EditorRelatedAction
 import com.itsaky.androidide.resources.R
-import com.itsaky.androidide.actions.ActionStyle
 
 /**
  * Expands the current selection using the language server set in editor.
@@ -38,10 +37,7 @@ class ExpandSelectionAction(context: Context, override val order: Int) : EditorR
     label = context.getString(R.string.action_expand_selection)
     icon = null
 
-    style = ActionStyle(
-        textSizeSp = 10f,
-        paddingHorizontalDp = 2
-    )
+    style = ActionStyle(textSizeSp = 10f, paddingHorizontalDp = 2)
   }
 
   override suspend fun execAction(data: ActionData): Any {

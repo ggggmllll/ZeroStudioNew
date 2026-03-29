@@ -21,8 +21,7 @@ import com.itsaky.androidide.eventbus.events.Event
 import java.io.File
 
 /**
- * 请求 UI 弹出 LSP 服务器安装对话框的事件。
- * 这是一个抽象的、可复用的配置对象，任意 LSP 服务器均可通过发送此事件唤起 Compose 安装器。
+ * 请求 UI 弹出 LSP 服务器安装对话框的事件。 这是一个抽象的、可复用的配置对象，任意 LSP 服务器均可通过发送此事件唤起 Compose 安装器。
  *
  * @author android_zero
  */
@@ -36,8 +35,6 @@ data class LspInstallRequestEvent(
     val confirmButtonText: String = "Install",
     val cancelButtonText: String = "Cancel",
     val isZipArchive: Boolean = true,
-    /**
-     * 安装完成后的回调（注意：由于跨线程，需谨慎处理）
-     */
-    val onInstallComplete: (() -> Unit)? = null
+    /** 安装完成后的回调（注意：由于跨线程，需谨慎处理） */
+    val onInstallComplete: (() -> Unit)? = null,
 ) : Event()

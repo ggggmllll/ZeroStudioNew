@@ -54,7 +54,7 @@ class JavaCompletionProviderTest {
       val pos = cursorPosition()
       val items = completionTitles(pos)
       assertThat(items)
-        .containsAtLeast("getClass", "toLowerCase", "toUpperCase", "substring", "charAt")
+          .containsAtLeast("getClass", "toLowerCase", "toUpperCase", "substring", "charAt")
     }
   }
 
@@ -67,7 +67,7 @@ class JavaCompletionProviderTest {
       val pos = cursorPosition()
       val items = completionTitles(pos)
       assertThat(items)
-        .containsAtLeast("getMessage", "getCause", "getStackTrace", "printStackTrace")
+          .containsAtLeast("getMessage", "getCause", "getStackTrace", "printStackTrace")
     }
   }
 
@@ -80,15 +80,16 @@ class JavaCompletionProviderTest {
       val pos = cursorPosition()
       val items = completionTitles(pos)
       assertThat(items)
-        .containsAtLeast("format", "join", "valueOf", "CASE_INSENSITIVE_ORDER", "class")
+          .containsAtLeast("format", "join", "valueOf", "CASE_INSENSITIVE_ORDER", "class")
     }
   }
 
   private fun completionTitles(pos: Position): List<CharSequence> {
     return JavaLSPTest.server
-      .complete(
-        CompletionParams(pos, JavaLSPTest.file!!, ICancelChecker.NOOP).apply { prefix = "" })
-      .items
-      .map { it.ideLabel }
+        .complete(
+            CompletionParams(pos, JavaLSPTest.file!!, ICancelChecker.NOOP).apply { prefix = "" }
+        )
+        .items
+        .map { it.ideLabel }
   }
 }

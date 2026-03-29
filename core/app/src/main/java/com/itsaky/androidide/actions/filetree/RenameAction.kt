@@ -32,10 +32,10 @@ import com.itsaky.androidide.utils.DialogUtils
 import com.itsaky.androidide.utils.FlashType
 import com.itsaky.androidide.utils.flashMessage
 import com.unnamed.b.atv.model.TreeNode
+import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.greenrobot.eventbus.EventBus
-import java.io.File
 
 /**
  * Action to rename the selected file.
@@ -43,11 +43,11 @@ import java.io.File
  * @author Akash Yadav
  */
 class RenameAction(context: Context, override val order: Int) :
-  BaseFileTreeAction(
-    context,
-    labelRes = R.string.rename_file,
-    iconRes = R.drawable.ic_file_rename
-  ) {
+    BaseFileTreeAction(
+        context,
+        labelRes = R.string.rename_file,
+        iconRes = R.drawable.ic_file_rename,
+    ) {
 
   override val id: String = "ide.editor.fileTree.rename"
 
@@ -58,15 +58,15 @@ class RenameAction(context: Context, override val order: Int) :
     val binding = LayoutDialogTextInputBinding.inflate(LayoutInflater.from(context))
     val builder = DialogUtils.newMaterialDialogBuilder(context)
     binding.name.editText!!.hint =
-      context.getString(com.itsaky.androidide.resources.R.string.new_name)
+        context.getString(com.itsaky.androidide.resources.R.string.new_name)
     binding.name.editText!!.setText(file.name)
     builder.setTitle(com.itsaky.androidide.resources.R.string.rename_file)
     builder.setMessage(com.itsaky.androidide.resources.R.string.msg_rename_file)
     builder.setView(binding.root)
     builder.setNegativeButton(android.R.string.cancel, null)
     builder.setPositiveButton(com.itsaky.androidide.resources.R.string.rename_file) {
-      dialogInterface,
-      _ ->
+        dialogInterface,
+        _ ->
       dialogInterface.dismiss()
       actionScope.launchAsyncWithProgress(
           configureFlashbar = { builder, cancelChecker ->
@@ -84,7 +84,8 @@ class RenameAction(context: Context, override val order: Int) :
               flashMessage(
                   if (renamed) com.itsaky.androidide.resources.R.string.renamed
                   else com.itsaky.androidide.resources.R.string.rename_failed,
-                  if (renamed) FlashType.SUCCESS else FlashType.ERROR)
+                  if (renamed) FlashType.SUCCESS else FlashType.ERROR,
+              )
               if (!renamed) {
                 return@withContext
               }
@@ -100,7 +101,8 @@ class RenameAction(context: Context, override val order: Int) :
                 requestFileListing()
               }
             }
-          })
+          },
+      )
     }
     builder.create().show()
   }

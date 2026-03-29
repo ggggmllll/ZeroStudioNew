@@ -27,11 +27,11 @@ import com.android.tools.idea.wizard.template.impl.targetSdk
 import com.android.tools.idea.wizard.template.renderIf
 
 fun buildGradle(
-  projectData: ProjectTemplateData,
-  packageName: String,
-  buildApi: AndroidVersion,
-  minApi: AndroidMajorVersion,
-  targetApi: AndroidMajorVersion,
+    projectData: ProjectTemplateData,
+    packageName: String,
+    buildApi: AndroidVersion,
+    minApi: AndroidMajorVersion,
+    targetApi: AndroidMajorVersion,
 ): String {
   val agpVersion = projectData.agpVersion
   val useAndroidX = projectData.androidXSupport

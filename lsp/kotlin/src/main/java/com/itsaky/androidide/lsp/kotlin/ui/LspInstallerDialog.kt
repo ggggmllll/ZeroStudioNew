@@ -56,7 +56,7 @@ fun LspInstallerDialog(request: LspInstallRequestEvent, onDismiss: () -> Unit) {
   var showConsole by remember { mutableStateOf(false) }
   var progress by remember { mutableStateOf(0f) }
   var statusMessage by remember { mutableStateOf("") }
-  
+
   var isSuccess by remember { mutableStateOf(false) }
 
   // 日志列表
@@ -73,7 +73,7 @@ fun LspInstallerDialog(request: LspInstallRequestEvent, onDismiss: () -> Unit) {
       onDismissRequest = {
         if (canDismiss) {
           if (!isSuccess) {
-              request.onInstallCancelled?.invoke()
+            request.onInstallCancelled?.invoke()
           }
           onDismiss()
         }
@@ -253,7 +253,7 @@ fun LspInstallerDialog(request: LspInstallRequestEvent, onDismiss: () -> Unit) {
                 }
               }
             },
-            enabled = !isInstalling, 
+            enabled = !isInstalling,
         ) {
           Text(if (isInstalling) "Installing..." else request.confirmButtonText)
         }
@@ -261,11 +261,11 @@ fun LspInstallerDialog(request: LspInstallRequestEvent, onDismiss: () -> Unit) {
       dismissButton = {
         TextButton(
             onClick = {
-               // 处理主动点击取消按钮事件
-               if (!isSuccess) {
-                   request.onInstallCancelled?.invoke()
-               }
-               onDismiss()
+              // 处理主动点击取消按钮事件
+              if (!isSuccess) {
+                request.onInstallCancelled?.invoke()
+              }
+              onDismiss()
             },
             enabled = !isInstalling,
         ) {

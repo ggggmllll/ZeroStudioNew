@@ -18,7 +18,7 @@ package com.android.tools.idea.wizard.template.impl.activities.fullscreenActivit
 import com.android.tools.idea.wizard.template.ThemesData
 
 fun fullscreenStyles(themesData: ThemesData) =
-  """<resources>
+    """<resources>
     <style name="${getFullscreenActionBarStyle(themesData.main.name)}" parent="Widget.AppCompat.ActionBar">
         <item name="android:background">@color/black_overlay</item>
     </style>

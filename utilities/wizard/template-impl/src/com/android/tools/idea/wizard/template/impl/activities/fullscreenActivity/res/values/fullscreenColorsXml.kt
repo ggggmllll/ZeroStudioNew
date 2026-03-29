@@ -18,7 +18,7 @@ package com.android.tools.idea.wizard.template.impl.activities.fullscreenActivit
 import com.android.tools.idea.wizard.template.MaterialColor.*
 
 fun fullscreenColors() =
-  """<resources>
+    """<resources>
     ${LIGHT_BLUE_600.xmlElement()}
     ${LIGHT_BLUE_900.xmlElement()}
     ${LIGHT_BLUE_A200.xmlElement()}

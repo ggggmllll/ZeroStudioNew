@@ -36,10 +36,10 @@ import com.itsaky.androidide.utils.ApkInstaller
 import com.itsaky.androidide.utils.InstallationResultHandler
 import com.itsaky.androidide.utils.flashError
 import com.unnamed.b.atv.model.TreeNode
+import java.io.File
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode.MAIN
-import java.io.File
 
 /**
  * Handles events related to files in filetree.
@@ -72,10 +72,10 @@ class FileTreeActionHandler : BaseEventHandler() {
     context.binding.root.closeDrawer(GravityCompat.START)
     if (event.file.name.endsWith(".apk")) {
       ApkInstaller.installApk(
-        context,
-        InstallationResultHandler.createEditorActivitySender(context),
-        event.file,
-        context.installationSessionCallback()
+          context,
+          InstallationResultHandler.createEditorActivitySender(context),
+          event.file,
+          context.installationSessionCallback(),
       )
       return
     }
@@ -83,7 +83,10 @@ class FileTreeActionHandler : BaseEventHandler() {
     if (MB_10 < event.file.length()) {
       flashError("File is too big!")
       log.warn(
-        "Cannot open {} as it is too big. File size: {} bytes", event.file, event.file.length())
+          "Cannot open {} as it is too big. File size: {} bytes",
+          event.file,
+          event.file.length(),
+      )
       return
     }
 
@@ -100,12 +103,12 @@ class FileTreeActionHandler : BaseEventHandler() {
     this.lastHeld = event[TreeNode::class.java]
     val context = event[Context::class.java]!! as EditorHandlerActivity
     createFileOptionsFragment(context, event.file)
-      .show(context.supportFragmentManager, TAG_FILE_OPTIONS_FRAGMENT)
+        .show(context.supportFragmentManager, TAG_FILE_OPTIONS_FRAGMENT)
   }
 
   private fun createFileOptionsFragment(
-    context: EditorHandlerActivity,
-    file: File
+      context: EditorHandlerActivity,
+      file: File,
   ): OptionsListFragment {
     val fragment = OptionsListFragment()
     val registry = ActionsRegistry.getInstance()
@@ -127,7 +130,7 @@ class FileTreeActionHandler : BaseEventHandler() {
       }
 
       fragment.addOption(
-        SheetOption(action.id, action.icon, action.label, file).apply { this.extra = data }
+          SheetOption(action.id, action.icon, action.label, file).apply { this.extra = data }
       )
     }
 

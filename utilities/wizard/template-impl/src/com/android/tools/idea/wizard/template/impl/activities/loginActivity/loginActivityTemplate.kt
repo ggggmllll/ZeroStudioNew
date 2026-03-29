@@ -40,11 +40,16 @@ val loginActivityTemplate
   get() = template {
     name = "Login Views Activity"
     description =
-      "Creates a new login activity, allowing users to enter an email address and password to log in or to register with your application"
+        "Creates a new login activity, allowing users to enter an email address and password to log in or to register with your application"
     minApi = MIN_API
     category = Category.Activity
     formFactor = FormFactor.Mobile
-    screens = listOf(WizardUiContext.ActivityGallery, WizardUiContext.MenuEntry, WizardUiContext.NewModule)
+    screens =
+        listOf(
+            WizardUiContext.ActivityGallery,
+            WizardUiContext.MenuEntry,
+            WizardUiContext.NewModule,
+        )
 
     lateinit var layoutName: StringParameter
     val activityClass = stringParameter {
@@ -66,11 +71,21 @@ val loginActivityTemplate
 
     val packageName = defaultPackageNameParameter
 
-    widgets(TextFieldWidget(activityClass), TextFieldWidget(layoutName), PackageNameWidget(packageName), LanguageWidget())
+    widgets(
+        TextFieldWidget(activityClass),
+        TextFieldWidget(layoutName),
+        PackageNameWidget(packageName),
+        LanguageWidget(),
+    )
 
     thumb { File("login-activity").resolve("template_login_activity.png") }
 
     recipe = { data: TemplateData ->
-      loginActivityRecipe(data as ModuleTemplateData, activityClass.value, layoutName.value, packageName.value)
+      loginActivityRecipe(
+          data as ModuleTemplateData,
+          activityClass.value,
+          layoutName.value,
+          packageName.value,
+      )
     }
   }

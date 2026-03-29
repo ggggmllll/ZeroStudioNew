@@ -18,26 +18,26 @@ package com.itsaky.androidide.templates.impl.androidstudio.other.appWidget.src.a
 
 import com.android.tools.idea.wizard.template.Language
 import com.android.tools.idea.wizard.template.escapeKotlinIdentifier
+import com.android.tools.idea.wizard.template.renderIf
 import com.itsaky.androidide.templates.impl.androidstudio.activities.common.findViewById
 import com.itsaky.androidide.templates.impl.androidstudio.activities.common.importViewBindingClass
 import com.itsaky.androidide.templates.impl.androidstudio.activities.common.layoutToViewBindingClass
-import com.android.tools.idea.wizard.template.renderIf
 
 fun appWidgetConfigureActivityKt(
-  applicationPackage: String?,
-  className: String,
-  layoutName: String,
-  packageName: String,
-  isViewBindingSupported: Boolean,
+    applicationPackage: String?,
+    className: String,
+    layoutName: String,
+    packageName: String,
+    isViewBindingSupported: Boolean,
 ): String {
   val layout = "${layoutName}_configure"
   val contentViewBlock =
-    if (isViewBindingSupported)
-      """
+      if (isViewBindingSupported)
+          """
      binding = ${layoutToViewBindingClass(layout)}.inflate(layoutInflater)
      setContentView(binding.root)
   """
-    else "setContentView(R.layout.$layout)"
+      else "setContentView(R.layout.$layout)"
 
   return """
 package ${escapeKotlinIdentifier(packageName)}

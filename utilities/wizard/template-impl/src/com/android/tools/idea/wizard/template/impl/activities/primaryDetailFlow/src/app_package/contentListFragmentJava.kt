@@ -24,51 +24,51 @@ import com.android.tools.idea.wizard.template.impl.activities.common.layoutToVie
 import com.android.tools.idea.wizard.template.renderIf
 
 fun contentListFragmentJava(
-  collectionName: String,
-  detailName: String,
-  applicationPackage: String?,
-  detailNameLayout: String,
-  itemListContentLayout: String,
-  itemListLayout: String,
-  objectKindPlural: String,
-  packageName: String,
-  useAndroidX: Boolean,
-  isViewBindingSupported: Boolean,
+    collectionName: String,
+    detailName: String,
+    applicationPackage: String?,
+    detailNameLayout: String,
+    itemListContentLayout: String,
+    itemListLayout: String,
+    objectKindPlural: String,
+    packageName: String,
+    useAndroidX: Boolean,
+    isViewBindingSupported: Boolean,
 ): String {
   val layoutName = "fragment_${itemListLayout}"
   val onCreateViewBlock =
-    if (isViewBindingSupported)
-      """
+      if (isViewBindingSupported)
+          """
       binding = ${layoutToViewBindingClass(layoutName)}.inflate(inflater, container, false);
       return binding.getRoot();
   """
-    else "return inflater.inflate(R.layout.$layoutName, container, false);"
+      else "return inflater.inflate(R.layout.$layoutName, container, false);"
 
   val onCreateViewHolderBlock =
-    if (isViewBindingSupported)
-      """
+      if (isViewBindingSupported)
+          """
     ${layoutToViewBindingClass(itemListContentLayout)} binding =
       ${layoutToViewBindingClass(itemListContentLayout)}.inflate(LayoutInflater.from(parent.getContext()), parent, false);
     return new ViewHolder(binding);
   """
-    else
-      """
+      else
+          """
     View view = LayoutInflater.from(parent.getContext())
       .inflate(R.layout.${itemListContentLayout}, parent, false);
     return new ViewHolder(view);
   """
 
   val viewHolderBlock =
-    if (isViewBindingSupported)
-      """
+      if (isViewBindingSupported)
+          """
     ViewHolder(${layoutToViewBindingClass(itemListContentLayout)} binding) {
       super(binding.getRoot());
       mIdView = binding.idText;
       mContentView = binding.content;
     }
   """
-    else
-      """
+      else
+          """
     ViewHolder(View view) {
       super(view);
       mIdView = view.findViewById(R.id.id_text);

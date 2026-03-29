@@ -25,6 +25,7 @@ import com.itsaky.androidide.lsp.models.CompletionResult
 import com.itsaky.androidide.lsp.models.MatchLevel
 import com.itsaky.androidide.lsp.models.MatchLevel.NO_MATCH
 import com.itsaky.androidide.progress.ProgressManager.Companion.abortIfCancelled
+import java.nio.file.Path
 import jdkx.lang.model.element.ElementKind.METHOD
 import jdkx.lang.model.element.ExecutableElement
 import jdkx.lang.model.element.Modifier.STATIC
@@ -36,7 +37,6 @@ import openjdk.source.tree.MemberReferenceTree
 import openjdk.source.tree.Scope
 import openjdk.source.util.TreePath
 import openjdk.source.util.Trees
-import java.nio.file.Path
 
 /**
  * Completions for member reference.
@@ -44,17 +44,17 @@ import java.nio.file.Path
  * @author Akash Yadav
  */
 class MemberReferenceCompletionProvider(
-  completingFile: Path,
-  cursor: Long,
-  compiler: JavaCompilerService,
-  settings: IServerSettings,
+    completingFile: Path,
+    cursor: Long,
+    compiler: JavaCompilerService,
+    settings: IServerSettings,
 ) : IJavaCompletionProvider(cursor, completingFile, compiler, settings) {
 
   override fun doComplete(
-    task: CompileTask,
-    path: TreePath,
-    partial: String,
-    endsWithParen: Boolean,
+      task: CompileTask,
+      path: TreePath,
+      partial: String,
+      endsWithParen: Boolean,
   ): CompletionResult {
     val trees = Trees.instance(task.task)
     val select = path.leaf as MemberReferenceTree
@@ -76,8 +76,8 @@ class MemberReferenceCompletionProvider(
   }
 
   private fun completeArrayMemberReference(
-    isStatic: Boolean,
-    partialName: CharSequence,
+      isStatic: Boolean,
+      partialName: CharSequence,
   ): CompletionResult {
     abortIfCancelled()
     abortCompletionIfCancelled()
@@ -91,41 +91,41 @@ class MemberReferenceCompletionProvider(
   }
 
   private fun completeTypeVariableMemberReference(
-    task: CompileTask,
-    scope: Scope,
-    type: TypeVariable,
-    isStatic: Boolean,
-    partial: String,
+      task: CompileTask,
+      scope: Scope,
+      type: TypeVariable,
+      isStatic: Boolean,
+      partial: String,
   ): CompletionResult {
     abortIfCancelled()
     abortCompletionIfCancelled()
     return when (type.upperBound) {
       is DeclaredType ->
-        completeDeclaredTypeMemberReference(
-          task,
-          scope,
-          type.upperBound as DeclaredType,
-          isStatic,
-          partial
-        )
+          completeDeclaredTypeMemberReference(
+              task,
+              scope,
+              type.upperBound as DeclaredType,
+              isStatic,
+              partial,
+          )
       is TypeVariable ->
-        completeTypeVariableMemberReference(
-          task,
-          scope,
-          type.upperBound as TypeVariable,
-          isStatic,
-          partial
-        )
+          completeTypeVariableMemberReference(
+              task,
+              scope,
+              type.upperBound as TypeVariable,
+              isStatic,
+              partial,
+          )
       else -> CompletionResult.EMPTY
     }
   }
 
   private fun completeDeclaredTypeMemberReference(
-    task: CompileTask,
-    scope: Scope,
-    type: DeclaredType,
-    isStatic: Boolean,
-    partial: String,
+      task: CompileTask,
+      scope: Scope,
+      type: DeclaredType,
+      isStatic: Boolean,
+      partial: String,
   ): CompletionResult {
     abortIfCancelled()
     abortCompletionIfCancelled()

@@ -23,15 +23,11 @@ import android.zero.studio.terminal.TermuxFragment
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.itsaky.androidide.R
-
 import com.itsaky.androidide.actions.ActionData
 import com.itsaky.androidide.actions.requireContext
 import com.itsaky.androidide.activities.TerminalActivity
 import com.itsaky.androidide.projects.IProjectManager
 import com.termux.shared.termux.TermuxConstants.TERMUX_APP.TERMUX_ACTIVITY
-import com.itsaky.androidide.utils.getTintedDrawable 
-
-import java.util.Objects
 import kotlin.reflect.KClass
 
 /**
@@ -47,24 +43,23 @@ class TerminalSidebarAction(context: Context, override val order: Int) : Abstrac
 
     fun startTerminalActivity(data: ActionData, isFailsafe: Boolean) {
       val context = data.requireContext()
-      val intent = Intent(context, TerminalActivity::class.java).apply {
-        // Try to get project path safely
-        try {
-            val projectPath = IProjectManager.getInstance().projectDirPath
-            if (!projectPath.isNullOrEmpty()) {
+      val intent =
+          Intent(context, TerminalActivity::class.java).apply {
+            // Try to get project path safely
+            try {
+              val projectPath = IProjectManager.getInstance().projectDirPath
+              if (!projectPath.isNullOrEmpty()) {
                 putExtra(TERMUX_ACTIVITY.EXTRA_SESSION_WORKING_DIR, projectPath)
-            }
-            
-            val projectName = IProjectManager.getInstance().getWorkspace()?.getRootProject()?.name
-            if (!projectName.isNullOrEmpty()) {
+              }
+
+              val projectName = IProjectManager.getInstance().getWorkspace()?.getRootProject()?.name
+              if (!projectName.isNullOrEmpty()) {
                 putExtra(TERMUX_ACTIVITY.EXTRA_SESSION_NAME, projectName)
-            }
-        } catch (e: Exception) {
-            
-        }
-        
-        putExtra(TERMUX_ACTIVITY.EXTRA_FAILSAFE_SESSION, isFailsafe)
-      }
+              }
+            } catch (e: Exception) {}
+
+            putExtra(TERMUX_ACTIVITY.EXTRA_FAILSAFE_SESSION, isFailsafe)
+          }
       context.startActivity(intent)
     }
   }

@@ -18,4 +18,5 @@
 package org.eclipse.lemminx.dom.builder
 
 typealias XmlConfigurator = XmlBuilder.() -> Unit
+
 typealias IndentedXmlConfigurator = IndentedXmlBuilder.() -> Unit

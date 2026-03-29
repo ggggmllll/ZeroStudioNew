@@ -31,8 +31,8 @@ import com.itsaky.androidide.templates.ParameterConstraint.PACKAGE
 import com.itsaky.androidide.templates.base.util.isValidModuleName
 import com.itsaky.androidide.templates.impl.R.string
 import com.itsaky.androidide.utils.AndroidUtils
-import jdkx.lang.model.SourceVersion
 import java.io.File
+import jdkx.lang.model.SourceVersion
 
 /**
  * Verifies constraint for text field widget.
@@ -115,8 +115,7 @@ object ConstraintVerifier {
       return null
     }
 
-    return BaseApplication.getBaseInstance()
-      .getString(string.msg_path_must_be_dir)
+    return BaseApplication.getBaseInstance().getString(string.msg_path_must_be_dir)
   }
 
   private fun checkIsFile(input: String): String? {

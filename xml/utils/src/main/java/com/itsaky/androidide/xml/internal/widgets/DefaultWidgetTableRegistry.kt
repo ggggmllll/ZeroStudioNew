@@ -20,9 +20,9 @@ package com.itsaky.androidide.xml.internal.widgets
 import com.google.auto.service.AutoService
 import com.itsaky.androidide.xml.widgets.WidgetTable
 import com.itsaky.androidide.xml.widgets.WidgetTableRegistry
-import org.slf4j.LoggerFactory
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
+import org.slf4j.LoggerFactory
 
 /**
  * Default implementation of the [WidgetTableRegistry].
@@ -67,9 +67,7 @@ class DefaultWidgetTableRegistry : WidgetTableRegistry {
 
     return widgets.inputStream().bufferedReader().useLines {
       val table = DefaultWidgetTable()
-      it.forEach { line ->
-        table.putWidget(line)
-      }
+      it.forEach { line -> table.putWidget(line) }
       table
     }
   }

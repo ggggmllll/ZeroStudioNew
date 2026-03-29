@@ -24,28 +24,31 @@ import com.android.tools.idea.wizard.template.impl.activities.common.layoutToVie
 import com.android.tools.idea.wizard.template.renderIf
 
 fun basicActivityKt(
-  isNewProject: Boolean,
-  applicationPackage: String?,
-  packageName: String,
-  useAndroidX: Boolean,
-  activityClass: String,
-  layoutName: String,
-  menuName: String,
-  navHostFragmentId: String,
-  isViewBindingSupported: Boolean,
+    isNewProject: Boolean,
+    applicationPackage: String?,
+    packageName: String,
+    useAndroidX: Boolean,
+    activityClass: String,
+    layoutName: String,
+    menuName: String,
+    navHostFragmentId: String,
+    isViewBindingSupported: Boolean,
 ): String {
-  val applicationPackageBlock = renderIf(applicationPackage != null) { "import ${escapeKotlinIdentifier(applicationPackage!!)}.R" }
+  val applicationPackageBlock =
+      renderIf(applicationPackage != null) {
+        "import ${escapeKotlinIdentifier(applicationPackage!!)}.R"
+      }
   val newProjectImportBlock =
-    renderIf(isNewProject) {
-      """
+      renderIf(isNewProject) {
+        """
 import android.view.Menu
 import android.view.MenuItem
 """
-    }
+      }
 
   val newProjectBlock2 =
-    renderIf(isNewProject) {
-      """
+      renderIf(isNewProject) {
+        """
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.$menuName, menu)
@@ -62,15 +65,15 @@ import android.view.MenuItem
         }
     }
     """
-    }
+      }
 
   val contentViewBlock =
-    if (isViewBindingSupported)
-      """
+      if (isViewBindingSupported)
+          """
      binding = ${layoutToViewBindingClass(layoutName)}.inflate(layoutInflater)
      setContentView(binding.root)
   """
-    else "setContentView(R.layout.$layoutName)"
+      else "setContentView(R.layout.$layoutName)"
 
   return """
 package ${escapeKotlinIdentifier(packageName)}

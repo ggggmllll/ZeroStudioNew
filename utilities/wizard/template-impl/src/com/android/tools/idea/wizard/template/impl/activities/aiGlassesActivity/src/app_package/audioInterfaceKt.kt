@@ -18,8 +18,8 @@ package com.android.tools.idea.wizard.template.impl.activities.aiGlassesActivity
 import com.android.tools.idea.wizard.template.escapeKotlinIdentifier
 
 fun audioInterfaceKt(packageName: String) =
-  // language=kotlin
-  """
+    // language=kotlin
+    """
 package ${escapeKotlinIdentifier(packageName)}
 
 import android.content.Context

@@ -26,9 +26,9 @@ import com.itsaky.androidide.utils.KeyboardUtils
 import io.github.rosemoe.sora.lang.completion.CompletionItem
 import io.github.rosemoe.sora.widget.component.CompletionLayout
 import io.github.rosemoe.sora.widget.component.EditorAutoCompletion
-import org.slf4j.LoggerFactory
 import java.lang.ref.WeakReference
 import kotlin.math.min
+import org.slf4j.LoggerFactory
 
 /**
  * Completion window for the editor.
@@ -62,10 +62,10 @@ class EditorCompletionWindow(val editor: IDEEditor) : EditorAutoCompletion(edito
       it.adapter = this.adapter
       it.setOnItemLongClickListener { _, view, position, _ ->
         val data =
-          (items[position] as? com.itsaky.androidide.lsp.models.CompletionItem)?.data
-            ?: return@setOnItemLongClickListener false
+            (items[position] as? com.itsaky.androidide.lsp.models.CompletionItem)?.data
+                ?: return@setOnItemLongClickListener false
         val url =
-          DocumentationReferenceProvider.getUrl(data) ?: return@setOnItemLongClickListener false
+            DocumentationReferenceProvider.getUrl(data) ?: return@setOnItemLongClickListener false
         Intent().apply {
           action = Intent.ACTION_VIEW
           setData(Uri.parse(url))
@@ -127,43 +127,41 @@ class EditorCompletionWindow(val editor: IDEEditor) : EditorAutoCompletion(edito
     currentSelection = -1
 
     publisher =
-      IDECompletionPublisher(
-        editor.handler,
-        {
-          val items = publisher.items
+        IDECompletionPublisher(
+            editor.handler,
+            {
+              val items = publisher.items
 
-          this.items.apply {
-            clear()
-            addAll(items)
-          }
+              this.items.apply {
+                clear()
+                addAll(items)
+              }
 
-          if (lastAttachedItems == null || lastAttachedItems.get() != items) {
-            adapter.attachValues(this, items)
-            adapter.notifyDataSetInvalidated()
-            lastAttachedItems = WeakReference(items)
-          } else {
-            adapter.notifyDataSetChanged()
-          }
+              if (lastAttachedItems == null || lastAttachedItems.get() != items) {
+                adapter.attachValues(this, items)
+                adapter.notifyDataSetInvalidated()
+                lastAttachedItems = WeakReference(items)
+              } else {
+                adapter.notifyDataSetChanged()
+              }
 
-          val newHeight = (adapter!!.itemHeight * adapter!!.count).toFloat()
-          if (newHeight == 0F) {
-            hide()
-          }
+              val newHeight = (adapter!!.itemHeight * adapter!!.count).toFloat()
+              if (newHeight == 0F) {
+                hide()
+              }
 
-          editor.getComponent(EditorAutoCompletion::class.java).updateCompletionWindowPosition()
-          setSize(width, min(newHeight, maxHeight.toFloat()).toInt())
-          if (!isShowing) {
-            show()
-          }
+              editor.getComponent(EditorAutoCompletion::class.java).updateCompletionWindowPosition()
+              setSize(width, min(newHeight, maxHeight.toFloat()).toInt())
+              if (!isShowing) {
+                show()
+              }
 
-          if (adapter!!.count >= 1
-            && KeyboardUtils.isHardKeyboardConnected(context)
-          ) {
-            currentSelection = 0
-          }
-        },
-        editor.editorLanguage.interruptionLevel
-      )
+              if (adapter!!.count >= 1 && KeyboardUtils.isHardKeyboardConnected(context)) {
+                currentSelection = 0
+              }
+            },
+            editor.editorLanguage.interruptionLevel,
+        )
 
     publisher.setUpdateThreshold(1)
 
@@ -174,5 +172,4 @@ class EditorCompletionWindow(val editor: IDEEditor) : EditorAutoCompletion(edito
 
     completionThread.start()
   }
-
 }

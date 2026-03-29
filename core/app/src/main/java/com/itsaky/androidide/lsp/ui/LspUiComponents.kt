@@ -23,7 +23,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import com.itsaky.androidide.resources.R
 
 /**
@@ -32,47 +31,40 @@ import com.itsaky.androidide.resources.R
  * @param oldName The current name of the symbol.
  * @param onConfirm Callback when the user confirms the rename.
  * @param onDismiss Callback when the dialog is dismissed.
- *
  * @author android_zero
  */
 @Composable
-fun RenameSymbolDialog(
-    oldName: String,
-    onConfirm: (String) -> Unit,
-    onDismiss: () -> Unit
-) {
-    var newName by remember { mutableStateOf(oldName) }
+fun RenameSymbolDialog(oldName: String, onConfirm: (String) -> Unit, onDismiss: () -> Unit) {
+  var newName by remember { mutableStateOf(oldName) }
 
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(text = stringResource(R.string.rename_symbol)) },
-        text = {
-            Column {
-                Text(
-                    text = "Enter a new name for '$oldName':",
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-                OutlinedTextField(
-                    value = newName,
-                    onValueChange = { newName = it },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-        },
-        confirmButton = {
-            TextButton(
-                onClick = { onConfirm(newName) },
-                enabled = newName.isNotBlank() && newName != oldName
-            ) {
-                Text(stringResource(android.R.string.ok))
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(stringResource(android.R.string.cancel))
-            }
+  AlertDialog(
+      onDismissRequest = onDismiss,
+      title = { Text(text = stringResource(R.string.rename_symbol)) },
+      text = {
+        Column {
+          Text(
+              text = "Enter a new name for '$oldName':",
+              style = MaterialTheme.typography.bodyMedium,
+              modifier = Modifier.padding(bottom = 8.dp),
+          )
+          OutlinedTextField(
+              value = newName,
+              onValueChange = { newName = it },
+              singleLine = true,
+              modifier = Modifier.fillMaxWidth(),
+          )
         }
-    )
+      },
+      confirmButton = {
+        TextButton(
+            onClick = { onConfirm(newName) },
+            enabled = newName.isNotBlank() && newName != oldName,
+        ) {
+          Text(stringResource(android.R.string.ok))
+        }
+      },
+      dismissButton = {
+        TextButton(onClick = onDismiss) { Text(stringResource(android.R.string.cancel)) }
+      },
+  )
 }

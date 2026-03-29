@@ -16,7 +16,7 @@
 package com.android.tools.idea.wizard.template.impl.activities.firebaseAiLogicActivity.res.values
 
 fun stringsXml() =
-  """
+    """
 <resources>
     <string name="app_name">Firebase AI Logic API</string>
     <string name="action_go">Go</string>

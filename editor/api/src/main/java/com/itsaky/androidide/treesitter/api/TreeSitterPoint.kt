@@ -21,13 +21,9 @@ import com.itsaky.androidide.treesitter.TSPoint
 import com.itsaky.androidide.utils.DefaultRecyclable
 import com.itsaky.androidide.utils.RecyclableObjectPool
 
-/**
- * @author Akash Yadav
- */
-class TreeSitterPoint @JvmOverloads internal constructor(
-  row: Int = 0,
-  column: Int = 0
-) : TSPoint(row, column), RecyclableObjectPool.Recyclable by DefaultRecyclable() {
+/** @author Akash Yadav */
+class TreeSitterPoint @JvmOverloads internal constructor(row: Int = 0, column: Int = 0) :
+    TSPoint(row, column), RecyclableObjectPool.Recyclable by DefaultRecyclable() {
 
   companion object {
 

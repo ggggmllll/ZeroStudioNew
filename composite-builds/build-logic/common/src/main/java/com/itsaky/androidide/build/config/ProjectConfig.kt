@@ -1,42 +1,44 @@
-
 package com.itsaky.androidide.build.config
 
-import org.gradle.api.Project
-import java.text.SimpleDateFormat
-import java.util.Date
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import com.itsaky.androidide.build.config.BuildConfig
+import org.gradle.api.Project
 
 /** @author Akash Yadav */
 object ProjectConfig {
 
-  const val REPO_HOST = /**"github.com"*/ BuildConfig.REPO_HOST
-  const val REPO_OWNER = /**"AndroidIDEOfficial" */ BuildConfig.REPO_OWNER
-  const val REPO_NAME = /**"AndroidIDE" */ BuildConfig.REPO_NAME
-  const val REPO_URL = /**"https://$REPO_HOST/$REPO_OWNER/$REPO_NAME"*/ BuildConfig.REPO_URL
+  const val REPO_HOST =
+  /** "github.com" */
+      BuildConfig.REPO_HOST
+  const val REPO_OWNER =
+  /** "AndroidIDEOfficial" */
+      BuildConfig.REPO_OWNER
+  const val REPO_NAME =
+  /** "AndroidIDE" */
+      BuildConfig.REPO_NAME
+  const val REPO_URL =
+  /** "https://$REPO_HOST/$REPO_OWNER/$REPO_NAME" */
+      BuildConfig.REPO_URL
   const val SCM_GIT = BuildConfig.SCM_GIT
-   /** "scm:git:git://$REPO_HOST/$REPO_OWNER/$REPO_NAME.git"*/
+  /** "scm:git:git://$REPO_HOST/$REPO_OWNER/$REPO_NAME.git" */
   const val SCM_SSH = BuildConfig.SCM_SSH
-   /** "scm:git:ssh://git@$REPO_HOST/$REPO_OWNER/$REPO_NAME.git" */
-  const val PROJECT_SITE = /** "https://m.androidide.com" */ BuildConfig.PROJECT_SITE
+  /** "scm:git:ssh://git@$REPO_HOST/$REPO_OWNER/$REPO_NAME.git" */
+  const val PROJECT_SITE =
+  /** "https://m.androidide.com" */
+      BuildConfig.PROJECT_SITE
 }
 
 private var shouldPrintNotAGitRepoWarning = true
 private var shouldPrintVersionName = true
 private var shouldPrintVersionCode = true
 
-/**
- * Helper function to get the current date in YYYYMMDD format.
- */
+/** Helper function to get the current date in YYYYMMDD format. */
 private fun getCurrentDateVersion(): String {
-    val dateFormatter = DateTimeFormatter.ofPattern("yyyyMMdd")
-    return LocalDate.now().format(dateFormatter)
+  val dateFormatter = DateTimeFormatter.ofPattern("yyyyMMdd")
+  return LocalDate.now().format(dateFormatter)
 }
 
-/**
- * Whether this build is being executed in the F-Droid build server.
- */
+/** Whether this build is being executed in the F-Droid build server. */
 val Project.isFDroidBuild: Boolean
   get() {
     if (!FDroidConfig.hasRead) {
@@ -46,127 +48,124 @@ val Project.isFDroidBuild: Boolean
   }
 
 // val Project.simpleVersionName: String
-  // get() {
+// get() {
 
-    // if (!CI.isGitRepo) {
-      // if (shouldPrintNotAGitRepoWarning) {
-        // logger.warn("Unable to infer version name. The build is not running on a git repository.")
-        // shouldPrintNotAGitRepoWarning = false
-      // }
+// if (!CI.isGitRepo) {
+// if (shouldPrintNotAGitRepoWarning) {
+// logger.warn("Unable to infer version name. The build is not running on a git repository.")
+// shouldPrintNotAGitRepoWarning = false
+// }
 
-      // return "1.0.0-beta"
-    // }
+// return "1.0.0-beta"
+// }
 
-    // val version = rootProject.version.toString()
-    // val regex = Regex("^v\\d+\\.?\\d+\\.?\\d+-\\w+")
+// val version = rootProject.version.toString()
+// val regex = Regex("^v\\d+\\.?\\d+\\.?\\d+-\\w+")
 
-    // val simpleVersion = regex.find(version)?.value?.substring(1)?.also {
-      // if (shouldPrintVersionName) {
-        // logger.warn("Simple version name is '$it' (from version $version)")
-        // shouldPrintVersionName = false
-      // }
-    // }
+// val simpleVersion = regex.find(version)?.value?.substring(1)?.also {
+// if (shouldPrintVersionName) {
+// logger.warn("Simple version name is '$it' (from version $version)")
+// shouldPrintVersionName = false
+// }
+// }
 
-    // if (simpleVersion == null) {
-      // if (CI.isTestEnv) {
-        // return "1.0.0-beta"
-      // }
+// if (simpleVersion == null) {
+// if (CI.isTestEnv) {
+// return "1.0.0-beta"
+// }
 
-      // throw IllegalStateException(
-        // "Cannot extract simple version name. Invalid version string '$version'. Version names must be SEMVER with 'v' prefix"
-      // )
-    // }
+// throw IllegalStateException(
+// "Cannot extract simple version name. Invalid version string '$version'. Version names must be
+// SEMVER with 'v' prefix"
+// )
+// }
 
-    // return simpleVersion
-  // }
+// return simpleVersion
+// }
 
 // private var shouldPrintVersionCode = true
 // val Project.projectVersionCode: Int
-  // get() {
+// get() {
 
-    // val version = simpleVersionName
-    // val regex = Regex("^\\d+\\.?\\d+\\.?\\d+")
+// val version = simpleVersionName
+// val regex = Regex("^\\d+\\.?\\d+\\.?\\d+")
 
-    // val versionCode = regex.find(version)?.value?.replace(".", "")?.toInt()?.also {
-      // if (shouldPrintVersionCode) {
-        // logger.warn("Version code is '$it' (from version ${version}).")
-        // shouldPrintVersionCode = false
-      // }
-    // }
-      // ?: throw IllegalStateException(
-        // "Cannot extract version code. Invalid version string '$version'. Version names must be SEMVER with 'v' prefix"
-      // )
+// val versionCode = regex.find(version)?.value?.replace(".", "")?.toInt()?.also {
+// if (shouldPrintVersionCode) {
+// logger.warn("Version code is '$it' (from version ${version}).")
+// shouldPrintVersionCode = false
+// }
+// }
+// ?: throw IllegalStateException(
+// "Cannot extract version code. Invalid version string '$version'. Version names must be SEMVER
+// with 'v' prefix"
+// )
 
-    // return versionCode
-  // }
+// return versionCode
+// }
 
 // val Project.publishingVersion: String
-  // get() {
+// get() {
 
-    // var publishing = simpleVersionName
-    // if (isFDroidBuild) {
-      // // when building for F-Droid, the release is already published so we should have
-      // // the maven dependencies already published
-      // // simply return the simple version name here.
-      // return publishing
-    // }
+// var publishing = simpleVersionName
+// if (isFDroidBuild) {
+// // when building for F-Droid, the release is already published so we should have
+// // the maven dependencies already published
+// // simply return the simple version name here.
+// return publishing
+// }
 
-    // if (CI.isCiBuild && CI.isGitRepo && CI.branchName != "main") {
-      // publishing += "-${CI.commitHash}-SNAPSHOT"
-    // }
+// if (CI.isCiBuild && CI.isGitRepo && CI.branchName != "main") {
+// publishing += "-${CI.commitHash}-SNAPSHOT"
+// }
 
-    // return publishing
-  // }
- 
-/**
- * Generates a simple version name based on the current date,
- * in the format "vYYYYMMDD".
- */
+// return publishing
+// }
+
+/** Generates a simple version name based on the current date, in the format "vYYYYMMDD". */
 val Project.simpleVersionName: String
-    get() {
-        val dateVersion = getCurrentDateVersion()
-        val version = "v$dateVersion"
+  get() {
+    val dateVersion = getCurrentDateVersion()
+    val version = "v$dateVersion"
 
-        if (shouldPrintVersionName) {
-            // Log the generated date-based version name
-            logger.warn("Simple version name is '$version' (date-based).")
-            shouldPrintVersionName = false
-        }
-        // No longer relying on git repo or rootProject.version for simpleVersionName,
-        // as the user explicitly requested a date-based format.
-        return version
+    if (shouldPrintVersionName) {
+      // Log the generated date-based version name
+      logger.warn("Simple version name is '$version' (date-based).")
+      shouldPrintVersionName = false
     }
+    // No longer relying on git repo or rootProject.version for simpleVersionName,
+    // as the user explicitly requested a date-based format.
+    return version
+  }
 
 /**
- * Generates the project version code based on the current date,
- * in the format YYYYMMDD (as an integer).
+ * Generates the project version code based on the current date, in the format YYYYMMDD (as an
+ * integer).
  */
 val Project.projectVersionCode: Int
-    get() {
-        // Get the date string part from simpleVersionName (e.g., "YYYYMMDD" from "vYYYYMMDD")
-        val dateString = simpleVersionName.substring(1) // Remove the 'v' prefix
+  get() {
+    // Get the date string part from simpleVersionName (e.g., "YYYYMMDD" from "vYYYYMMDD")
+    val dateString = simpleVersionName.substring(1) // Remove the 'v' prefix
 
-        val versionCode = dateString.toIntOrNull()
+    val versionCode = dateString.toIntOrNull()
 
-        if (versionCode == null) {
-            // This should ideally not happen if simpleVersionName is correctly formatted as vYYYYMMDD
-            throw IllegalStateException(
-                "Cannot extract version code. Invalid date string '$dateString'."
-            )
-        }
-
-        if (shouldPrintVersionCode) {
-            logger.warn("Version code is '$versionCode' (date-based).")
-            shouldPrintVersionCode = false
-        }
-
-        return versionCode
+    if (versionCode == null) {
+      // This should ideally not happen if simpleVersionName is correctly formatted as vYYYYMMDD
+      throw IllegalStateException("Cannot extract version code. Invalid date string '$dateString'.")
     }
+
+    if (shouldPrintVersionCode) {
+      logger.warn("Version code is '$versionCode' (date-based).")
+      shouldPrintVersionCode = false
+    }
+
+    return versionCode
+  }
 
 val Project.publishingVersion: String
   get() {
-        val dateVersion = getCurrentDateVersion()
-        val version = "v$dateVersion"
+    val dateVersion = getCurrentDateVersion()
+    val version = "v$dateVersion"
     var publishing = simpleVersionName
     if (isFDroidBuild) {
       // when building for F-Droid, the release is already published so we should have
@@ -175,7 +174,12 @@ val Project.publishingVersion: String
       return version
     }
 
-    if (CI.isCiBuild && CI.branchName != /**"ZeroStudio"*/ BuildConfig.GIT_Branch_Name) {
+    if (
+        CI.isCiBuild &&
+            CI.branchName !=
+                /** "ZeroStudio" */
+                BuildConfig.GIT_Branch_Name
+    ) {
       publishing += "-${CI.commitHash}-SNAPSHOT"
     }
 

@@ -25,10 +25,10 @@ import com.itsaky.androidide.progress.ProgressManager
 import com.itsaky.androidide.progress.ProgressManager.Companion.abortIfCancelled
 import com.itsaky.androidide.projects.FileManager
 import com.itsaky.androidide.projects.IProjectManager
-import org.slf4j.LoggerFactory
 import java.nio.file.Path
 import java.time.Instant
 import java.util.concurrent.atomic.AtomicBoolean
+import org.slf4j.LoggerFactory
 
 /**
  * Code analyzer for java source code.
@@ -49,8 +49,9 @@ class JavaDiagnosticProvider {
 
   fun analyze(file: Path): DiagnosticResult {
 
-    val module = IProjectManager.getInstance().getWorkspace()?.findModuleForFile(file, false)
-      ?: return DiagnosticResult.NO_UPDATE
+    val module =
+        IProjectManager.getInstance().getWorkspace()?.findModuleForFile(file, false)
+            ?: return DiagnosticResult.NO_UPDATE
     val compiler = JavaCompilerService(module)
 
     abortIfCancelled()
@@ -75,15 +76,14 @@ class JavaDiagnosticProvider {
 
     analyzing.set(true)
 
-    val analyzingThread = AnalyzingThread(compiler, file).also {
-      analyzingThread = it
-      it.start()
-      it.join()
-    }
+    val analyzingThread =
+        AnalyzingThread(compiler, file).also {
+          analyzingThread = it
+          it.start()
+          it.join()
+        }
 
-    return analyzingThread.result.also {
-      this.analyzingThread = null
-    }
+    return analyzingThread.result.also { this.analyzingThread = null }
   }
 
   fun isAnalyzing(): Boolean {
@@ -100,19 +100,13 @@ class JavaDiagnosticProvider {
 
   private fun doAnalyze(file: Path, task: CompileTask): DiagnosticResult {
     val result =
-      if (!isTaskValid(task)) {
-        // Do not use Collections.emptyList ()
-        // The returned list is accessed and the list returned by Collections.emptyList()
-        // throws exception when trying to access.
-        log.info("Using cached diagnostics")
-        cachedDiagnostics
-      } else
-        DiagnosticResult(
-          file,
-          findDiagnostics(task, file).sortedBy {
-            it.range
-          }
-        )
+        if (!isTaskValid(task)) {
+          // Do not use Collections.emptyList ()
+          // The returned list is accessed and the list returned by Collections.emptyList()
+          // throws exception when trying to access.
+          log.info("Using cached diagnostics")
+          cachedDiagnostics
+        } else DiagnosticResult(file, findDiagnostics(task, file).sortedBy { it.range })
     return result.also {
       log.info("Analyze file completed. Found {} diagnostic items", result.diagnostics.size)
     }
@@ -124,7 +118,7 @@ class JavaDiagnosticProvider {
   }
 
   inner class AnalyzingThread(val compiler: JavaCompilerService, val file: Path) :
-    Thread("JavaAnalyzerThread") {
+      Thread("JavaAnalyzerThread") {
 
     var result: DiagnosticResult = DiagnosticResult.NO_UPDATE
 
@@ -134,23 +128,23 @@ class JavaDiagnosticProvider {
 
     override fun run() {
       result =
-        try {
-          compiler.compile(file).get { task -> doAnalyze(file, task) }
-        } catch (err: Throwable) {
-          if (CancelChecker.isCancelled(err)) {
-            log.error("Analyze request cancelled")
-          } else {
-            log.warn("Unable to analyze file", err)
-          }
-          DiagnosticResult.NO_UPDATE
-        } finally {
-          compiler.destroy()
-          analyzing.set(false)
-        }
-          .also {
-            cachedDiagnostics = it
-            analyzeTimestamps[file] = Instant.now()
-          }
+          try {
+                compiler.compile(file).get { task -> doAnalyze(file, task) }
+              } catch (err: Throwable) {
+                if (CancelChecker.isCancelled(err)) {
+                  log.error("Analyze request cancelled")
+                } else {
+                  log.warn("Unable to analyze file", err)
+                }
+                DiagnosticResult.NO_UPDATE
+              } finally {
+                compiler.destroy()
+                analyzing.set(false)
+              }
+              .also {
+                cachedDiagnostics = it
+                analyzeTimestamps[file] = Instant.now()
+              }
     }
   }
 }

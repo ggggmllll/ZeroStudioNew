@@ -21,13 +21,11 @@ import com.itsaky.androidide.treesitter.TSLanguage
 import com.itsaky.androidide.utils.DefaultRecyclable
 import com.itsaky.androidide.utils.RecyclableObjectPool
 
-/**
- * @author Akash Yadav
- */
-class TreeSitterNativeLanguage @JvmOverloads internal constructor(
-  name: String? = null,
-  pointers: LongArray? = longArrayOf(0, 0)
-) : TSLanguage(name, pointers), RecyclableObjectPool.Recyclable by DefaultRecyclable() {
+/** @author Akash Yadav */
+class TreeSitterNativeLanguage
+@JvmOverloads
+internal constructor(name: String? = null, pointers: LongArray? = longArrayOf(0, 0)) :
+    TSLanguage(name, pointers), RecyclableObjectPool.Recyclable by DefaultRecyclable() {
 
   companion object {
 

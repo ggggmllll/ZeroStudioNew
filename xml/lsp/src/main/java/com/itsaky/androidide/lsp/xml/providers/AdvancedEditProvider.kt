@@ -41,7 +41,7 @@ import com.itsaky.androidide.treesitter.xml.TSLanguageXml
 object AdvancedEditProvider {
 
   const val TAG_INFO_QUERY =
-    """
+      """
     (empty_element
     "<" @tag.open
     tag_name: (_) @element.name
@@ -67,13 +67,14 @@ object AdvancedEditProvider {
     }
 
     val content =
-      FileManager.getDocumentContents(event.changedFile).let {
-        if (it.isBlank()) return
-        StringBuilder(it)
-      }
+        FileManager.getDocumentContents(event.changedFile).let {
+          if (it.isBlank()) return
+          StringBuilder(it)
+        }
 
     val client =
-      ILanguageServerRegistry.getDefault().getServer(XMLLanguageServer.SERVER_ID)?.client ?: return
+        ILanguageServerRegistry.getDefault().getServer(XMLLanguageServer.SERVER_ID)?.client
+            ?: return
 
     val start = event.changeRange.start.requireIndex()
     val (endLine, endCol, end) = event.changeRange.end
@@ -110,22 +111,21 @@ object AdvancedEditProvider {
   }
 
   private fun closeEndTagElement(
-    content: StringBuilder,
-    captures: Array<TSQueryCapture>,
-    query: TSQuery,
-    edits: MutableList<TextEdit>,
-    endLine: Int,
-    endCol: Int
+      content: StringBuilder,
+      captures: Array<TSQueryCapture>,
+      query: TSQuery,
+      edits: MutableList<TextEdit>,
+      endLine: Int,
+      endCol: Int,
   ) {
     val tagName =
-      captures
-        .find { query.getCaptureNameForId(it.index) == "tag.start.name" }
-        ?.let {
-          val start = it.node.startByte
-          val end = it.node.endByte
-          if (start < end) content.substring(start / 2, end / 2) else null
-        }
-        ?: return
+        captures
+            .find { query.getCaptureNameForId(it.index) == "tag.start.name" }
+            ?.let {
+              val start = it.node.startByte
+              val end = it.node.endByte
+              if (start < end) content.substring(start / 2, end / 2) else null
+            } ?: return
 
     val closeCapture = captures.find { query.getCaptureNameForId(it.index) == "tag.end.close" }
 
@@ -138,11 +138,11 @@ object AdvancedEditProvider {
   }
 
   private fun closeEmptyElement(
-    captures: Array<TSQueryCapture>,
-    query: TSQuery,
-    edits: MutableList<TextEdit>,
-    endLine: Int,
-    endCol: Int
+      captures: Array<TSQueryCapture>,
+      query: TSQuery,
+      edits: MutableList<TextEdit>,
+      endLine: Int,
+      endCol: Int,
   ) {
     val capture = captures.find { query.getCaptureNameForId(it.index) == "tag.close" } ?: return
 
@@ -160,9 +160,9 @@ object AdvancedEditProvider {
   }
 
   private fun perfromQuery(
-    tree: TSTree,
-    queryString: String,
-    action: (TSQuery, List<TSQueryMatch>) -> Unit
+      tree: TSTree,
+      queryString: String,
+      action: (TSQuery, List<TSQueryMatch>) -> Unit,
   ) {
     TSQuery.create(TSLanguageXml.getInstance(), queryString).use { query ->
       if (!query.canAccess() || query.errorType != TSQueryError.None) {
@@ -188,7 +188,7 @@ private fun List<TSQueryMatch>.findMatchAt(query: TSQuery, index: Int): TSQueryM
     for (capture in match.captures) {
       val name = query.getCaptureNameForId(capture.index)
       if (
-        (capture.node.startByte / 2) == index && (name == "tag.slash" || name == "tag.end.slash")
+          (capture.node.startByte / 2) == index && (name == "tag.slash" || name == "tag.end.slash")
       ) {
         return match
       }

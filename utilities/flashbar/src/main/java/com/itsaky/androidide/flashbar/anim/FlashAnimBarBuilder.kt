@@ -80,30 +80,30 @@ class FlashAnimBarBuilder(context: Context) : BaseFlashAnimBuilder(context) {
 
       when (type!!) {
         ENTER ->
-          when (gravity!!) {
-            TOP -> translationAnim.setFloatValues(-view!!.height.toFloat(), 0f)
-            BOTTOM -> translationAnim.setFloatValues(view!!.height.toFloat(), 0f)
-          }
+            when (gravity!!) {
+              TOP -> translationAnim.setFloatValues(-view!!.height.toFloat(), 0f)
+              BOTTOM -> translationAnim.setFloatValues(view!!.height.toFloat(), 0f)
+            }
         EXIT ->
-          when (gravity!!) {
-            TOP -> translationAnim.setFloatValues(0f, -view!!.height.toFloat())
-            BOTTOM -> translationAnim.setFloatValues(0f, view!!.height.toFloat())
-          }
+            when (gravity!!) {
+              TOP -> translationAnim.setFloatValues(0f, -view!!.height.toFloat())
+              BOTTOM -> translationAnim.setFloatValues(0f, view!!.height.toFloat())
+            }
       }
     } else {
       translationAnim.setPropertyName("translationX")
 
       when (type!!) {
         ENTER ->
-          when (direction!!) {
-            LEFT -> translationAnim.setFloatValues(-view!!.width.toFloat(), 0f)
-            RIGHT -> translationAnim.setFloatValues(view!!.width.toFloat(), 0f)
-          }
+            when (direction!!) {
+              LEFT -> translationAnim.setFloatValues(-view!!.width.toFloat(), 0f)
+              RIGHT -> translationAnim.setFloatValues(view!!.width.toFloat(), 0f)
+            }
         EXIT ->
-          when (direction!!) {
-            LEFT -> translationAnim.setFloatValues(0f, -view!!.width.toFloat())
-            RIGHT -> translationAnim.setFloatValues(0f, view!!.width.toFloat())
-          }
+            when (direction!!) {
+              LEFT -> translationAnim.setFloatValues(0f, -view!!.width.toFloat())
+              RIGHT -> translationAnim.setFloatValues(0f, view!!.width.toFloat())
+            }
       }
     }
 
@@ -131,10 +131,11 @@ class FlashAnimBarBuilder(context: Context) : BaseFlashAnimBuilder(context) {
 
   enum class Type {
     ENTER,
-    EXIT
+    EXIT,
   }
+
   enum class Direction {
     LEFT,
-    RIGHT
+    RIGHT,
   }
 }

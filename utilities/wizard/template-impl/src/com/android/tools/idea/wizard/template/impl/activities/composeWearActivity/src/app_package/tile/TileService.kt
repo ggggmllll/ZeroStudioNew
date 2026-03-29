@@ -19,7 +19,7 @@ package com.android.tools.idea.wizard.template.impl.activities.composeWearActivi
 import com.android.tools.idea.wizard.template.escapeKotlinIdentifier
 
 fun tileServiceKt(tileServiceClass: String, defaultPreview: String, packageName: String) =
-  """
+    """
 package ${escapeKotlinIdentifier(packageName)}.tile
 
 import android.content.Context

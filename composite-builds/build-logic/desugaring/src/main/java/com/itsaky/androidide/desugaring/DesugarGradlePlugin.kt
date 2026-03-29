@@ -34,18 +34,17 @@ class DesugarGradlePlugin : Plugin<Project> {
       extension.enabled.convention(true)
 
       val androidComponents =
-        extensions.findByType(AndroidComponentsExtension::class.java) ?: run {
-          logger.warn("Could not find androidComponents extension")
-          return
-        }
+          extensions.findByType(AndroidComponentsExtension::class.java)
+              ?: run {
+                logger.warn("Could not find androidComponents extension")
+                return
+              }
 
       androidComponents.onVariants { variant ->
         logger.debug("Applying desugaring to ${variant.name}")
 
         variant.instrumentation.apply {
-          transformClassesWith(
-            DesugarClassVisitorFactory::class.java, ALL
-          ) { params ->
+          transformClassesWith(DesugarClassVisitorFactory::class.java, ALL) { params ->
             params.setFrom(extension)
           }
 

@@ -26,8 +26,8 @@ import com.itsaky.androidide.actions.EditorActivityAction
 import com.itsaky.androidide.resources.R
 
 /** @author Akash Yadav */
-class FindActionMenu(context: Context, override val order: Int) : EditorActivityAction(),
-  ActionMenu {
+class FindActionMenu(context: Context, override val order: Int) :
+    EditorActivityAction(), ActionMenu {
 
   override val children: MutableSet<ActionItem> = mutableSetOf()
   override val id: String = "ide.editor.find"

@@ -25,17 +25,17 @@ import com.itsaky.androidide.inflater.utils.newAttribute
 open class AttributeImpl
 @JvmOverloads
 constructor(
-  override val namespace: INamespace? = null,
-  override val name: String,
-  override var value: String
+    override val namespace: INamespace? = null,
+    override val name: String,
+    override var value: String,
 ) : IAttribute {
 
   @JvmOverloads
   fun copyAttr(
-    view: IView? = null,
-    namespace: INamespace? = this.namespace,
-    name: String = this.name,
-    value: String = this.value
+      view: IView? = null,
+      namespace: INamespace? = this.namespace,
+      name: String = this.name,
+      value: String = this.value,
   ): IAttribute {
     return newAttribute(view = view, namespace = namespace, name = name, value = value)
   }

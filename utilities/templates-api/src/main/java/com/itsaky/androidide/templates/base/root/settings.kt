@@ -19,22 +19,19 @@ package com.itsaky.androidide.templates.base.root
 
 import com.itsaky.androidide.templates.base.ProjectTemplateBuilder
 
-/**
- * @author android_zero
- */
+/** @author android_zero */
 private fun ProjectTemplateBuilder.mavenUrl(url: String): String {
-    return if (data.useKts) {
-        "maven { url = uri(\"$url\") }"
-    } else {
-        "maven { url \"$url\" }"
-    }
+  return if (data.useKts) {
+    "maven { url = uri(\"$url\") }"
+  } else {
+    "maven { url \"$url\" }"
+  }
 }
 
-/**
- * @author android_zero
- */
+/** @author android_zero */
 private val ProjectTemplateBuilder.repositoriesBlock: String
-    get() = """
+  get() =
+      """
     ${mavenUrl("https://maven.aliyun.com/repository/gradle-plugin")}
     ${mavenUrl("https://maven.aliyun.com/repository/public")}
     ${mavenUrl("https://maven.aliyun.com/repository/google")}
@@ -47,8 +44,8 @@ private val ProjectTemplateBuilder.repositoriesBlock: String
     ${mavenUrl("https://repo.itextsupport.com/android")}
     ${mavenUrl("https://repo1.maven.org/maven2/")}
     ${mavenUrl("https://jitpack.io")}
-""".trimIndent()
-
+"""
+          .trimIndent()
 
 internal fun ProjectTemplateBuilder.settingsGradleSrcStr(): String {
   return """

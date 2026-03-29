@@ -20,7 +20,7 @@ import com.android.tools.idea.wizard.template.escapeKotlinIdentifier
 import com.android.tools.idea.wizard.template.getMaterialComponentName
 
 fun loginViewModelKt(packageName: String, useAndroidX: Boolean) =
-  """
+    """
 package ${escapeKotlinIdentifier(packageName)}.ui.login
 
 import ${getMaterialComponentName("android.arch.lifecycle.LiveData", useAndroidX)}

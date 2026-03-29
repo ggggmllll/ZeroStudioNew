@@ -22,7 +22,6 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -44,140 +43,159 @@ import java.util.Locale
  */
 class GitBranchPopupManager(
     private val context: Context,
-    private val onBranchSelected: (String) -> Unit
+    private val onBranchSelected: (String) -> Unit,
 ) {
 
-    private var popupWindow: PopupWindow? = null
-    private var adapter: BranchAdapter? = null
+  private var popupWindow: PopupWindow? = null
+  private var adapter: BranchAdapter? = null
 
-    // 模拟数据
-    private val allBranches = listOf(
-        BranchModel("feature/ui-v2", isCurrent = true, isLocal = true),
-        BranchModel("main", isCurrent = false, isLocal = true),
-        BranchModel("dev", isCurrent = false, isLocal = true),
-        BranchModel("origin/main", isCurrent = false, isLocal = false),
-        BranchModel("origin/feature/ui-v2", isCurrent = false, isLocal = false)
+  // 模拟数据
+  private val allBranches =
+      listOf(
+          BranchModel("feature/ui-v2", isCurrent = true, isLocal = true),
+          BranchModel("main", isCurrent = false, isLocal = true),
+          BranchModel("dev", isCurrent = false, isLocal = true),
+          BranchModel("origin/main", isCurrent = false, isLocal = false),
+          BranchModel("origin/feature/ui-v2", isCurrent = false, isLocal = false),
+      )
+
+  fun show(anchor: View) {
+    val view = LayoutInflater.from(context).inflate(R.layout.layout_git_branch_popup, null)
+
+    val rvBranches = view.findViewById<RecyclerView>(R.id.rv_branch_list)
+    val etSearch = view.findViewById<EditText>(R.id.et_search_branch)
+    val btnNew = view.findViewById<TextView>(R.id.btn_new_branch)
+
+    adapter =
+        BranchAdapter(allBranches) { branch ->
+          onBranchSelected(branch.name)
+          popupWindow?.dismiss()
+        }
+    rvBranches.layoutManager = LinearLayoutManager(context)
+    rvBranches.adapter = adapter
+
+    etSearch.addTextChangedListener(
+        object : TextWatcher {
+          override fun afterTextChanged(s: Editable?) {}
+
+          override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+          override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+            adapter?.filter(s.toString())
+          }
+        }
     )
 
-    fun show(anchor: View) {
-        val view = LayoutInflater.from(context).inflate(R.layout.layout_git_branch_popup, null)
+    btnNew.setOnClickListener {
+      // TODO: 新建分支逻辑
+      popupWindow?.dismiss()
+    }
 
-        val rvBranches = view.findViewById<RecyclerView>(R.id.rv_branch_list)
-        val etSearch = view.findViewById<EditText>(R.id.et_search_branch)
-        val btnNew = view.findViewById<TextView>(R.id.btn_new_branch)
-
-        adapter = BranchAdapter(allBranches) { branch ->
-            onBranchSelected(branch.name)
-            popupWindow?.dismiss()
-        }
-        rvBranches.layoutManager = LinearLayoutManager(context)
-        rvBranches.adapter = adapter
-
-        etSearch.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) {}
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                adapter?.filter(s.toString())
+    popupWindow =
+        PopupWindow(
+                view,
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                true,
+            )
+            .apply {
+              setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+              elevation = 16f
+              isOutsideTouchable = true
             }
-        })
 
-        btnNew.setOnClickListener {
-            // TODO: 新建分支逻辑
-            popupWindow?.dismiss()
-        }
+    popupWindow?.showAsDropDown(anchor, 0, 12)
+  }
 
-        popupWindow = PopupWindow(
-            view,
-            ViewGroup.LayoutParams.WRAP_CONTENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT,
+  data class BranchModel(val name: String, val isCurrent: Boolean, val isLocal: Boolean)
+
+  private inner class BranchAdapter(
+      private val originalList: List<BranchModel>,
+      private val onClick: (BranchModel) -> Unit,
+  ) : RecyclerView.Adapter<BranchAdapter.ViewHolder>() {
+
+    private var displayList: List<BranchModel> = ArrayList(originalList)
+
+    fun filter(query: String) {
+      val lowerQuery = query.lowercase(Locale.getDefault())
+      displayList =
+          if (lowerQuery.isEmpty()) {
+            originalList
+          } else {
+            originalList.filter { it.name.lowercase(Locale.getDefault()).contains(lowerQuery) }
+          }
+      notifyDataSetChanged()
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+      val v =
+          LayoutInflater.from(parent.context).inflate(R.layout.item_git_branch_popup, parent, false)
+      return ViewHolder(v)
+    }
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+      val item = displayList[position]
+
+      holder.tvName.text = item.name
+
+      if (item.isCurrent) {
+        // 选中状态：使用 Secondary Container 颜色
+        val activeBg =
+            MaterialColors.getColor(
+                holder.itemView,
+                com.google.android.material.R.attr.colorSecondaryContainer,
+            )
+        val activeText =
+            MaterialColors.getColor(
+                holder.itemView,
+                com.google.android.material.R.attr.colorOnSecondaryContainer,
+            )
+
+        holder.container.setBackgroundColor(activeBg)
+        holder.ivCheck.visibility = View.VISIBLE
+        holder.tvName.setTextColor(activeText)
+        holder.ivCheck.setColorFilter(activeText)
+      } else {
+        // 未选中：直接设为透明背景，避免 ResourceNotFoundException
+        holder.container.setBackgroundColor(Color.TRANSPARENT)
+
+        // 如果需要点击涟漪，可以在 XML 布局中给 container 设置 android:background="?attr/selectableItemBackground"
+
+        val defaultText =
+            MaterialColors.getColor(
+                holder.itemView,
+                com.google.android.material.R.attr.colorOnSurface,
+            )
+
+        holder.ivCheck.visibility = View.GONE
+        holder.tvName.setTextColor(defaultText)
+      }
+
+      // 分组 Header 逻辑
+      val showHeader =
+          if (position == 0) {
             true
-        ).apply {
-            setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-            elevation = 16f
-            isOutsideTouchable = true
-        }
+          } else {
+            item.isLocal != displayList[position - 1].isLocal
+          }
 
-        popupWindow?.showAsDropDown(anchor, 0, 12)
+      if (showHeader) {
+        holder.tvHeader.visibility = View.VISIBLE
+        holder.tvHeader.text = if (item.isLocal) "LOCAL" else "REMOTE"
+      } else {
+        holder.tvHeader.visibility = View.GONE
+      }
+
+      holder.itemView.setOnClickListener { onClick(item) }
     }
 
-    data class BranchModel(
-        val name: String,
-        val isCurrent: Boolean,
-        val isLocal: Boolean
-    )
+    override fun getItemCount(): Int = displayList.size
 
-    private inner class BranchAdapter(
-        private val originalList: List<BranchModel>,
-        private val onClick: (BranchModel) -> Unit
-    ) : RecyclerView.Adapter<BranchAdapter.ViewHolder>() {
-
-        private var displayList: List<BranchModel> = ArrayList(originalList)
-
-        fun filter(query: String) {
-            val lowerQuery = query.lowercase(Locale.getDefault())
-            displayList = if (lowerQuery.isEmpty()) {
-                originalList
-            } else {
-                originalList.filter { it.name.lowercase(Locale.getDefault()).contains(lowerQuery) }
-            }
-            notifyDataSetChanged()
-        }
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-            val v = LayoutInflater.from(parent.context).inflate(R.layout.item_git_branch_popup, parent, false)
-            return ViewHolder(v)
-        }
-
-        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            val item = displayList[position]
-
-            holder.tvName.text = item.name
-
-            if (item.isCurrent) {
-                // 选中状态：使用 Secondary Container 颜色
-                val activeBg = MaterialColors.getColor(holder.itemView, com.google.android.material.R.attr.colorSecondaryContainer)
-                val activeText = MaterialColors.getColor(holder.itemView, com.google.android.material.R.attr.colorOnSecondaryContainer)
-
-                holder.container.setBackgroundColor(activeBg)
-                holder.ivCheck.visibility = View.VISIBLE
-                holder.tvName.setTextColor(activeText)
-                holder.ivCheck.setColorFilter(activeText)
-            } else {
-                // 未选中：直接设为透明背景，避免 ResourceNotFoundException
-                holder.container.setBackgroundColor(Color.TRANSPARENT)
-
-                // 如果需要点击涟漪，可以在 XML 布局中给 container 设置 android:background="?attr/selectableItemBackground"
-
-                val defaultText = MaterialColors.getColor(holder.itemView, com.google.android.material.R.attr.colorOnSurface)
-
-                holder.ivCheck.visibility = View.GONE
-                holder.tvName.setTextColor(defaultText)
-            }
-
-            // 分组 Header 逻辑
-            val showHeader = if (position == 0) {
-                true
-            } else {
-                item.isLocal != displayList[position - 1].isLocal
-            }
-
-            if (showHeader) {
-                holder.tvHeader.visibility = View.VISIBLE
-                holder.tvHeader.text = if (item.isLocal) "LOCAL" else "REMOTE"
-            } else {
-                holder.tvHeader.visibility = View.GONE
-            }
-
-            holder.itemView.setOnClickListener { onClick(item) }
-        }
-
-        override fun getItemCount(): Int = displayList.size
-
-        inner class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {
-            val tvHeader: TextView = v.findViewById(R.id.tv_header)
-            val container: View = v.findViewById(R.id.container_item)
-            val tvName: TextView = v.findViewById(R.id.tv_branch_name)
-            val ivCheck: ImageView = v.findViewById(R.id.iv_check)
-        }
+    inner class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {
+      val tvHeader: TextView = v.findViewById(R.id.tv_header)
+      val container: View = v.findViewById(R.id.container_item)
+      val tvName: TextView = v.findViewById(R.id.tv_branch_name)
+      val ivCheck: ImageView = v.findViewById(R.id.iv_check)
     }
+  }
 }

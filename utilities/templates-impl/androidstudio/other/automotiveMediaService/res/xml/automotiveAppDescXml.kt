@@ -17,7 +17,7 @@
 package com.itsaky.androidide.templates.impl.androidstudio.other.automotiveMediaService.res.xml
 
 fun automotiveAppDescXml() =
-  """
+    """
 <?xml version="1.0" encoding="utf-8"?>
 <automotiveApp>
     <uses name="media"/>

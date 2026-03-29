@@ -20,51 +20,56 @@ import rikka.recyclerview.BaseViewHolder.Creator
 
 class StartAdbViewHolder(binding: HomeStartAdbBinding, root: View) : BaseViewHolder<Any?>(root) {
 
-    companion object {
-        val CREATOR = Creator<Any> { inflater: LayoutInflater, parent: ViewGroup? ->
-            val outer = HomeItemContainerBinding.inflate(inflater, parent, false)
-            val inner = HomeStartAdbBinding.inflate(inflater, outer.root, true)
-            StartAdbViewHolder(inner, outer.root)
+  companion object {
+    val CREATOR =
+        Creator<Any> { inflater: LayoutInflater, parent: ViewGroup? ->
+          val outer = HomeItemContainerBinding.inflate(inflater, parent, false)
+          val inner = HomeStartAdbBinding.inflate(inflater, outer.root, true)
+          StartAdbViewHolder(inner, outer.root)
         }
-    }
+  }
 
-    init {
-        binding.button1.setOnClickListener { v: View ->
-            val context = v.context
-            MaterialAlertDialogBuilder(context)
-                .setTitle(R.string.home_adb_button_view_command)
-                .setMessage(
-                    HtmlCompat.fromHtml(
-                        context.getString(
-                            R.string.home_adb_dialog_view_command_message,
-                            Starter.adbCommand
-                        )
-                    )
+  init {
+    binding.button1.setOnClickListener { v: View ->
+      val context = v.context
+      MaterialAlertDialogBuilder(context)
+          .setTitle(R.string.home_adb_button_view_command)
+          .setMessage(
+              HtmlCompat.fromHtml(
+                  context.getString(
+                      R.string.home_adb_dialog_view_command_message,
+                      Starter.adbCommand,
+                  )
+              )
+          )
+          .setPositiveButton(R.string.home_adb_dialog_view_command_copy_button) { _, _ ->
+            if (ClipboardUtils.put(context, Starter.adbCommand)) {
+              Toast.makeText(
+                      context,
+                      context.getString(R.string.toast_copied_to_clipboard, Starter.adbCommand),
+                      Toast.LENGTH_SHORT,
+                  )
+                  .show()
+            }
+          }
+          .setNegativeButton(android.R.string.cancel, null)
+          .setNeutralButton(R.string.home_adb_dialog_view_command_button_send) { _, _ ->
+            var intent = Intent(Intent.ACTION_SEND)
+            intent.type = "text/plain"
+            intent.putExtra(Intent.EXTRA_TEXT, Starter.adbCommand)
+            intent =
+                Intent.createChooser(
+                    intent,
+                    context.getString(R.string.home_adb_dialog_view_command_button_send),
                 )
-                .setPositiveButton(R.string.home_adb_dialog_view_command_copy_button) { _, _ ->
-                    if (ClipboardUtils.put(context, Starter.adbCommand)) {
-                        Toast.makeText(
-                            context,
-                            context.getString(R.string.toast_copied_to_clipboard, Starter.adbCommand),
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                }
-                .setNegativeButton(android.R.string.cancel, null)
-                .setNeutralButton(R.string.home_adb_dialog_view_command_button_send) { _, _ ->
-                    var intent = Intent(Intent.ACTION_SEND)
-                    intent.type = "text/plain"
-                    intent.putExtra(Intent.EXTRA_TEXT, Starter.adbCommand)
-                    intent = Intent.createChooser(
-                        intent,
-                        context.getString(R.string.home_adb_dialog_view_command_button_send)
-                    )
-                    context.startActivity(intent)
-                }
-                .show()
-        }
-        binding.text1.movementMethod = LinkMovementMethod.getInstance()
-        binding.text1.text = context.getString(R.string.home_adb_description, Helps.ADB.get())
-            .toHtml(HtmlCompat.FROM_HTML_OPTION_TRIM_WHITESPACE)
+            context.startActivity(intent)
+          }
+          .show()
     }
+    binding.text1.movementMethod = LinkMovementMethod.getInstance()
+    binding.text1.text =
+        context
+            .getString(R.string.home_adb_description, Helps.ADB.get())
+            .toHtml(HtmlCompat.FROM_HTML_OPTION_TRIM_WHITESPACE)
+  }
 }

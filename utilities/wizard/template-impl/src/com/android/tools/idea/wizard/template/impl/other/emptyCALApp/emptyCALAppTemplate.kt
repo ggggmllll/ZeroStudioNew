@@ -66,16 +66,22 @@ val emptyCalAppTemplate
     val packageName = defaultPackageNameParameter
 
     widgets(
-      TextFieldWidget(carAppServiceName),
-      TextFieldWidget(sessionName),
-      TextFieldWidget(screenName),
-      PackageNameWidget(packageName),
-      LanguageWidget(),
+        TextFieldWidget(carAppServiceName),
+        TextFieldWidget(sessionName),
+        TextFieldWidget(screenName),
+        PackageNameWidget(packageName),
+        LanguageWidget(),
     )
 
     thumb { File("empty-cal-app").resolve("empty-cal-app.png") }
 
     recipe = { data: TemplateData ->
-      emptyCalAppRecipe(data as ModuleTemplateData, carAppServiceName.value, sessionName.value, screenName.value, packageName.value)
+      emptyCalAppRecipe(
+          data as ModuleTemplateData,
+          carAppServiceName.value,
+          sessionName.value,
+          screenName.value,
+          packageName.value,
+      )
     }
   }

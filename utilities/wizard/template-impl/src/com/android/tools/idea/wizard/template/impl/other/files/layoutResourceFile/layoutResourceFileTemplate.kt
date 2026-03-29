@@ -62,5 +62,7 @@ val layoutResourceFileTemplate
       File("no_activity.png")
     }
 
-    recipe = { data: TemplateData -> layoutResourceFileRecipe(data as ModuleTemplateData, layoutName.value, rootTag.value) }
+    recipe = { data: TemplateData ->
+      layoutResourceFileRecipe(data as ModuleTemplateData, layoutName.value, rootTag.value)
+    }
   }

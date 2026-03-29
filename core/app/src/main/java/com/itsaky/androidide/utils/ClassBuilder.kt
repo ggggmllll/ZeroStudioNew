@@ -33,14 +33,14 @@ object ClassBuilder {
   }
 
   private fun toJavaFile(
-    packageName: String,
-    type: TypeSpec,
-    block: JavaFile.Builder.() -> Unit = {}
+      packageName: String,
+      type: TypeSpec,
+      block: JavaFile.Builder.() -> Unit = {},
   ): JavaFile {
     return JavaFile.builder(packageName, type)
-      .indent(indentationString)
-      .apply { block(this) }
-      .build()
+        .indent(indentationString)
+        .apply { block(this) }
+        .build()
   }
 
   private fun newClassSpec(className: String): TypeSpec {
@@ -63,25 +63,25 @@ object ClassBuilder {
 
   private fun newEnumSpec(className: String): TypeSpec {
     return TypeSpec.enumBuilder(className)
-      .addModifiers(PUBLIC)
-      .addEnumConstant("ENUM_DECLARED")
-      .build()
+        .addModifiers(PUBLIC)
+        .addEnumConstant("ENUM_DECLARED")
+        .build()
   }
 
   @JvmStatic
   fun createActivity(packageName: String, className: String): String {
     val onCreate =
-      MethodSpec.methodBuilder("onCreate")
-        .addAnnotation(Override::class.java)
-        .addModifiers(PROTECTED)
-        .addParameter(Bundle::class.java, "savedInstanceState")
-        .addStatement("super.onCreate(savedInstanceState)")
-        .build()
+        MethodSpec.methodBuilder("onCreate")
+            .addAnnotation(Override::class.java)
+            .addModifiers(PROTECTED)
+            .addParameter(Bundle::class.java, "savedInstanceState")
+            .addStatement("super.onCreate(savedInstanceState)")
+            .build()
     val activity =
-      newClassSpec(className)
-        .toBuilder()
-        .superclass(AppCompatActivity::class.java)
-        .addMethod(onCreate)
+        newClassSpec(className)
+            .toBuilder()
+            .superclass(AppCompatActivity::class.java)
+            .addMethod(onCreate)
     return toJavaFile(packageName, activity.build()) { skipJavaLangImports(true) }.toString()
   }
 }

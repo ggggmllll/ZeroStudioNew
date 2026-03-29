@@ -32,8 +32,8 @@ import com.itsaky.androidide.lsp.models.TextEdit
 import com.itsaky.androidide.models.Range
 import com.itsaky.androidide.utils.DialogUtils
 import com.itsaky.androidide.utils.flashInfo
-import org.slf4j.LoggerFactory
 import java.nio.file.Path
+import org.slf4j.LoggerFactory
 
 /**
  * Analyzes the source file for unresolved names and tries to import all of them at once.
@@ -115,28 +115,28 @@ class AutoFixImportsAction : BaseJavaCodeAction() {
 
     val context = data.requireContext()
     DialogUtils.newMaterialDialogBuilder(context)
-      .setCancelable(true)
-      .setItems(e.value.toTypedArray()) { dialog, which ->
-        dialog.dismiss()
-        result.classes[e.key] = listOf(e.value[which])
+        .setCancelable(true)
+        .setItems(e.value.toTypedArray()) { dialog, which ->
+          dialog.dismiss()
+          result.classes[e.key] = listOf(e.value[which])
 
-        // once the user decides which class to import for this simple name,
-        // call this method again to see if there any other simple names with multiple options
-        finalizeClassNames(data, result)
-      }
-      .setTitle(context.getString(R.string.title_class_chooser, e.key))
-      .show()
+          // once the user decides which class to import for this simple name,
+          // call this method again to see if there any other simple names with multiple options
+          finalizeClassNames(data, result)
+        }
+        .setTitle(context.getString(R.string.title_class_chooser, e.key))
+        .show()
   }
 
   private fun performEdits(data: ActionData, result: Result) {
     val path = data.requirePath()
     val compiler = data.requireCompiler()
     val client =
-      data.getLanguageClient()
-        ?: run {
-          log.warn("No language client found. Cannot perform edits.")
-          return
-        }
+        data.getLanguageClient()
+            ?: run {
+              log.warn("No language client found. Cannot perform edits.")
+              return
+            }
 
     val classes = result.classes.mapNotNull { it.value.firstOrNull() }
 
@@ -177,20 +177,20 @@ class AutoFixImportsAction : BaseJavaCodeAction() {
     val names = mutableListOf<String>()
     var docContents: CharSequence? = null
     val diagnostics =
-      task.diagnostics.filter {
-        it.source.toUri() == file.toUri() && it.code == DiagnosticCode.NOT_IMPORTED.id
-      }
+        task.diagnostics.filter {
+          it.source.toUri() == file.toUri() && it.code == DiagnosticCode.NOT_IMPORTED.id
+        }
     for (diagnostic in diagnostics) {
       val content =
-        try {
-          docContents ?: diagnostic.source.getCharContent(true).also { docContents = it }
-        } catch (e: Exception) {
-          log.error("Failed to get contents of file {}", file, e)
-          continue
-        }
+          try {
+            docContents ?: diagnostic.source.getCharContent(true).also { docContents = it }
+          } catch (e: Exception) {
+            log.error("Failed to get contents of file {}", file, e)
+            continue
+          }
 
       val name =
-        content.subSequence(diagnostic.startPosition.toInt(), diagnostic.endPosition.toInt())
+          content.subSequence(diagnostic.startPosition.toInt(), diagnostic.endPosition.toInt())
       names.add(name.toString())
     }
     return names

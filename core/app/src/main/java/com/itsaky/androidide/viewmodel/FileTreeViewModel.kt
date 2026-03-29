@@ -42,9 +42,7 @@ internal class FileTreeViewModel : ViewModel() {
         // this could block teh UI thread
         return@executeAsync tree.saveState
       }) { result ->
-        runOnUiThread {
-          treeState.value = result
-        }
+        runOnUiThread { treeState.value = result }
       }
     }
   }

@@ -19,48 +19,51 @@ package com.itsaky.androidide.templates.impl.androidstudio.fragments.modalBottom
 import com.android.tools.idea.wizard.template.Language
 import com.android.tools.idea.wizard.template.escapeKotlinIdentifier
 import com.android.tools.idea.wizard.template.getMaterialComponentName
+import com.android.tools.idea.wizard.template.renderIf
 import com.itsaky.androidide.templates.impl.androidstudio.activities.common.importViewBindingClass
 import com.itsaky.androidide.templates.impl.androidstudio.activities.common.layoutToViewBindingClass
-import com.android.tools.idea.wizard.template.renderIf
 
 fun itemListDialogFragmentKt(
-  applicationPackage: String?,
-  columnCount: Int,
-  fragmentClass: String,
-  itemLayout: String,
-  listLayout: String,
-  objectKind: String,
-  packageName: String,
-  useAndroidX: Boolean,
-  isViewBindingSupported: Boolean,
+    applicationPackage: String?,
+    columnCount: Int,
+    fragmentClass: String,
+    itemLayout: String,
+    listLayout: String,
+    objectKind: String,
+    packageName: String,
+    useAndroidX: Boolean,
+    isViewBindingSupported: Boolean,
 ): String {
   val layoutManagerImport =
-    if (columnCount == 1) "import ${getMaterialComponentName("android.support.v7.widget.LinearLayoutManager", useAndroidX)}"
-    else "import ${getMaterialComponentName("android.support.v7.widget.GridLayoutManager", useAndroidX)}"
+      if (columnCount == 1)
+          "import ${getMaterialComponentName("android.support.v7.widget.LinearLayoutManager", useAndroidX)}"
+      else
+          "import ${getMaterialComponentName("android.support.v7.widget.GridLayoutManager", useAndroidX)}"
 
   val layoutManagerInstantiation =
-    if (columnCount == 1) "activity?.findViewById<RecyclerView>(R.id.list)?.layoutManager = LinearLayoutManager(context)"
-    else "list.layoutManager = GridLayoutManager(context, ${columnCount})"
+      if (columnCount == 1)
+          "activity?.findViewById<RecyclerView>(R.id.list)?.layoutManager = LinearLayoutManager(context)"
+      else "list.layoutManager = GridLayoutManager(context, ${columnCount})"
 
   val onCreateViewBlock =
-    if (isViewBindingSupported)
-      """
+      if (isViewBindingSupported)
+          """
       _binding = ${layoutToViewBindingClass(listLayout)}.inflate(inflater, container, false)
       return binding.root
   """
-    else "return inflater.inflate(R.layout.$listLayout, container, false)"
+      else "return inflater.inflate(R.layout.$listLayout, container, false)"
 
   val viewHolderBlock =
-    if (isViewBindingSupported)
-      """
+      if (isViewBindingSupported)
+          """
     private inner class ViewHolder internal constructor(binding: ${layoutToViewBindingClass(itemLayout)})
         : RecyclerView.ViewHolder(binding.root) {
 
         internal val text: TextView = binding.text
     }
   """
-    else
-      """
+      else
+          """
     private inner class ViewHolder internal constructor(inflater: LayoutInflater, parent: ViewGroup)
         : RecyclerView.ViewHolder(inflater.inflate(R.layout.${itemLayout}, parent, false)) {
 
@@ -69,12 +72,12 @@ fun itemListDialogFragmentKt(
   """
 
   val onCreateViewHolderBlock =
-    if (isViewBindingSupported)
-      """
+      if (isViewBindingSupported)
+          """
     return ViewHolder(${layoutToViewBindingClass(itemLayout)}.inflate(LayoutInflater.from(parent.context), parent, false))
   """
-    else
-      """
+      else
+          """
     return ViewHolder(LayoutInflater.from(parent.context), parent)
   """
 

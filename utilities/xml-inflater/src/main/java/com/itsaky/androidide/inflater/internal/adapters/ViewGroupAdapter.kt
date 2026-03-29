@@ -30,16 +30,11 @@ import com.itsaky.androidide.inflater.LayoutStrategy.Companion.TOP_LEFT
  *
  * @author Akash Yadav
  */
-abstract class ViewGroupAdapter<T : ViewGroup> : ViewAdapter<T>(),
-                                                 IViewGroupAdapter {
+abstract class ViewGroupAdapter<T : ViewGroup> : ViewAdapter<T>(), IViewGroupAdapter {
 
-  override fun createAttrHandlers(
-    create: (String, AttributeHandlerScope<T>.() -> Unit) -> Unit
-  ) {
+  override fun createAttrHandlers(create: (String, AttributeHandlerScope<T>.() -> Unit) -> Unit) {
     super.createAttrHandlers(create)
-    create("animateLayoutChanges") {
-      view.layoutTransition = LayoutTransition()
-    }
+    create("animateLayoutChanges") { view.layoutTransition = LayoutTransition() }
     create("clipChildren") { view.clipChildren = parseBoolean(value) }
     create("clipToPadding") { view.clipToPadding = parseBoolean(value) }
     create("descendantFocusability") {

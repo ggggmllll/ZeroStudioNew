@@ -24,24 +24,24 @@ import com.android.tools.idea.wizard.template.renderIf
 import com.android.tools.idea.wizard.template.underscoreToLowerCamelCase
 
 fun drawerActivityJava(
-  packageName: String,
-  applicationPackage: String?,
-  activityClass: String,
-  appBarLayoutName: String,
-  layoutName: String,
-  menuName: String,
-  navHostFragmentId: String,
-  useAndroidX: Boolean,
-  isViewBindingSupported: Boolean,
+    packageName: String,
+    applicationPackage: String?,
+    activityClass: String,
+    appBarLayoutName: String,
+    layoutName: String,
+    menuName: String,
+    navHostFragmentId: String,
+    useAndroidX: Boolean,
+    isViewBindingSupported: Boolean,
 ): String {
 
   val contentViewBlock =
-    if (isViewBindingSupported)
-      """
+      if (isViewBindingSupported)
+          """
      binding = ${layoutToViewBindingClass(layoutName)}.inflate(getLayoutInflater());
      setContentView(binding.getRoot());
   """
-    else "setContentView(R.layout.$layoutName);"
+      else "setContentView(R.layout.$layoutName);"
   val appBarMainBinding = underscoreToLowerCamelCase(appBarLayoutName)
 
   return """

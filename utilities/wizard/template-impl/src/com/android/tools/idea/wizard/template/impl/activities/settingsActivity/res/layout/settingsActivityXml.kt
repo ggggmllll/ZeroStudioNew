@@ -17,7 +17,7 @@
 package com.android.tools.idea.wizard.template.impl.activities.settingsActivity.res.layout
 
 fun settingsActivityXml() =
-  """<LinearLayout
+    """<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">

@@ -59,7 +59,6 @@ import com.itsaky.androidide.tasks.TaskExecutor.executeAsyncProvideError
 import com.itsaky.androidide.utils.IntentUtils.shareFile
 import com.itsaky.androidide.utils.Symbols.forFile
 import com.itsaky.androidide.utils.flashError
-import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.IOException
 import java.nio.charset.StandardCharsets
@@ -69,18 +68,20 @@ import java.nio.file.StandardOpenOption.CREATE_NEW
 import java.nio.file.StandardOpenOption.WRITE
 import java.util.concurrent.Callable
 import kotlin.math.roundToInt
+import org.slf4j.LoggerFactory
 
 /**
  * Bottom sheet shown in editor activity.
+ *
  * @author Akash Yadav
  */
 class EditorBottomSheet
 @JvmOverloads
 constructor(
-  context: Context,
-  attrs: AttributeSet? = null,
-  defStyleAttr: Int = 0,
-  defStyleRes: Int = 0,
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0,
+    defStyleRes: Int = 0,
 ) : RelativeLayout(context, attrs, defStyleAttr, defStyleRes) {
 
   private val collapsedHeight: Float by lazy {
@@ -94,8 +95,7 @@ constructor(
     }
   }
 
-  @JvmField
-  var binding: LayoutEditorBottomSheetBinding
+  @JvmField var binding: LayoutEditorBottomSheetBinding
   val pagerAdapter: EditorBottomSheetTabAdapter
 
   private var anchorOffset = 0
@@ -118,30 +118,31 @@ constructor(
   private fun initialize(context: FragmentActivity) {
 
     val mediator =
-      TabLayoutMediator(binding.tabs, binding.pager, true, true) { tab, position ->
-        tab.text = pagerAdapter.getTitle(position)
-      }
+        TabLayoutMediator(binding.tabs, binding.pager, true, true) { tab, position ->
+          tab.text = pagerAdapter.getTitle(position)
+        }
 
     mediator.attach()
     binding.pager.isUserInputEnabled = false
     binding.pager.offscreenPageLimit = pagerAdapter.itemCount - 1 // Do not remove any views
 
     binding.tabs.addOnTabSelectedListener(
-      object : OnTabSelectedListener {
-        override fun onTabSelected(tab: Tab) {
-          val fragment: Fragment = pagerAdapter.getFragmentAtIndex(tab.position)
-          if (fragment is ShareableOutputFragment) {
-            binding.clearFab.show()
-            binding.shareOutputFab.show()
-          } else {
-            binding.clearFab.hide()
-            binding.shareOutputFab.hide()
+        object : OnTabSelectedListener {
+          override fun onTabSelected(tab: Tab) {
+            val fragment: Fragment = pagerAdapter.getFragmentAtIndex(tab.position)
+            if (fragment is ShareableOutputFragment) {
+              binding.clearFab.show()
+              binding.shareOutputFab.show()
+            } else {
+              binding.clearFab.hide()
+              binding.shareOutputFab.hide()
+            }
           }
-        }
 
-        override fun onTabUnselected(tab: Tab) {}
-        override fun onTabReselected(tab: Tab) {}
-      }
+          override fun onTabUnselected(tab: Tab) {}
+
+          override fun onTabReselected(tab: Tab) {}
+        }
     )
 
     binding.shareOutputFab.setOnClickListener {
@@ -155,8 +156,8 @@ constructor(
       val filename = fragment.getFilename()
 
       @Suppress("DEPRECATION")
-      val progress = android.app.ProgressDialog.show(context, null,
-        context.getString(string.please_wait))
+      val progress =
+          android.app.ProgressDialog.show(context, null, context.getString(string.please_wait))
       executeAsync(fragment::getContent) {
         progress.dismiss()
         shareText(it, filename)
@@ -201,9 +202,7 @@ constructor(
     initialize(context)
   }
 
-  /**
-   * Set whether the input method is visible.
-   */
+  /** Set whether the input method is visible. */
   fun setImeVisible(isVisible: Boolean) {
     isImeVisible = isVisible
     behavior.isGestureInsetBottomIgnored = isVisible
@@ -211,49 +210,49 @@ constructor(
 
   fun setOffsetAnchor(view: View) {
     val listener =
-      object : ViewTreeObserver.OnGlobalLayoutListener {
-        override fun onGlobalLayout() {
-          view.viewTreeObserver.removeOnGlobalLayoutListener(this)
-          anchorOffset = view.height + SizeUtils.dp2px(1f)
+        object : ViewTreeObserver.OnGlobalLayoutListener {
+          override fun onGlobalLayout() {
+            view.viewTreeObserver.removeOnGlobalLayoutListener(this)
+            anchorOffset = view.height + SizeUtils.dp2px(1f)
 
-          behavior.peekHeight = collapsedHeight.roundToInt()
-          behavior.expandedOffset = anchorOffset
-          behavior.isGestureInsetBottomIgnored = isImeVisible
+            behavior.peekHeight = collapsedHeight.roundToInt()
+            behavior.expandedOffset = anchorOffset
+            behavior.isGestureInsetBottomIgnored = isImeVisible
 
-          binding.root.updatePadding(bottom = anchorOffset + insetBottom)
-          binding.headerContainer.apply {
-            updatePaddingRelative(bottom = paddingBottom + insetBottom)
-            updateLayoutParams<ViewGroup.LayoutParams> {
-              height = (collapsedHeight + insetBottom).roundToInt()
+            binding.root.updatePadding(bottom = anchorOffset + insetBottom)
+            binding.headerContainer.apply {
+              updatePaddingRelative(bottom = paddingBottom + insetBottom)
+              updateLayoutParams<ViewGroup.LayoutParams> {
+                height = (collapsedHeight + insetBottom).roundToInt()
+              }
             }
           }
         }
-      }
 
     view.viewTreeObserver.addOnGlobalLayoutListener(listener)
   }
 
   fun onSlide(sheetOffset: Float) {
-    val heightScale = if (sheetOffset >= COLLAPSE_HEADER_AT_OFFSET) {
-      ((COLLAPSE_HEADER_AT_OFFSET - sheetOffset) + COLLAPSE_HEADER_AT_OFFSET) * 2f
-    } else {
-      1f
-    }
+    val heightScale =
+        if (sheetOffset >= COLLAPSE_HEADER_AT_OFFSET) {
+          ((COLLAPSE_HEADER_AT_OFFSET - sheetOffset) + COLLAPSE_HEADER_AT_OFFSET) * 2f
+        } else {
+          1f
+        }
 
-    val paddingScale = if (!isImeVisible && sheetOffset <= COLLAPSE_HEADER_AT_OFFSET) {
-      ((1f - sheetOffset) * 2f) - 1f
-    } else {
-      0f
-    }
-    
+    val paddingScale =
+        if (!isImeVisible && sheetOffset <= COLLAPSE_HEADER_AT_OFFSET) {
+          ((1f - sheetOffset) * 2f) - 1f
+        } else {
+          0f
+        }
+
     val padding = insetBottom * paddingScale
     binding.headerContainer.apply {
       updateLayoutParams<ViewGroup.LayoutParams> {
         height = ((collapsedHeight + padding) * heightScale).roundToInt()
       }
-      updatePaddingRelative(
-        bottom = padding.roundToInt()
-      )
+      updatePaddingRelative(bottom = padding.roundToInt())
     }
   }
 
@@ -310,8 +309,8 @@ constructor(
     binding.symbolInput.itemAnimator?.endAnimations()
 
     TransitionManager.beginDelayedTransition(
-      binding.root,
-      MaterialSharedAxis(MaterialSharedAxis.Y, false)
+        binding.root,
+        MaterialSharedAxis(MaterialSharedAxis.Y, false),
     )
 
     val activity = context as Activity
@@ -341,18 +340,24 @@ constructor(
       flashError(context.getString(string.msg_output_text_extraction_failed))
       return
     }
-    val pd = android.app.ProgressDialog.show(context, null, context.getString(string.please_wait),
-      true, false)
+    val pd =
+        android.app.ProgressDialog.show(
+            context,
+            null,
+            context.getString(string.please_wait),
+            true,
+            false,
+        )
     executeAsyncProvideError(
-      Callable { writeTempFile(text, type) },
-      CallbackWithError<File> { result: File?, error: Throwable? ->
-        pd.dismiss()
-        if (result == null || error != null) {
-          log.warn("Unable to share output", error)
-          return@CallbackWithError
-        }
-        shareFile(result)
-      }
+        Callable { writeTempFile(text, type) },
+        CallbackWithError<File> { result: File?, error: Throwable? ->
+          pd.dismiss()
+          if (result == null || error != null) {
+            log.warn("Unable to share output", error)
+            return@CallbackWithError
+          }
+          shareFile(result)
+        },
     )
   }
 

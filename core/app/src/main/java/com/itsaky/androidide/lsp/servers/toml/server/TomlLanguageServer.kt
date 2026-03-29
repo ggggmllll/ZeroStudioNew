@@ -18,6 +18,7 @@
 package com.itsaky.androidide.lsp.servers.toml.server
 
 import com.itsaky.androidide.lsp.util.Logger
+import java.util.concurrent.CompletableFuture
 import org.eclipse.lsp4j.*
 import org.eclipse.lsp4j.jsonrpc.messages.Either
 import org.eclipse.lsp4j.services.LanguageClient
@@ -25,7 +26,6 @@ import org.eclipse.lsp4j.services.LanguageClientAware
 import org.eclipse.lsp4j.services.LanguageServer
 import org.eclipse.lsp4j.services.TextDocumentService
 import org.eclipse.lsp4j.services.WorkspaceService
-import java.util.concurrent.CompletableFuture
 
 /**
  * 嵌入式 TOML LSP 服务器。
@@ -33,47 +33,54 @@ import java.util.concurrent.CompletableFuture
  * @author android_zero
  */
 class TomlLanguageServer : LanguageServer, LanguageClientAware {
-    private val LOG = Logger.instance("TomlLanguageServer")
-    private var client: LanguageClient? = null
-    
-    private val textDocumentService = TomlTextDocumentService(this)
-    private val workspaceService = TomlWorkspaceService(this)
+  private val LOG = Logger.instance("TomlLanguageServer")
+  private var client: LanguageClient? = null
 
-    override fun initialize(params: InitializeParams): CompletableFuture<InitializeResult> {
-        val caps = ServerCapabilities()
-        caps.textDocumentSync = Either.forLeft(TextDocumentSyncKind.Full)
-        
-        // ----------------- 开启支持的必做功能 -----------------
-        caps.completionProvider = CompletionOptions(false, listOf(".", "="))
-        caps.hoverProvider = Either.forLeft(true)
-        caps.documentHighlightProvider = Either.forLeft(true)
-        caps.definitionProvider = Either.forLeft(true)
-        caps.renameProvider = Either.forLeft(true)
-        caps.documentSymbolProvider = Either.forLeft(true)
-        caps.foldingRangeProvider = Either.forLeft(true)
-        caps.documentFormattingProvider = Either.forLeft(true)
-        caps.documentLinkProvider = DocumentLinkOptions(false)
-        caps.codeActionProvider = Either.forLeft(true)
+  private val textDocumentService = TomlTextDocumentService(this)
+  private val workspaceService = TomlWorkspaceService(this)
 
-        // ----------------- 明确关闭不支持的功能 -----------------
-        caps.signatureHelpProvider = null
-        caps.referencesProvider = Either.forLeft(false)
-        caps.implementationProvider = Either.forLeft(false)
-        caps.typeDefinitionProvider = Either.forLeft(false)
-        caps.declarationProvider = Either.forLeft(false)
-        caps.callHierarchyProvider = Either.forLeft(false)
-        caps.inlayHintProvider = Either.forLeft(false)
-        caps.codeLensProvider = null
-        caps.semanticTokensProvider = null
-        caps.workspaceSymbolProvider = Either.forLeft(false)
+  override fun initialize(params: InitializeParams): CompletableFuture<InitializeResult> {
+    val caps = ServerCapabilities()
+    caps.textDocumentSync = Either.forLeft(TextDocumentSyncKind.Full)
 
-        return CompletableFuture.completedFuture(InitializeResult(caps))
-    }
+    // ----------------- 开启支持的必做功能 -----------------
+    caps.completionProvider = CompletionOptions(false, listOf(".", "="))
+    caps.hoverProvider = Either.forLeft(true)
+    caps.documentHighlightProvider = Either.forLeft(true)
+    caps.definitionProvider = Either.forLeft(true)
+    caps.renameProvider = Either.forLeft(true)
+    caps.documentSymbolProvider = Either.forLeft(true)
+    caps.foldingRangeProvider = Either.forLeft(true)
+    caps.documentFormattingProvider = Either.forLeft(true)
+    caps.documentLinkProvider = DocumentLinkOptions(false)
+    caps.codeActionProvider = Either.forLeft(true)
 
-    override fun shutdown(): CompletableFuture<Any> = CompletableFuture.completedFuture(null)
-    override fun exit() {}
-    override fun getTextDocumentService(): TextDocumentService = textDocumentService
-    override fun getWorkspaceService(): WorkspaceService = workspaceService
-    override fun connect(client: LanguageClient) { this.client = client }
-    fun getClient() = client
+    // ----------------- 明确关闭不支持的功能 -----------------
+    caps.signatureHelpProvider = null
+    caps.referencesProvider = Either.forLeft(false)
+    caps.implementationProvider = Either.forLeft(false)
+    caps.typeDefinitionProvider = Either.forLeft(false)
+    caps.declarationProvider = Either.forLeft(false)
+    caps.callHierarchyProvider = Either.forLeft(false)
+    caps.inlayHintProvider = Either.forLeft(false)
+    caps.codeLensProvider = null
+    caps.semanticTokensProvider = null
+    caps.workspaceSymbolProvider = Either.forLeft(false)
+
+    return CompletableFuture.completedFuture(InitializeResult(caps))
+  }
+
+  override fun shutdown(): CompletableFuture<Any> = CompletableFuture.completedFuture(null)
+
+  override fun exit() {}
+
+  override fun getTextDocumentService(): TextDocumentService = textDocumentService
+
+  override fun getWorkspaceService(): WorkspaceService = workspaceService
+
+  override fun connect(client: LanguageClient) {
+    this.client = client
+  }
+
+  fun getClient() = client
 }

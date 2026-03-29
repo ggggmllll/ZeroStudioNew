@@ -23,12 +23,7 @@ import com.itsaky.androidide.utils.ILogger.Level
 class ReflectiveLogListener(private val receiver: Class<out Any>) : ILogger.LogListener {
   override fun log(level: Level, tag: String, message: String) {
     val method =
-      receiver.getDeclaredMethod(
-        "log",
-        Level::class.java,
-        String::class.java,
-        String::class.java
-      )
+        receiver.getDeclaredMethod("log", Level::class.java, String::class.java, String::class.java)
     method.isAccessible = true
     method.invoke(null, level, tag, message)
   }

@@ -16,7 +16,7 @@
 package com.android.tools.idea.wizard.template.impl.activities.responsiveActivity.res.layout_w600dp
 
 fun fragmentTransformXml(transformFragmentName: String) =
-  """
+    """
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.recyclerview.widget.RecyclerView
     xmlns:android="http://schemas.android.com/apk/res/android"

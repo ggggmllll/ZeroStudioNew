@@ -19,7 +19,7 @@ package com.android.tools.idea.wizard.template.impl.activities.archStarterActivi
 import com.android.tools.idea.wizard.template.impl.activities.archStarterActivity.ArchStarterActivityTemplateVariables
 
 fun ArchStarterActivityTemplateVariables.navigation() =
-  """
+    """
 ${packageDeclaration("ui")}
 
 import androidx.compose.foundation.layout.fillMaxSize

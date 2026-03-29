@@ -1,16 +1,16 @@
 /*
  *  This file is part of AndroidIDE.
- *  
+ *
  *  AndroidIDE is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- *  
+ *
  *  AndroidIDE is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- *  
+ *
  *  You should have received a copy of the GNU General Public License
  *   along with AndroidIDE.  If not, see <https://www.gnu.org/licenses/>.
  */
@@ -25,12 +25,11 @@ import com.itsaky.androidide.utils.DialogUtils
 import com.itsaky.androidide.utils.ILogger
 import com.itsaky.androidide.utils.flashError
 
-/**
- * @see openApplicationModuleChooser
- */
-inline fun openApplicationModuleChooser(data: ActionData,
-  crossinline callback: (AndroidModule) -> Unit) =
-  openApplicationModuleChooser(data.requireContext(), callback)
+/** @see openApplicationModuleChooser */
+inline fun openApplicationModuleChooser(
+    data: ActionData,
+    crossinline callback: (AndroidModule) -> Unit,
+) = openApplicationModuleChooser(data.requireContext(), callback)
 
 /**
  * Shows a dialog to let the user choose between Android application modules in case the project has
@@ -39,13 +38,16 @@ inline fun openApplicationModuleChooser(data: ActionData,
  *
  * @param
  */
-inline fun openApplicationModuleChooser(context: Context,
-  crossinline callback: (AndroidModule) -> Unit) {
-  val applications = IProjectManager.getInstance()
-    .getWorkspace()
-    ?.androidProjects()
-    ?.filter(AndroidModule::isApplication)
-    ?.toList() ?: emptyList()
+inline fun openApplicationModuleChooser(
+    context: Context,
+    crossinline callback: (AndroidModule) -> Unit,
+) {
+  val applications =
+      IProjectManager.getInstance()
+          .getWorkspace()
+          ?.androidProjects()
+          ?.filter(AndroidModule::isApplication)
+          ?.toList() ?: emptyList()
 
   if (applications.isEmpty()) {
     flashError(R.string.msg_launch_failure_no_app_module)
@@ -61,16 +63,17 @@ inline fun openApplicationModuleChooser(context: Context,
 
   // there are multiple application modules in the project
   // ask the user to select the application module to build
-  val builder = DialogUtils.newSingleChoiceDialog(
-    context,
-    context.getString(R.string.title_choose_application),
-    applications.map { it.path }.toTypedArray(),
-    0
-  ) { selection ->
-    val app = applications[selection]
-    ILogger.ROOT.info("Selected application: '{}'", app.path)
-    callback(app)
-  }
+  val builder =
+      DialogUtils.newSingleChoiceDialog(
+          context,
+          context.getString(R.string.title_choose_application),
+          applications.map { it.path }.toTypedArray(),
+          0,
+      ) { selection ->
+        val app = applications[selection]
+        ILogger.ROOT.info("Selected application: '{}'", app.path)
+        callback(app)
+      }
 
   builder.show()
 }

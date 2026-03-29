@@ -28,9 +28,9 @@ import com.itsaky.androidide.models.Position
 import io.github.rosemoe.sora.lang.completion.CompletionCancelledException
 import io.github.rosemoe.sora.text.CharPosition
 import io.github.rosemoe.sora.text.ContentReference
-import org.slf4j.LoggerFactory
 import java.nio.file.Path
 import java.util.concurrent.CancellationException
+import org.slf4j.LoggerFactory
 
 /**
  * Common implementation of completion provider which requests completions to provided language
@@ -39,8 +39,8 @@ import java.util.concurrent.CancellationException
  * @author Akash Yadav
  */
 internal class CommonCompletionProvider(
-  private val server: ILanguageServer,
-  private val cancelChecker: CompletionCancelChecker
+    private val server: ILanguageServer,
+    private val cancelChecker: CompletionCancelChecker,
 ) {
 
   companion object {
@@ -55,38 +55,41 @@ internal class CommonCompletionProvider(
    * @param file The file to compute completions for.
    * @param position The position of the cursor in the content.
    * @return The computed completion items. May return an empty list if the there was an error
-   * computing the completion items.
+   *   computing the completion items.
    */
   inline fun complete(
-    content: ContentReference,
-    file: Path,
-    position: CharPosition,
-    prefixMatcher: (Char) -> Boolean
+      content: ContentReference,
+      file: Path,
+      position: CharPosition,
+      prefixMatcher: (Char) -> Boolean,
   ): List<CompletionItem> {
     val completionResult =
-      try {
-        setupLookupForCompletion(file)
-        val prefix = CompletionHelper.computePrefix(content, position, prefixMatcher)
-        val params =
-          CompletionParams(Position(position.line, position.column, position.index), file,
-            cancelChecker)
-        params.content = content
-        params.prefix = prefix
-        server.complete(params)
-      } catch (e: Throwable) {
+        try {
+          setupLookupForCompletion(file)
+          val prefix = CompletionHelper.computePrefix(content, position, prefixMatcher)
+          val params =
+              CompletionParams(
+                  Position(position.line, position.column, position.index),
+                  file,
+                  cancelChecker,
+              )
+          params.content = content
+          params.prefix = prefix
+          server.complete(params)
+        } catch (e: Throwable) {
 
-        if (e is CancellationException) {
-          log.debug("Completion process cancelled")
-        }
-
-        // Do not log if completion was interrupted or cancelled
-        if (!(e is CancellationException || e is CompletionCancelledException)) {
-          if (!server.handleFailure(LSPFailure(COMPLETION, e))) {
-            log.error("Unable to compute completions", e)
+          if (e is CancellationException) {
+            log.debug("Completion process cancelled")
           }
+
+          // Do not log if completion was interrupted or cancelled
+          if (!(e is CancellationException || e is CompletionCancelledException)) {
+            if (!server.handleFailure(LSPFailure(COMPLETION, e))) {
+              log.error("Unable to compute completions", e)
+            }
+          }
+          CompletionResult.EMPTY
         }
-        CompletionResult.EMPTY
-      }
 
     if (completionResult == CompletionResult.EMPTY) {
       return listOf()

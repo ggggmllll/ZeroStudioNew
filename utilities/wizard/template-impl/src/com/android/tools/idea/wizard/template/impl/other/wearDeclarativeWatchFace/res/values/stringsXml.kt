@@ -16,8 +16,8 @@
 package com.android.tools.idea.wizard.template.impl.other.wearDeclarativeWatchFace.res.values
 
 fun stringsXml() =
-  // language=XML
-  """
+    // language=XML
+    """
 <resources>
     <string name="greeting">Hello, world!</string>
 </resources>

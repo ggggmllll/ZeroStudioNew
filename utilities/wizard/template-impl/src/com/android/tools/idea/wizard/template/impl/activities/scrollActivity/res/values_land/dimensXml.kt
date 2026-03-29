@@ -17,7 +17,7 @@
 package com.android.tools.idea.wizard.template.impl.activities.scrollActivity.res.values_land
 
 fun dimensXml() =
-  """<resources>
+    """<resources>
     <dimen name="fab_margin">48dp</dimen>
     <dimen name="text_margin">48dp</dimen>
 </resources>

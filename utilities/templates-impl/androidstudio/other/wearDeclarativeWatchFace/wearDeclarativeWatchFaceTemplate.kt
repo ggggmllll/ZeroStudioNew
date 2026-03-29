@@ -22,8 +22,8 @@ import com.android.tools.idea.wizard.template.PackageNameWidget
 import com.android.tools.idea.wizard.template.TemplateData
 import com.android.tools.idea.wizard.template.TemplateFlag
 import com.android.tools.idea.wizard.template.WizardUiContext
-import com.itsaky.androidide.templates.impl.androidstudio.defaultPackageNameParameter
 import com.android.tools.idea.wizard.template.template
+import com.itsaky.androidide.templates.impl.androidstudio.defaultPackageNameParameter
 import java.io.File
 
 val wearDeclarativeWatchFaceTemplate

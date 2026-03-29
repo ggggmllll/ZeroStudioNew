@@ -26,9 +26,9 @@ import androidx.core.view.updateLayoutParams
 import com.itsaky.androidide.utils.getSystemBarInsets
 
 /**
- * This view will set its height to the value of a bottom screen inset as soon
- * as it is attached to a window. It is intended to be placed as the last view in a vertical
- * scrolling pane, so elements above it are always positioned above the navigation bar.
+ * This view will set its height to the value of a bottom screen inset as soon as it is attached to
+ * a window. It is intended to be placed as the last view in a vertical scrolling pane, so elements
+ * above it are always positioned above the navigation bar.
  *
  * The width of this view is defined manually
  *
@@ -45,19 +45,16 @@ class BottomInsetHeightDistributor : FrameLayout {
   }
 
   constructor(
-    context: Context,
-    attrs: AttributeSet?,
-    defStyleAttr: Int
+      context: Context,
+      attrs: AttributeSet?,
+      defStyleAttr: Int,
   ) : super(context, attrs, defStyleAttr) {
     applyLayoutParameters()
   }
 
   private fun applyLayoutParameters() {
     doOnAttach { view ->
-      updateLayoutParams<ViewGroup.LayoutParams> {
-        height = getSystemBarInsets(view).bottom
-      }
+      updateLayoutParams<ViewGroup.LayoutParams> { height = getSystemBarInsets(view).bottom }
     }
   }
-
 }

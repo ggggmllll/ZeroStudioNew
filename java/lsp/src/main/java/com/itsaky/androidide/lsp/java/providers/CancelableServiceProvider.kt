@@ -25,4 +25,4 @@ import com.itsaky.androidide.progress.ICancelChecker
  * @author Akash Yadav
  */
 abstract class CancelableServiceProvider(cancelChecker: ICancelChecker) :
-  ICancelChecker by cancelChecker
+    ICancelChecker by cancelChecker

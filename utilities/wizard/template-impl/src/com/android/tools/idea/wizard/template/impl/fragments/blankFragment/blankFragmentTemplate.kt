@@ -63,5 +63,7 @@ val blankFragmentTemplate
 
     thumb { File("blank-fragment").resolve("template_blank_fragment.png") }
 
-    recipe = { data: TemplateData -> blankFragmentRecipe(data as ModuleTemplateData, className.value, layoutName.value) }
+    recipe = { data: TemplateData ->
+      blankFragmentRecipe(data as ModuleTemplateData, className.value, layoutName.value)
+    }
   }

@@ -23,6 +23,9 @@ import com.itsaky.androidide.templates.impl.androidstudio.other.files.aidlFile.s
 fun RecipeExecutor.aidlFileRecipe(moduleData: ModuleTemplateData, interfaceName: String) {
   // At this moment, aidrDir is guaranteed to be non-null by checking the TemplateConstraint.Aidl
   val aidlOut = moduleData.aidlDir!!
-  save(interfaceAidl(interfaceName, moduleData.packageName), aidlOut.resolve("${interfaceName}.aidl"))
+  save(
+      interfaceAidl(interfaceName, moduleData.packageName),
+      aidlOut.resolve("${interfaceName}.aidl"),
+  )
   open(aidlOut.resolve("${interfaceName}.aidl"))
 }

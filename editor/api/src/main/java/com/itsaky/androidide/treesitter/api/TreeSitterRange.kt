@@ -22,22 +22,27 @@ import com.itsaky.androidide.treesitter.TSRange
 import com.itsaky.androidide.utils.DefaultRecyclable
 import com.itsaky.androidide.utils.RecyclableObjectPool
 
-/**
- * @author Akash Yadav
- */
-class TreeSitterRange @JvmOverloads internal constructor(
-  startByte: Int = 0,
-  endByte: Int = 0,
-  startPoint: TSPoint? = null,
-  endPoint: TSPoint? = null
-) : TSRange(startByte, endByte, startPoint, endPoint),
-  RecyclableObjectPool.Recyclable by DefaultRecyclable() {
+/** @author Akash Yadav */
+class TreeSitterRange
+@JvmOverloads
+internal constructor(
+    startByte: Int = 0,
+    endByte: Int = 0,
+    startPoint: TSPoint? = null,
+    endPoint: TSPoint? = null,
+) :
+    TSRange(startByte, endByte, startPoint, endPoint),
+    RecyclableObjectPool.Recyclable by DefaultRecyclable() {
 
   companion object {
 
     @JvmStatic
-    fun obtain(startByte: Int, endByte: Int, startPoint: TSPoint?,
-      endPoint: TSPoint?): TreeSitterRange {
+    fun obtain(
+        startByte: Int,
+        endByte: Int,
+        startPoint: TSPoint?,
+        endPoint: TSPoint?,
+    ): TreeSitterRange {
       return obtainFromPool<TreeSitterRange>().apply {
         this.startByte = startByte
         this.endByte = endByte

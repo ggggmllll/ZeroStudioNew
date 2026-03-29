@@ -19,124 +19,137 @@ package com.itsaky.androidide.utils
 
 import java.io.File
 
-/**
- * @author Mohammed-baqer-null @ https://github.com/Mohammed-baqer-null
- */
-
+/** @author Mohammed-baqer-null @ https://github.com/Mohammed-baqer-null */
 object GradleFileParser {
 
-    fun parseModuleBuildGradle(moduleDir: File): GradleBuildInfo? {
-        val buildGradleKts = File(moduleDir, "build.gradle.kts")
-        val buildGradle = File(moduleDir, "build.gradle")
+  fun parseModuleBuildGradle(moduleDir: File): GradleBuildInfo? {
+    val buildGradleKts = File(moduleDir, "build.gradle.kts")
+    val buildGradle = File(moduleDir, "build.gradle")
 
-        val gradleFile = when {
-            buildGradleKts.exists() -> buildGradleKts
-            buildGradle.exists() -> buildGradle
-            else -> return null
+    val gradleFile =
+        when {
+          buildGradleKts.exists() -> buildGradleKts
+          buildGradle.exists() -> buildGradle
+          else -> return null
         }
 
-        return try {
-            val content = gradleFile.readText()
-            val isKotlin = gradleFile.name.endsWith(".kts")
-            
-            val versionName = extractVersionName(content, isKotlin)
-            val versionCode = extractVersionCode(content, isKotlin)
-            val minSdk = extractMinSdk(content, isKotlin)
-            val targetSdk = extractTargetSdk(content, isKotlin)
-            val compileSdk = extractCompileSdk(content, isKotlin)
+    return try {
+      val content = gradleFile.readText()
+      val isKotlin = gradleFile.name.endsWith(".kts")
 
-            GradleBuildInfo(
-                versionName = versionName,
-                versionCode = versionCode,
-                minSdk = minSdk,
-                targetSdk = targetSdk,
-                compileSdk = compileSdk
-            )
-        } catch (e: Exception) {
-            null
-        }
+      val versionName = extractVersionName(content, isKotlin)
+      val versionCode = extractVersionCode(content, isKotlin)
+      val minSdk = extractMinSdk(content, isKotlin)
+      val targetSdk = extractTargetSdk(content, isKotlin)
+      val compileSdk = extractCompileSdk(content, isKotlin)
+
+      GradleBuildInfo(
+          versionName = versionName,
+          versionCode = versionCode,
+          minSdk = minSdk,
+          targetSdk = targetSdk,
+          compileSdk = compileSdk,
+      )
+    } catch (e: Exception) {
+      null
     }
+  }
 
-    private fun extractVersionName(content: String, isKotlin: Boolean): String? {
-        val patterns = listOf(
+  private fun extractVersionName(content: String, isKotlin: Boolean): String? {
+    val patterns =
+        listOf(
             Regex("""versionName\s*=\s*"([^"]+)""""),
             Regex("""versionName\s*=\s*'([^']+)'"""),
             Regex("""versionName\("([^"]+)"\)"""),
-            Regex("""versionName\s+["']([^"']+)["']""")
+            Regex("""versionName\s+["']([^"']+)["']"""),
         )
-        
-        for (pattern in patterns) {
-            pattern.find(content)?.groupValues?.getOrNull(1)?.let { return it }
-        }
-        return null
-    }
 
-    private fun extractVersionCode(content: String, isKotlin: Boolean): Int? {
-        val patterns = listOf(
+    for (pattern in patterns) {
+      pattern.find(content)?.groupValues?.getOrNull(1)?.let {
+        return it
+      }
+    }
+    return null
+  }
+
+  private fun extractVersionCode(content: String, isKotlin: Boolean): Int? {
+    val patterns =
+        listOf(
             Regex("""versionCode\s*=\s*(\d+)"""),
             Regex("""versionCode\((\d+)\)"""),
-            Regex("""versionCode\s+(\d+)""")
+            Regex("""versionCode\s+(\d+)"""),
         )
-        
-        for (pattern in patterns) {
-            pattern.find(content)?.groupValues?.getOrNull(1)?.toIntOrNull()?.let { return it }
-        }
-        return null
-    }
 
-    private fun extractMinSdk(content: String, isKotlin: Boolean): Int? {
-        val patterns = listOf(
+    for (pattern in patterns) {
+      pattern.find(content)?.groupValues?.getOrNull(1)?.toIntOrNull()?.let {
+        return it
+      }
+    }
+    return null
+  }
+
+  private fun extractMinSdk(content: String, isKotlin: Boolean): Int? {
+    val patterns =
+        listOf(
             Regex("""minSdk\s*=\s*(\d+)"""),
             Regex("""minSdkVersion\s*=\s*(\d+)"""),
             Regex("""minSdk\((\d+)\)"""),
             Regex("""minSdkVersion\((\d+)\)"""),
             Regex("""minSdkVersion\s+(\d+)"""),
-            Regex("""minSdk\s+(\d+)""")
+            Regex("""minSdk\s+(\d+)"""),
         )
-        
-        for (pattern in patterns) {
-            pattern.find(content)?.groupValues?.getOrNull(1)?.toIntOrNull()?.let { return it }
-        }
-        return null
-    }
 
-    private fun extractTargetSdk(content: String, isKotlin: Boolean): Int? {
-        val patterns = listOf(
+    for (pattern in patterns) {
+      pattern.find(content)?.groupValues?.getOrNull(1)?.toIntOrNull()?.let {
+        return it
+      }
+    }
+    return null
+  }
+
+  private fun extractTargetSdk(content: String, isKotlin: Boolean): Int? {
+    val patterns =
+        listOf(
             Regex("""targetSdk\s*=\s*(\d+)"""),
             Regex("""targetSdkVersion\s*=\s*(\d+)"""),
             Regex("""targetSdk\((\d+)\)"""),
             Regex("""targetSdkVersion\((\d+)\)"""),
             Regex("""targetSdkVersion\s+(\d+)"""),
-            Regex("""targetSdk\s+(\d+)""")
+            Regex("""targetSdk\s+(\d+)"""),
         )
-        
-        for (pattern in patterns) {
-            pattern.find(content)?.groupValues?.getOrNull(1)?.toIntOrNull()?.let { return it }
-        }
-        return null
-    }
 
-    private fun extractCompileSdk(content: String, isKotlin: Boolean): Int? {
-        val patterns = listOf(
+    for (pattern in patterns) {
+      pattern.find(content)?.groupValues?.getOrNull(1)?.toIntOrNull()?.let {
+        return it
+      }
+    }
+    return null
+  }
+
+  private fun extractCompileSdk(content: String, isKotlin: Boolean): Int? {
+    val patterns =
+        listOf(
             Regex("""compileSdk\s*=\s*(\d+)"""),
             Regex("""compileSdkVersion\s*=\s*(\d+)"""),
             Regex("""compileSdk\((\d+)\)"""),
             Regex("""compileSdkVersion\((\d+)\)"""),
             Regex("""compileSdkVersion\s+(\d+)"""),
-            Regex("""compileSdk\s+(\d+)""")
+            Regex("""compileSdk\s+(\d+)"""),
         )
-        
-        for (pattern in patterns) {
-            pattern.find(content)?.groupValues?.getOrNull(1)?.toIntOrNull()?.let { return it }
-        }
-        return null
-    }
 
-    data class GradleBuildInfo(
-        val versionName: String?,
-        val versionCode: Int?,
-        val minSdk: Int?,
-        val targetSdk: Int?,
-        val compileSdk: Int?
-    )
+    for (pattern in patterns) {
+      pattern.find(content)?.groupValues?.getOrNull(1)?.toIntOrNull()?.let {
+        return it
+      }
+    }
+    return null
+  }
+
+  data class GradleBuildInfo(
+      val versionName: String?,
+      val versionCode: Int?,
+      val minSdk: Int?,
+      val targetSdk: Int?,
+      val compileSdk: Int?,
+  )
 }

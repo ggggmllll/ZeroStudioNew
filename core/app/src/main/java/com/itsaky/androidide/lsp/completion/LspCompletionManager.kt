@@ -30,103 +30,104 @@ import org.eclipse.lsp4j.TextDocumentIdentifier
 
 /**
  * 独立的 LSP 代码补全管理器。
+ *
  * @author android_zero
  */
-class LspCompletionManager(
-    private val lspEditor: LspEditor
-) : EventReceiver<ContentChangeEvent> {
+class LspCompletionManager(private val lspEditor: LspEditor) : EventReceiver<ContentChangeEvent> {
 
-    private val editor = lspEditor.editor ?: throw IllegalStateException("CodeEditor is not attached")
-    private val lspRequestManager = lspEditor.requestManager
-    
-    private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
-    private var searchJob: Job? = null
-    
-    // 维护 Adapter 的局部引用，解决 adapter 字段受保护无法访问的问题
-    private val materialAdapter = MaterialCompletionAdapter(editor.context)
+  private val editor = lspEditor.editor ?: throw IllegalStateException("CodeEditor is not attached")
+  private val lspRequestManager = lspEditor.requestManager
 
-    init {
-        // 为原生的补全弹窗注入 Material 风格的代码补全适配器
-        val completionWindow = editor.getComponent(EditorAutoCompletion::class.java)
-        completionWindow.setAdapter(materialAdapter)
-        
-        // 若要手动覆盖或完全接管原生逻辑，可取消注释。否则 LSP 语言会自动提供补全结果。
-        // editor.subscribeEvent(ContentChangeEvent::class.java, this)
-    }
+  private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+  private var searchJob: Job? = null
 
-    override fun onReceive(event: ContentChangeEvent, unsubscribe: Unsubscribe) {
-        if (lspRequestManager == null || !lspEditor.isConnected) return
-        
-        if (event.action == ContentChangeEvent.ACTION_SET_NEW_TEXT) return
-        
-        searchJob?.cancel()
-        searchJob = scope.launch {
-            delay(150) 
+  // 维护 Adapter 的局部引用，解决 adapter 字段受保护无法访问的问题
+  private val materialAdapter = MaterialCompletionAdapter(editor.context)
 
-            val cursor = editor.cursor
-            val line = cursor.leftLine
-            val column = cursor.leftColumn
-            val uri = lspEditor.uri.toString()
+  init {
+    // 为原生的补全弹窗注入 Material 风格的代码补全适配器
+    val completionWindow = editor.getComponent(EditorAutoCompletion::class.java)
+    completionWindow.setAdapter(materialAdapter)
 
-            val params = CompletionParams().apply {
-                textDocument = TextDocumentIdentifier(uri)
-                position = Position(line, column)
-            }
+    // 若要手动覆盖或完全接管原生逻辑，可取消注释。否则 LSP 语言会自动提供补全结果。
+    // editor.subscribeEvent(ContentChangeEvent::class.java, this)
+  }
 
-            try {
-                val future = lspRequestManager.completion(params) ?: return@launch
-                val result = future.get() 
-                
-                val items: List<org.eclipse.lsp4j.CompletionItem> = if (result.isLeft) {
-                    result.left ?: emptyList()
-                } else {
-                    result.right?.items ?: emptyList()
-                }
+  override fun onReceive(event: ContentChangeEvent, unsubscribe: Unsubscribe) {
+    if (lspRequestManager == null || !lspEditor.isConnected) return
 
-                if (items.isEmpty()) return@launch
+    if (event.action == ContentChangeEvent.ACTION_SET_NEW_TEXT) return
 
-                val prefixLength = computePrefixLength(line, column)
+    searchJob?.cancel()
+    searchJob = scope.launch {
+      delay(150)
 
-                val mappedItems = items.map { lspItem ->
-                    LspCompletionItem(lspItem, lspEditor.eventManager, prefixLength)
-                }
+      val cursor = editor.cursor
+      val line = cursor.leftLine
+      val column = cursor.leftColumn
+      val uri = lspEditor.uri.toString()
 
-                withContext(Dispatchers.Main) {
-                    val completionWindow = editor.getComponent(EditorAutoCompletion::class.java)
-                    
-                    // 使用局部维护的 materialAdapter，绕过访问权限限制
-                    materialAdapter.attachValues(completionWindow, mappedItems)
-                    materialAdapter.notifyDataSetChanged()
-                    
-                    if (!completionWindow.isShowing) {
-                        completionWindow.show()
-                    }
-                }
-            } catch (e: Exception) {
-                if (e !is CancellationException) {
-                    e.printStackTrace()
-                }
-            }
-        }
-    }
-    
-    private fun computePrefixLength(line: Int, column: Int): Int {
-        // 获取标准的 String，避免 ContentLine 在 Kotlin 中索引重载引发的歧义报错
-        val lineText = editor.text.getLineString(line)
-        var length = 0
-        for (i in column - 1 downTo 0) {
-            val ch = lineText[i]
-            if (ch.isLetterOrDigit() || ch == '_') {
-                length++
+      val params =
+          CompletionParams().apply {
+            textDocument = TextDocumentIdentifier(uri)
+            position = Position(line, column)
+          }
+
+      try {
+        val future = lspRequestManager.completion(params) ?: return@launch
+        val result = future.get()
+
+        val items: List<org.eclipse.lsp4j.CompletionItem> =
+            if (result.isLeft) {
+              result.left ?: emptyList()
             } else {
-                break
+              result.right?.items ?: emptyList()
             }
+
+        if (items.isEmpty()) return@launch
+
+        val prefixLength = computePrefixLength(line, column)
+
+        val mappedItems = items.map { lspItem ->
+          LspCompletionItem(lspItem, lspEditor.eventManager, prefixLength)
         }
-        return length
+
+        withContext(Dispatchers.Main) {
+          val completionWindow = editor.getComponent(EditorAutoCompletion::class.java)
+
+          // 使用局部维护的 materialAdapter，绕过访问权限限制
+          materialAdapter.attachValues(completionWindow, mappedItems)
+          materialAdapter.notifyDataSetChanged()
+
+          if (!completionWindow.isShowing) {
+            completionWindow.show()
+          }
+        }
+      } catch (e: Exception) {
+        if (e !is CancellationException) {
+          e.printStackTrace()
+        }
+      }
     }
-    
-    fun dispose() {
-        searchJob?.cancel()
-        scope.cancel()
+  }
+
+  private fun computePrefixLength(line: Int, column: Int): Int {
+    // 获取标准的 String，避免 ContentLine 在 Kotlin 中索引重载引发的歧义报错
+    val lineText = editor.text.getLineString(line)
+    var length = 0
+    for (i in column - 1 downTo 0) {
+      val ch = lineText[i]
+      if (ch.isLetterOrDigit() || ch == '_') {
+        length++
+      } else {
+        break
+      }
     }
+    return length
+  }
+
+  fun dispose() {
+    searchJob?.cancel()
+    scope.cancel()
+  }
 }

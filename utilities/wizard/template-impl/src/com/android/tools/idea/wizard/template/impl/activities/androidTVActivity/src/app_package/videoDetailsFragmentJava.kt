@@ -17,11 +17,11 @@
 package com.android.tools.idea.wizard.template.impl.activities.androidTVActivity.src.app_package
 
 fun videoDetailsFragmentJava(
-  activityClass: String,
-  detailsActivity: String,
-  detailsFragment: String,
-  minApiLevel: Int,
-  packageName: String,
+    activityClass: String,
+    detailsActivity: String,
+    detailsFragment: String,
+    minApiLevel: Int,
+    packageName: String,
 ): String {
   val contextArgBlock = if (minApiLevel >= 23) "getContext()" else "getActivity()"
 

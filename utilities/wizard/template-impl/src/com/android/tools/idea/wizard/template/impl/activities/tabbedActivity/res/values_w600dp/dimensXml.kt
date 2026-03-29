@@ -17,7 +17,7 @@
 package com.android.tools.idea.wizard.template.impl.activities.tabbedActivity.res.values_w600dp
 
 fun dimensXml() =
-  """<resources>
+    """<resources>
     <dimen name="fab_margin">48dp</dimen>
 </resources>
 """

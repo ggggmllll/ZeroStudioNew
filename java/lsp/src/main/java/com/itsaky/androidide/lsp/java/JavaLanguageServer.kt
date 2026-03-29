@@ -64,6 +64,8 @@ import com.itsaky.androidide.projects.IWorkspace
 import com.itsaky.androidide.projects.ModuleProject
 import com.itsaky.androidide.utils.DocumentUtils
 import com.itsaky.androidide.utils.VMUtils
+import java.nio.file.Path
+import java.util.Objects
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -72,8 +74,6 @@ import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import org.slf4j.LoggerFactory
-import java.nio.file.Path
-import java.util.Objects
 
 class JavaLanguageServer : ILanguageServer {
 
@@ -89,8 +89,7 @@ class JavaLanguageServer : ILanguageServer {
 
   val settings: IServerSettings
     get() {
-      return _settings ?: JavaServerSettings.getInstance()
-        .also { _settings = it }
+      return _settings ?: JavaServerSettings.getInstance().also { _settings = it }
     }
 
   override val serverId: String = SERVER_ID
@@ -162,8 +161,7 @@ class JavaLanguageServer : ILanguageServer {
 
   override fun complete(params: CompletionParams?): CompletionResult {
     val compiler = getCompiler(params!!.file)
-    if (!settings.completionsEnabled() || !completionProvider.canComplete(params.file)
-    ) {
+    if (!settings.completionsEnabled() || !completionProvider.canComplete(params.file)) {
       return CompletionResult.EMPTY
     }
 
@@ -172,9 +170,8 @@ class JavaLanguageServer : ILanguageServer {
       diagnosticProvider.cancel()
     }
 
-    completionProvider.reset(
-      compiler, settings, cachedCompletion
-    ) { cachedCompletion: CachedCompletion ->
+    completionProvider.reset(compiler, settings, cachedCompletion) {
+        cachedCompletion: CachedCompletion ->
       updateCachedCompletion(cachedCompletion)
     }
 
@@ -240,9 +237,9 @@ class JavaLanguageServer : ILanguageServer {
     if (!DocumentUtils.isJavaFile(file)) {
       return JavaCompilerService.NO_MODULE_COMPILER
     }
-    val workspace = getInstance().getWorkspace()
-      ?: return JavaCompilerService.NO_MODULE_COMPILER
-    val module = workspace.findModuleForFile(file!!) ?: return JavaCompilerService.NO_MODULE_COMPILER
+    val workspace = getInstance().getWorkspace() ?: return JavaCompilerService.NO_MODULE_COMPILER
+    val module =
+        workspace.findModuleForFile(file!!) ?: return JavaCompilerService.NO_MODULE_COMPILER
     return JavaCompilerProvider.get(module)
   }
 
@@ -271,8 +268,7 @@ class JavaLanguageServer : ILanguageServer {
 
     // TODO Find an alternative to efficiently update changeDelta in JavaCompilerService instance
     JavaCompilerService.NO_MODULE_COMPILER.onDocumentChange(event)
-    val module = getInstance()
-      .getWorkspace()?.findModuleForFile(event.changedFile, true)
+    val module = getInstance().getWorkspace()?.findModuleForFile(event.changedFile, true)
     if (module != null) {
       val compiler = JavaCompilerProvider.get(module)
       compiler.onDocumentChange(event)
@@ -311,9 +307,7 @@ class JavaLanguageServer : ILanguageServer {
 
     CoroutineScope(Dispatchers.Default).launch {
       val result = analyze(selectedFile!!)
-      withContext(Dispatchers.Main) {
-        client?.publishDiagnostics(result)
-      }
+      withContext(Dispatchers.Main) { client?.publishDiagnostics(result) }
     }
   }
 }

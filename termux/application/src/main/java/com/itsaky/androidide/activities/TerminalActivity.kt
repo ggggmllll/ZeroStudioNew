@@ -35,13 +35,12 @@ import com.termux.app.terminal.TermuxTerminalSessionActivityClient
 import com.termux.shared.termux.shell.command.runner.terminal.TermuxSession
 import org.slf4j.LoggerFactory
 
-/**
- * @author Akash Yadav
- */
+/** @author Akash Yadav */
 class TerminalActivity : TermuxActivity() {
 
   override val navigationBarColor: Int
     get() = ContextCompat.getColor(this, android.R.color.black)
+
   override val statusBarColor: Int
     get() = ContextCompat.getColor(this, android.R.color.black)
 
@@ -61,14 +60,12 @@ class TerminalActivity : TermuxActivity() {
   }
 
   override fun onCreate(savedInstanceState: Bundle?) {
-    val controller = WindowCompat.getInsetsController(
-      window, window.decorView)
+    val controller = WindowCompat.getInsetsController(window, window.decorView)
     controller.isAppearanceLightNavigationBars = false
     controller.isAppearanceLightStatusBars = false
     super.onCreate(savedInstanceState)
 
-    canAddNewSessions = savedInstanceState?.getBoolean(
-      KEY_TERMINAL_CAN_ADD_SESSIONS, true) ?: true
+    canAddNewSessions = savedInstanceState?.getBoolean(KEY_TERMINAL_CAN_ADD_SESSIONS, true) ?: true
   }
 
   override fun onCreateTerminalSessionClient(): TermuxTerminalSessionActivityClient {
@@ -86,9 +83,9 @@ class TerminalActivity : TermuxActivity() {
   }
 
   override fun onCreateNewSession(
-    isFailsafe: Boolean,
-    sessionName: String?,
-    workingDirectory: String?
+      isFailsafe: Boolean,
+      sessionName: String?,
+      workingDirectory: String?,
   ) {
     if (canAddNewSessions) {
       super.onCreateNewSession(isFailsafe, sessionName, workingDirectory)
@@ -98,11 +95,11 @@ class TerminalActivity : TermuxActivity() {
   }
 
   override fun setupTermuxSessionOnServiceConnected(
-    intent: Intent?,
-    workingDir: String?,
-    sessionName: String?,
-    existingSession: TermuxSession?,
-    launchFailsafe: Boolean
+      intent: Intent?,
+      workingDir: String?,
+      sessionName: String?,
+      existingSession: TermuxSession?,
+      launchFailsafe: Boolean,
   ) {
     if (intent != null) {
       val runIdesetup = intent.getBooleanExtra(EXTRA_ONBOARDING_RUN_IDESETUP, false)
@@ -114,36 +111,43 @@ class TerminalActivity : TermuxActivity() {
     }
 
     super.setupTermuxSessionOnServiceConnected(
-      intent,
-      workingDir,
-      sessionName,
-      existingSession,
-      launchFailsafe
+        intent,
+        workingDir,
+        sessionName,
+        existingSession,
+        launchFailsafe,
     )
   }
 
   private fun addIdesetupSession(args: Array<String>) {
-    val script = IdesetupSession.createScript(this) ?: run {
-      log.error("Failed to add idesetup session. Cannot create script.")
-      flashError(R.string.msg_cannot_create_terminal_session)
-      return
-    }
+    val script =
+        IdesetupSession.createScript(this)
+            ?: run {
+              log.error("Failed to add idesetup session. Cannot create script.")
+              flashError(R.string.msg_cannot_create_terminal_session)
+              return
+            }
 
     Log.d("IdeSetupConfig", "buildIdeSetupArguments: ${args.joinToString(separator = " ")}")
 
-    val session = IdesetupSession.wrap(termuxService.createTermuxSession(
-      /* executablePath = */ script.absolutePath,
-      /* arguments = */ args,
-      /* stdin = */ null,
-      /* workingDirectory = */ Environment.HOME.absolutePath,
-      /* isFailSafe = */ false,
-      /* sessionName = */ "IDE setup"
-    ), script)
+    val session =
+        IdesetupSession.wrap(
+            termuxService.createTermuxSession(
+                /* executablePath = */ script.absolutePath,
+                /* arguments = */ args,
+                /* stdin = */ null,
+                /* workingDirectory = */ Environment.HOME.absolutePath,
+                /* isFailSafe = */ false,
+                /* sessionName = */ "IDE setup",
+            ),
+            script,
+        )
 
-    session ?: run {
-      flashError(R.string.msg_cannot_create_terminal_session)
-      return
-    }
+    session
+        ?: run {
+          flashError(R.string.msg_cannot_create_terminal_session)
+          return
+        }
 
     termuxTerminalSessionClient.setCurrentSession(session.terminalSession)
   }

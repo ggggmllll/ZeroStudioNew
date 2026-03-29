@@ -52,7 +52,8 @@ val contentProviderTemplate
     val authorities = stringParameter {
       name = "URI Authorities"
       default = ""
-      help = "A semicolon separated list of one or more URI authorities that identify data under the purview of the content provider"
+      help =
+          "A semicolon separated list of one or more URI authorities that identify data under the purview of the content provider"
       constraints = listOf(NONEMPTY, URI_AUTHORITY)
       loggable = true
     }
@@ -70,11 +71,11 @@ val contentProviderTemplate
     }
 
     widgets(
-      TextFieldWidget(className),
-      TextFieldWidget(authorities),
-      CheckBoxWidget(isExported),
-      CheckBoxWidget(isEnabled),
-      LanguageWidget(),
+        TextFieldWidget(className),
+        TextFieldWidget(authorities),
+        CheckBoxWidget(isExported),
+        CheckBoxWidget(isEnabled),
+        LanguageWidget(),
     )
 
     thumb {
@@ -83,6 +84,12 @@ val contentProviderTemplate
     }
 
     recipe = { data: TemplateData ->
-      contentProviderRecipe(data as ModuleTemplateData, className.value, authorities.value, isExported.value, isEnabled.value)
+      contentProviderRecipe(
+          data as ModuleTemplateData,
+          className.value,
+          authorities.value,
+          isExported.value,
+          isEnabled.value,
+      )
     }
   }

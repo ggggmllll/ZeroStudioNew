@@ -48,17 +48,17 @@ class XMLCompletionProviderTest : CompletionHelper by CompletionHelperImpl() {
       assertThat(items).containsAtLeast("ImageView", "ImageButton")
     }
   }
-  
+
   @Test
   fun `test empty tag completion`() {
     XMLLSPTest.apply {
       openFile("../res/layout/EmptyTagNameCompletion")
-      
+
       val (isIncomplete, items) = complete()
-      
+
       assertThat(isIncomplete).isTrue()
       assertThat(items).isNotEmpty()
-      
+
       assertThat(items).containsAtLeast("ImageView", "ImageButton")
     }
   }
@@ -87,7 +87,13 @@ class XMLCompletionProviderTest : CompletionHelper by CompletionHelperImpl() {
       assertThat(isIncomplete).isFalse()
       assertThat(items).isNotEmpty()
 
-      assertThat(items).containsAtLeast("android:text", "android:textColor", "android:textAlignment", "android:textAllCaps")
+      assertThat(items)
+          .containsAtLeast(
+              "android:text",
+              "android:textColor",
+              "android:textAlignment",
+              "android:textAllCaps",
+          )
     }
   }
 }

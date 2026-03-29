@@ -37,7 +37,7 @@ fun Context.resolveAttr(id: Int, resolveRefs: Boolean = true): Int {
 
 @JvmOverloads
 fun Theme.resolveAttr(id: Int, resolveRefs: Boolean = true): Int =
-  TypedValue().let {
-    resolveAttribute(id, it, resolveRefs)
-    it.data
-  }
+    TypedValue().let {
+      resolveAttribute(id, it, resolveRefs)
+      it.data
+    }

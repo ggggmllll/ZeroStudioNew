@@ -43,11 +43,11 @@ open class RelativeLayoutAdapter<T : RelativeLayout> : ViewGroupAdapter<T>() {
 
   override fun createUiWidgets(): List<UiWidget> {
     return listOf(
-      UiWidget(
-        RelativeLayout::class.java,
-        string.widget_relative_layout,
-        drawable.ic_widget_relative_layout
-      )
+        UiWidget(
+            RelativeLayout::class.java,
+            string.widget_relative_layout,
+            drawable.ic_widget_relative_layout,
+        )
     )
   }
 }

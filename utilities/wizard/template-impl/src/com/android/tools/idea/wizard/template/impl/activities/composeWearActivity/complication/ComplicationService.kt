@@ -19,7 +19,7 @@ package com.android.tools.idea.wizard.template.impl.activities.composeWearActivi
 import com.android.tools.idea.wizard.template.escapeKotlinIdentifier
 
 fun complicationServiceKt(complicationServiceKt: String, packageName: String) =
-  """
+    """
 package ${escapeKotlinIdentifier(packageName)}.complication
 
 import androidx.wear.watchface.complications.data.ComplicationData

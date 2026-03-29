@@ -34,72 +34,73 @@ import com.itsaky.androidide.fragments.git.menu.GitPopupManager
  */
 class GitHostFragment : Fragment() {
 
-    private var _binding: FragmentGitHostBinding? = null
-    private val binding get() = _binding!!
-    
-    private lateinit var popupManager: GitPopupManager
-    
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = FragmentGitHostBinding.inflate(inflater, container, false)
-        return binding.root
-    }
+  private var _binding: FragmentGitHostBinding? = null
+  private val binding
+    get() = _binding!!
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        
-        setupViewPager()
-        setupPopupMenu()
-    }
+  private lateinit var popupManager: GitPopupManager
 
-    private fun setupViewPager() {
-        val adapter = GitPagerAdapter(this)
-        binding.gitViewPager.adapter = adapter
-        binding.gitViewPager.offscreenPageLimit = 1
+  override fun onCreateView(
+      inflater: LayoutInflater,
+      container: ViewGroup?,
+      savedInstanceState: Bundle?,
+  ): View {
+    _binding = FragmentGitHostBinding.inflate(inflater, container, false)
+    return binding.root
+  }
 
-        TabLayoutMediator(binding.gitTabLayout, binding.gitViewPager) { tab, position ->
-            tab.text = when (position) {
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+
+    setupViewPager()
+    setupPopupMenu()
+  }
+
+  private fun setupViewPager() {
+    val adapter = GitPagerAdapter(this)
+    binding.gitViewPager.adapter = adapter
+    binding.gitViewPager.offscreenPageLimit = 1
+
+    TabLayoutMediator(binding.gitTabLayout, binding.gitViewPager) { tab, position ->
+          tab.text =
+              when (position) {
                 0 -> getString(R.string.title_projects) // Project/Files
-                1 -> getString(R.string.changelist)     // Changes
-                2 -> getString(R.string.commits)        // History
+                1 -> getString(R.string.changelist) // Changes
+                2 -> getString(R.string.commits) // History
                 3 -> getString(R.string.git_collaboration) // collaboration
-                4 -> getString(R.string.branches)       // Branches
-                5 -> getString(R.string.stash)          // Stash
+                4 -> getString(R.string.branches) // Branches
+                5 -> getString(R.string.stash) // Stash
                 else -> getString(R.string.other)
-            }
-        }.attach()
-    }
-
-    private fun setupPopupMenu() {
-        popupManager = GitPopupManager(requireContext())
-        
-        binding.btnGitMenu.setOnClickListener { anchorView ->
-            popupManager.show(anchorView)
+              }
         }
-    }
+        .attach()
+  }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
+  private fun setupPopupMenu() {
+    popupManager = GitPopupManager(requireContext())
 
-    private inner class GitPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
-        // 页面数量为 6 (0-5)
-        override fun getItemCount(): Int = 6
+    binding.btnGitMenu.setOnClickListener { anchorView -> popupManager.show(anchorView) }
+  }
 
-        override fun createFragment(position: Int): Fragment {
-            return when (position) {
-                0 -> GitProjectsFragment() 
-                1 -> GitChangesFragment() 
-                2 -> GitHistoryFragment()
-                3 -> GitCollaborationFragment()
-                4 -> GitBranchesFragment()
-                5 -> GitStashFragment()
-                else -> Fragment()
-            }
-        }
+  override fun onDestroyView() {
+    super.onDestroyView()
+    _binding = null
+  }
+
+  private inner class GitPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
+    // 页面数量为 6 (0-5)
+    override fun getItemCount(): Int = 6
+
+    override fun createFragment(position: Int): Fragment {
+      return when (position) {
+        0 -> GitProjectsFragment()
+        1 -> GitChangesFragment()
+        2 -> GitHistoryFragment()
+        3 -> GitCollaborationFragment()
+        4 -> GitBranchesFragment()
+        5 -> GitStashFragment()
+        else -> Fragment()
+      }
     }
+  }
 }

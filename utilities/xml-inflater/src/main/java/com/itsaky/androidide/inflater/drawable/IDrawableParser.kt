@@ -30,7 +30,8 @@ import org.xmlpull.v1.XmlPullParser
  * @author Akash Yadav
  */
 abstract class IDrawableParser
-protected constructor(protected open val parser: XmlPullParser?, open var minDepth: Int) : AbstractParser() {
+protected constructor(protected open val parser: XmlPullParser?, open var minDepth: Int) :
+    AbstractParser() {
   /**
    * Parse the drawable using the already provided parser and data.
    *
@@ -62,7 +63,7 @@ protected constructor(protected open val parser: XmlPullParser?, open var minDep
     }
     return drawable
   }
-  
+
   /**
    * Actual implementation of the parse logic.
    *

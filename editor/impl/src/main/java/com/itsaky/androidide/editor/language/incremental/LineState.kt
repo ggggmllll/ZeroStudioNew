@@ -25,7 +25,6 @@ import org.antlr.v4.runtime.Lexer
  * @param state The state of the line.
  * @param hasBraces `true` if the line has braces. `false` otherwise.
  * @param lexerMode The mode of the lexer. This MUST be preserved in the lexer.
- *
  * @author Akash Yadav
  */
 data class LineState(

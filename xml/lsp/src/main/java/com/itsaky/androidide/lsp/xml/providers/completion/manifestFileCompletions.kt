@@ -29,14 +29,14 @@ const val MANIFEST_TAG_PREFIX = "AndroidManifest"
 
 fun canCompleteManifest(pathData: ResourcePathData, type: NodeType): Boolean {
   return pathData.file.name == ANDROID_MANIFEST_XML ||
-    (VMUtils.isJvm() &&
-      pathData.file.name.startsWith("Manifest") &&
-      pathData.file.name.endsWith("_template.xml"))
+      (VMUtils.isJvm() &&
+          pathData.file.name.startsWith("Manifest") &&
+          pathData.file.name.endsWith("_template.xml"))
 }
 
 fun manifestResourceTable(): Set<IResourceTable> {
   return setOf(
-    Lookup.getDefault().lookup(ResourceTableRegistry.COMPLETION_MANIFEST_ATTR_RES)
-      ?: return emptySet()
+      Lookup.getDefault().lookup(ResourceTableRegistry.COMPLETION_MANIFEST_ATTR_RES)
+          ?: return emptySet()
   )
 }

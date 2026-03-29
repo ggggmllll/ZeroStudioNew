@@ -18,27 +18,27 @@ package com.itsaky.androidide.templates.impl.androidstudio.fragments.googleAdMob
 
 import com.android.tools.idea.wizard.template.Language
 import com.android.tools.idea.wizard.template.getMaterialComponentName
+import com.android.tools.idea.wizard.template.renderIf
 import com.itsaky.androidide.templates.impl.androidstudio.activities.common.findViewById
 import com.itsaky.androidide.templates.impl.androidstudio.activities.common.importViewBindingClass
 import com.itsaky.androidide.templates.impl.androidstudio.activities.common.layoutToViewBindingClass
-import com.android.tools.idea.wizard.template.renderIf
 
 fun adMobInterstitialAdFragmentJava(
-  applicationPackage: String?,
-  fragmentClass: String,
-  layoutName: String,
-  packageName: String,
-  useAndroidX: Boolean,
-  isViewBindingSupported: Boolean,
+    applicationPackage: String?,
+    fragmentClass: String,
+    layoutName: String,
+    packageName: String,
+    useAndroidX: Boolean,
+    isViewBindingSupported: Boolean,
 ): String {
 
   val onCreateViewBlock =
-    if (isViewBindingSupported)
-      """
+      if (isViewBindingSupported)
+          """
       binding = ${layoutToViewBindingClass(layoutName)}.inflate(inflater, container, false);
       return binding.getRoot();
   """
-    else "return inflater.inflate(R.layout.$layoutName, container, false);"
+      else "return inflater.inflate(R.layout.$layoutName, container, false);"
 
   return """
 package ${packageName};

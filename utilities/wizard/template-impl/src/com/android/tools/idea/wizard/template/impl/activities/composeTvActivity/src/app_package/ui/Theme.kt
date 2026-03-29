@@ -19,7 +19,7 @@ package com.android.tools.idea.wizard.template.impl.activities.composeTvActivity
 import com.android.tools.idea.wizard.template.escapeKotlinIdentifier
 
 fun themeKt(packageName: String, themeName: String) =
-  """
+    """
 package ${escapeKotlinIdentifier(packageName)}.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme

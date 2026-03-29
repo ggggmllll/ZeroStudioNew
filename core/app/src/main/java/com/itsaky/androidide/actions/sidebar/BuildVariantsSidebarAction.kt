@@ -23,7 +23,6 @@ import androidx.fragment.app.Fragment
 import com.itsaky.androidide.R
 import com.itsaky.androidide.fragments.sidebar.BuildVariantsFragment
 import kotlin.reflect.KClass
-import com.itsaky.androidide.utils.getTintedDrawable
 
 /**
  * Sidebar action for showing the build variants of Android modules in the project.
@@ -31,7 +30,7 @@ import com.itsaky.androidide.utils.getTintedDrawable
  * @author Akash Yadav
  */
 class BuildVariantsSidebarAction(context: Context, override val order: Int) :
-  AbstractSidebarAction() {
+    AbstractSidebarAction() {
 
   override val fragmentClass: KClass<out Fragment> = BuildVariantsFragment::class
   override val id: String = "ide.editor.sidebar.buildVariants"

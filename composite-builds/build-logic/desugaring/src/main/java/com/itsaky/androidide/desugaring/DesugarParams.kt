@@ -32,26 +32,17 @@ import org.gradle.api.tasks.Input
  */
 interface DesugarParams : InstrumentationParameters {
 
-  /**
-   * Whether the desugaring is enabled.
-   */
-  @get:Input
-  val enabled: Property<Boolean>
+  /** Whether the desugaring is enabled. */
+  @get:Input val enabled: Property<Boolean>
 
-  /**
-   * The replacement instructions.
-   */
-  @get:Input
-  val replacements: MapProperty<ReplaceMethodInsnKey, ReplaceMethodInsn>
+  /** The replacement instructions. */
+  @get:Input val replacements: MapProperty<ReplaceMethodInsnKey, ReplaceMethodInsn>
 
-  @get:Input
-  val includedPackages: SetProperty<String>
+  @get:Input val includedPackages: SetProperty<String>
 
   companion object {
 
-    /**
-     * Sets [DesugarParams] properties from [DesugarExtension].
-     */
+    /** Sets [DesugarParams] properties from [DesugarExtension]. */
     fun DesugarParams.setFrom(extension: DesugarExtension) {
       replacements.convention(emptyMap())
       includedPackages.convention(emptySet())

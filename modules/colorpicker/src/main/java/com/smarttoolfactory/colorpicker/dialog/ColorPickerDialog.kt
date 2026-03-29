@@ -31,51 +31,40 @@ fun ColorPickerRingDiamondHSLDialog(
     ringBorderStrokeColor: Color = Color.Black,
     ringBorderStrokeWidth: Dp = 4.dp,
     selectionRadius: Dp = 8.dp,
-    onDismiss: (Color, String) -> Unit
+    onDismiss: (Color, String) -> Unit,
 ) {
 
-    var color by remember { mutableStateOf(initialColor.copy()) }
-    var hexString by remember { mutableStateOf(ColorUtil.colorToHexAlpha(color)) }
+  var color by remember { mutableStateOf(initialColor.copy()) }
+  var hexString by remember { mutableStateOf(ColorUtil.colorToHexAlpha(color)) }
 
-    Dialog(
-        onDismissRequest = {
-            onDismiss(color, hexString)
-        }
-    ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+  Dialog(onDismissRequest = { onDismiss(color, hexString) }) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+      ColorPickerRingDiamondHSL(
+          modifier =
+              Modifier.fillMaxWidth()
+                  .weight(1f)
+                  .background(Color(0xcc212121), shape = RoundedCornerShape(5.dp))
+                  .padding(horizontal = 10.dp, vertical = 2.dp),
+          initialColor = initialColor,
+          ringOuterRadiusFraction = ringOuterRadiusFraction,
+          ringInnerRadiusFraction = ringInnerRadiusFraction,
+          ringBackgroundColor = ringBackgroundColor,
+          ringBorderStrokeColor = ringBorderStrokeColor,
+          ringBorderStrokeWidth = ringBorderStrokeWidth,
+          selectionRadius = selectionRadius,
+      ) { colorChange, hexChange ->
+        color = colorChange
+        hexString = hexChange
+      }
 
-            ColorPickerRingDiamondHSL(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .background(Color(0xcc212121), shape = RoundedCornerShape(5.dp))
-                    .padding(horizontal = 10.dp, vertical = 2.dp),
-                initialColor = initialColor,
-                ringOuterRadiusFraction = ringOuterRadiusFraction,
-                ringInnerRadiusFraction = ringInnerRadiusFraction,
-                ringBackgroundColor = ringBackgroundColor,
-                ringBorderStrokeColor = ringBorderStrokeColor,
-                ringBorderStrokeWidth = ringBorderStrokeWidth,
-                selectionRadius = selectionRadius
-            ) { colorChange, hexChange ->
-                color = colorChange
-                hexString = hexChange
-            }
-
-            FloatingActionButton(
-                onClick = {
-                    onDismiss(color, hexString)
-                },
-                backgroundColor = Color.Black
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Close,
-                    contentDescription = null,
-                    tint = Blue400
-                )
-            }
-        }
+      FloatingActionButton(
+          onClick = { onDismiss(color, hexString) },
+          backgroundColor = Color.Black,
+      ) {
+        Icon(imageVector = Icons.Filled.Close, contentDescription = null, tint = Blue400)
+      }
     }
+  }
 }
 
 @Composable
@@ -87,51 +76,40 @@ fun ColorPickerRingDiamondHEXDialog(
     ringBorderStrokeColor: Color = Color.Black,
     ringBorderStrokeWidth: Dp = 4.dp,
     selectionRadius: Dp = 8.dp,
-    onDismiss: (Color, String) -> Unit
+    onDismiss: (Color, String) -> Unit,
 ) {
 
-    var color by remember { mutableStateOf(initialColor.copy()) }
-    var hexString by remember { mutableStateOf(ColorUtil.colorToHexAlpha(color)) }
+  var color by remember { mutableStateOf(initialColor.copy()) }
+  var hexString by remember { mutableStateOf(ColorUtil.colorToHexAlpha(color)) }
 
-    Dialog(
-        onDismissRequest = {
-            onDismiss(color, hexString)
-        }
-    ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+  Dialog(onDismissRequest = { onDismiss(color, hexString) }) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+      ColorPickerRingDiamondHEX(
+          modifier =
+              Modifier.fillMaxWidth()
+                  .weight(1f)
+                  .background(Color(0xcc212121), shape = RoundedCornerShape(5.dp))
+                  .padding(horizontal = 10.dp, vertical = 2.dp),
+          initialColor = initialColor,
+          ringOuterRadiusFraction = ringOuterRadiusFraction,
+          ringInnerRadiusFraction = ringInnerRadiusFraction,
+          ringBackgroundColor = ringBackgroundColor,
+          ringBorderStrokeColor = ringBorderStrokeColor,
+          ringBorderStrokeWidth = ringBorderStrokeWidth,
+          selectionRadius = selectionRadius,
+      ) { colorChange, hexChange ->
+        color = colorChange
+        hexString = hexChange
+      }
 
-            ColorPickerRingDiamondHEX(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .background(Color(0xcc212121), shape = RoundedCornerShape(5.dp))
-                    .padding(horizontal = 10.dp, vertical = 2.dp),
-                initialColor = initialColor,
-                ringOuterRadiusFraction = ringOuterRadiusFraction,
-                ringInnerRadiusFraction = ringInnerRadiusFraction,
-                ringBackgroundColor = ringBackgroundColor,
-                ringBorderStrokeColor = ringBorderStrokeColor,
-                ringBorderStrokeWidth = ringBorderStrokeWidth,
-                selectionRadius = selectionRadius
-            ) { colorChange, hexChange ->
-                color = colorChange
-                hexString = hexChange
-            }
-
-            FloatingActionButton(
-                onClick = {
-                    onDismiss(color, hexString)
-                },
-                backgroundColor = Color.Black
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Close,
-                    contentDescription = null,
-                    tint = Blue400
-                )
-            }
-        }
+      FloatingActionButton(
+          onClick = { onDismiss(color, hexString) },
+          backgroundColor = Color.Black,
+      ) {
+        Icon(imageVector = Icons.Filled.Close, contentDescription = null, tint = Blue400)
+      }
     }
+  }
 }
 
 @Composable
@@ -143,51 +121,41 @@ fun ColorPickerRingRectHSLDialog(
     ringBorderStrokeColor: Color = Color.Black,
     ringBorderStrokeWidth: Dp = 4.dp,
     selectionRadius: Dp = 8.dp,
-    onDismiss: (Color, String) -> Unit
+    onDismiss: (Color, String) -> Unit,
 ) {
 
-    var color by remember { mutableStateOf(initialColor.copy()) }
-    var hexString by remember { mutableStateOf(ColorUtil.colorToHexAlpha(color)) }
+  var color by remember { mutableStateOf(initialColor.copy()) }
+  var hexString by remember { mutableStateOf(ColorUtil.colorToHexAlpha(color)) }
 
-    Dialog(
-        onDismissRequest = {
-            onDismiss(color, hexString)
-        }
-    ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+  Dialog(onDismissRequest = { onDismiss(color, hexString) }) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+      ColorPickerRingRectHSL(
+          modifier =
+              Modifier.fillMaxWidth()
+                  .weight(1f)
+                  .background(Color(0xcc212121), shape = RoundedCornerShape(5.dp))
+                  .padding(horizontal = 10.dp, vertical = 2.dp),
+          initialColor = initialColor,
+          ringOuterRadiusFraction = ringOuterRadiusFraction,
+          ringInnerRadiusFraction = ringInnerRadiusFraction,
+          ringBackgroundColor = ringBackgroundColor,
+          ringBorderStrokeColor = ringBorderStrokeColor,
+          ringBorderStrokeWidth = ringBorderStrokeWidth,
+          selectionRadius = selectionRadius,
+      ) { colorChange, hexChange ->
+        color = colorChange
+        hexString = hexChange
+      }
 
-            ColorPickerRingRectHSL(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .background(Color(0xcc212121), shape = RoundedCornerShape(5.dp))
-                    .padding(horizontal = 10.dp, vertical = 2.dp),
-                initialColor = initialColor,
-                ringOuterRadiusFraction = ringOuterRadiusFraction,
-                ringInnerRadiusFraction = ringInnerRadiusFraction,
-                ringBackgroundColor = ringBackgroundColor,
-                ringBorderStrokeColor = ringBorderStrokeColor,
-                ringBorderStrokeWidth = ringBorderStrokeWidth,
-                selectionRadius = selectionRadius
-            ) { colorChange, hexChange ->
-                color = colorChange
-                hexString = hexChange
-            }
-
-            FloatingActionButton(
-                onClick = { onDismiss(color, hexString) },
-                backgroundColor = Color.Black
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Close,
-                    contentDescription = null,
-                    tint = Blue400
-                )
-            }
-        }
+      FloatingActionButton(
+          onClick = { onDismiss(color, hexString) },
+          backgroundColor = Color.Black,
+      ) {
+        Icon(imageVector = Icons.Filled.Close, contentDescription = null, tint = Blue400)
+      }
     }
+  }
 }
-
 
 @Composable
 fun ColorPickerRingRectHSVDialog(
@@ -198,50 +166,40 @@ fun ColorPickerRingRectHSVDialog(
     ringBorderStrokeColor: Color = Color.Black,
     ringBorderStrokeWidth: Dp = 4.dp,
     selectionRadius: Dp = 8.dp,
-    onDismiss: (Color, String) -> Unit
+    onDismiss: (Color, String) -> Unit,
 ) {
 
-    var color by remember { mutableStateOf(initialColor.copy()) }
-    var hexString by remember { mutableStateOf(ColorUtil.colorToHexAlpha(color)) }
+  var color by remember { mutableStateOf(initialColor.copy()) }
+  var hexString by remember { mutableStateOf(ColorUtil.colorToHexAlpha(color)) }
 
-    Dialog(
-        onDismissRequest = {
-            onDismiss(color, hexString)
-        }
-    ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            ColorPickerRingRectHSV(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .background(Color(0xcc212121), shape = RoundedCornerShape(5.dp))
-                    .padding(horizontal = 10.dp, vertical = 2.dp),
-                initialColor = initialColor,
-                ringOuterRadiusFraction = ringOuterRadiusFraction,
-                ringInnerRadiusFraction = ringInnerRadiusFraction,
-                ringBackgroundColor = ringBackgroundColor,
-                ringBorderStrokeColor = ringBorderStrokeColor,
-                ringBorderStrokeWidth = ringBorderStrokeWidth,
-                selectionRadius = selectionRadius
-            ) { colorChange, hexChange ->
-                color = colorChange
-                hexString = hexChange
-            }
+  Dialog(onDismissRequest = { onDismiss(color, hexString) }) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+      ColorPickerRingRectHSV(
+          modifier =
+              Modifier.fillMaxWidth()
+                  .weight(1f)
+                  .background(Color(0xcc212121), shape = RoundedCornerShape(5.dp))
+                  .padding(horizontal = 10.dp, vertical = 2.dp),
+          initialColor = initialColor,
+          ringOuterRadiusFraction = ringOuterRadiusFraction,
+          ringInnerRadiusFraction = ringInnerRadiusFraction,
+          ringBackgroundColor = ringBackgroundColor,
+          ringBorderStrokeColor = ringBorderStrokeColor,
+          ringBorderStrokeWidth = ringBorderStrokeWidth,
+          selectionRadius = selectionRadius,
+      ) { colorChange, hexChange ->
+        color = colorChange
+        hexString = hexChange
+      }
 
-            FloatingActionButton(
-                onClick = {
-                    onDismiss(color, hexString)
-                },
-                backgroundColor = Color.Black
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Close,
-                    contentDescription = null,
-                    tint = Blue400
-                )
-            }
-        }
+      FloatingActionButton(
+          onClick = { onDismiss(color, hexString) },
+          backgroundColor = Color.Black,
+      ) {
+        Icon(imageVector = Icons.Filled.Close, contentDescription = null, tint = Blue400)
+      }
     }
+  }
 }
 
 @Composable
@@ -251,35 +209,29 @@ fun ColorPickerRingHexHSVDialog(
     selectionRadius: Dp = 8.dp,
     dialogBackgroundColor: Color = Color.White,
     dialogShape: Shape = RoundedCornerShape(5.dp),
-    onDismiss: (Color, String) -> Unit
+    onDismiss: (Color, String) -> Unit,
 ) {
 
-    var color by remember { mutableStateOf(initialColor.copy()) }
-    var hexString by remember { mutableStateOf(ColorUtil.colorToHexAlpha(color)) }
+  var color by remember { mutableStateOf(initialColor.copy()) }
+  var hexString by remember { mutableStateOf(ColorUtil.colorToHexAlpha(color)) }
 
-    Dialog(
-        onDismissRequest = {
-            onDismiss(color, hexString)
-        }
+  Dialog(onDismissRequest = { onDismiss(color, hexString) }) {
+    Surface(
+        modifier = modifier,
+        color = dialogBackgroundColor,
+        shape = dialogShape,
+        elevation = 2.dp,
     ) {
-        Surface(
-            modifier = modifier,
-            color = dialogBackgroundColor,
-            shape = dialogShape,
-            elevation = 2.dp
-        ) {
-            ColorPickerRingRectHex(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 8.dp, vertical = 12.dp),
-                initialColor = initialColor,
-                selectionRadius = selectionRadius
-            ) { colorChange, hexChange ->
-                color = colorChange
-                hexString = hexChange
-            }
-        }
+      ColorPickerRingRectHex(
+          modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 12.dp),
+          initialColor = initialColor,
+          selectionRadius = selectionRadius,
+      ) { colorChange, hexChange ->
+        color = colorChange
+        hexString = hexChange
+      }
     }
+  }
 }
 
 @Composable
@@ -289,35 +241,29 @@ fun ColorPickerCircleHSVDialog(
     selectionRadius: Dp = 8.dp,
     dialogBackgroundColor: Color = Color.White,
     dialogShape: Shape = RoundedCornerShape(5.dp),
-    onDismiss: (Color, String) -> Unit
+    onDismiss: (Color, String) -> Unit,
 ) {
 
-    var color by remember { mutableStateOf(initialColor.copy()) }
-    var hexString by remember { mutableStateOf(ColorUtil.colorToHexAlpha(color)) }
+  var color by remember { mutableStateOf(initialColor.copy()) }
+  var hexString by remember { mutableStateOf(ColorUtil.colorToHexAlpha(color)) }
 
-    Dialog(
-        onDismissRequest = {
-            onDismiss(color, hexString)
-        }
+  Dialog(onDismissRequest = { onDismiss(color, hexString) }) {
+    Surface(
+        modifier = modifier,
+        color = dialogBackgroundColor,
+        shape = dialogShape,
+        elevation = 2.dp,
     ) {
-        Surface(
-            modifier = modifier,
-            color = dialogBackgroundColor,
-            shape = dialogShape,
-            elevation = 2.dp
-        ) {
-            ColorPickerCircleValueHSV(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 8.dp, vertical = 12.dp),
-                initialColor = initialColor,
-                selectionRadius = selectionRadius
-            ) { colorChange, hexChange ->
-                color = colorChange
-                hexString = hexChange
-            }
-        }
+      ColorPickerCircleValueHSV(
+          modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 12.dp),
+          initialColor = initialColor,
+          selectionRadius = selectionRadius,
+      ) { colorChange, hexChange ->
+        color = colorChange
+        hexString = hexChange
+      }
     }
+  }
 }
 
 @Composable
@@ -327,33 +273,29 @@ fun ColorPickerSVRectHSVDialog(
     selectionRadius: Dp = 8.dp,
     dialogBackgroundColor: Color = Color.White,
     dialogShape: Shape = RoundedCornerShape(5.dp),
-    onDismiss: (Color, String) -> Unit
+    onDismiss: (Color, String) -> Unit,
 ) {
 
-    var color by remember { mutableStateOf(initialColor.copy()) }
-    var hexString by remember { mutableStateOf(ColorUtil.colorToHexAlpha(color)) }
+  var color by remember { mutableStateOf(initialColor.copy()) }
+  var hexString by remember { mutableStateOf(ColorUtil.colorToHexAlpha(color)) }
 
-    Dialog(
-        onDismissRequest = {
-            onDismiss(color, hexString)
-        }
+  Dialog(onDismissRequest = { onDismiss(color, hexString) }) {
+    Surface(
+        modifier = modifier,
+        color = dialogBackgroundColor,
+        shape = dialogShape,
+        elevation = 2.dp,
     ) {
-        Surface(
-            modifier = modifier,
-            color = dialogBackgroundColor,
-            shape = dialogShape,
-            elevation = 2.dp
-        ) {
-            ColorPickerRectSaturationValueHSV(
-                modifier = Modifier,
-                initialColor = initialColor,
-                selectionRadius = selectionRadius
-            ) { colorChange, hexChange ->
-                color = colorChange
-                hexString = hexChange
-            }
-        }
+      ColorPickerRectSaturationValueHSV(
+          modifier = Modifier,
+          initialColor = initialColor,
+          selectionRadius = selectionRadius,
+      ) { colorChange, hexChange ->
+        color = colorChange
+        hexString = hexChange
+      }
     }
+  }
 }
 
 @Composable
@@ -363,33 +305,29 @@ fun ColorPickerSLRectHSLDialog(
     selectionRadius: Dp = 8.dp,
     dialogBackgroundColor: Color = Color.White,
     dialogShape: Shape = RoundedCornerShape(5.dp),
-    onDismiss: (Color, String) -> Unit
+    onDismiss: (Color, String) -> Unit,
 ) {
 
-    var color by remember { mutableStateOf(initialColor.copy()) }
-    var hexString by remember { mutableStateOf(ColorUtil.colorToHexAlpha(color)) }
+  var color by remember { mutableStateOf(initialColor.copy()) }
+  var hexString by remember { mutableStateOf(ColorUtil.colorToHexAlpha(color)) }
 
-    Dialog(
-        onDismissRequest = {
-            onDismiss(color, hexString)
-        }
+  Dialog(onDismissRequest = { onDismiss(color, hexString) }) {
+    Surface(
+        modifier = modifier,
+        color = dialogBackgroundColor,
+        shape = dialogShape,
+        elevation = 2.dp,
     ) {
-        Surface(
-            modifier = modifier,
-            color = dialogBackgroundColor,
-            shape = dialogShape,
-            elevation = 2.dp
-        ) {
-            ColorPickerRectSaturationLightnessHSL(
-                modifier = Modifier,
-                initialColor = initialColor,
-                selectionRadius = selectionRadius
-            ) { colorChange, hexChange ->
-                color = colorChange
-                hexString = hexChange
-            }
-        }
+      ColorPickerRectSaturationLightnessHSL(
+          modifier = Modifier,
+          initialColor = initialColor,
+          selectionRadius = selectionRadius,
+      ) { colorChange, hexChange ->
+        color = colorChange
+        hexString = hexChange
+      }
     }
+  }
 }
 
 @Composable
@@ -399,33 +337,29 @@ fun ColorPickerHSRectHSVDialog(
     selectionRadius: Dp = 8.dp,
     dialogBackgroundColor: Color = Color.White,
     dialogShape: Shape = RoundedCornerShape(5.dp),
-    onDismiss: (Color, String) -> Unit
+    onDismiss: (Color, String) -> Unit,
 ) {
 
-    var color by remember { mutableStateOf(initialColor.copy()) }
-    var hexString by remember { mutableStateOf(ColorUtil.colorToHexAlpha(color)) }
+  var color by remember { mutableStateOf(initialColor.copy()) }
+  var hexString by remember { mutableStateOf(ColorUtil.colorToHexAlpha(color)) }
 
-    Dialog(
-        onDismissRequest = {
-            onDismiss(color, hexString)
-        }
+  Dialog(onDismissRequest = { onDismiss(color, hexString) }) {
+    Surface(
+        modifier = modifier,
+        color = dialogBackgroundColor,
+        shape = dialogShape,
+        elevation = 2.dp,
     ) {
-        Surface(
-            modifier = modifier,
-            color = dialogBackgroundColor,
-            shape = dialogShape,
-            elevation = 2.dp
-        ) {
-            ColorPickerRectHueSaturationHSV(
-                modifier = Modifier,
-                initialColor = initialColor,
-                selectionRadius = selectionRadius
-            ) { colorChange, hexChange ->
-                color = colorChange
-                hexString = hexChange
-            }
-        }
+      ColorPickerRectHueSaturationHSV(
+          modifier = Modifier,
+          initialColor = initialColor,
+          selectionRadius = selectionRadius,
+      ) { colorChange, hexChange ->
+        color = colorChange
+        hexString = hexChange
+      }
     }
+  }
 }
 
 @Composable
@@ -435,33 +369,29 @@ fun ColorPickerHVRectHSVDialog(
     selectionRadius: Dp = 8.dp,
     dialogBackgroundColor: Color = Color.White,
     dialogShape: Shape = RoundedCornerShape(5.dp),
-    onDismiss: (Color, String) -> Unit
+    onDismiss: (Color, String) -> Unit,
 ) {
 
-    var color by remember { mutableStateOf(initialColor.copy()) }
-    var hexString by remember { mutableStateOf(ColorUtil.colorToHexAlpha(color)) }
+  var color by remember { mutableStateOf(initialColor.copy()) }
+  var hexString by remember { mutableStateOf(ColorUtil.colorToHexAlpha(color)) }
 
-    Dialog(
-        onDismissRequest = {
-            onDismiss(color, hexString)
-        }
+  Dialog(onDismissRequest = { onDismiss(color, hexString) }) {
+    Surface(
+        modifier = modifier,
+        color = dialogBackgroundColor,
+        shape = dialogShape,
+        elevation = 2.dp,
     ) {
-        Surface(
-            modifier = modifier,
-            color = dialogBackgroundColor,
-            shape = dialogShape,
-            elevation = 2.dp
-        ) {
-            ColorPickerRectHueValueHSV(
-                modifier = Modifier,
-                initialColor = initialColor,
-                selectionRadius = selectionRadius
-            ) { colorChange, hexChange ->
-                color = colorChange
-                hexString = hexChange
-            }
-        }
+      ColorPickerRectHueValueHSV(
+          modifier = Modifier,
+          initialColor = initialColor,
+          selectionRadius = selectionRadius,
+      ) { colorChange, hexChange ->
+        color = colorChange
+        hexString = hexChange
+      }
     }
+  }
 }
 
 @Composable
@@ -471,33 +401,29 @@ fun ColorPickerHSRectHSLDialog(
     selectionRadius: Dp = 8.dp,
     dialogBackgroundColor: Color = Color.White,
     dialogShape: Shape = RoundedCornerShape(5.dp),
-    onDismiss: (Color, String) -> Unit
+    onDismiss: (Color, String) -> Unit,
 ) {
 
-    var color by remember { mutableStateOf(initialColor.copy()) }
-    var hexString by remember { mutableStateOf(ColorUtil.colorToHexAlpha(color)) }
+  var color by remember { mutableStateOf(initialColor.copy()) }
+  var hexString by remember { mutableStateOf(ColorUtil.colorToHexAlpha(color)) }
 
-    Dialog(
-        onDismissRequest = {
-            onDismiss(color, hexString)
-        }
+  Dialog(onDismissRequest = { onDismiss(color, hexString) }) {
+    Surface(
+        modifier = modifier,
+        color = dialogBackgroundColor,
+        shape = dialogShape,
+        elevation = 2.dp,
     ) {
-        Surface(
-            modifier = modifier,
-            color = dialogBackgroundColor,
-            shape = dialogShape,
-            elevation = 2.dp
-        ) {
-            ColorPickerRectHueSaturationHSL(
-                modifier = Modifier,
-                initialColor = initialColor,
-                selectionRadius = selectionRadius
-            ) { colorChange, hexChange ->
-                color = colorChange
-                hexString = hexChange
-            }
-        }
+      ColorPickerRectHueSaturationHSL(
+          modifier = Modifier,
+          initialColor = initialColor,
+          selectionRadius = selectionRadius,
+      ) { colorChange, hexChange ->
+        color = colorChange
+        hexString = hexChange
+      }
     }
+  }
 }
 
 @Composable
@@ -507,33 +433,29 @@ fun ColorPickerHLRectHSLDialog(
     selectionRadius: Dp = 8.dp,
     dialogBackgroundColor: Color = Color.White,
     dialogShape: Shape = RoundedCornerShape(5.dp),
-    onDismiss: (Color, String) -> Unit
+    onDismiss: (Color, String) -> Unit,
 ) {
 
-    var color by remember { mutableStateOf(initialColor.copy()) }
-    var hexString by remember { mutableStateOf(ColorUtil.colorToHexAlpha(color)) }
+  var color by remember { mutableStateOf(initialColor.copy()) }
+  var hexString by remember { mutableStateOf(ColorUtil.colorToHexAlpha(color)) }
 
-    Dialog(
-        onDismissRequest = {
-            onDismiss(color, hexString)
-        }
+  Dialog(onDismissRequest = { onDismiss(color, hexString) }) {
+    Surface(
+        modifier = modifier,
+        color = dialogBackgroundColor,
+        shape = dialogShape,
+        elevation = 2.dp,
     ) {
-        Surface(
-            modifier = modifier,
-            color = dialogBackgroundColor,
-            shape = dialogShape,
-            elevation = 2.dp
-        ) {
-            ColorPickerRectHueLightnessHSL(
-                modifier = Modifier,
-                initialColor = initialColor,
-                selectionRadius = selectionRadius
-            ) { colorChange, hexChange ->
-                color = colorChange
-                hexString = hexChange
-            }
-        }
+      ColorPickerRectHueLightnessHSL(
+          modifier = Modifier,
+          initialColor = initialColor,
+          selectionRadius = selectionRadius,
+      ) { colorChange, hexChange ->
+        color = colorChange
+        hexString = hexChange
+      }
     }
+  }
 }
 
 @Composable
@@ -542,29 +464,25 @@ fun ColorPickerM2Dialog(
     initialColor: Color,
     dialogBackgroundColor: Color = Color.White,
     dialogShape: Shape = RoundedCornerShape(5.dp),
-    onDismiss: (Color, String) -> Unit
+    onDismiss: (Color, String) -> Unit,
 ) {
 
-    var color by remember { mutableStateOf(initialColor.copy()) }
-    var hexString by remember { mutableStateOf(ColorUtil.colorToHexAlpha(color)) }
+  var color by remember { mutableStateOf(initialColor.copy()) }
+  var hexString by remember { mutableStateOf(ColorUtil.colorToHexAlpha(color)) }
 
-    Dialog(
-        onDismissRequest = {
-            onDismiss(color, hexString)
-        }
+  Dialog(onDismissRequest = { onDismiss(color, hexString) }) {
+    Surface(
+        modifier = modifier,
+        color = dialogBackgroundColor,
+        shape = dialogShape,
+        elevation = 2.dp,
     ) {
-        Surface(
-            modifier = modifier,
-            color = dialogBackgroundColor,
-            shape = dialogShape,
-            elevation = 2.dp
-        ) {
-            M2ColorPicker { colorChange ->
-                color = colorChange
-                hexString = ColorUtil.colorToHex(color)
-            }
-        }
+      M2ColorPicker { colorChange ->
+        color = colorChange
+        hexString = ColorUtil.colorToHex(color)
+      }
     }
+  }
 }
 
 @Composable
@@ -573,27 +491,23 @@ fun ColorPickerM3Dialog(
     initialColor: Color,
     dialogBackgroundColor: Color = Color.White,
     dialogShape: Shape = RoundedCornerShape(5.dp),
-    onDismiss: (Color, String) -> Unit
+    onDismiss: (Color, String) -> Unit,
 ) {
 
-    var color by remember { mutableStateOf(initialColor.copy()) }
-    var hexString by remember { mutableStateOf(ColorUtil.colorToHexAlpha(color)) }
+  var color by remember { mutableStateOf(initialColor.copy()) }
+  var hexString by remember { mutableStateOf(ColorUtil.colorToHexAlpha(color)) }
 
-    Dialog(
-        onDismissRequest = {
-            onDismiss(color, hexString)
-        }
+  Dialog(onDismissRequest = { onDismiss(color, hexString) }) {
+    Surface(
+        modifier = modifier,
+        color = dialogBackgroundColor,
+        shape = dialogShape,
+        elevation = 2.dp,
     ) {
-        Surface(
-            modifier = modifier,
-            color = dialogBackgroundColor,
-            shape = dialogShape,
-            elevation = 2.dp
-        ) {
-            M3ColorPicker { colorChange ->
-                color = colorChange
-                hexString = ColorUtil.colorToHex(color)
-            }
-        }
+      M3ColorPicker { colorChange ->
+        color = colorChange
+        hexString = ColorUtil.colorToHex(color)
+      }
     }
+  }
 }

@@ -49,5 +49,7 @@ val shortcutsResourceFileTemplate
 
     widgets(TextFieldWidget(fileName))
 
-    recipe = { data: TemplateData -> shortcutsResourceFileRecipe(data as ModuleTemplateData, fileName.value) }
+    recipe = { data: TemplateData ->
+      shortcutsResourceFileRecipe(data as ModuleTemplateData, fileName.value)
+    }
   }

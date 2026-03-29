@@ -40,22 +40,22 @@ class ExtendedMenuToolbar : MaterialToolbar {
 
   constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
 
-  constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(
-    context,
-    attrs,
-    defStyleAttr
-  )
+  constructor(
+      context: Context,
+      attrs: AttributeSet,
+      defStyleAttr: Int,
+  ) : super(context, attrs, defStyleAttr)
 
   override fun onConfigurationChanged(newConfig: Configuration?) {
     super.onConfigurationChanged(newConfig)
 
     viewTreeObserver.addOnGlobalLayoutListener(
-      object: ViewTreeObserver.OnGlobalLayoutListener {
-        override fun onGlobalLayout() {
-          updateMenuDisplay()
-          viewTreeObserver.removeOnGlobalLayoutListener(this)
+        object : ViewTreeObserver.OnGlobalLayoutListener {
+          override fun onGlobalLayout() {
+            updateMenuDisplay()
+            viewTreeObserver.removeOnGlobalLayoutListener(this)
+          }
         }
-      }
     )
   }
 
@@ -96,8 +96,7 @@ class ExtendedMenuToolbar : MaterialToolbar {
       val flag = getShowAsActionFlag(item)
 
       val ignoreItem =
-        flag == MenuItemImpl.SHOW_AS_ACTION_NEVER ||
-        flag == MenuItemImpl.SHOW_AS_ACTION_WITH_TEXT
+          flag == MenuItemImpl.SHOW_AS_ACTION_NEVER || flag == MenuItemImpl.SHOW_AS_ACTION_WITH_TEXT
 
       if (ignoreItem) {
         continue
@@ -118,9 +117,8 @@ class ExtendedMenuToolbar : MaterialToolbar {
   private fun getShowAsActionFlag(item: MenuItem): Int {
     val itemImpl = item as MenuItemImpl
     return if (itemImpl.requiresActionButton()) MenuItemImpl.SHOW_AS_ACTION_ALWAYS
-      else if (itemImpl.requestsActionButton()) MenuItemImpl.SHOW_AS_ACTION_IF_ROOM
-      else if (itemImpl.showsTextAsAction()) MenuItemImpl.SHOW_AS_ACTION_WITH_TEXT
-      else MenuItemImpl.SHOW_AS_ACTION_NEVER
+    else if (itemImpl.requestsActionButton()) MenuItemImpl.SHOW_AS_ACTION_IF_ROOM
+    else if (itemImpl.showsTextAsAction()) MenuItemImpl.SHOW_AS_ACTION_WITH_TEXT
+    else MenuItemImpl.SHOW_AS_ACTION_NEVER
   }
-
 }

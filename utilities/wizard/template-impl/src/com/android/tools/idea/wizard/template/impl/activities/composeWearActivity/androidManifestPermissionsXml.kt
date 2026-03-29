@@ -19,7 +19,7 @@ package com.android.tools.idea.wizard.template.impl.activities.composeWearActivi
 import com.android.tools.idea.wizard.template.renderIf
 
 fun androidManifestWearOsAdditions(useWearSdkLibrary: Boolean) =
-  """
+    """
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.WAKE_LOCK" />

@@ -40,15 +40,19 @@ open class TextureViewAdapter<T : TextureView> : ViewAdapter<T>() {
   private val unsupportedAttrs = arrayOf("background", "foreground")
 
   override fun postCreateAttrHandlers(
-    handlers: MutableMap<String, AttributeHandlerScope<T>.() -> Unit>) {
+      handlers: MutableMap<String, AttributeHandlerScope<T>.() -> Unit>
+  ) {
 
     unsupportedAttrs.forEach(handlers::remove)
   }
 
   override fun createUiWidgets(): List<UiWidget> {
     return listOf(
-      UiWidget(DesignerTextureView::class.java, string.widget_textureview,
-        drawable.ic_widget_textureview)
+        UiWidget(
+            DesignerTextureView::class.java,
+            string.widget_textureview,
+            drawable.ic_widget_textureview,
+        )
     )
   }
 

@@ -33,6 +33,8 @@ import com.itsaky.androidide.lsp.models.MatchLevel
 import com.itsaky.androidide.lsp.models.MatchLevel.NO_MATCH
 import com.itsaky.androidide.progress.ProgressManager.Companion.abortIfCancelled
 import com.squareup.javapoet.MethodSpec.Builder
+import java.nio.file.Path
+import java.util.function.Predicate
 import jdkx.lang.model.element.ElementKind.METHOD
 import jdkx.lang.model.element.ExecutableElement
 import jdkx.lang.model.element.Modifier.FINAL
@@ -43,8 +45,6 @@ import openjdk.source.tree.ClassTree
 import openjdk.source.tree.Tree.Kind.CLASS
 import openjdk.source.util.TreePath
 import openjdk.source.util.Trees
-import java.nio.file.Path
-import java.util.function.Predicate
 
 /**
  * Provides completions using [openjdk.source.tree.Scope].
@@ -52,34 +52,34 @@ import java.util.function.Predicate
  * @author Akash Yadav
  */
 class ScopeCompletionProvider(
-  completingFile: Path,
-  cursor: Long,
-  compiler: JavaCompilerService,
-  settings: IServerSettings,
+    completingFile: Path,
+    cursor: Long,
+    compiler: JavaCompilerService,
+    settings: IServerSettings,
 ) : IJavaCompletionProvider(cursor, completingFile, compiler, settings) {
 
   override fun doComplete(
-    task: CompileTask,
-    path: TreePath,
-    partial: String,
-    endsWithParen: Boolean,
+      task: CompileTask,
+      path: TreePath,
+      partial: String,
+      endsWithParen: Boolean,
   ): CompletionResult {
     val trees = Trees.instance(task.task)
     val list: MutableList<CompletionItem> = ArrayList()
     val scope = trees.getScope(path)
     val filter =
-      Predicate<CharSequence?> {
-        if (it == null || it.isEmpty()) {
-          return@Predicate false
-        }
+        Predicate<CharSequence?> {
+          if (it == null || it.isEmpty()) {
+            return@Predicate false
+          }
 
-        var name = it
-        if (it.contains('(')) {
-          name = it.substring(0, it.lastIndexOf('('))
-        }
+          var name = it
+          if (it.contains('(')) {
+            name = it.substring(0, it.lastIndexOf('('))
+          }
 
-        return@Predicate matchLevel(name, partial) != NO_MATCH
-      }
+          return@Predicate matchLevel(name, partial) != NO_MATCH
+        }
 
     abortIfCancelled()
     abortCompletionIfCancelled()
@@ -115,12 +115,12 @@ class ScopeCompletionProvider(
    * @return The completion item.
    */
   private fun overrideIfPossible(
-    task: CompileTask,
-    parentPath: TreePath,
-    method: ExecutableElement,
-    endsWithParen: Boolean,
-    matchLevel: MatchLevel,
-    partial: String
+      task: CompileTask,
+      parentPath: TreePath,
+      method: ExecutableElement,
+      endsWithParen: Boolean,
+      matchLevel: MatchLevel,
+      partial: String,
   ): CompletionItem {
     if (parentPath.leaf.kind != CLASS) {
       // Can only override if the cursor is directly in a class declaration
@@ -131,21 +131,21 @@ class ScopeCompletionProvider(
     abortCompletionIfCancelled()
     val types = task.task.types
     val parentElement =
-      Trees.instance(task.task).getElement(parentPath)
-        ?: // Can't get further information for overriding this method
-        return method(task, listOf(method), !endsWithParen, matchLevel, partial)
+        Trees.instance(task.task).getElement(parentPath)
+            ?: // Can't get further information for overriding this method
+            return method(task, listOf(method), !endsWithParen, matchLevel, partial)
     val type = parentElement.asType() as DeclaredType
     val enclosing = method.enclosingElement
     val isFinalClass = enclosing.modifiers.contains(FINAL)
     val isNotOverridable =
-      (method.modifiers.contains(STATIC) ||
-          method.modifiers.contains(FINAL) ||
-          method.modifiers.contains(PRIVATE))
+        (method.modifiers.contains(STATIC) ||
+            method.modifiers.contains(FINAL) ||
+            method.modifiers.contains(PRIVATE))
     if (
-      isFinalClass ||
-      isNotOverridable ||
-      !types.isAssignable(type, enclosing.asType()) ||
-      parentPath.leaf !is ClassTree
+        isFinalClass ||
+            isNotOverridable ||
+            !types.isAssignable(type, enclosing.asType()) ||
+            parentPath.leaf !is ClassTree
     ) {
       // Override is not possible
       return method(task, listOf(method), !endsWithParen, matchLevel, partial)

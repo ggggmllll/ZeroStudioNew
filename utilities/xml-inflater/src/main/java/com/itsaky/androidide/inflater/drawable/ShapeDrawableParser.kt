@@ -30,9 +30,9 @@ import android.graphics.drawable.GradientDrawable.Orientation.RIGHT_LEFT
 import android.graphics.drawable.GradientDrawable.Orientation.TL_BR
 import android.graphics.drawable.GradientDrawable.Orientation.TOP_BOTTOM
 import android.graphics.drawable.GradientDrawable.Orientation.TR_BL
+import java.util.Arrays
 import org.jetbrains.annotations.Contract
 import org.xmlpull.v1.XmlPullParser
-import java.util.Arrays
 
 /**
  * Parses a drawable whose root element is `<shape>`. If the parse was successful, returns a
@@ -40,12 +40,15 @@ import java.util.Arrays
  *
  * @author Akash Yadav
  */
-class ShapeDrawableParser protected constructor(parser: XmlPullParser?, minDepth: Int) : IDrawableParser(parser, minDepth) {
+class ShapeDrawableParser protected constructor(parser: XmlPullParser?, minDepth: Int) :
+    IDrawableParser(parser, minDepth) {
   @Throws(Exception::class)
   public override fun parseDrawable(context: Context): Drawable {
     val drawable = GradientDrawable()
     var index = attrIndex("shape")
-    drawable.shape = if (index == -1) GradientDrawable.RECTANGLE else parseShape(parser!!.getAttributeValue(index))
+    drawable.shape =
+        if (index == -1) GradientDrawable.RECTANGLE
+        else parseShape(parser!!.getAttributeValue(index))
     if (isApi29) {
       index = attrIndex("innerRadius")
       drawable.innerRadius = if (index == -1) 0 else parseDimension(context, value(index))
@@ -75,12 +78,15 @@ class ShapeDrawableParser protected constructor(parser: XmlPullParser?, minDepth
     }
     return drawable
   }
-  
+
   private fun parseStroke(context: Context, drawable: GradientDrawable) {
     var index = attrIndex("width")
     var strokeWidth = 0
     if (index != -1) {
-      drawable.setStroke(parseDimension(context, value(index)).also { strokeWidth = it }, Color.TRANSPARENT)
+      drawable.setStroke(
+          parseDimension(context, value(index)).also { strokeWidth = it },
+          Color.TRANSPARENT,
+      )
     }
     index = attrIndex("color")
     var strokeColor = Color.TRANSPARENT
@@ -91,22 +97,30 @@ class ShapeDrawableParser protected constructor(parser: XmlPullParser?, minDepth
     var dashWidth = 0
     if (index != -1) {
       drawable.setStroke(
-        strokeWidth, strokeColor, parseDimension(context, value(index)).also { dashWidth = it }.toFloat(), 0f)
+          strokeWidth,
+          strokeColor,
+          parseDimension(context, value(index)).also { dashWidth = it }.toFloat(),
+          0f,
+      )
     }
     index = attrIndex("dashGap")
     if (index != -1) {
       drawable.setStroke(
-        strokeWidth, strokeColor, dashWidth.toFloat(), parseDimension(context, value(index)).toFloat())
+          strokeWidth,
+          strokeColor,
+          dashWidth.toFloat(),
+          parseDimension(context, value(index)).toFloat(),
+      )
     }
   }
-  
+
   private fun parseSolid(context: Context, drawable: GradientDrawable) {
     val index = attrIndex("color")
     if (index != -1) {
       drawable.setColor(parseColor(context, value(index)))
     }
   }
-  
+
   private fun parseSize(context: Context, drawable: GradientDrawable) {
     var index = attrIndex("width")
     if (index != -1) {
@@ -117,9 +131,9 @@ class ShapeDrawableParser protected constructor(parser: XmlPullParser?, minDepth
       drawable.setSize(drawable.intrinsicWidth, parseDimension(context, value(index)))
     }
   }
-  
+
   private fun parsePadding(context: Context, drawable: GradientDrawable) {
-    
+
     // Padding is available from API 29 only
     if (!isApi29) {
       return
@@ -153,7 +167,7 @@ class ShapeDrawableParser protected constructor(parser: XmlPullParser?, minDepth
       drawable.setPadding(rect.left, rect.top, rect.right, rect.bottom)
     }
   }
-  
+
   private fun parseGradient(context: Context, drawable: GradientDrawable) {
     var index = attrIndex("angle")
     drawable.orientation = if (index == -1) LEFT_RIGHT else parseGradientOrientation(value(index))
@@ -187,11 +201,12 @@ class ShapeDrawableParser protected constructor(parser: XmlPullParser?, minDepth
       drawable.colors = colors
     }
     index = attrIndex("type")
-    drawable.gradientType = if (index == -1) GradientDrawable.LINEAR_GRADIENT else parseGradientType(value(index))
+    drawable.gradientType =
+        if (index == -1) GradientDrawable.LINEAR_GRADIENT else parseGradientType(value(index))
     index = attrIndex("useLevel")
     drawable.useLevel = index != -1 && parseBoolean(value(index))
   }
-  
+
   private fun parseGradientType(value: String): Int {
     return when (value) {
       "radial" -> GradientDrawable.RADIAL_GRADIENT
@@ -200,10 +215,10 @@ class ShapeDrawableParser protected constructor(parser: XmlPullParser?, minDepth
       else -> GradientDrawable.LINEAR_GRADIENT
     }
   }
-  
+
   private fun parseGradientOrientation(value: String): Orientation {
     val angle = value.toInt()
-    
+
     // Angle must be between 0-315 and a multiple of 45
     // Angle moves in anti-clockwise direction
     if (angle == 45) {
@@ -227,10 +242,10 @@ class ShapeDrawableParser protected constructor(parser: XmlPullParser?, minDepth
     return if (angle == 315) {
       TL_BR
     } else LEFT_RIGHT
-    
+
     // Angle 0 or any invalid valid should make the orientation left to right
   }
-  
+
   private fun parseCorners(context: Context, drawable: GradientDrawable) {
     var index = attrIndex("radius")
     drawable.cornerRadius = if (index == -1) 0f else parseDimension(context, value(index)).toFloat()
@@ -265,7 +280,7 @@ class ShapeDrawableParser protected constructor(parser: XmlPullParser?, minDepth
       drawable.cornerRadii = radii
     }
   }
-  
+
   @Contract(pure = true)
   private fun parseShape(value: String): Int {
     return when (value) {

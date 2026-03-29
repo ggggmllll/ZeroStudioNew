@@ -28,10 +28,10 @@ import com.itsaky.androidide.projects.builder.BuildService
 import com.itsaky.androidide.projects.util.findAppModule
 import com.itsaky.androidide.testing.tooling.ToolingApiTestLauncher
 import com.itsaky.androidide.testing.tooling.models.ToolingApiTestLauncherParams
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlinx.coroutines.runBlocking
 import org.junit.Ignore
 import org.robolectric.Robolectric
-import java.util.concurrent.atomic.AtomicBoolean
 
 @Ignore("Test utility provider")
 object XmlInflaterTest {

@@ -80,7 +80,11 @@ open class ProgressBarAdapter<T : ProgressBar> : ViewAdapter<T>() {
 
   override fun createUiWidgets(): List<UiWidget> {
     return listOf(
-      UiWidget(ProgressBar::class.java, string.widget_progressbar, drawable.ic_widget_progress_bar)
+        UiWidget(
+            ProgressBar::class.java,
+            string.widget_progressbar,
+            drawable.ic_widget_progress_bar,
+        )
     )
   }
 }

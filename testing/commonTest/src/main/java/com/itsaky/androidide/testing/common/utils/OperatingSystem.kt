@@ -24,30 +24,18 @@ package com.itsaky.androidide.testing.common.utils
  */
 object OperatingSystem {
 
-  /**
-   * The name of the operating system.
-   */
+  /** The name of the operating system. */
   val OS = System.getProperty("os.name")
 
-  /**
-   * True if the operating system is Windows.
-   */
+  /** True if the operating system is Windows. */
   var IS_WINDOWS: Boolean = OS.indexOf("win") >= 0
 
-  /**
-   * True if the operating system is Mac.
-   */
+  /** True if the operating system is Mac. */
   var IS_MAC: Boolean = OS.indexOf("mac") >= 0
 
-  /**
-   * True if the operating system is Unix.
-   */
-  var IS_UNIX: Boolean = OS.indexOf("nix") >= 0 ||
-    OS.indexOf("nux") >= 0 ||
-    OS.indexOf("aix") > 0
+  /** True if the operating system is Unix. */
+  var IS_UNIX: Boolean = OS.indexOf("nix") >= 0 || OS.indexOf("nux") >= 0 || OS.indexOf("aix") > 0
 
-  /**
-   * True if the operating system is Solaris.
-   */
+  /** True if the operating system is Solaris. */
   var IS_SOLARIS: Boolean = OS.indexOf("sunos") >= 0
 }

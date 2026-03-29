@@ -15,36 +15,31 @@
  *   along with AndroidIDE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 @Suppress("JavaPluginLanguageLevel")
 plugins {
-    id("java-library")
-    id("org.jetbrains.kotlin.jvm")
-    // id("com.google.protobuf")
+  id("java-library")
+  id("org.jetbrains.kotlin.jvm")
+  // id("com.google.protobuf")
 }
-
-
 
 dependencies {
 
-   // implementation("com.google.protobuf:protobuf-kotlin:4.33.2")
-   // implementation("io.grpc:grpc-protobuf:1.78.0")
-   // implementation("io.grpc:grpc-stub:1.78.0")
-   // implementation("io.grpc:grpc-kotlin-stub:1.5.0")
-   compileOnly("javax.annotation:javax.annotation-api:1.3.2")
-   
-   
-    api(projects.logging.logger)
-    api(projects.tooling.events)
-    api(projects.tooling.model)
-    api(projects.utilities.buildInfo)
-    api(projects.utilities.shared)
+  // implementation("com.google.protobuf:protobuf-kotlin:4.33.2")
+  // implementation("io.grpc:grpc-protobuf:1.78.0")
+  // implementation("io.grpc:grpc-stub:1.78.0")
+  // implementation("io.grpc:grpc-kotlin-stub:1.5.0")
+  compileOnly("javax.annotation:javax.annotation-api:1.3.2")
 
-    api(libs.google.gson)
-    api(libs.common.lsp4j.jsonrpc)
-    implementation(libs.common.jkotlin)
+  api(projects.logging.logger)
+  api(projects.tooling.events)
+  api(projects.tooling.model)
+  api(projects.utilities.buildInfo)
+  api(projects.utilities.shared)
+
+  api(libs.google.gson)
+  api(libs.common.lsp4j.jsonrpc)
+  implementation(libs.common.jkotlin)
 }
-
 
 // protobuf {
     // protoc {

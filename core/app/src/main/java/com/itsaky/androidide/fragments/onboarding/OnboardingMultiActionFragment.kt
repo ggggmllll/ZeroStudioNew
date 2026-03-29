@@ -26,9 +26,7 @@ import com.itsaky.androidide.databinding.LayoutOnboardingMultiactionBinding
 import com.itsaky.androidide.models.OnboardingItem
 import com.itsaky.androidide.utils.uncheckedCast
 
-/**
- * @author Akash Yadav
- */
+/** @author Akash Yadav */
 open class OnboardingMultiActionFragment : OnboardingFragment() {
 
   protected var recyclerView: RecyclerView? = null
@@ -40,18 +38,19 @@ open class OnboardingMultiActionFragment : OnboardingFragment() {
 
     @JvmStatic
     fun newInstance(
-      title: CharSequence,
-      subtitle: CharSequence,
-      items: List<OnboardingItem>
+        title: CharSequence,
+        subtitle: CharSequence,
+        items: List<OnboardingItem>,
     ): OnboardingFragment {
       return OnboardingMultiActionFragment().apply {
-        arguments = Bundle().apply {
-          putCharSequence(KEY_ONBOARDING_TITLE, title)
-          putCharSequence(KEY_ONBOARDING_SUBTITLE, subtitle)
+        arguments =
+            Bundle().apply {
+              putCharSequence(KEY_ONBOARDING_TITLE, title)
+              putCharSequence(KEY_ONBOARDING_SUBTITLE, subtitle)
 
-          val arr = items.toTypedArray()
-          putParcelableArray(KEY_ACTION_ITEMS, arr)
-        }
+              val arr = items.toTypedArray()
+              putParcelableArray(KEY_ACTION_ITEMS, arr)
+            }
       }
     }
   }
@@ -67,7 +66,8 @@ open class OnboardingMultiActionFragment : OnboardingFragment() {
       requireArguments().getParcelableArray(KEY_ACTION_ITEMS, T::class.java)!!
     } else {
       uncheckedCast(
-        @Suppress("DEPRECATION") requireArguments().getParcelableArray(KEY_ACTION_ITEMS)!!)
+          @Suppress("DEPRECATION") requireArguments().getParcelableArray(KEY_ACTION_ITEMS)!!
+      )
     }
   }
 

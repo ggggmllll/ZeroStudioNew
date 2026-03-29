@@ -20,6 +20,4 @@ plugins {
   id("java-library")
 }
 
-dependencies {
-  api(projects.buildLogic.common)
-}
+dependencies { api(projects.buildLogic.common) }

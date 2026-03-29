@@ -21,8 +21,10 @@ import com.itsaky.androidide.buildinfo.BuildInfo
 
 const val GITHUB_API_BASE_URL = "https://api.github.com"
 const val GITHUB_API_REPOS_URL = "${GITHUB_API_BASE_URL}/repos"
-const val GITHUB_API_REPO_URL = "${GITHUB_API_REPOS_URL}/${BuildInfo.REPO_OWNER}/${BuildInfo.REPO_NAME}"
+const val GITHUB_API_REPO_URL =
+    "${GITHUB_API_REPOS_URL}/${BuildInfo.REPO_OWNER}/${BuildInfo.REPO_NAME}"
 
 const val GITHUB_RAW_API_BASE_URL = "https://raw.githubusercontent.com"
-const val GITHUB_RAW_API_REPO_URL = "${GITHUB_RAW_API_BASE_URL}/${BuildInfo.REPO_OWNER}/${BuildInfo.REPO_NAME}"
+const val GITHUB_RAW_API_REPO_URL =
+    "${GITHUB_RAW_API_BASE_URL}/${BuildInfo.REPO_OWNER}/${BuildInfo.REPO_NAME}"
 const val GITHUB_RAW_API_REPO_BRANCH_URL = "${GITHUB_RAW_API_REPO_URL}/dev"

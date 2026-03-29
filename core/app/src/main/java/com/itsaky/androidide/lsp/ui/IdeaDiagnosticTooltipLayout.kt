@@ -35,89 +35,94 @@ import io.github.rosemoe.sora.widget.schemes.EditorColorScheme
  */
 class IdeaDiagnosticTooltipLayout : DiagnosticTooltipLayout {
 
-    private lateinit var window: EditorDiagnosticTooltipWindow
-    private lateinit var rootView: LinearLayout
-    private lateinit var messageText: TextView
-    private lateinit var quickfixText: TextView
+  private lateinit var window: EditorDiagnosticTooltipWindow
+  private lateinit var rootView: LinearLayout
+  private lateinit var messageText: TextView
+  private lateinit var quickfixText: TextView
 
-    private var currentDiagnostic: DiagnosticDetail? = null
+  private var currentDiagnostic: DiagnosticDetail? = null
 
-    override fun attach(window: EditorDiagnosticTooltipWindow) {
-        this.window = window
+  override fun attach(window: EditorDiagnosticTooltipWindow) {
+    this.window = window
+  }
+
+  override fun createView(inflater: LayoutInflater): View {
+    val context = window.editor.context
+    val dp = context.resources.displayMetrics.density
+
+    rootView =
+        LinearLayout(context).apply {
+          orientation = LinearLayout.VERTICAL
+          setPadding((10 * dp).toInt(), (8 * dp).toInt(), (10 * dp).toInt(), (8 * dp).toInt())
+        }
+
+    messageText = TextView(context).apply { textSize = 13f }
+
+    quickfixText =
+        TextView(context).apply {
+          textSize = 12f
+          gravity = Gravity.END
+          setPadding(0, (4 * dp).toInt(), 0, 0)
+          visibility = View.GONE
+          setOnClickListener {
+            currentDiagnostic?.quickfixes?.firstOrNull()?.executeQuickfix()
+            window.dismiss()
+          }
+        }
+
+    rootView.addView(messageText)
+    rootView.addView(quickfixText)
+    return rootView
+  }
+
+  override fun applyColorScheme(colorScheme: EditorColorScheme) {
+    val dp = window.editor.context.resources.displayMetrics.density
+    messageText.setTextColor(
+        colorScheme.getColor(EditorColorScheme.DIAGNOSTIC_TOOLTIP_DETAILED_MSG)
+    )
+    quickfixText.setTextColor(colorScheme.getColor(EditorColorScheme.DIAGNOSTIC_TOOLTIP_ACTION))
+
+    val gd =
+        GradientDrawable().apply {
+          cornerRadius = 6 * dp
+          setColor(colorScheme.getColor(EditorColorScheme.DIAGNOSTIC_TOOLTIP_BACKGROUND))
+          setStroke((1 * dp).toInt(), colorScheme.getColor(EditorColorScheme.HOVER_BORDER))
+        }
+    rootView.background = gd
+  }
+
+  override fun renderDiagnostic(diagnostic: DiagnosticDetail?) {
+    currentDiagnostic = diagnostic
+    if (diagnostic == null) {
+      messageText.text = ""
+      quickfixText.visibility = View.GONE
+      return
     }
 
-    override fun createView(inflater: LayoutInflater): View {
-        val context = window.editor.context
-        val dp = context.resources.displayMetrics.density
+    val fullText = diagnostic.detailedMessage ?: diagnostic.briefMessage
+    messageText.text = fullText
 
-        rootView = LinearLayout(context).apply {
-            orientation = LinearLayout.VERTICAL
-            setPadding((10 * dp).toInt(), (8 * dp).toInt(), (10 * dp).toInt(), (8 * dp).toInt())
-        }
-
-        messageText = TextView(context).apply {
-            textSize = 13f
-        }
-        
-        quickfixText = TextView(context).apply {
-            textSize = 12f
-            gravity = Gravity.END
-            setPadding(0, (4 * dp).toInt(), 0, 0)
-            visibility = View.GONE
-            setOnClickListener {
-                currentDiagnostic?.quickfixes?.firstOrNull()?.executeQuickfix()
-                window.dismiss()
-            }
-        }
-
-        rootView.addView(messageText)
-        rootView.addView(quickfixText)
-        return rootView
+    val fixes = diagnostic.quickfixes
+    val firstFix = fixes?.firstOrNull()
+    if (firstFix != null) {
+      quickfixText.visibility = View.VISIBLE
+      quickfixText.text = "Fix: ${firstFix.resolveTitle(window.editor.context)} >"
+    } else {
+      quickfixText.visibility = View.GONE
     }
+  }
 
-    override fun applyColorScheme(colorScheme: EditorColorScheme) {
-        val dp = window.editor.context.resources.displayMetrics.density
-        messageText.setTextColor(colorScheme.getColor(EditorColorScheme.DIAGNOSTIC_TOOLTIP_DETAILED_MSG))
-        quickfixText.setTextColor(colorScheme.getColor(EditorColorScheme.DIAGNOSTIC_TOOLTIP_ACTION))
+  override fun measureContent(maxWidth: Int, maxHeight: Int): Pair<Int, Int> {
+    rootView.measure(
+        View.MeasureSpec.makeMeasureSpec(maxWidth, View.MeasureSpec.AT_MOST),
+        View.MeasureSpec.makeMeasureSpec(maxHeight, View.MeasureSpec.AT_MOST),
+    )
+    return rootView.measuredWidth to rootView.measuredHeight
+  }
 
-        val gd = GradientDrawable().apply {
-            cornerRadius = 6 * dp
-            setColor(colorScheme.getColor(EditorColorScheme.DIAGNOSTIC_TOOLTIP_BACKGROUND))
-            setStroke((1 * dp).toInt(), colorScheme.getColor(EditorColorScheme.HOVER_BORDER))
-        }
-        rootView.background = gd
-    }
+  override fun isPointerOverPopup(): Boolean = false
 
-    override fun renderDiagnostic(diagnostic: DiagnosticDetail?) {
-        currentDiagnostic = diagnostic
-        if (diagnostic == null) {
-            messageText.text = ""
-            quickfixText.visibility = View.GONE
-            return
-        }
+  override fun isMenuShowing(): Boolean = false
 
-        val fullText = diagnostic.detailedMessage ?: diagnostic.briefMessage
-        messageText.text = fullText
-
-        val fixes = diagnostic.quickfixes
-        val firstFix = fixes?.firstOrNull()
-        if (firstFix != null) {
-            quickfixText.visibility = View.VISIBLE
-            quickfixText.text = "Fix: ${firstFix.resolveTitle(window.editor.context)} >"
-        } else {
-            quickfixText.visibility = View.GONE
-        }
-    }
-
-    override fun measureContent(maxWidth: Int, maxHeight: Int): Pair<Int, Int> {
-        rootView.measure(
-            View.MeasureSpec.makeMeasureSpec(maxWidth, View.MeasureSpec.AT_MOST),
-            View.MeasureSpec.makeMeasureSpec(maxHeight, View.MeasureSpec.AT_MOST)
-        )
-        return rootView.measuredWidth to rootView.measuredHeight
-    }
-
-    override fun isPointerOverPopup(): Boolean = false
-    override fun isMenuShowing(): Boolean = false
-    override fun onWindowDismissed() {}
+  override fun onWindowDismissed() {}
 }

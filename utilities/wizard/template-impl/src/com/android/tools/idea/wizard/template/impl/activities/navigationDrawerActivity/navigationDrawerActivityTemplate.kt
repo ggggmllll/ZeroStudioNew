@@ -41,7 +41,13 @@ val navigationDrawerActivityTemplate = template {
 
   category = Category.Activity
   formFactor = FormFactor.Mobile
-  screens = listOf(WizardUiContext.ActivityGallery, WizardUiContext.MenuEntry, WizardUiContext.NewProject, WizardUiContext.NewModule)
+  screens =
+      listOf(
+          WizardUiContext.ActivityGallery,
+          WizardUiContext.MenuEntry,
+          WizardUiContext.NewProject,
+          WizardUiContext.NewModule,
+      )
 
   lateinit var layoutName: StringParameter
 
@@ -66,7 +72,8 @@ val navigationDrawerActivityTemplate = template {
   val isLauncher = booleanParameter {
     name = "Launcher Activity"
     default = false
-    help = "If true, this activity will have a CATEGORY_LAUNCHER intent filter, making it visible in the launcher"
+    help =
+        "If true, this activity will have a CATEGORY_LAUNCHER intent filter, making it visible in the launcher"
   }
 
   val packageName = defaultPackageNameParameter
@@ -122,33 +129,33 @@ val navigationDrawerActivityTemplate = template {
   }
 
   widgets(
-    TextFieldWidget(activityClass),
-    TextFieldWidget(layoutName),
-    CheckBoxWidget(isLauncher),
-    TextFieldWidget(packageName),
-    // Below are invisible widgets. Defining as widgets to impose constraints
-    TextFieldWidget(appBarLayoutName),
-    TextFieldWidget(drawerMenu),
-    TextFieldWidget(navHeaderLayoutName),
-    TextFieldWidget(contentLayoutName),
-    TextFieldWidget(navGraphName),
-    LanguageWidget(),
+      TextFieldWidget(activityClass),
+      TextFieldWidget(layoutName),
+      CheckBoxWidget(isLauncher),
+      TextFieldWidget(packageName),
+      // Below are invisible widgets. Defining as widgets to impose constraints
+      TextFieldWidget(appBarLayoutName),
+      TextFieldWidget(drawerMenu),
+      TextFieldWidget(navHeaderLayoutName),
+      TextFieldWidget(contentLayoutName),
+      TextFieldWidget(navGraphName),
+      LanguageWidget(),
   )
 
   thumb { File("navigation-drawer-activity").resolve("template_blank_activity_drawer.png") }
 
   recipe = { data: TemplateData ->
     generateNavigationDrawer(
-      data = data as ModuleTemplateData,
-      activityClass = activityClass.value,
-      layoutName = layoutName.value,
-      isLauncher = isLauncher.value,
-      packageName = packageName.value,
-      appBarLayoutName = appBarLayoutName.value,
-      navHeaderLayoutName = navHeaderLayoutName.value,
-      drawerMenu = drawerMenu.value,
-      contentLayoutName = contentLayoutName.value,
-      navGraphName = navGraphName.value,
+        data = data as ModuleTemplateData,
+        activityClass = activityClass.value,
+        layoutName = layoutName.value,
+        isLauncher = isLauncher.value,
+        packageName = packageName.value,
+        appBarLayoutName = appBarLayoutName.value,
+        navHeaderLayoutName = navHeaderLayoutName.value,
+        drawerMenu = drawerMenu.value,
+        contentLayoutName = contentLayoutName.value,
+        navGraphName = navGraphName.value,
     )
   }
 }

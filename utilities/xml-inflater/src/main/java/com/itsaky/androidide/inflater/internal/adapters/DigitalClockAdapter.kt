@@ -37,7 +37,11 @@ import com.itsaky.androidide.resources.R.string
 open class DigitalClockAdapter<T : DigitalClock> : TextViewAdapter<T>() {
   override fun createUiWidgets(): List<UiWidget> {
     return listOf(
-      UiWidget(DigitalClock::class.java, string.widget_digital_clock, drawable.ic_widget_text_clock)
+        UiWidget(
+            DigitalClock::class.java,
+            string.widget_digital_clock,
+            drawable.ic_widget_text_clock,
+        )
     )
   }
 }

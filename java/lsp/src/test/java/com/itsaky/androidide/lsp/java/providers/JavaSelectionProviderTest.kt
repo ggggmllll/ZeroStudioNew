@@ -46,8 +46,16 @@ class JavaSelectionProviderTest {
       cursor = requireCursor()
       deleteCursorText()
       dispatchEvent(
-        DocumentChangeEvent(file!!, contents.toString(), contents.toString(), 1, NEW_TEXT, 0,
-          Range.NONE))
+          DocumentChangeEvent(
+              file!!,
+              contents.toString(),
+              contents.toString(),
+              1,
+              NEW_TEXT,
+              0,
+              Range.NONE,
+          )
+      )
 
       val range = findRange()
       val expanded = runBlocking { server.expandSelection(ExpandSelectionParams(file!!, range)) }

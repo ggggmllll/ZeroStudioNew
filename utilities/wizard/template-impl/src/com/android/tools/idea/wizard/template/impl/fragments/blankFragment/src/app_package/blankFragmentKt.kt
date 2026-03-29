@@ -21,13 +21,16 @@ import com.android.tools.idea.wizard.template.getMaterialComponentName
 import com.android.tools.idea.wizard.template.renderIf
 
 fun blankFragmentKt(
-  applicationPackage: String?,
-  className: String,
-  fragmentName: String,
-  packageName: String,
-  useAndroidX: Boolean,
+    applicationPackage: String?,
+    className: String,
+    fragmentName: String,
+    packageName: String,
+    useAndroidX: Boolean,
 ): String {
-  val applicationPackageBlock = renderIf(applicationPackage != null) { "import ${escapeKotlinIdentifier(applicationPackage!!)}.R" }
+  val applicationPackageBlock =
+      renderIf(applicationPackage != null) {
+        "import ${escapeKotlinIdentifier(applicationPackage!!)}.R"
+      }
   return """
 package ${escapeKotlinIdentifier(packageName)}
 

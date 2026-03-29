@@ -64,7 +64,7 @@ class LayoutAttributeCompletionProviderTest : CompletionHelper by CompletionHelp
       assertThat(items).contains("android:layout_marginStart") // from ViewGroup.MarginLayoutParams
     }
   }
-  
+
   @Test // prefix: 'android:l'
   fun `attributes must be completed when namespace is specified as well`() {
     XMLLSPTest.apply {
@@ -82,7 +82,7 @@ class LayoutAttributeCompletionProviderTest : CompletionHelper by CompletionHelp
       assertThat(items).contains("android:layout_marginStart") // from ViewGroup.MarginLayoutParams
     }
   }
-  
+
   @Test // prefix: 'android:margin'
   fun `attributes must be completed with a partial prefix`() {
     XMLLSPTest.apply {
@@ -95,7 +95,7 @@ class LayoutAttributeCompletionProviderTest : CompletionHelper by CompletionHelp
       assertThat(items).contains("android:layout_marginTop") // from ViewGroup.MarginLayoutParams
     }
   }
-  
+
   @Test // prefix: 'padding'
   fun `duplicate attributes must not be included`() {
     XMLLSPTest.apply {
@@ -112,7 +112,7 @@ class LayoutAttributeCompletionProviderTest : CompletionHelper by CompletionHelp
       assertThat(items).doesNotContain("android:padding")
     }
   }
-  
+
   @Test // prefix: 'layout'
   fun `attributes from all defined namespaces must be completed`() {
     XMLLSPTest.apply {
@@ -123,12 +123,13 @@ class LayoutAttributeCompletionProviderTest : CompletionHelper by CompletionHelp
       assertThat(items).contains("material:layout_constraintEnd_toEndOf") // From ConstraintLayout
       assertThat(items).contains("material:layout_constraintEnd_toStartOf") // From ConstraintLayout
       assertThat(items).contains("material:layout_constraintStart_toEndOf") // From ConstraintLayout
-      assertThat(items).contains("material:layout_constraintStart_toStartOf") // From ConstraintLayout
-      assertThat(items).contains("material:layout_constraintHorizontal_bias") // From ConstraintLayout
-      
+      assertThat(items)
+          .contains("material:layout_constraintStart_toStartOf") // From ConstraintLayout
+      assertThat(items)
+          .contains("material:layout_constraintHorizontal_bias") // From ConstraintLayout
     }
   }
-  
+
   @Test // prefix: 'material:layout'
   fun `attributes from the defined namespace must be completed`() {
     XMLLSPTest.apply {
@@ -139,14 +140,16 @@ class LayoutAttributeCompletionProviderTest : CompletionHelper by CompletionHelp
       assertThat(items).contains("material:layout_constraintEnd_toEndOf") // From ConstraintLayout
       assertThat(items).contains("material:layout_constraintEnd_toStartOf") // From ConstraintLayout
       assertThat(items).contains("material:layout_constraintStart_toEndOf") // From ConstraintLayout
-      assertThat(items).contains("material:layout_constraintStart_toStartOf") // From ConstraintLayout
-      assertThat(items).contains("material:layout_constraintHorizontal_bias") // From ConstraintLayout
-      
+      assertThat(items)
+          .contains("material:layout_constraintStart_toStartOf") // From ConstraintLayout
+      assertThat(items)
+          .contains("material:layout_constraintHorizontal_bias") // From ConstraintLayout
+
       // Attributes no other attributes must be included
       assertThat(items.filter { !it.startsWith("material:") }).isEmpty()
     }
   }
-  
+
   @Test // prefix: 'layout'
   fun `attributes from defined auto namespace must be completed`() {
     XMLLSPTest.apply {
@@ -157,12 +160,13 @@ class LayoutAttributeCompletionProviderTest : CompletionHelper by CompletionHelp
       assertThat(items).contains("material:layout_constraintEnd_toEndOf") // From ConstraintLayout
       assertThat(items).contains("material:layout_constraintEnd_toStartOf") // From ConstraintLayout
       assertThat(items).contains("material:layout_constraintStart_toEndOf") // From ConstraintLayout
-      assertThat(items).contains("material:layout_constraintStart_toStartOf") // From ConstraintLayout
-      assertThat(items).contains("material:layout_constraintHorizontal_bias") // From ConstraintLayout
-      
+      assertThat(items)
+          .contains("material:layout_constraintStart_toStartOf") // From ConstraintLayout
+      assertThat(items)
+          .contains("material:layout_constraintHorizontal_bias") // From ConstraintLayout
     }
   }
-  
+
   @Test // prefix: 'material:layout'
   fun `attributes from the defined auto namespace must be completed`() {
     XMLLSPTest.apply {
@@ -173,9 +177,11 @@ class LayoutAttributeCompletionProviderTest : CompletionHelper by CompletionHelp
       assertThat(items).contains("material:layout_constraintEnd_toEndOf") // From ConstraintLayout
       assertThat(items).contains("material:layout_constraintEnd_toStartOf") // From ConstraintLayout
       assertThat(items).contains("material:layout_constraintStart_toEndOf") // From ConstraintLayout
-      assertThat(items).contains("material:layout_constraintStart_toStartOf") // From ConstraintLayout
-      assertThat(items).contains("material:layout_constraintHorizontal_bias") // From ConstraintLayout
-      
+      assertThat(items)
+          .contains("material:layout_constraintStart_toStartOf") // From ConstraintLayout
+      assertThat(items)
+          .contains("material:layout_constraintHorizontal_bias") // From ConstraintLayout
+
       // Attributes no other attributes must be included
       assertThat(items.filter { !it.startsWith("material:") }).isEmpty()
     }

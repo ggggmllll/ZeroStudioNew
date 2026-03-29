@@ -22,22 +22,22 @@ import com.android.tools.idea.wizard.template.impl.activities.common.importViewB
 import com.android.tools.idea.wizard.template.impl.activities.common.layoutToViewBindingClass
 
 fun contentListDetailHostActivityKt(
-  packageName: String,
-  applicationPackage: String?,
-  collection: String,
-  activityLayout: String,
-  navHostFragmentId: String,
-  useAndroidX: Boolean,
-  isViewBindingSupported: Boolean,
+    packageName: String,
+    applicationPackage: String?,
+    collection: String,
+    activityLayout: String,
+    navHostFragmentId: String,
+    useAndroidX: Boolean,
+    isViewBindingSupported: Boolean,
 ): String {
   val layoutName = "activity_${activityLayout}"
   val contentViewBlock =
-    if (isViewBindingSupported)
-      """
+      if (isViewBindingSupported)
+          """
      val binding = ${layoutToViewBindingClass(layoutName)}.inflate(layoutInflater)
      setContentView(binding.root)
   """
-    else "setContentView(R.layout.$layoutName)"
+      else "setContentView(R.layout.$layoutName)"
 
   return """
 package ${escapeKotlinIdentifier(packageName)}

@@ -25,39 +25,39 @@ import org.eclipse.lsp4j.InsertTextFormat
 
 /**
  * Kotlin 补全项提供者。
- * 
- * 作用：拦截 KLS 返回的原始 CompletionItem，对 Snippet 类型的补全项进行参数名还原优化，
- * 然后包装成编辑器可用的 LspCompletionItem。
+ *
+ * 作用：拦截 KLS 返回的原始 CompletionItem，对 Snippet 类型的补全项进行参数名还原优化， 然后包装成编辑器可用的 LspCompletionItem。
  *
  * @author android_zero
  */
 class KotlinCompletionProvider : CompletionItemProvider<CompletionItem> {
 
-    override fun createCompletionItem(
-        completionItem: org.eclipse.lsp4j.CompletionItem,
-        eventManager: LspEventManager,
-        prefixLength: Int
-    ): CompletionItem {
-        
-        // 仅处理 Snippet 类型的补全（通常是函数调用）
-        if (completionItem.insertTextFormat == InsertTextFormat.Snippet) {
-            // 获取原始的插入文本，如果 insertText 为空，则回退到 label
-            val rawInsertText = completionItem.insertText ?: completionItem.label
-            
-            // 执行转换逻辑：p0 -> context
-            val transformedText = KotlinSnippetTransformer.transform(
-                insertText = rawInsertText,
-                detail = completionItem.detail,
-                label = completionItem.label
-            )
+  override fun createCompletionItem(
+      completionItem: org.eclipse.lsp4j.CompletionItem,
+      eventManager: LspEventManager,
+      prefixLength: Int,
+  ): CompletionItem {
 
-            // 应用转换后的文本
-            if (transformedText != null) {
-                completionItem.insertText = transformedText
-            }
-        }
+    // 仅处理 Snippet 类型的补全（通常是函数调用）
+    if (completionItem.insertTextFormat == InsertTextFormat.Snippet) {
+      // 获取原始的插入文本，如果 insertText 为空，则回退到 label
+      val rawInsertText = completionItem.insertText ?: completionItem.label
 
-        // 返回标准的 LSP 补全包装类，交给底层框架渲染 UI
-        return LspCompletionItem(completionItem, eventManager, prefixLength)
+      // 执行转换逻辑：p0 -> context
+      val transformedText =
+          KotlinSnippetTransformer.transform(
+              insertText = rawInsertText,
+              detail = completionItem.detail,
+              label = completionItem.label,
+          )
+
+      // 应用转换后的文本
+      if (transformedText != null) {
+        completionItem.insertText = transformedText
+      }
     }
+
+    // 返回标准的 LSP 补全包装类，交给底层框架渲染 UI
+    return LspCompletionItem(completionItem, eventManager, prefixLength)
+  }
 }

@@ -22,10 +22,10 @@ import java.util.TreeMap
  * resources from libraries and are not validated.
  */
 class ResourceTable(val validateResources: Boolean = false, val logger: BlameLogger? = null) :
-  IResourceTable {
+    IResourceTable {
   /**
-   * The string pool used by this resource table. Values that reference strings must use
-   * this pool to create their strings.
+   * The string pool used by this resource table. Values that reference strings must use this pool
+   * to create their strings.
    */
   val stringPool = StringPool()
 
@@ -41,13 +41,13 @@ class ResourceTable(val validateResources: Boolean = false, val logger: BlameLog
   enum class CollisionResult {
     KEEP_ORIGINAL,
     CONFLICT,
-    TAKE_NEW
+    TAKE_NEW,
   }
 
   data class SearchResult(
-    override val tablePackage: ResourceTablePackage,
-    override val group: ResourceGroup,
-    override val entry: ResourceEntry
+      override val tablePackage: ResourceTablePackage,
+      override val group: ResourceGroup,
+      override val entry: ResourceEntry,
   ) : ISearchResult
 
   /**
@@ -59,16 +59,24 @@ class ResourceTable(val validateResources: Boolean = false, val logger: BlameLog
    * @param product The product for which this value applies.
    * @param value The value associated with the given resource.
    * @return Returns false if and only if the resource was not able to be added. This is caused if
-   *  the resource name failed to be validated or there exists a conflict with a resource already in
-   *  the table.
+   *   the resource name failed to be validated or there exists a conflict with a resource already
+   *   in the table.
    */
   fun addResource(
-    name: ResourceName, config: ConfigDescription, product: String, value: Value
+      name: ResourceName,
+      config: ConfigDescription,
+      product: String,
+      value: Value,
   ): Boolean =
-    addResourceImpl(
-      name, 0, config, product, value, ::resourceNameValidator, ::resolveValueCollision
-    )
-
+      addResourceImpl(
+          name,
+          0,
+          config,
+          product,
+          value,
+          ::resourceNameValidator,
+          ::resolveValueCollision,
+      )
 
   /**
    * Adds a resource to the table with the given id and value.
@@ -80,19 +88,25 @@ class ResourceTable(val validateResources: Boolean = false, val logger: BlameLog
    * @param product The product for which this value applies.
    * @param value The value associated with the given resource.
    * @return Returns false if and only if the resource was not able to be added. This is caused if
-   *  the resource name failed to be validated, there exists a conflict with a resource already in
-   *  the table, or the id is a dynamic id but does not match with the package, type, or entry.
+   *   the resource name failed to be validated, there exists a conflict with a resource already in
+   *   the table, or the id is a dynamic id but does not match with the package, type, or entry.
    */
   fun addResourceWithId(
-    name: ResourceName,
-    id: Int,
-    config: ConfigDescription,
-    product: String,
-    value: Value
+      name: ResourceName,
+      id: Int,
+      config: ConfigDescription,
+      product: String,
+      value: Value,
   ): Boolean =
-    addResourceImpl(
-      name, id, config, product, value, ::resourceNameValidator, ::resolveValueCollision
-    )
+      addResourceImpl(
+          name,
+          id,
+          config,
+          product,
+          value,
+          ::resourceNameValidator,
+          ::resolveValueCollision,
+      )
 
   /**
    * Adds a file reference resource to the table with the given file path.
@@ -103,15 +117,15 @@ class ResourceTable(val validateResources: Boolean = false, val logger: BlameLog
    * @param source The place in source where the reference exists.
    * @param path The path name to the file being referenced.
    * @return Returns false if and only if the resource was not able to be added. This is caused if
-   *  the resource name failed to be validated or there exists a conflict with a resource already in
-   *  the table.
+   *   the resource name failed to be validated or there exists a conflict with a resource already
+   *   in the table.
    */
   fun addFileReference(
-    name: ResourceName, config: ConfigDescription, source: Source, path: String
-  ): Boolean =
-    addFileReferenceImpl(
-      name, config, source, path, null, ::resourceNameValidator
-    )
+      name: ResourceName,
+      config: ConfigDescription,
+      source: Source,
+      path: String,
+  ): Boolean = addFileReferenceImpl(name, config, source, path, null, ::resourceNameValidator)
 
   /**
    * Same as [addFileReference], but doesn't verify the name of the file reference resource. This is
@@ -125,17 +139,16 @@ class ResourceTable(val validateResources: Boolean = false, val logger: BlameLog
    * @param path The path name to the file being referenced.
    * @param file The file object referenced by this resource.
    * @return Returns false if and only if the resource was not able to be added. This is caused if
-   *  the resource name failed to be validated or there exists a conflict with a resource already in
-   *  the table.
+   *   the resource name failed to be validated or there exists a conflict with a resource already
+   *   in the table.
    */
   fun addFileReferenceMangled(
-    name: ResourceName,
-    config: ConfigDescription,
-    source: Source,
-    path: String,
-    file: File
-  ): Boolean =
-    addFileReferenceImpl(name, config, source, path, file, ::skipNameValidator)
+      name: ResourceName,
+      config: ConfigDescription,
+      source: Source,
+      path: String,
+      file: File,
+  ): Boolean = addFileReferenceImpl(name, config, source, path, file, ::skipNameValidator)
 
   /**
    * Same as [addResource], but doesn't verify the name of the resource. This is used when loading
@@ -147,14 +160,15 @@ class ResourceTable(val validateResources: Boolean = false, val logger: BlameLog
    * @param product The product for which this value applies.
    * @param value The value associated with the given resource.
    * @return Returns false if and only if the resource was not able to be added. This is caused if
-   *  there exists a conflict with a resource already in the table.
+   *   there exists a conflict with a resource already in the table.
    */
   fun addResourceMangled(
-    name: ResourceName, config: ConfigDescription, product: String, value: Value
+      name: ResourceName,
+      config: ConfigDescription,
+      product: String,
+      value: Value,
   ): Boolean =
-    addResourceImpl(
-      name, 0, config, product, value, ::skipNameValidator, ::resolveValueCollision
-    )
+      addResourceImpl(name, 0, config, product, value, ::skipNameValidator, ::resolveValueCollision)
 
   /**
    * Same as [addResourceWithId], but doesn't verify the name of the resource. This is used when
@@ -167,19 +181,25 @@ class ResourceTable(val validateResources: Boolean = false, val logger: BlameLog
    * @param product The product for which this value applies.
    * @param value The value associated with the given resource.
    * @return Returns false if and only if the resource was not able to be added. This is caused if
-   *  there exists a conflict with a resource already in the table, or the id is a dynamic id but
-   *  does not match with the package, type, or entry.
+   *   there exists a conflict with a resource already in the table, or the id is a dynamic id but
+   *   does not match with the package, type, or entry.
    */
   fun addResourceWithIdMangled(
-    name: ResourceName,
-    id: Int,
-    config: ConfigDescription,
-    product: String,
-    value: Value
+      name: ResourceName,
+      id: Int,
+      config: ConfigDescription,
+      product: String,
+      value: Value,
   ) =
-    addResourceImpl(
-      name, id, config, product, value, ::skipNameValidator, ::resolveValueCollision
-    )
+      addResourceImpl(
+          name,
+          id,
+          config,
+          product,
+          value,
+          ::skipNameValidator,
+          ::resolveValueCollision,
+      )
 
   /**
    * Sets the resource with the given name to the set visibility. If this resource has no value in
@@ -188,31 +208,31 @@ class ResourceTable(val validateResources: Boolean = false, val logger: BlameLog
    * @param name The full name of the resource, whose visibility will be modified.
    * @param visibility the new Visibility of the resource.
    * @return true, if and only if the visibility was able to be updated. This may not happen if the
-   * visibility has already been set to at least as visible as the new visibility.
+   *   visibility has already been set to at least as visible as the new visibility.
    */
   fun setVisibility(name: ResourceName, visibility: Visibility) =
-    setVisibilityImpl(name, visibility, 0, ::resourceNameValidator)
+      setVisibilityImpl(name, visibility, 0, ::resourceNameValidator)
 
   fun setVisibilityWithId(name: ResourceName, visibility: Visibility, id: Int) =
-    setVisibilityImpl(name, visibility, id, ::resourceNameValidator)
+      setVisibilityImpl(name, visibility, id, ::resourceNameValidator)
 
   fun setVisibilityMangled(name: ResourceName, visibility: Visibility) =
-    setVisibilityImpl(name, visibility, 0, ::skipNameValidator)
+      setVisibilityImpl(name, visibility, 0, ::skipNameValidator)
 
   fun setVisibilityWithIdMangled(name: ResourceName, visibility: Visibility, id: Int) =
-    setVisibilityImpl(name, visibility, id, ::skipNameValidator)
+      setVisibilityImpl(name, visibility, id, ::skipNameValidator)
 
   fun setAllowNew(name: ResourceName, allowNew: AllowNew) =
-    setAllowNewImpl(name, allowNew, ::resourceNameValidator)
+      setAllowNewImpl(name, allowNew, ::resourceNameValidator)
 
   fun setAllowNewMangled(name: ResourceName, allowNew: AllowNew) =
-    setAllowNewImpl(name, allowNew, ::skipNameValidator)
+      setAllowNewImpl(name, allowNew, ::skipNameValidator)
 
   fun setOverlayable(name: ResourceName, overlayable: OverlayableItem) =
-    setOverlayableImpl(name, overlayable, ::resourceNameValidator)
+      setOverlayableImpl(name, overlayable, ::resourceNameValidator)
 
   fun setOverlayableMangled(name: ResourceName, overlayable: OverlayableItem) =
-    setOverlayableImpl(name, overlayable, ::skipNameValidator)
+      setOverlayableImpl(name, overlayable, ::skipNameValidator)
 
   override fun findResource(name: ResourceName): SearchResult? {
     val tablePackage = findPackage(name.pck!!)
@@ -228,13 +248,13 @@ class ResourceTable(val validateResources: Boolean = false, val logger: BlameLog
   }
 
   /**
-   * Returns the package struct with the given name, or null if such a package does not
-   * exist. The empty string is a valid package and typically is used to represent the
-   * 'current' package before it is known to the ResourceTable.
+   * Returns the package struct with the given name, or null if such a package does not exist. The
+   * empty string is a valid package and typically is used to represent the 'current' package before
+   * it is known to the ResourceTable.
    *
    * @param name the name of the package.
-   * @return the [ResourceTablePackage] with the requested name or {@code null} if that package
-   *   does not exist in the table.
+   * @return the [ResourceTablePackage] with the requested name or {@code null} if that package does
+   *   not exist in the table.
    */
   override fun findPackage(name: String): ResourceTablePackage? {
     return packages.find { it.name == name }
@@ -262,8 +282,8 @@ class ResourceTable(val validateResources: Boolean = false, val logger: BlameLog
   }
 
   /**
-   * Attempts to find a package having the specified name and ID. If not found, a new package
-   * of the specified parameters is created and returned.
+   * Attempts to find a package having the specified name and ID. If not found, a new package of the
+   * specified parameters is created and returned.
    */
   fun createPackageAllowingDuplicateNames(name: String, id: Byte): ResourceTablePackage {
     val match = packages.find { it.name == name && it.id == id }
@@ -308,14 +328,16 @@ class ResourceTable(val validateResources: Boolean = false, val logger: BlameLog
   }
 
   private fun validateName(
-    nameValidator: (String) -> String, name: ResourceName, source: Source
+      nameValidator: (String) -> String,
+      name: ResourceName,
+      source: Source,
   ): Boolean {
     val badCodePoint = nameValidator.invoke(name.entry!!)
     if (badCodePoint.isNotEmpty()) {
       logError(
-        blameSource(source),
-        "Resource '$name' has invalid entry name '${name.entry}'. " +
-          "Invalid character '$badCodePoint'."
+          blameSource(source),
+          "Resource '$name' has invalid entry name '${name.entry}'. " +
+              "Invalid character '$badCodePoint'.",
       )
       return false
     }
@@ -323,13 +345,13 @@ class ResourceTable(val validateResources: Boolean = false, val logger: BlameLog
   }
 
   private fun addResourceImpl(
-    name: ResourceName,
-    id: Int,
-    config: ConfigDescription,
-    product: String,
-    value: Value,
-    nameValidator: (String) -> String,
-    conflictResolver: (Value, Value) -> CollisionResult
+      name: ResourceName,
+      id: Int,
+      config: ConfigDescription,
+      product: String,
+      value: Value,
+      nameValidator: (String) -> String,
+      conflictResolver: (Value, Value) -> CollisionResult,
   ): Boolean {
 
     val source = value.source
@@ -342,9 +364,9 @@ class ResourceTable(val validateResources: Boolean = false, val logger: BlameLog
     val packageId = tablePackage.id
     if (id.isValidDynamicId() && packageId != null && id.getPackageId() != packageId) {
       logError(
-        blameSource(value.source),
-        "Failed to add resource '$name' with ID ${id.toString(16)} because " +
-          "package '${tablePackage.name}' already has ID ${packageId.toString(16)}."
+          blameSource(value.source),
+          "Failed to add resource '$name' with ID ${id.toString(16)} because " +
+              "package '${tablePackage.name}' already has ID ${packageId.toString(16)}.",
       )
       return false
     }
@@ -353,25 +375,25 @@ class ResourceTable(val validateResources: Boolean = false, val logger: BlameLog
     val useId = !validateResources && id.isValidDynamicId()
 
     val resourceGroup =
-      tablePackage.findOrCreateGroup(name.type, if (useId) id.getTypeId() else null)
+        tablePackage.findOrCreateGroup(name.type, if (useId) id.getTypeId() else null)
     val groupId = resourceGroup.id
     if (checkId && groupId != null && groupId != id.getTypeId()) {
       logError(
-        blameSource(value.source),
-        "Failed to add resource '$name' with ID ${id.toString(16)} because type " +
-          "'${resourceGroup.type.tagName}' already has ID ${groupId.toString(16)}."
+          blameSource(value.source),
+          "Failed to add resource '$name' with ID ${id.toString(16)} because type " +
+              "'${resourceGroup.type.tagName}' already has ID ${groupId.toString(16)}.",
       )
       return false
     }
 
     val resourceEntry =
-      resourceGroup.findOrCreateEntry(name.entry!!, if (useId) id.getEntryId() else null)
+        resourceGroup.findOrCreateEntry(name.entry!!, if (useId) id.getEntryId() else null)
     val entryId = resourceEntry.id
     if (checkId && entryId != null && id.getEntryId() != entryId) {
       logError(
-        blameSource(value.source),
-        "Failed to add resource '$name' with ID ${id.toString(16)}, because resource already" +
-          " has ID ${resourceIdFromParts(packageId!!, groupId!!, entryId).toString(16)}."
+          blameSource(value.source),
+          "Failed to add resource '$name' with ID ${id.toString(16)}, because resource already" +
+              " has ID ${resourceIdFromParts(packageId!!, groupId!!, entryId).toString(16)}.",
       )
       return false
     }
@@ -386,11 +408,12 @@ class ResourceTable(val validateResources: Boolean = false, val logger: BlameLog
         CollisionResult.TAKE_NEW -> configValue.value = value
         CollisionResult.CONFLICT -> {
           val previousSource =
-            logger?.getOriginalSource(blameSource(oldValue.source)) ?: blameSource(oldValue.source)
+              logger?.getOriginalSource(blameSource(oldValue.source))
+                  ?: blameSource(oldValue.source)
           logError(
-            blameSource(value.source),
-            "Duplicate value for resource '$name' with config '$config' and product '$product'. " +
-              "Resource was previously defined here: $previousSource."
+              blameSource(value.source),
+              "Duplicate value for resource '$name' with config '$config' and product '$product'. " +
+                  "Resource was previously defined here: $previousSource.",
           )
           return false
         }
@@ -409,26 +432,32 @@ class ResourceTable(val validateResources: Boolean = false, val logger: BlameLog
   }
 
   private fun addFileReferenceImpl(
-    name: ResourceName,
-    config: ConfigDescription,
-    source: Source,
-    path: String,
-    file: File?,
-    nameValidator: (String) -> String
+      name: ResourceName,
+      config: ConfigDescription,
+      source: Source,
+      path: String,
+      file: File?,
+      nameValidator: (String) -> String,
   ): Boolean {
     val fileReference = FileReference(stringPool.makeRef(path))
     fileReference.source = source
     fileReference.file = file
     return addResourceImpl(
-      name, 0, config, "", fileReference, nameValidator, ::resolveValueCollision
+        name,
+        0,
+        config,
+        "",
+        fileReference,
+        nameValidator,
+        ::resolveValueCollision,
     )
   }
 
   private fun setVisibilityImpl(
-    name: ResourceName,
-    visibility: Visibility,
-    id: Int,
-    nameValidator: (String) -> String
+      name: ResourceName,
+      visibility: Visibility,
+      id: Int,
+      nameValidator: (String) -> String,
   ): Boolean {
     val source = visibility.source
     if (!validateName(nameValidator, name, source)) {
@@ -439,9 +468,9 @@ class ResourceTable(val validateResources: Boolean = false, val logger: BlameLog
     val packageId = tablePackage.id
     if (id.isValidDynamicId() && packageId != null && id.getPackageId() != packageId) {
       logError(
-        blameSource(source),
-        "Failed to add resource '$name' with ID ${id.toString(16)} because package " +
-          "'${tablePackage.name}' already has ID ${packageId.toString(16)}."
+          blameSource(source),
+          "Failed to add resource '$name' with ID ${id.toString(16)} because package " +
+              "'${tablePackage.name}' already has ID ${packageId.toString(16)}.",
       )
       return false
     }
@@ -450,25 +479,25 @@ class ResourceTable(val validateResources: Boolean = false, val logger: BlameLog
     val useId = !validateResources && id.isValidDynamicId()
 
     val resourceGroup =
-      tablePackage.findOrCreateGroup(name.type, if (useId) id.getTypeId() else null)
+        tablePackage.findOrCreateGroup(name.type, if (useId) id.getTypeId() else null)
     val groupId = resourceGroup.id
     if (checkId && groupId != null && groupId != id.getTypeId()) {
       logError(
-        blameSource(source),
-        "Failed to add resource '$name' with ID ${id.toString(16)} because type " +
-          "'${resourceGroup.type.tagName}' already has ID ${groupId.toString(16)}."
+          blameSource(source),
+          "Failed to add resource '$name' with ID ${id.toString(16)} because type " +
+              "'${resourceGroup.type.tagName}' already has ID ${groupId.toString(16)}.",
       )
       return false
     }
 
     val resourceEntry =
-      resourceGroup.findOrCreateEntry(name.entry!!, if (useId) id.getEntryId() else null)
+        resourceGroup.findOrCreateEntry(name.entry!!, if (useId) id.getEntryId() else null)
     val entryId = resourceEntry.id
     if (checkId && entryId != null && id.getEntryId() != entryId) {
       logError(
-        blameSource(source),
-        "Failed to add resource '$name' with ID ${id.toString(16)}, because resource already " +
-          "has ID ${resourceIdFromParts(packageId!!, groupId!!, entryId).toString(16)}."
+          blameSource(source),
+          "Failed to add resource '$name' with ID ${id.toString(16)}, because resource already " +
+              "has ID ${resourceIdFromParts(packageId!!, groupId!!, entryId).toString(16)}.",
       )
       return false
     }
@@ -486,26 +515,26 @@ class ResourceTable(val validateResources: Boolean = false, val logger: BlameLog
 
     when {
       visibility.level == ResourceVisibility.UNDEFINED &&
-        resourceEntry.visibility.level != ResourceVisibility.UNDEFINED -> {
+          resourceEntry.visibility.level != ResourceVisibility.UNDEFINED -> {
         // We can't undefine a symbol. Ignore
       }
 
       visibility.level == ResourceVisibility.PRIVATE &&
-        resourceEntry.visibility.level == ResourceVisibility.PUBLIC -> {
+          resourceEntry.visibility.level == ResourceVisibility.PUBLIC -> {
         logError(
-          blameSource(source),
-          "Failed to add resource '$name' as private (java-symbol) because it was " +
-            "previously defined as public."
+            blameSource(source),
+            "Failed to add resource '$name' as private (java-symbol) because it was " +
+                "previously defined as public.",
         )
         return false
       }
 
       visibility.level == ResourceVisibility.PUBLIC &&
-        resourceEntry.visibility.level == ResourceVisibility.PRIVATE -> {
+          resourceEntry.visibility.level == ResourceVisibility.PRIVATE -> {
         logError(
-          blameSource(source),
-          "Failed to add resource '$name' as public because it was previously defined as " +
-            "private (java-symbol)."
+            blameSource(source),
+            "Failed to add resource '$name' as public because it was previously defined as " +
+                "private (java-symbol).",
         )
         return false
       }
@@ -520,7 +549,9 @@ class ResourceTable(val validateResources: Boolean = false, val logger: BlameLog
   }
 
   private fun setAllowNewImpl(
-    name: ResourceName, allowNew: AllowNew, nameValidator: (String) -> String
+      name: ResourceName,
+      allowNew: AllowNew,
+      nameValidator: (String) -> String,
   ): Boolean {
     if (!validateName(nameValidator, name, allowNew.source)) {
       return false
@@ -534,7 +565,9 @@ class ResourceTable(val validateResources: Boolean = false, val logger: BlameLog
   }
 
   private fun setOverlayableImpl(
-    name: ResourceName, overlayable: OverlayableItem, nameValidator: (String) -> String
+      name: ResourceName,
+      overlayable: OverlayableItem,
+      nameValidator: (String) -> String,
   ): Boolean {
     if (!validateName(nameValidator, name, overlayable.source)) {
       return false
@@ -547,11 +580,11 @@ class ResourceTable(val validateResources: Boolean = false, val logger: BlameLog
     val oldEntry = entry.overlayable
     if (oldEntry != null) {
       val previousSource =
-        logger?.getOriginalSource(blameSource(oldEntry.source)) ?: blameSource(oldEntry.source)
+          logger?.getOriginalSource(blameSource(oldEntry.source)) ?: blameSource(oldEntry.source)
       logError(
-        blameSource(overlayable.source),
-        "Failed to add overlayable declaration for resource '$name', because resource already " +
-          "has an overlayable defined here: $previousSource."
+          blameSource(overlayable.source),
+          "Failed to add overlayable declaration for resource '$name', because resource already " +
+              "has an overlayable defined here: $previousSource.",
       )
       return false
     }
@@ -564,16 +597,18 @@ class ResourceTable(val validateResources: Boolean = false, val logger: BlameLog
       val existingAttr = existing as? AttributeResource
       val incomingAttr = incoming as? AttributeResource
 
-      incomingAttr ?: return when {
-        incoming.weak -> CollisionResult.KEEP_ORIGINAL
-        existing.weak -> CollisionResult.TAKE_NEW
-        else -> CollisionResult.CONFLICT
-      }
+      incomingAttr
+          ?: return when {
+            incoming.weak -> CollisionResult.KEEP_ORIGINAL
+            existing.weak -> CollisionResult.TAKE_NEW
+            else -> CollisionResult.CONFLICT
+          }
 
-      existingAttr ?: return when {
-        existing.weak -> CollisionResult.TAKE_NEW
-        else -> CollisionResult.CONFLICT
-      }
+      existingAttr
+          ?: return when {
+            existing.weak -> CollisionResult.TAKE_NEW
+            else -> CollisionResult.CONFLICT
+          }
 
       // Attribute specific handling. Since declarations and definitions of attributes can happen
       // almost anywhere, we need special handling to see which definition sticks.
@@ -597,7 +632,7 @@ class ResourceTable(val validateResources: Boolean = false, val logger: BlameLog
     }
 
     fun resourceNameValidator(name: String): String =
-      if (isValidResourceEntryName(name)) "" else name
+        if (isValidResourceEntryName(name)) "" else name
 
     fun skipNameValidator(name: String): String {
       return ""
@@ -607,22 +642,15 @@ class ResourceTable(val validateResources: Boolean = false, val logger: BlameLog
 
 /** the public status of a resource */
 class Visibility(
-  val source: Source = Source(""),
-  val comment: String = "",
-  val level: ResourceVisibility = ResourceVisibility.UNDEFINED
+    val source: Source = Source(""),
+    val comment: String = "",
+    val level: ResourceVisibility = ResourceVisibility.UNDEFINED,
 )
 
 /** Represents <add-resource> in an overlay */
-class AllowNew(
-  val source: Source,
-  val comment: String
-)
+class AllowNew(val source: Source, val comment: String)
 
-class Overlayable(
-  val name: String,
-  val actor: String,
-  val source: Source
-) {
+class Overlayable(val name: String, val actor: String, val source: Source) {
 
   constructor() : this("", "", Source(""))
 
@@ -640,10 +668,10 @@ class Overlayable(
 }
 
 class OverlayableItem(
-  val overlayable: Overlayable,
-  val policies: Int = Policy.NONE,
-  val comment: String = "",
-  val source: Source = Source("")
+    val overlayable: Overlayable,
+    val policies: Int = Policy.NONE,
+    val comment: String = "",
+    val source: Source = Source(""),
 ) {
 
   override fun equals(other: Any?): Boolean {
@@ -682,17 +710,17 @@ class OverlayableItem(
 
 /** Represents all groups by type under a single package. */
 class ResourceTablePackage(override var name: String = "", var id: Byte? = null) :
-  IResourceTablePackage {
+    IResourceTablePackage {
 
   internal val groups = mutableListOf<ResourceGroup>()
 
   override fun findGroup(type: AaptResourceType, groupId: Byte?) =
-    if (groupId != null) {
-      groups.find { type == it.type && groupId == it.id }
-        ?: groups.find { type == it.type && it.id == null }
-    } else {
-      groups.find { type == it.type }
-    }
+      if (groupId != null) {
+        groups.find { type == it.type && groupId == it.id }
+            ?: groups.find { type == it.type && it.id == null }
+      } else {
+        groups.find { type == it.type }
+      }
 
   fun findOrCreateGroup(type: AaptResourceType, groupId: Byte? = null): ResourceGroup {
     val group = findGroup(type, groupId)
@@ -727,7 +755,7 @@ class ResourceGroup(val type: AaptResourceType) : IResourceGroup {
     val styleableContainer = mapEntry.values.first().values
     // Only one Item should be held in the container
     if (styleableContainer.size != 1)
-      error("Too many resources in one entry: ${styleableContainer.size}")
+        error("Too many resources in one entry: ${styleableContainer.size}")
     // The children will be present under the Styleable Item.
     return styleableContainer[0].value!! as Styleable
   }

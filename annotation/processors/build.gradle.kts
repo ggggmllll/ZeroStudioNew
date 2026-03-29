@@ -15,17 +15,10 @@
  *   along with AndroidIDE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-import com.itsaky.androidide.build.config.BuildConfig
-
-plugins {
-  kotlin("jvm")
-}
-
-
+plugins { kotlin("jvm") }
 
 dependencies {
   implementation(kotlin("stdlib"))
@@ -46,9 +39,9 @@ dependencies {
   compileOnly("net.ltgt.gradle.incap:incap:$incap")
   annotationProcessor("net.ltgt.gradle.incap:incap-processor:$incap")
 }
+
 tasks.withType<KotlinCompile>().configureEach {
-    compilerOptions.jvmTarget.set(JvmTarget.JVM_17)
-}
-// tasks.withType<KotlinCompile> {
+  compilerOptions.jvmTarget.set(JvmTarget.JVM_17)
+}// tasks.withType<KotlinCompile> {
   // kotlinOptions.jvmTarget = "17"
 // }

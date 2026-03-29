@@ -18,8 +18,8 @@
 package com.itsaky.androidide.lsp.java.parser.ts
 
 import com.itsaky.androidide.treesitter.TSTree
-import jdkx.tools.JavaFileObject
 import java.net.URI
+import jdkx.tools.JavaFileObject
 
 /**
  * Parse result of [TSJavaParser].

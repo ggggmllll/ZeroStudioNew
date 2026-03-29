@@ -1,17 +1,17 @@
-/*******************************************************************************
- * Copyright (c) 2015-2017 Angelo ZERR.
- * This program and the accompanying materials are made
- * available under the terms of the Eclipse Public License 2.0
- * which is available at https://www.eclipse.org/legal/epl-2.0/
+/**
+ * ****************************************************************************
+ * Copyright (c) 2015-2017 Angelo ZERR. This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0 which is available at
+ * https://www.eclipse.org/legal/epl-2.0/
+ *
  * <p>
  * SPDX-License-Identifier: EPL-2.0
- * <p>
- * Contributors:
- * Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
- * Sebastian Thomschke (Vegard IT GmbH) - add previousLineText support
  *
- ******************************************************************************/
-
+ * <p>
+ * Contributors: Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation Sebastian
+ * Thomschke (Vegard IT GmbH) - add previousLineText support
+ * ****************************************************************************
+ */
 package io.github.rosemoe.sora.langs.monarch.languageconfiguration
 
 import com.squareup.moshi.JsonAdapter
@@ -34,436 +34,427 @@ import io.github.rosemoe.sora.langs.monarch.languageconfiguration.model.OnEnterR
 import kotlin.properties.Delegates
 
 class LanguageConfigurationAdapter : JsonAdapter<LanguageConfiguration>() {
-    override fun fromJson(reader: JsonReader): LanguageConfiguration {
-        reader.isLenient = true
+  override fun fromJson(reader: JsonReader): LanguageConfiguration {
+    reader.isLenient = true
 
-        var comments: CommentRule? = null
+    var comments: CommentRule? = null
 
-        var brackets: List<CharacterPair>? = null
+    var brackets: List<CharacterPair>? = null
 
-        var surroundingPairs: List<BaseAutoClosingPair>? = null
+    var surroundingPairs: List<BaseAutoClosingPair>? = null
 
-        var wordPattern: Regex? = null
+    var wordPattern: Regex? = null
 
-        var indentationRules: IndentationRule? = null
+    var indentationRules: IndentationRule? = null
 
-        var onEnterRules: List<OnEnterRule> = listOf()
+    var onEnterRules: List<OnEnterRule> = listOf()
 
-        var autoCloseBefore: String? = null
+    var autoCloseBefore: String? = null
 
-        var foldingRules: FoldingRules? = null
+    var foldingRules: FoldingRules? = null
 
-        var colorizedBracketPairs: List<CharacterPair>? = null
+    var colorizedBracketPairs: List<CharacterPair>? = null
 
-        var autoClosingPairs: List<AutoClosingPairConditional>? = null
+    var autoClosingPairs: List<AutoClosingPairConditional>? = null
 
-        reader.beginObject()
+    reader.beginObject()
 
-        while (reader.hasNext()) {
-            when (reader.nextName()) {
-                "comments" -> {
-                    comments = readCommentRule(reader)
-                }
-
-                "brackets" -> {
-                    brackets = readBrackets(reader)
-                }
-
-                "colorizedBracketPairs" -> {
-                    colorizedBracketPairs = readBrackets(reader)
-                }
-
-                "surroundingPairs" -> {
-                    surroundingPairs = readSurroundingPairs(reader)
-                }
-
-                "autoClosingPairs" -> {
-                    autoClosingPairs = readAutoClosingPairs(reader)
-                }
-
-                "wordPattern" -> {
-                    wordPattern = readRegex(reader)
-                }
-
-                "indentationRules" -> {
-                    indentationRules = readIndentationRules(reader)
-                }
-
-                "onEnterRules" -> {
-                    onEnterRules = readOnEnterRules(reader)
-                }
-
-                "autoCloseBefore" -> {
-                    autoCloseBefore = reader.nextString()
-                }
-
-                "folding" -> {
-                    foldingRules = readFoldingRules(reader)
-                }
-
-                else -> {
-                    reader.skipValue()
-                }
-            }
+    while (reader.hasNext()) {
+      when (reader.nextName()) {
+        "comments" -> {
+          comments = readCommentRule(reader)
         }
 
-        reader.endObject()
+        "brackets" -> {
+          brackets = readBrackets(reader)
+        }
 
-        return LanguageConfiguration(
-            comments = comments,
-            brackets = brackets,
-            surroundingPairs = surroundingPairs,
-            wordPattern = wordPattern,
-            indentationRules = indentationRules,
-            onEnterRules = onEnterRules,
-            autoCloseBefore = autoCloseBefore,
-            colorizedBracketPairs = colorizedBracketPairs,
-            folding = foldingRules,
-            autoClosingPairs = autoClosingPairs
-        )
+        "colorizedBracketPairs" -> {
+          colorizedBracketPairs = readBrackets(reader)
+        }
 
+        "surroundingPairs" -> {
+          surroundingPairs = readSurroundingPairs(reader)
+        }
+
+        "autoClosingPairs" -> {
+          autoClosingPairs = readAutoClosingPairs(reader)
+        }
+
+        "wordPattern" -> {
+          wordPattern = readRegex(reader)
+        }
+
+        "indentationRules" -> {
+          indentationRules = readIndentationRules(reader)
+        }
+
+        "onEnterRules" -> {
+          onEnterRules = readOnEnterRules(reader)
+        }
+
+        "autoCloseBefore" -> {
+          autoCloseBefore = reader.nextString()
+        }
+
+        "folding" -> {
+          foldingRules = readFoldingRules(reader)
+        }
+
+        else -> {
+          reader.skipValue()
+        }
+      }
     }
 
-    private fun readAutoClosingPairs(reader: JsonReader): List<AutoClosingPairConditional> {
-        reader.beginArray()
+    reader.endObject()
 
-        val list = mutableListOf<AutoClosingPairConditional>()
+    return LanguageConfiguration(
+        comments = comments,
+        brackets = brackets,
+        surroundingPairs = surroundingPairs,
+        wordPattern = wordPattern,
+        indentationRules = indentationRules,
+        onEnterRules = onEnterRules,
+        autoCloseBefore = autoCloseBefore,
+        colorizedBracketPairs = colorizedBracketPairs,
+        folding = foldingRules,
+        autoClosingPairs = autoClosingPairs,
+    )
+  }
 
-        while (reader.hasNext()) {
-            if (reader.peek() == JsonReader.Token.BEGIN_OBJECT) {
-                val pair = readAutoClosingPairConditional(reader, false)
+  private fun readAutoClosingPairs(reader: JsonReader): List<AutoClosingPairConditional> {
+    reader.beginArray()
 
-                list.add(pair)
-            } else {
-                val pair = readAutoClosingPair(reader, false)
+    val list = mutableListOf<AutoClosingPairConditional>()
 
-                list.add(AutoClosingPairConditional(pair.open, pair.close, emptyList()))
-            }
-        }
+    while (reader.hasNext()) {
+      if (reader.peek() == JsonReader.Token.BEGIN_OBJECT) {
+        val pair = readAutoClosingPairConditional(reader, false)
 
-        reader.endArray()
+        list.add(pair)
+      } else {
+        val pair = readAutoClosingPair(reader, false)
 
-        return list
+        list.add(AutoClosingPairConditional(pair.open, pair.close, emptyList()))
+      }
     }
 
-    private fun readFoldingRules(reader: JsonReader): FoldingRules {
-        reader.beginObject()
+    reader.endArray()
 
-        var offSide: Boolean? = null
+    return list
+  }
 
-        var markers: FoldingMarkers? = null
+  private fun readFoldingRules(reader: JsonReader): FoldingRules {
+    reader.beginObject()
 
-        while (reader.hasNext()) {
-            when (reader.nextName()) {
-                "offSide" -> {
-                    offSide = reader.nextBoolean()
-                }
+    var offSide: Boolean? = null
 
-                "markers" -> {
-                    markers = readFoldingMarkers(reader)
-                }
-            }
+    var markers: FoldingMarkers? = null
+
+    while (reader.hasNext()) {
+      when (reader.nextName()) {
+        "offSide" -> {
+          offSide = reader.nextBoolean()
         }
 
-        reader.endObject()
-
-        return FoldingRules(
-            offSide = offSide,
-            markers = markers
-        )
+        "markers" -> {
+          markers = readFoldingMarkers(reader)
+        }
+      }
     }
 
-    private fun readFoldingMarkers(reader: JsonReader): FoldingMarkers {
-        reader.beginObject()
+    reader.endObject()
 
-        var start by Delegates.notNull<Regex>()
-        var end by Delegates.notNull<Regex>()
+    return FoldingRules(offSide = offSide, markers = markers)
+  }
 
-        while (reader.hasNext()) {
-            when (reader.nextName()) {
-                "start" -> {
-                    start = readRegex(reader)
-                }
+  private fun readFoldingMarkers(reader: JsonReader): FoldingMarkers {
+    reader.beginObject()
 
-                "end" -> {
-                    end = readRegex(reader)
-                }
-            }
+    var start by Delegates.notNull<Regex>()
+    var end by Delegates.notNull<Regex>()
+
+    while (reader.hasNext()) {
+      when (reader.nextName()) {
+        "start" -> {
+          start = readRegex(reader)
         }
 
-        reader.endObject()
-
-        return FoldingMarkers(
-            start = start,
-            end = end
-        )
+        "end" -> {
+          end = readRegex(reader)
+        }
+      }
     }
 
+    reader.endObject()
 
-    private fun readOnEnterRules(reader: JsonReader): List<OnEnterRule> {
-        reader.beginArray()
+    return FoldingMarkers(start = start, end = end)
+  }
 
-        val onEnterRules = mutableListOf<OnEnterRule>()
+  private fun readOnEnterRules(reader: JsonReader): List<OnEnterRule> {
+    reader.beginArray()
 
-        while (reader.hasNext()) {
-            reader.beginObject()
+    val onEnterRules = mutableListOf<OnEnterRule>()
 
-            var beforeText by Delegates.notNull<Regex>()
-            var afterText: Regex? = null
-            var action by Delegates.notNull<EnterAction>()
-            var previousLineText: Regex? = null
+    while (reader.hasNext()) {
+      reader.beginObject()
 
-            while (reader.hasNext()) {
-                when (reader.nextName()) {
-                    "beforeText" -> {
-                        beforeText = readRegex(reader)
-                    }
+      var beforeText by Delegates.notNull<Regex>()
+      var afterText: Regex? = null
+      var action by Delegates.notNull<EnterAction>()
+      var previousLineText: Regex? = null
 
-                    "afterText" -> {
-                        afterText = readRegex(reader)
-                    }
+      while (reader.hasNext()) {
+        when (reader.nextName()) {
+          "beforeText" -> {
+            beforeText = readRegex(reader)
+          }
 
-                    "action" -> {
-                        action = readEnterAction(reader)
-                    }
+          "afterText" -> {
+            afterText = readRegex(reader)
+          }
 
-                    "previousLineText" -> {
-                        previousLineText = readRegex(reader)
-                    }
-                }
-            }
+          "action" -> {
+            action = readEnterAction(reader)
+          }
 
-            onEnterRules.add(OnEnterRule(beforeText, afterText, previousLineText, action))
-            reader.endObject()
+          "previousLineText" -> {
+            previousLineText = readRegex(reader)
+          }
         }
+      }
 
-        reader.endArray()
-
-        return onEnterRules
+      onEnterRules.add(OnEnterRule(beforeText, afterText, previousLineText, action))
+      reader.endObject()
     }
 
-    private fun readEnterAction(reader: JsonReader): EnterAction {
-        reader.beginObject()
-        var indentAction by Delegates.notNull<Int>()
-        var appendText: String? = null
-        var removeText: Int? = null
+    reader.endArray()
 
-        while (reader.hasNext()) {
-            when (reader.nextName()) {
-                "indent" -> {
+    return onEnterRules
+  }
 
-                    indentAction = when (reader.nextString()) {
-                        "none" -> IndentAction.None
-                        "indent" -> IndentAction.Indent
-                        "indentOutdent" -> IndentAction.IndentOutdent
-                        "outdent" -> IndentAction.Outdent
-                        else -> throw IllegalArgumentException("Invalid indentAction")
-                    }
-                }
+  private fun readEnterAction(reader: JsonReader): EnterAction {
+    reader.beginObject()
+    var indentAction by Delegates.notNull<Int>()
+    var appendText: String? = null
+    var removeText: Int? = null
 
-                "appendText" -> {
-                    appendText = reader.nextString()
-                }
+    while (reader.hasNext()) {
+      when (reader.nextName()) {
+        "indent" -> {
 
-                "removeText" -> {
-                    removeText = reader.nextInt()
-                }
-            }
+          indentAction =
+              when (reader.nextString()) {
+                "none" -> IndentAction.None
+                "indent" -> IndentAction.Indent
+                "indentOutdent" -> IndentAction.IndentOutdent
+                "outdent" -> IndentAction.Outdent
+                else -> throw IllegalArgumentException("Invalid indentAction")
+              }
         }
-        reader.endObject()
-        return EnterAction(indentAction, appendText, removeText)
+
+        "appendText" -> {
+          appendText = reader.nextString()
+        }
+
+        "removeText" -> {
+          removeText = reader.nextInt()
+        }
+      }
+    }
+    reader.endObject()
+    return EnterAction(indentAction, appendText, removeText)
+  }
+
+  private fun readIndentationRules(reader: JsonReader): IndentationRule {
+    reader.beginObject()
+    var decreaseIndentPattern by Delegates.notNull<Regex>()
+    var increaseIndentPattern by Delegates.notNull<Regex>()
+    var indentNextLinePattern: Regex? = null
+    var unIndentedLinePattern: Regex? = null
+
+    while (reader.hasNext()) {
+      when (reader.nextName()) {
+        "decreaseIndentPattern" -> {
+          decreaseIndentPattern = readRegex(reader)
+        }
+
+        "increaseIndentPattern" -> {
+          increaseIndentPattern = readRegex(reader)
+        }
+
+        "indentNextLinePattern" -> {
+          indentNextLinePattern = readRegex(reader)
+        }
+
+        "unIndentedLinePattern" -> {
+          unIndentedLinePattern = readRegex(reader)
+        }
+      }
     }
 
-    private fun readIndentationRules(reader: JsonReader): IndentationRule {
-        reader.beginObject()
-        var decreaseIndentPattern by Delegates.notNull<Regex>()
-        var increaseIndentPattern by Delegates.notNull<Regex>()
-        var indentNextLinePattern: Regex? = null
-        var unIndentedLinePattern: Regex? = null
+    reader.endObject()
 
-        while (reader.hasNext()) {
-            when (reader.nextName()) {
-                "decreaseIndentPattern" -> {
-                    decreaseIndentPattern = readRegex(reader)
-                }
+    return IndentationRule(
+        decreaseIndentPattern = decreaseIndentPattern,
+        increaseIndentPattern = increaseIndentPattern,
+        indentNextLinePattern = indentNextLinePattern,
+        unIndentedLinePattern = unIndentedLinePattern,
+    )
+  }
 
-                "increaseIndentPattern" -> {
-                    increaseIndentPattern = readRegex(reader)
-                }
-
-                "indentNextLinePattern" -> {
-                    indentNextLinePattern = readRegex(reader)
-                }
-
-                "unIndentedLinePattern" -> {
-                    unIndentedLinePattern = readRegex(reader)
-                }
-            }
-        }
-
-        reader.endObject()
-
-        return IndentationRule(
-            decreaseIndentPattern = decreaseIndentPattern,
-            increaseIndentPattern = increaseIndentPattern,
-            indentNextLinePattern = indentNextLinePattern,
-            unIndentedLinePattern = unIndentedLinePattern
-        )
+  private fun readRegex(reader: JsonReader): Regex {
+    if (reader.peek() == JsonReader.Token.STRING) {
+      return GlobalRegexLib.compile(reader.nextString())
     }
 
+    reader.beginObject()
 
-    private fun readRegex(reader: JsonReader): Regex {
-        if (reader.peek() == JsonReader.Token.STRING) {
-            return GlobalRegexLib.compile(reader.nextString())
+    var pattern by Delegates.notNull<String>()
+
+    while (reader.hasNext()) {
+      when (reader.nextName()) {
+        "pattern" -> {
+          pattern = reader.nextString()
         }
-
-        reader.beginObject()
-
-        var pattern by Delegates.notNull<String>()
-
-        while (reader.hasNext()) {
-            when (reader.nextName()) {
-                "pattern" -> {
-                    pattern = reader.nextString()
-                }
-            }
-        }
-
-        reader.endObject()
-
-        return GlobalRegexLib.compile(pattern)
+      }
     }
 
-    private fun readSurroundingPairs(reader: JsonReader): List<BaseAutoClosingPair> {
-        reader.beginArray()
+    reader.endObject()
 
-        val list = mutableListOf<BaseAutoClosingPair>()
+    return GlobalRegexLib.compile(pattern)
+  }
 
-        while (reader.hasNext()) {
-            list.add(readAutoClosingPair(reader, true))
-        }
+  private fun readSurroundingPairs(reader: JsonReader): List<BaseAutoClosingPair> {
+    reader.beginArray()
 
-        reader.endArray()
+    val list = mutableListOf<BaseAutoClosingPair>()
 
-        return list
+    while (reader.hasNext()) {
+      list.add(readAutoClosingPair(reader, true))
     }
 
-    private fun readAutoClosingPair(
-        reader: JsonReader,
-        isSurroundingPair: Boolean
-    ): BaseAutoClosingPair {
-        if (reader.peek() == JsonReader.Token.BEGIN_OBJECT) {
-            return readAutoClosingPairConditional(reader, isSurroundingPair)
-        }
+    reader.endArray()
 
-        reader.beginArray()
+    return list
+  }
 
-        val open = reader.nextString()
-        val close = reader.nextString()
-
-        if (reader.hasNext()) {
-            val notIn = readStringArray(reader)
-            return AutoClosingPairConditional(open, close, notIn, isSurroundingPair)
-        }
-
-        reader.endArray()
-
-        return AutoClosingPair(open, close, isSurroundingPair)
+  private fun readAutoClosingPair(
+      reader: JsonReader,
+      isSurroundingPair: Boolean,
+  ): BaseAutoClosingPair {
+    if (reader.peek() == JsonReader.Token.BEGIN_OBJECT) {
+      return readAutoClosingPairConditional(reader, isSurroundingPair)
     }
 
-    private fun readAutoClosingPairConditional(
-        reader: JsonReader,
-        isSurroundingPair: Boolean
-    ): AutoClosingPairConditional {
-        reader.beginObject()
+    reader.beginArray()
 
-        var open by Delegates.notNull<String>()
-        var close by Delegates.notNull<String>()
-        var notIn: List<String>? = null
+    val open = reader.nextString()
+    val close = reader.nextString()
 
-        while (reader.hasNext()) {
-            when (reader.nextName()) {
-                "open" -> {
-                    open = reader.nextString()
-                }
+    if (reader.hasNext()) {
+      val notIn = readStringArray(reader)
+      return AutoClosingPairConditional(open, close, notIn, isSurroundingPair)
+    }
 
-                "close" -> {
-                    close = reader.nextString()
-                }
+    reader.endArray()
 
-                "notIn" -> {
-                    notIn = readStringArray(reader)
-                }
-            }
+    return AutoClosingPair(open, close, isSurroundingPair)
+  }
+
+  private fun readAutoClosingPairConditional(
+      reader: JsonReader,
+      isSurroundingPair: Boolean,
+  ): AutoClosingPairConditional {
+    reader.beginObject()
+
+    var open by Delegates.notNull<String>()
+    var close by Delegates.notNull<String>()
+    var notIn: List<String>? = null
+
+    while (reader.hasNext()) {
+      when (reader.nextName()) {
+        "open" -> {
+          open = reader.nextString()
         }
 
-        reader.endObject()
-
-        return AutoClosingPairConditional(open, close, notIn ?: emptyList(), isSurroundingPair)
-    }
-
-    private fun readStringArray(reader: JsonReader): List<String> {
-        reader.beginArray()
-
-        val list = mutableListOf<String>()
-
-        while (reader.hasNext()) {
-            list.add(reader.nextString())
+        "close" -> {
+          close = reader.nextString()
         }
 
-        reader.endArray()
-
-        return list
+        "notIn" -> {
+          notIn = readStringArray(reader)
+        }
+      }
     }
 
-    private fun readBrackets(reader: JsonReader): List<CharacterPair> {
-        reader.beginArray()
+    reader.endObject()
 
-        val list = mutableListOf<CharacterPair>()
+    return AutoClosingPairConditional(open, close, notIn ?: emptyList(), isSurroundingPair)
+  }
 
-        while (reader.hasNext()) {
-            list.add(readCharacterPair(reader))
+  private fun readStringArray(reader: JsonReader): List<String> {
+    reader.beginArray()
+
+    val list = mutableListOf<String>()
+
+    while (reader.hasNext()) {
+      list.add(reader.nextString())
+    }
+
+    reader.endArray()
+
+    return list
+  }
+
+  private fun readBrackets(reader: JsonReader): List<CharacterPair> {
+    reader.beginArray()
+
+    val list = mutableListOf<CharacterPair>()
+
+    while (reader.hasNext()) {
+      list.add(readCharacterPair(reader))
+    }
+
+    reader.endArray()
+
+    return list
+  }
+
+  private fun readCommentRule(reader: JsonReader): CommentRule {
+    reader.beginObject()
+
+    var lineComment: String? = null
+    var blockComment: CharacterPair? = null
+
+    while (reader.hasNext()) {
+      when (reader.nextName()) {
+        "lineComment" -> {
+          lineComment = reader.nextString()
         }
 
-        reader.endArray()
-
-        return list
-    }
-
-    private fun readCommentRule(reader: JsonReader): CommentRule {
-        reader.beginObject()
-
-        var lineComment: String? = null
-        var blockComment: CharacterPair? = null
-
-        while (reader.hasNext()) {
-            when (reader.nextName()) {
-                "lineComment" -> {
-                    lineComment = reader.nextString()
-                }
-
-                "blockComment" -> {
-                    blockComment = readCharacterPair(reader)
-                }
-            }
+        "blockComment" -> {
+          blockComment = readCharacterPair(reader)
         }
-
-        reader.endObject()
-
-        return CommentRule(lineComment, blockComment)
+      }
     }
 
-    private fun readCharacterPair(reader: JsonReader): CharacterPair {
-        reader.beginArray()
+    reader.endObject()
 
-        val first = reader.nextString()
-        val second = reader.nextString()
+    return CommentRule(lineComment, blockComment)
+  }
 
-        reader.endArray()
+  private fun readCharacterPair(reader: JsonReader): CharacterPair {
+    reader.beginArray()
 
-        return CharacterPair(first, second)
-    }
+    val first = reader.nextString()
+    val second = reader.nextString()
 
-    override fun toJson(p0: JsonWriter, p1: LanguageConfiguration?) {}
+    reader.endArray()
 
+    return CharacterPair(first, second)
+  }
+
+  override fun toJson(p0: JsonWriter, p1: LanguageConfiguration?) {}
 }

@@ -47,7 +47,12 @@ val viewModelActivityTemplate
 
     category = Category.Activity
     formFactor = FormFactor.Mobile
-    screens = listOf(WizardUiContext.ActivityGallery, WizardUiContext.MenuEntry, WizardUiContext.NewModule)
+    screens =
+        listOf(
+            WizardUiContext.ActivityGallery,
+            WizardUiContext.MenuEntry,
+            WizardUiContext.NewModule,
+        )
 
     val activityClass = stringParameter {
       name = "Activity Name"
@@ -96,7 +101,8 @@ val viewModelActivityTemplate
     val isLauncher = booleanParameter {
       name = "Launcher Activity"
       default = false
-      help = "If true, this activity will have a CATEGORY_LAUNCHER intent filter, making it visible in the launcher"
+      help =
+          "If true, this activity will have a CATEGORY_LAUNCHER intent filter, making it visible in the launcher"
     }
 
     val packageName = defaultPackageNameParameter
@@ -111,30 +117,30 @@ val viewModelActivityTemplate
     }
 
     widgets(
-      TextFieldWidget(activityClass),
-      TextFieldWidget(activityLayout),
-      TextFieldWidget(fragmentClass),
-      TextFieldWidget(fragmentLayout),
-      TextFieldWidget(viewModelClass),
-      CheckBoxWidget(isLauncher),
-      PackageNameWidget(packageName),
-      TextFieldWidget(fragmentPackage),
-      LanguageWidget(),
+        TextFieldWidget(activityClass),
+        TextFieldWidget(activityLayout),
+        TextFieldWidget(fragmentClass),
+        TextFieldWidget(fragmentLayout),
+        TextFieldWidget(viewModelClass),
+        CheckBoxWidget(isLauncher),
+        PackageNameWidget(packageName),
+        TextFieldWidget(fragmentPackage),
+        LanguageWidget(),
     )
 
     thumb { File("viewmodel-activity").resolve("template_blank_activity.png") }
 
     recipe = { data: TemplateData ->
       viewModelActivityRecipe(
-        data as ModuleTemplateData,
-        activityClass.value,
-        activityLayout.value,
-        fragmentClass.value,
-        fragmentLayout.value,
-        viewModelClass.value,
-        isLauncher.value,
-        packageName.value,
-        fragmentPackage.value,
+          data as ModuleTemplateData,
+          activityClass.value,
+          activityLayout.value,
+          fragmentClass.value,
+          fragmentLayout.value,
+          viewModelClass.value,
+          isLauncher.value,
+          packageName.value,
+          fragmentPackage.value,
       )
     }
   }

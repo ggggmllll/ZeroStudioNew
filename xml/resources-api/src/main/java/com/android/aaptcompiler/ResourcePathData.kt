@@ -48,14 +48,14 @@ import java.util.Locale
  * @param configString the configuration associated with this resource.
  */
 data class ResourcePathData(
-  var source: Source,
-  var extension: String,
-  var name: String,
-  var resourceDirectory: String,
-  // Keep the original and append extra configs at the end.
-  var configString: String,
-  var file: File,
-  var config: ConfigDescription
+    var source: Source,
+    var extension: String,
+    var name: String,
+    var resourceDirectory: String,
+    // Keep the original and append extra configs at the end.
+    var configString: String,
+    var file: File,
+    var config: ConfigDescription,
 ) {
   val type: AaptResourceType? = resourceTypeFromTag(resourceDirectory)
 
@@ -64,38 +64,44 @@ data class ResourcePathData(
   }
 }
 
-fun extractPathData(file: File, sourcePath: String = file.absolutePath) : ResourcePathData {
-  val extension = if (file.name.lowercase().endsWith(".9.png")) {
-    "9.png"
-  } else {
-    file.name.substringAfterLast(".", "")
-  }
+fun extractPathData(file: File, sourcePath: String = file.absolutePath): ResourcePathData {
+  val extension =
+      if (file.name.lowercase().endsWith(".9.png")) {
+        "9.png"
+      } else {
+        file.name.substringAfterLast(".", "")
+      }
   // Again the file name can contain multiple dots, and also because of the '.9.png' we can't just
   // get substringBeforeLast('.').
-  val resName =
-    if (extension.isNotEmpty()) file.name.substringBefore(".$extension")
-    else file.name
+  val resName = if (extension.isNotEmpty()) file.name.substringBefore(".$extension") else file.name
   val source = Source(sourcePath)
   // TODO(b/142481190): think about obfuscation
   val parentName = file.parentFile!!.name
   val type = parentName.substringBefore("-")
-  val config = if (type != parentName) {
-    file.parentFile!!.name.substringAfter(type).substring(1)
-  } else {
-    ""
-  }
+  val config =
+      if (type != parentName) {
+        file.parentFile!!.name.substringAfter(type).substring(1)
+      } else {
+        ""
+      }
 
   val configDescription = parse(config)
 
   return ResourcePathData(
-    source, extension.lowercase(Locale.getDefault()), resName, type, config, file, configDescription
+      source,
+      extension.lowercase(Locale.getDefault()),
+      resName,
+      type,
+      config,
+      file,
+      configDescription,
   )
 }
 
 /**
- * Obtains the renaming for compilation for the given file. When compiling a file, `aapt2`
- * will output a file with a name that depends on the file being compiled, as well as its path.
- * This method will compute what the output name is for a given input.
+ * Obtains the renaming for compilation for the given file. When compiling a file, `aapt2` will
+ * output a file with a name that depends on the file being compiled, as well as its path. This
+ * method will compute what the output name is for a given input.
  *
  * @param f the file
  * @return the new file's name (this will take the file's path into consideration)
@@ -104,8 +110,7 @@ fun extractPathData(file: File, sourcePath: String = file.absolutePath) : Resour
 internal fun compilationRename(f: File): String {
   var fileName = f.name
 
-  val fileParent = f.parentFile
-    ?: error("Could not get parent of file '" + f.absolutePath + "'")
+  val fileParent = f.parentFile ?: error("Could not get parent of file '" + f.absolutePath + "'")
 
   val parentName = fileParent.name
 

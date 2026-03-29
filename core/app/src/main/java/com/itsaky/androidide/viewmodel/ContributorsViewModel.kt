@@ -31,9 +31,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-/**
- * @author Akash Yadav
- */
+/** @author Akash Yadav */
 class ContributorsViewModel : ViewModel() {
 
   internal val _crowdinTranslators = MutableLiveData(emptyList<CrowdinTranslator>())
@@ -51,12 +49,8 @@ class ContributorsViewModel : ViewModel() {
   }
 
   fun observeLoadingState(owner: LifecycleOwner, observer: Observer<Boolean>) {
-    _crowdinTranslatorsLoading.observe(owner) {
-      observer.onChanged(isLoading)
-    }
-    _githubContributorsLoading.observe(owner) {
-      observer.onChanged(isLoading)
-    }
+    _crowdinTranslatorsLoading.observe(owner) { observer.onChanged(isLoading) }
+    _githubContributorsLoading.observe(owner) { observer.onChanged(isLoading) }
   }
 
   fun fetchCrowdinTranslators() {

@@ -26,7 +26,7 @@ import com.itsaky.androidide.databinding.FragmentOnboardingBinding
 import com.itsaky.androidide.fragments.FragmentWithBinding
 
 open class OnboardingFragment :
-  FragmentWithBinding<FragmentOnboardingBinding>(FragmentOnboardingBinding::inflate) {
+    FragmentWithBinding<FragmentOnboardingBinding>(FragmentOnboardingBinding::inflate) {
 
   companion object {
 
@@ -35,14 +35,18 @@ open class OnboardingFragment :
     const val KEY_ONBOARDING_EXTRA_INFO = "ide.onboarding.fragment.extraInfo"
 
     @JvmStatic
-    fun newInstance(title: CharSequence, subtitle: CharSequence,
-      extraInfo: CharSequence = ""): OnboardingFragment {
+    fun newInstance(
+        title: CharSequence,
+        subtitle: CharSequence,
+        extraInfo: CharSequence = "",
+    ): OnboardingFragment {
       return OnboardingFragment().apply {
-        arguments = Bundle().apply {
-          putCharSequence(KEY_ONBOARDING_TITLE, title)
-          putCharSequence(KEY_ONBOARDING_SUBTITLE, subtitle)
-          putCharSequence(KEY_ONBOARDING_EXTRA_INFO, extraInfo)
-        }
+        arguments =
+            Bundle().apply {
+              putCharSequence(KEY_ONBOARDING_TITLE, title)
+              putCharSequence(KEY_ONBOARDING_SUBTITLE, subtitle)
+              putCharSequence(KEY_ONBOARDING_EXTRA_INFO, extraInfo)
+            }
       }
     }
   }
@@ -54,9 +58,7 @@ open class OnboardingFragment :
 
     val extraInfo = requireArguments().getCharSequence(KEY_ONBOARDING_EXTRA_INFO, "")
     if (extraInfo.isBlank()) {
-      binding.onboardingExtraInfo.updateLayoutParams<ViewGroup.LayoutParams> {
-        height = 0
-      }
+      binding.onboardingExtraInfo.updateLayoutParams<ViewGroup.LayoutParams> { height = 0 }
     } else {
       binding.onboardingExtraInfo.movementMethod = LinkMovementMethodCompat.getInstance()
       binding.onboardingExtraInfo.text = extraInfo

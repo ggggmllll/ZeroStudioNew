@@ -19,13 +19,13 @@ package com.itsaky.androidide.xml.internal.versions
 
 import androidx.collection.mutableIntObjectMapOf
 import com.itsaky.androidide.xml.versions.ApiVersion
+import java.io.InputStream
 import jaxp.xml.namespace.QName
 import jaxp.xml.stream.XMLInputFactory
 import jaxp.xml.stream.events.Attribute
 import jaxp.xml.stream.events.EndElement
 import jaxp.xml.stream.events.StartElement
 import org.slf4j.LoggerFactory
-import java.io.InputStream
 
 /**
  * Parser for parsing `api-versions.xml` file from the Android SDK and building [ApiVersion] models.
@@ -37,9 +37,11 @@ open class ApiVersionsParser {
   // A cache to store the ApiVersion instances with different values
   // For example, if two classes have the same value for `since`,
   // 'removed' and 'deprecated', then the same ApiVersion instance
-  // will be used for the two classes. To prevent value corruption, ApiVersion instances are immutable.
+  // will be used for the two classes. To prevent value corruption, ApiVersion instances are
+  // immutable.
   // The keys in this map are the packed (bitwise ORed) values of the three version integers.
-  // The first 8 bits are 0, the next 8 bits represent 'since', the next 8 bits represent 'deprecated'
+  // The first 8 bits are 0, the next 8 bits represent 'since', the next 8 bits represent
+  // 'deprecated'
   // and the last 8 bits represent 'removed'.
   private val apiInfosCache = mutableIntObjectMapOf<ApiVersion>()
 
@@ -82,11 +84,8 @@ open class ApiVersionsParser {
     onFinishParse()
   }
 
-  /**
-   * Called when the parser is done parsing the `api-versions.xml` file.
-   */
-  protected open fun onFinishParse() {
-  }
+  /** Called when the parser is done parsing the `api-versions.xml` file. */
+  protected open fun onFinishParse() {}
 
   private fun consumeStartElement(event: StartElement) {
     when (event.name.localPart) {
@@ -98,30 +97,20 @@ open class ApiVersionsParser {
   }
 
   private fun consumeClass(event: StartElement) {
-    checkNotNull(apiVersion) {
-      "<class> element must be inside <api> element"
-    }
+    checkNotNull(apiVersion) { "<class> element must be inside <api> element" }
 
-    check(currentClass == null) {
-      "<class> elements cannot be nested"
-    }
+    check(currentClass == null) { "<class> elements cannot be nested" }
 
     val (name, versions) = event.parseAttrs()
-    check(!isDuplicateClass(name)) {
-      "Duplicate class entry: $name"
-    }
+    check(!isDuplicateClass(name)) { "Duplicate class entry: $name" }
 
-    val apiInfo = apiInfosCache.getOrPut(versions) {
-      createApiInfo(versions)
-    }
+    val apiInfo = apiInfosCache.getOrPut(versions) { createApiInfo(versions) }
 
     consumeClassVersionInfo(name, apiInfo)
     this.currentClass = name
   }
 
-  /**
-   * Check if the given class name is a duplicate.
-   */
+  /** Check if the given class name is a duplicate. */
   protected open fun isDuplicateClass(name: String): Boolean {
     return false
   }
@@ -136,18 +125,15 @@ open class ApiVersionsParser {
 
   private fun consumeMember(event: StartElement, memberType: String) {
     val (name, versions) = event.parseAttrs()
-    val currentClass = checkNotNull(currentClass) {
-      "<${memberType}> element must be inside <class> element"
-    }
+    val currentClass =
+        checkNotNull(currentClass) { "<${memberType}> element must be inside <class> element" }
     check(!isDuplicateMember(currentClass, name)) {
       "Duplicate $memberType entry in class $currentClass: $name"
     }
     consumeMemberVersionInfo(currentClass, name, memberType, createApiInfo(versions))
   }
 
-  /**
-   * Check if the given member of the given class is a duplicate.
-   */
+  /** Check if the given member of the given class is a duplicate. */
   protected open fun isDuplicateMember(className: String, memberName: String): Boolean {
     return false
   }
@@ -156,17 +142,17 @@ open class ApiVersionsParser {
    * Consume [ApiVersion] info for a member of a class.
    *
    * @param className The name of the class which declares this member.
-   * @param member The identifier of the member. This is the name of the field and the method signature for methods.
+   * @param member The identifier of the member. This is the name of the field and the method
+   *   signature for methods.
    * @param memberType The type of member. This may be "field" or "method".
    * @param apiVersion The [ApiVersion] info.
    */
   protected open fun consumeMemberVersionInfo(
-    className: String,
-    member: String,
-    memberType: String,
-    apiVersion: ApiVersion
-  ) {
-  }
+      className: String,
+      member: String,
+      memberType: String,
+      apiVersion: ApiVersion,
+  ) {}
 
   private fun consumeEndElement(element: EndElement) {
     when (element.name.localPart) {
@@ -192,9 +178,7 @@ open class ApiVersionsParser {
       }
     }
 
-    checkNotNull(name) {
-      "Missing name attribute"
-    }
+    checkNotNull(name) { "Missing name attribute" }
 
     // Android API versions would not exceed 255, right?
     check(since in 1..255 && deprecated in 0..255 && removed in 0..255) {

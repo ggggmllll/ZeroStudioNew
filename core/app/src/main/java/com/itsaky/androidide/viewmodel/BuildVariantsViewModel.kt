@@ -43,20 +43,14 @@ class BuildVariantsViewModel : ViewModel() {
       this._updatedBuildVariants.value = value
     }
 
-  /**
-   * Resets the updated selections.
-   */
+  /** Resets the updated selections. */
   internal fun resetUpdatedSelections() {
     updatedBuildVariants = updatedBuildVariants.also { it.clear() }
   }
 
   fun updateModuleConfig(projectPath: String, updatedInfo: BuildVariantInfo) {
-    buildVariants = buildVariants.toMutableMap().apply {
-      put(projectPath, updatedInfo)
-    }
-    
-    updatedBuildVariants = updatedBuildVariants.also {
-      it[projectPath] = updatedInfo
-    }
+    buildVariants = buildVariants.toMutableMap().apply { put(projectPath, updatedInfo) }
+
+    updatedBuildVariants = updatedBuildVariants.also { it[projectPath] = updatedInfo }
   }
 }

@@ -45,11 +45,11 @@ import com.itsaky.androidide.tooling.api.messages.result.TaskExecutionResult.Fai
 import com.itsaky.androidide.tooling.api.messages.result.TaskExecutionResult.Failure.UNSUPPORTED_GRADLE_VERSION
 import com.itsaky.androidide.tooling.api.models.ToolingServerMetadata
 import com.itsaky.androidide.tooling.impl.internal.ProjectImpl
+import com.itsaky.androidide.tooling.impl.net.SimpleHttpProxy
 import com.itsaky.androidide.tooling.impl.sync.ModelBuilderException
 import com.itsaky.androidide.tooling.impl.sync.RootModelBuilder
 import com.itsaky.androidide.tooling.impl.sync.RootProjectModelBuilderParams
 import com.itsaky.androidide.utils.StopWatch
-import com.itsaky.androidide.tooling.impl.net.SimpleHttpProxy
 import java.io.File
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CompletionException
@@ -428,7 +428,9 @@ internal class ToolingApiServerImpl(private val project: ProjectImpl) : ITooling
       }
 
   private inline fun <T : Any?> supplyAsync(crossinline action: () -> T): CompletableFuture<T> =
-      CompletableFuture.supplyAsync { action() }
+      CompletableFuture.supplyAsync {
+        action()
+      }
 
   private inline fun <T : Any?> runBuild(crossinline action: () -> T): CompletableFuture<T> =
       supplyAsync {

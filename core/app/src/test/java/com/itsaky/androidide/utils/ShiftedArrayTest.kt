@@ -24,9 +24,7 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
-/**
- * @author Akash Yadav
- */
+/** @author Akash Yadav */
 @RunWith(RobolectricTestRunner::class)
 @Config(application = Application::class)
 class ShiftedArrayTest {
@@ -37,10 +35,11 @@ class ShiftedArrayTest {
     val array = MutableShiftedLongArray(backing)
     for (s in 0..<array.size) {
       val sh = array.shift
-      val add = if (s > 0) {
-        array.shift(1)
-        1
-      } else 0
+      val add =
+          if (s > 0) {
+            array.shift(1)
+            1
+          } else 0
       for (i in 0..<array.size) {
         assertThat(array[i]).isEqualTo(backing[(sh + i + add) % backing.size])
       }

@@ -32,14 +32,17 @@ import com.android.tools.idea.wizard.template.TextFieldWidget
 import com.android.tools.idea.wizard.template.WizardUiContext
 import com.android.tools.idea.wizard.template.enumParameter
 import com.android.tools.idea.wizard.template.fragmentToLayout
-import com.itsaky.androidide.templates.impl.androidstudio.activities.common.MIN_API
-import com.itsaky.androidide.templates.impl.androidstudio.defaultPackageNameParameter
 import com.android.tools.idea.wizard.template.stringParameter
 import com.android.tools.idea.wizard.template.template
+import com.itsaky.androidide.templates.impl.androidstudio.activities.common.MIN_API
+import com.itsaky.androidide.templates.impl.androidstudio.defaultPackageNameParameter
 import java.io.File
 import java.util.Locale
 
-/** Possible values for the AdFormat. Values are in camel case intentionally to be shown in the combo box. */
+/**
+ * Possible values for the AdFormat. Values are in camel case intentionally to be shown in the combo
+ * box.
+ */
 enum class AdFormat {
   Interstitial,
   Banner,
@@ -74,25 +77,34 @@ val googleAdMobAdsFragmentTemplate
     }
 
     val adFormat =
-      enumParameter<AdFormat> {
-        name = "Ad Format"
-        default = AdFormat.Interstitial
-        help = "Select Interstitial Ad or Banner Ad"
-      }
+        enumParameter<AdFormat> {
+          name = "Ad Format"
+          default = AdFormat.Interstitial
+          help = "Select Interstitial Ad or Banner Ad"
+        }
 
     val packageName = defaultPackageNameParameter
 
     widgets(
-      TextFieldWidget(fragmentClass),
-      TextFieldWidget(layoutName),
-      EnumWidget(adFormat),
-      PackageNameWidget(packageName),
-      LanguageWidget(),
+        TextFieldWidget(fragmentClass),
+        TextFieldWidget(layoutName),
+        EnumWidget(adFormat),
+        PackageNameWidget(packageName),
+        LanguageWidget(),
     )
 
-    thumb { File("google-admob-ads-fragment").resolve("template_admob_fragment_" + adFormat.value.name.lowercase(Locale.US) + ".png") }
+    thumb {
+      File("google-admob-ads-fragment")
+          .resolve("template_admob_fragment_" + adFormat.value.name.lowercase(Locale.US) + ".png")
+    }
 
     recipe = { data: TemplateData ->
-      googleAdMobAdsFragmentRecipe(data as ModuleTemplateData, fragmentClass.value, layoutName.value, adFormat.value, packageName.value)
+      googleAdMobAdsFragmentRecipe(
+          data as ModuleTemplateData,
+          fragmentClass.value,
+          layoutName.value,
+          adFormat.value,
+          packageName.value,
+      )
     }
   }

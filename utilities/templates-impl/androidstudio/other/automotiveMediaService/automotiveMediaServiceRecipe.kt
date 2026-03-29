@@ -27,11 +27,11 @@ import com.itsaky.androidide.templates.impl.androidstudio.other.automotiveMediaS
 import java.io.File
 
 fun RecipeExecutor.automotiveMediaServiceRecipe(
-  moduleData: ModuleTemplateData,
-  mediaBrowserServiceName: String,
-  packageName: String,
-  useCustomTheme: Boolean,
-  customThemeName: String,
+    moduleData: ModuleTemplateData,
+    mediaBrowserServiceName: String,
+    packageName: String,
+    useCustomTheme: Boolean,
+    customThemeName: String,
 ) {
   val projectData = moduleData.projectTemplateData
   val appCompatVersion = moduleData.apis.appCompatVersion
@@ -52,29 +52,33 @@ fun RecipeExecutor.automotiveMediaServiceRecipe(
   if (projectData.isNewProject) {
     addIncludeToSettings(sharedModule)
     serviceManifestOut = projectData.rootDir.resolve(sharedModule).resolve(relativeManifestDir)
-    serviceSrcOut = projectData.rootDir.resolve(sharedModule).resolve(relativeSrcDir).resolve(sharedModule)
+    serviceSrcOut =
+        projectData.rootDir.resolve(sharedModule).resolve(relativeSrcDir).resolve(sharedModule)
     serviceResOut = projectData.rootDir.resolve(sharedModule).resolve(relativeResDir)
     sharedPackageName = "$packageName.$sharedModule"
 
     save(
-      // TODO(b/419624430): This should be created through a gradle build model instead of
-      // creating from text,
-      // creating this way given that this is the only place to create a build.gradle for anther
-      // module.
-      source =
-        buildGradle(
-          projectData = projectData,
-          packageName = sharedPackageName,
-          buildApi = apis.buildApi,
-          minApi = apis.minApi,
-          targetApi = apis.targetApi,
-        ),
-      to = projectData.rootDir.resolve(sharedModule).resolve("build.gradle"),
+        // TODO(b/419624430): This should be created through a gradle build model instead of
+        // creating from text,
+        // creating this way given that this is the only place to create a build.gradle for anther
+        // module.
+        source =
+            buildGradle(
+                projectData = projectData,
+                packageName = sharedPackageName,
+                buildApi = apis.buildApi,
+                minApi = apis.minApi,
+                targetApi = apis.targetApi,
+            ),
+        to = projectData.rootDir.resolve(sharedModule).resolve("build.gradle"),
     )
-    setJavaKotlinCompileOptions(projectData.language == Language.Kotlin, projectData.rootDir.resolve(sharedModule))
+    setJavaKotlinCompileOptions(
+        projectData.language == Language.Kotlin,
+        projectData.rootDir.resolve(sharedModule),
+    )
     addDependency(
-      mavenCoordinate = "com.android.support:support-media-compat:${appCompatVersion}.+",
-      moduleDir = projectData.rootDir.resolve(sharedModule),
+        mavenCoordinate = "com.android.support:support-media-compat:${appCompatVersion}.+",
+        moduleDir = projectData.rootDir.resolve(sharedModule),
     )
     // TODO: It may be better to not rely on the hard-coded module name
     addModuleDependency("implementation", sharedModule, projectData.rootDir.resolve("mobile"))
@@ -89,8 +93,13 @@ fun RecipeExecutor.automotiveMediaServiceRecipe(
   }
   /* Create Media Service */
   mergeXml(
-    androidManifestXml(customThemeName, mediaBrowserServiceName, sharedPackageName, useCustomTheme),
-    serviceManifestOut.resolve("AndroidManifest.xml"),
+      androidManifestXml(
+          customThemeName,
+          mediaBrowserServiceName,
+          sharedPackageName,
+          useCustomTheme,
+      ),
+      serviceManifestOut.resolve("AndroidManifest.xml"),
   )
 
   if (useCustomTheme) {
@@ -99,10 +108,10 @@ fun RecipeExecutor.automotiveMediaServiceRecipe(
   mergeXml(automotiveAppDescXml(), serviceResOut.resolve("xml/automotive_app_desc.xml"))
 
   val musicService =
-    when (projectData.language) {
-      Language.Java -> musicServiceJava(mediaBrowserServiceName, sharedPackageName, useAndroidX)
-      Language.Kotlin -> musicServiceKt(mediaBrowserServiceName, sharedPackageName, useAndroidX)
-    }
+      when (projectData.language) {
+        Language.Java -> musicServiceJava(mediaBrowserServiceName, sharedPackageName, useAndroidX)
+        Language.Kotlin -> musicServiceKt(mediaBrowserServiceName, sharedPackageName, useAndroidX)
+      }
   save(musicService, serviceSrcOut.resolve("${mediaBrowserServiceName}.${ktOrJavaExt}"))
   open(serviceSrcOut.resolve("${mediaBrowserServiceName}.${ktOrJavaExt}"))
   if (useCustomTheme) {

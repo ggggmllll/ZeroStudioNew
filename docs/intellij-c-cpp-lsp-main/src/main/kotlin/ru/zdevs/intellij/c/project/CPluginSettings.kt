@@ -10,25 +10,25 @@ import com.intellij.util.xmlb.XmlSerializerUtil
 @State(
     name = "CPluginSettings",
     storages = [Storage("CPluginSettings.xml")],
-    category = SettingsCategory.PLUGINS
+    category = SettingsCategory.PLUGINS,
 )
 class CPluginSettings : PersistentStateComponent<CPluginSettings> {
-    var languageType: String = CProject.LANGUAGE_C
-    var buildSystem: String = CProject.BUILD_SYSTEM_MAKEFILE
-    var toolChain: ArrayList<String> = ArrayList()
+  var languageType: String = CProject.LANGUAGE_C
+  var buildSystem: String = CProject.BUILD_SYSTEM_MAKEFILE
+  var toolChain: ArrayList<String> = ArrayList()
 
-    override fun getState(): CPluginSettings {
-        return this
-    }
+  override fun getState(): CPluginSettings {
+    return this
+  }
 
-    override fun loadState(state: CPluginSettings) {
-        XmlSerializerUtil.copyBean(state, this)
-    }
+  override fun loadState(state: CPluginSettings) {
+    XmlSerializerUtil.copyBean(state, this)
+  }
 
-    companion object {
-        val instance: CPluginSettings
-            get() = ApplicationManager.getApplication().getService<CPluginSettings>(
-                CPluginSettings::class.java
-            )
-    }
+  companion object {
+    val instance: CPluginSettings
+      get() =
+          ApplicationManager.getApplication()
+              .getService<CPluginSettings>(CPluginSettings::class.java)
+  }
 }

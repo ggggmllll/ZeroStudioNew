@@ -25,8 +25,8 @@ import com.itsaky.androidide.lsp.java.indexing.classfile.ClassAnnotationElementV
 import com.itsaky.androidide.lsp.java.indexing.classfile.EnumAnnotationElementValue
 import com.itsaky.androidide.lsp.java.indexing.classfile.IAnnotationElementValue
 import com.itsaky.androidide.lsp.java.indexing.classfile.JavaConstant
-import com.itsaky.androidide.lsp.java.utils.JavaType
 import com.itsaky.androidide.lsp.java.indexing.classfile.PrimitiveAnnotationElementValue
+import com.itsaky.androidide.lsp.java.utils.JavaType
 import com.itsaky.androidide.testing.android.rules.RealmDBTestRule
 import io.realm.RealmAny
 import io.realm.RealmList
@@ -35,20 +35,21 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-/**
- * @author Akash Yadav
- */
+/** @author Akash Yadav */
 @RunWith(AndroidJUnit4::class)
 class SharedModelCRUDTest {
 
-  @Rule
-  @JvmField
-  val dbTestRule = RealmDBTestRule(JavaIndexingRealmModule())
+  @Rule @JvmField val dbTestRule = RealmDBTestRule(JavaIndexingRealmModule())
 
   @Test
   fun testApiInfoCreate() {
     dbTestRule.withDb("api-info") {
-      val apiInfo = com.itsaky.androidide.indexing.core.platform.ApiInfo.newInstance(since = 1, deprecatedIn = 21, removedIn = 23)
+      val apiInfo =
+          com.itsaky.androidide.indexing.core.platform.ApiInfo.newInstance(
+              since = 1,
+              deprecatedIn = 21,
+              removedIn = 23,
+          )
       assertInsertUnique(apiInfo)
 
       val apiInfo2 = apiInfo.clone().update(removedIn = 26)
@@ -62,7 +63,12 @@ class SharedModelCRUDTest {
   @Test(expected = RealmPrimaryKeyConstraintException::class)
   fun testApiInfoDuplicationError() {
     dbTestRule.withDb("api-info-duplication-error") {
-      val apiInfo = com.itsaky.androidide.indexing.core.platform.ApiInfo.newInstance(since = 1, deprecatedIn = 21, removedIn = 23)
+      val apiInfo =
+          com.itsaky.androidide.indexing.core.platform.ApiInfo.newInstance(
+              since = 1,
+              deprecatedIn = 21,
+              removedIn = 23,
+          )
       assertInsertSingle(apiInfo)
       assertInsertSingle(apiInfo)
     }
@@ -72,9 +78,9 @@ class SharedModelCRUDTest {
   fun testConstantCreate() {
     dbTestRule.withDb("java-constant-create") {
       val constant =
-        JavaConstant.newInstance(kind = JavaType.KIND_INT, value = RealmAny.valueOf(1.toInt()))
+          JavaConstant.newInstance(kind = JavaType.KIND_INT, value = RealmAny.valueOf(1.toInt()))
       val constant2 =
-        JavaConstant.newInstance(kind = JavaType.KIND_INT, value = RealmAny.valueOf(2.toInt()))
+          JavaConstant.newInstance(kind = JavaType.KIND_INT, value = RealmAny.valueOf(2.toInt()))
 
       assertInsertUnique(constant)
 
@@ -89,7 +95,7 @@ class SharedModelCRUDTest {
   fun testConstantDuplicationError() {
     dbTestRule.withDb("java-constant-duplication-error") {
       val constant =
-        JavaConstant.newInstance(kind = JavaType.KIND_INT, value = RealmAny.valueOf(1.toInt()))
+          JavaConstant.newInstance(kind = JavaType.KIND_INT, value = RealmAny.valueOf(1.toInt()))
       assertInsertSingle(constant)
       assertInsertSingle(constant)
     }
@@ -118,14 +124,16 @@ class SharedModelCRUDTest {
   @Test
   fun testPrimitiveAnnotationValueCreate() {
     dbTestRule.withDb("annotation-value-primitive") {
-      val prim1 = PrimitiveAnnotationElementValue.newInstance(
-        IAnnotationElementValue.KIND_INT,
-        JavaConstant.newInstance(JavaType.KIND_INT, RealmAny.valueOf(1.toInt()))
-      )
-      val prim2 = PrimitiveAnnotationElementValue.newInstance(
-        IAnnotationElementValue.KIND_STRING,
-        JavaConstant.newInstance(JavaType.KIND_REF, RealmAny.valueOf("Something something"))
-      )
+      val prim1 =
+          PrimitiveAnnotationElementValue.newInstance(
+              IAnnotationElementValue.KIND_INT,
+              JavaConstant.newInstance(JavaType.KIND_INT, RealmAny.valueOf(1.toInt())),
+          )
+      val prim2 =
+          PrimitiveAnnotationElementValue.newInstance(
+              IAnnotationElementValue.KIND_STRING,
+              JavaConstant.newInstance(JavaType.KIND_REF, RealmAny.valueOf("Something something")),
+          )
 
       assertInsertUnique(prim1)
 
@@ -139,10 +147,11 @@ class SharedModelCRUDTest {
   @Test(expected = RealmPrimaryKeyConstraintException::class)
   fun testPrimitiveAnnotationValueDuplicationError() {
     dbTestRule.withDb("annotation-value-primitive-duplication") {
-      val prim1 = PrimitiveAnnotationElementValue.newInstance(
-        IAnnotationElementValue.KIND_INT,
-        JavaConstant.newInstance(JavaType.KIND_INT, RealmAny.valueOf(1.toInt()))
-      )
+      val prim1 =
+          PrimitiveAnnotationElementValue.newInstance(
+              IAnnotationElementValue.KIND_INT,
+              JavaConstant.newInstance(JavaType.KIND_INT, RealmAny.valueOf(1.toInt())),
+          )
       assertInsertSingle(prim1)
       assertInsertSingle(prim1)
     }
@@ -151,28 +160,30 @@ class SharedModelCRUDTest {
   @Test
   fun testArrayAnnotationValueCreate() {
     dbTestRule.withDb("annotation-value-array") {
-      val obj1 = ArrayAnnotationElementValue.newInstance(
-        RealmList()
-      )
-      val obj2 = ArrayAnnotationElementValue.newInstance(
-        RealmList<RealmAny>().apply {
-          add(
-            RealmAny.valueOf(
-              PrimitiveAnnotationElementValue.newInstance(
-                IAnnotationElementValue.KIND_STRING,
-                JavaConstant.newInstance(JavaType.KIND_REF, RealmAny.valueOf("Something something"))
-              )
-            )
-          )
+      val obj1 = ArrayAnnotationElementValue.newInstance(RealmList())
+      val obj2 =
+          ArrayAnnotationElementValue.newInstance(
+              RealmList<RealmAny>().apply {
+                add(
+                    RealmAny.valueOf(
+                        PrimitiveAnnotationElementValue.newInstance(
+                            IAnnotationElementValue.KIND_STRING,
+                            JavaConstant.newInstance(
+                                JavaType.KIND_REF,
+                                RealmAny.valueOf("Something something"),
+                            ),
+                        )
+                    )
+                )
 
-          RealmAny.valueOf(
-            PrimitiveAnnotationElementValue.newInstance(
-              IAnnotationElementValue.KIND_INT,
-              JavaConstant.newInstance(JavaType.KIND_INT, RealmAny.valueOf(123.toInt()))
-            )
+                RealmAny.valueOf(
+                    PrimitiveAnnotationElementValue.newInstance(
+                        IAnnotationElementValue.KIND_INT,
+                        JavaConstant.newInstance(JavaType.KIND_INT, RealmAny.valueOf(123.toInt())),
+                    )
+                )
+              }
           )
-        }
-      )
 
       assertInsertUnique(obj1)
 
@@ -186,25 +197,29 @@ class SharedModelCRUDTest {
   @Test(expected = RealmPrimaryKeyConstraintException::class)
   fun testArrayAnnotationValueDuplicationError() {
     dbTestRule.withDb("annotation-value-array-duplication") {
-      val obj1 = ArrayAnnotationElementValue.newInstance(
-        RealmList<RealmAny>().apply {
-          add(
-            RealmAny.valueOf(
-              PrimitiveAnnotationElementValue.newInstance(
-                IAnnotationElementValue.KIND_STRING,
-                JavaConstant.newInstance(JavaType.KIND_REF, RealmAny.valueOf("Something something"))
-              )
-            )
-          )
+      val obj1 =
+          ArrayAnnotationElementValue.newInstance(
+              RealmList<RealmAny>().apply {
+                add(
+                    RealmAny.valueOf(
+                        PrimitiveAnnotationElementValue.newInstance(
+                            IAnnotationElementValue.KIND_STRING,
+                            JavaConstant.newInstance(
+                                JavaType.KIND_REF,
+                                RealmAny.valueOf("Something something"),
+                            ),
+                        )
+                    )
+                )
 
-          RealmAny.valueOf(
-            PrimitiveAnnotationElementValue.newInstance(
-              IAnnotationElementValue.KIND_INT,
-              JavaConstant.newInstance(JavaType.KIND_INT, RealmAny.valueOf(123.toInt()))
-            )
+                RealmAny.valueOf(
+                    PrimitiveAnnotationElementValue.newInstance(
+                        IAnnotationElementValue.KIND_INT,
+                        JavaConstant.newInstance(JavaType.KIND_INT, RealmAny.valueOf(123.toInt())),
+                    )
+                )
+              }
           )
-        }
-      )
       assertInsertSingle(obj1)
       assertInsertSingle(obj1)
     }
@@ -213,12 +228,14 @@ class SharedModelCRUDTest {
   @Test
   fun testClassAnnotationValueCreate() {
     dbTestRule.withDb("annotation-value-class") {
-      val obj1 = ClassAnnotationElementValue.newInstance(
-        JavaType.newInstance("com/example/SomeType", JavaType.KIND_REF)
-      )
-      val obj2 = ClassAnnotationElementValue.newInstance(
-        JavaType.newInstance("com/example/SomeType", JavaType.KIND_REF, arrayDims = 5)
-      )
+      val obj1 =
+          ClassAnnotationElementValue.newInstance(
+              JavaType.newInstance("com/example/SomeType", JavaType.KIND_REF)
+          )
+      val obj2 =
+          ClassAnnotationElementValue.newInstance(
+              JavaType.newInstance("com/example/SomeType", JavaType.KIND_REF, arrayDims = 5)
+          )
 
       assertInsertUnique(obj1)
 
@@ -232,9 +249,10 @@ class SharedModelCRUDTest {
   @Test(expected = RealmPrimaryKeyConstraintException::class)
   fun testClassAnnotationValueDuplicationError() {
     dbTestRule.withDb("annotation-value-class-duplication") {
-      val obj1 = ClassAnnotationElementValue.newInstance(
-        JavaType.newInstance("com/example/SomeType", JavaType.KIND_REF)
-      )
+      val obj1 =
+          ClassAnnotationElementValue.newInstance(
+              JavaType.newInstance("com/example/SomeType", JavaType.KIND_REF)
+          )
       assertInsertSingle(obj1)
       assertInsertSingle(obj1)
     }
@@ -243,14 +261,16 @@ class SharedModelCRUDTest {
   @Test
   fun testEnumAnnotationValueCreate() {
     dbTestRule.withDb("annotation-value-enum") {
-      val obj1 = EnumAnnotationElementValue.newInstance(
-        "SomeEnum_ENTRY",
-        JavaType.newInstance("com/example/SomeEnum", JavaType.KIND_REF),
-      )
-      val obj2 = EnumAnnotationElementValue.newInstance(
-        "SomeEnum_ENTRY_2",
-        JavaType.newInstance("com/example/SomeEnum", JavaType.KIND_REF),
-      )
+      val obj1 =
+          EnumAnnotationElementValue.newInstance(
+              "SomeEnum_ENTRY",
+              JavaType.newInstance("com/example/SomeEnum", JavaType.KIND_REF),
+          )
+      val obj2 =
+          EnumAnnotationElementValue.newInstance(
+              "SomeEnum_ENTRY_2",
+              JavaType.newInstance("com/example/SomeEnum", JavaType.KIND_REF),
+          )
 
       assertInsertUnique(obj1)
 
@@ -264,10 +284,11 @@ class SharedModelCRUDTest {
   @Test(expected = RealmPrimaryKeyConstraintException::class)
   fun testEnumAnnotationValueDuplicationError() {
     dbTestRule.withDb("annotation-value-enum-duplication") {
-      val obj1 = EnumAnnotationElementValue.newInstance(
-        "SomeEnum_ENTRY",
-        JavaType.newInstance("com/example/SomeEnum", JavaType.KIND_REF),
-      )
+      val obj1 =
+          EnumAnnotationElementValue.newInstance(
+              "SomeEnum_ENTRY",
+              JavaType.newInstance("com/example/SomeEnum", JavaType.KIND_REF),
+          )
       assertInsertSingle(obj1)
       assertInsertSingle(obj1)
     }

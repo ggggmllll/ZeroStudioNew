@@ -16,7 +16,7 @@
 package com.itsaky.androidide.templates.impl.androidstudio.other.appWidget.res.values
 
 fun attrsXml() =
-  """<resources>
+    """<resources>
     <declare-styleable name="AppWidgetAttrs">
         <attr name="appWidgetPadding" format="dimension" />
         <attr name="appWidgetInnerRadius" format="dimension" />

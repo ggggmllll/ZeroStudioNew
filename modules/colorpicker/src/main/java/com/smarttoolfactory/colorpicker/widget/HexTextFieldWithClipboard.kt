@@ -35,15 +35,15 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.mapLatest
 
 /**
- * [TextField] that displays color in hex representation either with #RRGGBB or #AARRGGBB
- * depending on [useAlpha] flag and with [LocalClipboardManager] to save hex to clipboard.
+ * [TextField] that displays color in hex representation either with #RRGGBB or #AARRGGBB depending
+ * on [useAlpha] flag and with [LocalClipboardManager] to save hex to clipboard.
  *
  * @param hexString string in hex format.
  * @param useAlpha when set to true returns colors in #AARRGGBB format.
- * @param onTextChange this callback returns when the last char typed by user is an acceptable
- * HEX char between 0-9,a-f, or A-F.
- * @param onColorChange when user type valid 6 or 8 char hex returns a [Color] associated
- * with the hex string.
+ * @param onTextChange this callback returns when the last char typed by user is an acceptable HEX
+ *   char between 0-9,a-f, or A-F.
+ * @param onColorChange when user type valid 6 or 8 char hex returns a [Color] associated with the
+ *   hex string.
  */
 @Composable
 fun HexTextFieldWithClipboard(
@@ -51,250 +51,222 @@ fun HexTextFieldWithClipboard(
     hexString: String,
     useAlpha: Boolean = false,
     onTextChange: (String) -> Unit,
-    onColorChange: (Color) -> Unit
+    onColorChange: (Color) -> Unit,
 ) {
-    val clipboardManager = LocalClipboardManager.current
-    val context = LocalContext.current
+  val clipboardManager = LocalClipboardManager.current
+  val context = LocalContext.current
 
-    val hexText = rememberUpdatedState(newValue = hexString)
+  val hexText = rememberUpdatedState(newValue = hexString)
 
-    val currentRegex = if (useAlpha) hexWithAlphaRegex else hexRegex
-    val isHexValid = currentRegex.matches(hexText.value)
+  val currentRegex = if (useAlpha) hexWithAlphaRegex else hexRegex
+  val isHexValid = currentRegex.matches(hexText.value)
 
-    val color = derivedStateOf {
-        try {
-            HexUtil.hexToColor(hexText.value)
-        } catch (e: Exception) {
-            Color.Unspecified
-        }
+  val color = derivedStateOf {
+    try {
+      HexUtil.hexToColor(hexText.value)
+    } catch (e: Exception) {
+      Color.Unspecified
     }
+  }
 
-    val lightness = ColorUtil.colorToHSL(color.value)[2]
+  val lightness = ColorUtil.colorToHSL(color.value)[2]
 
-    val textColor = if (color.value == Color.Unspecified) {
+  val textColor =
+      if (color.value == Color.Unspecified) {
         Color.Black
-    } else {
+      } else {
         if (lightness < .6f) Color.White else Color.Black
-    }
+      }
 
-
-    val hexModifier = if (isHexValid) {
+  val hexModifier =
+      if (isHexValid) {
         modifier
             .shadow(2.dp, RoundedCornerShape(50))
             .background(color = color.value)
             .padding(start = 20.dp, end = 4.dp, top = 4.dp, bottom = 4.dp)
-    } else {
+      } else {
         modifier
             .shadow(2.dp, RoundedCornerShape(50))
             .background(color = Color.White)
             .padding(start = 20.dp, end = 4.dp, top = 4.dp, bottom = 4.dp)
-    }
+      }
 
-    Row(
-        modifier = hexModifier,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
+  Row(modifier = hexModifier, verticalAlignment = Alignment.CenterVertically) {
+    BasicTextField(
+        modifier = Modifier.width(140.dp).wrapContentHeight().padding(bottom = 10.dp, top = 12.dp),
+        visualTransformation = HexVisualTransformation(useAlpha),
+        value = hexString.removePrefix("#"),
+        textStyle = TextStyle(color = textColor, fontSize = 20.sp),
+        onValueChange = {
+          if (it.length <= if (useAlpha) 8 else 6) {
+            var validHex = true
 
-        BasicTextField(
-            modifier = Modifier
-                .width(140.dp)
-                .wrapContentHeight()
-                .padding(bottom = 10.dp, top = 12.dp),
-            visualTransformation = HexVisualTransformation(useAlpha),
-            value = hexString.removePrefix("#"),
-            textStyle = TextStyle(
-                color = textColor,
-                fontSize = 20.sp
-            ),
-
-            onValueChange = {
-
-                if (it.length <= if (useAlpha) 8 else 6) {
-                    var validHex = true
-
-                    for (index in it.indices) {
-                        validHex = hexRegexSingleChar.matches(it[index].toString())
-                        if (!validHex) break
-                    }
-
-                    if (validHex) {
-                        onTextChange("#$it")
-                        // Hex String with 6 or 8 chars matches a Color
-                        if (currentRegex.matches(it)) {
-                            onColorChange(HexUtil.hexToColor(it))
-                        }
-                    }
-                }
-            },
-            cursorBrush = SolidColor(textColor)
-        )
-
-
-        if (isHexValid) {
-            IconButton(
-                onClick = {
-                    Toast.makeText(context, "Copied $hexString", Toast.LENGTH_SHORT).show()
-                    clipboardManager.setText(AnnotatedString(hexString))
-                }) {
-                Icon(
-                    tint = if (isHexValid) textColor else Color.LightGray,
-                    painter = painterResource(id = R.drawable.ic_baseline_content_copy_24),
-                    contentDescription = "clipboard"
-                )
+            for (index in it.indices) {
+              validHex = hexRegexSingleChar.matches(it[index].toString())
+              if (!validHex) break
             }
-        } else {
-            Icon(
-                modifier = Modifier.padding(12.dp),
-                tint = Color.Red,
-                imageVector = Icons.Filled.Error,
-                contentDescription = "error"
-            )
-        }
+
+            if (validHex) {
+              onTextChange("#$it")
+              // Hex String with 6 or 8 chars matches a Color
+              if (currentRegex.matches(it)) {
+                onColorChange(HexUtil.hexToColor(it))
+              }
+            }
+          }
+        },
+        cursorBrush = SolidColor(textColor),
+    )
+
+    if (isHexValid) {
+      IconButton(
+          onClick = {
+            Toast.makeText(context, "Copied $hexString", Toast.LENGTH_SHORT).show()
+            clipboardManager.setText(AnnotatedString(hexString))
+          }
+      ) {
+        Icon(
+            tint = if (isHexValid) textColor else Color.LightGray,
+            painter = painterResource(id = R.drawable.ic_baseline_content_copy_24),
+            contentDescription = "clipboard",
+        )
+      }
+    } else {
+      Icon(
+          modifier = Modifier.padding(12.dp),
+          tint = Color.Red,
+          imageVector = Icons.Filled.Error,
+          contentDescription = "error",
+      )
     }
+  }
 }
 
 /**
- * [TextField] that displays color in hex representation either with #RRGGBB
- * with [LocalClipboardManager] to save hex to clipboard and displays when 6 characters input
- * displays name closest to R, G, B values in 3D space.
+ * [TextField] that displays color in hex representation either with #RRGGBB with
+ * [LocalClipboardManager] to save hex to clipboard and displays when 6 characters input displays
+ * name closest to R, G, B values in 3D space.
  *
  * @param hexString string in hex format.
- * @param onTextChange this callback returns when the last char typed by user is an acceptable
- * HEX char between 0-9,a-f, or A-F.
- * @param onColorChange when user type valid 6 or 8 char hex returns a [Color] associated
- * with the hex string.
+ * @param onTextChange this callback returns when the last char typed by user is an acceptable HEX
+ *   char between 0-9,a-f, or A-F.
+ * @param onColorChange when user type valid 6 or 8 char hex returns a [Color] associated with the
+ *   hex string.
  */
 @Composable
 fun HexTextFieldWithLabelClipboard(
     modifier: Modifier = Modifier,
     hexString: String,
     onTextChange: (String) -> Unit,
-    onColorChange: (Color) -> Unit
+    onColorChange: (Color) -> Unit,
 ) {
-    val clipboardManager = LocalClipboardManager.current
-    val context = LocalContext.current
+  val clipboardManager = LocalClipboardManager.current
+  val context = LocalContext.current
 
-    val colorNameParser = rememberColorParser()
-    val hexText = rememberUpdatedState(newValue = hexString)
-    var colorName by remember { mutableStateOf("") }
+  val colorNameParser = rememberColorParser()
+  val hexText = rememberUpdatedState(newValue = hexString)
+  var colorName by remember { mutableStateOf("") }
 
-    val currentRegex = hexRegex
-    val isHexValid = currentRegex.matches(hexText.value)
+  val currentRegex = hexRegex
+  val isHexValid = currentRegex.matches(hexText.value)
 
-    val color = derivedStateOf {
-        try {
-            HexUtil.hexToColor(hexText.value)
-        } catch (e: Exception) {
-            Color.Unspecified
-        }
+  val color = derivedStateOf {
+    try {
+      HexUtil.hexToColor(hexText.value)
+    } catch (e: Exception) {
+      Color.Unspecified
     }
+  }
 
-    val lightness = ColorUtil.colorToHSL(color.value)[2]
+  val lightness = ColorUtil.colorToHSL(color.value)[2]
 
-    val textColor = if (color.value == Color.Unspecified) {
+  val textColor =
+      if (color.value == Color.Unspecified) {
         Color.Black
-    } else {
+      } else {
         if (lightness < .6f) Color.White else Color.Black
-    }
+      }
 
-    LaunchedEffect(key1 = colorNameParser) {
+  LaunchedEffect(key1 = colorNameParser) {
+    snapshotFlow { hexText.value }
+        .distinctUntilChanged()
+        .mapLatest {
+          println("✊ HEX: $it, isHexValid: $isHexValid")
+          if (currentRegex.matches(hexText.value)) {
+            colorNameParser.parseColorName(color.value)
+          } else {
+            ""
+          }
+        }
+        .flowOn(Dispatchers.Default)
+        .collect { name: String -> colorName = name }
+  }
 
-        snapshotFlow { hexText.value }
-            .distinctUntilChanged()
-            .mapLatest {
-                println("✊ HEX: $it, isHexValid: $isHexValid")
-                if (currentRegex.matches(hexText.value)) {
-                    colorNameParser.parseColorName(color.value)
-                } else {
-                    ""
-                }
-            }
-            .flowOn(Dispatchers.Default)
-            .collect { name: String ->
-                colorName = name
-            }
-    }
-
-    val hexModifier = if (isHexValid) {
+  val hexModifier =
+      if (isHexValid) {
         modifier
             .shadow(2.dp, RoundedCornerShape(50))
             .background(color = color.value)
             .padding(start = 20.dp, end = 4.dp, top = 4.dp, bottom = 4.dp)
-    } else {
+      } else {
         modifier
             .shadow(2.dp, RoundedCornerShape(50))
             .background(color = Color.White)
             .padding(start = 20.dp, end = 4.dp, top = 4.dp, bottom = 4.dp)
-    }
+      }
 
-    Row(
-        modifier = hexModifier,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
+  Row(modifier = hexModifier, verticalAlignment = Alignment.CenterVertically) {
+    Box {
+      Text(text = colorName, fontSize = 10.sp, color = textColor, modifier = Modifier.padding(2.dp))
 
+      BasicTextField(
+          modifier =
+              Modifier.width(140.dp).wrapContentHeight().padding(bottom = 10.dp, top = 12.dp),
+          visualTransformation = HexVisualTransformation(false),
+          value = hexString.removePrefix("#"),
+          textStyle = TextStyle(color = textColor, fontSize = 20.sp),
+          onValueChange = {
+            if (it.length <= 6) {
+              var validHex = true
 
-        Box {
-            Text(
-                text = colorName,
-                fontSize = 10.sp,
-                color = textColor,
-                modifier = Modifier.padding(2.dp)
-            )
+              for (index in it.indices) {
+                validHex = hexRegexSingleChar.matches(it[index].toString())
+                if (!validHex) break
+              }
 
-            BasicTextField(
-                modifier = Modifier
-                    .width(140.dp)
-                    .wrapContentHeight()
-                    .padding(bottom = 10.dp, top = 12.dp),
-                visualTransformation = HexVisualTransformation(false),
-                value = hexString.removePrefix("#"),
-                textStyle = TextStyle(
-                    color = textColor,
-                    fontSize = 20.sp
-                ),
-
-                onValueChange = {
-
-                    if (it.length <= 6) {
-                        var validHex = true
-
-                        for (index in it.indices) {
-                            validHex = hexRegexSingleChar.matches(it[index].toString())
-                            if (!validHex) break
-                        }
-
-                        if (validHex) {
-                            onTextChange("#$it")
-                            // Hex String with 6 chars matches a Color
-                            if (currentRegex.matches(it)) {
-                                onColorChange(HexUtil.hexToColor(it))
-                            }
-                        }
-                    }
-                },
-                cursorBrush = SolidColor(textColor)
-            )
-        }
-
-        if (isHexValid) {
-            IconButton(
-                onClick = {
-                    Toast.makeText(context, "Copied $hexString", Toast.LENGTH_SHORT).show()
-                    clipboardManager.setText(AnnotatedString(hexString))
-                }) {
-                Icon(
-                    tint = if (isHexValid) textColor else Color.LightGray,
-                    painter = painterResource(id = R.drawable.ic_baseline_content_copy_24),
-                    contentDescription = "clipboard"
-                )
+              if (validHex) {
+                onTextChange("#$it")
+                // Hex String with 6 chars matches a Color
+                if (currentRegex.matches(it)) {
+                  onColorChange(HexUtil.hexToColor(it))
+                }
+              }
             }
-        } else {
-            Icon(
-                modifier = Modifier.padding(12.dp),
-                tint = Color.Red,
-                imageVector = Icons.Filled.Error,
-                contentDescription = "error"
-            )
-        }
+          },
+          cursorBrush = SolidColor(textColor),
+      )
     }
+
+    if (isHexValid) {
+      IconButton(
+          onClick = {
+            Toast.makeText(context, "Copied $hexString", Toast.LENGTH_SHORT).show()
+            clipboardManager.setText(AnnotatedString(hexString))
+          }
+      ) {
+        Icon(
+            tint = if (isHexValid) textColor else Color.LightGray,
+            painter = painterResource(id = R.drawable.ic_baseline_content_copy_24),
+            contentDescription = "clipboard",
+        )
+      }
+    } else {
+      Icon(
+          modifier = Modifier.padding(12.dp),
+          tint = Color.Red,
+          imageVector = Icons.Filled.Error,
+          contentDescription = "error",
+      )
+    }
+  }
 }

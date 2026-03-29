@@ -15,16 +15,15 @@
  *   along with AndroidIDE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 plugins { id("com.android.library") }
 
 android { namespace = "com.unnamed.b.atv" }
 
-dependencies { 
-    implementation(libs.androidx.appcompat)
-    implementation(libs.androidx.recyclerview)
+dependencies {
+  implementation(libs.androidx.appcompat)
+  implementation(libs.androidx.recyclerview)
 
-    testImplementation(libs.tests.junit)
-    androidTestImplementation(libs.tests.androidx.junit)
-    androidTestImplementation(libs.tests.androidx.espresso.core)
+  testImplementation(libs.tests.junit)
+  androidTestImplementation(libs.tests.androidx.junit)
+  androidTestImplementation(libs.tests.androidx.espresso.core)
 }

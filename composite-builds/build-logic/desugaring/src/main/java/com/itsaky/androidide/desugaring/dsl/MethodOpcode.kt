@@ -24,39 +24,26 @@ import org.objectweb.asm.Opcodes
  *
  * @author Akash Yadav
  */
-enum class MethodOpcode(val insnName: String, val opcode: Int
-) {
+enum class MethodOpcode(val insnName: String, val opcode: Int) {
 
-  /**
-   * The opcode for `invokestatic`.
-   */
+  /** The opcode for `invokestatic`. */
   INVOKESTATIC("invoke-static", Opcodes.INVOKESTATIC),
 
-  /**
-   * The opcode for `invokespecial`.
-   */
+  /** The opcode for `invokespecial`. */
   INVOKESPECIAL("invoke-special", Opcodes.INVOKESPECIAL),
 
-  /**
-   * The opcode for `invokevirtual`.
-   */
+  /** The opcode for `invokevirtual`. */
   INVOKEVIRTUAL("invoke-virtual", Opcodes.INVOKEVIRTUAL),
 
-  /**
-   * The opcode for `invokeinterface`.
-   */
+  /** The opcode for `invokeinterface`. */
   INVOKEINTERFACE("invoke-interface", Opcodes.INVOKEINTERFACE),
 
-  /**
-   * Any opcode. This is for internal use only.
-   */
+  /** Any opcode. This is for internal use only. */
   ANY("invoke-any", 0);
 
   companion object {
 
-    /**
-     * Finds the [MethodOpcode] with the given instruction name.
-     */
+    /** Finds the [MethodOpcode] with the given instruction name. */
     @JvmStatic
     fun find(insn: String): MethodOpcode? {
       return MethodOpcode.values().find { it.insnName == insn }

@@ -22,8 +22,13 @@ package com.itsaky.androidide.templates.impl.androidstudio.activities.androidTVA
  * @author Historical contributors (The Android Open Source Project)
  * @author android_zero
  */
-fun mainActivityKt(activityClass: String, layoutName: String, mainFragment: String, packageName: String) =
-  """
+fun mainActivityKt(
+    activityClass: String,
+    layoutName: String,
+    mainFragment: String,
+    packageName: String,
+) =
+    """
 package ${packageName}
 
 import android.os.Bundle

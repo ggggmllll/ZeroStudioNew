@@ -45,7 +45,8 @@ val automotiveMessagingServiceTemplate
     val serviceName = stringParameter {
       name = "Service class name"
       default = "MyMessagingService"
-      help = "The name of the service that will handle incoming messages and send corresponding notifications"
+      help =
+          "The name of the service that will handle incoming messages and send corresponding notifications"
       constraints = listOf(CLASS, UNIQUE, NONEMPTY)
       loggable = true
     }
@@ -69,20 +70,20 @@ val automotiveMessagingServiceTemplate
     val packageName = defaultPackageNameParameter
 
     widgets(
-      TextFieldWidget(serviceName),
-      TextFieldWidget(readReceiverName),
-      TextFieldWidget(replyReceiverName),
-      PackageNameWidget(packageName),
-      LanguageWidget(),
+        TextFieldWidget(serviceName),
+        TextFieldWidget(readReceiverName),
+        TextFieldWidget(replyReceiverName),
+        PackageNameWidget(packageName),
+        LanguageWidget(),
     )
 
     recipe = { data: TemplateData ->
       automotiveMessagingServiceRecipe(
-        data as ModuleTemplateData,
-        serviceName.value,
-        readReceiverName.value,
-        replyReceiverName.value,
-        packageName.value,
+          data as ModuleTemplateData,
+          serviceName.value,
+          readReceiverName.value,
+          replyReceiverName.value,
+          packageName.value,
       )
     }
 

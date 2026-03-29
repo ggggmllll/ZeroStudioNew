@@ -21,20 +21,15 @@ import com.itsaky.androidide.treesitter.TSQueryCursor
 import com.itsaky.androidide.utils.DefaultRecyclable
 import com.itsaky.androidide.utils.RecyclableObjectPool
 
-/**
- * @author Akash Yadav
- */
-class TreeSitterQueryCursor(
-  pointer: Long = 0
-) : TSQueryCursor(pointer), RecyclableObjectPool.Recyclable by DefaultRecyclable() {
+/** @author Akash Yadav */
+class TreeSitterQueryCursor(pointer: Long = 0) :
+    TSQueryCursor(pointer), RecyclableObjectPool.Recyclable by DefaultRecyclable() {
 
   companion object {
 
     @JvmStatic
     fun obtain(pointer: Long): TreeSitterQueryCursor {
-      return obtainFromPool<TreeSitterQueryCursor>().apply {
-        this.nativeObject = pointer
-      }
+      return obtainFromPool<TreeSitterQueryCursor>().apply { this.nativeObject = pointer }
     }
   }
 

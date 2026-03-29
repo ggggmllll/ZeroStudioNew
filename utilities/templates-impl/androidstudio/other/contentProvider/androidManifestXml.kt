@@ -16,8 +16,14 @@
 
 package com.itsaky.androidide.templates.impl.androidstudio.other.contentProvider
 
-fun androidManifestXml(authorities: String, className: String, isEnabled: Boolean, isExported: Boolean, packageName: String) =
-  """
+fun androidManifestXml(
+    authorities: String,
+    className: String,
+    isEnabled: Boolean,
+    isExported: Boolean,
+    packageName: String,
+) =
+    """
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <application>

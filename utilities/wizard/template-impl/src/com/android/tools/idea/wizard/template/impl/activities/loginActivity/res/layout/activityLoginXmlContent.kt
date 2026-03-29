@@ -20,8 +20,10 @@ import com.android.tools.idea.wizard.template.renderIf
 
 fun activityLoginXmlContent(minApiLevel: Int): String {
 
-  val autofillHintsEmail = renderIf(minApiLevel > 25) { """android:autofillHints="@string/prompt_email"""" }
-  val autofillHintsPassword = renderIf(minApiLevel > 25) { """android:autofillHints="@string/prompt_password"""" }
+  val autofillHintsEmail =
+      renderIf(minApiLevel > 25) { """android:autofillHints="@string/prompt_email"""" }
+  val autofillHintsPassword =
+      renderIf(minApiLevel > 25) { """android:autofillHints="@string/prompt_password"""" }
   return """
     <EditText
         android:id="@+id/username"

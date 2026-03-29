@@ -25,9 +25,9 @@ import com.android.tools.idea.wizard.template.ModuleTemplateData
 import com.android.tools.idea.wizard.template.TemplateData
 import com.android.tools.idea.wizard.template.TextFieldWidget
 import com.android.tools.idea.wizard.template.WizardUiContext
-import com.itsaky.androidide.templates.impl.androidstudio.activities.common.MIN_API
 import com.android.tools.idea.wizard.template.stringParameter
 import com.android.tools.idea.wizard.template.template
+import com.itsaky.androidide.templates.impl.androidstudio.activities.common.MIN_API
 import java.io.File
 
 val layoutResourceFileTemplate
@@ -62,5 +62,7 @@ val layoutResourceFileTemplate
       File("no_activity.png")
     }
 
-    recipe = { data: TemplateData -> layoutResourceFileRecipe(data as ModuleTemplateData, layoutName.value, rootTag.value) }
+    recipe = { data: TemplateData ->
+      layoutResourceFileRecipe(data as ModuleTemplateData, layoutName.value, rootTag.value)
+    }
   }

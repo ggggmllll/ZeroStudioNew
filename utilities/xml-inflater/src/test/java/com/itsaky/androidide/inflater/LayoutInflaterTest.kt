@@ -31,11 +31,11 @@ import com.itsaky.androidide.inflater.internal.utils.IDTable
 import com.itsaky.androidide.inflater.utils.newAttribute
 import com.itsaky.androidide.projects.android.AndroidModule
 import com.itsaky.androidide.projects.util.findAppModule
+import java.io.File
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
-import java.io.File
 
 /** @author Akash Yadav */
 @RunWith(RobolectricTestRunner::class)
@@ -80,15 +80,15 @@ class LayoutInflaterTest {
 
             (inflated as ViewImpl).attributes.apply {
               assertThat(this)
-                .contains(newAttribute(inflated, INamespace.ANDROID, "id", "@+id/template_view"))
+                  .contains(newAttribute(inflated, INamespace.ANDROID, "id", "@+id/template_view"))
               assertThat(this)
-                .contains(
-                  newAttribute(inflated, INamespace.ANDROID, "layout_height", "match_parent")
-                )
+                  .contains(
+                      newAttribute(inflated, INamespace.ANDROID, "layout_height", "match_parent")
+                  )
               assertThat(this)
-                .contains(
-                  newAttribute(inflated, INamespace.ANDROID, "layout_width", "match_parent")
-                )
+                  .contains(
+                      newAttribute(inflated, INamespace.ANDROID, "layout_width", "match_parent")
+                  )
             }
           }
         }
@@ -107,12 +107,12 @@ class LayoutInflaterTest {
 
         val view = inflated[0] as ViewGroupImpl
         assertThat(view.printHierarchy())
-          .isEqualTo(
-            "android.widget.LinearLayout\n" +
-              "    android.widget.RelativeLayout\n" +
-              "        android.widget.TextView\n" +
-              "        android.widget.TextView\n"
-          )
+            .isEqualTo(
+                "android.widget.LinearLayout\n" +
+                    "    android.widget.RelativeLayout\n" +
+                    "        android.widget.TextView\n" +
+                    "        android.widget.TextView\n"
+            )
         val included = view[0] as IncludeView
         included.findAttribute("layout_height", INamespace.ANDROID.uri).apply {
           assertThat(this).isNotNull()
@@ -139,11 +139,11 @@ class LayoutInflaterTest {
 
         val view = inflated[0] as ViewGroupImpl
         assertThat(view.printHierarchy())
-          .isEqualTo(
-            "android.widget.LinearLayout\n" +
-              "    android.widget.TextView\n" +
-              "    android.widget.TextView\n"
-          )
+            .isEqualTo(
+                "android.widget.LinearLayout\n" +
+                    "    android.widget.TextView\n" +
+                    "    android.widget.TextView\n"
+            )
 
         assertThat(view.childCount).isEqualTo(2)
 
@@ -170,17 +170,17 @@ class LayoutInflaterTest {
         // verity the inflated layout hierarchy
         // this takes care of verifying that the generated XML elements will have proper XML tagsl
         assertThat(root.printHierarchy())
-          .isEqualTo(
-            "android.widget.LinearLayout\n" +
-              "    com.itsaky.androidide.inflater.unsupported.UnsupportedView\n" +
-              "    com.itsaky.androidide.inflater.unsupported.UnsupportedLayout\n" +
-              "    com.itsaky.androidide.inflater.unsupported.UnsupportedLayout\n" +
-              "        android.widget.ImageView\n" +
-              "        android.widget.ImageView\n" +
-              "    com.itsaky.androidide.inflater.unsupported.UnsupportedLayout\n" +
-              "        com.itsaky.androidide.inflater.unsupported.UnsupportedView\n" +
-              "        com.itsaky.androidide.inflater.unsupported.UnsupportedView\n"
-          )
+            .isEqualTo(
+                "android.widget.LinearLayout\n" +
+                    "    com.itsaky.androidide.inflater.unsupported.UnsupportedView\n" +
+                    "    com.itsaky.androidide.inflater.unsupported.UnsupportedLayout\n" +
+                    "    com.itsaky.androidide.inflater.unsupported.UnsupportedLayout\n" +
+                    "        android.widget.ImageView\n" +
+                    "        android.widget.ImageView\n" +
+                    "    com.itsaky.androidide.inflater.unsupported.UnsupportedLayout\n" +
+                    "        com.itsaky.androidide.inflater.unsupported.UnsupportedView\n" +
+                    "        com.itsaky.androidide.inflater.unsupported.UnsupportedView\n"
+            )
 
         // TextView is used to inflate unsupported views
         assertThat(root[0].view).isInstanceOf(TextView::class.java)
@@ -201,7 +201,7 @@ class LayoutInflaterTest {
       }
     }
   }
-  
+
   @Test
   fun `test order of included view with sibling views`() {
     inflaterTest {
@@ -210,19 +210,19 @@ class LayoutInflaterTest {
         val inflater = ILayoutInflater.newInflater(it)
         val inflated = inflater.inflate(layoutFile("include_order"), parent)
         assertThat(inflated).hasSize(1)
-      
+
         val view = inflated[0] as ViewGroupImpl
-        
+
         // verify the hierarchy
         assertThat(view.printHierarchy())
-          .isEqualTo(
-            "android.widget.LinearLayout\n" +
-              "    android.view.View\n" +
-              "    android.widget.RelativeLayout\n" +
-              "        android.widget.TextView\n" +
-              "        android.widget.TextView\n" +
-              "    android.view.View\n"
-          )
+            .isEqualTo(
+                "android.widget.LinearLayout\n" +
+                    "    android.view.View\n" +
+                    "    android.widget.RelativeLayout\n" +
+                    "        android.widget.TextView\n" +
+                    "        android.widget.TextView\n" +
+                    "    android.view.View\n"
+            )
       }
     }
   }

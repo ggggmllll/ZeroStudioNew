@@ -55,7 +55,11 @@ open class AnalogClockAdapter<T : AnalogClock> : ViewAdapter<T>() {
 
   override fun createUiWidgets(): List<UiWidget> {
     return listOf(
-      UiWidget(AnalogClock::class.java, string.widget_analog_clock, drawable.ic_widget_analog_clock)
+        UiWidget(
+            AnalogClock::class.java,
+            string.widget_analog_clock,
+            drawable.ic_widget_analog_clock,
+        )
     )
   }
 

@@ -29,6 +29,7 @@ import com.itsaky.androidide.editor.databinding.LayoutCompletionItemBinding
 import com.itsaky.androidide.lookup.Lookup
 import com.itsaky.androidide.lsp.java.utils.JavaType
 import com.itsaky.androidide.lsp.models.ClassCompletionData
+import com.itsaky.androidide.lsp.models.CompletionItem as LspCompletionItem
 import com.itsaky.androidide.lsp.models.CompletionItemKind.CLASS
 import com.itsaky.androidide.lsp.models.CompletionItemKind.CONSTRUCTOR
 import com.itsaky.androidide.lsp.models.CompletionItemKind.ENUM
@@ -51,7 +52,6 @@ import com.itsaky.androidide.utils.customOrJBMono
 import com.itsaky.androidide.xml.versions.ApiVersions
 import io.github.rosemoe.sora.widget.component.EditorCompletionAdapter
 import org.eclipse.jdt.core.Signature
-import com.itsaky.androidide.lsp.models.CompletionItem as LspCompletionItem
 
 class CompletionListAdapter : EditorCompletionAdapter() {
 

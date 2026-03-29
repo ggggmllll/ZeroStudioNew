@@ -17,7 +17,7 @@
 package com.itsaky.androidide.templates.impl.androidstudio.fragments.scrollFragment.res.values
 
 fun dimensXml() =
-  """
+    """
 <resources>
     <dimen name="text_margin">16dp</dimen>
 </resources>

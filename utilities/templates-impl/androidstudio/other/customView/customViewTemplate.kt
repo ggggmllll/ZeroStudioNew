@@ -27,15 +27,16 @@ import com.android.tools.idea.wizard.template.PackageNameWidget
 import com.android.tools.idea.wizard.template.TemplateData
 import com.android.tools.idea.wizard.template.TextFieldWidget
 import com.android.tools.idea.wizard.template.WizardUiContext
-import com.itsaky.androidide.templates.impl.androidstudio.defaultPackageNameParameter
 import com.android.tools.idea.wizard.template.stringParameter
 import com.android.tools.idea.wizard.template.template
+import com.itsaky.androidide.templates.impl.androidstudio.defaultPackageNameParameter
 import java.io.File
 
 val customViewTemplate
   get() = template {
     name = "Custom View"
-    description = "Creates a new custom view that extends android.view.View and exposes custom attributes"
+    description =
+        "Creates a new custom view that extends android.view.View and exposes custom attributes"
 
     formFactor = FormFactor.Mobile
     category = Category.UiComponent
@@ -58,5 +59,7 @@ val customViewTemplate
 
     widgets(PackageNameWidget(packageName), TextFieldWidget(viewClass), LanguageWidget())
 
-    recipe = { data: TemplateData -> customViewRecipe(data as ModuleTemplateData, packageName.value, viewClass.value) }
+    recipe = { data: TemplateData ->
+      customViewRecipe(data as ModuleTemplateData, packageName.value, viewClass.value)
+    }
   }

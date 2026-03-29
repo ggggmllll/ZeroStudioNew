@@ -25,7 +25,6 @@ import com.itsaky.androidide.actions.requireContext
 import com.itsaky.androidide.activities.editor.BaseEditorActivity
 import com.itsaky.androidide.resources.R
 import kotlin.reflect.KClass
-import com.itsaky.androidide.utils.getTintedDrawable 
 
 /**
  * Sidebar action for closing the project.
@@ -33,7 +32,7 @@ import com.itsaky.androidide.utils.getTintedDrawable
  * @author Akash Yadav
  */
 class CloseProjectSidebarAction(context: Context, override val order: Int) :
-  AbstractSidebarAction() {
+    AbstractSidebarAction() {
 
   override val id: String = "ide.editor.sidebar.closeProject"
   override val fragmentClass: KClass<out Fragment>? = null

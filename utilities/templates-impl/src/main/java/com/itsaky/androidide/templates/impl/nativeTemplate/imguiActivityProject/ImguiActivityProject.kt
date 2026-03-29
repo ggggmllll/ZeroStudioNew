@@ -25,7 +25,6 @@ import com.itsaky.androidide.templates.base.defaultAppModuleWithNdk
 import com.itsaky.androidide.templates.impl.R
 import com.itsaky.androidide.templates.impl.base.createRecipe
 import com.itsaky.androidide.templates.impl.baseProjectImpl
-import com.itsaky.androidide.templates.projectCmakeVersionParameter
 import com.itsaky.androidide.templates.projectNdkVersionParameter
 import com.itsaky.androidide.templates.useCmakeParameter
 import com.itsaky.androidide.templates.useNdkParameter
@@ -33,54 +32,62 @@ import java.io.File
 
 /**
  * ImGui Native Build Project Template.
+ *
  * @author android_zero
  */
-fun imguiActivityProject(): ProjectTemplate = baseProjectImpl(
-    useNdk = useNdkParameter { default = true },
-    ndkVersion = projectNdkVersionParameter { default = NdkVersion.R27A },
-    useCmake = useCmakeParameter { default = false }
-) {
-    templateName = R.string.title_template_native_build_imgui
-    thumb = R.drawable.template_ndk_native_imgui
+fun imguiActivityProject(): ProjectTemplate =
+    baseProjectImpl(
+        useNdk = useNdkParameter { default = true },
+        ndkVersion = projectNdkVersionParameter { default = NdkVersion.R27A },
+        useCmake = useCmakeParameter { default = false },
+    ) {
+      templateName = R.string.title_template_native_build_imgui
+      thumb = R.drawable.template_ndk_native_imgui
 
-    defaultAppModuleWithNdk(addAndroidX = false) {
-        
+      defaultAppModuleWithNdk(addAndroidX = false) {
         postRecipe = commonPostRecipe {
-            copyDefaultRes()
-            // 使用ImGui 专用的 AndroidManifest.xml
-            save(imguiManifestXml(data.packageName, "MainActivity"), manifestFile())
+          copyDefaultRes()
+          // 使用ImGui 专用的 AndroidManifest.xml
+          save(imguiManifestXml(data.packageName, "MainActivity"), manifestFile())
         }
 
         recipe = createRecipe {
-            val mainDir = File(data.projectDir, "src/main")
-            mainDir.mkdirs()
+          val mainDir = File(data.projectDir, "src/main")
+          mainDir.mkdirs()
 
-           // 解压jni源码压缩包
-            extractAssetWithDialog(
-                path = "template/imgui/jni/imgui-NdkSource-Jni.tar.xz",
-                destDir = mainDir,
-                stripPaths = 0,
-                dialogTitle = "Extracting NDK Sources",
-                dialogMessage = "Please wait while the ImGui NDK sources are being extracted..."
-            )
+          // 解压jni源码压缩包
+          extractAssetWithDialog(
+              path = "template/imgui/jni/imgui-NdkSource-Jni.tar.xz",
+              destDir = mainDir,
+              stripPaths = 0,
+              dialogTitle = "Extracting NDK Sources",
+              dialogMessage = "Please wait while the ImGui NDK sources are being extracted...",
+          )
 
-            val activityClass = "MainActivity"
-            sources {
-                if (data.language == Language.Kotlin) {
-                    writeKtSrc(data.packageName, activityClass, source = imguiActivitySrcKt(data.packageName, activityClass))
-                } else {
-                    writeJavaSrc(data.packageName, activityClass, source = imguiActivitySrcJava(data.packageName, activityClass))
-                }
+          val activityClass = "MainActivity"
+          sources {
+            if (data.language == Language.Kotlin) {
+              writeKtSrc(
+                  data.packageName,
+                  activityClass,
+                  source = imguiActivitySrcKt(data.packageName, activityClass),
+              )
+            } else {
+              writeJavaSrc(
+                  data.packageName,
+                  activityClass,
+                  source = imguiActivitySrcJava(data.packageName, activityClass),
+              )
             }
+          }
 
-            res {
-                putStringRes("app_name", data.appName ?: "ImGui App")
-            }
+          res { putStringRes("app_name", data.appName ?: "ImGui App") }
         }
+      }
     }
-}
 
-internal fun imguiActivitySrcKt(packageName: String, activityClass: String): String = """
+internal fun imguiActivitySrcKt(packageName: String, activityClass: String): String =
+    """
 package ${packageName}
 
 import android.app.NativeActivity
@@ -127,9 +134,11 @@ class ${activityClass} : NativeActivity() {
         return unicodeCharacterQueue.poll() ?: 0
     }
 }
-""".trimIndent()
+"""
+        .trimIndent()
 
-internal fun imguiActivitySrcJava(packageName: String, activityClass: String): String = """
+internal fun imguiActivitySrcJava(packageName: String, activityClass: String): String =
+    """
 package ${packageName};
 
 import android.app.NativeActivity;
@@ -182,9 +191,14 @@ public final class ${activityClass} extends NativeActivity {
         return poll.intValue();
     }
 }
-""".trimIndent()
+"""
+        .trimIndent()
 
-internal fun AndroidModuleTemplateBuilder.imguiManifestXml(packageName: String, activityClass: String) = """
+internal fun AndroidModuleTemplateBuilder.imguiManifestXml(
+    packageName: String,
+    activityClass: String,
+) =
+    """
 <?xml version='1.0' encoding='utf-8'?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
@@ -213,4 +227,5 @@ internal fun AndroidModuleTemplateBuilder.imguiManifestXml(packageName: String, 
                android:value="4.0" />
      </application>
 </manifest>
-""".trimIndent()
+"""
+        .trimIndent()

@@ -19,33 +19,35 @@ package com.itsaky.androidide.lsp
 
 import android.content.Context
 import com.itsaky.androidide.lsp.servers.*
-import com.itsaky.androidide.lsp.util.Logger
-import com.itsaky.androidide.lsp.servers.toml.TomlServer
-import com.itsaky.androidide.lsp.servers.lua.*
 import com.itsaky.androidide.lsp.servers.kotlin.*
+import com.itsaky.androidide.lsp.servers.lua.*
+import com.itsaky.androidide.lsp.servers.toml.TomlServer
+import com.itsaky.androidide.lsp.util.Logger
+
 /**
- * A bootstrap class responsible for initializing and registering all built-in
- * Language Server Protocol (LSP) servers with the central [LspManager].
+ * A bootstrap class responsible for initializing and registering all built-in Language Server
+ * Protocol (LSP) servers with the central [LspManager].
  *
  * This should be called once during the application's startup sequence.
  *
  * @author android_zero
  */
 object LspBootstrap {
-    private val LOG = Logger.instance("LspBootstrap")
-    private var isInitialized = false
+  private val LOG = Logger.instance("LspBootstrap")
+  private var isInitialized = false
 
-    /**
-     * Initializes and registers all built-in LSP servers. This method is idempotent.
-     *
-     * @param context The application context.
-     */
-    fun init(context: Context) {
-        if (isInitialized) return
-        
-        LOG.info("Bootstrapping AndroidIDE built-in LSP Servers...")
+  /**
+   * Initializes and registers all built-in LSP servers. This method is idempotent.
+   *
+   * @param context The application context.
+   */
+  fun init(context: Context) {
+    if (isInitialized) return
 
-        val builtInServers = listOf(
+    LOG.info("Bootstrapping AndroidIDE built-in LSP Servers...")
+
+    val builtInServers =
+        listOf(
             BashServer(),
             CssServer(),
             EmmetServer(),
@@ -59,12 +61,12 @@ object LspBootstrap {
             TypeScriptServer(),
             XmlServer(),
             TomlServer(),
-            KotlinServer()
+            KotlinServer(),
         )
 
-        LspManager.registerServers(builtInServers)
-        
-        isInitialized = true
-        LOG.info("LSP Bootstrap initialization complete.")
-    }
+    LspManager.registerServers(builtInServers)
+
+    isInitialized = true
+    LOG.info("LSP Bootstrap initialization complete.")
+  }
 }

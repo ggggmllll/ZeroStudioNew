@@ -29,9 +29,7 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
-/**
- * @author Akash Yadav
- */
+/** @author Akash Yadav */
 @RunWith(RobolectricTestRunner::class)
 @Config(manifest = Config.DEFAULT_VALUE_STRING)
 class FindHelperTest {

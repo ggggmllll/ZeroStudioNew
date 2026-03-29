@@ -23,16 +23,16 @@ import kotlinx.coroutines.flow.asSharedFlow
 
 /**
  * 轻量级的全局 Kotlin Flow 事件总线，用于 LSP 模块。
- * 
+ *
  * @author android_zero
  */
 object LspEventBus {
-    private val _installRequests = MutableSharedFlow<LspInstallRequestEvent>(extraBufferCapacity = 1)
-    val installRequests = _installRequests.asSharedFlow()
+  private val _installRequests = MutableSharedFlow<LspInstallRequestEvent>(extraBufferCapacity = 1)
+  val installRequests = _installRequests.asSharedFlow()
 
-    fun postInstallRequest(event: LspInstallRequestEvent) {
-        _installRequests.tryEmit(event)
-    }
+  fun postInstallRequest(event: LspInstallRequestEvent) {
+    _installRequests.tryEmit(event)
+  }
 }
 
 /**
@@ -50,12 +50,10 @@ data class LspInstallRequestEvent(
     val confirmButtonText: String = "Install",
     val cancelButtonText: String = "Cancel",
     val isZipArchive: Boolean = true,
-    
+
     /** 安装成功完成后的回调 */
     val onInstallComplete: (() -> Unit)? = null,
-    
-    /** 
-     * 用于通知 Manager
-     */
-    val onInstallCancelled: (() -> Unit)? = null
+
+    /** 用于通知 Manager */
+    val onInstallCancelled: (() -> Unit)? = null,
 )

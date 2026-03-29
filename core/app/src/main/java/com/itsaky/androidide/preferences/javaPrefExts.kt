@@ -25,9 +25,9 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 internal class JavaCodeConfigurations(
-  override val key: String = "idepref_editor_java",
-  override val title: Int = string.idepref_editor_category_java,
-  override val children: List<IPreference> = mutableListOf(),
+    override val key: String = "idepref_editor_java",
+    override val title: Int = string.idepref_editor_category_java,
+    override val children: List<IPreference> = mutableListOf(),
 ) : IPreferenceGroup() {
 
   init {
@@ -39,21 +39,24 @@ internal class JavaCodeConfigurations(
 /** @author Akash Yadav */
 @Parcelize
 private class GoogleCodeStyle(
-  override val key: String = JavaPreferences.GOOGLE_CODE_STYLE,
-  override val title: Int = string.idepref_java_useGoogleStyle_title,
-  override val summary: Int? = string.idepref_java_useGoogleStyle_summary,
-  override val icon: Int? = drawable.ic_format_code,
-) : SwitchPreference(getValue = JavaPreferences::googleCodeStyle::get,
-  setValue = JavaPreferences::googleCodeStyle::set)
+    override val key: String = JavaPreferences.GOOGLE_CODE_STYLE,
+    override val title: Int = string.idepref_java_useGoogleStyle_title,
+    override val summary: Int? = string.idepref_java_useGoogleStyle_summary,
+    override val icon: Int? = drawable.ic_format_code,
+) :
+    SwitchPreference(
+        getValue = JavaPreferences::googleCodeStyle::get,
+        setValue = JavaPreferences::googleCodeStyle::set,
+    )
 
 @Parcelize
 private class JavaDiagnosticsEnabled(
-  override val key: String = JavaPreferences.JAVA_DIAGNOSTICS_ENABLED,
-  override val title: Int = R.string.idepref_java_diagnosticEnabled_title,
-  override val summary: Int? = R.string.idepref_java_diagnosticsEnabled_summary,
-  override val icon: Int? = drawable.ic_compilation_error
+    override val key: String = JavaPreferences.JAVA_DIAGNOSTICS_ENABLED,
+    override val title: Int = R.string.idepref_java_diagnosticEnabled_title,
+    override val summary: Int? = R.string.idepref_java_diagnosticsEnabled_summary,
+    override val icon: Int? = drawable.ic_compilation_error,
 ) :
-  SwitchPreference(
-    getValue = JavaPreferences::isJavaDiagnosticsEnabled::get,
-    setValue = JavaPreferences::isJavaDiagnosticsEnabled::set
-  )
+    SwitchPreference(
+        getValue = JavaPreferences::isJavaDiagnosticsEnabled::get,
+        setValue = JavaPreferences::isJavaDiagnosticsEnabled::set,
+    )

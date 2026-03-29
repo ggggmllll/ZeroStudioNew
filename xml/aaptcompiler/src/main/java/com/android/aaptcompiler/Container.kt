@@ -74,10 +74,10 @@ class Container(val output: OutputStream, val totalEntryCount: Int) {
   }
 
   fun addFileEntry(input: InputStream, file: ResourceFile) =
-    addFileEntryImpl(input.readBytes(), file)
+      addFileEntryImpl(input.readBytes(), file)
 
   fun addXmlEntry(resource: XmlResource) =
-    addFileEntryImpl(resource.xmlProto.toByteArray(), resource.file)
+      addFileEntryImpl(resource.xmlProto.toByteArray(), resource.file)
 
   private fun addFileEntryImpl(content: ByteArray, file: ResourceFile) {
     if (currentEntryCount >= totalEntryCount) {
@@ -97,7 +97,7 @@ class Container(val output: OutputStream, val totalEntryCount: Int) {
     val dataSize = content.size
     val dataPadding = (4 - (dataSize % 4)) % 4
     val totalSize =
-      RES_FILE_ENTRY_HEADER_SIZE.toLong() + headerSize + headerPadding + dataSize + dataPadding
+        RES_FILE_ENTRY_HEADER_SIZE.toLong() + headerSize + headerPadding + dataSize + dataPadding
     codedOut.writeFixed64NoTag(totalSize)
 
     // Write the res file header size.

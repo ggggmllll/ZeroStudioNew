@@ -20,46 +20,45 @@ package com.itsaky.androidide.lsp.util
 import com.itsaky.androidide.lsp.LspActions
 import com.itsaky.androidide.projects.FileManager
 import java.io.File
-import java.nio.file.Paths
 
 /**
  * A provider for retrieving the current version of a text document.
  *
- * In the Language Server Protocol, every time a document is modified, its version number
- * must be incremented. This class bridges the gap between sora-editor-lsp's internal logic
- * and AndroidIDE's document management system ([FileManager]).
+ * In the Language Server Protocol, every time a document is modified, its version number must be
+ * incremented. This class bridges the gap between sora-editor-lsp's internal logic and AndroidIDE's
+ * document management system ([FileManager]).
  *
  * @author android_zero
  */
 object DocumentVersionProvider {
 
-    /**
-     * Retrieves the version of the document from AndroidIDE's active document cache.
-     *
-     * @param file The file to query.
-     * @return The monotonic version number, or 0 if the document is not open.
-     */
-    @JvmStatic
-    fun getVersion(file: File): Int {
-        return try {
-            val path = file.toPath()
-            val activeDoc = FileManager.getActiveDocument(path)
-            // If the document is open in AndroidIDE, return its tracked version.
-            // Otherwise, return 0 (initial version).
-            activeDoc?.version ?: 0
-        } catch (e: Exception) {
-            0
-        }
+  /**
+   * Retrieves the version of the document from AndroidIDE's active document cache.
+   *
+   * @param file The file to query.
+   * @return The monotonic version number, or 0 if the document is not open.
+   */
+  @JvmStatic
+  fun getVersion(file: File): Int {
+    return try {
+      val path = file.toPath()
+      val activeDoc = FileManager.getActiveDocument(path)
+      // If the document is open in AndroidIDE, return its tracked version.
+      // Otherwise, return 0 (initial version).
+      activeDoc?.version ?: 0
+    } catch (e: Exception) {
+      0
     }
+  }
 
-    /**
-     * Retrieves the version based on a URI string (typically from LSP).
-     *
-     * @param uriString The URI string (e.g., "file:///...").
-     */
-    @JvmStatic
-    fun getVersionFromUri(uriString: String): Int {
-        val path = LspActions.fixUriPath(uriString)
-        return getVersion(File(path))
-    }
+  /**
+   * Retrieves the version based on a URI string (typically from LSP).
+   *
+   * @param uriString The URI string (e.g., "file:///...").
+   */
+  @JvmStatic
+  fun getVersionFromUri(uriString: String): Int {
+    val path = LspActions.fixUriPath(uriString)
+    return getVersion(File(path))
+  }
 }

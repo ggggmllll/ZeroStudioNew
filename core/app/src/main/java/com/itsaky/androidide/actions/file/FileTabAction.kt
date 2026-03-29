@@ -42,11 +42,11 @@ abstract class FileTabAction : EditorActivityAction() {
     }
 
     val activity =
-      data.getActivity()
-        ?: run {
-          markInvisible()
-          return
-        }
+        data.getActivity()
+            ?: run {
+              markInvisible()
+              return
+            }
 
     visible = activity.editorViewModel.getOpenedFiles().isNotEmpty()
     enabled = visible

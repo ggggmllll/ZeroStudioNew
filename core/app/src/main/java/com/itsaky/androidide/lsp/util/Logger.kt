@@ -21,34 +21,34 @@ import android.util.Log
 
 /**
  * 简单日志包装器。
- * 
+ *
  * @author android_zero
  */
 class Logger private constructor(private val tag: String) {
 
-    companion object {
-        fun instance(tag: String): Logger {
-            return Logger(tag)
-        }
+  companion object {
+    fun instance(tag: String): Logger {
+      return Logger(tag)
     }
+  }
 
-    fun info(message: String) {
-        Log.i(tag, message)
-    }
+  fun info(message: String) {
+    Log.i(tag, message)
+  }
 
-    fun debug(message: String) {
-        Log.d(tag, message)
-    }
+  fun debug(message: String) {
+    Log.d(tag, message)
+  }
 
-    fun warn(message: String) {
-        Log.w(tag, message)
-    }
+  fun warn(message: String) {
+    Log.w(tag, message)
+  }
 
-    fun error(message: String, throwable: Throwable? = null) {
-        if (throwable != null) {
-            Log.e(tag, message, throwable)
-        } else {
-            Log.e(tag, message)
-        }
+  fun error(message: String, throwable: Throwable? = null) {
+    if (throwable != null) {
+      Log.e(tag, message, throwable)
+    } else {
+      Log.e(tag, message)
     }
+  }
 }

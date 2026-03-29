@@ -31,6 +31,7 @@ import com.itsaky.androidide.actions.openApplicationModuleChooser
 import com.itsaky.androidide.activities.editor.EditorHandlerActivity
 import com.itsaky.androidide.lookup.Lookup
 import com.itsaky.androidide.models.ApkMetadata
+import com.itsaky.androidide.preferences.internal.BuildPreferences
 import com.itsaky.androidide.projects.android.AndroidModule
 import com.itsaky.androidide.projects.builder.BuildService
 import com.itsaky.androidide.resources.R
@@ -40,24 +41,23 @@ import com.itsaky.androidide.utils.ApkInstaller
 import com.itsaky.androidide.utils.InstallationResultHandler
 import com.itsaky.androidide.utils.flashError
 import com.itsaky.androidide.utils.resolveAttr
+import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.slf4j.LoggerFactory
-import java.io.File
-import com.itsaky.androidide.preferences.internal.BuildPreferences
 
 /**
  * The 'Quick Run' and 'Cancel build' action in the editor activity.
  *
- * If a build is in progress, executing this action cancels the build. Otherwise, the selected
- * build variant is built and installed to the device.
+ * If a build is in progress, executing this action cancels the build. Otherwise, the selected build
+ * variant is built and installed to the device.
  *
  * @author Akash Yadav
-  * @author android_zero
+ * @author android_zero
  */
 class QuickRunWithCancellationAction(context: Context, override val order: Int) :
-  BaseBuildAction() {
+    BaseBuildAction() {
 
   companion object {
 
@@ -77,10 +77,12 @@ class QuickRunWithCancellationAction(context: Context, override val order: Int) 
 
   override fun prepare(data: ActionData) {
     super.prepare(data)
-    val context = data.getActivity() ?: run {
-      markInvisible()
-      return
-    }
+    val context =
+        data.getActivity()
+            ?: run {
+              markInvisible()
+              return
+            }
 
     if (data.isBuildInProgress()) {
       label = context.getString(R.string.title_cancel_build)
@@ -96,11 +98,10 @@ class QuickRunWithCancellationAction(context: Context, override val order: Int) 
 
   override fun createColorFilter(data: ActionData): ColorFilter? {
     return data.getContext()?.let {
-      PorterDuffColorFilter(it.resolveAttr(
-        if (data.isBuildInProgress())
-          R.attr.colorError
-        else R.attr.colorSuccess
-      ), PorterDuff.Mode.SRC_ATOP)
+      PorterDuffColorFilter(
+          it.resolveAttr(if (data.isBuildInProgress()) R.attr.colorError else R.attr.colorSuccess),
+          PorterDuff.Mode.SRC_ATOP,
+      )
     }
   }
 
@@ -116,15 +117,17 @@ class QuickRunWithCancellationAction(context: Context, override val order: Int) 
     openApplicationModuleChooser(data) { module ->
       val activity = data.getActivity() ?: return@openApplicationModuleChooser
 
-      val variant = module.getSelectedVariant() ?: run {
-        activity.flashError(
-          activity.getString(R.string.err_selected_variant_not_found))
-        return@openApplicationModuleChooser
-      }
+      val variant =
+          module.getSelectedVariant()
+              ?: run {
+                activity.flashError(activity.getString(R.string.err_selected_variant_not_found))
+                return@openApplicationModuleChooser
+              }
 
       val taskName = "${module.path}:${variant.mainArtifact.assembleTaskName}"
       log.info(
-        "Running task '$taskName' to assemble variant '${variant.name}' of project '${module.path}'")
+          "Running task '$taskName' to assemble variant '${variant.name}' of project '${module.path}'"
+      )
 
       onModuleSelected(data, module, variant, taskName)
     }
@@ -132,16 +135,18 @@ class QuickRunWithCancellationAction(context: Context, override val order: Int) 
   }
 
   private fun onModuleSelected(
-    data: ActionData,
-    module: AndroidModule,
-    variant: BasicAndroidVariantMetadata,
-    taskName: String
+      data: ActionData,
+      module: AndroidModule,
+      variant: BasicAndroidVariantMetadata,
+      taskName: String,
   ) {
 
-    val buildService = this.buildService ?: run {
-      log.error("Cannot execute task '{}'. BuildService not found.", taskName)
-      return
-    }
+    val buildService =
+        this.buildService
+            ?: run {
+              log.error("Cannot execute task '{}'. BuildService not found.", taskName)
+              return
+            }
 
     if (!buildService.isToolingServerStarted()) {
       flashError(string.msg_tooling_server_unavailable)
@@ -149,38 +154,38 @@ class QuickRunWithCancellationAction(context: Context, override val order: Int) 
     }
 
     val activity =
-      data.getActivity() as? EditorHandlerActivity
-        ?: run {
-          log.error(
-            "Cannot execute task '{}'. Activity instance not provided in ActionData or is not an EditorHandlerActivity.", taskName)
-          return
+        data.getActivity() as? EditorHandlerActivity
+            ?: run {
+              log.error(
+                  "Cannot execute task '{}'. Activity instance not provided in ActionData or is not an EditorHandlerActivity.",
+                  taskName,
+              )
+              return
+            }
+
+    actionScope
+        .launch(Dispatchers.Default) {
+          if (BuildPreferences.clearLogcatBeforeRun) {
+            activity.runOnUiThread { activity.content.bottomSheet.clearBuildOutput() }
+          }
+          activity.saveAllResult()
+
+          val result = withContext(Dispatchers.IO) { buildService.executeTasks(taskName).get() }
+
+          log.debug("Task execution result: {}", result)
+
+          if (result?.isSuccessful != true) {
+            log.error("Tasks failed to execute: '{}'", taskName)
+            return@launch
+          }
+
+          handleResult(data, result, module, variant)
         }
-
-    actionScope.launch(Dispatchers.Default) {
-      if (BuildPreferences.clearLogcatBeforeRun) {
-        activity.runOnUiThread {
-            activity.content.bottomSheet.clearBuildOutput()
+        .invokeOnCompletion { error ->
+          if (error != null) {
+            log.error("Failed to run '{}'", taskName, error)
+          }
         }
-    }
-      activity.saveAllResult()
-
-      val result = withContext(Dispatchers.IO) {
-        buildService.executeTasks(taskName).get()
-      }
-
-      log.debug("Task execution result: {}", result)
-
-      if (result?.isSuccessful != true) {
-        log.error("Tasks failed to execute: '{}'", taskName)
-        return@launch
-      }
-
-      handleResult(data, result, module, variant)
-    }.invokeOnCompletion { error ->
-      if (error != null) {
-        log.error("Failed to run '{}'", taskName, error)
-      }
-    }
   }
 
   private fun cancelBuild(data: ActionData): Boolean {
@@ -190,16 +195,13 @@ class QuickRunWithCancellationAction(context: Context, override val order: Int) 
       flashError(com.itsaky.androidide.projects.R.string.msg_tooling_server_unavailable)
       return false
     }
-    
+
     if (BuildPreferences.clearLogcatBeforeRun) {
-        val activity = data.getActivity() as? EditorHandlerActivity
-        activity?.runOnUiThread {
-            activity.content.bottomSheet.clearBuildOutput()
-        }
+      val activity = data.getActivity() as? EditorHandlerActivity
+      activity?.runOnUiThread { activity.content.bottomSheet.clearBuildOutput() }
     }
-    
-    builder.cancelCurrentBuild().whenComplete { result,
-      error ->
+
+    builder.cancelCurrentBuild().whenComplete { result, error ->
       if (error != null) {
         log.error("Failed to send build cancellation request", error)
         return@whenComplete
@@ -207,9 +209,9 @@ class QuickRunWithCancellationAction(context: Context, override val order: Int) 
 
       if (!result.wasEnqueued) {
         log.warn(
-          "Unable to enqueue cancellation request reason={} reason.message={}",
-          result.failureReason,
-          result.failureReason!!.message
+            "Unable to enqueue cancellation request reason={} reason.message={}",
+            result.failureReason,
+            result.failureReason!!.message,
         )
         return@whenComplete
       }
@@ -221,10 +223,10 @@ class QuickRunWithCancellationAction(context: Context, override val order: Int) 
   }
 
   private fun handleResult(
-    data: ActionData,
-    result: TaskExecutionResult?,
-    module: AndroidModule,
-    variant: BasicAndroidVariantMetadata
+      data: ActionData,
+      result: TaskExecutionResult?,
+      module: AndroidModule,
+      variant: BasicAndroidVariantMetadata,
   ) {
     if (result == null || !result.isSuccessful) {
       log.debug("Cannot install APK. Task execution failed.")
@@ -257,11 +259,11 @@ class QuickRunWithCancellationAction(context: Context, override val order: Int) 
 
   private fun install(data: ActionData, apk: File) {
     val activity =
-      data.getActivity() as? EditorHandlerActivity
-        ?: run {
-          log.error("Cannot install APK. Unable to get activity instance.")
-          return
-        }
+        data.getActivity() as? EditorHandlerActivity
+            ?: run {
+              log.error("Cannot install APK. Unable to get activity instance.")
+              return
+            }
 
     activity.runOnUiThread {
       log.debug("Installing APK: {}", apk)
@@ -272,10 +274,10 @@ class QuickRunWithCancellationAction(context: Context, override val order: Int) 
       }
 
       ApkInstaller.installApk(
-        activity,
-        InstallationResultHandler.createEditorActivitySender(activity),
-        apk,
-        activity.installationSessionCallback()
+          activity,
+          InstallationResultHandler.createEditorActivitySender(activity),
+          apk,
+          activity.installationSessionCallback(),
       )
     }
   }
@@ -283,6 +285,8 @@ class QuickRunWithCancellationAction(context: Context, override val order: Int) 
   private fun ActionData.isBuildInProgress(): Boolean {
     val context = getActivity()
     val buildService = Lookup.getDefault().lookup(BuildService.KEY_BUILD_SERVICE)
-    return (context as? EditorHandlerActivity)?.editorViewModel?.let { it.isInitializing || it.isBuildInProgress } == true || buildService?.isBuildInProgress == true
+    return (context as? EditorHandlerActivity)?.editorViewModel?.let {
+      it.isInitializing || it.isBuildInProgress
+    } == true || buildService?.isBuildInProgress == true
   }
 }

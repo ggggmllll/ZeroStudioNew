@@ -19,7 +19,7 @@ package com.itsaky.androidide.templates.impl.androidstudio.other.customView.src.
 import com.android.tools.idea.wizard.template.renderIf
 
 fun customViewJava(applicationPackage: String?, packageName: String, viewClass: String) =
-  """
+    """
 package ${packageName};
 
 import android.content.Context;

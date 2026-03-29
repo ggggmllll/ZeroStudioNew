@@ -33,7 +33,7 @@ class FindAnonymousVisitor : ErrorAwareTreeScanner<Unit, Unit>() {
 
   private enum class Mode {
     COLLECT,
-    CHECK
+    CHECK,
   }
 
   var noInner = 0

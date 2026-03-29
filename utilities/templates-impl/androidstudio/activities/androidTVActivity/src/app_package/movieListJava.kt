@@ -23,7 +23,7 @@ package com.itsaky.androidide.templates.impl.androidstudio.activities.androidTVA
  * @author android_zero
  */
 fun movieListJava(packageName: String) =
-  """
+    """
 package ${packageName};
 
 import java.util.ArrayList;

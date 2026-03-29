@@ -15,7 +15,6 @@
  *   along with AndroidIDE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 import com.itsaky.androidide.build.config.BuildConfig
 
 plugins {
@@ -23,11 +22,7 @@ plugins {
   kotlin("android")
 }
 
-
-
-android {
-  namespace = "${BuildConfig.packageName}.testing.unit"
-}
+android { namespace = "${BuildConfig.packageName}.testing.unit" }
 
 dependencies {
   api(libs.tests.androidx.test.core)
@@ -35,7 +30,7 @@ dependencies {
   api(libs.tests.junit)
   api(libs.tests.google.truth)
   api(libs.tests.mockk)
-testImplementation("org.conscrypt:conscrypt-openjdk:2.5.2")
+  testImplementation("org.conscrypt:conscrypt-openjdk:2.5.2")
   api(projects.core.common)
   api(projects.testing.commonTest)
   api(projects.utilities.buildInfo)

@@ -15,25 +15,22 @@
  *   along with AndroidIDE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 @Suppress("JavaPluginLanguageLevel")
 plugins {
-    id("java-library")
-    id("org.jetbrains.kotlin.jvm")
+  id("java-library")
+  id("org.jetbrains.kotlin.jvm")
 }
 
-
-
 dependencies {
-    api(libs.androidx.annotation)
-    api(libs.androidx.collection)
+  api(libs.androidx.annotation)
+  api(libs.androidx.collection)
 
-    implementation(libs.google.guava)
-    implementation(libs.google.gson)
+  implementation(libs.google.guava)
+  implementation(libs.google.gson)
 
-    implementation(projects.logging.logger)
-    implementation(projects.utilities.buildInfo)
+  implementation(projects.logging.logger)
+  implementation(projects.utilities.buildInfo)
 
-    testImplementation(libs.tests.google.truth)
-    testImplementation(libs.tests.junit)
+  testImplementation(libs.tests.google.truth)
+  testImplementation(libs.tests.junit)
 }

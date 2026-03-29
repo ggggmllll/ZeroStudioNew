@@ -24,24 +24,12 @@ plugins {
   id("com.google.protobuf")
 }
 
-android {
-  namespace = "${BuildConfig.packageName}.xml.resapi"
-}
+android { namespace = "${BuildConfig.packageName}.xml.resapi" }
 
 protobuf {
-  protoc {
-    artifact = "com.google.protobuf:protoc:4.27.0"
-  }
+  protoc { artifact = "com.google.protobuf:protoc:4.27.0" }
 
-  generateProtoTasks {
-    all().forEach {
-      it.builtins {
-        id("java") {
-          option("lite")
-        }
-      }
-    }
-  }
+  generateProtoTasks { all().forEach { it.builtins { id("java") { option("lite") } } } }
 }
 
 dependencies {

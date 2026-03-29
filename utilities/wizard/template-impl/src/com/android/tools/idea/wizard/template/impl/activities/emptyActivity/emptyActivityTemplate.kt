@@ -47,7 +47,13 @@ val emptyActivityTemplate
 
     category = Category.Activity
     formFactor = FormFactor.Mobile
-    screens = listOf(WizardUiContext.ActivityGallery, WizardUiContext.MenuEntry, WizardUiContext.NewProject, WizardUiContext.NewModule)
+    screens =
+        listOf(
+            WizardUiContext.ActivityGallery,
+            WizardUiContext.MenuEntry,
+            WizardUiContext.NewProject,
+            WizardUiContext.NewModule,
+        )
     constraints = listOf(TemplateConstraint.AndroidX, TemplateConstraint.Material3)
 
     val generateLayout: BooleanParameter = booleanParameter {
@@ -77,29 +83,30 @@ val emptyActivityTemplate
       name = "Launcher Activity"
       visible = { !isNewModule }
       default = false
-      help = "If true, this activity will have a CATEGORY_LAUNCHER intent filter, making it visible in the launcher"
+      help =
+          "If true, this activity will have a CATEGORY_LAUNCHER intent filter, making it visible in the launcher"
     }
     val packageName = defaultPackageNameParameter
 
     widgets(
-      TextFieldWidget(activityClass),
-      CheckBoxWidget(generateLayout),
-      TextFieldWidget(layoutName),
-      CheckBoxWidget(isLauncher),
-      PackageNameWidget(packageName),
-      LanguageWidget(),
+        TextFieldWidget(activityClass),
+        CheckBoxWidget(generateLayout),
+        TextFieldWidget(layoutName),
+        CheckBoxWidget(isLauncher),
+        PackageNameWidget(packageName),
+        LanguageWidget(),
     )
 
     thumb { File("empty-activity").resolve("template_empty_activity.png") }
 
     recipe = { data ->
       generateEmptyActivity(
-        data as ModuleTemplateData,
-        activityClass.value,
-        generateLayout.value,
-        layoutName.value,
-        isLauncher.value,
-        packageName.value,
+          data as ModuleTemplateData,
+          activityClass.value,
+          generateLayout.value,
+          layoutName.value,
+          isLauncher.value,
+          packageName.value,
       )
     }
   }

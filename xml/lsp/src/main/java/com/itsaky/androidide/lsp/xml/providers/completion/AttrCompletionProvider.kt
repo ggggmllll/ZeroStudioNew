@@ -42,7 +42,7 @@ import org.eclipse.lemminx.dom.DOMNode
  * @author Akash Yadav
  */
 open class AttrCompletionProvider(provider: ICompletionProvider) :
-  IXmlCompletionProvider(provider) {
+    IXmlCompletionProvider(provider) {
 
   private var attrHasNamespace = false
 
@@ -51,26 +51,26 @@ open class AttrCompletionProvider(provider: ICompletionProvider) :
   }
 
   override fun doComplete(
-    params: CompletionParams,
-    pathData: ResourcePathData,
-    document: DOMDocument,
-    type: NodeType,
-    prefix: String
+      params: CompletionParams,
+      pathData: ResourcePathData,
+      document: DOMDocument,
+      type: NodeType,
+      prefix: String,
   ): CompletionResult {
     val list = mutableListOf<CompletionItem>()
 
     val newPrefix =
-      if (attrAtCursor.name.contains(':')) {
-        attrAtCursor.name.substringAfterLast(':')
-      } else attrAtCursor.name
+        if (attrAtCursor.name.contains(':')) {
+          attrAtCursor.name.substringAfterLast(':')
+        } else attrAtCursor.name
 
     attrHasNamespace = newPrefix != attrAtCursor.name
 
     val namespace =
-      attrAtCursor.namespaceURI
-        ?: run {
-          return completeFromAllNamespaces(nodeAtCursor, list, newPrefix)
-        }
+        attrAtCursor.namespaceURI
+            ?: run {
+              return completeFromAllNamespaces(nodeAtCursor, list, newPrefix)
+            }
 
     val nsPrefix = attrAtCursor.nodeName.substringBefore(':')
     completeForNamespace(namespace, nsPrefix, nodeAtCursor, newPrefix, list)
@@ -79,9 +79,9 @@ open class AttrCompletionProvider(provider: ICompletionProvider) :
   }
 
   private fun completeFromAllNamespaces(
-    node: DOMNode,
-    list: MutableList<CompletionItem>,
-    newPrefix: String
+      node: DOMNode,
+      list: MutableList<CompletionItem>,
+      newPrefix: String,
   ): CompletionResult {
     val namespaces = findAllNamespaces(node)
     namespaces.forEach { completeForNamespace(it.second, it.first, node, newPrefix, list) }
@@ -90,11 +90,11 @@ open class AttrCompletionProvider(provider: ICompletionProvider) :
   }
 
   protected open fun completeForNamespace(
-    namespace: String?,
-    nsPrefix: String,
-    node: DOMNode,
-    newPrefix: String,
-    list: MutableList<CompletionItem>
+      namespace: String?,
+      nsPrefix: String,
+      node: DOMNode,
+      newPrefix: String,
+      list: MutableList<CompletionItem>,
   ) {
     if (namespace == null) {
       log.warn("Namespace is null. Cannot compute completions for namespace prefix: {}.", nsPrefix)
@@ -123,12 +123,12 @@ open class AttrCompletionProvider(provider: ICompletionProvider) :
   }
 
   protected open fun addFromPackage(
-    tablePackage: IResourceTablePackage?,
-    node: DOMNode,
-    pck: String,
-    nsPrefix: String,
-    newPrefix: String,
-    list: MutableList<CompletionItem>
+      tablePackage: IResourceTablePackage?,
+      node: DOMNode,
+      pck: String,
+      nsPrefix: String,
+      newPrefix: String,
+      list: MutableList<CompletionItem>,
   ) {
     val styleables = tablePackage?.findGroup(STYLEABLE) ?: return
     val nodeStyleables = findNodeStyleables(node, styleables)
@@ -137,20 +137,20 @@ open class AttrCompletionProvider(provider: ICompletionProvider) :
     }
 
     addFromStyleables(
-      styleables = nodeStyleables,
-      pck = pck,
-      pckPrefix = nsPrefix,
-      prefix = newPrefix,
-      list = list
+        styleables = nodeStyleables,
+        pck = pck,
+        pckPrefix = nsPrefix,
+        prefix = newPrefix,
+        list = list,
     )
   }
 
   protected open fun addFromStyleables(
-    styleables: Set<Styleable>,
-    pck: String,
-    pckPrefix: String,
-    prefix: String,
-    list: MutableList<CompletionItem>
+      styleables: Set<Styleable>,
+      pck: String,
+      pckPrefix: String,
+      prefix: String,
+      list: MutableList<CompletionItem>,
   ) {
     for (nodeStyleable in styleables) {
       for (ref in nodeStyleable.entries) {
@@ -159,14 +159,14 @@ open class AttrCompletionProvider(provider: ICompletionProvider) :
           continue
         }
         list.add(
-          createAttrCompletionItem(
-            attr = ref,
-            resPkg = pck,
-            nsPrefix = pckPrefix,
-            hasNamespace = attrHasNamespace,
-            matchLevel = matchLevel,
-            partial = prefix
-          )
+            createAttrCompletionItem(
+                attr = ref,
+                resPkg = pck,
+                nsPrefix = pckPrefix,
+                hasNamespace = attrHasNamespace,
+                matchLevel = matchLevel,
+                partial = prefix,
+            )
         )
       }
     }
@@ -182,11 +182,11 @@ open class AttrCompletionProvider(provider: ICompletionProvider) :
 
     // Find the widget
     val widget =
-      if (nodeName.contains(".")) {
-        widgets.getWidget(nodeName)
-      } else {
-        widgets.findWidgetWithSimpleName(nodeName)
-      }
+        if (nodeName.contains(".")) {
+          widgets.getWidget(nodeName)
+        } else {
+          widgets.findWidgetWithSimpleName(nodeName)
+        }
 
     if (widget != null) {
       // This is a widget from the Android SDK
@@ -204,10 +204,10 @@ open class AttrCompletionProvider(provider: ICompletionProvider) :
   }
 
   protected open fun findStyleablesForName(
-    styleables: IResourceGroup,
-    node: DOMNode,
-    addFromParent: Boolean = false,
-    suffix: String = ""
+      styleables: IResourceGroup,
+      node: DOMNode,
+      addFromParent: Boolean = false,
+      suffix: String = "",
   ): Set<Styleable> {
     val result = mutableSetOf<Styleable>()
 
@@ -236,8 +236,8 @@ open class AttrCompletionProvider(provider: ICompletionProvider) :
   }
 
   protected open fun findLayoutParams(
-    styleables: IResourceGroup,
-    parentNode: DOMNode
+      styleables: IResourceGroup,
+      parentNode: DOMNode,
   ): Set<Styleable> {
     val result = mutableSetOf<Styleable>()
 
@@ -256,12 +256,12 @@ open class AttrCompletionProvider(provider: ICompletionProvider) :
   }
 
   protected open fun findStyleablesForWidget(
-    styleables: IResourceGroup,
-    widgets: WidgetTable,
-    widget: Widget,
-    node: DOMNode,
-    adddFromParent: Boolean = true,
-    suffix: String = ""
+      styleables: IResourceGroup,
+      widgets: WidgetTable,
+      widget: Widget,
+      node: DOMNode,
+      adddFromParent: Boolean = true,
+      suffix: String = "",
   ): Set<Styleable> {
     val result = mutableSetOf<Styleable>()
 
@@ -275,22 +275,22 @@ open class AttrCompletionProvider(provider: ICompletionProvider) :
     if (adddFromParent && node.parentNode != null) {
       val parentName = node.parentNode.nodeName
       val parentWidget =
-        if (parentName.contains(".")) {
-          widgets.getWidget(parentName)
-        } else {
-          widgets.findWidgetWithSimpleName(parentName)
-        }
+          if (parentName.contains(".")) {
+            widgets.getWidget(parentName)
+          } else {
+            widgets.findWidgetWithSimpleName(parentName)
+          }
 
       if (parentWidget != null) {
         result.addAll(
-          findStyleablesForWidget(
-            styleables,
-            widgets,
-            parentWidget,
-            node.parentNode,
-            false,
-            "_Layout"
-          )
+            findStyleablesForWidget(
+                styleables,
+                widgets,
+                parentWidget,
+                node.parentNode,
+                false,
+                "_Layout",
+            )
         )
       } else {
         result.addAll(findLayoutParams(styleables, node.parentNode))
@@ -301,19 +301,19 @@ open class AttrCompletionProvider(provider: ICompletionProvider) :
   }
 
   protected open fun addWidgetStyleable(
-    styleables: IResourceGroup,
-    widget: Widget,
-    result: MutableSet<Styleable>,
-    suffix: String = ""
+      styleables: IResourceGroup,
+      widget: Widget,
+      result: MutableSet<Styleable>,
+      suffix: String = "",
   ) {
     addWidgetStyleable(styleables, widget.simpleName, result, suffix)
   }
 
   protected open fun addWidgetStyleable(
-    styleables: IResourceGroup,
-    widget: String,
-    result: MutableSet<Styleable>,
-    suffix: String = ""
+      styleables: IResourceGroup,
+      widget: String,
+      result: MutableSet<Styleable>,
+      suffix: String = "",
   ) {
     val entry = findStyleableEntry(styleables, "${widget}${suffix}")
     if (entry != null) {
@@ -322,11 +322,11 @@ open class AttrCompletionProvider(provider: ICompletionProvider) :
   }
 
   protected open fun addSuperclassStyleables(
-    styleables: IResourceGroup,
-    widgets: WidgetTable,
-    widget: Widget,
-    result: MutableSet<Styleable>,
-    suffix: String = ""
+      styleables: IResourceGroup,
+      widgets: WidgetTable,
+      widget: Widget,
+      result: MutableSet<Styleable>,
+      suffix: String = "",
   ) {
     for (superclass in widget.superclasses) {
       // When a ViewGroup is encountered in the superclasses, add the margin layout params

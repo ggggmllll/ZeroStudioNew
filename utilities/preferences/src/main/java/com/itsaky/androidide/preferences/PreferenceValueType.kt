@@ -40,5 +40,5 @@ enum class PreferenceValueType {
   BOOLEAN,
 
   /** No preference value is required. */
-  NONE
+  NONE,
 }

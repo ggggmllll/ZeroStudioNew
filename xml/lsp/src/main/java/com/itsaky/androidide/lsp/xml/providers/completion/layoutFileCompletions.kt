@@ -21,10 +21,7 @@ import com.android.aaptcompiler.AaptResourceType.LAYOUT
 import com.android.aaptcompiler.ResourcePathData
 import com.itsaky.androidide.lsp.xml.utils.XmlUtils.NodeType
 
-/**
- * @author Akash Yadav
- */
-
-fun canCompleteLayout(pathData: ResourcePathData, type: NodeType) : Boolean {
+/** @author Akash Yadav */
+fun canCompleteLayout(pathData: ResourcePathData, type: NodeType): Boolean {
   return pathData.type == LAYOUT
 }

@@ -12,35 +12,35 @@ import me.rerere.ai.ui.UIMessage
 // 提供商实现
 // 采用无状态设计，使用时除了需要传入需要的参数外，还需要传入provider setting作为参数
 interface Provider<T : ProviderSetting> {
-    suspend fun listModels(providerSetting: T): List<Model>
+  suspend fun listModels(providerSetting: T): List<Model>
 
-    suspend fun getBalance(providerSetting: T): String {
-        return "TODO"
-    }
+  suspend fun getBalance(providerSetting: T): String {
+    return "TODO"
+  }
 
-    suspend fun generateText(
-        providerSetting: T,
-        messages: List<UIMessage>,
-        params: TextGenerationParams,
-    ): MessageChunk
+  suspend fun generateText(
+      providerSetting: T,
+      messages: List<UIMessage>,
+      params: TextGenerationParams,
+  ): MessageChunk
 
-    suspend fun streamText(
-        providerSetting: T,
-        messages: List<UIMessage>,
-        params: TextGenerationParams,
-    ): Flow<MessageChunk>
+  suspend fun streamText(
+      providerSetting: T,
+      messages: List<UIMessage>,
+      params: TextGenerationParams,
+  ): Flow<MessageChunk>
 
-    suspend fun generateEmbedding(
-        providerSetting: T,
-        params: EmbeddingGenerationParams,
-    ): EmbeddingGenerationResult {
-        error("Embedding generation is not supported")
-    }
+  suspend fun generateEmbedding(
+      providerSetting: T,
+      params: EmbeddingGenerationParams,
+  ): EmbeddingGenerationResult {
+    error("Embedding generation is not supported")
+  }
 
-    suspend fun generateImage(
-        providerSetting: ProviderSetting,
-        params: ImageGenerationParams,
-    ): ImageGenerationResult
+  suspend fun generateImage(
+      providerSetting: ProviderSetting,
+      params: ImageGenerationParams,
+  ): ImageGenerationResult
 }
 
 @Serializable
@@ -80,14 +80,6 @@ data class EmbeddingGenerationResult(
     val embeddings: List<List<Float>>,
 )
 
-@Serializable
-data class CustomHeader(
-    val name: String,
-    val value: String
-)
+@Serializable data class CustomHeader(val name: String, val value: String)
 
-@Serializable
-data class CustomBody(
-    val key: String,
-    val value: JsonElement
-)
+@Serializable data class CustomBody(val key: String, val value: JsonElement)

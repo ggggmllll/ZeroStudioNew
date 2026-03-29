@@ -22,7 +22,7 @@ package com.itsaky.androidide.templates.impl.androidstudio.activities.androidTVA
  * @author android_zero
  */
 fun themesXml(themeName: String) =
-  """
+    """
 <resources>
     <style name="$themeName" parent="@style/Theme.Leanback" />
 </resources>

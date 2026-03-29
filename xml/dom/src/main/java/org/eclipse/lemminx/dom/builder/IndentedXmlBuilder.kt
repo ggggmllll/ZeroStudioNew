@@ -22,18 +22,22 @@ package org.eclipse.lemminx.dom.builder
  *
  * @author Akash Yadav
  */
-class IndentedXmlBuilder(private val autoIndent: Boolean = false, whitespacesIndent: String?, lineDelimiter: String?,
-                         options: BaseXmlFormattingOptions?
+class IndentedXmlBuilder(
+    private val autoIndent: Boolean = false,
+    whitespacesIndent: String?,
+    lineDelimiter: String?,
+    options: BaseXmlFormattingOptions?,
 ) : XmlBuilder(whitespacesIndent, lineDelimiter, options) {
 
-  constructor(autoIndent: Boolean) : this(autoIndent, "", System.lineSeparator(), BaseXmlFormattingOptions())
+  constructor(
+      autoIndent: Boolean
+  ) : this(autoIndent, "", System.lineSeparator(), BaseXmlFormattingOptions())
 
   constructor() : this(false)
 
   private var indentLevel = 0
 
-  override fun startElement(prefix: String?, name: String?, close: Boolean
-  ): XmlBuilder {
+  override fun startElement(prefix: String?, name: String?, close: Boolean): XmlBuilder {
     if (autoIndent) {
       lfIndent()
     }
@@ -44,15 +48,16 @@ class IndentedXmlBuilder(private val autoIndent: Boolean = false, whitespacesInd
     }
   }
 
-  override fun addAttributeContents(name: String?, equalsSign: Boolean,
-                                    originalValue: String?,
-                                    surroundWithQuotes: Boolean
+  override fun addAttributeContents(
+      name: String?,
+      equalsSign: Boolean,
+      originalValue: String?,
+      surroundWithQuotes: Boolean,
   ) {
     if (autoIndent) {
       lfIndent()
     }
-    super.addAttributeContents(name, equalsSign, originalValue,
-      surroundWithQuotes)
+    super.addAttributeContents(name, equalsSign, originalValue, surroundWithQuotes)
   }
 
   override fun selfCloseElement(): XmlBuilder {
@@ -62,9 +67,7 @@ class IndentedXmlBuilder(private val autoIndent: Boolean = false, whitespacesInd
     return super.selfCloseElement()
   }
 
-  override fun endElement(prefix: String?, name: String?,
-                          isEndTagClosed: Boolean
-  ): XmlBuilder {
+  override fun endElement(prefix: String?, name: String?, isEndTagClosed: Boolean): XmlBuilder {
     if (autoIndent) {
       dcrIndent()
       lfIndent()
@@ -72,31 +75,23 @@ class IndentedXmlBuilder(private val autoIndent: Boolean = false, whitespacesInd
     return super.endElement(prefix, name, isEndTagClosed)
   }
 
-  /**
-   * Increment the indentation level.
-   */
+  /** Increment the indentation level. */
   fun incrIndent() {
     ++indentLevel
   }
 
-  /**
-   * Decrement the indentation level.
-   */
+  /** Decrement the indentation level. */
   fun dcrIndent() {
     --indentLevel
   }
 
-  /**
-   * Appends a line feed and indents the next line.
-   */
+  /** Appends a line feed and indents the next line. */
   fun lfIndent() {
     linefeed()
     indent()
   }
 
-  /**
-   * Appends indentation to the indent line.
-   */
+  /** Appends indentation to the indent line. */
   fun indent() {
     indent(indentLevel)
   }

@@ -33,38 +33,40 @@ import io.github.rosemoe.sora.text.TextRange
  * @author Akash Yadav
  */
 class LSPFormatter(val server: ILanguageServer? = null) : AsyncFormatter() {
-  
+
   override fun formatAsync(text: Content, cursorRange: TextRange): TextRange {
     return doFormat(text, cursorRange)
   }
 
   override fun formatRegionAsync(
-    text: Content,
-    rangeToFormat: TextRange,
-    cursorRange: TextRange
+      text: Content,
+      rangeToFormat: TextRange,
+      cursorRange: TextRange,
   ): TextRange {
     return doFormat(text, cursorRange, rangeToFormat)
   }
 
   private fun doFormat(
-    text: Content,
-    cursorRange: TextRange,
-    rangeToFormat: TextRange? = null
+      text: Content,
+      cursorRange: TextRange,
+      rangeToFormat: TextRange? = null,
   ): TextRange {
     if (server == null) {
       return cursorRange
     }
 
     val range =
-      (rangeToFormat?.asRange() ?: text.wholeRange()).apply {
-        start.apply {
-          index = (if (line == 0 && column == 0) 0 else text.getCharIndex(line, column))
+        (rangeToFormat?.asRange() ?: text.wholeRange()).apply {
+          start.apply {
+            index = (if (line == 0 && column == 0) 0 else text.getCharIndex(line, column))
+          }
+          end.apply {
+            index = (if (line == 0 && column == 0) 0 else text.getCharIndex(line, column))
+          }
         }
-        end.apply { index = (if (line == 0 && column == 0) 0 else text.getCharIndex(line, column)) }
-      }
     val result = server.formatCode(FormatCodeParams(text, range))
 
-    if (!result.hasEdits() ) {
+    if (!result.hasEdits()) {
       // Deselect the selected content
       return TextRange(cursorRange.start, cursorRange.start)
     }
@@ -74,11 +76,11 @@ class LSPFormatter(val server: ILanguageServer? = null) : AsyncFormatter() {
     } else {
       result.edits.forEach {
         text.replace(
-          it.range.start.line,
-          it.range.start.column,
-          it.range.end.line,
-          it.range.end.column,
-          it.newText
+            it.range.start.line,
+            it.range.start.column,
+            it.range.end.line,
+            it.range.end.column,
+            it.newText,
         )
       }
     }
@@ -88,7 +90,7 @@ class LSPFormatter(val server: ILanguageServer? = null) : AsyncFormatter() {
 }
 
 private fun CodeFormatResult.hasEdits() =
-  this.indexedTextEdits.isNotEmpty() || this.edits.isNotEmpty()
+    this.indexedTextEdits.isNotEmpty() || this.edits.isNotEmpty()
 
 private fun TextRange.asRange(): Range {
   return Range().also {

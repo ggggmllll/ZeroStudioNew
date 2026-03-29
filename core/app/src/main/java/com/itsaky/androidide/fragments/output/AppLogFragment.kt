@@ -31,11 +31,12 @@ import com.itsaky.androidide.services.log.LogReceiverImpl
 import com.itsaky.androidide.services.log.LogReceiverService
 import com.itsaky.androidide.services.log.LogReceiverServiceConnection
 import com.itsaky.androidide.services.log.lookupLogService
-import org.slf4j.LoggerFactory
 import java.util.concurrent.atomic.AtomicBoolean
+import org.slf4j.LoggerFactory
 
 /**
  * Fragment to show application logs.
+ *
  * @author Akash Yadav
  */
 class AppLogFragment : LogViewFragment() {
@@ -45,36 +46,41 @@ class AppLogFragment : LogViewFragment() {
   private var logServiceConnection: LogReceiverServiceConnection? = null
   private var logReceiverImpl: LogReceiverImpl? = null
 
-  private val logServiceConnectionObserver = object : BroadcastReceiver() {
-    override fun onReceive(context: Context?, intent: Intent?) {
-      if (intent?.action != LogReceiverService.ACTION_CONNECTION_UPDATE) {
-        log.warn(
-          "Received invalid broadcast. Action '${LogReceiverService.ACTION_CONNECTION_UPDATE}' is expected.")
-        return
-      }
+  private val logServiceConnectionObserver =
+      object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+          if (intent?.action != LogReceiverService.ACTION_CONNECTION_UPDATE) {
+            log.warn(
+                "Received invalid broadcast. Action '${LogReceiverService.ACTION_CONNECTION_UPDATE}' is expected."
+            )
+            return
+          }
 
-      val params = ConnectionObserverParams.from(intent) ?: run {
-        log.warn(
-          "Received ${LogReceiverService.ACTION_CONNECTION_UPDATE} broadcast, but invalid extras were provided: $intent")
-        return
-      }
+          val params =
+              ConnectionObserverParams.from(intent)
+                  ?: run {
+                    log.warn(
+                        "Received ${LogReceiverService.ACTION_CONNECTION_UPDATE} broadcast, but invalid extras were provided: $intent"
+                    )
+                    return
+                  }
 
-      val isBound = isBoundToLogReceiver.get()
-      if (!isBound && params.totalConnections > 0) {
-        // log receiver has been connected to one or more log senders
-        // bind to the receiver and notify senders to start reading logs
-        bindToLogReceiver()
-        return
-      }
+          val isBound = isBoundToLogReceiver.get()
+          if (!isBound && params.totalConnections > 0) {
+            // log receiver has been connected to one or more log senders
+            // bind to the receiver and notify senders to start reading logs
+            bindToLogReceiver()
+            return
+          }
 
-      if (isBound && params.totalConnections == 0) {
-        // all log senders have been disconnected from the log receiver
-        // unbind from the log receiver
-        unbindFromLogReceiver()
-        return
+          if (isBound && params.totalConnections == 0) {
+            // all log senders have been disconnected from the log receiver
+            // unbind from the log receiver
+            unbindFromLogReceiver()
+            return
+          }
+        }
       }
-    }
-  }
 
   companion object {
 
@@ -82,15 +88,17 @@ class AppLogFragment : LogViewFragment() {
   }
 
   override fun isSimpleFormattingEnabled() = false
+
   override fun getFilename() = "app_logs"
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-    emptyStateViewModel.emptyMessage.value = if (DevOpsPreferences.logsenderEnabled) {
-      getString(R.string.msg_emptyview_applogs)
-    } else {
-      getString(R.string.msg_logsender_disabled)
-    }
+    emptyStateViewModel.emptyMessage.value =
+        if (DevOpsPreferences.logsenderEnabled) {
+          getString(R.string.msg_emptyview_applogs)
+        } else {
+          getString(R.string.msg_logsender_disabled)
+        }
 
     registerLogConnectionObserver()
   }
@@ -108,7 +116,7 @@ class AppLogFragment : LogViewFragment() {
     try {
       val intentFilter = IntentFilter(LogReceiverService.ACTION_CONNECTION_UPDATE)
       LocalBroadcastManager.getInstance(requireContext())
-        .registerReceiver(logServiceConnectionObserver, intentFilter)
+          .registerReceiver(logServiceConnectionObserver, intentFilter)
     } catch (e: Exception) {
       log.warn("Failed to register connection observer for LogReceiverService", e)
     }
@@ -117,7 +125,7 @@ class AppLogFragment : LogViewFragment() {
   private fun unregisterLogConnectionObserver() {
     try {
       LocalBroadcastManager.getInstance(requireContext())
-        .unregisterReceiver(logServiceConnectionObserver)
+          .unregisterReceiver(logServiceConnectionObserver)
     } catch (e: Exception) {
       log.warn("Failed to unregister connection observer for LogReceiverService", e)
     }
@@ -134,15 +142,17 @@ class AppLogFragment : LogViewFragment() {
       }
 
       val context = context ?: return
-      val intent = Intent(context, LogReceiverService::class.java).setAction(
-        LogReceiverService.ACTION_CONNECT_LOG_CONSUMER)
+      val intent =
+          Intent(context, LogReceiverService::class.java)
+              .setAction(LogReceiverService.ACTION_CONNECT_LOG_CONSUMER)
 
-      val serviceConnection = logServiceConnection ?: LogReceiverServiceConnection { binder ->
-        logReceiverImpl = binder
-        lookupLogService()?.setConsumer(this::appendLog)
-      }.also { serviceConnection ->
-        logServiceConnection = serviceConnection
-      }
+      val serviceConnection =
+          logServiceConnection
+              ?: LogReceiverServiceConnection { binder ->
+                    logReceiverImpl = binder
+                    lookupLogService()?.setConsumer(this::appendLog)
+                  }
+                  .also { serviceConnection -> logServiceConnection = serviceConnection }
 
       // do not auto create the service with BIND_AUTO_CREATE
       check(context.bindService(intent, serviceConnection, Context.BIND_IMPORTANT))
@@ -162,10 +172,12 @@ class AppLogFragment : LogViewFragment() {
       lookupLogService()?.setConsumer(null)
       logReceiverImpl?.disconnectAll()
 
-      val serviceConnection = logServiceConnection ?: run {
-        log.warn("Trying to unbind from LogReceiverService, but ServiceConnection is null")
-        return
-      }
+      val serviceConnection =
+          logServiceConnection
+              ?: run {
+                log.warn("Trying to unbind from LogReceiverService, but ServiceConnection is null")
+                return
+              }
 
       val context = context ?: return
       context.unbindService(serviceConnection)

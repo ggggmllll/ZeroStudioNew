@@ -23,7 +23,7 @@ package com.itsaky.androidide.templates.impl.androidstudio.activities.androidTVA
  * @author android_zero
  */
 fun movieListKt(packageName: String) =
-  """
+    """
 package ${packageName}
 
 object MovieList {

@@ -15,7 +15,6 @@
  *   along with AndroidIDE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 @Suppress("JavaPluginLanguageLevel")
 plugins {
   id("java-library")
@@ -23,12 +22,10 @@ plugins {
   id("org.jetbrains.kotlin.jvm")
 }
 
-
-
 dependencies {
   kapt(libs.google.auto.service)
   api(libs.google.auto.service.annotations)
-testImplementation("org.conscrypt:conscrypt-openjdk:2.5.2")
+  testImplementation("org.conscrypt:conscrypt-openjdk:2.5.2")
   api(libs.tests.junit)
   api(projects.logging.logger)
 
