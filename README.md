@@ -23,6 +23,10 @@
   <a href="https://docs.ZeroStudio.com/">Explore the docs »</a> &nbsp; &nbsp;
 </p>
 
+
+![page preview](docs/About/pages.png)
+
+
 ## Features
 
 - [x] Gradle support.
