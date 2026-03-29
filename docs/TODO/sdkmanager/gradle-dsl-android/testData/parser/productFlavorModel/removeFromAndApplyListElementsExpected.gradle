@@ -1,0 +1,8 @@
+android {
+  defaultConfig {
+    consumerProguardFiles 'proguard-android.txt'
+    proguardFiles = ['proguard-android.txt']
+    resourceConfigurations += ['abcd']
+    resValue "abcd", "efgh", "ijkl"
+  }
+}
