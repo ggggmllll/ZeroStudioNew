@@ -346,3 +346,6 @@
 -keep class * extends com.google.protobuf.GeneratedMessageLite {
   <fields>;
 }
+
+# 忽略 BlockHound 的缺失引用
+-dontwarn reactor.blockhound.integration.BlockHoundIntegration

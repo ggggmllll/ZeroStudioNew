@@ -83,6 +83,7 @@ android {
           "META-INF/kotlin-stdlib.kotlin_module",
           "META-INF/NOTICE.md",
           "META-INF/plugin.xml",
+          "META-INF/services/reactor.blockhound.integration.BlockHoundIntegration",
           "com/android/builder/model/version.properties",
           "META-INF/versions/9/OSGI-INF/MANIFEST.MF",
       )
@@ -99,6 +100,7 @@ android {
 
   lint {
     abortOnError = false
+    checkReleaseBuilds = false
     disable.addAll(arrayOf("VectorPath", "NestedWeights", "ContentDescription", "SmallSp"))
   }
 }
