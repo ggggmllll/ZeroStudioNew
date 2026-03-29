@@ -26,36 +26,36 @@ fun flashbarBuilder(): Flashbar.Builder? {
   return withActivity { flashbarBuilder() }
 }
 
-fun flashMessage(msg: String?, type: FlashType) {
-  withActivity { flashMessage(msg, type) }
+fun flashMessage(msg: String?, type: FlashType): Flashbar? {
+  return withActivity { flashMessage(msg, type) }
 }
 
-fun flashMessage(@StringRes msg: Int, type: FlashType) {
-  withActivity { flashMessage(msg, type) }
+fun flashMessage(@StringRes msg: Int, type: FlashType): Flashbar? {
+  return withActivity { flashMessage(msg, type) }
 }
 
-fun flashSuccess(msg: String?) {
-  withActivity { flashSuccess(msg) }
+fun flashSuccess(msg: String?): Flashbar? {
+  return withActivity { flashSuccess(msg) }
 }
 
-fun flashSuccess(@StringRes msg: Int) {
-  withActivity { flashSuccess(msg) }
+fun flashSuccess(@StringRes msg: Int): Flashbar? {
+  return withActivity { flashSuccess(msg) }
 }
 
-fun flashError(msg: String?) {
-  withActivity { flashError(msg) }
+fun flashError(msg: String?): Flashbar? {
+  return withActivity { flashError(msg) }
 }
 
-fun flashError(@StringRes msg: Int) {
-  withActivity { flashError(msg) }
+fun flashError(@StringRes msg: Int): Flashbar? {
+  return withActivity { flashError(msg) }
 }
 
-fun flashInfo(msg: String?) {
-  withActivity { flashInfo(msg) }
+fun flashInfo(msg: String?): Flashbar? {
+  return withActivity { flashInfo(msg) }
 }
 
-fun flashInfo(@StringRes msg: Int) {
-  withActivity { flashInfo(msg) }
+fun flashInfo(@StringRes msg: Int): Flashbar? {
+  return withActivity { flashInfo(msg) }
 }
 
 @JvmOverloads
@@ -64,6 +64,11 @@ fun <R> flashProgress(
     action: (Flashbar) -> R?,
 ): R? {
   return withActivity { flashProgress(configure, action) }
+}
+
+/** Dismisses the currently showing flashbar if any */
+fun dismissFlashbar() {
+  withActivity { dismissFlashbar() }
 }
 
 private fun <T> withActivity(action: Activity.() -> T?): T? {

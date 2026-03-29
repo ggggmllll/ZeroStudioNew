@@ -60,48 +60,48 @@ fun Activity.flashbarBuilder(
       .messageColor(messageColor)
 }
 
-fun Activity.flashMessage(msg: String?, type: FlashType) {
-  msg ?: return
-  when (type) {
+fun Activity.flashMessage(msg: String?, type: FlashType): Flashbar? {
+  msg ?: return null
+  return when (type) {
     ERROR -> flashError(msg)
     INFO -> flashInfo(msg)
     SUCCESS -> flashSuccess(msg)
   }
 }
 
-fun Activity.flashMessage(@StringRes msg: Int, type: FlashType) {
-  when (type) {
+fun Activity.flashMessage(@StringRes msg: Int, type: FlashType): Flashbar? {
+  return when (type) {
     ERROR -> flashError(msg)
     INFO -> flashInfo(msg)
     SUCCESS -> flashSuccess(msg)
   }
 }
 
-fun Activity.flashSuccess(msg: String?) {
-  msg ?: return
-  flashbarBuilder().successIcon().message(msg).showOnUiThread()
+fun Activity.flashSuccess(msg: String?): Flashbar? {
+  msg ?: return null
+  return flashbarBuilder().successIcon().message(msg).showOnUiThread()
 }
 
-fun Activity.flashError(msg: String?) {
-  msg ?: return
-  flashbarBuilder().errorIcon().message(msg).showOnUiThread()
+fun Activity.flashError(msg: String?): Flashbar? {
+  msg ?: return null
+  return flashbarBuilder().errorIcon().message(msg).showOnUiThread()
 }
 
-fun Activity.flashInfo(msg: String?) {
-  msg ?: return
-  flashbarBuilder().infoIcon().message(msg).showOnUiThread()
+fun Activity.flashInfo(msg: String?): Flashbar? {
+  msg ?: return null
+  return flashbarBuilder().infoIcon().message(msg).showOnUiThread()
 }
 
-fun Activity.flashSuccess(@StringRes msg: Int) {
-  flashbarBuilder().successIcon().message(msg).showOnUiThread()
+fun Activity.flashSuccess(@StringRes msg: Int): Flashbar? {
+  return flashbarBuilder().successIcon().message(msg).showOnUiThread()
 }
 
-fun Activity.flashError(@StringRes msg: Int) {
-  flashbarBuilder().errorIcon().message(msg).showOnUiThread()
+fun Activity.flashError(@StringRes msg: Int): Flashbar? {
+  return flashbarBuilder().errorIcon().message(msg).showOnUiThread()
 }
 
-fun Activity.flashInfo(@StringRes msg: Int) {
-  flashbarBuilder().infoIcon().message(msg).showOnUiThread()
+fun Activity.flashInfo(@StringRes msg: Int): Flashbar? {
+  return flashbarBuilder().infoIcon().message(msg).showOnUiThread()
 }
 
 @JvmOverloads
@@ -121,8 +121,10 @@ fun <R : Any?> Activity.flashProgress(
   return action(flashbar)
 }
 
-fun Flashbar.Builder.showOnUiThread() {
-  build().showOnUiThread()
+fun Flashbar.Builder.showOnUiThread(): Flashbar {
+  val flashbar = build()
+  flashbar.showOnUiThread()
+  return flashbar
 }
 
 fun Flashbar.showOnUiThread() {
