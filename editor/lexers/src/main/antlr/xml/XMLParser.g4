@@ -2,7 +2,6 @@
  [The "BSD licence"]
  Copyright (c) 2013 Terence Parr
  All rights reserved.
-
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions
  are met:
@@ -13,7 +12,6 @@
     documentation and/or other materials provided with the distribution.
  3. The name of the author may not be used to endorse or promote products
     derived from this software without specific prior written permission.
-
  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
@@ -27,52 +25,27 @@
 */
 
 /** XML parser derived from ANTLR v4 ref guide book example */
-
-// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
-// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
-
 parser grammar XMLParser;
 
-options {
-    tokenVocab = XMLLexer;
-}
+options { tokenVocab=XMLLexer; }
 
-document
-    : prolog? misc* element misc* EOF
-    ;
+document                :   prolog? misc* element misc*;
 
-prolog
-    : XMLDeclOpen attribute* SPECIAL_CLOSE
-    ;
+prolog                  :   XMLDeclOpen attribute* SPECIAL_CLOSE ;
 
-content
-    : chardata? ((element | reference | CDATA | PI | COMMENT) chardata?)*
-    ;
+content                 :   chardata?
+                            ((element | reference | CDATA | PI | COMMENT) chardata?)* ;
 
-element
-    : '<' Name attribute* '>' content '<' '/' Name '>'
-    | '<' Name attribute* '/>'
-    ;
+element                 :   nonEmptyClosingElement | emptyClosingElement;
+nonEmptyClosingElement  :   OPEN Name attribute* CLOSE content OPEN_SLASH Name CLOSE;
+emptyClosingElement     :   OPEN Name attribute* SLASH_CLOSE;
 
-reference
-    : EntityRef
-    | CharRef
-    ;
+reference               :   EntityRef | CharRef ;
 
-attribute
-    : Name '=' STRING
-    ; // Our STRING is AttValue in spec
+attribute               :   (prefix)? Name EQUALS STRING ;
 
-/** ``All text that is not markup constitutes the character data of
- *  the document.''
- */
-chardata
-    : TEXT
-    | SEA_WS
-    ;
+prefix                  :   Name COLON ;
 
-misc
-    : COMMENT
-    | PI
-    | SEA_WS
-    ;
+chardata                :   TEXT | SEA_WS ;
+
+misc                    :   COMMENT | PI | SEA_WS ;

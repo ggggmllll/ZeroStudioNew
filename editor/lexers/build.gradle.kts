@@ -15,15 +15,20 @@
  *   along with AndroidIDE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import com.itsaky.androidide.build.config.BuildConfig
+
 import com.itsaky.androidide.plugins.LexerGeneratorPlugin
+import com.itsaky.androidide.build.config.BuildConfig
 
 plugins {
   id("java-library")
   kotlin("jvm")
 }
 
-apply { plugin(LexerGeneratorPlugin::class.java) }
+apply {
+  plugin(LexerGeneratorPlugin::class.java)
+}
+
+
 
 java {
   sourceCompatibility = BuildConfig.javaVersion
@@ -32,7 +37,7 @@ java {
 
 dependencies {
   api(libs.common.antlr4.runtime)
-
+  
   implementation(libs.common.jkotlin)
 
   testImplementation(libs.tests.junit)

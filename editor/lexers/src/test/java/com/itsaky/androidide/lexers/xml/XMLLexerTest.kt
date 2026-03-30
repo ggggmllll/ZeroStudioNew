@@ -53,8 +53,8 @@ class XMLLexerTest : BaseLexerTest() {
     val lexer = XMLLexer(createStream("<tag attr=\"value\"></tag>"))
     val tokens = lexer.allTokens
     ensureTokenSequence(
-        tokens,
-        listOf(OPEN, Name, Name, EQUALS, STRING, CLOSE, OPEN_SLASH, Name, CLOSE),
+      tokens,
+      listOf(OPEN, Name, Name, EQUALS, STRING, CLOSE, OPEN_SLASH, Name, CLOSE)
     )
   }
 
