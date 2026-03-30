@@ -33,6 +33,7 @@
     <color name="search_highlight_fg">?attr/colorOnSurface</color>
 
     <color name="icon_light_background">#FFFFFF</color>
+    <color name="ic_launcher_background">#FFFFFF</color>
     
     <!-- 最佳亮暗黑色 -->
     <!-- 暗影灰 -->

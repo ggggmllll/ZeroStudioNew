@@ -24,6 +24,13 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.unit.dp
 
+/**
+ * Splash screen activity that displays an animation upon app launch.
+ * This activity uses Jetpack Compose for its UI.
+ *
+ * @author android_zero
+ * @author Itsaky (Original author)
+ */
 @SuppressLint("CustomSplashScreen")
 class SplashActivity : ComponentActivity() {
 
@@ -44,6 +51,20 @@ class SplashActivity : ComponentActivity() {
     }
 }
 
+/**
+ * A composable function that displays the ZeroStudio splash screen animation.
+ *
+ * @param onFinished A callback lambda that is invoked when the animation completes.
+ *
+ * This composable uses a single `Animatable` float value to drive a complex,
+ * multi-stage animation drawn on a `Canvas`.
+ *
+ * Animation Stages:
+ * - 0.0s to 0.48s (p=0.0-0.4): Left bracket `<` appears.
+ * - 0.24s to 0.84s (p=0.2-0.7): Android robot rises from the bottom.
+ * - 0.48s to 0.96s (p=0.4-0.8): Right bracket `>` appears.
+ * - 0.72s to 1.2s  (p=0.6-1.0): "ZeroStudio" text appears character by character.
+ */
 @Composable
 fun ZeroStudioUltraFastSplash(onFinished: () -> Unit) {
     // 动画状态：0f 到 1f
@@ -91,6 +112,14 @@ fun ZeroStudioUltraFastSplash(onFinished: () -> Unit) {
     }
 }
 
+/**
+ * A [DrawScope] extension function to draw the left or right bracket of the logo.
+ * @param cx The horizontal center of the canvas.
+ * @param cy The vertical center of the canvas.
+ * @param isLeft True to draw the left bracket, false for the right.
+ * @param progress The animation progress (0.0 to 1.0) for the alpha transparency.
+ * @param scale A scaling factor for size and position.
+ */
 private fun DrawScope.drawBracket(cx: Float, cy: Float, isLeft: Boolean, progress: Float, scale: Float) {
     val offsetX = if (isLeft) -380f * scale else 380f * scale
     val brush = if (isLeft) {
@@ -127,6 +156,13 @@ private fun DrawScope.drawBracket(cx: Float, cy: Float, isLeft: Boolean, progres
     )
 }
 
+/**
+ * A [DrawScope] extension function to draw the Android robot logo.
+ * @param cx The horizontal center of the canvas.
+ * @param cy The vertical center of the canvas.
+ * @param progress The animation progress (0.0 to 1.0) for the reveal and movement.
+ * @param scale A scaling factor for size and position.
+ */
 private fun DrawScope.drawAndroidRobot(cx: Float, cy: Float, progress: Float, scale: Float) {
     val robotColor = Color(0xFF3DDC84)
     val headRadius = 165f * scale
@@ -170,22 +206,22 @@ private fun DrawScope.drawZeroStudioText(cx: Float, cy: Float, progress: Float, 
         val paint = android.graphics.Paint().apply {
             textSize = 110f * scale
             typeface = Typeface.create("sans-serif-medium", Typeface.BOLD)
-            textAlign = android.graphics.Paint.Center
+            textAlign = android.graphics.Paint.Align.CENTER
             isAntiAlias = true
             
-            val shader = android.graphics.LinearGradient(
+            // Apply a linear gradient to the text paint.
+            shader = android.graphics.LinearGradient(
                 cx - 200f, cy + textYOffset, cx + 200f, cy + textYOffset,
-                android.graphics.Color.parseColor("#4285F4"), // 起始蓝
-                android.graphics.Color.parseColor("#34A853"), // 结束绿
+                android.graphics.Color.parseColor("#4285F4"), // Start color (Blue)
+                android.graphics.Color.parseColor("#34A853"), // End color (Green)
                 android.graphics.Shader.TileMode.CLAMP
             )
-            setShader(shader)
         }
         
         canvas.nativeCanvas.drawText(
-            visibleText, 
-            cx, 
-            cy + textYOffset, 
+            visibleText,
+            cx,
+            cy + textYOffset,
             paint
         )
     }

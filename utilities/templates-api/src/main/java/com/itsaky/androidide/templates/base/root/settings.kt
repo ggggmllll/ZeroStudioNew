@@ -43,7 +43,7 @@ pluginManagement {
     gradlePluginPortal()
     google()
     mavenCentral()
-    mavenLocal() //Load from local $HOME/.m2
+    mavenLocal() //Load from local ~/.m2
     $repositoriesBlock
   }
 }
@@ -54,7 +54,7 @@ dependencyResolutionManagement {
     gradlePluginPortal()
     google()
     mavenCentral()
-    mavenLocal() //Load from local $HOME/.m2
+    mavenLocal() //Load from local ~/.m2
     $repositoriesBlock
   }
 }

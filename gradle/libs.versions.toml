@@ -527,7 +527,7 @@ compose = [
     "androidx-compose-ui-graphics",
     "androidx-compose-ui-tooling-preview",
     "androidx-compose-material3",
-    # "composite-composePullrefresh",
+    "androidx-activity-compose",
     "androidx-compose-material-icons-extended",
 ]
 io-markwon = [
