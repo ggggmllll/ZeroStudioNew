@@ -3,15 +3,14 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.io.FileInputStream
 import java.util.Properties
-import kotlin.math.sign
 
 plugins {
-    alias(libs.plugins.android.library)
-    alias(libs.plugins.org.jetbrains.kotlin.plugin.compose)
+    alias(libs.plugins.android.application)
+    // alias(libs.plugins.android.library)
     alias(libs.plugins.org.jetbrains.kotlin.plugin.serialization)
+    alias(libs.plugins.org.jetbrains.kotlin.plugin.compose)
     alias(libs.plugins.com.google.devtools.ksp)
-    // alias(libs.plugins.google.services)
-    // alias(libs.plugins.firebase.crashlytics)
+
 }
 
 android {
@@ -19,16 +18,16 @@ android {
     compileSdk = 36
 
     defaultConfig {
-        // applicationId = "me.rerere.rikkahub"
+        applicationId = "me.rerere.rikkahub"
         minSdk = 26
-        // targetSdk = 36
-        // versionCode = 147
-        // versionName = "2.1.4"
+        targetSdk = 36
+        versionCode = 150
+        versionName = "2.1.7"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         ndk {
-            abiFilters += listOf("arm64-v8a","armeabi-v7a", "x86_64")
+            abiFilters += listOf("arm64-v8a", "x86_64")
         }
     }
 
@@ -39,35 +38,35 @@ android {
             val isBuildingBundle = gradle.startParameter.taskNames.any { it.lowercase().contains("bundle") }
             isEnable = !isBuildingBundle
             reset()
-            include("arm64-v8a", "armeabi-v7a", "x86_64")
+            include("arm64-v8a", "x86_64")
             isUniversalApk = true
         }
     }
 
-    // signingConfigs {
-        // create("release") {
-            // val localProperties = Properties()
-            // val localPropertiesFile = rootProject.file("local.properties")
+    signingConfigs {
+        create("release") {
+            val localProperties = Properties()
+            val localPropertiesFile = rootProject.file("local.properties")
 
-            // if (localPropertiesFile.exists()) {
-                // localProperties.load(FileInputStream(localPropertiesFile))
+            if (localPropertiesFile.exists()) {
+                localProperties.load(FileInputStream(localPropertiesFile))
 
-                // val storeFilePath = localProperties.getProperty("storeFile")
-                // val storePasswordValue = localProperties.getProperty("storePassword")
-                // val keyAliasValue = localProperties.getProperty("keyAlias")
-                // val keyPasswordValue = localProperties.getProperty("keyPassword")
+                val storeFilePath = localProperties.getProperty("storeFile")
+                val storePasswordValue = localProperties.getProperty("storePassword")
+                val keyAliasValue = localProperties.getProperty("keyAlias")
+                val keyPasswordValue = localProperties.getProperty("keyPassword")
 
-                // if (storeFilePath != null && storePasswordValue != null &&
-                    // keyAliasValue != null && keyPasswordValue != null
-                // ) {
-                    // storeFile = file(storeFilePath)
-                    // storePassword = storePasswordValue
-                    // keyAlias = keyAliasValue
-                    // keyPassword = keyPasswordValue
-                // }
-            // }
-        // }
-    // }
+                if (storeFilePath != null && storePasswordValue != null &&
+                    keyAliasValue != null && keyPasswordValue != null
+                ) {
+                    storeFile = file(storeFilePath)
+                    storePassword = storePasswordValue
+                    keyAlias = keyAliasValue
+                    keyPassword = keyPasswordValue
+                }
+            }
+        }
+    }
 
     buildTypes {
         release {
@@ -81,22 +80,22 @@ android {
             buildConfigField("String", "VERSION_NAME", "\"${android.defaultConfig.versionName}\"")
             buildConfigField("String", "VERSION_CODE", "\"${android.defaultConfig.versionCode}\"")
         }
-        // debug {
-            // applicationIdSuffix = ".debug"
-            // buildConfigField("String", "VERSION_NAME", "\"${android.defaultConfig.versionName}\"")
-            // buildConfigField("String", "VERSION_CODE", "\"${android.defaultConfig.versionCode}\"")
-        // }
-        // create("baseline") {
-            // initWith(getByName("release"))
-            // matchingFallbacks.add("release")
-            // signingConfig = signingConfigs.getByName("debug")
-            // applicationIdSuffix = ".debug"
-            // isDebuggable = false
-            // isMinifyEnabled = false
-            // isShrinkResources = false
-            // isProfileable = true
-        // }
-    // }
+        debug {
+            applicationIdSuffix = ".debug"
+            buildConfigField("String", "VERSION_NAME", "\"${android.defaultConfig.versionName}\"")
+            buildConfigField("String", "VERSION_CODE", "\"${android.defaultConfig.versionCode}\"")
+        }
+        create("baseline") {
+            initWith(getByName("release"))
+            matchingFallbacks.add("release")
+            signingConfig = signingConfigs.getByName("debug")
+            applicationIdSuffix = ".debug"
+            isDebuggable = false
+            isMinifyEnabled = false
+            isShrinkResources = false
+            isProfileable = true
+        }
+    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -108,9 +107,9 @@ android {
     sourceSets {
         getByName("androidTest").assets.srcDirs("$projectDir/schemas")
     }
-    // androidResources {
-        // generateLocaleConfig = true
-    // }
+    androidResources {
+        generateLocaleConfig = true
+    }
     packaging {
         jniLibs {
             useLegacyPackaging = true
@@ -146,12 +145,6 @@ ksp {
     arg("room.schemaLocation", "$projectDir/schemas")
 }
 
-kotlin {
-    compilerOptions {
-        jvmTarget.set(JvmTarget.JVM_17)
-    }
-}
-
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -169,9 +162,6 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.material3.adaptive)
     implementation(libs.androidx.material3.adaptive.layout)
-
-    // Navigation 2
-    implementation(libs.androidx.navigation.compose)
 
     // Navigation 3
     implementation(libs.androidx.navigation3.runtime)
@@ -274,19 +264,29 @@ dependencies {
     // mcp
     implementation(libs.modelcontextprotocol.kotlin.sdk)
 
+    // jmDNS (mDNS/Bonjour for .local hostname)
+    implementation(libs.jmdns)
+
+    // SLF4J Android binding — routes Ktor/SLF4J logs to logcat
+    implementation(libs.tooling.slf4j)
+    implementation(libs.slf4j.android)
+
+    // sqlite-android (requery SQLite for Android)
+    implementation(libs.sqlite.android)
+
     // modules
-    implementation(projects.core.chatai.ai)
+    implementation(projects.core.chatai.app)
+    implementation(projects.core.chatai.web)
     implementation(projects.core.chatai.document)
     implementation(projects.core.chatai.highlight)
-    implementation(projects.core.chatai.web)
     implementation(projects.core.chatai.search)
     implementation(projects.core.chatai.tts)
-    implementation(projects.core.chatai.common)
+    implementation(projects.core.common)
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
-    implementation(kotlin("reflect"))
+    implementation(libs.org.jetbrains.kotlin.reflect)
 
     // Leak Canary
-    // debugImplementation(libs.leakcanary.android)
+    // debugImplementation(libs.common.leakcanary)
 
     // tests
     testImplementation(libs.tests.junit)
@@ -297,4 +297,10 @@ dependencies {
     androidTestImplementation(libs.androidx.room.testing)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+}
+
+
+
+tasks.withType<KotlinCompile>().configureEach {
+  compilerOptions { jvmTarget.set(JvmTarget.JVM_17) }
 }

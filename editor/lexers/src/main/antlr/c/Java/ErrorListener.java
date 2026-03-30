@@ -1,3 +1,5 @@
+package com.itsaky.androidide.lexers.c;
+
 import org.antlr.v4.runtime.*;
 import java.io.PrintStream;
 

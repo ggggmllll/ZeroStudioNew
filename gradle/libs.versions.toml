@@ -129,6 +129,13 @@ metadataExtractor = "2.19.0"
 javaxAnnotation = "1.3.2"
 orgNanohttpd = "2.3.1"
 incap = "1.0.0"
+haze = "1.0.2"
+huge-icons = "1.1.0"
+jmdns = "3.5.9"
+slf4j-android = "1.7.36"
+sqlite-android = "3.45.0"
+floatingx = "2.3.7"
+
 
 #语法解析分析
 tree-sitter = "4.3.2"
@@ -239,6 +246,15 @@ common-com-squareup-javapoet = { module = "com.squareup:javapoet", version = "1.
 common-net-ltgt-gradle-incap = { module = "net.ltgt.gradle.incap:incap", version.ref = "incap" }
 common-net-ltgt-gradle-incap-processor = { module = "net.ltgt.gradle.incap:incap-processor", version.ref = "incap" }
 common-asm = { module = "org.ow2.asm:asm", version = "9.7.1" }
+haze = { module = "dev.chrisbanes.haze:haze", version.ref = "haze" }
+haze-materials = { module = "dev.chrisbanes.haze:haze-materials", version.ref = "haze" }
+huge-icons = { module = "com.composables:icons-huge", version.ref = "huge-icons" }
+jmdns = { module = "org.jmdns:jmdns", version.ref = "jmdns" }
+slf4j-android = { module = "org.slf4j:slf4j-android", version.ref = "slf4j-android" }
+sqlite-android = { module = "io.requery:sqlite-android", version.ref = "sqlite-android" }
+floatingx = { module = "io.github.petterpx:floatingx", version.ref = "floatingx" }
+floatingx-compose = { module = "io.github.petterpx:floatingx-compose", version.ref = "floatingx" }
+
 
 # AndroidX 相关sdk
 androidx-annotation = { module = "androidx.annotation:annotation", version.ref = "androidxCore" }
@@ -390,6 +406,7 @@ tests-mockk = { module = "io.mockk:mockk", version = "1.13.10" }
 tests-barista = { module = "com.adevinta.android:barista", version = "4.3.0" }
 tests-conscrypt-openjdk = { module = "org.conscrypt:conscrypt-openjdk", version = "2.5.2" }
 androidx-benchmark-macro-junit4 = { group = "androidx.benchmark", name = "benchmark-macro-junit4", version.ref = "benchmarkMacroJunit4" }
+androidx-room-testing = { group = "androidx.room", name = "room-testing", version.ref = "androidx-room" }
 
 
 # root/build.gradle.kts > Classpaths
@@ -414,6 +431,16 @@ io-ktor-server-content-negotiation = { group = "io.ktor", name = "ktor-server-co
 io-ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "io-ktor" }
 io-ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "io-ktor" }
 io-ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "io-ktor" }
+io-ktor-server-default-headers = { group = "io.ktor", name = "ktor-server-default-headers", version.ref = "io-ktor" }
+io-ktor-server-conditional-headers = { group = "io.ktor", name = "ktor-server-conditional-headers", version.ref = "io-ktor" }
+io-ktor-server-compression = { group = "io.ktor", name = "ktor-server-compression", version.ref = "io-ktor" }
+io-ktor-server-cors = { group = "io.ktor", name = "ktor-server-cors", version.ref = "io-ktor" }
+io-ktor-server-auth = { group = "io.ktor", name = "ktor-server-auth", version.ref = "io-ktor" }
+io-ktor-server-auth-jwt = { group = "io.ktor", name = "ktor-server-auth-jwt", version.ref = "io-ktor" }
+io-ktor-server-host-common = { group = "io.ktor", name = "ktor-server-host-common", version.ref = "io-ktor" }
+io-ktor-server-status-pages = { group = "io.ktor", name = "ktor-server-status-pages", version.ref = "io-ktor" }
+io-ktor-server-sse = { group = "io.ktor", name = "ktor-server-sse", version.ref = "io-ktor" }
+io-ktor-server-cio = { group = "io.ktor", name = "ktor-server-cio", version.ref = "io-ktor" }
 
 #kotlin相关
 org-jetbrains-kotlin-scripting-compiler-embeddable = { module = "org.jetbrains.kotlin:kotlin-scripting-compiler-embeddable", version.ref = "kotlin" }
@@ -515,14 +542,21 @@ io-markwon = [
     "common-markwon-jeziellago"
 ]
 
-io-ktor = [
+io-ktor-server = [
     "io-ktor-server-core",
     "io-ktor-server-netty",
-    "io-ktor-serialization-kotlinx-json",
+    "io-ktor-server-cio",
+    "io-ktor-server-auth",
+    "io-ktor-server-auth-jwt",
+    "io-ktor-server-default-headers",
+    "io-ktor-server-conditional-headers",
+    "io-ktor-server-compression",
+    "io-ktor-server-cors",
+    "io-ktor-server-host-common",
     "io-ktor-server-content-negotiation",
-    "io-ktor-client-content-negotiation",
-    "io-ktor-client-okhttp",
-    "io-ktor-client-core",
+    "io-ktor-server-status-pages",
+    "io-ktor-server-sse",
+    "io-ktor-serialization-kotlinx-json"
 ]
 
 io-insert-koin = [

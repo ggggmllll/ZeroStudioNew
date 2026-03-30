@@ -168,7 +168,7 @@ public class JavaHighlighter implements Highlighter {
               new ForegroundColorSpan(scheme.getColor(SchemeAndroidIDE.TYPE_NAME)),
               SpannableStringBuilder.SPAN_EXCLUSIVE_EXCLUSIVE);
           break;
-        case JavaLexer.BLOCK_COMMENT:
+        case JavaLexer.COMMENT:
         case JavaLexer.LINE_COMMENT:
           sb.append(
               token.getText(),

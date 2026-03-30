@@ -7,10 +7,11 @@ pluginManagement {
 
   repositories {
     maven { url = uri("${rootProject.projectDir}/gradle/libs") }
-
+    maven("https://repo.itextsupport.com/android")
     gradlePluginPortal()
     google()
     mavenCentral()
+    mavenLocal()
     maven("https://repo.itextsupport.com/android")
     maven("https://cache-redirector.jetbrains.com/kotlin.bintray.com/kotlin-plugin/")
     maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/kotlin-ide/")
@@ -28,6 +29,14 @@ pluginManagement {
     // password = "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" } }
 
   }
+  
+  resolutionStrategy {
+        eachPlugin {
+            if (requested.id.id == "io.objectbox") {
+                useModule("io.objectbox:objectbox-gradle-plugin:${requested.version}")
+            }
+        }
+    }
 }
 
 dependencyResolutionManagement {
@@ -68,9 +77,10 @@ dependencyResolutionManagement {
   repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
   repositories {
     maven { url = uri("${rootProject.projectDir}/gradle/libs") }
-
+    maven("https://repo.itextsupport.com/android")
     google()
     mavenCentral()
+    mavenLocal()
     // maven { url = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/") }
     // maven { url = uri("https://s01.oss.sonatype.org/content/groups/public/") }
     maven { url = uri("https://jitpack.io") }
@@ -148,15 +158,14 @@ include(
     ":core:git",
     ":core:layout-editor",
     ":core:zero-mcp-server",
-    // ":core:chatai:app",
-    // ":core:chatai:ai",
-    // ":core:chatai:common",
-    // ":core:chatai:document",
-    // ":core:chatai:highlight",
-    // ":core:chatai:locale-tui",
-    // ":core:chatai:search",
-    // ":core:chatai:tts",
-    // ":core:chatai:web",
+    ":core:chatai:app",
+    ":core:chatai:highlight",
+    ":core:chatai:ai",
+    ":core:chatai:search",
+    ":core:chatai:tts",
+    ":core:chatai:common",
+    ":core:chatai:document",
+    ":core:chatai:web",
 
     ":editor:api",
     ":editor:impl",

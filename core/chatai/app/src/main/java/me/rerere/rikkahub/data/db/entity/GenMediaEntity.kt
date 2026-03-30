@@ -6,9 +6,14 @@ import androidx.room.PrimaryKey
 
 @Entity
 data class GenMediaEntity(
-    @PrimaryKey(autoGenerate = true) val id: Int = 0,
-    @ColumnInfo("path") val path: String,
-    @ColumnInfo("model_id") val modelId: String,
-    @ColumnInfo("prompt") val prompt: String,
-    @ColumnInfo("create_at") val createAt: Long,
+    @PrimaryKey(autoGenerate = true)
+    val id: Int = 0,
+    @ColumnInfo("path")
+    val path: String,
+    @ColumnInfo("model_id")
+    val modelId: String,
+    @ColumnInfo("prompt")
+    val prompt: String,
+    @ColumnInfo("create_at")
+    val createAt: Long,
 )

@@ -39,6 +39,7 @@ plugins {
   alias(libs.plugins.protobuf) apply false
   alias(libs.plugins.com.google.devtools.ksp) apply false
   alias(libs.plugins.google.services) apply false
+  alias(libs.plugins.firebase.crashlytics) apply false
   id("com.google.firebase.firebase-perf") version "2.0.2" apply false
 
   // kotlin相关

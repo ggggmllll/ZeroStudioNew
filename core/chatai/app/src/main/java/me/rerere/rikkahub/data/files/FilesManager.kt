@@ -15,9 +15,6 @@ import java.io.File
 import java.io.FileInputStream
 import java.net.HttpURLConnection
 import java.net.URL
-import kotlin.io.encoding.Base64
-import kotlin.io.encoding.ExperimentalEncodingApi
-import kotlin.uuid.Uuid
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -32,27 +29,31 @@ import me.rerere.rikkahub.data.repository.FilesRepository
 import me.rerere.rikkahub.utils.exportImage
 import me.rerere.rikkahub.utils.exportImageFile
 import me.rerere.rikkahub.utils.getActivity
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
+import kotlin.uuid.Uuid
 
 class FilesManager(
     private val context: Context,
     private val repository: FilesRepository,
     private val appScope: AppScope,
 ) {
-  companion object {
-    private const val TAG = "FilesManager"
-  }
+    companion object {
+        private const val TAG = "FilesManager"
+    }
 
-  suspend fun saveUploadFromUri(
-      uri: Uri,
-      displayName: String? = null,
-      mimeType: String? = null,
-  ): ManagedFileEntity =
-      withContext(Dispatchers.IO) {
+    suspend fun saveUploadFromUri(
+        uri: Uri,
+        displayName: String? = null,
+        mimeType: String? = null,
+    ): ManagedFileEntity = withContext(Dispatchers.IO) {
         val resolvedName = displayName ?: getFileNameFromUri(uri) ?: "file"
         val resolvedMime = mimeType ?: getFileMimeType(uri) ?: "application/octet-stream"
         val target = createTargetFile(FileFolders.UPLOAD, resolvedName, resolvedMime)
         context.contentResolver.openInputStream(uri)?.use { input ->
-          target.outputStream().use { output -> input.copyTo(output) }
+            target.outputStream().use { output ->
+                input.copyTo(output)
+            }
         }
         val now = System.currentTimeMillis()
         repository.insert(
@@ -66,14 +67,13 @@ class FilesManager(
                 updatedAt = now,
             )
         )
-      }
+    }
 
-  suspend fun saveUploadFromBytes(
-      bytes: ByteArray,
-      displayName: String,
-      mimeType: String = "application/octet-stream",
-  ): ManagedFileEntity =
-      withContext(Dispatchers.IO) {
+    suspend fun saveUploadFromBytes(
+        bytes: ByteArray,
+        displayName: String,
+        mimeType: String = "application/octet-stream",
+    ): ManagedFileEntity = withContext(Dispatchers.IO) {
         val target = createTargetFile(FileFolders.UPLOAD, displayName, mimeType)
         target.writeBytes(bytes)
         val now = System.currentTimeMillis()
@@ -88,14 +88,13 @@ class FilesManager(
                 updatedAt = now,
             )
         )
-      }
+    }
 
-  suspend fun saveUploadText(
-      text: String,
-      displayName: String = "pasted_text.txt",
-      mimeType: String = "text/plain",
-  ): ManagedFileEntity =
-      withContext(Dispatchers.IO) {
+    suspend fun saveUploadText(
+        text: String,
+        displayName: String = "pasted_text.txt",
+        mimeType: String = "text/plain",
+    ): ManagedFileEntity = withContext(Dispatchers.IO) {
         val target = createTargetFile(FileFolders.UPLOAD, displayName, mimeType)
         target.writeText(text)
         val now = System.currentTimeMillis()
@@ -110,438 +109,430 @@ class FilesManager(
                 updatedAt = now,
             )
         )
-      }
-
-  fun observe(folder: String = FileFolders.UPLOAD): Flow<List<ManagedFileEntity>> =
-      repository.listByFolder(folder)
-
-  suspend fun list(folder: String = FileFolders.UPLOAD): List<ManagedFileEntity> =
-      repository.listByFolder(folder).first()
-
-  suspend fun get(id: Long): ManagedFileEntity? = repository.getById(id)
-
-  suspend fun getByRelativePath(relativePath: String): ManagedFileEntity? =
-      repository.getByPath(relativePath)
-
-  fun getFile(entity: ManagedFileEntity): File = File(context.filesDir, entity.relativePath)
-
-  fun createChatFilesByContents(uris: List<Uri>): List<Uri> {
-    val newUris = mutableListOf<Uri>()
-    val dir = context.filesDir.resolve(FileFolders.UPLOAD)
-    if (!dir.exists()) {
-      dir.mkdirs()
     }
-    uris.forEach { uri ->
-      val sourceName = getFileNameFromUri(uri) ?: uri.lastPathSegment ?: "file"
-      val sourceMime = getFileMimeType(uri)
-      val fileName = buildUuidFileName(displayName = sourceName, mimeType = sourceMime)
-      val file = dir.resolve(fileName)
-      if (!file.exists()) {
-        file.createNewFile()
-      }
-      val newUri = file.toUri()
-      runCatching {
-            context.contentResolver.openInputStream(uri)?.use { inputStream ->
-              file.outputStream().use { outputStream -> inputStream.copyTo(outputStream) }
-            }
-            val guessedMime = sourceMime ?: guessMimeType(file, sourceName)
-            trackUploadFile(file = file, displayName = sourceName, mimeType = guessedMime)
-            newUris.add(newUri)
-          }
-          .onFailure {
-            it.printStackTrace()
-            Log.e(TAG, "createChatFilesByContents: Failed to save file from $uri", it)
-            Logging.log(
-                TAG,
-                "createChatFilesByContents: Failed to save file from $uri ${it.message} | ${it.stackTraceToString()}",
-            )
-          }
-    }
-    return newUris
-  }
 
-  fun createChatFilesByByteArrays(byteArrays: List<ByteArray>): List<Uri> {
-    val newUris = mutableListOf<Uri>()
-    val dir = context.filesDir.resolve(FileFolders.UPLOAD)
-    if (!dir.exists()) {
-      dir.mkdirs()
-    }
-    byteArrays.forEach { byteArray ->
-      val fileName = buildUuidFileName(displayName = "image.png", mimeType = "image/png")
-      val file = dir.resolve(fileName)
-      if (!file.exists()) {
-        file.createNewFile()
-      }
-      val newUri = file.toUri()
-      file.outputStream().use { outputStream -> outputStream.write(byteArray) }
-      trackUploadFile(file = file, displayName = "image.png", mimeType = "image/png")
-      newUris.add(newUri)
-    }
-    return newUris
-  }
+    fun observe(folder: String = FileFolders.UPLOAD): Flow<List<ManagedFileEntity>> =
+        repository.listByFolder(folder)
 
-  @OptIn(ExperimentalEncodingApi::class)
-  suspend fun convertBase64ImagePartToLocalFile(message: UIMessage): UIMessage =
-      withContext(Dispatchers.IO) {
-        message.copy(
-            parts =
-                message.parts.map { part ->
-                  when (part) {
-                    is UIMessagePart.Image -> {
-                      if (part.url.startsWith("data:image")) {
-                        val sourceByteArray =
-                            Base64.decode(part.url.substringAfter("base64,").toByteArray())
-                        val bitmap =
-                            BitmapFactory.decodeByteArray(sourceByteArray, 0, sourceByteArray.size)
-                        val byteArray = bitmap.compressToPng()
-                        val urls = createChatFilesByByteArrays(listOf(byteArray))
-                        Log.i(
-                            TAG,
-                            "convertBase64ImagePartToLocalFile: convert base64 img to ${urls.joinToString(", ")}",
-                        )
-                        part.copy(
-                            url = urls.first().toString(),
-                        )
-                      } else {
-                        part
-                      }
-                    }
+    suspend fun list(folder: String = FileFolders.UPLOAD): List<ManagedFileEntity> =
+        repository.listByFolder(folder).first()
 
-                    else -> part
-                  }
-                }
-        )
-      }
+    suspend fun get(id: Long): ManagedFileEntity? = repository.getById(id)
 
-  fun deleteChatFiles(uris: List<Uri>) {
-    val relativePaths = mutableSetOf<String>()
-    uris
-        .filter { it.toString().startsWith("file:") }
-        .forEach { uri ->
-          val file = uri.toFile()
-          getRelativePathInFilesDir(file)?.let { relativePaths.add(it) }
-          if (file.exists()) {
-            file.delete()
-          }
-        }
-    if (relativePaths.isNotEmpty()) {
-      appScope.launch(Dispatchers.IO) {
-        relativePaths.forEach { path -> repository.deleteByPath(path) }
-      }
-    }
-  }
+    suspend fun getByRelativePath(relativePath: String): ManagedFileEntity? = repository.getByPath(relativePath)
 
-  suspend fun countChatFiles(): Pair<Int, Long> =
-      withContext(Dispatchers.IO) {
+    fun getFile(entity: ManagedFileEntity): File =
+        File(context.filesDir, entity.relativePath)
+
+    fun createChatFilesByContents(uris: List<Uri>): List<Uri> {
+        val newUris = mutableListOf<Uri>()
         val dir = context.filesDir.resolve(FileFolders.UPLOAD)
         if (!dir.exists()) {
-          return@withContext Pair(0, 0)
+            dir.mkdirs()
+        }
+        uris.forEach { uri ->
+            val sourceName = getFileNameFromUri(uri) ?: uri.lastPathSegment ?: "file"
+            val sourceMime = getFileMimeType(uri)
+            val fileName = buildUuidFileName(displayName = sourceName, mimeType = sourceMime)
+            val file = dir.resolve(fileName)
+            if (!file.exists()) {
+                file.createNewFile()
+            }
+            val newUri = file.toUri()
+            runCatching {
+                context.contentResolver.openInputStream(uri)?.use { inputStream ->
+                    file.outputStream().use { outputStream ->
+                        inputStream.copyTo(outputStream)
+                    }
+                }
+                val guessedMime = sourceMime ?: guessMimeType(file, sourceName)
+                trackUploadFile(file = file, displayName = sourceName, mimeType = guessedMime)
+                newUris.add(newUri)
+            }.onFailure {
+                it.printStackTrace()
+                Log.e(TAG, "createChatFilesByContents: Failed to save file from $uri", it)
+                Logging.log(
+                    TAG,
+                    "createChatFilesByContents: Failed to save file from $uri ${it.message} | ${it.stackTraceToString()}"
+                )
+            }
+        }
+        return newUris
+    }
+
+    fun createChatFilesByByteArrays(byteArrays: List<ByteArray>): List<Uri> {
+        val newUris = mutableListOf<Uri>()
+        val dir = context.filesDir.resolve(FileFolders.UPLOAD)
+        if (!dir.exists()) {
+            dir.mkdirs()
+        }
+        byteArrays.forEach { byteArray ->
+            val fileName = buildUuidFileName(displayName = "image.png", mimeType = "image/png")
+            val file = dir.resolve(fileName)
+            if (!file.exists()) {
+                file.createNewFile()
+            }
+            val newUri = file.toUri()
+            file.outputStream().use { outputStream ->
+                outputStream.write(byteArray)
+            }
+            trackUploadFile(file = file, displayName = "image.png", mimeType = "image/png")
+            newUris.add(newUri)
+        }
+        return newUris
+    }
+
+    @OptIn(ExperimentalEncodingApi::class)
+    suspend fun convertBase64ImagePartToLocalFile(message: UIMessage): UIMessage =
+        withContext(Dispatchers.IO) {
+            message.copy(
+                parts = message.parts.map { part ->
+                    when (part) {
+                        is UIMessagePart.Image -> {
+                            if (part.url.startsWith("data:image")) {
+                                val sourceByteArray = Base64.decode(part.url.substringAfter("base64,").toByteArray())
+                                val bitmap = BitmapFactory.decodeByteArray(sourceByteArray, 0, sourceByteArray.size)
+                                val byteArray = bitmap.compressToPng()
+                                val urls = createChatFilesByByteArrays(listOf(byteArray))
+                                Log.i(
+                                    TAG,
+                                    "convertBase64ImagePartToLocalFile: convert base64 img to ${urls.joinToString(", ")}"
+                                )
+                                part.copy(
+                                    url = urls.first().toString(),
+                                )
+                            } else {
+                                part
+                            }
+                        }
+
+                        else -> part
+                    }
+                }
+            )
+        }
+
+    fun deleteChatFiles(uris: List<Uri>) {
+        val relativePaths = mutableSetOf<String>()
+        uris.filter { it.toString().startsWith("file:") }.forEach { uri ->
+            val file = uri.toFile()
+            getRelativePathInFilesDir(file)?.let { relativePaths.add(it) }
+            if (file.exists()) {
+                file.delete()
+            }
+        }
+        if (relativePaths.isNotEmpty()) {
+            appScope.launch(Dispatchers.IO) {
+                relativePaths.forEach { path ->
+                    repository.deleteByPath(path)
+                }
+            }
+        }
+    }
+
+    suspend fun countChatFiles(): Pair<Int, Long> = withContext(Dispatchers.IO) {
+        val dir = context.filesDir.resolve(FileFolders.UPLOAD)
+        if (!dir.exists()) {
+            return@withContext Pair(0, 0)
         }
         val files = dir.listFiles() ?: return@withContext Pair(0, 0)
         val count = files.size
         val size = files.sumOf { it.length() }
         Pair(count, size)
-      }
-
-  fun createChatTextFile(text: String): UIMessagePart.Document {
-    val dir = context.filesDir.resolve(FileFolders.UPLOAD)
-    if (!dir.exists()) {
-      dir.mkdirs()
     }
-    val fileName = buildUuidFileName(displayName = "pasted_text.txt", mimeType = "text/plain")
-    val file = dir.resolve(fileName)
-    file.writeText(text)
-    trackUploadFile(file = file, displayName = "pasted_text.txt", mimeType = "text/plain")
-    return UIMessagePart.Document(
-        url = file.toUri().toString(),
-        fileName = "pasted_text.txt",
-        mime = "text/plain",
-    )
-  }
 
-  fun getImagesDir(): File {
-    val dir = context.filesDir.resolve("images")
-    if (!dir.exists()) {
-      dir.mkdirs()
+    fun createChatTextFile(text: String): UIMessagePart.Document {
+        val dir = context.filesDir.resolve(FileFolders.UPLOAD)
+        if (!dir.exists()) {
+            dir.mkdirs()
+        }
+        val fileName = buildUuidFileName(displayName = "pasted_text.txt", mimeType = "text/plain")
+        val file = dir.resolve(fileName)
+        file.writeText(text)
+        trackUploadFile(file = file, displayName = "pasted_text.txt", mimeType = "text/plain")
+        return UIMessagePart.Document(
+            url = file.toUri().toString(),
+            fileName = "pasted_text.txt",
+            mime = "text/plain"
+        )
     }
-    return dir
-  }
 
-  @OptIn(ExperimentalEncodingApi::class)
-  fun createImageFileFromBase64(base64Data: String, filePath: String): File {
-    val data =
-        if (base64Data.startsWith("data:image")) {
-          base64Data.substringAfter("base64,")
+    fun getImagesDir(): File {
+        val dir = context.filesDir.resolve("images")
+        if (!dir.exists()) {
+            dir.mkdirs()
+        }
+        return dir
+    }
+
+    @OptIn(ExperimentalEncodingApi::class)
+    fun createImageFileFromBase64(base64Data: String, filePath: String): File {
+        val data = if (base64Data.startsWith("data:image")) {
+            base64Data.substringAfter("base64,")
         } else {
-          base64Data
+            base64Data
         }
 
-    val byteArray = Base64.decode(data.toByteArray())
-    val file = File(filePath)
-    file.parentFile?.mkdirs()
-    file.writeBytes(byteArray)
-    return file
-  }
+        val byteArray = Base64.decode(data.toByteArray())
+        val file = File(filePath)
+        file.parentFile?.mkdirs()
+        file.writeBytes(byteArray)
+        return file
+    }
 
-  fun listImageFiles(): List<File> {
-    val imagesDir = getImagesDir()
-    return imagesDir
-        .listFiles()
-        ?.filter { it.isFile && it.extension.lowercase() in listOf("png", "jpg", "jpeg", "webp") }
-        ?.toList() ?: emptyList()
-  }
+    fun listImageFiles(): List<File> {
+        val imagesDir = getImagesDir()
+        return imagesDir.listFiles()
+            ?.filter { it.isFile && it.extension.lowercase() in listOf("png", "jpg", "jpeg", "webp") }
+            ?.toList()
+            ?: emptyList()
+    }
 
-  @OptIn(ExperimentalEncodingApi::class)
-  suspend fun saveMessageImage(activityContext: Context, image: String) =
-      withContext(Dispatchers.IO) {
+    @OptIn(ExperimentalEncodingApi::class)
+    suspend fun saveMessageImage(activityContext: Context, image: String) = withContext(Dispatchers.IO) {
         val activity = requireNotNull(activityContext.getActivity()) { "Activity not found" }
         when {
-          image.startsWith("data:image") -> {
-            val byteArray = Base64.decode(image.substringAfter("base64,").toByteArray())
-            val bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
-            activityContext.exportImage(activity, bitmap)
-          }
+            image.startsWith("data:image") -> {
+                val byteArray = Base64.decode(image.substringAfter("base64,").toByteArray())
+                val bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
+                activityContext.exportImage(activity, bitmap)
+            }
 
-          image.startsWith("file:") -> {
-            val file = image.toUri().toFile()
-            activityContext.exportImageFile(activity, file)
-          }
+            image.startsWith("file:") -> {
+                val file = image.toUri().toFile()
+                activityContext.exportImageFile(activity, file)
+            }
 
-          image.startsWith("http") -> {
-            runCatching {
-                  val url = URL(image)
-                  val connection = url.openConnection() as HttpURLConnection
-                  connection.connect()
+            image.startsWith("http") -> {
+                runCatching {
+                    val url = URL(image)
+                    val connection = url.openConnection() as HttpURLConnection
+                    connection.connect()
 
-                  if (connection.responseCode == HttpURLConnection.HTTP_OK) {
-                    val bitmap = BitmapFactory.decodeStream(connection.inputStream)
-                    activityContext.exportImage(activity, bitmap)
-                  } else {
-                    Log.e(
-                        TAG,
-                        "saveMessageImage: Failed to download image from $image, response code: ${connection.responseCode}",
-                    )
-                  }
-                }
-                .getOrNull()
-          }
+                    if (connection.responseCode == HttpURLConnection.HTTP_OK) {
+                        val bitmap = BitmapFactory.decodeStream(connection.inputStream)
+                        activityContext.exportImage(activity, bitmap)
+                    } else {
+                        Log.e(
+                            TAG,
+                            "saveMessageImage: Failed to download image from $image, response code: ${connection.responseCode}"
+                        )
+                    }
+                }.getOrNull()
+            }
 
-          else -> error("Invalid image format")
+            else -> error("Invalid image format")
         }
-      }
+    }
 
-  suspend fun syncFolder(folder: String = FileFolders.UPLOAD): Int =
-      withContext(Dispatchers.IO) {
+    suspend fun syncFolder(folder: String = FileFolders.UPLOAD): Int = withContext(Dispatchers.IO) {
         val dir = File(context.filesDir, folder)
         if (!dir.exists()) return@withContext 0
         val files = dir.listFiles()?.filter { it.isFile } ?: return@withContext 0
         var inserted = 0
         files.forEach { file ->
-          val relativePath = "${folder}/${file.name}"
-          val existing = repository.getByPath(relativePath)
-          if (existing == null) {
-            val now = System.currentTimeMillis()
-            val displayName = file.name
-            val mimeType = guessMimeType(file, displayName)
-            repository.insert(
-                ManagedFileEntity(
-                    folder = folder,
-                    relativePath = relativePath,
-                    displayName = displayName,
-                    mimeType = mimeType,
-                    sizeBytes = file.length(),
-                    createdAt = file.lastModified().takeIf { it > 0 } ?: now,
-                    updatedAt = now,
+            val relativePath = "${folder}/${file.name}"
+            val existing = repository.getByPath(relativePath)
+            if (existing == null) {
+                val now = System.currentTimeMillis()
+                val displayName = file.name
+                val mimeType = guessMimeType(file, displayName)
+                repository.insert(
+                    ManagedFileEntity(
+                        folder = folder,
+                        relativePath = relativePath,
+                        displayName = displayName,
+                        mimeType = mimeType,
+                        sizeBytes = file.length(),
+                        createdAt = file.lastModified().takeIf { it > 0 } ?: now,
+                        updatedAt = now,
+                    )
                 )
-            )
-            inserted += 1
-          }
+                inserted += 1
+            }
         }
         inserted
-      }
+    }
 
-  suspend fun delete(id: Long, deleteFromDisk: Boolean = true): Boolean =
-      withContext(Dispatchers.IO) {
+    suspend fun delete(id: Long, deleteFromDisk: Boolean = true): Boolean = withContext(Dispatchers.IO) {
         val entity = repository.getById(id) ?: return@withContext false
         if (deleteFromDisk) {
-          runCatching { getFile(entity).delete() }
+            runCatching { getFile(entity).delete() }
         }
         repository.deleteById(id) > 0
-      }
-
-  private fun createTargetFile(folder: String, displayName: String, mimeType: String?): File {
-    val dir = File(context.filesDir, folder)
-    if (!dir.exists()) {
-      dir.mkdirs()
     }
-    return File(dir, buildUuidFileName(displayName = displayName, mimeType = mimeType))
-  }
 
-  private fun buildUuidFileName(displayName: String?, mimeType: String?): String {
-    val extFromName =
-        displayName
+    private fun createTargetFile(folder: String, displayName: String, mimeType: String?): File {
+        val dir = File(context.filesDir, folder)
+        if (!dir.exists()) {
+            dir.mkdirs()
+        }
+        return File(dir, buildUuidFileName(displayName = displayName, mimeType = mimeType))
+    }
+
+    private fun buildUuidFileName(displayName: String?, mimeType: String?): String {
+        val extFromName = displayName
             ?.substringAfterLast('.', "")
             ?.takeIf { it.isNotBlank() && it != displayName }
             ?.lowercase()
-    val extFromMime =
-        mimeType
+        val extFromMime = mimeType
             ?.let { MimeTypeMap.getSingleton().getExtensionFromMimeType(it.lowercase()) }
             ?.takeIf { it.isNotBlank() }
             ?.lowercase()
-    val ext = extFromName ?: extFromMime ?: "bin"
-    return "${Uuid.random()}.$ext"
-  }
+        val ext = extFromName ?: extFromMime ?: "bin"
+        return "${Uuid.random()}.$ext"
+    }
 
-  private fun trackUploadFile(file: File, displayName: String, mimeType: String) {
-    val relativePath = "${FileFolders.UPLOAD}/${file.name}"
-    appScope.launch(Dispatchers.IO) {
-      runCatching {
-            val existing = repository.getByPath(relativePath)
-            if (existing != null) {
-              return@runCatching
-            }
-            val now = System.currentTimeMillis()
-            repository.insert(
-                ManagedFileEntity(
-                    folder = FileFolders.UPLOAD,
-                    relativePath = relativePath,
-                    displayName = displayName,
-                    mimeType = mimeType,
-                    sizeBytes = file.length(),
-                    createdAt = now,
-                    updatedAt = now,
+    private fun trackUploadFile(file: File, displayName: String, mimeType: String) {
+        val relativePath = "${FileFolders.UPLOAD}/${file.name}"
+        appScope.launch(Dispatchers.IO) {
+            runCatching {
+                val existing = repository.getByPath(relativePath)
+                if (existing != null) {
+                    return@runCatching
+                }
+                val now = System.currentTimeMillis()
+                repository.insert(
+                    ManagedFileEntity(
+                        folder = FileFolders.UPLOAD,
+                        relativePath = relativePath,
+                        displayName = displayName,
+                        mimeType = mimeType,
+                        sizeBytes = file.length(),
+                        createdAt = now,
+                        updatedAt = now,
+                    )
                 )
-            )
-          }
-          .onFailure {
-            Log.e(TAG, "trackUploadFile: Failed to track file ${file.absolutePath}", it)
-            Logging.log(
-                TAG,
-                "trackUploadFile: Failed to track file ${file.absolutePath} ${it.message} | ${it.stackTraceToString()}",
-            )
-          }
-    }
-  }
-
-  private fun getRelativePathInFilesDir(file: File): String? {
-    val canonicalFile = runCatching { file.canonicalFile }.getOrNull() ?: return null
-    val canonicalFilesDir =
-        runCatching { context.filesDir.canonicalFile }.getOrNull() ?: return null
-    val basePath = canonicalFilesDir.path
-    val filePath = canonicalFile.path
-    if (!filePath.startsWith("$basePath${File.separator}")) {
-      return null
-    }
-    return canonicalFile.relativeTo(canonicalFilesDir).path.replace(File.separatorChar, '/')
-  }
-
-  fun getFileNameFromUri(uri: Uri): String? {
-    var fileName: String? = null
-    val projection =
-        arrayOf(OpenableColumns.DISPLAY_NAME, DocumentsContract.Document.COLUMN_DISPLAY_NAME)
-    context.contentResolver.query(uri, projection, null, null, null)?.use { cursor ->
-      if (cursor.moveToFirst()) {
-        val documentDisplayNameIndex =
-            cursor.getColumnIndex(DocumentsContract.Document.COLUMN_DISPLAY_NAME)
-        if (documentDisplayNameIndex != -1) {
-          fileName = cursor.getString(documentDisplayNameIndex)
-        } else {
-          val openableDisplayNameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
-          if (openableDisplayNameIndex != -1) {
-            fileName = cursor.getString(openableDisplayNameIndex)
-          }
+            }.onFailure {
+                Log.e(TAG, "trackUploadFile: Failed to track file ${file.absolutePath}", it)
+                Logging.log(
+                    TAG,
+                    "trackUploadFile: Failed to track file ${file.absolutePath} ${it.message} | ${it.stackTraceToString()}"
+                )
+            }
         }
-      }
-    }
-    return fileName
-  }
-
-  fun getFileMimeType(uri: Uri): String? {
-    return when (uri.scheme) {
-      "content" -> context.contentResolver.getType(uri)
-      else -> null
-    }
-  }
-
-  private fun guessMimeType(file: File, fileName: String): String {
-    val ext = fileName.substringAfterLast('.', "").lowercase()
-    if (ext.isNotEmpty()) {
-      return MimeTypeMap.getSingleton().getMimeTypeFromExtension(ext) ?: "application/octet-stream"
-    }
-    return sniffMimeType(file)
-  }
-
-  private fun sniffMimeType(file: File): String {
-    val header = ByteArray(16)
-    val read =
-        runCatching { FileInputStream(file).use { input -> input.read(header) } }.getOrDefault(-1)
-
-    if (read <= 0) return "application/octet-stream"
-
-    // Magic numbers
-    if (header.startsWithBytes(0x89, 0x50, 0x4E, 0x47)) return "image/png"
-    if (header.startsWithBytes(0xFF, 0xD8, 0xFF)) return "image/jpeg"
-    if (header.startsWithBytes(0x47, 0x49, 0x46, 0x38)) return "image/gif"
-    if (header.startsWithBytes(0x25, 0x50, 0x44, 0x46)) return "application/pdf"
-    if (header.startsWithBytes(0x50, 0x4B, 0x03, 0x04)) return "application/zip"
-    if (header.startsWithBytes(0x50, 0x4B, 0x05, 0x06)) return "application/zip"
-    if (header.startsWithBytes(0x50, 0x4B, 0x07, 0x08)) return "application/zip"
-    if (
-        header.startsWithBytes(0x52, 0x49, 0x46, 0x46) &&
-            header.sliceArray(8..11).contentEquals(byteArrayOf(0x57, 0x45, 0x42, 0x50))
-    ) {
-      return "image/webp"
     }
 
-    // Heuristic: treat mostly printable UTF-8 as text/plain
-    val textSample =
-        runCatching {
-              val sample = ByteArray(512)
-              FileInputStream(file).use { input ->
+    private fun getRelativePathInFilesDir(file: File): String? {
+        val canonicalFile = runCatching { file.canonicalFile }.getOrNull() ?: return null
+        val canonicalFilesDir = runCatching { context.filesDir.canonicalFile }.getOrNull() ?: return null
+        val basePath = canonicalFilesDir.path
+        val filePath = canonicalFile.path
+        if (!filePath.startsWith("$basePath${File.separator}")) {
+            return null
+        }
+        return canonicalFile.relativeTo(canonicalFilesDir).path.replace(File.separatorChar, '/')
+    }
+
+    fun getFileNameFromUri(uri: Uri): String? {
+        var fileName: String? = null
+        val projection = arrayOf(
+            OpenableColumns.DISPLAY_NAME,
+            DocumentsContract.Document.COLUMN_DISPLAY_NAME
+        )
+        context.contentResolver.query(uri, projection, null, null, null)?.use { cursor ->
+            if (cursor.moveToFirst()) {
+                val documentDisplayNameIndex =
+                    cursor.getColumnIndex(DocumentsContract.Document.COLUMN_DISPLAY_NAME)
+                if (documentDisplayNameIndex != -1) {
+                    fileName = cursor.getString(documentDisplayNameIndex)
+                } else {
+                    val openableDisplayNameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                    if (openableDisplayNameIndex != -1) {
+                        fileName = cursor.getString(openableDisplayNameIndex)
+                    }
+                }
+            }
+        }
+        return fileName
+    }
+
+    fun getFileMimeType(uri: Uri): String? {
+        return when (uri.scheme) {
+            "content" -> context.contentResolver.getType(uri)
+            else -> null
+        }
+    }
+
+    private fun guessMimeType(file: File, fileName: String): String {
+        val ext = fileName.substringAfterLast('.', "").lowercase()
+        if (ext.isNotEmpty()) {
+            return MimeTypeMap.getSingleton().getMimeTypeFromExtension(ext)
+                ?: "application/octet-stream"
+        }
+        return sniffMimeType(file)
+    }
+
+    private fun sniffMimeType(file: File): String {
+        val header = ByteArray(16)
+        val read = runCatching {
+            FileInputStream(file).use { input ->
+                input.read(header)
+            }
+        }.getOrDefault(-1)
+
+        if (read <= 0) return "application/octet-stream"
+
+        // Magic numbers
+        if (header.startsWithBytes(0x89, 0x50, 0x4E, 0x47)) return "image/png"
+        if (header.startsWithBytes(0xFF, 0xD8, 0xFF)) return "image/jpeg"
+        if (header.startsWithBytes(0x47, 0x49, 0x46, 0x38)) return "image/gif"
+        if (header.startsWithBytes(0x25, 0x50, 0x44, 0x46)) return "application/pdf"
+        if (header.startsWithBytes(0x50, 0x4B, 0x03, 0x04)) return "application/zip"
+        if (header.startsWithBytes(0x50, 0x4B, 0x05, 0x06)) return "application/zip"
+        if (header.startsWithBytes(0x50, 0x4B, 0x07, 0x08)) return "application/zip"
+        if (header.startsWithBytes(0x52, 0x49, 0x46, 0x46) && header.sliceArray(8..11)
+                .contentEquals(byteArrayOf(0x57, 0x45, 0x42, 0x50))
+        ) {
+            return "image/webp"
+        }
+
+        // Heuristic: treat mostly printable UTF-8 as text/plain
+        val textSample = runCatching {
+            val sample = ByteArray(512)
+            FileInputStream(file).use { input ->
                 val len = input.read(sample)
                 if (len <= 0) return@runCatching null
                 sample.copyOf(len)
-              }
             }
-            .getOrNull()
-    if (textSample != null && isLikelyText(textSample)) {
-      return "text/plain"
+        }.getOrNull()
+        if (textSample != null && isLikelyText(textSample)) {
+            return "text/plain"
+        }
+
+        return "application/octet-stream"
     }
 
-    return "application/octet-stream"
-  }
-
-  private fun isLikelyText(bytes: ByteArray): Boolean {
-    var printable = 0
-    var total = 0
-    bytes.forEach { b ->
-      val c = b.toInt() and 0xFF
-      total += 1
-      if (c == 0x09 || c == 0x0A || c == 0x0D) {
-        printable += 1
-      } else if (c in 0x20..0x7E) {
-        printable += 1
-      }
+    private fun isLikelyText(bytes: ByteArray): Boolean {
+        var printable = 0
+        var total = 0
+        bytes.forEach { b ->
+            val c = b.toInt() and 0xFF
+            total += 1
+            if (c == 0x09 || c == 0x0A || c == 0x0D) {
+                printable += 1
+            } else if (c in 0x20..0x7E) {
+                printable += 1
+            }
+        }
+        return total > 0 && printable.toDouble() / total >= 0.8
     }
-    return total > 0 && printable.toDouble() / total >= 0.8
-  }
 
-  private fun ByteArray.startsWithBytes(vararg values: Int): Boolean {
-    if (this.size < values.size) return false
-    for (i in values.indices) {
-      if ((this[i].toInt() and 0xFF) != values[i]) return false
+    private fun ByteArray.startsWithBytes(vararg values: Int): Boolean {
+        if (this.size < values.size) return false
+        for (i in values.indices) {
+            if ((this[i].toInt() and 0xFF) != values[i]) return false
+        }
+        return true
     }
-    return true
-  }
 
-  private fun Bitmap.compressToPng(): ByteArray =
-      ByteArrayOutputStream().use {
+    private fun Bitmap.compressToPng(): ByteArray = ByteArrayOutputStream().use {
         compress(Bitmap.CompressFormat.PNG, 100, it)
         it.toByteArray()
-      }
+    }
 }
 
 object FileFolders {
-  const val UPLOAD = "upload"
-  const val SKILLS = "skills"
+    const val UPLOAD = "upload"
+    const val SKILLS = "skills"
 }

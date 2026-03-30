@@ -1,3 +1,5 @@
+package com.itsaky.androidide.lexers.c;
+
 public enum TypeClassification {
     Global_,
     Block_,
