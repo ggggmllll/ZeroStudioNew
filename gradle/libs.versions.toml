@@ -57,9 +57,8 @@ nav2 = "2.9.6"
 nav3Core = "1.0.0-rc01"
 profileinstaller = "1.4.1"
 lifecycleRuntimeKtx = "2.9.4"
-material3AdaptiveNav3 = "1.2.0"
+material3AdaptiveNav3 = "1.3.0-alpha09"
 lifecycleViewmodelNav3 = "1.0.0-alpha04"
-nav3Material = "1.0.0-SNAPSHOT"
 datastore = "1.1.7"
 benchmarkMacroJunit4 = "1.4.1"
 baselineprofile = "1.4.1"
@@ -133,7 +132,7 @@ haze = "1.0.2"
 huge-icons = "1.1.0"
 jmdns = "3.5.9"
 slf4j-android = "1.7.36"
-sqlite-android = "3.45.0"
+sqlite-android = "3.34.0"
 floatingx = "2.3.7"
 
 
@@ -246,15 +245,6 @@ common-com-squareup-javapoet = { module = "com.squareup:javapoet", version = "1.
 common-net-ltgt-gradle-incap = { module = "net.ltgt.gradle.incap:incap", version.ref = "incap" }
 common-net-ltgt-gradle-incap-processor = { module = "net.ltgt.gradle.incap:incap-processor", version.ref = "incap" }
 common-asm = { module = "org.ow2.asm:asm", version = "9.7.1" }
-haze = { module = "dev.chrisbanes.haze:haze", version.ref = "haze" }
-haze-materials = { module = "dev.chrisbanes.haze:haze-materials", version.ref = "haze" }
-huge-icons = { module = "com.composables:icons-huge", version.ref = "huge-icons" }
-jmdns = { module = "org.jmdns:jmdns", version.ref = "jmdns" }
-slf4j-android = { module = "org.slf4j:slf4j-android", version.ref = "slf4j-android" }
-sqlite-android = { module = "io.requery:sqlite-android", version.ref = "sqlite-android" }
-floatingx = { module = "io.github.petterpx:floatingx", version.ref = "floatingx" }
-floatingx-compose = { module = "io.github.petterpx:floatingx-compose", version.ref = "floatingx" }
-
 
 # AndroidX 相关sdk
 androidx-annotation = { module = "androidx.annotation:annotation", version.ref = "androidxCore" }
@@ -304,7 +294,7 @@ androidx-navigation3-runtime = { module = "androidx.navigation3:navigation3-runt
 androidx-navigation3-ui = { module = "androidx.navigation3:navigation3-ui", version.ref = "nav3Core" }
 androidx-material3-adaptive = { group = "androidx.compose.material3.adaptive", name = "adaptive", version.ref = "material3AdaptiveNav3" }
 androidx-material3-adaptive-layout = { group = "androidx.compose.material3.adaptive", name = "adaptive-layout", version.ref = "material3AdaptiveNav3" }
-androidx-material3-adaptive-navigation3 = { group = "androidx.compose.material3.adaptive", name = "adaptive-navigation3", version.ref = "nav3Material" }
+androidx-material3-adaptive-navigation3 = { group = "androidx.compose.material3.adaptive", name = "adaptive-navigation3", version.ref = "material3AdaptiveNav3" }
 androidx-lifecycle-viewmodel-navigation3 = { module = "androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "lifecycleViewmodelNav3" }
 androidx-room-paging = { group = "androidx.room", name = "room-paging", version.ref = "androidx-room" }
 androidx-paging-runtime = { group = "androidx.paging", name = "paging-runtime", version.ref = "paging" }
@@ -490,11 +480,10 @@ jlatexmath-font-cyrillic = { module = "com.github.rikkahub.jlatexmath-android:jl
 #lsp4j 语言服务器
 xmlLsp-org-eclipse-lemminx = { module = "org.eclipse.lemminx:org.eclipse.lemminx", version = "0.31.0" }
 
-#格式化
-com-github-fwcd-ktfmt = { module = "zerostudio:ktfmt", version = "b5d31d1" }
+
+
 
 # grpc二进制协议 + protobuf
-grpc-okhttp = { module = "io.grpc:grpc-okhttp", version.ref = "ioGrpcVersion" }
 grpc-android = { module = "io.grpc:grpc-android", version.ref = "ioGrpcVersion" }
 google-protobuf-kotlin = { module = "com.google.protobuf:protobuf-kotlin", version.ref = "googleProtobufKotlin" }
 grpc-protobuf = { module = "io.grpc:grpc-protobuf", version.ref = "ioGrpcVersion" }
@@ -517,6 +506,15 @@ image-viewer = { group = "com.jvziyaoyao.scale", name = "image-viewer", version.
 metadata-extractor = { module = "com.drewnoakes:metadata-extractor", version.ref = "metadataExtractor" }
 quickjs = { group = "wang.harlon.quickjs", name = "wrapper-android", version.ref = "quickjs" }
 dom4j = { module = "org.dom4j:dom4j", version.ref = "dom4j" }
+haze = { module = "dev.chrisbanes.haze:haze", version.ref = "haze" }
+haze-materials = { module = "dev.chrisbanes.haze:haze-materials", version.ref = "haze" }
+jmdns = { module = "org.jmdns:jmdns", version.ref = "jmdns" }
+slf4j-android = { module = "org.slf4j:slf4j-android", version.ref = "slf4j-android" }
+sqlite-android = { module = "io.requery:sqlite-android", version.ref = "sqlite-android" }
+floatingx = { module = "io.github.petterpx:floatingx", version.ref = "floatingx" }
+floatingx-compose = { module = "io.github.petterpx:floatingx-compose", version.ref = "floatingx" }
+huge-icons = { group = "com.github.rikkahub", name = "hugeicons-compose", version.ref = "huge-icons" }
+
 
 
 [bundles]

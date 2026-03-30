@@ -203,8 +203,6 @@ dependencies {
   implementation(libs.composite.googleJavaFormat) {
     exclude(group = "com.google.guava", module = "guava")
   }
-  // kotlin格式化
-  implementation(libs.com.github.fwcd.ktfmt)
 
   // Local projects here
   implementation(projects.core.actions)

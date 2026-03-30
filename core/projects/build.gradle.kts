@@ -32,7 +32,6 @@ kapt {
 
 dependencies {
   implementation(libs.grpc.android)
-  implementation(libs.grpc.okhttp)
 
   kapt(projects.annotation.processors)
   kapt(libs.google.auto.service)

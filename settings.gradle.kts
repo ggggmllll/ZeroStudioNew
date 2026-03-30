@@ -6,27 +6,16 @@ pluginManagement {
   includeBuild("composite-builds/build-logic") { name = "build-logic" }
 
   repositories {
-    maven { url = uri("${rootProject.projectDir}/gradle/libs") }
-    maven("https://repo.itextsupport.com/android")
     gradlePluginPortal()
     google()
     mavenCentral()
     mavenLocal()
+    maven("https://jitpack.io")
+    maven("https://repo1.maven.org/maven2/")
     maven("https://repo.itextsupport.com/android")
-    maven("https://cache-redirector.jetbrains.com/kotlin.bintray.com/kotlin-plugin/")
-    maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/kotlin-ide/")
-    maven(url = "https://maven.pkg.jetbrains.space/kotlin/p/kotlin/bootstrap/")
-    maven(url = "https://maven.pkg.jetbrains.space/kotlin/p/kotlin/kotlin-ide-plugin-dependencies/")
-    maven(url = "https://www.jetbrains.com/intellij-repository/releases/")
-    maven(url = "https://cache-redirector.jetbrains.com/intellij-third-party-dependencies/")
     maven(url = "https://repo.gradle.org/gradle/libs-releases/")
-    maven { url = uri("https://maven.aliyun.com/repository/gradle-plugin") }
-    maven { url = uri("https://maven.aliyun.com/repository/public") }
-    maven { url = uri("https://maven.aliyun.com/repository/google") }
-    // maven {url = uri("https://maven.pkg.github.com/android-zeros/ZeroStudio-gradle-tooling-api/")
-    // credentials {
-    // username = "android-zeros"
-    // password = "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" } }
+    maven { url = uri("${rootProject.projectDir}/gradle/libs") }
+
 
   }
   
@@ -76,26 +65,15 @@ dependencyResolutionManagement {
 
   repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
   repositories {
-    maven { url = uri("${rootProject.projectDir}/gradle/libs") }
-    maven("https://repo.itextsupport.com/android")
     google()
     mavenCentral()
     mavenLocal()
-    // maven { url = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/") }
-    // maven { url = uri("https://s01.oss.sonatype.org/content/groups/public/") }
-    maven { url = uri("https://jitpack.io") }
-    maven { url = uri("https://repo1.maven.org/maven2/") }
+    maven("https://jitpack.io")
+    maven("https://repo1.maven.org/maven2/")
     maven("https://repo.itextsupport.com/android")
-    maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/kotlin-ide/")
-    maven("https://cache-redirector.jetbrains.com/kotlin.bintray.com/kotlin-plugin/")
-    maven(url = "https://maven.pkg.jetbrains.space/kotlin/p/kotlin/bootstrap/")
-    maven(url = "https://maven.pkg.jetbrains.space/kotlin/p/kotlin/kotlin-ide-plugin-dependencies/")
-    maven(url = "https://www.jetbrains.com/intellij-repository/releases/")
-    maven(url = "https://cache-redirector.jetbrains.com/intellij-third-party-dependencies/")
-    maven { url = uri("https://maven.aliyun.com/repository/gradle-plugin") }
-    maven { url = uri("https://maven.aliyun.com/repository/public") }
-    maven { url = uri("https://maven.aliyun.com/repository/google") }
-    maven("https://repo.itextsupport.com/android")
+    maven(url = "https://repo.gradle.org/gradle/libs-releases/")
+    maven { url = uri("${rootProject.projectDir}/gradle/libs") }
+
   }
   // versionCatalogs { create("ktlib") { from(files("gradle/kotlin.versions.toml")) } }
 }
@@ -158,14 +136,14 @@ include(
     ":core:git",
     ":core:layout-editor",
     ":core:zero-mcp-server",
-    ":core:chatai:app",
-    ":core:chatai:highlight",
-    ":core:chatai:ai",
-    ":core:chatai:search",
-    ":core:chatai:tts",
-    ":core:chatai:common",
-    ":core:chatai:document",
-    ":core:chatai:web",
+    // ":core:chatai:app",
+    // ":core:chatai:highlight",
+    // ":core:chatai:ai",
+    // ":core:chatai:search",
+    // ":core:chatai:tts",
+    // ":core:chatai:common",
+    // ":core:chatai:document",
+    // ":core:chatai:web",
 
     ":editor:api",
     ":editor:impl",

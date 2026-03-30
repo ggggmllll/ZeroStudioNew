@@ -32,17 +32,6 @@ private fun ProjectTemplateBuilder.mavenUrl(url: String): String {
 private val ProjectTemplateBuilder.repositoriesBlock: String
   get() =
       """
-    ${mavenUrl("https://maven.aliyun.com/repository/gradle-plugin")}
-    ${mavenUrl("https://maven.aliyun.com/repository/public")}
-    ${mavenUrl("https://maven.aliyun.com/repository/google")}
-    ${mavenUrl("https://cache-redirector.jetbrains.com/intellij-third-party-dependencies/")}
-    ${mavenUrl("https://www.jetbrains.com/intellij-repository/releases/")}
-    ${mavenUrl("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/kotlin-ide-plugin-dependencies/")}
-    ${mavenUrl("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/bootstrap/")}
-    ${mavenUrl("https://cache-redirector.jetbrains.com/kotlin.bintray.com/kotlin-plugin/")}
-    ${mavenUrl("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/kotlin-ide/")}
-    ${mavenUrl("https://repo.itextsupport.com/android")}
-    ${mavenUrl("https://repo1.maven.org/maven2/")}
     ${mavenUrl("https://jitpack.io")}
 """
           .trimIndent()
@@ -54,6 +43,7 @@ pluginManagement {
     gradlePluginPortal()
     google()
     mavenCentral()
+    mavenLocal() //Load from local $HOME/.m2
     $repositoriesBlock
   }
 }
@@ -64,6 +54,7 @@ dependencyResolutionManagement {
     gradlePluginPortal()
     google()
     mavenCentral()
+    mavenLocal() //Load from local $HOME/.m2
     $repositoriesBlock
   }
 }
