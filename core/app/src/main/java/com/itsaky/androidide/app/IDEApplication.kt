@@ -52,8 +52,10 @@ import com.termux.shared.reflection.ReflectionUtils
 import io.github.rosemoe.sora.widget.schemes.EditorColorScheme
 import java.lang.Thread.UncaughtExceptionHandler
 import kotlin.system.exitProcess
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
@@ -69,27 +71,51 @@ class IDEApplication : TermuxApplication() {
 
   private var uncaughtExceptionHandler: UncaughtExceptionHandler? = null
   private var ideLogcatReader: IDELogcatReader? = null
+  
+  private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.Default + CoroutineName("IDEAppScope"))
 
   init {
-    if (!VMUtils.isJvm()) {
-      TreeSitter.loadLibrary()
-    }
+    // if (!VMUtils.isJvm()) {
+      // TreeSitter.loadLibrary()
+    // }
 
     RecyclableObjectPool.DEBUG = BuildConfig.DEBUG
   }
 
   @OptIn(DelicateCoroutinesApi::class)
   override fun onCreate() {
-    Environment.init(this)
+    // Environment.init(this)
     instance = this
+    super.onCreate()
+    
+    applyPersistedLocale()
 
     uncaughtExceptionHandler = Thread.getDefaultUncaughtExceptionHandler()
     Thread.setDefaultUncaughtExceptionHandler { thread, th -> handleCrash(thread, th) }
 
-    super.onCreate()
+    applicationScope.launch {
+      // 初始化环境目录
+      Environment.init(this@IDEApplication)
+      
+      // 加载 TreeSitter JNI
+      if (!VMUtils.isJvm()) {
+        TreeSitter.loadLibrary()
+        ToolsManager.init(this@IDEApplication, null)
+      }
 
-    ToolsManager.init(this, null)
+      // 反射与色彩方案加载
+      ReflectionUtils.bypassHiddenAPIReflectionRestrictions()
+      IDEColorSchemeProvider.init()
+    }
 
+    initEventBus()
+    AppCompatDelegate.setDefaultNightMode(GeneralPreferences.uiMode)
+    if (IThemeManager.getInstance().getCurrentTheme() == IDETheme.MATERIAL_YOU) {
+      DynamicColors.applyToActivitiesIfAvailable(this)
+    }
+    EditorColorScheme.setDefault(SchemeAndroidIDE.newInstance(null))
+
+    // Debugging 配置
     if (BuildConfig.DEBUG) {
       StrictMode.setVmPolicy(
           StrictMode.VmPolicy.Builder(StrictMode.getVmPolicy()).penaltyLog().detectAll().build()
@@ -98,7 +124,22 @@ class IDEApplication : TermuxApplication() {
         startLogcatReader()
       }
     }
+  }
 
+  /**
+   * 在启动时恢复语言设置
+   */
+  private fun applyPersistedLocale() {
+    val selectedLocaleKey = GeneralPreferences.selectedLocale
+    if (selectedLocaleKey != null) {
+      val locale = LocaleProvider.getLocale(selectedLocaleKey)
+      if (locale != null) {
+        AppCompatDelegate.setApplicationLocales(LocaleListCompat.create(locale))
+      }
+    }
+  }
+
+  private fun initEventBus() {
     EventBus.builder()
         .addIndex(AppEventsIndex())
         .addIndex(EditorEventsIndex())
@@ -136,40 +177,10 @@ class IDEApplication : TermuxApplication() {
     }
   }
 
-  // fun reportStatsIfNecessary() {
-
-  // val constraints = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
-  // val request = PeriodicWorkRequestBuilder<StatUploadWorker>(Duration.ofHours(24)).setInputData(
-  // AndroidIDEStats.statData.toInputData()
-  // ).setConstraints(constraints)
-  // .addTag(StatUploadWorker.WORKER_WORK_NAME).build()
-
-  // val workManager = WorkManager.getInstance(this)
-
-  // log.info("reportStatsIfNecessary: Enqueuing StatUploadWorker...")
-  // val operation = workManager.enqueueUniquePeriodicWork(
-  // StatUploadWorker.WORKER_WORK_NAME,
-  // ExistingPeriodicWorkPolicy.UPDATE, request
-  // )
-
-  // operation.state.observeForever(object : Observer<Operation.State> {
-  // override fun onChanged(value: Operation.State) {
-  // operation.state.removeObserver(this)
-  // log.debug("reportStatsIfNecessary: WorkManager enqueue result: {}", value)
-  // }
-  // })
-  // }
-
   @Subscribe(threadMode = ThreadMode.MAIN)
   fun onPrefChanged(event: PreferenceChangeEvent) {
     val enabled = event.value as? Boolean?
-    // if (event.key == StatPreferences.STAT_OPT_IN) {
-    // if (enabled == true) {
-    // reportStatsIfNecessary()
-    // } else {
-    // cancelStatUploadWorker()
-    // }
-    // } else
+
     if (event.key == DevOpsPreferences.KEY_DEVOPTS_DEBUGGING_DUMPLOGS) {
       if (enabled == true) {
         startLogcatReader()
@@ -177,15 +188,12 @@ class IDEApplication : TermuxApplication() {
         stopLogcatReader()
       }
     } else if (event.key == GeneralPreferences.UI_MODE) {
-      // Global fallback handling
-      // Activities might also handle this locally to trigger recreate()
       val mode = GeneralPreferences.uiMode
       if (mode != AppCompatDelegate.getDefaultNightMode()) {
         AppCompatDelegate.setDefaultNightMode(mode)
       }
     } else if (event.key == GeneralPreferences.SELECTED_LOCALE) {
 
-      // Use empty locale list if the locale has been reset to 'System Default'
       val selectedLocale = GeneralPreferences.selectedLocale
       val localeListCompat =
           selectedLocale?.let { LocaleListCompat.create(LocaleProvider.getLocale(selectedLocale)) }
@@ -215,18 +223,6 @@ class IDEApplication : TermuxApplication() {
     }
   }
 
-  // private fun cancelStatUploadWorker() {
-  // log.info("Opted-out of stat collection. Cancelling StatUploadWorker if enqueued...")
-  // val operation = WorkManager.getInstance(this)
-  // .cancelUniqueWork(StatUploadWorker.WORKER_WORK_NAME)
-  // operation.state.observeForever(object : Observer<Operation.State> {
-  // override fun onChanged(value: Operation.State) {
-  // operation.state.removeObserver(this)
-  // log.info("StatUploadWorker: Cancellation result state: {}", value)
-  // }
-  // })
-  // }
-
   private fun startLogcatReader() {
     if (ideLogcatReader != null) {
       // already started
@@ -244,9 +240,7 @@ class IDEApplication : TermuxApplication() {
   }
 
   companion object {
-
     private val log = LoggerFactory.getLogger(IDEApplication::class.java)
-
     @JvmStatic
     lateinit var instance: IDEApplication
       private set

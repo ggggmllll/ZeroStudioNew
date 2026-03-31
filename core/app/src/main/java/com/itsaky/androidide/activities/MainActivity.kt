@@ -79,34 +79,44 @@ class MainActivity : EdgeToEdgeIDEActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
-    if (savedInstanceState == null) {
-      supportFragmentManager
-          .beginTransaction()
-          .add(android.R.id.content, MainFragment(), "tag_main")
-          .add(android.R.id.content, TemplateListFragment(), "tag_list")
-          .add(android.R.id.content, TemplateDetailsFragment(), "tag_details")
-          .commitNowAllowingStateLoss()
-    }
+    // if (savedInstanceState == null) {
+      // supportFragmentManager
+          // .beginTransaction()
+          // .add(android.R.id.content, MainFragment(), "tag_main")
+          // .add(android.R.id.content, TemplateListFragment(), "tag_list")
+          // .add(android.R.id.content, TemplateDetailsFragment(), "tag_details")
+          // .commitNowAllowingStateLoss()
+    // }
 
     viewModel.currentScreen.observe(this) { screen ->
       if (screen == -1) return@observe
 
-      val mainFrag = supportFragmentManager.findFragmentByTag("tag_main")
-      val listFrag = supportFragmentManager.findFragmentByTag("tag_list")
-      val detailsFrag = supportFragmentManager.findFragmentByTag("tag_details")
+      val fm = supportFragmentManager
+      val transaction = fm.beginTransaction()
 
-      supportFragmentManager
-          .beginTransaction()
-          .apply {
-            mainFrag?.let { if (screen == MainViewModel.SCREEN_MAIN) show(it) else hide(it) }
-            listFrag?.let {
-              if (screen == MainViewModel.SCREEN_TEMPLATE_LIST) show(it) else hide(it)
-            }
-            detailsFrag?.let {
-              if (screen == MainViewModel.SCREEN_TEMPLATE_DETAILS) show(it) else hide(it)
-            }
-          }
-          .commitAllowingStateLoss()
+      var mainFrag = fm.findFragmentByTag("tag_main")
+      var listFrag = fm.findFragmentByTag("tag_list")
+      var detailsFrag = fm.findFragmentByTag("tag_details")
+
+      // 懒加载：仅在需要显示该 Fragment 时才进行实例化并添加
+      if (screen == MainViewModel.SCREEN_MAIN && mainFrag == null) {
+          mainFrag = MainFragment()
+          transaction.add(android.R.id.content, mainFrag, "tag_main")
+      }
+      if (screen == MainViewModel.SCREEN_TEMPLATE_LIST && listFrag == null) {
+          listFrag = TemplateListFragment()
+          transaction.add(android.R.id.content, listFrag, "tag_list")
+      }
+      if (screen == MainViewModel.SCREEN_TEMPLATE_DETAILS && detailsFrag == null) {
+          detailsFrag = TemplateDetailsFragment()
+          transaction.add(android.R.id.content, detailsFrag, "tag_details")
+      }
+
+      mainFrag?.let { if (screen == MainViewModel.SCREEN_MAIN) transaction.show(it) else transaction.hide(it) }
+      listFrag?.let { if (screen == MainViewModel.SCREEN_TEMPLATE_LIST) transaction.show(it) else transaction.hide(it) }
+      detailsFrag?.let { if (screen == MainViewModel.SCREEN_TEMPLATE_DETAILS) transaction.show(it) else transaction.hide(it) }
+
+      transaction.commitAllowingStateLoss()
 
       onBackPressedCallback.isEnabled = screen != MainViewModel.SCREEN_MAIN
     }

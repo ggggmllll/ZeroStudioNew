@@ -6,9 +6,7 @@ import android.graphics.Typeface
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.LinearOutSlowInEasing
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,6 +15,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.DrawScope
@@ -28,8 +27,7 @@ import androidx.compose.ui.unit.dp
  * Splash screen activity that displays an animation upon app launch.
  * This activity uses Jetpack Compose for its UI.
  *
- * @author android_zero
- * @author Itsaky (Original author)
+ * @author android_zero (One-to-one UI restoration & Performance optimization)
  */
 @SuppressLint("CustomSplashScreen")
 class SplashActivity : ComponentActivity() {
@@ -74,7 +72,7 @@ fun ZeroStudioUltraFastSplash(onFinished: () -> Unit) {
         // 总时长 1.2s
         animState.animateTo(
             targetValue = 1f,
-            animationSpec = tween(durationMillis = 1200, easing = LinearOutSlowInEasing)
+            animationSpec = tween(durationMillis = 1200, easing = FastOutSlowInEasing)
         )
         onFinished()
     }
@@ -84,7 +82,9 @@ fun ZeroStudioUltraFastSplash(onFinished: () -> Unit) {
     Canvas(modifier = Modifier.fillMaxSize().background(Color.White)) {
         val cx = size.width / 2
         val cy = size.height / 2
-        val scale = 0.75f // 调整整体尺寸
+        
+        // 整体缩小约 15%
+        val scale = 0.6375f 
 
         // 左括号 < (阶段 0.0 - 0.4)
         if (p > 0f) {
@@ -107,7 +107,7 @@ fun ZeroStudioUltraFastSplash(onFinished: () -> Unit) {
         // "ZeroStudio" 逐字出现 (阶段 0.6 - 1.0)
         if (p > 0.6f) {
             val textP = ((p - 0.6f) / 0.4f).coerceIn(0f, 1f)
-            drawZeroStudioText(cx, cy + (350f * scale), progress = textP, scale = scale)
+            drawZeroStudioText(cx, cy + (280f * scale), progress = textP, scale = scale)
         }
     }
 }
@@ -121,18 +121,20 @@ fun ZeroStudioUltraFastSplash(onFinished: () -> Unit) {
  * @param scale A scaling factor for size and position.
  */
 private fun DrawScope.drawBracket(cx: Float, cy: Float, isLeft: Boolean, progress: Float, scale: Float) {
-    val offsetX = if (isLeft) -380f * scale else 380f * scale
+    val offsetX = if (isLeft) -320f * scale else 320f * scale
+    
+    // 左侧：深蓝过渡到浅蓝/白； 右侧：亮绿过渡到深绿
     val brush = if (isLeft) {
         Brush.linearGradient(
-            colors = listOf(Color(0xFF4285F4), Color(0xFF34A853)),
-            start = Offset(cx + offsetX - 100f, cy - 150f),
-            end = Offset(cx + offsetX + 100f, cy + 150f)
+            colors = listOf(Color(0xFF1E88E5), Color(0xFF81D4FA)), // 蓝色渐变
+            start = Offset(cx + offsetX, cy - 150f),
+            end = Offset(cx + offsetX, cy + 150f)
         )
     } else {
         Brush.linearGradient(
-            colors = listOf(Color(0xFF3DDC84), Color(0xFF81C784)),
-            start = Offset(cx + offsetX - 100f, cy - 150f),
-            end = Offset(cx + offsetX + 100f, cy + 150f)
+            colors = listOf(Color(0xFF00E676), Color(0xFF00B0FF)), // 亮绿渐变
+            start = Offset(cx + offsetX, cy - 150f),
+            end = Offset(cx + offsetX, cy + 150f)
         )
     }
 
@@ -166,15 +168,24 @@ private fun DrawScope.drawBracket(cx: Float, cy: Float, isLeft: Boolean, progres
 private fun DrawScope.drawAndroidRobot(cx: Float, cy: Float, progress: Float, scale: Float) {
     val robotColor = Color(0xFF3DDC84)
     val headRadius = 165f * scale
-    val yOffset = (1 - progress) * 80f // 升起动画效果
+    // 升起动画，Y轴偏移。将基准中心线下移，与括号视觉重心保持一致
+    val baseCy = cy + (60f * scale) 
+    val yOffset = (1 - progress) * 100f 
 
-    // 机器人头部
+    // 机器人头部使用垂直渐变，底部略微深色透明过渡
+    val robotBrush = Brush.verticalGradient(
+        colors = listOf(Color(0xFF00E676), Color(0xFF00C853)),
+        startY = baseCy - headRadius + yOffset,
+        endY = baseCy + yOffset
+    )
+
+    // 绘制机器人半圆头部
     drawArc(
-        color = robotColor,
+        brush = robotBrush,
         startAngle = 180f,
         sweepAngle = 180f,
         useCenter = true,
-        topLeft = Offset(cx - headRadius, cy - headRadius - 10f + yOffset),
+        topLeft = Offset(cx - headRadius, baseCy - headRadius + yOffset),
         size = Size(headRadius * 2, headRadius * 2),
         alpha = progress
     )
@@ -182,16 +193,35 @@ private fun DrawScope.drawAndroidRobot(cx: Float, cy: Float, progress: Float, sc
     // 眼睛
     if (progress > 0.7f) {
         val eyeAlpha = ((progress - 0.7f) / 0.3f).coerceIn(0f, 1f)
-        drawCircle(Color.Black, 16f * scale, Offset(cx - 65f * scale, cy - 85f * scale + yOffset), alpha = eyeAlpha)
-        drawCircle(Color.Black, 16f * scale, Offset(cx + 65f * scale, cy - 85f * scale + yOffset), alpha = eyeAlpha)
+        // 眼睛出现时的弹跳缩放
+        val eyeScale = if (eyeAlpha < 0.8f) (eyeAlpha / 0.8f) * 1.2f else 1.0f 
+        val eyeRadius = 18f * scale * eyeScale
+        
+        drawCircle(Color.White, eyeRadius, Offset(cx - 65f * scale, baseCy - 75f * scale + yOffset), alpha = eyeAlpha)
+        drawCircle(Color.White, eyeRadius, Offset(cx + 65f * scale, baseCy - 75f * scale + yOffset), alpha = eyeAlpha)
     }
 
     // 触角
     if (progress > 0.5f) {
         val antP = ((progress - 0.5f) / 0.5f).coerceIn(0f, 1f)
-        val strokeW = 15f * scale
-        drawLine(robotColor, Offset(cx - 70f * scale, cy - headRadius + 10f + yOffset), Offset(cx - 110f * scale, cy - headRadius - 60f + yOffset), strokeW, alpha = antP, cap = StrokeCap.Round)
-        drawLine(robotColor, Offset(cx + 70f * scale, cy - headRadius + 10f + yOffset), Offset(cx + 110f * scale, cy - headRadius - 60f + yOffset), strokeW, alpha = antP, cap = StrokeCap.Round)
+        val strokeW = 20f * scale // 调整为有一定宽度的圆柱形
+        
+        drawLine(
+            brush = robotBrush,
+            start = Offset(cx - 70f * scale, baseCy - headRadius + 15f * scale + yOffset), 
+            end = Offset(cx - 105f * scale, baseCy - headRadius - 45f * scale + yOffset), 
+            strokeWidth = strokeW, 
+            alpha = antP, 
+            cap = StrokeCap.Round
+        )
+        drawLine(
+            brush = robotBrush,
+            start = Offset(cx + 70f * scale, baseCy - headRadius + 15f * scale + yOffset), 
+            end = Offset(cx + 105f * scale, baseCy - headRadius - 45f * scale + yOffset), 
+            strokeWidth = strokeW, 
+            alpha = antP, 
+            cap = StrokeCap.Round
+        )
     }
 }
 
@@ -212,8 +242,8 @@ private fun DrawScope.drawZeroStudioText(cx: Float, cy: Float, progress: Float, 
             // Apply a linear gradient to the text paint.
             shader = android.graphics.LinearGradient(
                 cx - 200f, cy + textYOffset, cx + 200f, cy + textYOffset,
-                android.graphics.Color.parseColor("#4285F4"), // Start color (Blue)
-                android.graphics.Color.parseColor("#34A853"), // End color (Green)
+                android.graphics.Color.parseColor("#1E88E5"), // Start color
+                android.graphics.Color.parseColor("#00E676"), // End color
                 android.graphics.Shader.TileMode.CLAMP
             )
         }

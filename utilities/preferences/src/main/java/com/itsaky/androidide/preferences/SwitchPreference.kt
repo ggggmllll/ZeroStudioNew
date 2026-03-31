@@ -25,6 +25,7 @@ import kotlin.reflect.KMutableProperty0
  * A switch preference.
  *
  * @author Akash Yadav
+ * @author android_zero
  */
 abstract class SwitchPreference
 @JvmOverloads
@@ -36,13 +37,17 @@ constructor(val setValue: ((Boolean) -> Unit)? = null, val getValue: (() -> Bool
   override fun onCreatePreference(context: Context): Preference {
     val pref = androidx.preference.SwitchPreference(context)
     // 禁用自动持久化，防止 UI 状态被 SharedPreferences 覆盖
-    pref.isPersistent = false
+    pref.isPersistent = false 
     pref.isChecked = prefValue()
     return pref
   }
 
   override fun onPreferenceChanged(preference: Preference, newValue: Any?): Boolean {
-    setValue?.let { it(newValue as Boolean? ?: prefValue()) }
+    val value = newValue as? Boolean ?: prefValue()
+    setValue?.let { it(value) }
+    if (preference is androidx.preference.SwitchPreference) {
+        preference.isChecked = value
+    }
     return true
   }
 
