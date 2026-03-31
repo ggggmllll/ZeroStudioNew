@@ -70,6 +70,8 @@ class IDEApplication : TermuxApplication() {
 
   private var uncaughtExceptionHandler: UncaughtExceptionHandler? = null
   private var ideLogcatReader: IDELogcatReader? = null
+  
+  private val appScope = CoroutineScope(SupervisorJob() + Dispatchers.IO + CoroutineName("IDEAppScope"))
 
   init {
     RecyclableObjectPool.DEBUG = BuildConfig.DEBUG
