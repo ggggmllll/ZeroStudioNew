@@ -77,18 +77,16 @@ class IDEApplication : TermuxApplication() {
 
   @OptIn(DelicateCoroutinesApi::class)
   override fun onCreate() {
+    super.onCreate()
+
     Environment.init(this)
     instance = this
 
-    // Initialize the multilingual configuration
     applyPersistedLocale()
 
     uncaughtExceptionHandler = Thread.getDefaultUncaughtExceptionHandler()
     Thread.setDefaultUncaughtExceptionHandler { thread, th -> handleCrash(thread, th) }
 
-    super.onCreate()
-
-    // Use GlobalScope to initialize in the background to avoid impacting performance.
     GlobalScope.launch(Dispatchers.IO) {
       delay(3000)
       if (!VMUtils.isJvm()) {
