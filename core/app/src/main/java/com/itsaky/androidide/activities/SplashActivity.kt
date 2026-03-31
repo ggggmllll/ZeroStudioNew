@@ -196,8 +196,8 @@ private fun DrawScope.drawAndroidRobot(cx: Float, cy: Float, progress: Float, sc
 }
 
 private fun DrawScope.drawZeroStudioText(cx: Float, cy: Float, progress: Float, scale: Float) {
-    val fullText = "ZeroStudio"
-    val textYOffset = 180f * scale 
+    val fullText = "ZeroStudio "
+    val textYOffset = 244f * scale 
     
     val count = (fullText.length * progress).toInt()
     val visibleText = fullText.take(count)

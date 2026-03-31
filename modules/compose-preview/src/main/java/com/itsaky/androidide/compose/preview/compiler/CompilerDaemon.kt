@@ -39,15 +39,6 @@ import org.slf4j.LoggerFactory
 /**
  * 热重载的核心：一个常驻的编译守护进程 (Daemon)。
  *
- * <p>工作流程：</p>
- * <ol>
- * <li><b>自引导编译</b>: 首次启动时，动态编译一个内置的 Java 反射包装器 <code>CompilerWrapper.java</code>，用于后续统一调用 Kotlin
- *   编译器和 D8。</li>
- * <li><b>进程复用</b>: 启动一个长期存活的 JVM 进程，通过标准输入(stdin)接收编译或DEX转换指令。</li>
- * <li><b>指令分发</b>: 根据指令前缀（"COMPILE" 或 "DEX"），在同一个 JVM 内部调用相应的工具链，避免了重复启动 JVM 的巨大开销。</li>
- * <li><b>生命周期管理</b>: 进程在空闲超时后会自动退出以释放资源，并在下次需要时自动重启。</li>
- * </ol>
- *
  * @author android_zero
  */
 class CompilerDaemon(
@@ -173,7 +164,7 @@ class CompilerDaemon(
   private fun buildD8Args(classFiles: List<File>, outputDir: File): List<String> = buildList {
     add("--release")
     add("--min-api")
-    add("21") // 保持与 AndroidIDE 兼容
+    add("21")
 
     if (Environment.ANDROID_JAR.exists()) {
       add("--lib")
@@ -276,7 +267,9 @@ class CompilerDaemon(
     val command =
         listOf(
             javaExecutable.absolutePath,
-            "-Xmx512m",
+            "-Xmx1024m",
+            "-Dkotlin.colors.enabled=false",
+            "-Djansi.mode=strip",
             "-cp",
             bootstrapClasspath,
             "CompilerWrapper",
