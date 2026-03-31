@@ -174,7 +174,7 @@ private fun DrawScope.drawAndroidRobot(cx: Float, cy: Float, progress: Float, sc
 
     // 机器人头部使用垂直渐变，底部略微深色透明过渡
     val robotBrush = Brush.verticalGradient(
-        colors = listOf(Color(0xFF00E676), Color(0xFF1B5E20)),
+        colors = listOf(Color(0xFF00E676), Color(0x33C47E)),
         startY = baseCy - headRadius + yOffset,
         endY = baseCy + yOffset
     )
@@ -227,7 +227,7 @@ private fun DrawScope.drawAndroidRobot(cx: Float, cy: Float, progress: Float, sc
 
 private fun DrawScope.drawZeroStudioText(cx: Float, cy: Float, progress: Float, scale: Float) {
     val fullText = "ZeroStudio "
-    val textYOffset = 444f * scale 
+    val textYOffset = 776f * scale 
     
     val count = (fullText.length * progress).toInt()
     val visibleText = fullText.take(count)
