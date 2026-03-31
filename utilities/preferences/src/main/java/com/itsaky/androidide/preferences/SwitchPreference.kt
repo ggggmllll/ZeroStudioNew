@@ -14,16 +14,14 @@
  *  You should have received a copy of the GNU General Public License
  *   along with AndroidIDE.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package com.itsaky.androidide.preferences
 
 import android.content.Context
 import androidx.preference.Preference
-import androidx.preference.TwoStatePreference
 import kotlin.reflect.KMutableProperty0
 
 /**
- * A switch preference 
+ * A custom switch preference that supports manual data binding and Material 3 styling.
  *
  * @author Akash Yadav
  * @author android_zero
@@ -33,33 +31,32 @@ abstract class SwitchPreference
 constructor(val setValue: ((Boolean) -> Unit)? = null, val getValue: (() -> Boolean)? = null) :
   BasePreference() {
 
-  constructor(property: KMutableProperty0<Boolean>) : this(property::set, property::get)
+    constructor(property: KMutableProperty0<Boolean>) : this(property::set, property::get)
 
   override fun onCreatePreference(context: Context): Preference {
-    return androidx.preference.SwitchPreference(context).apply {
-        isPersistent = false
-        
-        isChecked = getValue?.invoke() ?: false
-    }
+    val pref = androidx.preference.SwitchPreference(context)
+    
+    pref.isPersistent = false 
+    
+    pref.isChecked = prefValue()
+    
+    return pref
   }
 
   override fun onPreferenceChanged(preference: Preference, newValue: Any?): Boolean {
     val isChecked = newValue as? Boolean ?: false
     
-    setValue?.invoke(isChecked)
+    setValue?.let { it(isChecked) }
     
-    if (preference is TwoStatePreference) {
+    if (preference is androidx.preference.SwitchPreference) {
         preference.isChecked = isChecked
     }
     
     return true
   }
 
-  override fun onCreateView(context: Context): Preference {
-    return super.onCreateView(context).apply {
-      if (this is TwoStatePreference) {
-        this.isChecked = getValue?.invoke() ?: false
-      }
-    }
+  private fun prefValue(): Boolean {
+    val value = getValue?.let { it() } ?: false
+    return value
   }
 }
