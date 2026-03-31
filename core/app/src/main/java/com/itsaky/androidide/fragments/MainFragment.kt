@@ -174,7 +174,7 @@ class MainFragment : BaseFragment() {
               } else {
                 historyState
                     .sortedByDescending { it.timestamp }
-                    .take(4)
+                    .take(0xff)
                     .forEach { project -> RecentProjectItem(project) }
               }
             }
@@ -186,7 +186,7 @@ class MainFragment : BaseFragment() {
               if (historyState.isNotEmpty()) {
                 historyState
                     .sortedByDescending { it.openCount }
-                    .take(3)
+                    .take(0xff)
                     .forEach { project -> FrequentProjectItem(project) }
               } else {
                 Text(
