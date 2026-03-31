@@ -54,6 +54,7 @@ import com.itsaky.androidide.preferences.internal.EditorPreferences
 import com.itsaky.androidide.syntax.colorschemes.SchemeAndroidIDE
 import com.itsaky.androidide.tasks.cancelIfActive
 import com.itsaky.androidide.tasks.runOnUiThread
+import com.itsaky.androidide.treesitter.TreeSitter
 import com.itsaky.androidide.utils.customOrJBMono
 import io.github.rosemoe.sora.event.ContentChangeEvent
 import io.github.rosemoe.sora.event.EditorFocusChangeEvent
@@ -133,9 +134,31 @@ class CodeEditorView(context: Context, file: File, selection: Range) :
   companion object {
 
     private val log = LoggerFactory.getLogger(CodeEditorView::class.java)
+    
+    @Volatile
+    private var isTreeSitterLoaded = false
+
+    @JvmStatic
+    fun ensureTreeSitterLoaded() {
+      if (!isTreeSitterLoaded) {
+        synchronized(this) {
+          if (!isTreeSitterLoaded) {
+            try {
+              TreeSitter.loadLibrary()
+              isTreeSitterLoaded = true
+              log.info("TreeSitter native library loaded dynamically on demand.")
+            } catch (e: Throwable) {
+              log.error("Failed to load TreeSitter native library", e)
+            }
+          }
+        }
+      }
+    }
   }
 
   init {
+    ensureTreeSitterLoaded()
+
     _binding = LayoutCodeEditorBinding.inflate(LayoutInflater.from(context))
 
     binding.editor.apply {
@@ -151,8 +174,7 @@ class CodeEditorView(context: Context, file: File, selection: Range) :
       // Register focus change listener for Auto-Save on Focus Loss
       subscribeEvent(EditorFocusChangeEvent::class.java) { event, _ ->
         if (!event.isGainFocus && EditorPreferences.autoSaveOnFocusLoss && isModified) {
-          log.debug("Focus lost. Performing auto-save for file: ${file?.name}")
-          // Use codeEditorScope directly to launch save task
+          log.debug("Focus lost. Performing auto-save for ${file?.name}")
           codeEditorScope.launch { save() }
         }
       }

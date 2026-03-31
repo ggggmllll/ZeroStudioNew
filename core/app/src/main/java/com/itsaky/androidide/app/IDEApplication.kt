@@ -40,7 +40,6 @@ import com.itsaky.androidide.preferences.internal.DevOpsPreferences
 import com.itsaky.androidide.preferences.internal.GeneralPreferences
 import com.itsaky.androidide.resources.localization.LocaleProvider
 import com.itsaky.androidide.syntax.colorschemes.SchemeAndroidIDE
-import com.itsaky.androidide.treesitter.TreeSitter
 import com.itsaky.androidide.ui.themes.IDETheme
 import com.itsaky.androidide.ui.themes.IThemeManager
 import com.itsaky.androidide.utils.Environment
@@ -52,12 +51,10 @@ import com.termux.shared.reflection.ReflectionUtils
 import io.github.rosemoe.sora.widget.schemes.EditorColorScheme
 import java.lang.Thread.UncaughtExceptionHandler
 import kotlin.system.exitProcess
-import kotlinx.coroutines.CoroutineName
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
@@ -73,51 +70,32 @@ class IDEApplication : TermuxApplication() {
 
   private var uncaughtExceptionHandler: UncaughtExceptionHandler? = null
   private var ideLogcatReader: IDELogcatReader? = null
-  
-  private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.Default + CoroutineName("IDEAppScope"))
 
   init {
-    // if (!VMUtils.isJvm()) {
-      // TreeSitter.loadLibrary()
-    // }
-
     RecyclableObjectPool.DEBUG = BuildConfig.DEBUG
   }
 
   @OptIn(DelicateCoroutinesApi::class)
   override fun onCreate() {
-    // Environment.init(this)
+    Environment.init(this)
     instance = this
-    super.onCreate()
-    
+
+    // Initialize the multilingual configuration
     applyPersistedLocale()
 
     uncaughtExceptionHandler = Thread.getDefaultUncaughtExceptionHandler()
     Thread.setDefaultUncaughtExceptionHandler { thread, th -> handleCrash(thread, th) }
 
-    applicationScope.launch {
-      // 初始化环境目录
-      Environment.init(this@IDEApplication)
-      
-      // 加载 TreeSitter JNI
+    super.onCreate()
+
+    // Use GlobalScope to initialize in the background to avoid impacting performance.
+    GlobalScope.launch(Dispatchers.IO) {
+      delay(3000)
       if (!VMUtils.isJvm()) {
-        TreeSitter.loadLibrary()
         ToolsManager.init(this@IDEApplication, null)
       }
-
-      // 反射与色彩方案加载
-      ReflectionUtils.bypassHiddenAPIReflectionRestrictions()
-      IDEColorSchemeProvider.init()
     }
 
-    initEventBus()
-    AppCompatDelegate.setDefaultNightMode(GeneralPreferences.uiMode)
-    if (IThemeManager.getInstance().getCurrentTheme() == IDETheme.MATERIAL_YOU) {
-      DynamicColors.applyToActivitiesIfAvailable(this)
-    }
-    EditorColorScheme.setDefault(SchemeAndroidIDE.newInstance(null))
-
-    // Debugging 配置
     if (BuildConfig.DEBUG) {
       StrictMode.setVmPolicy(
           StrictMode.VmPolicy.Builder(StrictMode.getVmPolicy()).penaltyLog().detectAll().build()
@@ -126,22 +104,7 @@ class IDEApplication : TermuxApplication() {
         startLogcatReader()
       }
     }
-  }
 
-  /**
-   * 在启动时恢复语言设置
-   */
-  private fun applyPersistedLocale() {
-    val selectedLocaleKey = GeneralPreferences.selectedLocale
-    if (selectedLocaleKey != null) {
-      val locale = LocaleProvider.getLocale(selectedLocaleKey)
-      if (locale != null) {
-        AppCompatDelegate.setApplicationLocales(LocaleListCompat.create(locale))
-      }
-    }
-  }
-
-  private fun initEventBus() {
     EventBus.builder()
         .addIndex(AppEventsIndex())
         .addIndex(EditorEventsIndex())
@@ -160,7 +123,21 @@ class IDEApplication : TermuxApplication() {
     EditorColorScheme.setDefault(SchemeAndroidIDE.newInstance(null))
 
     ReflectionUtils.bypassHiddenAPIReflectionRestrictions()
-    GlobalScope.launch { IDEColorSchemeProvider.init() }
+    GlobalScope.launch(Dispatchers.IO) { IDEColorSchemeProvider.init() }
+  }
+
+  /**
+   * Reads the saved locale key and applies it globally to prevent the system
+   * from resetting the app language to the device default on cold start.
+   */
+  private fun applyPersistedLocale() {
+    val selectedLocaleKey = GeneralPreferences.selectedLocale
+    if (selectedLocaleKey != null) {
+      val locale = LocaleProvider.getLocale(selectedLocaleKey)
+      if (locale != null) {
+        AppCompatDelegate.setApplicationLocales(LocaleListCompat.create(locale))
+      }
+    }
   }
 
   fun showChangelog() {
@@ -182,7 +159,7 @@ class IDEApplication : TermuxApplication() {
   @Subscribe(threadMode = ThreadMode.MAIN)
   fun onPrefChanged(event: PreferenceChangeEvent) {
     val enabled = event.value as? Boolean?
-
+    
     if (event.key == DevOpsPreferences.KEY_DEVOPTS_DEBUGGING_DUMPLOGS) {
       if (enabled == true) {
         startLogcatReader()
@@ -195,7 +172,6 @@ class IDEApplication : TermuxApplication() {
         AppCompatDelegate.setDefaultNightMode(mode)
       }
     } else if (event.key == GeneralPreferences.SELECTED_LOCALE) {
-
       val selectedLocale = GeneralPreferences.selectedLocale
       val localeListCompat =
           selectedLocale?.let { LocaleListCompat.create(LocaleProvider.getLocale(selectedLocale)) }
@@ -209,7 +185,6 @@ class IDEApplication : TermuxApplication() {
     writeException(th)
 
     try {
-
       val intent = Intent()
       intent.action = CrashHandlerActivity.REPORT_ACTION
       intent.putExtra(CrashHandlerActivity.TRACE_KEY, getFullStackTrace(th))
@@ -243,6 +218,7 @@ class IDEApplication : TermuxApplication() {
 
   companion object {
     private val log = LoggerFactory.getLogger(IDEApplication::class.java)
+
     @JvmStatic
     lateinit var instance: IDEApplication
       private set

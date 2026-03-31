@@ -99,6 +99,7 @@ class MainActivity : EdgeToEdgeIDEActivity() {
       var detailsFrag = fm.findFragmentByTag("tag_details")
 
       // 懒加载：仅在需要显示该 Fragment 时才进行实例化并添加
+      //可选项优化方案：Navigation Component
       if (screen == MainViewModel.SCREEN_MAIN && mainFrag == null) {
           mainFrag = MainFragment()
           transaction.add(android.R.id.content, mainFrag, "tag_main")
