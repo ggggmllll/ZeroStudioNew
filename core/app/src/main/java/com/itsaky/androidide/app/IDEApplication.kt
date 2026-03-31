@@ -77,10 +77,10 @@ class IDEApplication : TermuxApplication() {
 
   @OptIn(DelicateCoroutinesApi::class)
   override fun onCreate() {
+    instance = this
     super.onCreate()
 
     Environment.init(this)
-    instance = this
 
     applyPersistedLocale()
 
@@ -120,8 +120,10 @@ class IDEApplication : TermuxApplication() {
 
     EditorColorScheme.setDefault(SchemeAndroidIDE.newInstance(null))
 
-    ReflectionUtils.bypassHiddenAPIReflectionRestrictions()
-    GlobalScope.launch(Dispatchers.IO) { IDEColorSchemeProvider.init() }
+    appScope.launch {
+      ReflectionUtils.bypassHiddenAPIReflectionRestrictions()
+      IDEColorSchemeProvider.init()
+    }
   }
 
   /**

@@ -20,6 +20,9 @@ import android.app.Application;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Handler;
+import android.os.Looper;
+
 import com.blankj.utilcode.util.ThrowableUtils;
 import com.itsaky.androidide.buildinfo.BuildInfo;
 import com.itsaky.androidide.resources.R;
@@ -33,7 +36,11 @@ import com.itsaky.androidide.utils.VMUtils;
 import java.io.File;
 import com.itsaky.androidide.app.BaseConstants;
 
-
+/**
+ * 基础应用类
+ * 
+ * @author android_zero
+ */
 public class BaseApplication extends Application {
 
   public static final String NOTIFICATION_GRADLE_BUILD_SERVICE = BaseConstants.NOTIFICATION_GRADLE_BUILD_SERVICE;
@@ -43,6 +50,7 @@ public class BaseApplication extends Application {
   public static final String DOCS_URL = BaseConstants.DOCS_URL;
   public static final String CONTRIBUTOR_GUIDE_URL = BaseConstants.CONTRIBUTOR_GUIDE_URL;
   public static final String EMAIL = BaseConstants.EMAIL;
+
   private static BaseApplication instance;
   private PreferenceManager mPrefsManager;
 
@@ -53,15 +61,23 @@ public class BaseApplication extends Application {
   @Override
   public void onCreate() {
     instance = this;
-    Environment.init(this);
+    
+    if (Environment.ROOT == null) {
+        Environment.init(this);
+    }
 
     super.onCreate();
 
     mPrefsManager = new PreferenceManager(this);
-    JavaCharacter.initMap();
+    
+    new Thread(JavaCharacter::initMap, "JavaChar-Init-Thread").start();
 
     if (!VMUtils.isJvm()) {
-      ToolsManager.init(this, null);
+      new Handler(Looper.getMainLooper()).postDelayed(() -> {
+          new Thread(() -> {
+              ToolsManager.init(BaseApplication.this, null);
+          }, "ToolsManager-Init-Thread").start();
+      }, 3000); //延迟3秒运行
     }
   }
 
