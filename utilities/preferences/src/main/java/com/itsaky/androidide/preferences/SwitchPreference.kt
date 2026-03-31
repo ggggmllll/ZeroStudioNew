@@ -19,6 +19,7 @@ package com.itsaky.androidide.preferences
 
 import android.content.Context
 import androidx.preference.Preference
+import androidx.preference.SwitchPreferenceCompat
 import kotlin.reflect.KMutableProperty0
 
 /**
@@ -35,22 +36,27 @@ constructor(val setValue: ((Boolean) -> Unit)? = null, val getValue: (() -> Bool
   constructor(property: KMutableProperty0<Boolean>) : this(property::set, property::get)
 
   override fun onCreatePreference(context: Context): Preference {
-    val pref = androidx.preference.SwitchPreference(context)
-    // 禁用自动持久化，防止 UI 状态被 SharedPreferences 覆盖
+    val pref = SwitchPreferenceCompat(context)
+    // 禁用自动持久化
     pref.isPersistent = false 
     pref.isChecked = prefValue()
     return pref
   }
-
+  
   override fun onPreferenceChanged(preference: Preference, newValue: Any?): Boolean {
-    val value = newValue as? Boolean ?: prefValue()
-    setValue?.let { it(value) }
-    if (preference is androidx.preference.SwitchPreference) {
-        preference.isChecked = value
+    val isChecked = newValue as? Boolean ?: prefValue()
+    
+    setValue?.let { it(isChecked) }
+    
+    if (preference is SwitchPreferenceCompat) {
+        preference.isChecked = isChecked
+    } else if (preference is androidx.preference.SwitchPreference) {
+        preference.isChecked = isChecked
     }
+    
     return true
   }
-
+  
   private fun prefValue(): Boolean {
     return getValue?.let { it() } ?: false
   }
