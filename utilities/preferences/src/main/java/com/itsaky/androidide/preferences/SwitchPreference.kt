@@ -19,42 +19,32 @@ package com.itsaky.androidide.preferences
 
 import android.content.Context
 import androidx.preference.Preference
-import androidx.preference.PreferenceDataStore
-import androidx.preference.SwitchPreferenceCompat
 import kotlin.reflect.KMutableProperty0
 
 /**
- * switch preference
+ * A switch preference.
+ *
  * @author Akash Yadav
- * @author android_zero
  */
 abstract class SwitchPreference
 @JvmOverloads
 constructor(val setValue: ((Boolean) -> Unit)? = null, val getValue: (() -> Boolean)? = null) :
-    BasePreference() {
+  BasePreference() {
 
-  constructor(property: KMutableProperty0<Boolean>) : this(property::set, property::get)
+    constructor(property: KMutableProperty0<Boolean>) : this(property::set, property::get)
 
   override fun onCreatePreference(context: Context): Preference {
-    val pref = SwitchPreferenceCompat(context)
-    
-    pref.preferenceDataStore = object : PreferenceDataStore() {
-        override fun putBoolean(key: String?, value: Boolean) {
-            setValue?.let { it(value) }
-        }
-
-        override fun getBoolean(key: String?, defValue: Boolean): Boolean {
-            return getValue?.let { it() } ?: defValue
-        }
-    }
-    
-    pref.isPersistent = false 
-    pref.isChecked = getValue?.let { it() } ?: false
-    
+    val pref = androidx.preference.SwitchPreference(context)
+    pref.isChecked = prefValue()
     return pref
   }
 
   override fun onPreferenceChanged(preference: Preference, newValue: Any?): Boolean {
+    setValue?.let { it(newValue as Boolean? ?: prefValue()) }
     return true
+  }
+
+  private fun prefValue(): Boolean {
+    return getValue?.let { it() } ?: false
   }
 }
