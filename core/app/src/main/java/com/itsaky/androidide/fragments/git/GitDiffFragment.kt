@@ -133,7 +133,7 @@ class GitDiffFragment : BaseGitPageFragment() {
     val target = changedFiles.getOrNull(currentIndex) ?: return
     withRepo { repo ->
       Libgit2Helper.revertFilesToIndexVersion(repo, listOf(target.relativePathUnderRepo), force = true)
-      if (target.changeType == Cons.gitStatusNew) {
+      if (target.changeType == Cons.gitStatusUntracked) {
         Libgit2Helper.rmUntrackedFiles(listOf(target.canonicalPath))
       }
     }
@@ -148,7 +148,7 @@ class GitDiffFragment : BaseGitPageFragment() {
     withRepo { repo -> loadCurrentDiff(repo) }
   }
 
-  private fun withRepo(action: suspend (Repository) -> Unit) {
+  private fun withRepo(action: (Repository) -> Unit) {
     val projectDir = IProjectManager.getInstance().projectDirPath
     if (projectDir.isNullOrBlank()) {
       Toast.makeText(context, "No opened project", Toast.LENGTH_SHORT).show()
@@ -156,7 +156,7 @@ class GitDiffFragment : BaseGitPageFragment() {
     }
 
     viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
-      val ret = runCatching { Repository.open(projectDir).use { repo -> action(repo) } }
+      val ret = runCatching { Repository.open(projectDir).use(action) }
       withContext(Dispatchers.Main) {
         ret.onSuccess { adapter.notifyDataSetChanged() }
         ret.onFailure {

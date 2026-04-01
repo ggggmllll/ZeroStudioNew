@@ -42,22 +42,9 @@ class GitPullRequestsFragment : BaseGitPageFragment() {
   }
 
   override fun setupToolbar() {
-    addToolbarAction(R.drawable.ic_add_24, "Open Pull Requests") {
-      emitGitOperation("pull_requests", "open_pr_page")
-      openPullRequestsPage()
-    }
-    addToolbarAction(R.drawable.ic_filter_list_24, "Open Merge Requests") {
-      emitGitOperation("pull_requests", "open_mr_page")
-      openMergeRequestsPage()
-    }
-    addToolbarAction(R.drawable.ic_refresh_24, "Refresh") {
-      links = GitHostWebLinks.resolveForCurrentProject()
-      emitGitOperation("pull_requests", "refresh_remote_links")
-    }
-    addToolbarAction(R.drawable.ic_check_24, "New Task") {
-      emitGitOperation("pull_requests", "create_issue")
-      openNewTaskPage()
-    }
+    addToolbarAction(R.drawable.ic_add_24, "Open Pull Requests") { openPullRequestsPage() }
+    addToolbarAction(R.drawable.ic_filter_list_24, "Open Merge Requests") { openMergeRequestsPage() }
+    addToolbarAction(R.drawable.ic_refresh_24, "Refresh") { links = GitHostWebLinks.resolveForCurrentProject() }
   }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -66,21 +53,12 @@ class GitPullRequestsFragment : BaseGitPageFragment() {
     links = GitHostWebLinks.resolveForCurrentProject()
     view.findViewById<RecyclerView>(R.id.rv_branches)?.apply {
       layoutManager = LinearLayoutManager(context)
-      adapter = QuickLinksAdapter(listOf("Open Pull Requests in Browser", "Create Task (Issue)", "Open Merge Requests"))
+      adapter = QuickLinksAdapter(listOf("Open Pull Requests in Browser"))
     }
   }
 
   private fun openPullRequestsPage() {
     val target = links?.pullRequestsUrl ?: links?.mergeRequestsUrl
-    if (target == null) {
-      Toast.makeText(context, "No remote repository detected", Toast.LENGTH_SHORT).show()
-      return
-    }
-    openExternalLink(target)
-  }
-
-  private fun openNewTaskPage() {
-    val target = links?.newTaskUrl(title = "Code review task", body = "Created from AndroidIDE")
     if (target == null) {
       Toast.makeText(context, "No remote repository detected", Toast.LENGTH_SHORT).show()
       return
@@ -107,13 +85,7 @@ class GitPullRequestsFragment : BaseGitPageFragment() {
 
     override fun onBindViewHolder(holder: Holder, position: Int) {
       holder.text.text = items[position]
-      holder.itemView.setOnClickListener {
-        when (position) {
-          0 -> openPullRequestsPage()
-          1 -> openNewTaskPage()
-          else -> openMergeRequestsPage()
-        }
-      }
+      holder.itemView.setOnClickListener { openPullRequestsPage() }
     }
 
     override fun getItemCount() = items.size

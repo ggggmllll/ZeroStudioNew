@@ -59,8 +59,8 @@ constructor(val setValue: ((Boolean) -> Unit)? = null, val getValue: (() -> Bool
   }
 
   override fun onPreferenceClick(preference: Preference): Boolean {
-    // Let AndroidX TwoStatePreference handle checked-state toggling itself.
-    // We only persist the new value in onPreferenceChanged to avoid double-toggle bugs.
-    return false
+    if (preference !is TwoStatePreference) return false
+    val nextValue = !preference.isChecked
+    return onPreferenceChanged(preference, nextValue)
   }
 }

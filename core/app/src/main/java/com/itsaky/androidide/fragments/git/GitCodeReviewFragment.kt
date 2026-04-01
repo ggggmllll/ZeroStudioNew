@@ -26,26 +26,21 @@ class GitCodeReviewFragment : BaseGitPageFragment() {
 
   override fun setupToolbar() {
     addToolbarAction(R.drawable.ic_check_24, "Open Review Page") {
-      emitGitOperation("code_review", "open_review_page")
-      openIfAny(links?.pullRequestsUrl ?: links?.mergeRequestsUrl)
+      val url = links?.pullRequestsUrl ?: links?.mergeRequestsUrl
+      if (url == null) {
+        Toast.makeText(context, "No remote repository detected", Toast.LENGTH_SHORT).show()
+      } else {
+        openExternalLink(url)
+      }
     }
 
     addToolbarAction(R.drawable.ic_info_24, "Open Diffs") {
-      emitGitOperation("code_review", "open_diffs_page")
-      openIfAny(links?.pullRequestsUrl ?: links?.mergeRequestsUrl)
-    }
-
-    addToolbarAction(R.drawable.ic_add_24, "New Review Task") {
-      emitGitOperation("code_review", "new_review_task")
-      val task = links?.newTaskUrl("Code Review Task", "Created from AndroidIDE code review page")
-      openIfAny(task)
-    }
-  }
-
-  private fun openIfAny(url: String?) {
-    if (url == null) {
-      Toast.makeText(context, "No remote repository detected", Toast.LENGTH_SHORT).show()
-      return
+      val url = links?.baseHttpUrl
+      if (url == null) {
+        Toast.makeText(context, "No remote repository detected", Toast.LENGTH_SHORT).show()
+      } else {
+        openExternalLink("$url/pulls")
+      }
     }
     openExternalLink(url)
   }
