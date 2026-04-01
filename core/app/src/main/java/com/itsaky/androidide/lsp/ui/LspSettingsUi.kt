@@ -17,6 +17,10 @@
 
 package com.itsaky.androidide.lsp.ui
 
+
+import android.content.Context
+import android.content.SharedPreferences
+import androidx.core.content.edit
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -26,6 +30,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -76,6 +81,10 @@ fun LspSettingsScreen() {
               style = MaterialTheme.typography.bodyMedium,
               color = MaterialTheme.colorScheme.onSurfaceVariant,
           )
+        }
+
+        item {
+          ClangdSettingsCard()
         }
 
         // Group 1: Built-in & Extension Servers (Start with standard ID, not "ext_")
@@ -212,6 +221,187 @@ fun EditExtensionsDialog(server: BaseLspServer, onDismiss: () -> Unit) {
       },
       dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } },
   )
+}
+
+
+private object ClangdPrefKeys {
+  const val ENABLED = "lsp.clangd.enabled"
+  const val CLANGD_PATH = "lsp.clangd.binary_path"
+  const val COMPLETION_LIMIT = "lsp.clangd.completion.limit"
+  const val ENABLE_DIAGNOSTICS = "lsp.clangd.feature.diagnostics"
+  const val ENABLE_COMPLETION = "lsp.clangd.feature.completion"
+  const val ENABLE_DEFINITION = "lsp.clangd.feature.definition"
+  const val ENABLE_REFERENCES = "lsp.clangd.feature.references"
+  const val ENABLE_SIGNATURE_HELP = "lsp.clangd.feature.signature"
+  const val ENABLE_SMART_SELECTION = "lsp.clangd.feature.smart_selection"
+  const val ENABLE_CODE_ACTIONS = "lsp.clangd.feature.code_actions"
+  const val ENABLE_LOWERCASE_MATCH = "lsp.clangd.completion.match_lowercase"
+  const val FUZZY_MATCH_RATIO = "lsp.clangd.completion.fuzzy_ratio"
+  const val REQUEST_TIMEOUT_MS = "lsp.clangd.request.timeout_ms"
+}
+
+private data class ClangdSettingsUiState(
+    val enabled: Boolean = true,
+    val clangdPath: String = "clangd",
+    val completionLimit: Int = 100,
+    val diagnostics: Boolean = true,
+    val completion: Boolean = true,
+    val definition: Boolean = true,
+    val references: Boolean = true,
+    val signatureHelp: Boolean = true,
+    val smartSelection: Boolean = true,
+    val codeActions: Boolean = true,
+    val matchLowercase: Boolean = true,
+    val fuzzyMatchRatio: Int = 59,
+    val requestTimeoutMs: Long = 3500L,
+)
+
+@Composable
+private fun ClangdSettingsCard() {
+  val context = LocalContext.current
+  val prefs = remember(context) { context.getSharedPreferences("lsp_manager_prefs", Context.MODE_PRIVATE) }
+  var state by remember { mutableStateOf(prefs.readClangdSettings()) }
+  var completionLimitText by remember { mutableStateOf(state.completionLimit.toString()) }
+  var timeoutText by remember { mutableStateOf(state.requestTimeoutMs.toString()) }
+
+  Card(
+      modifier = Modifier.fillMaxWidth(),
+      colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+  ) {
+    Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+      Text(
+          text = stringResource(R.string.lsp_clangd_title),
+          style = MaterialTheme.typography.titleMedium,
+          fontWeight = FontWeight.Bold,
+      )
+      Text(
+          text = stringResource(R.string.lsp_clangd_desc),
+          style = MaterialTheme.typography.bodySmall,
+          color = MaterialTheme.colorScheme.onSurfaceVariant,
+      )
+
+      SettingSwitchRow(stringResource(R.string.lsp_clangd_enabled), state.enabled) {
+        state = state.copy(enabled = it)
+      }
+
+      OutlinedTextField(
+          value = state.clangdPath,
+          onValueChange = { state = state.copy(clangdPath = it) },
+          label = { Text(stringResource(R.string.lsp_clangd_binary_path)) },
+          modifier = Modifier.fillMaxWidth(),
+          enabled = state.enabled,
+      )
+
+      OutlinedTextField(
+          value = completionLimitText,
+          onValueChange = {
+            completionLimitText = it.filter { c -> c.isDigit() }
+            state = state.copy(completionLimit = completionLimitText.toIntOrNull()?.coerceIn(1, 500) ?: state.completionLimit)
+          },
+          label = { Text(stringResource(R.string.lsp_clangd_completion_limit)) },
+          modifier = Modifier.fillMaxWidth(),
+          enabled = state.enabled,
+      )
+
+      OutlinedTextField(
+          value = timeoutText,
+          onValueChange = {
+            timeoutText = it.filter { c -> c.isDigit() }
+            state = state.copy(requestTimeoutMs = timeoutText.toLongOrNull()?.coerceIn(200L, 15000L) ?: state.requestTimeoutMs)
+          },
+          label = { Text(stringResource(R.string.lsp_clangd_request_timeout)) },
+          modifier = Modifier.fillMaxWidth(),
+          enabled = state.enabled,
+      )
+
+      Text(text = stringResource(R.string.lsp_clangd_features), style = MaterialTheme.typography.labelLarge)
+      SettingSwitchRow(stringResource(R.string.lsp_clangd_feature_diagnostics), state.diagnostics, state.enabled) { state = state.copy(diagnostics = it) }
+      SettingSwitchRow(stringResource(R.string.lsp_clangd_feature_completion), state.completion, state.enabled) { state = state.copy(completion = it) }
+      SettingSwitchRow(stringResource(R.string.lsp_clangd_feature_definition), state.definition, state.enabled) { state = state.copy(definition = it) }
+      SettingSwitchRow(stringResource(R.string.lsp_clangd_feature_references), state.references, state.enabled) { state = state.copy(references = it) }
+      SettingSwitchRow(stringResource(R.string.lsp_clangd_feature_signature), state.signatureHelp, state.enabled) { state = state.copy(signatureHelp = it) }
+      SettingSwitchRow(stringResource(R.string.lsp_clangd_feature_selection), state.smartSelection, state.enabled) { state = state.copy(smartSelection = it) }
+      SettingSwitchRow(stringResource(R.string.lsp_clangd_feature_actions), state.codeActions, state.enabled) { state = state.copy(codeActions = it) }
+      SettingSwitchRow(stringResource(R.string.lsp_clangd_feature_match_lowercase), state.matchLowercase, state.enabled) { state = state.copy(matchLowercase = it) }
+
+      Text(
+          text = stringResource(R.string.lsp_clangd_fuzzy_ratio, state.fuzzyMatchRatio),
+          style = MaterialTheme.typography.labelMedium,
+      )
+      Slider(
+          value = state.fuzzyMatchRatio.toFloat(),
+          valueRange = 0f..100f,
+          onValueChange = { state = state.copy(fuzzyMatchRatio = it.toInt()) },
+          enabled = state.enabled,
+      )
+
+      Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Button(onClick = {
+          prefs.writeClangdSettings(state)
+          completionLimitText = state.completionLimit.toString()
+          timeoutText = state.requestTimeoutMs.toString()
+        }) {
+          Text(stringResource(R.string.lsp_btn_save))
+        }
+        OutlinedButton(onClick = {
+          state = ClangdSettingsUiState()
+          completionLimitText = state.completionLimit.toString()
+          timeoutText = state.requestTimeoutMs.toString()
+        }) {
+          Text(stringResource(R.string.lsp_clangd_reset_defaults))
+        }
+      }
+      Text(
+          text = stringResource(R.string.lsp_restart_required),
+          style = MaterialTheme.typography.labelSmall,
+          color = MaterialTheme.colorScheme.error,
+      )
+    }
+  }
+}
+
+@Composable
+private fun SettingSwitchRow(label: String, checked: Boolean, enabled: Boolean = true, onChecked: (Boolean) -> Unit) {
+  Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+    Text(text = label, modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium)
+    Switch(checked = checked, onCheckedChange = onChecked, enabled = enabled)
+  }
+}
+
+private fun SharedPreferences.readClangdSettings(): ClangdSettingsUiState {
+  return ClangdSettingsUiState(
+      enabled = getBoolean(ClangdPrefKeys.ENABLED, true),
+      clangdPath = getString(ClangdPrefKeys.CLANGD_PATH, "clangd") ?: "clangd",
+      completionLimit = getInt(ClangdPrefKeys.COMPLETION_LIMIT, 100).coerceIn(1, 500),
+      diagnostics = getBoolean(ClangdPrefKeys.ENABLE_DIAGNOSTICS, true),
+      completion = getBoolean(ClangdPrefKeys.ENABLE_COMPLETION, true),
+      definition = getBoolean(ClangdPrefKeys.ENABLE_DEFINITION, true),
+      references = getBoolean(ClangdPrefKeys.ENABLE_REFERENCES, true),
+      signatureHelp = getBoolean(ClangdPrefKeys.ENABLE_SIGNATURE_HELP, true),
+      smartSelection = getBoolean(ClangdPrefKeys.ENABLE_SMART_SELECTION, true),
+      codeActions = getBoolean(ClangdPrefKeys.ENABLE_CODE_ACTIONS, true),
+      matchLowercase = getBoolean(ClangdPrefKeys.ENABLE_LOWERCASE_MATCH, true),
+      fuzzyMatchRatio = getInt(ClangdPrefKeys.FUZZY_MATCH_RATIO, 59).coerceIn(0, 100),
+      requestTimeoutMs = getLong(ClangdPrefKeys.REQUEST_TIMEOUT_MS, 3500L).coerceIn(200L, 15000L),
+  )
+}
+
+private fun SharedPreferences.writeClangdSettings(state: ClangdSettingsUiState) {
+  edit {
+    putBoolean(ClangdPrefKeys.ENABLED, state.enabled)
+    putString(ClangdPrefKeys.CLANGD_PATH, state.clangdPath.ifBlank { "clangd" })
+    putInt(ClangdPrefKeys.COMPLETION_LIMIT, state.completionLimit.coerceIn(1, 500))
+    putBoolean(ClangdPrefKeys.ENABLE_DIAGNOSTICS, state.diagnostics)
+    putBoolean(ClangdPrefKeys.ENABLE_COMPLETION, state.completion)
+    putBoolean(ClangdPrefKeys.ENABLE_DEFINITION, state.definition)
+    putBoolean(ClangdPrefKeys.ENABLE_REFERENCES, state.references)
+    putBoolean(ClangdPrefKeys.ENABLE_SIGNATURE_HELP, state.signatureHelp)
+    putBoolean(ClangdPrefKeys.ENABLE_SMART_SELECTION, state.smartSelection)
+    putBoolean(ClangdPrefKeys.ENABLE_CODE_ACTIONS, state.codeActions)
+    putBoolean(ClangdPrefKeys.ENABLE_LOWERCASE_MATCH, state.matchLowercase)
+    putInt(ClangdPrefKeys.FUZZY_MATCH_RATIO, state.fuzzyMatchRatio.coerceIn(0, 100))
+    putLong(ClangdPrefKeys.REQUEST_TIMEOUT_MS, state.requestTimeoutMs.coerceIn(200L, 15000L))
+  }
 }
 
 @Composable
