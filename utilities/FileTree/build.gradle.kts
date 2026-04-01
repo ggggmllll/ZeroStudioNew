@@ -1,3 +1,6 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 group = "com.github.RohitKushvaha01"
 
 version = "1.0.0"
@@ -29,9 +32,6 @@ android {
     sourceCompatibility = JavaVersion.VERSION_11
     targetCompatibility = JavaVersion.VERSION_11
   }
-  compilerOptions {
-    jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11)
-}
 
 }
 
@@ -51,6 +51,12 @@ dependencies {
   implementation(libs.google.material) 
   
   testImplementation(libs.tests.junit) 
-  androidTestImplementation(libs.androidx.junit) 
+  androidTestImplementation(libs.tests.androidx.junit) 
   androidTestImplementation(libs.androidx.espresso.core)
+}
+
+kotlin { jvmToolchain(11) }
+
+tasks.withType<KotlinCompile>().configureEach {
+  compilerOptions { jvmTarget.set(JvmTarget.JVM_11) }
 }
