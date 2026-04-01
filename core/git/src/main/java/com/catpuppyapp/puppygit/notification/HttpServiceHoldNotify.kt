@@ -29,7 +29,8 @@ class HttpServiceHoldNotify private constructor(override val notifyId: Int) :
               Action(
                   iconId = R.drawable.baseline_content_copy_24,
                   text = context.getString(R.string.copy),
-                  pendingIntent = createPendingIntentWithAct(context, HttpService.command_copy_addr),
+                  pendingIntent =
+                      createPendingIntentWithAct(context, HttpService.command_copy_addr),
               ),
           )
         },

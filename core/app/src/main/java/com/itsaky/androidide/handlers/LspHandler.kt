@@ -21,8 +21,8 @@ import android.content.Context
 import com.itsaky.androidide.lsp.api.ILanguageClient
 import com.itsaky.androidide.lsp.api.ILanguageServerRegistry
 import com.itsaky.androidide.lsp.java.JavaLanguageServer
-import com.itsaky.androidide.lsp.xml.XMLLanguageServer
 import com.itsaky.androidide.lsp.kotlin.KotlinLanguageServer
+import com.itsaky.androidide.lsp.xml.XMLLanguageServer
 
 /** @author Akash Yadav */
 object LspHandler {

@@ -3,7 +3,8 @@ class C1(
     val b: Int?,
 )
 
-class C2 constructor(
+class C2
+constructor(
     val a: Int?,
     val b: Int?,
 )

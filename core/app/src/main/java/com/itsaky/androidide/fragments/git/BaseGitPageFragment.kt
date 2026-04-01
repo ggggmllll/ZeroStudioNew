@@ -25,8 +25,8 @@ import android.widget.HorizontalScrollView
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.Toast
-import androidx.lifecycle.ViewModelProvider
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import com.itsaky.androidide.R
 
 /**

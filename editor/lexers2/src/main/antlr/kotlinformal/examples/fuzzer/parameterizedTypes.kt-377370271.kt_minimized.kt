@@ -1,3 +1,3 @@
 tailrec fun box(): String {
-assertGenericType((((Any::extension)!!))!!!!.returnType)
+  assertGenericType((((Any::extension)!!))!!!!.returnType)
 }

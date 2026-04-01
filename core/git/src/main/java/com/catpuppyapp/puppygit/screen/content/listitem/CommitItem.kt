@@ -117,7 +117,7 @@ fun CommitItem(
                     onClick(commitDto)
                   },
                   onLongClick = { // x 算了)xTODO
-                                  // 把长按也改成短按那样，在调用者那里实现，这里只负责把dto传过去，不过好像没必要，因为调用者那里还是要写同样的代码，不然弹窗不知道操作的是哪个对象
+                    // 把长按也改成短按那样，在调用者那里实现，这里只负责把dto传过去，不过好像没必要，因为调用者那里还是要写同样的代码，不然弹窗不知道操作的是哪个对象
                     lastClickedItemKey.value = commitDto.oidStr
 
                     // 震动反馈

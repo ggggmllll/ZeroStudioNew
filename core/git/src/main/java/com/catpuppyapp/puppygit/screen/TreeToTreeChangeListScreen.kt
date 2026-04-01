@@ -83,7 +83,7 @@ fun TreeToTreeChangeListScreen(
     commit2OidStrCacheKey: String, // right
     commitForQueryParentsCacheKey:
         String, // commit for query parents, if empty ,will not query parents for commits. ps: only
-                // need this param when compare to parents, other cases, should pass empty string
+    // need this param when compare to parents, other cases, should pass empty string
     titleCacheKey: String,
     naviUp: () -> Unit,
 ) {

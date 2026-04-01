@@ -1,3 +1,3 @@
 fun box(): String {
-assertNotEquals(::nullable.parameters.single().type, ((::nullable))!!!!.returnType)
+  assertNotEquals(::nullable.parameters.single().type, ((::nullable))!!!!.returnType)
 }

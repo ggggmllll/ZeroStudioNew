@@ -203,11 +203,8 @@ fun ChangeListInnerPage(
     changeListRepoList: CustomStateListSaveable<RepoEntity>? = null,
     goToChangeListPage: (goToThisRepo: RepoEntity) -> Unit = {},
     needReQueryRepoList: MutableState<String>? = null,
-    newestPageId:
-        MutableState<
-            String
-        >, // for check if switched page
-           // （用来检测页面是否切换过，有时候有的仓库查询慢，切换仓库，切换后查出来了，会覆盖条目列表，出现仓库b显示了仓库a的条目的问题，更新列表前检测下此值是否有变化能避免此bug）
+    newestPageId: MutableState<String>, // for check if switched page
+    // （用来检测页面是否切换过，有时候有的仓库查询慢，切换仓库，切换后查出来了，会覆盖条目列表，出现仓库b显示了仓库a的条目的问题，更新列表前检测下此值是否有变化能避免此bug）
     // 这组件再多一个参数就崩溃了，不要再加了，会报verifyError错误，升级gradle或许可以解决，具体原因不明（缓存问题，删除项目根目录下的.gradle目录重新构建即可），后来发现是compose变异器本身的bug，编译太复杂的组件就可能报错
     //    isDiffToHead:MutableState<Boolean> = mutableStateOf(false),  //仅
     // treeTotree页面需要此参数，用来判断是否在和headdiff
@@ -1541,9 +1538,8 @@ fun ChangeListInnerPage(
         curRepo = curRepo,
         loadingOn = loadingOn,
         loadingOff = loadingOff,
-        showClear =
-            false, // 这个页面只有在期望设置上有效上游以执行后续操作的情况下才显示此弹窗，所以不需要clear
-                   // (例如：我想执行sync，但发现完全没上游或只设置了部分参数（例如指定了remote，但没指定分支），这时就弹窗设置下，然后若设置成功则继续执行sync)
+        showClear = false, // 这个页面只有在期望设置上有效上游以执行后续操作的情况下才显示此弹窗，所以不需要clear
+        // (例如：我想执行sync，但发现完全没上游或只设置了部分参数（例如指定了remote，但没指定分支），这时就弹窗设置下，然后若设置成功则继续执行sync)
         remoteList = upstreamRemoteOptionsList.value,
         curBranchShortName = upstreamCurBranchShortName.value, // 供显示的，让用户知道在为哪个分支设置上游
         curBranchFullName = upstreamCurBranchFullName.value,
@@ -2241,7 +2237,7 @@ fun ChangeListInnerPage(
             untrakcedFileList.add(
                 it.canonicalPath
             ) // 删除文件，添加全路径（但其实用仓库内相对路径也行，只是需要把仓库路径和仓库下相对路径拼接一下，而这个全路径是我在查询status
-              // list的时候拼好的，所以直接用就行）
+            // list的时候拼好的，所以直接用就行）
           } else if (
               it.changeType != Cons.gitStatusConflict
           ) { // 冲突条目不可revert！其余index中有的文件，也就是git tracked的文件，删除/修改 之类的，都可恢复为index中的状态

@@ -66,7 +66,10 @@ class GitPullRequestsFragment : BaseGitPageFragment() {
     links = GitHostWebLinks.resolveForCurrentProject()
     view.findViewById<RecyclerView>(R.id.rv_branches)?.apply {
       layoutManager = LinearLayoutManager(context)
-      adapter = QuickLinksAdapter(listOf("Open Pull Requests in Browser", "Create Task (Issue)", "Open Merge Requests"))
+      adapter =
+          QuickLinksAdapter(
+              listOf("Open Pull Requests in Browser", "Create Task (Issue)", "Open Merge Requests")
+          )
     }
   }
 
@@ -101,7 +104,8 @@ class GitPullRequestsFragment : BaseGitPageFragment() {
       RecyclerView.Adapter<QuickLinksAdapter.Holder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder {
       val view =
-          LayoutInflater.from(parent.context).inflate(android.R.layout.simple_list_item_1, parent, false)
+          LayoutInflater.from(parent.context)
+              .inflate(android.R.layout.simple_list_item_1, parent, false)
       return Holder(view)
     }
 

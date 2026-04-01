@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 
 internal sealed class GitUiEvent {
   data class Operation(val section: String, val action: String) : GitUiEvent()
+
   data class Error(val message: String) : GitUiEvent()
 }
 
@@ -18,4 +19,3 @@ internal class GitUiEventViewModel : ViewModel() {
     _events.tryEmit(event)
   }
 }
-

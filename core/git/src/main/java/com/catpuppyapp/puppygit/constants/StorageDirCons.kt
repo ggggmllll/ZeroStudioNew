@@ -54,9 +54,8 @@ object StorageDirCons {
     val rootDir =
         StorageDirEntity(
             id = "e526cc40419d43d59e466c", // 22位，和默认的20位有所区分，这样自动生成的就永远不会和这个冲突了
-            name =
-                "", // 名字为空代码里好处理，逻辑上也通顺，因为virtualPath值应为 /name ，如果root的那么是非空，那路径就会变成
-                    // /root这样了，很奇怪，生成名字时也得特殊处理有点麻烦，留空一切问题就都不存在了
+            name = "", // 名字为空代码里好处理，逻辑上也通顺，因为virtualPath值应为 /name ，如果root的那么是非空，那路径就会变成
+            // /root这样了，很奇怪，生成名字时也得特殊处理有点麻烦，留空一切问题就都不存在了
             fullPath = separator, // 这个 / 并不是系统的 /，而是虚拟根节点，所有StorageDir的根目录，只有root节点的路径值才是 /
             virtualPath = separator,
             type = Type.root, // 检测到这个类型，列出所有parentId是它的id的storageDir条目

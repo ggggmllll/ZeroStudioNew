@@ -60,7 +60,7 @@ class TerminalBootstrapPackagesPlugin : Plugin<Project> {
 
     /** The bootstrap packages version, basically the tag name of the GitHub release. */
     private const val BOOTSTRAP_PACKAGES_VERSION =
-    /** "03.03.2025" */
+        /** "03.03.2025" */
         BuildConfig.BOOTSTRAP_PACKAGES_VERSION
 
     private const val PACKAGES_DOWNLOAD_URL = BuildConfig.PACKAGES_DOWNLOAD_URL

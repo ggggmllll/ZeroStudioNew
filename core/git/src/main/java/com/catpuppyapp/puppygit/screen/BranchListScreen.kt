@@ -388,9 +388,8 @@ fun BranchListScreen(
       val username = usernameFromConfig
       val email = emailFromConfig
       val requireMergeByRevspec =
-          curRepoIsDetached
-              .value // 如果是detached head，没当前分支，用下面的revspec（commit
-                     // hash）进行合并，否则用上面的targetRefName(分支短或全名）进行合并
+          curRepoIsDetached.value // 如果是detached head，没当前分支，用下面的revspec（commit
+      // hash）进行合并，否则用上面的targetRefName(分支短或全名）进行合并
       val revspec = src.oidStr
 
       val mergeResult =
@@ -1965,7 +1964,7 @@ fun BranchListScreen(
                   if (commit1 == commit2) { // local and upstream are the same, no need compare
                     Msg.requireShow(activityContext.getString(R.string.both_are_the_same))
                   } else { // necessary things are ready and local vs upstream ain't same, then ,
-                           // should go to diff page
+                    // should go to diff page
 
                     // 注意是 parentTreeOid to thisObj.treeOid，也就是 旧提交to新提交，相当于 git diff
                     // abc...def，比较的是旧版到新版，新增或删除或修改了什么，反过来的话，新增删除之类的也就反了

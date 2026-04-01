@@ -1,10 +1,9 @@
-suspend fun (ArrayList<Int>)?.yield(v: Int): Unit = suspendCoroutineOrReturn((if ((try {
+suspend fun (ArrayList<Int>)?.yield(v: Int): Unit =
+    suspendCoroutineOrReturn(
+        (if ((try {} finally {}) != null) {
 
-}
-finally {
-
-}) != null) {
-({x -> })
-} else {
-({x -> })
-}))
+          ({ x -> })
+        } else {
+          ({ x -> })
+        })
+    )

@@ -140,7 +140,11 @@ class GitChangesFragment : BaseGitPageFragment() {
   private fun unstageAll() {
     withRepo { repo ->
       val (_, staged) =
-          Libgit2Helper.checkIndexIsEmptyAndGetIndexList(repo = repo, repoId = "", onlyCheckEmpty = false)
+          Libgit2Helper.checkIndexIsEmptyAndGetIndexList(
+              repo = repo,
+              repoId = "",
+              onlyCheckEmpty = false,
+          )
       val paths = staged.orEmpty().map { it.relativePathUnderRepo }
       if (paths.isEmpty()) {
         throw RuntimeException("No staged file")
@@ -161,7 +165,8 @@ class GitChangesFragment : BaseGitPageFragment() {
   private fun commitChanges() {
     val msg = binding.etCommitMessage.text.toString().trim()
     if (msg.isBlank()) {
-      Toast.makeText(context, getString(R.string.please_input_commit_msg), Toast.LENGTH_SHORT).show()
+      Toast.makeText(context, getString(R.string.please_input_commit_msg), Toast.LENGTH_SHORT)
+          .show()
       return
     }
 
@@ -231,7 +236,8 @@ class GitChangesFragment : BaseGitPageFragment() {
   private inner class ChangeAdapter(private val data: List<ChangeRow>) :
       RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    override fun getItemViewType(position: Int): Int = if (data[position] is ChangeRow.Header) 0 else 1
+    override fun getItemViewType(position: Int): Int =
+        if (data[position] is ChangeRow.Header) 0 else 1
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
       return if (viewType == 0) {
@@ -272,7 +278,9 @@ class GitChangesFragment : BaseGitPageFragment() {
 
         itemView.setOnClickListener {
           if (row.staged) {
-            withRepo { repo -> Libgit2Helper.unStageItems(repo, listOf(item.relativePathUnderRepo)) }
+            withRepo { repo ->
+              Libgit2Helper.unStageItems(repo, listOf(item.relativePathUnderRepo))
+            }
           } else {
             withRepo { repo -> Libgit2Helper.stageStatusEntryAndWriteToDisk(repo, listOf(item)) }
           }

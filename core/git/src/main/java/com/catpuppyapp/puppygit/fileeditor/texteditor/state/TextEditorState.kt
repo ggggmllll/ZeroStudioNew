@@ -376,9 +376,8 @@ class TextEditorState(
       try {
         targetIndexValidOrThrow(targetIndex, fields.size)
       } catch (
-          e:
-              Exception) { // will throw when line dost, maybe changed by external or other cases,
-                           // but it's fine, no need throw exception
+          e: Exception) { // will throw when line dost, maybe changed by external or other cases,
+        // but it's fine, no need throw exception
         MyLog.d(TAG, "TextEditorState.splitNewLine() err: ${e.stackTraceToString()}")
         return
       }
@@ -472,7 +471,7 @@ class TextEditorState(
           splitFieldValues
               .last()
               .text // 分割后的最后一行，光标会focus到此行，此行与 newSplitFieldValues 的最后一个元素相同，因为 newSplitFieldValues
-                    // 是 splitFieldValues 的一个sub list
+      // 是 splitFieldValues 的一个sub list
 
       val newSelectedIndices = selectedIndices.toMutableList()
 
@@ -639,9 +638,8 @@ class TextEditorState(
       try {
         targetIndexValidOrThrow(targetIndex, fields.size)
       } catch (
-          e:
-              Exception) { // will throw when line dost, maybe changed by external or other cases,
-                           // but it's fine, no need throw exception
+          e: Exception) { // will throw when line dost, maybe changed by external or other cases,
+        // but it's fine, no need throw exception
         MyLog.d(TAG, "TextEditorState.updateField() err: ${e.stackTraceToString()}")
         return@p
       }
@@ -1012,9 +1010,8 @@ class TextEditorState(
       try {
         targetIndexValidOrThrow(targetIndex, fields.size)
       } catch (
-          e:
-              Exception) { // will throw when line dost, maybe changed by external or other cases,
-                           // but it's fine, no need throw exception
+          e: Exception) { // will throw when line dost, maybe changed by external or other cases,
+        // but it's fine, no need throw exception
         MyLog.d(TAG, "TextEditorState.deleteNewLine() err: ${e.stackTraceToString()}")
       }
 
@@ -1106,7 +1103,7 @@ class TextEditorState(
       columnEndIndexExclusive: Int = columnStartIndexInclusive,
       requireSelectLine: Boolean =
           true, // if true, will add targetIndex into selected indices, set false if you don't want
-                // to select this line(e.g. when you just want go to line)
+      // to select this line(e.g. when you just want go to line)
       requireLock: Boolean = true,
       forceAdd: Boolean = false,
 
@@ -1297,9 +1294,8 @@ class TextEditorState(
     try {
       targetIndexValidOrThrow(targetIndex, init_fields.size)
     } catch (
-        e:
-            Exception) { // will throw when line dost, maybe changed by external or other cases, but
-                         // it's fine, no need throw exception
+        e: Exception) { // will throw when line dost, maybe changed by external or other cases, but
+      // it's fine, no need throw exception
       MyLog.d(TAG, "TextEditorState.selectFieldInternal() err: ${e.localizedMessage}")
     }
 
@@ -1608,7 +1604,7 @@ class TextEditorState(
               focusingLineIdx = lastDeletedIndex
               true
             } else { // old index invalid, means was deleted the last line, so, now should move to
-                     // new last line of file
+              // new last line of file
               focusingLineIdx = newFields.lastIndex
               false
             }
@@ -2067,9 +2063,8 @@ class TextEditorState(
   fun getSelectedCount(): Int {
     //        return selectedIndices.toSet().filter{ it>=0 }.size
     // //toSet()是为了去重，我不确定是否一定没重复，去下保险；filter {it>=0} 是为了避免里面有-1，我记得初始值好像是往selectedIndices里塞个-1。
-    return selectedIndices
-        .size // toSet()是为了去重，我不确定是否一定没重复，去下保险；filter {it>=0}
-              // 是为了避免里面有-1，我记得初始值好像是往selectedIndices里塞个-1。
+    return selectedIndices.size // toSet()是为了去重，我不确定是否一定没重复，去下保险；filter {it>=0}
+    // 是为了避免里面有-1，我记得初始值好像是往selectedIndices里塞个-1。
   }
 
   fun contentIsEmpty(): Boolean {

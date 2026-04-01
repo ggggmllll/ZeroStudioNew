@@ -3,9 +3,7 @@ plugins {
   id("kotlin-android")
 }
 
-android {
-  namespace = "com.termux.shell"
-}
+android { namespace = "com.termux.shell" }
 
 dependencies {
   implementation(projects.core.common)
@@ -13,4 +11,3 @@ dependencies {
   implementation(projects.termux.shared)
   implementation(projects.termux.emulator)
 }
-

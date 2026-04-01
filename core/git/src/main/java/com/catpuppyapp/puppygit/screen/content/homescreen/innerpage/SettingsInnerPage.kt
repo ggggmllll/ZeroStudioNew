@@ -1162,7 +1162,9 @@ fun SettingsInnerPage(
                           "${Cons.defalutPuppyGitDataUnderAllReposDirName}/${Cons.defaultEditCacheDirName}"
                       ),
                   ),
-              trailIconOnClick = { goToFilesPage(AppModel.getOrCreateEditCacheDir().canonicalPath) },
+              trailIconOnClick = {
+                goToFilesPage(AppModel.getOrCreateEditCacheDir().canonicalPath)
+              },
           )
         },
         right = { Switch(checked = enableEditCache.value, onCheckedChange = null) },

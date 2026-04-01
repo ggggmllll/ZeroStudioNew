@@ -134,9 +134,8 @@ class CodeEditorView(context: Context, file: File, selection: Range) :
   companion object {
 
     private val log = LoggerFactory.getLogger(CodeEditorView::class.java)
-    
-    @Volatile
-    private var isTreeSitterLoaded = false
+
+    @Volatile private var isTreeSitterLoaded = false
 
     @JvmStatic
     fun ensureTreeSitterLoaded() {
@@ -189,10 +188,10 @@ class CodeEditorView(context: Context, file: File, selection: Range) :
     addView(searchLayout, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT))
 
     readFileAndApplySelection(file, selection)
-    
+
     setupContentChangeListener()
   }
-  
+
   private fun setupContentChangeListener() {
     binding.editor.subscribeEvent(io.github.rosemoe.sora.event.ContentChangeEvent::class.java) {
         event: io.github.rosemoe.sora.event.ContentChangeEvent,
@@ -203,6 +202,7 @@ class CodeEditorView(context: Context, file: File, selection: Range) :
       }
     }
   }
+
   /**
    * Schedules an auto-save operation if enabled. It cancels any pending auto-save job and starts a
    * new one with the configured delay.
@@ -348,8 +348,6 @@ class CodeEditorView(context: Context, file: File, selection: Range) :
           log.error("Failed to analyze file for diagnostics", e)
         }
       }
-
-
     }
   }
 

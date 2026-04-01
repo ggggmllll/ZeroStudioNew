@@ -611,7 +611,7 @@ fun DiffScreen(
             untrakcedFileList.add(
                 targetItem.canonicalPath
             ) // 删除文件，添加全路径（但其实用仓库内相对路径也行，只是需要把仓库路径和仓库下相对路径拼接一下，而这个全路径是我在查询status
-              // list的时候拼好的，所以直接用就行）
+            // list的时候拼好的，所以直接用就行）
           } else if (
               targetItem.changeType != Cons.gitStatusConflict
           ) { // 冲突条目不可revert！其余index中有的文件，也就是git tracked的文件，删除/修改 之类的，都可恢复为index中的状态
@@ -3182,9 +3182,8 @@ fun DiffScreen(
                 changeType == Cons.gitStatusNew ||
                 changeType == Cons.gitStatusDeleted ||
                 changeType ==
-                    Cons
-                        .gitStatusTypechanged // e.g. submodule folder path change to a file, will
-                                              // show type changed, view this is ok
+                    Cons.gitStatusTypechanged // e.g. submodule folder path change to a file, will
+            // show type changed, view this is ok
             )
 
         val loadingFinishedButHasErr = (loading.not() && errMsg.isNotBlank())
@@ -3309,7 +3308,10 @@ private fun NaviButton(
     naviUp: () -> Unit,
     switchItem:
         (
-            oldItem: DiffableItem?, newItem: DiffableItem, newItemIndex: Int, isToNext: Boolean,
+            oldItem: DiffableItem?,
+            newItem: DiffableItem,
+            newItemIndex: Int,
+            isToNext: Boolean,
         ) -> Unit,
     goToTop: () -> Unit,
 ) {

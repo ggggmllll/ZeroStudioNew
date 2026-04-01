@@ -70,7 +70,7 @@ class IDEApplication : TermuxApplication() {
 
   private var uncaughtExceptionHandler: UncaughtExceptionHandler? = null
   private var ideLogcatReader: IDELogcatReader? = null
-  
+
   init {
     RecyclableObjectPool.DEBUG = BuildConfig.DEBUG
   }
@@ -122,12 +122,12 @@ class IDEApplication : TermuxApplication() {
       ReflectionUtils.bypassHiddenAPIReflectionRestrictions()
       IDEColorSchemeProvider.init()
     }
-        Environment.init(this)
+    Environment.init(this)
   }
 
   /**
-   * Reads the saved locale key and applies it globally to prevent the system
-   * from resetting the app language to the device default on cold start.
+   * Reads the saved locale key and applies it globally to prevent the system from resetting the app
+   * language to the device default on cold start.
    */
   private fun applyPersistedLocale() {
     val selectedLocaleKey = GeneralPreferences.selectedLocale
@@ -158,7 +158,7 @@ class IDEApplication : TermuxApplication() {
   @Subscribe(threadMode = ThreadMode.MAIN)
   fun onPrefChanged(event: PreferenceChangeEvent) {
     val enabled = event.value as? Boolean?
-    
+
     if (event.key == DevOpsPreferences.KEY_DEVOPTS_DEBUGGING_DUMPLOGS) {
       if (enabled == true) {
         startLogcatReader()

@@ -1321,7 +1321,7 @@ fun SubmoduleListScreen(
                   Icons.Filled.Delete, // 删除
                   Icons.Filled
                       .ReplayCircleFilled, // do `git submodule update`, actually is checkout
-                                           // submodule to parent's recorded commit
+                  // submodule to parent's recorded commit
                   Icons.Filled.DownloadForOffline, // clone
                   Icons.Filled.SelectAll, // 全选
               )
@@ -1430,7 +1430,7 @@ fun SubmoduleListScreen(
                     showReloadDialog.value = true
                   },
                   syncConfigs@{ // git submodule init, git submodule sync. this is necessary if
-                                // user's edit .gitmodules by hand
+                    // user's edit .gitmodules by hand
                     syncParentConfig.value = true
                     syncSubmoduleConfig.value = true
 

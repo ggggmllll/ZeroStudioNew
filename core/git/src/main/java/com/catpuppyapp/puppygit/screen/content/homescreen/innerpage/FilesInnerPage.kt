@@ -1100,7 +1100,7 @@ fun FilesInnerPage(
                         Msg.requireShow(
                             activityContext.getString(R.string.copied)
                         ) // 这里如果用 Msg.requierShow()
-                          // 还得刷新页面才能看到信息，这个操作没必要刷新页面，不如直接用Toast，不过Toast怎么实现的？不用刷新页面吗？
+                        // 还得刷新页面才能看到信息，这个操作没必要刷新页面，不如直接用Toast，不过Toast怎么实现的？不用刷新页面吗？
                         // test x能) 测试下刷新页面是否就能看到信息且不影响弹窗（当然不会影响，因为显示弹窗的状态变量还是真啊！只要状态没变，页面还是一样）
                         //
                         // Msg.requireShow(appContext.getString(R.string.copied))  //这里如果用
@@ -1294,9 +1294,8 @@ fun FilesInnerPage(
                   } else { // 文件不存在（且文件名ok
                     val isCreateSuccess =
                         if (isDir) { // create dir
-                          file
-                              .mkdir() // 这不需要mkdirs()，用户肯定是在当前目录创建一层目录，所以mkdir()就够用了，而且路径分隔符 /
-                                       // 被检测文件名是否合法的函数当作非法字符，无法使用，所以用户其实也没法输入连环目录
+                          file.mkdir() // 这不需要mkdirs()，用户肯定是在当前目录创建一层目录，所以mkdir()就够用了，而且路径分隔符 /
+                          // 被检测文件名是否合法的函数当作非法字符，无法使用，所以用户其实也没法输入连环目录
                         } else { // create file
                           file.createNewFile()
                         }
@@ -1389,8 +1388,8 @@ fun FilesInnerPage(
               val repoWorkDir = Libgit2Helper.getRepoWorkdirNoEndsWithSlash(repo)
               val onlyReturnReadyRepo =
                   !trueGoToReposFalseGoToChangeList // if go to repos page, no need require repo
-                                                    // ready; if go to changelist, require a ready
-                                                    // repo
+              // ready; if go to changelist, require a ready
+              // repo
               val target =
                   AppModel.dbContainer.repoRepository.getByFullSavePath(
                       repoWorkDir,
@@ -3902,7 +3901,7 @@ private suspend fun doInit(
           StringBuilder(
               40
           ) // most time the path should more than 30 "/storage/emulated/0" , so set it to 40 I
-            // think is better than StringBuilder default size 16
+      // think is better than StringBuilder default size 16
       for (pathName in splitPath) { // 更新面包屑
         lastPathName.append(separator).append(pathName) // 拼接列表路径为仓库下的 完整相对路径
         // bread crumb为了生成快速创建的是阉割板的对象，只有少数必要参数，如果想获取path的完整dto，需要重新生成，
@@ -3914,9 +3913,8 @@ private suspend fun doInit(
         pathDto.isDir = true
 
         pathDto.fullPath =
-            lastPathName
-                .toString() // this will output path like "/abc/def" and should faster than
-                            // `File(root, lastPathName).canonicalPath`
+            lastPathName.toString() // this will output path like "/abc/def" and should faster than
+        // `File(root, lastPathName).canonicalPath`
 
         pathDto.name = pathName
         curBreadCrumbList.add(pathDto)

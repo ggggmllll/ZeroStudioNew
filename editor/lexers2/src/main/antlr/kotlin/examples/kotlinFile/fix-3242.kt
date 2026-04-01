@@ -1,11 +1,10 @@
-class C{
+class C {
 
-    constructor() : this(
-        1, 2,
-    )
+  constructor() :
+      this(
+          1,
+          2,
+      )
 
-    constructor(a: Int, b: Int){
-
-    }
-
+  constructor(a: Int, b: Int) {}
 }

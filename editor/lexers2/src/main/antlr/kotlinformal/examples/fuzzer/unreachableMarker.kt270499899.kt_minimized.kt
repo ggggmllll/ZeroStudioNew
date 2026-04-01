@@ -1,6 +1,9 @@
 inline fun bar(block: (() -> String)): String {
-return (block)!!()
+  return (block)!!()
 }
+
 inline fun bar2(): String {
-return bar({return "def"})
+  return bar({
+    return "def"
+  })
 }

@@ -36,9 +36,9 @@ abstract class BasePreference : IPreference() {
 
   override fun onCreateView(context: Context): Preference {
     val pref = onCreatePreference(context)
-    
+
     pref.key = this.key
-    
+
     onBindProperty(pref)
 
     pref.title = context.getString(this.title)
@@ -47,15 +47,15 @@ abstract class BasePreference : IPreference() {
     pref.isIconSpaceReserved = this.icon != null
     this.icon?.let {
       pref.icon =
-        ContextCompat.getDrawable(context, it)?.apply {
-          colorFilter =
-            PorterDuffColorFilter(context.resolveAttr(attr.colorOnPrimaryContainer), SRC_ATOP)
-        }
+          ContextCompat.getDrawable(context, it)?.apply {
+            colorFilter =
+                PorterDuffColorFilter(context.resolveAttr(attr.colorOnPrimaryContainer), SRC_ATOP)
+          }
     }
 
     pref.setOnPreferenceClickListener { onPreferenceClick(pref) }
     pref.setOnPreferenceChangeListener(this::onPreferenceChanged)
-    
+
     return pref
   }
 

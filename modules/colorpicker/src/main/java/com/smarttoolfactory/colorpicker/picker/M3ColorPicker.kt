@@ -250,7 +250,9 @@ fun PrimaryAccentSelectionTab(
               else Modifier.clip(RoundedCornerShape(10.dp)).background(Color.DarkGray),
           selected = selected,
           onClick = { onTabChange(index) },
-          text = { Text(text = text, color = if (selected) Color.White else Color.White.copy(.5f)) },
+          text = {
+            Text(text = text, color = if (selected) Color.White else Color.White.copy(.5f))
+          },
       )
     }
   }

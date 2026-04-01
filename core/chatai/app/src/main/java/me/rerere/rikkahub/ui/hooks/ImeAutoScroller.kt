@@ -17,21 +17,20 @@ import androidx.compose.ui.platform.LocalDensity
 fun ImeLazyListAutoScroller(
     lazyListState: LazyListState,
 ) {
-    val ime = WindowInsets.ime
-    val localDensity = LocalDensity.current
-    var imeHeigh by remember { mutableIntStateOf(0) }
-    LaunchedEffect(Unit) {
-        snapshotFlow {
-            ime.getBottom(localDensity)
-        }.collect { keyboardHeight ->
-            if (keyboardHeight > 0) {
-                if (imeHeigh < keyboardHeight) {
-                    lazyListState.scrollBy((keyboardHeight - imeHeigh).toFloat())
-                } else {
-                    lazyListState.scrollBy((keyboardHeight - imeHeigh).toFloat())
-                }
-                imeHeigh = keyboardHeight
+  val ime = WindowInsets.ime
+  val localDensity = LocalDensity.current
+  var imeHeigh by remember { mutableIntStateOf(0) }
+  LaunchedEffect(Unit) {
+    snapshotFlow { ime.getBottom(localDensity) }
+        .collect { keyboardHeight ->
+          if (keyboardHeight > 0) {
+            if (imeHeigh < keyboardHeight) {
+              lazyListState.scrollBy((keyboardHeight - imeHeigh).toFloat())
+            } else {
+              lazyListState.scrollBy((keyboardHeight - imeHeigh).toFloat())
             }
+            imeHeigh = keyboardHeight
+          }
         }
-    }
+  }
 }

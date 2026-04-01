@@ -70,7 +70,7 @@ fun goToFileHistory(fileFullPath: String, activityContext: Context) {
         if (
             relativePath == null
         ) { // this should never happen, cuz go to file history only available for file, not for
-            // dir, and this only happens when the realFullPath = repoWorkDirPath
+          // dir, and this only happens when the realFullPath = repoWorkDirPath
           Msg.requireShow(activityContext.getString(R.string.path_not_under_repo))
           return@job
         }
@@ -81,7 +81,7 @@ fun goToFileHistory(fileFullPath: String, activityContext: Context) {
                 repoWorkDirPath,
                 onlyReturnReadyRepo =
                     false, // if not ready, cant open at upside code, so reached here, no need more
-                           // check about ready, is 100% ready
+                // check about ready, is 100% ready
                 requireSyncRepoInfoWithGit = false, // no need
             )
 

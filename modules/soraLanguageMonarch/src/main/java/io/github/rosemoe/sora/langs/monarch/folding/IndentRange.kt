@@ -105,10 +105,8 @@ object IndentRange {
     for (line in model.lineCount - 1 downTo 0) {
       if (delegate.isCancelled) break
       val indent =
-          helper.getIndentFor(
-              line
-          ) // computeIndentLevel(model.getLine(line).getBackingCharArray(),
-            // model.getColumnCount(line), tabSize)
+          helper.getIndentFor(line) // computeIndentLevel(model.getLine(line).getBackingCharArray(),
+      // model.getColumnCount(line), tabSize)
       var previous = previousRegions.last()
 
       if (indent == -1) {

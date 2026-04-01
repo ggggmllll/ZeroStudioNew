@@ -101,8 +101,7 @@ class FileTreeActionHandler : BaseEventHandler() {
     }
 
     this.lastHeld =
-        event[LegacyTreeNode::class.java]
-            ?: event[com.rk.filetree.model.TreeNode::class.java]
+        event[LegacyTreeNode::class.java] ?: event[com.rk.filetree.model.TreeNode::class.java]
     val context = event[Context::class.java]!! as EditorHandlerActivity
     createFileOptionsFragment(context, event.file)
         .show(context.supportFragmentManager, TAG_FILE_OPTIONS_FRAGMENT)
@@ -164,7 +163,8 @@ class FileTreeActionHandler : BaseEventHandler() {
 
   private fun requestFileListing() {
     EventBus.getDefault().post(ListProjectFilesRequestEvent())
-    EventBus.getDefault().post(com.itsaky.androidide.fragments.git.tree.ListProjectFilesRequestEvent())
+    EventBus.getDefault()
+        .post(com.itsaky.androidide.fragments.git.tree.ListProjectFilesRequestEvent())
   }
 
   private fun requestExpandHeldNode() {
@@ -175,7 +175,8 @@ class FileTreeActionHandler : BaseEventHandler() {
     when (node) {
       is LegacyTreeNode -> EventBus.getDefault().post(ExpandTreeNodeRequestEvent(node))
       is com.rk.filetree.model.TreeNode ->
-          EventBus.getDefault().post(com.itsaky.androidide.fragments.git.tree.ExpandTreeNodeRequestEvent(node))
+          EventBus.getDefault()
+              .post(com.itsaky.androidide.fragments.git.tree.ExpandTreeNodeRequestEvent(node))
     }
   }
 }

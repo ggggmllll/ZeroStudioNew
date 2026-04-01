@@ -16,10 +16,8 @@ data class StorageDirEntity(
         "", // 实际路径的canonicalPath，fullPath具有唯一性，且一旦创建sd就不可再更改，除非删除重建，所以，fullPath可用来标识一个sd条目
     var type: Int = StorageDirCons.Type.internal,
     var allowDel: Int = Cons.dbCommonTrue, // 是否允许删除
-    var parentId: String =
-        StorageDirCons.DefaultStorageDir.rootDir
-            .id, // parent
-                 // StorageDir的id，注意：这个parentId只是为了防止以后实现嵌套困难，但实际上sd并不需要嵌套，也没计划要实现嵌套，嵌套只会增加复杂度
+    var parentId: String = StorageDirCons.DefaultStorageDir.rootDir.id, // parent
+    // StorageDir的id，注意：这个parentId只是为了防止以后实现嵌套困难，但实际上sd并不需要嵌套，也没计划要实现嵌套，嵌套只会增加复杂度
 
     // 规范所有的virtualPath都应以/开头，非/结尾
     var virtualPath: String = "", // virtual应由代码自动生成，不要让用户填

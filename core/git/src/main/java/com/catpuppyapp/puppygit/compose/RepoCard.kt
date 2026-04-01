@@ -119,7 +119,7 @@ fun RepoCard(
     // 设置当前仓库（如果不将repo先设置为无效值，可能会导致页面获取旧值，显示过时信息）
     curRepo.value =
         RepoEntity() // change state to a new value, if delete this line, may cause page not refresh
-                     // after changed repo
+    // after changed repo
     curRepo.value = repoDto // update state to target value
 
     curRepoIndex.intValue = repoDtoIndex

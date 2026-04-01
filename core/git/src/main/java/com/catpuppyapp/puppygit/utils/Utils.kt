@@ -781,7 +781,7 @@ fun getParentPathEndsWithSeparator(
         path.removeSuffix(
             separator
         ) // this is necessary, e.g. "def/abc/" same means with "def/abc", the parent should is
-          // "def/" for both
+    // "def/" for both
     val lastIndexOfSeparator = path.lastIndexOf(separator)
     if (lastIndexOfSeparator != -1) { // found "/", has a parent path
       return path.substring(0, lastIndexOfSeparator + 1) // +1把/本身包含上
@@ -875,7 +875,7 @@ fun doJobThenOffLoading(
           try {
             // 最后解除loading
             loadingOff() // x
-                         // 20240426job被trycatch包裹，实际上这个已经是百分百会解除了，索性放到finally里，百分百解除的意义更明确)这个要不要放到finally里？要不然一出异常，loading就无法解除了，不过解除不了也好，省得用户误操作
+            // 20240426job被trycatch包裹，实际上这个已经是百分百会解除了，索性放到finally里，百分百解除的意义更明确)这个要不要放到finally里？要不然一出异常，loading就无法解除了，不过解除不了也好，省得用户误操作
           } catch (e: Exception) {
             Msg.requireShowLongDuration("loadOff err: " + e.localizedMessage)
             MyLog.e(TAG, "#doJobThenOffLoading(): #loadingOff error!\n" + e.stackTraceToString())

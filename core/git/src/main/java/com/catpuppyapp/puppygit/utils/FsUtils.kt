@@ -302,7 +302,7 @@ object FsUtils {
     return if (
         extIndex > 0
     ) { // 注意这里是索引大于最后一个分隔符加1，即"."之前至少有一个字符，因为如果文件名开头是"."，是隐藏文件，不将其视为后缀名，这时生成的文件名类似 ".git(1)"
-        // 而不是"(1).git"
+      // 而不是"(1).git"
       // 例如输入：/path/to/abc.txt, 返回 "/path/to/abc" 和 ".txt"，后缀名包含"."
       Pair(name.substring(0, extIndex), name.substring(extIndex))
     } else { // 无后缀或.在第一位(例如".git")
@@ -1363,17 +1363,17 @@ object FsUtils {
     return if (
         fullPath.startsWith(appDataRoot)
     ) { // internal storage must before external storage, because internal storage actually under
-        // external storage (eg: internal is
-        // "/storage/emulated/0/Android/data/packagename/xxx/xxxx/x", external is
-        // "/storage/emulated/0")
+      // external storage (eg: internal is
+      // "/storage/emulated/0/Android/data/packagename/xxx/xxxx/x", external is
+      // "/storage/emulated/0")
       appDataPathPrefix +
           ((getPathAfterParent(parent = appDataRoot, fullPath = fullPath)).removePrefix("/"))
     } else if (
         fullPath.startsWith(internalStorageRoot)
     ) { // internal storage must before external storage, because internal storage actually under
-        // external storage (eg: internal is
-        // "/storage/emulated/0/Android/data/packagename/xxx/xxxx/x", external is
-        // "/storage/emulated/0")
+      // external storage (eg: internal is
+      // "/storage/emulated/0/Android/data/packagename/xxx/xxxx/x", external is
+      // "/storage/emulated/0")
       internalPathPrefix +
           ((getPathAfterParent(parent = internalStorageRoot, fullPath = fullPath)).removePrefix(
               "/"

@@ -44,256 +44,266 @@ import org.slf4j.LoggerFactory
  */
 class ComposePreviewFragment : Fragment() {
 
-    private var _binding: FragmentComposePreviewBinding? = null
-    private val binding get() = _binding ?: throw IllegalStateException("Binding accessed after view destroyed")
+  private var _binding: FragmentComposePreviewBinding? = null
+  private val binding
+    get() = _binding ?: throw IllegalStateException("Binding accessed after view destroyed")
 
-    private val viewModel: ComposePreviewViewModel by viewModels()
+  private val viewModel: ComposePreviewViewModel by viewModels()
 
-    private var classLoader: ComposeClassLoader? = null
-    private var renderer: ComposableRenderer? = null
+  private var classLoader: ComposeClassLoader? = null
+  private var renderer: ComposableRenderer? = null
 
-    private var sourceCode: String = DEFAULT_SOURCE
-    private var onNavigateBack: (() -> Unit)? = null
+  private var sourceCode: String = DEFAULT_SOURCE
+  private var onNavigateBack: (() -> Unit)? = null
 
-    private var isInteractiveMode = false
-    private var interactiveMenuItem: MenuItem? = null
+  private var isInteractiveMode = false
+  private var interactiveMenuItem: MenuItem? = null
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = FragmentComposePreviewBinding.inflate(inflater, container, false)
-        return binding.root
+  override fun onCreateView(
+      inflater: LayoutInflater,
+      container: ViewGroup?,
+      savedInstanceState: Bundle?,
+  ): View {
+    _binding = FragmentComposePreviewBinding.inflate(inflater, container, false)
+    return binding.root
+  }
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+
+    setupToolbar()
+    setupPreview()
+    observeState()
+
+    val filePath = arguments?.getString(ARG_FILE_PATH) ?: ""
+    viewModel.initialize(requireContext(), filePath)
+
+    arguments?.getString(ARG_SOURCE_CODE)?.let { sourceCode = it }
+  }
+
+  private fun setupToolbar() {
+    binding.toolbar.setNavigationOnClickListener {
+      onNavigateBack?.invoke() ?: parentFragmentManager.popBackStack()
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    val menu = binding.toolbar.menu
+    interactiveMenuItem =
+        menu.add(Menu.NONE, INTERACTIVE_MENU_ID, Menu.NONE, "Static Mode").apply {
+          setIcon(android.R.drawable.ic_media_play)
+          setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
+        }
 
-        setupToolbar()
-        setupPreview()
-        observeState()
-
-        val filePath = arguments?.getString(ARG_FILE_PATH) ?: ""
-        viewModel.initialize(requireContext(), filePath)
-
-        arguments?.getString(ARG_SOURCE_CODE)?.let { sourceCode = it }
+    menu.add(Menu.NONE, BUILD_MENU_ID, Menu.NONE, "Build/Reload").apply {
+      setIcon(android.R.drawable.ic_menu_rotate)
+      setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
     }
 
-    private fun setupToolbar() {
-        binding.toolbar.setNavigationOnClickListener {
-            onNavigateBack?.invoke() ?: parentFragmentManager.popBackStack()
+    binding.toolbar.setOnMenuItemClickListener { item ->
+      when (item.itemId) {
+        INTERACTIVE_MENU_ID -> {
+          toggleInteractiveMode()
+          true
         }
+        BUILD_MENU_ID -> {
+          triggerBuildOrReload()
+          true
+        }
+        else -> false
+      }
+    }
+  }
 
-        val menu = binding.toolbar.menu
-        interactiveMenuItem = menu.add(Menu.NONE, INTERACTIVE_MENU_ID, Menu.NONE, "Static Mode").apply {
-            setIcon(android.R.drawable.ic_media_play)
-            setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
-        }
+  private fun toggleInteractiveMode() {
+    isInteractiveMode = !isInteractiveMode
+    interactiveMenuItem?.let {
+      if (isInteractiveMode) {
+        it.title = "Interactive Mode"
+        it.setIcon(android.R.drawable.ic_media_pause)
+      } else {
+        it.title = "Static Mode"
+        it.setIcon(android.R.drawable.ic_media_play)
+      }
+    }
+    val state = viewModel.previewState.value
+    if (state is PreviewState.Ready) {
+      handleReadyState(state)
+    }
+  }
 
-        menu.add(Menu.NONE, BUILD_MENU_ID, Menu.NONE, "Build/Reload").apply {
-            setIcon(android.R.drawable.ic_menu_rotate)
-            setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
-        }
+  private fun setupPreview() {
+    classLoader = ComposeClassLoader(requireContext())
+    renderer = ComposableRenderer(binding.composePreview, classLoader!!)
 
-        binding.toolbar.setOnMenuItemClickListener { item ->
-            when (item.itemId) {
-                INTERACTIVE_MENU_ID -> {
-                    toggleInteractiveMode()
-                    true
-                }
-                BUILD_MENU_ID -> {
-                    triggerBuildOrReload()
-                    true
-                }
-                else -> false
-            }
-        }
+    binding.errorOverlay.setOnClickListener { triggerBuildOrReload() }
+  }
+
+  private fun triggerBuildOrReload() {
+    val state = viewModel.previewState.value
+    if (state is PreviewState.NeedsBuild) {
+      triggerFullBuild()
+      return
+    }
+    if (state !is PreviewState.Error) return
+
+    LOG.info("Triggering Compose Hot-Reload via Fragment")
+    viewModel.setBuildingState()
+    viewModel.refreshAfterBuild(requireContext())
+  }
+
+  private fun triggerFullBuild() {
+    val modulePath = viewModel.getModulePath()
+    val variantName = viewModel.getVariantName()
+
+    val buildService = Lookup.getDefault().lookup(BuildService.KEY_BUILD_SERVICE)
+    if (buildService == null || !buildService.isToolingServerStarted()) {
+      LOG.warn("BuildService not available or not started")
+      return
     }
 
-    private fun toggleInteractiveMode() {
-        isInteractiveMode = !isInteractiveMode
-        interactiveMenuItem?.let {
-            if (isInteractiveMode) {
-                it.title = "Interactive Mode"
-                it.setIcon(android.R.drawable.ic_media_pause)
-            } else {
-                it.title = "Static Mode"
-                it.setIcon(android.R.drawable.ic_media_play)
-            }
-        }
-        val state = viewModel.previewState.value
-        if (state is PreviewState.Ready) {
-            handleReadyState(state)
-        }
+    val capitalizedVariant = variantName.replaceFirstChar {
+      if (it.isLowerCase()) it.titlecase() else it.toString()
     }
-
-    private fun setupPreview() {
-        classLoader = ComposeClassLoader(requireContext())
-        renderer = ComposableRenderer(binding.composePreview, classLoader!!)
-        
-        binding.errorOverlay.setOnClickListener {
-            triggerBuildOrReload()
-        }
-    }
-
-    private fun triggerBuildOrReload() {
-        val state = viewModel.previewState.value
-        if (state is PreviewState.NeedsBuild) {
-            triggerFullBuild()
-            return
-        }
-        if (state !is PreviewState.Error) return
-
-        LOG.info("Triggering Compose Hot-Reload via Fragment")
-        viewModel.setBuildingState()
-        viewModel.refreshAfterBuild(requireContext())
-    }
-
-    private fun triggerFullBuild() {
-        val modulePath = viewModel.getModulePath()
-        val variantName = viewModel.getVariantName()
-
-        val buildService = Lookup.getDefault().lookup(BuildService.KEY_BUILD_SERVICE)
-        if (buildService == null || !buildService.isToolingServerStarted()) {
-            LOG.warn("BuildService not available or not started")
-            return
-        }
-
-        val capitalizedVariant = variantName.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
-        val taskName = if (modulePath.isNotEmpty() && modulePath != ":") {
-            "$modulePath:assemble$capitalizedVariant"
+    val taskName =
+        if (modulePath.isNotEmpty() && modulePath != ":") {
+          "$modulePath:assemble$capitalizedVariant"
         } else {
-            "assemble$capitalizedVariant"
+          "assemble$capitalizedVariant"
         }
 
-        LOG.info("Triggering full build task from Fragment: {}", taskName)
-        viewModel.setBuildingState()
+    LOG.info("Triggering full build task from Fragment: {}", taskName)
+    viewModel.setBuildingState()
 
-        buildService.executeTasks(taskName).whenComplete { result, error ->
-            activity?.runOnUiThread {
-                if (error == null && result != null && result.isSuccessful) {
-                    LOG.info("Full build completed successfully, initiating hot-reload sync.")
-                    viewModel.refreshAfterBuild(requireContext())
-                } else {
-                    LOG.error("Full build failed.", error)
-                    viewModel.setBuildFailed()
-                }
-            }
+    buildService.executeTasks(taskName).whenComplete { result, error ->
+      activity?.runOnUiThread {
+        if (error == null && result != null && result.isSuccessful) {
+          LOG.info("Full build completed successfully, initiating hot-reload sync.")
+          viewModel.refreshAfterBuild(requireContext())
+        } else {
+          LOG.error("Full build failed.", error)
+          viewModel.setBuildFailed()
         }
+      }
     }
+  }
 
-    private fun observeState() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.previewState.collect { state -> handleState(state) }
-            }
+  private fun observeState() {
+    viewLifecycleOwner.lifecycleScope.launch {
+      viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+        viewModel.previewState.collect { state -> handleState(state) }
+      }
+    }
+  }
+
+  private fun handleState(state: PreviewState) {
+    binding.loadingIndicator.isVisible =
+        state is PreviewState.Compiling || state is PreviewState.Building
+    binding.initializingText.isVisible =
+        state is PreviewState.Initializing ||
+            state is PreviewState.Empty ||
+            state is PreviewState.NeedsBuild ||
+            state is PreviewState.Building
+    binding.errorOverlay.isVisible = state is PreviewState.Error
+    binding.composePreview.isVisible = state is PreviewState.Ready
+
+    when (state) {
+      is PreviewState.Idle -> {
+        if (sourceCode.isNotBlank()) {
+          viewModel.compileNow(sourceCode)
         }
+      }
+      is PreviewState.Initializing -> {
+        binding.initializingText.setText(R.string.preview_initializing)
+      }
+      is PreviewState.Empty -> {
+        binding.initializingText.setText(R.string.preview_empty_title)
+      }
+      is PreviewState.Compiling -> {
+        LOG.debug("Hot-Reloading Component...")
+        binding.initializingText.text = "Hot-Reloading..."
+      }
+      is PreviewState.Building -> {
+        binding.initializingText.setText(R.string.preview_building_project)
+        binding.loadingIndicator.isVisible = true
+      }
+      is PreviewState.NeedsBuild -> {
+        binding.initializingText.setText(R.string.preview_build_required_title)
+      }
+      is PreviewState.Ready -> {
+        handleReadyState(state)
+      }
+      is PreviewState.Error -> {
+        showError(state)
+      }
     }
+  }
 
-    private fun handleState(state: PreviewState) {
-        binding.loadingIndicator.isVisible = state is PreviewState.Compiling || state is PreviewState.Building
-        binding.initializingText.isVisible = state is PreviewState.Initializing || state is PreviewState.Empty || state is PreviewState.NeedsBuild || state is PreviewState.Building
-        binding.errorOverlay.isVisible = state is PreviewState.Error
-        binding.composePreview.isVisible = state is PreviewState.Ready
+  private fun handleReadyState(state: PreviewState.Ready) {
+    val loader = classLoader ?: return
+    val render = renderer ?: return
 
-        when (state) {
-            is PreviewState.Idle -> {
-                if (sourceCode.isNotBlank()) {
-                    viewModel.compileNow(sourceCode)
-                }
-            }
-            is PreviewState.Initializing -> {
-                binding.initializingText.setText(R.string.preview_initializing)
-            }
-            is PreviewState.Empty -> {
-                binding.initializingText.setText(R.string.preview_empty_title)
-            }
-            is PreviewState.Compiling -> {
-                LOG.debug("Hot-Reloading Component...")
-                binding.initializingText.text = "Hot-Reloading..."
-            }
-            is PreviewState.Building -> {
-                binding.initializingText.setText(R.string.preview_building_project)
-                binding.loadingIndicator.isVisible = true
-            }
-            is PreviewState.NeedsBuild -> {
-                binding.initializingText.setText(R.string.preview_build_required_title)
-            }
-            is PreviewState.Ready -> {
-                handleReadyState(state)
-            }
-            is PreviewState.Error -> {
-                showError(state)
-            }
+    loader.setProjectDexFiles(state.projectDexFiles)
+    loader.setRuntimeDex(state.runtimeDex)
+
+    val config = state.previewConfigs.firstOrNull() ?: return
+    render.render(
+        dexFile = state.dexFile,
+        className = state.className,
+        functionName = config.functionName,
+        isInteractive = isInteractiveMode,
+    )
+  }
+
+  private fun showError(state: PreviewState.Error) {
+    binding.errorOverlay.isVisible = true
+    binding.errorMessage.text = state.message
+
+    val details =
+        state.diagnostics.joinToString("\n") { diagnostic ->
+          buildString {
+            diagnostic.file?.let { append("$it:") }
+            diagnostic.line?.let { append("$it:") }
+            diagnostic.column?.let { append("$it ") }
+            append("[${diagnostic.severity}] ")
+            append(diagnostic.message)
+          }
         }
-    }
+    binding.errorDetails.text = details
+    binding.errorDetails.isVisible = details.isNotBlank()
+  }
 
-    private fun handleReadyState(state: PreviewState.Ready) {
-        val loader = classLoader ?: return
-        val render = renderer ?: return
+  fun updateSource(source: String) {
+    sourceCode = source
+    viewModel.onSourceChanged(source)
+  }
 
-        loader.setProjectDexFiles(state.projectDexFiles)
-        loader.setRuntimeDex(state.runtimeDex)
+  fun setNavigateBackListener(listener: () -> Unit) {
+    onNavigateBack = listener
+  }
 
-        val config = state.previewConfigs.firstOrNull() ?: return
-        render.render(
-            dexFile = state.dexFile,
-            className = state.className,
-            functionName = config.functionName,
-            isInteractive = isInteractiveMode,
-        )
-    }
+  override fun onDestroyView() {
+    super.onDestroyView()
+    classLoader?.release()
+    classLoader = null
+    renderer = null
+    _binding = null
+  }
 
-    private fun showError(state: PreviewState.Error) {
-        binding.errorOverlay.isVisible = true
-        binding.errorMessage.text = state.message
+  override fun onLowMemory() {
+    super.onLowMemory()
+    classLoader?.release()
+    LOG.warn("Low memory - released hot-reload preview resources")
+  }
 
-        val details = state.diagnostics.joinToString("\n") { diagnostic ->
-            buildString {
-                diagnostic.file?.let { append("$it:") }
-                diagnostic.line?.let { append("$it:") }
-                diagnostic.column?.let { append("$it ") }
-                append("[${diagnostic.severity}] ")
-                append(diagnostic.message)
-            }
-        }
-        binding.errorDetails.text = details
-        binding.errorDetails.isVisible = details.isNotBlank()
-    }
+  companion object {
+    private val LOG = LoggerFactory.getLogger(ComposePreviewFragment::class.java)
 
-    fun updateSource(source: String) {
-        sourceCode = source
-        viewModel.onSourceChanged(source)
-    }
+    private const val ARG_SOURCE_CODE = "source_code"
+    private const val ARG_FILE_PATH = "file_path"
+    private const val INTERACTIVE_MENU_ID = 2001
+    private const val BUILD_MENU_ID = 2002
 
-    fun setNavigateBackListener(listener: () -> Unit) {
-        onNavigateBack = listener
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        classLoader?.release()
-        classLoader = null
-        renderer = null
-        _binding = null
-    }
-
-    override fun onLowMemory() {
-        super.onLowMemory()
-        classLoader?.release()
-        LOG.warn("Low memory - released hot-reload preview resources")
-    }
-
-    companion object {
-        private val LOG = LoggerFactory.getLogger(ComposePreviewFragment::class.java)
-
-        private const val ARG_SOURCE_CODE = "source_code"
-        private const val ARG_FILE_PATH = "file_path"
-        private const val INTERACTIVE_MENU_ID = 2001
-        private const val BUILD_MENU_ID = 2002
-
-        private const val DEFAULT_SOURCE = """
+    private const val DEFAULT_SOURCE =
+        """
 package preview
 
 import androidx.compose.material3.Text
@@ -305,13 +315,14 @@ fun Preview() {
 }
 """
 
-        fun newInstance(sourceCode: String? = null, filePath: String? = null): ComposePreviewFragment {
-            return ComposePreviewFragment().apply {
-                arguments = Bundle().apply {
-                    sourceCode?.let { putString(ARG_SOURCE_CODE, it) }
-                    filePath?.let { putString(ARG_FILE_PATH, it) }
-                }
+    fun newInstance(sourceCode: String? = null, filePath: String? = null): ComposePreviewFragment {
+      return ComposePreviewFragment().apply {
+        arguments =
+            Bundle().apply {
+              sourceCode?.let { putString(ARG_SOURCE_CODE, it) }
+              filePath?.let { putString(ARG_FILE_PATH, it) }
             }
-        }
+      }
     }
+  }
 }

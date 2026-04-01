@@ -95,12 +95,18 @@ fun DiffRow(
     diffItemSaver: DiffItemSaver,
     initEditLineDialog:
         (
-            content: String, lineNum: Int, prependOrAppendOrReplace: Boolean?, filePath: String,
+            content: String,
+            lineNum: Int,
+            prependOrAppendOrReplace: Boolean?,
+            filePath: String,
         ) -> Unit,
     initDelLineDialog: (lineNum: Int, filePath: String) -> Unit,
     initRestoreLineDialog:
         (
-            content: String, lineNum: Int, trueRestoreFalseReplace_param: Boolean, filePath: String,
+            content: String,
+            lineNum: Int,
+            trueRestoreFalseReplace_param: Boolean,
+            filePath: String,
         ) -> Unit,
 ) {
   // better don't use `mutableCustomState` in this page,

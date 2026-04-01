@@ -111,7 +111,7 @@ object PageRequest {
 
   const val backLastEditedLine =
       "backLastEditedLine" // 用于 Editor页面 返回上次编辑行，以实现双击时在返回顶部和返回上次编辑行之间切换(20240507 废弃，改用
-                           // `switchBetweenFirstLineAndLastEditLine`)
+  // `switchBetweenFirstLineAndLastEditLine`)
 
   const val showOpenAsDialog = "showOpenAsDialog"
   const val switchBetweenFirstLineAndLastEditLine =

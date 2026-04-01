@@ -26,7 +26,8 @@ internal data class GitHostLinks(
     val encodedTitle = Uri.encode(title)
     val encodedBody = Uri.encode(body)
     return when (hostKind) {
-      GitHostKind.GITLAB -> "$issuesUrl/new?issue[title]=$encodedTitle&issue[description]=$encodedBody"
+      GitHostKind.GITLAB ->
+          "$issuesUrl/new?issue[title]=$encodedTitle&issue[description]=$encodedBody"
       else -> "$issuesUrl/new?title=$encodedTitle&body=$encodedBody"
     }
   }
@@ -118,7 +119,12 @@ internal object GitHostWebLinks {
             .mapNotNull { m ->
               val name = m.groupValues[1]
               val body = m.groupValues[2]
-              val url = Regex("""\n\s*url\s*=\s*(.+)""").find("\n$body")?.groupValues?.getOrNull(1)?.trim()
+              val url =
+                  Regex("""\n\s*url\s*=\s*(.+)""")
+                      .find("\n$body")
+                      ?.groupValues
+                      ?.getOrNull(1)
+                      ?.trim()
               if (url.isNullOrBlank()) null else GitRemoteConfig(name, url)
             }
             .toList()
@@ -137,11 +143,12 @@ internal object GitHostWebLinks {
             }
             .firstOrNull()
 
-    val preferredName = when {
-      !branchRemote.isNullOrBlank() -> branchRemote
-      remoteBlocks.any { it.name == "origin" } -> "origin"
-      else -> remoteBlocks.first().name
-    }
+    val preferredName =
+        when {
+          !branchRemote.isNullOrBlank() -> branchRemote
+          remoteBlocks.any { it.name == "origin" } -> "origin"
+          else -> remoteBlocks.first().name
+        }
 
     return remoteBlocks.firstOrNull { it.name == preferredName } ?: remoteBlocks.firstOrNull()
   }

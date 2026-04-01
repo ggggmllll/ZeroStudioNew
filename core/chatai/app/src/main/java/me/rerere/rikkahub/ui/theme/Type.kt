@@ -12,11 +12,13 @@ import me.rerere.rikkahub.R
 val Typography = Typography()
 
 @OptIn(ExperimentalTextApi::class)
-val JetbrainsMono = FontFamily(
-    Font(
-        resId = R.font.jetbrains_mono,
-        variationSettings = FontVariation.Settings(
-            FontVariation.weight(FontWeight.Normal.weight),
+val JetbrainsMono =
+    FontFamily(
+        Font(
+            resId = R.font.jetbrains_mono,
+            variationSettings =
+                FontVariation.Settings(
+                    FontVariation.weight(FontWeight.Normal.weight),
+                ),
         )
     )
-)

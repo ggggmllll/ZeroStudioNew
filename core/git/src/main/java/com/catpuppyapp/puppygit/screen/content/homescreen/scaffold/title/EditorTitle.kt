@@ -106,7 +106,8 @@ fun EditorTitle(
         remember(isPreviewModeOn, previewingPath, editorPageShowingFilePath.value) {
           FuckSafFile(
                   activityContext,
-                  if (isPreviewModeOn) FilePath(previewingPath) else editorPageShowingFilePath.value,
+                  if (isPreviewModeOn) FilePath(previewingPath)
+                  else editorPageShowingFilePath.value,
               )
               .name
         }

@@ -78,7 +78,9 @@ class GitProjectsFragment : BaseGitPageFragment(), FileClickListener, FileLongCl
 
     addToolbarAction(R.drawable.ic_target_positioning_24dp, "Locate File") { locateCurrentFile() }
 
-    addToolbarAction(R.drawable.ic_refresh_file_24dp, getString(R.string.refresh)) { refreshFileTree() }
+    addToolbarAction(R.drawable.ic_refresh_file_24dp, getString(R.string.refresh)) {
+      refreshFileTree()
+    }
 
     addToolbarAction(R.drawable.ic_git_clone_24dp, getString(R.string.git_clone)) {
       ZeroCloneDialogBottomSheetFragment.newInstance(repoId = "")
@@ -122,7 +124,10 @@ class GitProjectsFragment : BaseGitPageFragment(), FileClickListener, FileLongCl
           setLoading(true)
           val root =
               withContext(Dispatchers.IO) {
-                IProjectManager.getInstance().projectDirPath?.takeIf { it.isNotBlank() }?.let(::File)
+                IProjectManager.getInstance()
+                    .projectDirPath
+                    ?.takeIf { it.isNotBlank() }
+                    ?.let(::File)
               }
 
           if (root == null || !root.exists()) {

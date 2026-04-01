@@ -661,6 +661,8 @@ fun ServiceInnerPage(
       componentHeight = componentHeight,
       keyboardPaddingDp = keyboardPaddingDp,
       density = density,
-      skipCondition = { showSetTokenListDialog.value.not() && showSetIpWhiteListDialog.value.not() },
+      skipCondition = {
+        showSetTokenListDialog.value.not() && showSetIpWhiteListDialog.value.not()
+      },
   )
 }

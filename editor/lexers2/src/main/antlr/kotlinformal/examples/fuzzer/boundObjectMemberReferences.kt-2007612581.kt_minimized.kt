@@ -1,3 +1,3 @@
 fun box(): String {
-val fooParams = ((Host::foo)!!)!!.parameters
+  val fooParams = ((Host::foo)!!)!!.parameters
 }

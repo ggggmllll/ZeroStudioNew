@@ -1,11 +1,12 @@
-@D(+0.0)
- fun dPlusZero(): (Unit)? {
+@D(+0.0) fun dPlusZero(): (Unit)? {}
 
-}
 fun (Int)?.box(): String {
-check((((if ((::dPlusZero) <= it) {
-(::dPlusZero)
-} else {
-
-}).annotations.single() as D)), dpz)
+  check(
+      (((if ((::dPlusZero) <= it) {
+            (::dPlusZero)
+          } else {})
+          .annotations
+          .single() as D)),
+      dpz,
+  )
 }

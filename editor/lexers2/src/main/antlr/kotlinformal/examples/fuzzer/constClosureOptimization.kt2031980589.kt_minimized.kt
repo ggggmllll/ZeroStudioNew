@@ -1,9 +1,8 @@
 fun test(): Unit {
-fun local(): Unit {
+  fun local(): Unit {}
 
-}
-((when {
-(::local) in null -> (::local)
-else -> (::local)
-}))()
+  ((when {
+    (::local) in null -> (::local)
+    else -> (::local)
+  }))()
 }

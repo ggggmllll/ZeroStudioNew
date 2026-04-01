@@ -80,12 +80,12 @@ class MainActivity : EdgeToEdgeIDEActivity() {
     super.onCreate(savedInstanceState)
 
     // if (savedInstanceState == null) {
-      // supportFragmentManager
-          // .beginTransaction()
-          // .add(android.R.id.content, MainFragment(), "tag_main")
-          // .add(android.R.id.content, TemplateListFragment(), "tag_list")
-          // .add(android.R.id.content, TemplateDetailsFragment(), "tag_details")
-          // .commitNowAllowingStateLoss()
+    // supportFragmentManager
+    // .beginTransaction()
+    // .add(android.R.id.content, MainFragment(), "tag_main")
+    // .add(android.R.id.content, TemplateListFragment(), "tag_list")
+    // .add(android.R.id.content, TemplateDetailsFragment(), "tag_details")
+    // .commitNowAllowingStateLoss()
     // }
 
     viewModel.currentScreen.observe(this) { screen ->
@@ -99,23 +99,31 @@ class MainActivity : EdgeToEdgeIDEActivity() {
       var detailsFrag = fm.findFragmentByTag("tag_details")
 
       // 懒加载：仅在需要显示该 Fragment 时才进行实例化并添加
-      //可选项优化方案：Navigation Component
+      // 可选项优化方案：Navigation Component
       if (screen == MainViewModel.SCREEN_MAIN && mainFrag == null) {
-          mainFrag = MainFragment()
-          transaction.add(android.R.id.content, mainFrag, "tag_main")
+        mainFrag = MainFragment()
+        transaction.add(android.R.id.content, mainFrag, "tag_main")
       }
       if (screen == MainViewModel.SCREEN_TEMPLATE_LIST && listFrag == null) {
-          listFrag = TemplateListFragment()
-          transaction.add(android.R.id.content, listFrag, "tag_list")
+        listFrag = TemplateListFragment()
+        transaction.add(android.R.id.content, listFrag, "tag_list")
       }
       if (screen == MainViewModel.SCREEN_TEMPLATE_DETAILS && detailsFrag == null) {
-          detailsFrag = TemplateDetailsFragment()
-          transaction.add(android.R.id.content, detailsFrag, "tag_details")
+        detailsFrag = TemplateDetailsFragment()
+        transaction.add(android.R.id.content, detailsFrag, "tag_details")
       }
 
-      mainFrag?.let { if (screen == MainViewModel.SCREEN_MAIN) transaction.show(it) else transaction.hide(it) }
-      listFrag?.let { if (screen == MainViewModel.SCREEN_TEMPLATE_LIST) transaction.show(it) else transaction.hide(it) }
-      detailsFrag?.let { if (screen == MainViewModel.SCREEN_TEMPLATE_DETAILS) transaction.show(it) else transaction.hide(it) }
+      mainFrag?.let {
+        if (screen == MainViewModel.SCREEN_MAIN) transaction.show(it) else transaction.hide(it)
+      }
+      listFrag?.let {
+        if (screen == MainViewModel.SCREEN_TEMPLATE_LIST) transaction.show(it)
+        else transaction.hide(it)
+      }
+      detailsFrag?.let {
+        if (screen == MainViewModel.SCREEN_TEMPLATE_DETAILS) transaction.show(it)
+        else transaction.hide(it)
+      }
 
       transaction.commitAllowingStateLoss()
 

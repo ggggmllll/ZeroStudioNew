@@ -1,3 +1,3 @@
 class A {
-fun result() = (((::Nested)!!))!!().o + (A::Nested)().k
+  fun result() = (((::Nested)!!))!!().o + (A::Nested)().k
 }

@@ -33,12 +33,14 @@ fun ResetDialog(
     closeDialog: () -> Unit,
     onOk: ((resetType: Reset.ResetT) -> Unit)? =
         null, // here only passing reset type, the target hash can get from `fullOidOrBranchOrTag`,
-              // it's passed by caller, so caller can get it, no need passing at here
+    // it's passed by caller, so caller can get it, no need passing at here
     refreshPage:
         (
-            oldHeadCommitOid: String, isDetached: Boolean, resetTargetCommitOid: String,
+            oldHeadCommitOid: String,
+            isDetached: Boolean,
+            resetTargetCommitOid: String,
         ) -> Unit, // 入参为Hard Reset之前HEAD指向的commit
-                   // id和仓库是否detached。这个detached在这只是顺手判断，commitList页面要用到这个参数，但那个页面的curRepo若是从分支页面进入，则很少更新，所以，在这顺便更新下detached状态以尽量确保那个对象能持有准确的状态
+    // id和仓库是否detached。这个detached在这只是顺手判断，commitList页面要用到这个参数，但那个页面的curRepo若是从分支页面进入，则很少更新，所以，在这顺便更新下detached状态以尽量确保那个对象能持有准确的状态
 ) {
 
   val activityContext = LocalContext.current

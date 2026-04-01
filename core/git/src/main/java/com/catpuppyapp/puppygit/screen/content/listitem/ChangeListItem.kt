@@ -52,8 +52,8 @@ fun ChangeListItem(
     // 此参数用来确认是否diff to local，因为from为tree to tree时有可能和local diff也可能不是，所以无法单凭from to 判断
     isDiffToLocal:
         Boolean, // fromTo are treeToTree or indexToWorkdir all maybe diff to local, but tree to
-                 // tree maybe is not diff to local, so make sure is diff to local or not, by this
-                 // param
+    // tree maybe is not diff to local, so make sure is diff to local or not, by this
+    // param
     lastClickedItemKey: MutableState<String>,
     switchItemSelected: (StatusTypeEntrySaver) -> Unit,
     isItemInSelected: (StatusTypeEntrySaver) -> Boolean,

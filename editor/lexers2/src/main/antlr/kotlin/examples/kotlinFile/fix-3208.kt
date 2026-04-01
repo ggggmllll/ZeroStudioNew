@@ -1,9 +1,11 @@
-class C{
+class C {
 
-    val s: String
-        get() = ""
+  val s: String
+    get() = ""
 
-    var t: String
-        set(value) { t = value }
-        get() = t
+  var t: String
+    set(value) {
+      t = value
+    }
+    get() = t
 }

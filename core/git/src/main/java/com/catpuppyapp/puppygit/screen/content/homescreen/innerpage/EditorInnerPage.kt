@@ -1239,9 +1239,8 @@ fun EditorInnerPage(
       runBlocking {
         // user expect edit current previewing file
         val previewingPath =
-            previewNavStack.value
-                .previewingPath // or use page state `previewPath.value`, or
-                                // `previewNavStack.getCurrent()`
+            previewNavStack.value.previewingPath // or use page state `previewPath.value`, or
+        // `previewNavStack.getCurrent()`
         previewNavStack.value.editingPath = previewingPath
 
         // 若正在预览和正在编辑的文件不同则重载，否则仅退出预览模式即可
@@ -1589,7 +1588,7 @@ fun EditorInnerPage(
               onClick = { currentHomeScreen.intValue = Cons.selectedItem_Files },
           )
         } else { // should never reach here, but may be...will reach here in some weird cases, so,
-                 // better keep this code block
+          // better keep this code block
           PageCenterIconButton(
               contentPadding = contentPadding,
               icon = ImageVector.vectorResource(R.drawable.outline_reopen_window_24),
@@ -1913,7 +1912,7 @@ fun EditorInnerPage(
             showBackFromExternalAppAskReloadDialog.value.not() &&
                 isPreviewModeOn.value
                     .not() // will try reload file when quit preview mode, so, don't need reload at
-                           // here
+                // here
                 && editorPageShowingFilePath.value.isNotBlank() &&
                 isEdited.value.not() // if edited, should not auto reload to avoid lost user changes
                 && isSaving.value.not() // not saving in progress

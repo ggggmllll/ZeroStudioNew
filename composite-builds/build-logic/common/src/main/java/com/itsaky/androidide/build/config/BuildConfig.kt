@@ -68,7 +68,7 @@ object BuildConfig {
   const val GitHub_Acceleration_Mirror = "https://gh.fhjhy.top/"
   /* SetupAapt2Task.class appt2 download url*/
   const val AAPT2_DOWNLOAD_URL =
-  /** GitHub_Acceleration_Mirror + */
+      /** GitHub_Acceleration_Mirror + */
       "https://github.com/android-zero0/SDK-tool-for-Android-platform/releases/download/%1\$s/aapt2-%2\$s"
   /** SetupAapt2Task.class appt2 arm64-v8a check sha256 */
   const val ABI_ARM64_V8A_AAPT2_CHECKSUMS =

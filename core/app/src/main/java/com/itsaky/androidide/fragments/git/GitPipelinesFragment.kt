@@ -104,9 +104,13 @@ class GitPipelinesFragment : BaseGitPageFragment() {
         .show()
   }
 
-  private fun openTaskAndWorkflow(target: GitHostLinks, taskTitle: String, yaml: String, ref: String) {
-    val taskBody =
-        "Created from AndroidIDE. Remote=${target.remoteName}, ref=$ref, yaml=$yaml"
+  private fun openTaskAndWorkflow(
+      target: GitHostLinks,
+      taskTitle: String,
+      yaml: String,
+      ref: String,
+  ) {
+    val taskBody = "Created from AndroidIDE. Remote=${target.remoteName}, ref=$ref, yaml=$yaml"
     val issueUrl = target.newTaskUrl(taskTitle, taskBody)
     val workflowUrl = target.workflowRunUrl(yamlFile = yaml, ref = ref)
 
@@ -132,7 +136,8 @@ class GitPipelinesFragment : BaseGitPageFragment() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder {
       val view =
-          LayoutInflater.from(parent.context).inflate(android.R.layout.simple_list_item_1, parent, false)
+          LayoutInflater.from(parent.context)
+              .inflate(android.R.layout.simple_list_item_1, parent, false)
       return Holder(view)
     }
 

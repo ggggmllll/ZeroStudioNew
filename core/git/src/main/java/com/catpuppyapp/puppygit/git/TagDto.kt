@@ -13,7 +13,7 @@ class TagDto(
     var fullOidStr: String = "", // see below annotation of `targetFullOidStr`
     var targetFullOidStr: String =
         "", // if "isAnnotated" is false, this equals fullOidStr, else this is commit's oid,
-            // fullOidStr is Tag's oid
+    // fullOidStr is Tag's oid
     var isAnnotated: Boolean = false,
     var pointedCommitDto: CommitDto? = null,
 

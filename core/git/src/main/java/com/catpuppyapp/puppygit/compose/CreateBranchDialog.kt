@@ -112,14 +112,12 @@ fun CreateBranchDialog(
                   shortBranchName,
                   fullBranchName,
                   upstreamBranchShortNameParam,
-                  Cons
-                      .checkoutType_checkoutRefThenUpdateHead, // 原本是 if(isLocal)
-                                                               // checkoutTypeLocalBranch else
-                                                               // checkoutTypeRemoteBranch，但创建分支然后checkout必然是本地分支，所以这里不用检查，直接传本地分支即可
+                  Cons.checkoutType_checkoutRefThenUpdateHead, // 原本是 if(isLocal)
+                  // checkoutTypeLocalBranch else
+                  // checkoutTypeRemoteBranch，但创建分支然后checkout必然是本地分支，所以这里不用检查，直接传本地分支即可
                   force = force,
-                  updateHead =
-                      true, // 创建本地分支并
-                           // checkout，隐含使HEAD指向新创建的分支，所以必然需要updateHead，若不想更新head，应该不勾选checkout，这样就会仅创建分支了，而那样的话就不会调用本函数，所以，只要调用此函数，此值就应为true
+                  updateHead = true, // 创建本地分支并
+                  // checkout，隐含使HEAD指向新创建的分支，所以必然需要updateHead，若不想更新head，应该不勾选checkout，这样就会仅创建分支了，而那样的话就不会调用本函数，所以，只要调用此函数，此值就应为true
               )
 
           return@doCheckoutLocalBranch ret

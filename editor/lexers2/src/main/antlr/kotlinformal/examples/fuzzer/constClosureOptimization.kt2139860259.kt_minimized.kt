@@ -1,3 +1,3 @@
 fun Double.test(): Unit {
-(((::local))!!!!)()
+  (((::local))!! !!)()
 }

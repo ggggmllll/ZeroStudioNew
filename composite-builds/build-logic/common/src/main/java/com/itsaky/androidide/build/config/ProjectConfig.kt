@@ -8,23 +8,23 @@ import org.gradle.api.Project
 object ProjectConfig {
 
   const val REPO_HOST =
-  /** "github.com" */
+      /** "github.com" */
       BuildConfig.REPO_HOST
   const val REPO_OWNER =
-  /** "AndroidIDEOfficial" */
+      /** "AndroidIDEOfficial" */
       BuildConfig.REPO_OWNER
   const val REPO_NAME =
-  /** "AndroidIDE" */
+      /** "AndroidIDE" */
       BuildConfig.REPO_NAME
   const val REPO_URL =
-  /** "https://$REPO_HOST/$REPO_OWNER/$REPO_NAME" */
+      /** "https://$REPO_HOST/$REPO_OWNER/$REPO_NAME" */
       BuildConfig.REPO_URL
   const val SCM_GIT = BuildConfig.SCM_GIT
   /** "scm:git:git://$REPO_HOST/$REPO_OWNER/$REPO_NAME.git" */
   const val SCM_SSH = BuildConfig.SCM_SSH
   /** "scm:git:ssh://git@$REPO_HOST/$REPO_OWNER/$REPO_NAME.git" */
   const val PROJECT_SITE =
-  /** "https://m.androidide.com" */
+      /** "https://m.androidide.com" */
       BuildConfig.PROJECT_SITE
 }
 

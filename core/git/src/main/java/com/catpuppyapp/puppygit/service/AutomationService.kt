@@ -54,7 +54,7 @@ class AutomationService : BaseAccessibilityService() {
         "" // last target package name, used to check enter/leave app
     private var lastPackageName =
         "" // last event related package name, maybe is target app or not, used to skip repeat
-           // triggered
+    // triggered
 
     private val ignorePackageNames =
         listOf<String>(
@@ -387,10 +387,8 @@ class AutomationService : BaseAccessibilityService() {
 
             val targetOpened =
                 targetPackageTrueOpenedFalseCloseNullNeverOpenedList[packageName] == true
-            if (
-                !targetOpened
-            ) { // was leave, now opened or first time opened
-                // （初次打开或离开又重新打开）（还有一种可能是停留在当前app灭屏又亮屏，灭屏的需要在灭屏广播接收器里处理，直接设定成app离开就行）
+            if (!targetOpened) { // was leave, now opened or first time opened
+              // （初次打开或离开又重新打开）（还有一种可能是停留在当前app灭屏又亮屏，灭屏的需要在灭屏广播接收器里处理，直接设定成app离开就行）
               targetPackageTrueOpenedFalseCloseNullNeverOpenedList[packageName] = true
               MyLog.d(TAG, "target packageName '$packageName' opened, need do pull")
 

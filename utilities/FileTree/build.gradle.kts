@@ -32,7 +32,6 @@ android {
     sourceCompatibility = JavaVersion.VERSION_11
     targetCompatibility = JavaVersion.VERSION_11
   }
-
 }
 
 publishing {
@@ -48,10 +47,10 @@ publishing {
 dependencies {
   implementation(libs.androidx.core.ktx)
   implementation(libs.androidx.appcompat)
-  implementation(libs.google.material) 
-  
-  testImplementation(libs.tests.junit) 
-  androidTestImplementation(libs.tests.androidx.junit) 
+  implementation(libs.google.material)
+
+  testImplementation(libs.tests.junit)
+  androidTestImplementation(libs.tests.androidx.junit)
   androidTestImplementation(libs.tests.androidx.espresso.core)
 }
 

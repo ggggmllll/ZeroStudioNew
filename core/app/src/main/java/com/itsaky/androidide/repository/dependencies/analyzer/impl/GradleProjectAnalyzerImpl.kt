@@ -143,9 +143,8 @@ class GradleProjectAnalyzerImpl : ProjectAnalyzer {
 
                 if (remoteLatest != null && isNewerSemanticVersion(remoteLatest, dep.version)) {
                   bestLatest =
-                      listOfNotNull(bestLatest, remoteLatest).maxWithOrNull(
-                          SemanticVersionComparator
-                      )
+                      listOfNotNull(bestLatest, remoteLatest)
+                          .maxWithOrNull(SemanticVersionComparator)
                 }
               }
             }

@@ -46,13 +46,9 @@ class GitDiffFragment : BaseGitPageFragment() {
   }
 
   override fun setupToolbar() {
-    addToolbarAction(R.drawable.ic_add_24, getString(R.string.stage)) {
-      stageCurrentFile()
-    }
+    addToolbarAction(R.drawable.ic_add_24, getString(R.string.stage)) { stageCurrentFile() }
 
-    addToolbarAction(R.drawable.ic_undo_24, getString(R.string.revert)) {
-      revertCurrentFile()
-    }
+    addToolbarAction(R.drawable.ic_undo_24, getString(R.string.revert)) { revertCurrentFile() }
 
     addToolbarAction(R.drawable.ic_chevron_left_24, getString(R.string.previous_page)) {
       navigateDiff(-1)
@@ -116,7 +112,8 @@ class GitDiffFragment : BaseGitPageFragment() {
                 newLine = ln.newLineNum,
                 content = ln.getContentNoLineBreak(),
                 type = type,
-            ))
+            )
+        )
       }
     }
 
@@ -132,7 +129,11 @@ class GitDiffFragment : BaseGitPageFragment() {
   private fun revertCurrentFile() {
     val target = changedFiles.getOrNull(currentIndex) ?: return
     withRepo { repo ->
-      Libgit2Helper.revertFilesToIndexVersion(repo, listOf(target.relativePathUnderRepo), force = true)
+      Libgit2Helper.revertFilesToIndexVersion(
+          repo,
+          listOf(target.relativePathUnderRepo),
+          force = true,
+      )
       if (target.changeType == Cons.gitStatusNew) {
         Libgit2Helper.rmUntrackedFiles(listOf(target.canonicalPath))
       }
@@ -180,7 +181,8 @@ class GitDiffFragment : BaseGitPageFragment() {
       RecyclerView.Adapter<DiffAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-      val v = LayoutInflater.from(parent.context).inflate(R.layout.item_git_diff_line, parent, false)
+      val v =
+          LayoutInflater.from(parent.context).inflate(R.layout.item_git_diff_line, parent, false)
       return ViewHolder(v)
     }
 

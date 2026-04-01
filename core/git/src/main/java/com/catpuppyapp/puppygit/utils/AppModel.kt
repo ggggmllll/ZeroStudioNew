@@ -133,7 +133,7 @@ object AppModel {
 
   lateinit var allRepoParentDir:
       File // this is internal storage, early version doesn't support clone repo to external path,
-           // so this name not indicate this path is internal path, but actually it is
+  // so this name not indicate this path is internal path, but actually it is
   var exitApp: () -> Unit = {}
 
   /**

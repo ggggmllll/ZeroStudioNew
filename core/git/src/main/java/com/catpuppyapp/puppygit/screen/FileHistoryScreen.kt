@@ -344,7 +344,7 @@ fun FileHistoryScreen(
                 repositoryForRevWalk.value?.close()
                 repositoryForRevWalk.value =
                     null // if don't set to null, when assign new instance to state, implicitly call
-                         // equals(), the closed repo will thrown an err
+                // equals(), the closed repo will thrown an err
 
                 // do init: create new repo instance
                 val repo = Repository.open(repoFullPath)
@@ -878,10 +878,8 @@ fun FileHistoryScreen(
                 doJobThenOffLoading {
                   //                            delay(100)  // wait rendering, may unnecessary yet
                   val curItemIndex = curObjIndex.intValue // 被长按的条目在 filterlist中的索引
-                  val idxList =
-                      filterIdxList
-                          .value // 取出存储filter索引和源列表索引的 index list，条目索引对应filter
-                                 // list条目索引，条目值对应的是源列表的真实索引
+                  val idxList = filterIdxList.value // 取出存储filter索引和源列表索引的 index list，条目索引对应filter
+                  // list条目索引，条目值对应的是源列表的真实索引
 
                   doActIfIndexGood(curItemIndex, idxList) { // it为当前被长按的条目在源列表中的真实索引
                     UIHelper.scrollToItem(scope, listState, it) // 在源列表中定位条目

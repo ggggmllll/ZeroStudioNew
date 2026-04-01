@@ -32,7 +32,7 @@ object MyLog :
   private const val MYLOG_WRITE_TO_FILE = true // 日志写入文件开关
   var myLogLevel =
       'w' // 日志等级，w代表只输出告警信息等，v代表输出所有信息, log level is err>warn>info>debug>verbose, low level include
-          // high level output
+  // high level output
 
   // 指示当前类是否完成初始化的变量，若未初始化，意味着没设置必须的参数，这时候无法记日志
   private var isInited = false

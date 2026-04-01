@@ -423,7 +423,7 @@ class RepoRepositoryImpl(private val dao: RepoDao) : RepoRepository {
 
     var all =
         0 // count of all repos found. btw: this is not all subdirs count under dir, this only mean
-          // how many git repos found, it may less than subdirs under dir
+    // how many git repos found, it may less than subdirs under dir
     var success = 0 // count of success imported
     var existed = 0 // count of already exists in db, need not import
     var failed = 0 // count of import failed (target is a repo, but import err)
@@ -431,7 +431,7 @@ class RepoRepositoryImpl(private val dao: RepoDao) : RepoRepository {
     if (
         isReposParent
     ) { // scan repos under this folder(only scan top level, won't do recursive), in this case may
-        // found many repos
+      // found many repos
       val subdirs = File(dir).listFiles { it -> it.isDirectory }
       // has sub directories, try scan folder
       if (subdirs != null && subdirs.isNotEmpty()) {

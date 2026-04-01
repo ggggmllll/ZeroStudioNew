@@ -1,8 +1,7 @@
 fun box(): String {
-fun foo() = result
-(return(if (true) {
+  fun foo() = result
+  (return (if (true) {} else {
 
-} else {
-((::foo))
-}))!!()
+    ((::foo))
+  }))!!()
 }

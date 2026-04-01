@@ -15,9 +15,8 @@ class RemoteDtoForCredential(
     var remoteName: String = "",
     var repoId: String = "",
     var repoName: String = "",
-    var credentialId: String? =
-        "", // fetch
-            // credential，之所以没明确叫fetchCredential是历史遗留问题，最初设计没考虑到把fetch和push凭据分开，因此只有一个credential字段
+    var credentialId: String? = "", // fetch
+    // credential，之所以没明确叫fetchCredential是历史遗留问题，最初设计没考虑到把fetch和push凭据分开，因此只有一个credential字段
     var credentialName: String? = "",
     var credentialType: Int = Cons.dbCredentialTypeHttp,
     var pushCredentialId: String? = "",

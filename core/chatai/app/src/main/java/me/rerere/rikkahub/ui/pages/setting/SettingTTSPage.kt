@@ -1,14 +1,5 @@
 package me.rerere.rikkahub.ui.pages.setting
 
-import me.rerere.hugeicons.HugeIcons
-import me.rerere.hugeicons.stroke.Tick01
-import me.rerere.hugeicons.stroke.StopCircle
-import me.rerere.hugeicons.stroke.DragDropHorizontal
-import me.rerere.hugeicons.stroke.PencilEdit01
-import me.rerere.hugeicons.stroke.Add01
-import me.rerere.hugeicons.stroke.Tools
-import me.rerere.hugeicons.stroke.Delete01
-import me.rerere.hugeicons.stroke.VolumeHigh
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -36,7 +27,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
@@ -56,6 +46,14 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import me.rerere.hugeicons.HugeIcons
+import me.rerere.hugeicons.stroke.Add01
+import me.rerere.hugeicons.stroke.Delete01
+import me.rerere.hugeicons.stroke.DragDropHorizontal
+import me.rerere.hugeicons.stroke.PencilEdit01
+import me.rerere.hugeicons.stroke.StopCircle
+import me.rerere.hugeicons.stroke.Tools
+import me.rerere.hugeicons.stroke.VolumeHigh
 import me.rerere.rikkahub.R
 import me.rerere.rikkahub.data.datastore.DEFAULT_SYSTEM_TTS_ID
 import me.rerere.rikkahub.ui.components.nav.BackButton
@@ -74,242 +72,199 @@ import sh.calvin.reorderable.rememberReorderableLazyListState
 
 @Composable
 fun SettingTTSPage(vm: SettingVM = koinViewModel()) {
-    val settings by vm.settings.collectAsStateWithLifecycle()
-    val navController = LocalNavController.current
-    var editingProvider by remember { mutableStateOf<TTSProviderSetting?>(null) }
-    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+  val settings by vm.settings.collectAsStateWithLifecycle()
+  val navController = LocalNavController.current
+  var editingProvider by remember { mutableStateOf<TTSProviderSetting?>(null) }
+  val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
-    Scaffold(
-        topBar = {
-            LargeFlexibleTopAppBar(
-                title = {
-                    Text(text = stringResource(R.string.setting_tts_page_title))
-                },
-                navigationIcon = {
-                    BackButton()
-                },
-                actions = {
-                    AddTTSProviderButton {
-                        vm.updateSettings(
-                            settings.copy(
-                                ttsProviders = listOf(it) + settings.ttsProviders
-                            )
-                        )
-                    }
-                },
-                scrollBehavior = scrollBehavior,
-                colors = CustomColors.topBarColors
-            )
-        },
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-        containerColor = CustomColors.topBarColors.containerColor,
-    ) { innerPadding ->
-        val lazyListState = rememberLazyListState()
-        val reorderableState = rememberReorderableLazyListState(lazyListState) { from, to ->
-            val newProviders = settings.ttsProviders.toMutableList().apply {
-                add(to.index, removeAt(from.index))
-            }
-            vm.updateSettings(settings.copy(ttsProviders = newProviders))
-        }
-
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .imePadding(),
-            contentPadding = innerPadding + PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            state = lazyListState
-        ) {
-            items(settings.ttsProviders, key = { it.id }) { provider ->
-                ReorderableItem(
-                    state = reorderableState,
-                    key = provider.id
-                ) { isDragging ->
-                    TTSProviderItem(
-                        modifier = Modifier
-                            .scale(if (isDragging) 0.95f else 1f)
-                            .fillMaxWidth(),
-                        provider = provider,
-                        dragHandle = {
-                            val haptic = LocalHapticFeedback.current
-                            IconButton(
-                                onClick = {},
-                                modifier = Modifier
-                                    .longPressDraggableHandle(
-                                        onDragStarted = {
-                                            haptic.performHapticFeedback(HapticFeedbackType.GestureThresholdActivate)
-                                        },
-                                        onDragStopped = {
-                                            haptic.performHapticFeedback(HapticFeedbackType.GestureEnd)
-                                        }
-                                    )
-                            ) {
-                                Icon(
-                                    imageVector = HugeIcons.DragDropHorizontal,
-                                    contentDescription = null
-                                )
-                            }
-                        },
-                        isSelected = settings.selectedTTSProviderId == provider.id,
-                        onSelect = {
-                            vm.updateSettings(settings.copy(selectedTTSProviderId = provider.id))
-                        },
-                        onEdit = {
-                            editingProvider = provider
-                        },
-                        onDelete = {
-                            val newProviders = settings.ttsProviders - provider
-                            val newSelectedId =
-                                if (settings.selectedTTSProviderId == provider.id) DEFAULT_SYSTEM_TTS_ID else settings.selectedTTSProviderId
-                            vm.updateSettings(
-                                settings.copy(
-                                    ttsProviders = newProviders,
-                                    selectedTTSProviderId = newSelectedId
-                                )
-                            )
-                        }
-                    )
-                }
-            }
-        }
-    }
-
-    // Edit TTS Provider Bottom Sheet
-    editingProvider?.let { provider ->
-        val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-        var currentProvider by remember(provider) { mutableStateOf(provider) }
-
-        ModalBottomSheet(
-            onDismissRequest = {
-                editingProvider = null
+  Scaffold(
+      topBar = {
+        LargeFlexibleTopAppBar(
+            title = { Text(text = stringResource(R.string.setting_tts_page_title)) },
+            navigationIcon = { BackButton() },
+            actions = {
+              AddTTSProviderButton {
+                vm.updateSettings(settings.copy(ttsProviders = listOf(it) + settings.ttsProviders))
+              }
             },
-            sheetState = bottomSheetState,
-            dragHandle = {
-                BottomSheetDefaults.DragHandle()
-            }
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-                    .fillMaxHeight(0.8f),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                Text(
-                    text = stringResource(R.string.setting_tts_page_edit_provider),
-                    style = MaterialTheme.typography.headlineSmall
-                )
-
-                TTSProviderConfigure(
-                    setting = currentProvider,
-                    onValueChange = { newState ->
-                        currentProvider = newState
-                    },
-                    modifier = Modifier.weight(1f)
-                )
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    TextButton(
-                        onClick = {
-                            editingProvider = null
-                        },
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Text(stringResource(R.string.cancel))
-                    }
-
-                    TextButton(
-                        onClick = {
-                            val newProviders = settings.ttsProviders.map {
-                                if (it.id == provider.id) currentProvider else it
-                            }
-                            vm.updateSettings(settings.copy(ttsProviders = newProviders))
-                            editingProvider = null
-                        },
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Text(stringResource(R.string.chat_page_save))
-                    }
-                }
-            }
+            scrollBehavior = scrollBehavior,
+            colors = CustomColors.topBarColors,
+        )
+      },
+      modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+      containerColor = CustomColors.topBarColors.containerColor,
+  ) { innerPadding ->
+    val lazyListState = rememberLazyListState()
+    val reorderableState =
+        rememberReorderableLazyListState(lazyListState) { from, to ->
+          val newProviders =
+              settings.ttsProviders.toMutableList().apply { add(to.index, removeAt(from.index)) }
+          vm.updateSettings(settings.copy(ttsProviders = newProviders))
         }
+
+    LazyColumn(
+        modifier = Modifier.fillMaxSize().imePadding(),
+        contentPadding = innerPadding + PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        state = lazyListState,
+    ) {
+      items(settings.ttsProviders, key = { it.id }) { provider ->
+        ReorderableItem(state = reorderableState, key = provider.id) { isDragging ->
+          TTSProviderItem(
+              modifier = Modifier.scale(if (isDragging) 0.95f else 1f).fillMaxWidth(),
+              provider = provider,
+              dragHandle = {
+                val haptic = LocalHapticFeedback.current
+                IconButton(
+                    onClick = {},
+                    modifier =
+                        Modifier.longPressDraggableHandle(
+                            onDragStarted = {
+                              haptic.performHapticFeedback(
+                                  HapticFeedbackType.GestureThresholdActivate
+                              )
+                            },
+                            onDragStopped = {
+                              haptic.performHapticFeedback(HapticFeedbackType.GestureEnd)
+                            },
+                        ),
+                ) {
+                  Icon(imageVector = HugeIcons.DragDropHorizontal, contentDescription = null)
+                }
+              },
+              isSelected = settings.selectedTTSProviderId == provider.id,
+              onSelect = { vm.updateSettings(settings.copy(selectedTTSProviderId = provider.id)) },
+              onEdit = { editingProvider = provider },
+              onDelete = {
+                val newProviders = settings.ttsProviders - provider
+                val newSelectedId =
+                    if (settings.selectedTTSProviderId == provider.id) DEFAULT_SYSTEM_TTS_ID
+                    else settings.selectedTTSProviderId
+                vm.updateSettings(
+                    settings.copy(
+                        ttsProviders = newProviders,
+                        selectedTTSProviderId = newSelectedId,
+                    )
+                )
+              },
+          )
+        }
+      }
     }
+  }
+
+  // Edit TTS Provider Bottom Sheet
+  editingProvider?.let { provider ->
+    val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var currentProvider by remember(provider) { mutableStateOf(provider) }
+
+    ModalBottomSheet(
+        onDismissRequest = { editingProvider = null },
+        sheetState = bottomSheetState,
+        dragHandle = { BottomSheetDefaults.DragHandle() },
+    ) {
+      Column(
+          modifier = Modifier.fillMaxWidth().padding(16.dp).fillMaxHeight(0.8f),
+          verticalArrangement = Arrangement.spacedBy(16.dp),
+      ) {
+        Text(
+            text = stringResource(R.string.setting_tts_page_edit_provider),
+            style = MaterialTheme.typography.headlineSmall,
+        )
+
+        TTSProviderConfigure(
+            setting = currentProvider,
+            onValueChange = { newState -> currentProvider = newState },
+            modifier = Modifier.weight(1f),
+        )
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+          TextButton(onClick = { editingProvider = null }, modifier = Modifier.weight(1f)) {
+            Text(stringResource(R.string.cancel))
+          }
+
+          TextButton(
+              onClick = {
+                val newProviders =
+                    settings.ttsProviders.map { if (it.id == provider.id) currentProvider else it }
+                vm.updateSettings(settings.copy(ttsProviders = newProviders))
+                editingProvider = null
+              },
+              modifier = Modifier.weight(1f),
+          ) {
+            Text(stringResource(R.string.chat_page_save))
+          }
+        }
+      }
+    }
+  }
 }
 
 @Composable
 private fun AddTTSProviderButton(onAdd: (TTSProviderSetting) -> Unit) {
-    var showBottomSheet by remember { mutableStateOf(false) }
-    var currentProvider: TTSProviderSetting by remember { mutableStateOf(TTSProviderSetting.SystemTTS()) }
+  var showBottomSheet by remember { mutableStateOf(false) }
+  var currentProvider: TTSProviderSetting by remember {
+    mutableStateOf(TTSProviderSetting.SystemTTS())
+  }
 
-    IconButton(
-        onClick = {
-            currentProvider = TTSProviderSetting.SystemTTS()
-            showBottomSheet = true
-        }
+  IconButton(
+      onClick = {
+        currentProvider = TTSProviderSetting.SystemTTS()
+        showBottomSheet = true
+      }
+  ) {
+    Icon(
+        HugeIcons.Add01,
+        stringResource(R.string.setting_tts_page_add_provider_content_description),
+    )
+  }
+
+  if (showBottomSheet) {
+    val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    ModalBottomSheet(
+        onDismissRequest = { showBottomSheet = false },
+        sheetState = bottomSheetState,
+        dragHandle = { BottomSheetDefaults.DragHandle() },
     ) {
-        Icon(HugeIcons.Add01, stringResource(R.string.setting_tts_page_add_provider_content_description))
-    }
+      Column(
+          modifier = Modifier.fillMaxWidth().padding(16.dp).fillMaxHeight(0.8f),
+          verticalArrangement = Arrangement.spacedBy(16.dp),
+      ) {
+        Text(
+            text = stringResource(R.string.setting_tts_page_add_provider),
+            style = MaterialTheme.typography.headlineSmall,
+        )
 
-    if (showBottomSheet) {
-        val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-        ModalBottomSheet(
-            onDismissRequest = {
-                showBottomSheet = false
-            },
-            sheetState = bottomSheetState,
-            dragHandle = {
-                BottomSheetDefaults.DragHandle()
-            }
+        TTSProviderConfigure(
+            setting = currentProvider,
+            onValueChange = { newState -> currentProvider = newState },
+            modifier = Modifier.weight(1f),
+        )
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-                    .fillMaxHeight(0.8f),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                Text(
-                    text = stringResource(R.string.setting_tts_page_add_provider),
-                    style = MaterialTheme.typography.headlineSmall
-                )
+          TextButton(onClick = { showBottomSheet = false }, modifier = Modifier.weight(1f)) {
+            Text(stringResource(R.string.cancel))
+          }
 
-                TTSProviderConfigure(
-                    setting = currentProvider,
-                    onValueChange = { newState ->
-                        currentProvider = newState
-                    },
-                    modifier = Modifier.weight(1f)
-                )
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    TextButton(
-                        onClick = {
-                            showBottomSheet = false
-                        },
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Text(stringResource(R.string.cancel))
-                    }
-
-                    TextButton(
-                        onClick = {
-                            onAdd(currentProvider)
-                            showBottomSheet = false
-                        },
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Text(stringResource(R.string.setting_tts_page_add))
-                    }
-                }
-            }
+          TextButton(
+              onClick = {
+                onAdd(currentProvider)
+                showBottomSheet = false
+              },
+              modifier = Modifier.weight(1f),
+          ) {
+            Text(stringResource(R.string.setting_tts_page_add))
+          }
         }
+      }
     }
+  }
 }
 
 @Composable
@@ -320,141 +275,140 @@ private fun TTSProviderItem(
     dragHandle: @Composable () -> Unit,
     onSelect: () -> Unit,
     onEdit: () -> Unit,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
 ) {
-    var showDropdownMenu by remember { mutableStateOf(false) }
-    val tts = LocalTTSState.current
-    val isSpeaking by tts.isSpeaking.collectAsState()
-    val isAvailable by tts.isAvailable.collectAsState()
+  var showDropdownMenu by remember { mutableStateOf(false) }
+  val tts = LocalTTSState.current
+  val isSpeaking by tts.isSpeaking.collectAsState()
+  val isAvailable by tts.isAvailable.collectAsState()
 
-    Card(
-        modifier = modifier,
-        colors = CardDefaults.cardColors(
-            containerColor = if (isSelected) {
-                MaterialTheme.colorScheme.primaryContainer
-            } else {
-                CustomColors.listItemColors.containerColor
-            }
-        )
+  Card(
+      modifier = modifier,
+      colors =
+          CardDefaults.cardColors(
+              containerColor =
+                  if (isSelected) {
+                    MaterialTheme.colorScheme.primaryContainer
+                  } else {
+                    CustomColors.listItemColors.containerColor
+                  }
+          ),
+  ) {
+    Column(
+        modifier = Modifier.padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                AutoAIIcon(
-                    name = provider.name.ifEmpty { stringResource(R.string.setting_tts_page_default_name) },
-                    modifier = Modifier.size(32.dp)
-                )
+      Row(
+          horizontalArrangement = Arrangement.spacedBy(8.dp),
+          verticalAlignment = Alignment.CenterVertically,
+      ) {
+        AutoAIIcon(
+            name = provider.name.ifEmpty { stringResource(R.string.setting_tts_page_default_name) },
+            modifier = Modifier.size(32.dp),
+        )
 
-                Column(
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text(
-                        text = provider.name.ifEmpty { stringResource(R.string.setting_tts_page_default_name) },
-                        style = MaterialTheme.typography.titleMedium,
-                        color = if (isSelected) {
-                            MaterialTheme.colorScheme.onPrimaryContainer
-                        } else {
-                            MaterialTheme.colorScheme.onSurface
-                        }
-                    )
+        Column(modifier = Modifier.weight(1f)) {
+          Text(
+              text =
+                  provider.name.ifEmpty { stringResource(R.string.setting_tts_page_default_name) },
+              style = MaterialTheme.typography.titleMedium,
+              color =
+                  if (isSelected) {
+                    MaterialTheme.colorScheme.onPrimaryContainer
+                  } else {
+                    MaterialTheme.colorScheme.onSurface
+                  },
+          )
 
-                    Text(
-                        text = when (provider) {
-                            is TTSProviderSetting.OpenAI -> stringResource(R.string.setting_tts_page_provider_openai)
-                            is TTSProviderSetting.Gemini -> stringResource(R.string.setting_tts_page_provider_gemini)
-                            is TTSProviderSetting.MiniMax -> "MiniMax"
-                            is TTSProviderSetting.SystemTTS -> stringResource(R.string.setting_tts_page_provider_system)
-                            is TTSProviderSetting.Qwen -> "Qwen"
-                            is TTSProviderSetting.Groq -> "Groq"
-                            is TTSProviderSetting.XAI -> "xAI"
-                            is TTSProviderSetting.MiMo -> "MiMo"
-                        },
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-
-                RadioButton(
-                    selected = isSelected,
-                    onClick = onSelect
-                )
-
-                dragHandle()
-            }
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                // 状态标签
-                if (isSelected) {
-                    Tag(type = TagType.SUCCESS) {
-                        Text(stringResource(R.string.setting_tts_page_selected))
-                    }
-                }
-
-                Spacer(modifier = Modifier.weight(1f))
-
-                // TTS测试播放按钮
-                if (isSelected && isAvailable) {
-                    val testText = stringResource(R.string.setting_tts_page_test_text)
-                    IconButton(
-                        onClick = {
-                            if (!isSpeaking) {
-                                tts.speak(testText)
-                            } else {
-                                tts.stop()
-                            }
-                        }
-                    ) {
-                        Icon(
-                            imageVector = if (isSpeaking) HugeIcons.StopCircle else HugeIcons.VolumeHigh,
-                            contentDescription = if (isSpeaking) stringResource(R.string.stop) else stringResource(R.string.test_tts),
-                            tint = if (isSpeaking) MaterialTheme.colorScheme.error else LocalContentColor.current
-                        )
-                    }
-                }
-
-                IconButton(
-                    onClick = { showDropdownMenu = true }
-                ) {
-                    Icon(
-                        imageVector = HugeIcons.Tools,
-                        contentDescription = stringResource(R.string.setting_tts_page_more_options_content_description)
-                    )
-                    DropdownMenu(
-                        expanded = showDropdownMenu,
-                        onDismissRequest = { showDropdownMenu = false }
-                    ) {
-                        DropdownMenuItem(
-                            text = { Text(stringResource(R.string.edit)) },
-                            onClick = {
-                                showDropdownMenu = false
-                                onEdit()
-                            },
-                            leadingIcon = {
-                                Icon(HugeIcons.PencilEdit01, contentDescription = null)
-                            }
-                        )
-                        DropdownMenuItem(
-                            text = { Text(stringResource(R.string.delete)) },
-                            onClick = {
-                                showDropdownMenu = false
-                                onDelete()
-                            },
-                            leadingIcon = {
-                                Icon(HugeIcons.Delete01, contentDescription = null)
-                            },
-                            enabled = provider.id != DEFAULT_SYSTEM_TTS_ID
-                        )
-                    }
-                }
-            }
+          Text(
+              text =
+                  when (provider) {
+                    is TTSProviderSetting.OpenAI ->
+                        stringResource(R.string.setting_tts_page_provider_openai)
+                    is TTSProviderSetting.Gemini ->
+                        stringResource(R.string.setting_tts_page_provider_gemini)
+                    is TTSProviderSetting.MiniMax -> "MiniMax"
+                    is TTSProviderSetting.SystemTTS ->
+                        stringResource(R.string.setting_tts_page_provider_system)
+                    is TTSProviderSetting.Qwen -> "Qwen"
+                    is TTSProviderSetting.Groq -> "Groq"
+                    is TTSProviderSetting.XAI -> "xAI"
+                    is TTSProviderSetting.MiMo -> "MiMo"
+                  },
+              style = MaterialTheme.typography.bodySmall,
+              color = MaterialTheme.colorScheme.onSurfaceVariant,
+          )
         }
+
+        RadioButton(selected = isSelected, onClick = onSelect)
+
+        dragHandle()
+      }
+      Row(
+          modifier = Modifier.fillMaxWidth(),
+          horizontalArrangement = Arrangement.spacedBy(8.dp),
+          verticalAlignment = Alignment.CenterVertically,
+      ) {
+        // 状态标签
+        if (isSelected) {
+          Tag(type = TagType.SUCCESS) { Text(stringResource(R.string.setting_tts_page_selected)) }
+        }
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        // TTS测试播放按钮
+        if (isSelected && isAvailable) {
+          val testText = stringResource(R.string.setting_tts_page_test_text)
+          IconButton(
+              onClick = {
+                if (!isSpeaking) {
+                  tts.speak(testText)
+                } else {
+                  tts.stop()
+                }
+              }
+          ) {
+            Icon(
+                imageVector = if (isSpeaking) HugeIcons.StopCircle else HugeIcons.VolumeHigh,
+                contentDescription =
+                    if (isSpeaking) stringResource(R.string.stop)
+                    else stringResource(R.string.test_tts),
+                tint =
+                    if (isSpeaking) MaterialTheme.colorScheme.error else LocalContentColor.current,
+            )
+          }
+        }
+
+        IconButton(onClick = { showDropdownMenu = true }) {
+          Icon(
+              imageVector = HugeIcons.Tools,
+              contentDescription =
+                  stringResource(R.string.setting_tts_page_more_options_content_description),
+          )
+          DropdownMenu(
+              expanded = showDropdownMenu,
+              onDismissRequest = { showDropdownMenu = false },
+          ) {
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.edit)) },
+                onClick = {
+                  showDropdownMenu = false
+                  onEdit()
+                },
+                leadingIcon = { Icon(HugeIcons.PencilEdit01, contentDescription = null) },
+            )
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.delete)) },
+                onClick = {
+                  showDropdownMenu = false
+                  onDelete()
+                },
+                leadingIcon = { Icon(HugeIcons.Delete01, contentDescription = null) },
+                enabled = provider.id != DEFAULT_SYSTEM_TTS_ID,
+            )
+          }
+        }
+      }
     }
+  }
 }

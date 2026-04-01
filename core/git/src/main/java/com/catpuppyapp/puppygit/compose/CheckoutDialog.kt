@@ -76,12 +76,14 @@ fun CheckoutDialog(
     headChangedCallback: () -> Unit = {},
     refreshPage:
         (
-            checkout: Boolean, targetOid: String, forceCreateBranch: Boolean, branchName: String,
+            checkout: Boolean,
+            targetOid: String,
+            forceCreateBranch: Boolean,
+            branchName: String,
         ) -> Unit, // 刷新页面，若不需要刷新可传空
     expectCheckoutType: Int, // 期望的checkout类型，不一定会采用，但可确定调用checkout的是谁，是远程分支还是本地分支还是别的
-    showJustCheckout: Boolean =
-        false, // 参数原名：`checkoutLocalBranch`。 作用：显示一个just
-               // checkout选项并默认选中，一般只有checkout本地分支时才需要设此值为true
+    showJustCheckout: Boolean = false, // 参数原名：`checkoutLocalBranch`。 作用：显示一个just
+    // checkout选项并默认选中，一般只有checkout本地分支时才需要设此值为true
 ) {
 
   val repoId = curRepo.id

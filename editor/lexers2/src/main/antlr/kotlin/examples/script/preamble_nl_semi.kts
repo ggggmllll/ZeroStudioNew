@@ -1,6 +1,3 @@
-import java.*;
-
-;
-
+import java.*
 
 println("hello")

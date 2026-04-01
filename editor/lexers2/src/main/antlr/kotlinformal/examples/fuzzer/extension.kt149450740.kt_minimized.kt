@@ -1,3 +1,3 @@
 fun box(): String {
-return (((A::foo)!!)!!)(A())
+  return (((A::foo)!!)!!)(A())
 }

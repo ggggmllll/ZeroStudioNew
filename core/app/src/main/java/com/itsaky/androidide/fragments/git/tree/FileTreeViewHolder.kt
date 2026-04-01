@@ -10,13 +10,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
-import com.rk.filetree.model.TreeNode
 import androidx.annotation.ColorInt
 import androidx.core.widget.ImageViewCompat
 import com.blankj.utilcode.util.SizeUtils
 import com.itsaky.androidide.R
 import com.itsaky.androidide.databinding.LayoutRecyclerviewFiletreeItemBinding
 import com.itsaky.androidide.models.FileExtension
+import com.rk.filetree.model.TreeNode
 import java.io.File
 import kotlin.math.max
 

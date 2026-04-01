@@ -1,14 +1,14 @@
 fun f2(): Array? {
-    return null
+  return null
 }
 
 fun foo() =
     when (val type = f2()) {
-        is Array -> {
-            1
-        }
+      is Array -> {
+        1
+      }
 
-        else -> {
-            0
-        }
+      else -> {
+        0
+      }
     }

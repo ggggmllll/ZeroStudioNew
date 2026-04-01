@@ -76,7 +76,8 @@ fun treeToTreeBottomBarActAtLeastOneTestPassed() =
     cherrypickTestPassed ||
         createPatchTestPassed ||
         checkoutFilesTestPassed // tree to tree页面的checkout/cherrypick/patch，至少一个测试通过才在tree to
-                                // tree页面显示底栏
+
+// tree页面显示底栏
 
 val applyPatchTestPassed = true
 val overwriteExistWhenCreateBranchTestPassed = true

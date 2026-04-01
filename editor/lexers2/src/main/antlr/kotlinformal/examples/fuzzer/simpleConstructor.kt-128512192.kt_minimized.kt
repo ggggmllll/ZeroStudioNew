@@ -1,3 +1,3 @@
 fun box(): String {
-val a = (((::A)))!!!!.call("OK")
+  val a = (((::A)))!!!!.call("OK")
 }

@@ -16,24 +16,12 @@ fun ListSelectableItem(
     onSelectChange: (Any) -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
-    Row(
-        modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(6.dp)
-    ) {
-        if (enabled) {
-            Checkbox(
-                checked = key in selectedKeys,
-                onCheckedChange = {
-                    onSelectChange(key)
-                }
-            )
-        }
-        Box(
-            modifier = Modifier.weight(1f)
-        ) {
-            content()
-        }
+  Row(modifier = modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+    if (enabled) {
+      Checkbox(checked = key in selectedKeys, onCheckedChange = { onSelectChange(key) })
     }
+    Box(modifier = Modifier.weight(1f)) { content() }
+  }
 }

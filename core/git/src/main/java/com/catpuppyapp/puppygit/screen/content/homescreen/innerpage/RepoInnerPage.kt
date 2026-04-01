@@ -596,7 +596,7 @@ fun RepoInnerPage(
                 repo,
                 shortBranchName,
             ) // 获取当前分支的上游，例如 remote=origin 和 merge=refs/heads/main，参见配置文件
-              // branch.yourbranchname.remote 和 .merge 字段
+        // branch.yourbranchname.remote 和 .merge 字段
         // 如果查出的upstream还是无效，终止操作
         if (Libgit2Helper.isUpstreamInvalid(upstream)) {
           throw RuntimeException(
@@ -698,7 +698,7 @@ fun RepoInnerPage(
                     repo,
                     shortBranchName,
                 ) // 获取当前分支的上游，例如 remote=origin 和 merge=refs/heads/main，参见配置文件
-                  // branch.yourbranchname.remote 和 .merge 字段
+            // branch.yourbranchname.remote 和 .merge 字段
             // 如果查出的upstream还是无效，终止操作
             if (Libgit2Helper.isUpstreamInvalid(upstream)) {
               throw RuntimeException(

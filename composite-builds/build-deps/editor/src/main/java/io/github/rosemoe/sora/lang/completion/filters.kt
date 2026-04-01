@@ -478,7 +478,7 @@ fun fuzzyScore(
               backwardsDiagLength + 1 >
                   diagMatrix[row][
                       diagColumn] // only if our contiguous match would be longer than the
-                                  // "forwards" contiguous match
+      // "forwards" contiguous match
       ) {
         diagColumn = column
       }

@@ -14,7 +14,9 @@ object MavenMetadataFetcher {
         val formattedRepo = if (repoUrl.endsWith("/")) repoUrl else "$repoUrl/"
         val cacheKey = "$formattedRepo$gavPath"
 
-        MavenMetadataCache.get(cacheKey)?.let { return@withContext it }
+        MavenMetadataCache.get(cacheKey)?.let {
+          return@withContext it
+        }
 
         try {
           val urlString = "$formattedRepo$gavPath/maven-metadata.xml"

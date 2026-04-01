@@ -36,7 +36,7 @@ data class RepoEntity(
     var repoName: String = "", // repo name and repo dir name，字段需唯一
     var fullSavePath: String =
         "", // repo full save path, include all repo save path and repo name, such as,
-            // allRepoSaveLocation/thisRepoName
+    // allRepoSaveLocation/thisRepoName
 
     // 每次修改仓库remote后都要更新下这几个值
     // 这几个字段没什么意义了，之前对git理解错误，以为具体要用哪个remote和仓库关联，其实具体使用哪个remote取决于当前本地分支关联了哪个远程分支，远程分支属于哪个remote，pull和push时就会使用哪个remote，不过也可以把pull和push改成使用不同remote，就有点恶心了，暂时不考虑这种情况
@@ -51,7 +51,7 @@ data class RepoEntity(
     // 分支短名
     var branch: String =
         "", // 如果仓库没detached HEAD，这个是分支名，如果detached，这个是短commit hash，可以通过git24j的相关函数判断仓库是否处于detached
-            // HEAD状态，或者在detached时直接使用 lastCommitHash 的值也行
+    // HEAD状态，或者在detached时直接使用 lastCommitHash 的值也行
     var lastCommitHash: String = "", // 最后提交的完整hash
     var isDetached: Int = Cons.dbCommonFalse,
     var upstreamBranch: String = "", // eg: origin/main

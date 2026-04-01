@@ -1,1 +1,3 @@
-fun x() { } fun y() { }
+fun x() {}
+
+fun y() {}

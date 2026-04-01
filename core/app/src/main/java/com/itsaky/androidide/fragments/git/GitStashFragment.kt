@@ -136,7 +136,11 @@ class GitStashFragment : BaseGitPageFragment() {
           Toast.makeText(context, "Stash operation completed", Toast.LENGTH_SHORT).show()
         }
         ret.onFailure {
-          Toast.makeText(context, it.localizedMessage ?: "Stash operation failed", Toast.LENGTH_LONG)
+          Toast.makeText(
+                  context,
+                  it.localizedMessage ?: "Stash operation failed",
+                  Toast.LENGTH_LONG,
+              )
               .show()
         }
       }
@@ -147,7 +151,8 @@ class GitStashFragment : BaseGitPageFragment() {
       RecyclerView.Adapter<StashAdapter.VH>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
       val view =
-          LayoutInflater.from(parent.context).inflate(android.R.layout.simple_list_item_2, parent, false)
+          LayoutInflater.from(parent.context)
+              .inflate(android.R.layout.simple_list_item_2, parent, false)
       return VH(view)
     }
 

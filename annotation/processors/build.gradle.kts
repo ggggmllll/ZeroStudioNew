@@ -42,6 +42,6 @@ dependencies {
 
 tasks.withType<KotlinCompile>().configureEach {
   compilerOptions.jvmTarget.set(JvmTarget.JVM_17)
-}// tasks.withType<KotlinCompile> {
+} // tasks.withType<KotlinCompile> {
   // kotlinOptions.jvmTarget = "17"
 // }

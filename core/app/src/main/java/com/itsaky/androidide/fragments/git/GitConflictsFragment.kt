@@ -122,7 +122,11 @@ class GitConflictsFragment : BaseGitPageFragment() {
           loadConflicts()
         }
         ret.onFailure {
-          Toast.makeText(context, it.localizedMessage ?: "Conflict operation failed", Toast.LENGTH_LONG)
+          Toast.makeText(
+                  context,
+                  it.localizedMessage ?: "Conflict operation failed",
+                  Toast.LENGTH_LONG,
+              )
               .show()
         }
       }
@@ -133,7 +137,8 @@ class GitConflictsFragment : BaseGitPageFragment() {
       RecyclerView.Adapter<ConflictAdapter.VH>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
       val view =
-          LayoutInflater.from(parent.context).inflate(android.R.layout.simple_list_item_2, parent, false)
+          LayoutInflater.from(parent.context)
+              .inflate(android.R.layout.simple_list_item_2, parent, false)
       return VH(view)
     }
 

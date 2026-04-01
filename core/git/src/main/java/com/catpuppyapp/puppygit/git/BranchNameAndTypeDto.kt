@@ -18,15 +18,14 @@ class BranchNameAndTypeDto {
   var oidStr: String = "" // 分支最新提交oid
   var shortOidStr: String = "" // 分支最新提交oid，短
   var type: BranchType = BranchType.INVALID
-  var upstream: Upstream? =
-      null // 分支的上游。
-           // 注意：如果是符号引用，解析出的oid会是其指向的对象的oid，而且我不确定符号引用设置的上游是否有效，即使配置文件可以修改，也不确定是否实际能用，不过一般只有HEAD一个分支是符号引用，所以不同担心这个问题
+  var upstream: Upstream? = null // 分支的上游。
+  // 注意：如果是符号引用，解析出的oid会是其指向的对象的oid，而且我不确定符号引用设置的上游是否有效，即使配置文件可以修改，也不确定是否实际能用，不过一般只有HEAD一个分支是符号引用，所以不同担心这个问题
   var isCurrent: Boolean = false // 是否是当前分支
 
   // 这个值有可能为空，因为remote名和本地分支名有可能出现歧义，若此值为空，代表remote分支名存在歧义，若想删除，需要用户手动输入一个分支名
   var remotePrefixFromShortName: String =
       "" // 当分支是远程分支时此值可能不为空，代表的是远程分支前缀，例如 origin/main中的origin，注意 远程程名有可能包含分隔符，例如
-         // abc/def/branchname，其中abc/def是远程名，所以可能存在歧义，有歧义时，此值为空字符串。
+  // abc/def/branchname，其中abc/def是远程名，所以可能存在歧义，有歧义时，此值为空字符串。
 
   private var otherCached: String? = null
   private var otherSearchableTextCached: String? = null

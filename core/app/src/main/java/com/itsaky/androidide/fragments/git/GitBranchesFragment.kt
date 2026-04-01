@@ -46,6 +46,7 @@ class GitBranchesFragment : BaseGitPageFragment() {
   private var _binding: FragmentGitBranchesBinding? = null
   private val binding
     get() = _binding!!
+
   private val branchItems = mutableListOf<BranchItem>()
   private val adapter = BranchAdapter(branchItems)
   private var selectedBranch: BranchItem? = null
@@ -127,7 +128,11 @@ class GitBranchesFragment : BaseGitPageFragment() {
         Toast.makeText(context, "Loaded ${items.size} branches", Toast.LENGTH_SHORT).show()
       }
       result.onFailure { err ->
-        Toast.makeText(context, err.localizedMessage ?: "Failed to load branches", Toast.LENGTH_LONG)
+        Toast.makeText(
+                context,
+                err.localizedMessage ?: "Failed to load branches",
+                Toast.LENGTH_LONG,
+            )
             .show()
       }
     }
@@ -207,7 +212,8 @@ class GitBranchesFragment : BaseGitPageFragment() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
       val view =
-          LayoutInflater.from(parent.context).inflate(android.R.layout.simple_list_item_2, parent, false)
+          LayoutInflater.from(parent.context)
+              .inflate(android.R.layout.simple_list_item_2, parent, false)
       return VH(view)
     }
 

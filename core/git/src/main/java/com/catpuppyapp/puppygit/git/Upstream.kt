@@ -17,7 +17,7 @@ class Upstream {
   // 和BranchNameAndTypeDto.remotePrefixFromShortName有所不同！这里的这个值几乎不会解析失败，因为上游在配置文件中指定了remote，所以除非remote无效，否则，remote不会存在歧义，因此这个值也百分百能解析出来
   var remoteBranchShortRefSpecNoPrefix =
       "" // 移除 origin/main 中 origin/ 之后，余下的部分，例如 remoteBranchShortRefSpec=origin/main，则此变量应为
-         // main（或者是移除远程分支refs/heads/之后余下的部分，例如branchFullRefSpec=refs/heads/main，则此值应为main）
+  // main（或者是移除远程分支refs/heads/之后余下的部分，例如branchFullRefSpec=refs/heads/main，则此值应为main）
 
   var localOid: String = "" // 本地分支的最新commit hash
   var remoteOid: String = "" // 远程分支的最新commit hash

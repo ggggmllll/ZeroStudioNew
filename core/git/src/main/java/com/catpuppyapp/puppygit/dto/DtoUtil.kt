@@ -57,10 +57,8 @@ fun createCommitDto(
 ): CommitDto {
   val c = CommitDto()
 
-  c.oidStr =
-      commitOid
-          .toString() // next.toString() or commit.id() ，两者相同，但用 next.toString()
-                      // 性能更好，因为Oid纯java实现，不需要jni
+  c.oidStr = commitOid.toString() // next.toString() or commit.id() ，两者相同，但用 next.toString()
+  // 性能更好，因为Oid纯java实现，不需要jni
   c.shortOidStr = Libgit2Helper.getShortOidStrByFull(c.oidStr)
   val commitOidStr = commit.id().toString()
 

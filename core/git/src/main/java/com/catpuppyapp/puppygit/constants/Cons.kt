@@ -27,12 +27,12 @@ object Cons {
 
   const val init_last_clicked_item_key =
       "nexist_last_clicked_item_key_1899_1253RBCZ" // this is an item key, which never exist, just
-                                                   // used for none matched with last clicked item
-                                                   // when init value not changed
+  // used for none matched with last clicked item
+  // when init value not changed
   const val ChangeListNaviTarget_InitValue = "cl_navi_init_value"
   const val ChangeListNaviTarget_NoNeedReload =
       "cl_navi_no_need_reload" // 导航到这些页面(Difference/Editor)再返回不需要刷新页面(navi to these
-                               // pages(Difference/Editor) then navi back, no need reload)
+  // pages(Difference/Editor) then navi back, no need reload)
 
   // use as path separator
   const val slash = "/"
@@ -200,7 +200,7 @@ object Cons {
   const val dbRepoWorkStatusNeedPush = 4
   const val dbRepoWorkStatusMerging =
       5 // need merge continue or abort (old name: `dbRepoWorkStatusNeedMerge`, ps:
-        // 原本是想用来在本地和远程分支不一样时提示需要merge，后来废弃此方案）
+  // 原本是想用来在本地和远程分支不一样时提示需要merge，后来废弃此方案）
   const val dbRepoWorkStatusHasConflicts = 6 // merge过后，发现有冲突，需要手动解决冲突
   const val dbRepoWorkStatusNeedSync = 7 // 本地和远程ahead和behind输出不都是0，需要同步
   const val dbRepoWorkStatusRebasing = 8 // need rebase continue or abort

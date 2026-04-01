@@ -45,11 +45,9 @@ fun BottomSheet(
 ) {
 
   ModalBottomSheet(
-      modifier =
-          Modifier
-              .systemBarsPadding() // x 20240501 打脸了，加了什么false还是没效) x 20240501
-                                   // 在Activity的onCreate()加上什么WindowInsets false就有用了，imePadding()也是)
-                                   // 这个systemBarsPadding，理应会padding出顶部状态栏和底部导航栏的空间，但实际上，没用，还是手动加footer做padding了
+      modifier = Modifier.systemBarsPadding() // x 20240501 打脸了，加了什么false还是没效) x 20240501
+      // 在Activity的onCreate()加上什么WindowInsets false就有用了，imePadding()也是)
+      // 这个systemBarsPadding，理应会padding出顶部状态栏和底部导航栏的空间，但实际上，没用，还是手动加footer做padding了
       ,
       onDismissRequest = {
         // 菜单开启时点空白处或返回键会触发这个方法

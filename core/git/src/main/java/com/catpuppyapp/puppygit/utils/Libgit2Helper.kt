@@ -1103,7 +1103,7 @@ object Libgit2Helper {
       diffOptionsFlags: EnumSet<Diff.Options.FlagT> = getDefaultDiffOptionsFlags(),
       reverse: Boolean =
           false, // when compare worktreeToTree , pass true, then can use treeToWorktree api to diff
-                 // worktree to tree
+      // worktree to tree
       treeToWorkTree: Boolean = false, // 这样设计其实不好，最好是添加一个fromTo type，但是，直接添加这个变量需要改的代码最少，暂时先这样吧
   ): List<StatusTypeEntrySaver> {
     // 目前20240407不考虑submodule，在diffOptionsFlags里排除了，日后如果实现的话，也不包含submodule，若想diff
@@ -2257,7 +2257,7 @@ object Libgit2Helper {
     } catch (e: Exception) {
       val keyDoesntExistFlag =
           "could not find key" // eg: com.github.git24j.core.GitException: could not find key
-                               // 'remote.origin.pushurl' to delete
+      // 'remote.origin.pushurl' to delete
       if (
           e.localizedMessage?.contains(keyDoesntExistFlag) != true
       ) { // 如果不是“key不存在”的错误，则抛出，否则就不用抛了，因为本来就是要删除，"不存在"和"删除成功"没有区别
@@ -3173,7 +3173,7 @@ object Libgit2Helper {
               repo,
               needCheckRemoteBranchName,
           ) // x (改用resolveRefByName()了，不会抛异常了)
-            // 这个必须捕获异常，要不然设置一个烂upstream，连branch列表都显示不出来，用户想取消设置都没门，绝对不行！这里捕获的话，如果用户设置一个烂upstream，还能去分支列表取消一下
+      // 这个必须捕获异常，要不然设置一个烂upstream，连branch列表都显示不出来，用户想取消设置都没门，绝对不行！这里捕获的话，如果用户设置一个烂upstream，还能去分支列表取消一下
       val exist = ref != null
       //                MyLog.d(TAG,"#isUpstreamActuallyExistOnLocal(): exist=$exist")
       return exist
@@ -3297,15 +3297,12 @@ object Libgit2Helper {
 
       // 默认fetch分支时,PruneT.PRUNE +
       // Remote.AutotagOptionT.UNSPECIFIED，不会删除本地有远程没有的tags，也不会覆盖本地和远程同名的tags，与期望一致
-      pruneType: FetchOptions.PruneT =
-          FetchOptions.PruneT
-              .PRUNE, // prune 删除本地有远程没有的，如果fetch
-                      // branch，对tag无效，但如果refspec是refs/tags/xxx，则对tag有效；UNSPECIFIED，默认值，遵循配置文件；
-                      // NO_prune，强制不删
+      pruneType: FetchOptions.PruneT = FetchOptions.PruneT.PRUNE, // prune 删除本地有远程没有的，如果fetch
+      // branch，对tag无效，但如果refspec是refs/tags/xxx，则对tag有效；UNSPECIFIED，默认值，遵循配置文件；
+      // NO_prune，强制不删
       downloadTags: Remote.AutotagOptionT =
-          Remote.AutotagOptionT
-              .UNSPECIFIED, // auto，更新已有；all 下载所有；None严格遵循refspec
-                            // list不自动附加tag相关refspec；unspecified，默认值，遵循配置文件
+          Remote.AutotagOptionT.UNSPECIFIED, // auto，更新已有；all 下载所有；None严格遵循refspec
+      // list不自动附加tag相关refspec；unspecified，默认值，遵循配置文件
   ) {
     var repoIsShallow = isRepoShallow(repo)
     //            val repoGitDirPath = repo.workdir().pathString + File.separator + ".git"
@@ -3860,10 +3857,8 @@ object Libgit2Helper {
 
       for (i in 0..<allOpCount) {
         rebase.next()
-        if (
-            !repo.index().hasConflicts()
-        ) { // 无冲突，提交，这里不检查index是否为空，强制创建提交 //
-            // 需要测试能否创建空提交？应该能。测试结果：正常情况下能创建空提交，rebase状态下未测试，但应该能？无所谓，能就能，不能拉倒，反正没实际影响
+        if (!repo.index().hasConflicts()) { // 无冲突，提交，这里不检查index是否为空，强制创建提交 //
+          // 需要测试能否创建空提交？应该能。测试结果：正常情况下能创建空提交，rebase状态下未测试，但应该能？无所谓，能就能，不能拉倒，反正没实际影响
           rebase.commit(
               originCommitAuthor,
               rebaseCommiter,
@@ -3922,9 +3917,8 @@ object Libgit2Helper {
   /** 之所以不直接在这个函数里创建并返回RebaseOptions对象，是因为我不确定在这个函数里创建然后返回后对象是否会被释放 */
   private fun initRebaseOptions(rebaseOptions: Rebase.Options) {
     val mergeOpts = rebaseOptions.mergeOptions
-    mergeOpts.flags =
-        0 // 0代表一个flag都不设。另外：flag可设多个，重命名检测和有冲突不合并立即退出等，参见:
-          // https://libgit2.org/libgit2/#HEAD/type/git_merge_flag_t
+    mergeOpts.flags = 0 // 0代表一个flag都不设。另外：flag可设多个，重命名检测和有冲突不合并立即退出等，参见:
+    // https://libgit2.org/libgit2/#HEAD/type/git_merge_flag_t
     mergeOpts.fileFlags = Merge.FileFlagT.STYLE_DIFF3.bit // GIT_MERGE_FILE_STYLE_DIFF3, 1<<1
 
     val checkoutOpts = rebaseOptions.checkoutOptions
@@ -4095,9 +4089,8 @@ object Libgit2Helper {
       }
 
       val mergeOpts = Merge.Options.create()
-      mergeOpts.flags =
-          0 // 0代表一个flag都不设。另外：flag可设多个，重命名检测和有冲突不合并立即退出等，参见:
-            // https://libgit2.org/libgit2/#HEAD/type/git_merge_flag_t
+      mergeOpts.flags = 0 // 0代表一个flag都不设。另外：flag可设多个，重命名检测和有冲突不合并立即退出等，参见:
+      // https://libgit2.org/libgit2/#HEAD/type/git_merge_flag_t
       mergeOpts.fileFlags = Merge.FileFlagT.STYLE_DIFF3.bit // GIT_MERGE_FILE_STYLE_DIFF3, 1<<1
 
       val checkoutOpts = Checkout.Options.defaultOptions()
@@ -4156,10 +4149,9 @@ object Libgit2Helper {
         // 这样的refspec查找远程分支名
         // ref是有可能为null的，如果这个AnnotatedCommit没被任何分支指向的话
         val ref =
-            ac.ref()
-                ?: "" // ac.ref()可能的值：refs/heads/本地分支名(见过) or refs/remotes/远程仓库名/远程分支名(见过)
-                      // 。不会是commit hash，若用commit
-                      // hash创建AnnotatedCommit，ref()方法会返回null，亲测，即使有分支指向的那种commit也一样，只要创建AnnotateCommit时没传引用名(分支名)，ac.ref()一律返回null，所以我在这里加了 ?:"" 用来使其和commit关联时返回空字符串，后面调用的方法处理了空字符串的情况，确保后面的一系列操作不会出错
+            ac.ref() ?: "" // ac.ref()可能的值：refs/heads/本地分支名(见过) or refs/remotes/远程仓库名/远程分支名(见过)
+        // 。不会是commit hash，若用commit
+        // hash创建AnnotatedCommit，ref()方法会返回null，亲测，即使有分支指向的那种commit也一样，只要创建AnnotateCommit时没传引用名(分支名)，ac.ref()一律返回null，所以我在这里加了 ?:"" 用来使其和commit关联时返回空字符串，后面调用的方法处理了空字符串的情况，确保后面的一系列操作不会出错
         var branchNameOrRefShortHash =
             getShortRefSpecByRefsHeadsRefSpec(
                 ref
@@ -4496,10 +4488,8 @@ object Libgit2Helper {
       // 把结尾是/HEAD的远程分支忽略掉（本地HEAD不会出现在列表，所以不用处理），
       // 没必要列出来，其实就指向远程分支的主分支（常见的是main or master）而已，
       // 而主分支本身就已经在列表中了，所以再列HEAD没意义
-      if (
-          excludeRemoteHead
-      ) { // 如果设置了不包含remote head，则排除，否则不排除。在分支列表一般排除remote
-          // head，但在提交列表一般不排除。，不过其实在分支列表似乎也没必要排除HEAD啊？要不列出来？
+      if (excludeRemoteHead) { // 如果设置了不包含remote head，则排除，否则不排除。在分支列表一般排除remote
+        // head，但在提交列表一般不排除。，不过其实在分支列表似乎也没必要排除HEAD啊？要不列出来？
         if (
             b.value == Branch.BranchType.REMOTE &&
                 b.key
@@ -4507,12 +4497,10 @@ object Libgit2Helper {
                     .endsWith(
                         "/HEAD"
                     ) // 用末尾 /HEAD 的方式有可能判断误判，因为分支名也有可能叫这个，而remote名有可能歧义，所以，不能用名称来判断
-                &&
-                b.key.id() ==
-                    null // 我发现远程head id
-                         // 是null，暂时用这种方式排除了，之所以是null，是因为head是指向指针的指针：b.key.symbolicTarget()
-                         // 即可取出其指向的真实引用，一般是远程main分支，例如
-                         // origin/main，若想取出origin/main的id，可b.key.peel(GitObject.Type.COMMIT).id()
+                && b.key.id() == null // 我发现远程head id
+                // 是null，暂时用这种方式排除了，之所以是null，是因为head是指向指针的指针：b.key.symbolicTarget()
+                // 即可取出其指向的真实引用，一般是远程main分支，例如
+                // origin/main，若想取出origin/main的id，可b.key.peel(GitObject.Type.COMMIT).id()
                 && b.key.symbolicTarget() != null
         ) {
           b = it.next() // 记得更新下迭代器，不然就死循环了
@@ -4798,17 +4786,15 @@ object Libgit2Helper {
       if (
           detachHead
       ) { // detach head，checkout 远程分支或commit 应该走这里的逻辑。（不过其实也可以强制为远程分支创建具体分支名，但与pc git行为不符，pc git
-          // checkout 远程分支直接就变detached head，后续可通过创建本地分支来解除detached状态）
+        // checkout 远程分支直接就变detached head，后续可通过创建本地分支来解除detached状态）
         val ac =
             AnnotatedCommit.fromRef(
                 repo,
                 ref,
             ) // 包含分支名之类的，创建出的reflog更详细，会包含引用名，而普通hash只包含hash。 ps: 我是因为看到libgit2的example
-              // checkout.c里用的这个函数，所以我也用的这个函数。
-        repo.setHeadDetachedFromAnnotated(
-            ac
-        ) // 这个方法如果不灵，可替换成：
-          // repo.setHeadDetached(targetCommit.id())，targetCommit可通过checkoutRet.data取得
+        // checkout.c里用的这个函数，所以我也用的这个函数。
+        repo.setHeadDetachedFromAnnotated(ac) // 这个方法如果不灵，可替换成：
+        // repo.setHeadDetached(targetCommit.id())，targetCommit可通过checkoutRet.data取得
       } else { // 设置HEAD指向分支，checkout 本地分支应该执行这里
         repo.setHead(ref.name())
       }
@@ -4879,9 +4865,8 @@ object Libgit2Helper {
       val ref =
           if (trueUseDwimFalseUseLookup) Reference.dwim(repo, refNameShortOrFull)
           else Reference.lookup(repo, refNameShortOrFull)
-      return ref
-          ?.resolve() // resolve reference to direct ref, direct ref is point to commit, not
-                      // symbolicTarget
+      return ref?.resolve() // resolve reference to direct ref, direct ref is point to commit, not
+      // symbolicTarget
     } catch (e: Exception) {
       MyLog.d(
           TAG,
@@ -4997,9 +4982,8 @@ object Libgit2Helper {
       }
       val branchNameList = mutableListOf<String>()
       list.forEachBetter forEach@{
-        val prefixStr =
-            "refs/heads/" // 这里故意没写前面的
-                          // +，因为有的可能没+，例如："refs/heads/*:refs/remotes/origin/*"，不过我见过最多的还是带+的例如：“+refs/heads/*:refs/remotes/origin/*”
+        val prefixStr = "refs/heads/" // 这里故意没写前面的
+        // +，因为有的可能没+，例如："refs/heads/*:refs/remotes/origin/*"，不过我见过最多的还是带+的例如：“+refs/heads/*:refs/remotes/origin/*”
         val prefixIndex = it.indexOf(prefixStr)
         if (prefixIndex < 0) {
           return@forEach
@@ -5909,9 +5893,8 @@ object Libgit2Helper {
       } else { // 远程分支或hash。detached head
         repoDb.updateBranchAndCommitHash(
             repoId = repoId,
-            branch =
-                lastCommitHash, // checkout 远程分支，这个值应该传commit
-                                // hash，或者不传也无所谓，因为发现仓库是detached状态时，会不显示分支，改显示commithash
+            branch = lastCommitHash, // checkout 远程分支，这个值应该传commit
+            // hash，或者不传也无所谓，因为发现仓库是detached状态时，会不显示分支，改显示commithash
             lastCommitHash = lastCommitHash,
             isDetached = Cons.dbCommonTrue,
             upstreamBranch = upstreamBranchShortNameParam,
@@ -6506,9 +6489,8 @@ object Libgit2Helper {
 
   private fun initCherrypickOptions(opts: Cherrypick.Options) {
     val mergeOpts = opts.mergeOpts
-    mergeOpts.flags =
-        0 // 0代表一个flag都不设。另外：flag可设多个，重命名检测和有冲突不合并立即退出等，参见:
-          // https://libgit2.org/libgit2/#HEAD/type/git_merge_flag_t
+    mergeOpts.flags = 0 // 0代表一个flag都不设。另外：flag可设多个，重命名检测和有冲突不合并立即退出等，参见:
+    // https://libgit2.org/libgit2/#HEAD/type/git_merge_flag_t
     mergeOpts.fileFlags = Merge.FileFlagT.STYLE_DIFF3.bit // GIT_MERGE_FILE_STYLE_DIFF3, 1<<1
 
     val checkoutOpts = opts.checkoutOpts
@@ -6766,10 +6748,10 @@ object Libgit2Helper {
       fromTo: String,
       reverse: Boolean =
           false, // when compare worktreeToTree , pass true, then can use treeToWorktree api to diff
-                 // worktree to tree
+      // worktree to tree
       treeToWorkTree: Boolean =
           false, // only used when fromTo=TreeToTree, if true, will use treeToWorkdir instead
-                 // treeToTree
+      // treeToTree
       returnDiffContent: Boolean = false, // 为true返回patch内容，否则不返回，因为有可能内容很大，所以若没必要不建议返回
   ): Ret<PatchFile?> {
     val funName = "savePatchToFileAndGetContent"
@@ -8547,7 +8529,7 @@ object Libgit2Helper {
                   Remote.list(clonedRepo).getOrNull(0)
                       ?: Cons
                           .gitDefaultRemoteOrigin // 一般"origin"就是默认的名字，但还是查一下保险，以免和实际的 remote name
-                                                  // 不符
+              // 不符
               repo2ndQuery.pullRemoteName = defaultRemoteName
               repo2ndQuery.pullRemoteUrl = repo2ndQuery.cloneUrl
               repo2ndQuery.pushRemoteName = defaultRemoteName

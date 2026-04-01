@@ -633,123 +633,123 @@ private fun CloneScreenContent(
   val doSave: () -> Unit = {
     scope.launch(Dispatchers.IO) launch@{
       try {
-      // Do NOT set showLoadingDialog = true here, we use the custom "Loading..." text and dialog
-      // showLoadingDialog.value=true
+        // Do NOT set showLoadingDialog = true here, we use the custom "Loading..." text and dialog
+        // showLoadingDialog.value=true
 
-      val repoNameText = repoName.value.text
+        val repoNameText = repoName.value.text
 
-      if (!isValidFileName(repoNameText)) {
-        Msg.requireShowLongDuration(
-            activityContext.getString(R.string.err_repo_name_has_illegal_chars_or_too_long)
-        )
-        focusRepoName()
-        showRepoNameHasIllegalCharsOrTooLongErr.value = true
-        // showLoadingDialog.value=false
-        return@launch
-      }
-
-      val repoDb = AppModel.dbContainer.repoRepository
-      val credentialDb = AppModel.dbContainer.credentialRepository
-      val fullSavePath = File(storagePathSelectedPath.value.path, repoNameText).canonicalPath
-
-      val isRepoNameExist =
-          if (!isEditMode || repoNameText != repoFromDb.value.repoName) {
-            repoDb.isRepoNameExist(repoNameText)
-          } else {
-            false
-          }
-
-      if (isRepoNameExist || isPathExists(null, fullSavePath)) {
-        Msg.requireShowLongDuration(activityContext.getString(R.string.repo_name_exists_err))
-        focusRepoName()
-        showRepoNameAlreadyExistsErr.value = true
-        // showLoadingDialog.value=false
-        return@launch
-      }
-
-      var credentialIdForClone = ""
-
-      var credentialForSave: CredentialEntity? = null
-      if (credentialSelectedOption == optNumNewCredential) {
-        val credentialNameText = credentialName.value.text
-        val isCredentialNameExist = credentialDb.isCredentialNameExist(credentialNameText)
-        if (isCredentialNameExist) {
+        if (!isValidFileName(repoNameText)) {
           Msg.requireShowLongDuration(
-              activityContext.getString(R.string.credential_name_exists_err)
+              activityContext.getString(R.string.err_repo_name_has_illegal_chars_or_too_long)
           )
-          setCredentialNameExistAndFocus()
+          focusRepoName()
+          showRepoNameHasIllegalCharsOrTooLongErr.value = true
           // showLoadingDialog.value=false
           return@launch
         }
 
-        credentialForSave =
-            CredentialEntity(
-                name = credentialNameText,
-                value = credentialVal.value,
-                pass = credentialPass.value,
-                type = curCredentialType.intValue,
+        val repoDb = AppModel.dbContainer.repoRepository
+        val credentialDb = AppModel.dbContainer.credentialRepository
+        val fullSavePath = File(storagePathSelectedPath.value.path, repoNameText).canonicalPath
+
+        val isRepoNameExist =
+            if (!isEditMode || repoNameText != repoFromDb.value.repoName) {
+              repoDb.isRepoNameExist(repoNameText)
+            } else {
+              false
+            }
+
+        if (isRepoNameExist || isPathExists(null, fullSavePath)) {
+          Msg.requireShowLongDuration(activityContext.getString(R.string.repo_name_exists_err))
+          focusRepoName()
+          showRepoNameAlreadyExistsErr.value = true
+          // showLoadingDialog.value=false
+          return@launch
+        }
+
+        var credentialIdForClone = ""
+
+        var credentialForSave: CredentialEntity? = null
+        if (credentialSelectedOption == optNumNewCredential) {
+          val credentialNameText = credentialName.value.text
+          val isCredentialNameExist = credentialDb.isCredentialNameExist(credentialNameText)
+          if (isCredentialNameExist) {
+            Msg.requireShowLongDuration(
+                activityContext.getString(R.string.credential_name_exists_err)
             )
-        credentialDb.insertWithEncrypt(credentialForSave)
-        credentialIdForClone = credentialForSave.id
-      } else if (credentialSelectedOption == optNumSelectCredential) {
-        credentialIdForClone = selectedCredential.value.id
-      } else if (credentialSelectedOption == optNumMatchCredentialByDomain) {
-        credentialIdForClone = SpecialCredential.MatchByDomain.credentialId
-      }
+            setCredentialNameExistAndFocus()
+            // showLoadingDialog.value=false
+            return@launch
+          }
 
-      var intDepth = 0
-      var isShallow = Cons.dbCommonFalse
-      if (depth.value.isNotBlank()) {
-        try {
-          intDepth = depth.value.toInt().coerceAtLeast(0)
-        } catch (e: Exception) {
-          intDepth = 0
-          Log.d(
-              TAG,
-              "invalid depth value '${depth.value}', will use default value '0', err=${e.localizedMessage}",
-          )
+          credentialForSave =
+              CredentialEntity(
+                  name = credentialNameText,
+                  value = credentialVal.value,
+                  pass = credentialPass.value,
+                  type = curCredentialType.intValue,
+              )
+          credentialDb.insertWithEncrypt(credentialForSave)
+          credentialIdForClone = credentialForSave.id
+        } else if (credentialSelectedOption == optNumSelectCredential) {
+          credentialIdForClone = selectedCredential.value.id
+        } else if (credentialSelectedOption == optNumMatchCredentialByDomain) {
+          credentialIdForClone = SpecialCredential.MatchByDomain.credentialId
         }
-        if (intDepth > 0) {
-          isShallow = Cons.dbCommonTrue
+
+        var intDepth = 0
+        var isShallow = Cons.dbCommonFalse
+        if (depth.value.isNotBlank()) {
+          try {
+            intDepth = depth.value.toInt().coerceAtLeast(0)
+          } catch (e: Exception) {
+            intDepth = 0
+            Log.d(
+                TAG,
+                "invalid depth value '${depth.value}', will use default value '0', err=${e.localizedMessage}",
+            )
+          }
+          if (intDepth > 0) {
+            isShallow = Cons.dbCommonTrue
+          }
         }
-      }
 
-      val repoForSave: RepoEntity =
-          if (isEditMode) repoFromDb.value else RepoEntity(createBy = Cons.dbRepoCreateByClone)
-      repoForSave.repoName = repoNameText
-      repoForSave.fullSavePath = fullSavePath
-      repoForSave.cloneUrl = gitUrl.value
-      repoForSave.workStatus = Cons.dbRepoWorkStatusNotReadyNeedClone
-      repoForSave.credentialIdForClone = credentialIdForClone
-      repoForSave.isRecursiveCloneOn = boolToDbInt(isRecursiveClone)
-      repoForSave.depth = intDepth
-      repoForSave.isShallow = isShallow
+        val repoForSave: RepoEntity =
+            if (isEditMode) repoFromDb.value else RepoEntity(createBy = Cons.dbRepoCreateByClone)
+        repoForSave.repoName = repoNameText
+        repoForSave.fullSavePath = fullSavePath
+        repoForSave.cloneUrl = gitUrl.value
+        repoForSave.workStatus = Cons.dbRepoWorkStatusNotReadyNeedClone
+        repoForSave.credentialIdForClone = credentialIdForClone
+        repoForSave.isRecursiveCloneOn = boolToDbInt(isRecursiveClone)
+        repoForSave.depth = intDepth
+        repoForSave.isShallow = isShallow
 
-      if (branch.value.isNotBlank()) {
-        repoForSave.branch = branch.value
-        repoForSave.isSingleBranch = boolToDbInt(isSingleBranch)
-      } else {
-        repoForSave.branch = ""
-        repoForSave.isSingleBranch = Cons.dbCommonFalse
-      }
+        if (branch.value.isNotBlank()) {
+          repoForSave.branch = branch.value
+          repoForSave.isSingleBranch = boolToDbInt(isSingleBranch)
+        } else {
+          repoForSave.branch = ""
+          repoForSave.isSingleBranch = Cons.dbCommonFalse
+        }
 
-      if (isEditMode) {
-        repoDb.update(repoForSave)
-      } else {
-        repoDb.insert(repoForSave)
-      }
+        if (isEditMode) {
+          repoDb.update(repoForSave)
+        } else {
+          repoDb.insert(repoForSave)
+        }
 
-      withContext(Dispatchers.Main) {
-        // showLoadingDialog.value=false
-        isCloning.value = true // Show "Loading..." text above TextField
+        withContext(Dispatchers.Main) {
+          // showLoadingDialog.value=false
+          isCloning.value = true // Show "Loading..." text above TextField
 
-        // Start Cloning Process (must be called on Main because it mutates Compose states)
-        performClone(repoForSave)
-      }
+          // Start Cloning Process (must be called on Main because it mutates Compose states)
+          performClone(repoForSave)
+        }
 
-      // withMainContext {
-      // onDismiss()
-      // }
+        // withMainContext {
+        // onDismiss()
+        // }
       } catch (e: Exception) {
         withContext(Dispatchers.Main) {
           isCloning.value = false
@@ -913,9 +913,7 @@ private fun CloneScreenContent(
             onClick = {
               if (isCloning.value) return@IconButton
               if (!isReadyForClone.value) {
-                Msg.requireShowLongDuration(
-                    "Please check your input"
-                )
+                Msg.requireShowLongDuration("Please check your input")
                 return@IconButton
               }
               cloneStatus.value = activityContext.getString(R.string.cloning)

@@ -79,14 +79,21 @@ class GitHistoryFragment : BaseGitPageFragment() {
       var count = 0
       var next = rw.next()
       while (next != null && count < limit) {
-        val dto = Libgit2Helper.getSingleCommitSimple(repo, repoId = "", commitOidStr = next.toString(), settings)
+        val dto =
+            Libgit2Helper.getSingleCommitSimple(
+                repo,
+                repoId = "",
+                commitOidStr = next.toString(),
+                settings,
+            )
         list.add(
             CommitRow(
                 hash = dto.oidStr,
                 shortHash = dto.shortOidStr,
                 subject = dto.shortMsg,
                 author = dto.author,
-            ))
+            )
+        )
         next = rw.next()
         count++
       }
@@ -142,14 +149,16 @@ class GitHistoryFragment : BaseGitPageFragment() {
       RecyclerView.Adapter<CommitAdapter.VH>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
       val view =
-          LayoutInflater.from(parent.context).inflate(android.R.layout.simple_list_item_2, parent, false)
+          LayoutInflater.from(parent.context)
+              .inflate(android.R.layout.simple_list_item_2, parent, false)
       return VH(view)
     }
 
     override fun onBindViewHolder(holder: VH, position: Int) {
       val item = data[position]
       val active = selectedCommit?.hash == item.hash
-      holder.title.text = if (active) "✓ ${item.shortHash} ${item.subject}" else "${item.shortHash} ${item.subject}"
+      holder.title.text =
+          if (active) "✓ ${item.shortHash} ${item.subject}" else "${item.shortHash} ${item.subject}"
       holder.subtitle.text = item.author
       holder.itemView.setOnClickListener {
         selectedCommit = item

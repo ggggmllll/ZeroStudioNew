@@ -1,6 +1,5 @@
-class ThingTemplate {
+class ThingTemplate {}
 
-}
 annotation class ThingVal(template: ThingTemplate) {
-val Any.prop = template.prop
+  val Any.prop = template.prop
 }

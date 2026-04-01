@@ -1,9 +1,9 @@
-val f: (a: Int,)
-->
-Int
-        =
+val f:
+    (
+        a: Int,
+    ) -> Int =
     {
-        1
+      1
     }
 
 val dd = f(1)

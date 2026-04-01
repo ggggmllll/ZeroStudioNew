@@ -108,7 +108,9 @@ fun AndroidModuleTemplateBuilder.androidTVActivityRecipe(
         writeJavaSrc(
             packageName,
             activityClass,
-            source = { mainActivityJava(activityClass, layoutName, mainFragmentClass, packageName) },
+            source = {
+              mainActivityJava(activityClass, layoutName, mainFragmentClass, packageName)
+            },
         )
         writeJavaSrc(
             packageName,
