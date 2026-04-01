@@ -184,7 +184,7 @@ abstract class BaseEditorActivity :
                   return@forEachValue
                 }
 
-        dataset.entries.mapIndexed { index, entry ->
+        dataset.entries.forEachIndexed { index, entry ->
           entry.y = byte2MemorySize(proc.usageHistory[index], MemoryConstants.MB).toFloat()
         }
 

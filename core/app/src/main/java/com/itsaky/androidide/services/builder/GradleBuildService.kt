@@ -69,6 +69,7 @@ import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 
@@ -101,8 +102,9 @@ class GradleBuildService :
 
   @Volatile private var currentBuildProcess: Process? = null
 
+  private val serviceJob = SupervisorJob()
   private val buildServiceScope =
-      CoroutineScope(Dispatchers.Default + CoroutineName("GradleBuildService"))
+      CoroutineScope(serviceJob + Dispatchers.Default + CoroutineName("GradleBuildService"))
 
   private val isGradleWrapperAvailable: Boolean
     get() {
@@ -228,6 +230,7 @@ class GradleBuildService :
     // Ensure the build process is terminated immediately upon Service destruction to prevent leaks
     currentBuildProcess?.destroy()
     currentBuildProcess = null
+    serviceJob.cancel()
 
     isToolingServerStarted = false
   }
@@ -543,6 +546,7 @@ class GradleBuildService :
   override fun executeTasks(vararg tasks: String): CompletableFuture<TaskExecutionResult> {
     checkServerStarted()
     val tasksList = tasks.toList()
+    isReleaseVariant = false
 
     if (isDebugBuild(tasksList)) {
       log.info("Debug build detected, injecting logger plugin")
@@ -633,11 +637,19 @@ class GradleBuildService :
             val outputReader = process.inputStream.bufferedReader()
             val errorReader = process.errorStream.bufferedReader()
 
-            buildServiceScope.launch { outputReader.forEachLine { line -> logOutput(line) } }
+            val outputReaderJob =
+                buildServiceScope.launch(Dispatchers.IO) {
+                  outputReader.useLines { lines -> lines.forEach { line -> logOutput(line) } }
+                }
 
-            buildServiceScope.launch { errorReader.forEachLine { line -> logOutput(line) } }
+            val errorReaderJob =
+                buildServiceScope.launch(Dispatchers.IO) {
+                  errorReader.useLines { lines -> lines.forEach { line -> logOutput(line) } }
+                }
 
             val exitCode = process.waitFor()
+            outputReaderJob.join()
+            errorReaderJob.join()
             currentBuildProcess = null
 
             val result =
