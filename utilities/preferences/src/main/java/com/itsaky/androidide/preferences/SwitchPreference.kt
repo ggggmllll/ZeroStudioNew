@@ -18,7 +18,8 @@ package com.itsaky.androidide.preferences
 
 import android.content.Context
 import androidx.preference.Preference
-import androidx.preference.TwoStatePreference
+import androidx.preference.PreferenceViewHolder
+import com.google.android.material.materialswitch.MaterialSwitch
 import kotlin.reflect.KMutableProperty0
 
 /**
@@ -33,34 +34,46 @@ constructor(val setValue: ((Boolean) -> Unit)? = null, val getValue: (() -> Bool
 
   constructor(property: KMutableProperty0<Boolean>) : this(property::set, property::get)
 
+  private var currentChecked = false
+
   override fun onCreatePreference(context: Context): Preference {
-    return androidx.preference.SwitchPreference(context).apply {
-        isPersistent = false
+    return object : Preference(context) {
+      override fun onBindViewHolder(holder: PreferenceViewHolder) {
+        super.onBindViewHolder(holder)
+
+        val switch = holder.findViewById(com.itsaky.androidide.preferences.R.id.preference_switch)
+            as? MaterialSwitch ?: return
+
+        switch.setOnCheckedChangeListener(null)
+        switch.isChecked = currentChecked
+        switch.setOnCheckedChangeListener { _, isChecked ->
+          updateCheckedState(this@SwitchPreference, isChecked)
+        }
+      }
+    }.apply {
+      isPersistent = false
+      widgetLayoutResource = com.itsaky.androidide.preferences.R.layout.preference_widget_material_switch
     }
   }
 
   override fun onBindProperty(preference: Preference) {
-    if (preference is androidx.preference.SwitchPreference) {
-        val currentValue = getValue?.invoke() ?: false
-        preference.isChecked = currentValue
-    }
+    currentChecked = getValue?.invoke() ?: false
+  }
+
+  private fun updateCheckedState(preference: Preference, isChecked: Boolean) {
+    currentChecked = isChecked
+    setValue?.invoke(isChecked)
+    preference.notifyChanged()
   }
 
   override fun onPreferenceChanged(preference: Preference, newValue: Any?): Boolean {
-    val isChecked = newValue as? Boolean ?: false
-
-    setValue?.invoke(isChecked)
-
-    if (preference is TwoStatePreference) {
-      preference.isChecked = isChecked
-    }
-
+    val isChecked = newValue as? Boolean ?: return false
+    updateCheckedState(preference, isChecked)
     return true
   }
 
   override fun onPreferenceClick(preference: Preference): Boolean {
-    if (preference !is TwoStatePreference) return false
-    val nextValue = !preference.isChecked
-    return onPreferenceChanged(preference, nextValue)
+    updateCheckedState(preference, !currentChecked)
+    return true
   }
 }

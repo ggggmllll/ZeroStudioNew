@@ -138,6 +138,8 @@ class GradleProjectAnalyzerImpl : ProjectAnalyzer {
                 val remoteLatest =
                     stableVersions.maxWithOrNull(SemanticVersionComparator)
                         ?: metadata.bestLatest?.takeIf(::isStableVersion)
+                        ?: metadata.release?.takeIf(::isStableVersion)
+                        ?: metadata.latest?.takeIf(::isStableVersion)
 
                 if (remoteLatest != null && isNewerSemanticVersion(remoteLatest, dep.version)) {
                   bestLatest =

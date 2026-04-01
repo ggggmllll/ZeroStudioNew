@@ -914,10 +914,11 @@ private fun CloneScreenContent(
               if (isCloning.value) return@IconButton
               if (!isReadyForClone.value) {
                 Msg.requireShowLongDuration(
-                    activityContext.getString(R.string.please_check_your_input)
+                    "Please check your input"
                 )
                 return@IconButton
               }
+              cloneStatus.value = activityContext.getString(R.string.cloning)
               doSave()
             },
             // Keep clickable even when not ready so user gets explicit feedback.

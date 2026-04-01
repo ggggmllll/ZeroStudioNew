@@ -14,8 +14,6 @@ import com.itsaky.androidide.eventbus.events.filetree.FileLongClickEvent
 import com.itsaky.androidide.fragments.git.function.ZeroCloneDialogBottomSheetFragment
 import com.itsaky.androidide.fragments.git.menu.GitBranchPopupManager
 import com.itsaky.androidide.fragments.git.tree.ListProjectFilesRequestEvent
-import com.itsaky.androidide.fragments.git.tree.TreeStateManager
-import com.itsaky.androidide.fragments.git.function.ZeroCloneDialogBottomSheetFragment
 import com.itsaky.androidide.interfaces.IEditorHandler
 import com.itsaky.androidide.projects.IProjectManager
 import com.rk.filetree.interfaces.FileClickListener
@@ -81,17 +79,6 @@ class GitProjectsFragment : BaseGitPageFragment(), FileClickListener, FileLongCl
     addToolbarAction(R.drawable.ic_target_positioning_24dp, "Locate File") { locateCurrentFile() }
 
     addToolbarAction(R.drawable.ic_refresh_file_24dp, getString(R.string.refresh)) { refreshFileTree() }
-
-    addToolbarAction(R.drawable.ic_git_clone_24dp, getString(R.string.git_clone)) {
-      ZeroCloneDialogBottomSheetFragment.newInstance(repoId = "")
-          .show(childFragmentManager, "GitProjectsCloneBottomSheet")
-    }
-    addToolbarAction(R.drawable.ic_arrow_downward_24, getString(R.string.pull)) {
-      Toast.makeText(context, R.string.pull, Toast.LENGTH_SHORT).show()
-    }
-    addToolbarAction(R.drawable.ic_arrow_upward_24, getString(R.string.push)) {
-      Toast.makeText(context, R.string.push, Toast.LENGTH_SHORT).show()
-    }
 
     addToolbarAction(R.drawable.ic_git_clone_24dp, getString(R.string.git_clone)) {
       ZeroCloneDialogBottomSheetFragment.newInstance(repoId = "")
