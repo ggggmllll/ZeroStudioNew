@@ -398,11 +398,13 @@ abstract class ProjectHandlerActivity : BaseEditorActivity() {
     val buildService = Lookup.getDefault().lookup(BuildService.KEY_BUILD_SERVICE)
     if (buildService == null) {
       log.error("No build service found. Cannot initialize project.")
+      postProjectInit(false, null)
       return
     }
 
     if (!buildService.isToolingServerStarted()) {
       flashError(string.msg_tooling_server_unavailable)
+      postProjectInit(false, null)
       return
     }
 
