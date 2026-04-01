@@ -29,7 +29,10 @@ android {
     sourceCompatibility = JavaVersion.VERSION_11
     targetCompatibility = JavaVersion.VERSION_11
   }
-  kotlinOptions { jvmTarget = "11" }
+  compilerOptions {
+    jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11)
+}
+
 }
 
 publishing {
@@ -45,8 +48,9 @@ publishing {
 dependencies {
   implementation(libs.androidx.core.ktx)
   implementation(libs.androidx.appcompat)
-  implementation(libs.material)
-  testImplementation(libs.junit)
-  androidTestImplementation(libs.androidx.junit)
+  implementation(libs.google.material) 
+  
+  testImplementation(libs.tests.junit) 
+  androidTestImplementation(libs.androidx.junit) 
   androidTestImplementation(libs.androidx.espresso.core)
 }
