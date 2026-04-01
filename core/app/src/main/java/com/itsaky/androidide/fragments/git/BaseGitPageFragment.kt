@@ -36,6 +36,7 @@ import com.itsaky.androidide.R
 abstract class BaseGitPageFragment : Fragment() {
 
   protected var toolbarContainer: LinearLayout? = null
+  private val uiEventViewModel by activityViewModels<GitUiEventViewModel>()
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)

@@ -69,6 +69,15 @@ class GradleProjectAnalyzerImpl : ProjectAnalyzer {
             )
         )
 
+        repos.add(
+            ScopedRepositoryInfo(
+                "mavenCentral",
+                "https://repo1.maven.org/maven2/",
+                RepositoryType.MAVEN_CENTRAL,
+                File(projectDir, "build.gradle"),
+            )
+        )
+
         return@withContext repos.distinctBy { it.url }
       }
 
