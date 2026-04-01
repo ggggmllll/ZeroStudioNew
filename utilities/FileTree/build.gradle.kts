@@ -52,7 +52,7 @@ dependencies {
   
   testImplementation(libs.tests.junit) 
   androidTestImplementation(libs.tests.androidx.junit) 
-  androidTestImplementation(libs.androidx.espresso.core)
+  androidTestImplementation(libs.tests.androidx.espresso.core)
 }
 
 kotlin { jvmToolchain(11) }
