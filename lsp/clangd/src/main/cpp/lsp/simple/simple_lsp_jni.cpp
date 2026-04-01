@@ -165,7 +165,7 @@ void dispatchDiagnosticsToJava(const std::string& file_uri,
 // ============================================================================
 
 extern "C" JNIEXPORT jint JNICALL
-Java_com_wuxianggujun_tinaide_lsp_LspService_nativeOnLoad(JNIEnv* env, jclass clazz) {
+Java_android_zero_studio_lsp_clang_ClangdNativeBridge_nativeOnLoad(JNIEnv* env, jclass clazz) {
     if (env->GetJavaVM(&g_java_vm) != JNI_OK) {
         return JNI_ERR;
     }
@@ -189,7 +189,7 @@ Java_com_wuxianggujun_tinaide_lsp_LspService_nativeOnLoad(JNIEnv* env, jclass cl
     
     // 初始化 DiagnosticItem 类引用
     jclass diagnosticItemLocalClass = env->FindClass(
-        "com/wuxianggujun/tinaide/lsp/model/DiagnosticItem"
+        "android/zero/studio/lsp/clang/ClangDiagnosticItem"
     );
     if (diagnosticItemLocalClass) {
         g_diagnosticItemClass = reinterpret_cast<jclass>(
@@ -219,7 +219,7 @@ Java_com_wuxianggujun_tinaide_lsp_LspService_nativeOnLoad(JNIEnv* env, jclass cl
 // ============================================================================
 
 extern "C" JNIEXPORT jboolean JNICALL
-Java_com_wuxianggujun_tinaide_lsp_LspService_nativeInitialize(
+Java_android_zero_studio_lsp_clang_ClangdNativeBridge_nativeInitialize(
     JNIEnv* env,
     jclass clazz,
     jstring clangdPath,
@@ -250,7 +250,7 @@ Java_com_wuxianggujun_tinaide_lsp_LspService_nativeInitialize(
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_wuxianggujun_tinaide_lsp_LspService_nativeShutdown(
+Java_android_zero_studio_lsp_clang_ClangdNativeBridge_nativeShutdown(
     JNIEnv* env,
     jclass clazz
 ) {
@@ -260,7 +260,7 @@ Java_com_wuxianggujun_tinaide_lsp_LspService_nativeShutdown(
 }
 
 extern "C" JNIEXPORT jboolean JNICALL
-Java_com_wuxianggujun_tinaide_lsp_LspService_nativeIsInitialized(
+Java_android_zero_studio_lsp_clang_ClangdNativeBridge_nativeIsInitialized(
     JNIEnv* env,
     jclass clazz
 ) {
@@ -273,7 +273,7 @@ Java_com_wuxianggujun_tinaide_lsp_LspService_nativeIsInitialized(
 // ============================================================================
 
 extern "C" JNIEXPORT jlong JNICALL
-Java_com_wuxianggujun_tinaide_lsp_LspService_nativeRequestHover(
+Java_android_zero_studio_lsp_clang_ClangdNativeBridge_nativeRequestHover(
     JNIEnv* env,
     jclass clazz,
     jstring fileUri,
@@ -287,7 +287,7 @@ Java_com_wuxianggujun_tinaide_lsp_LspService_nativeRequestHover(
 }
 
 extern "C" JNIEXPORT jlong JNICALL
-Java_com_wuxianggujun_tinaide_lsp_LspService_nativeRequestCompletion(
+Java_android_zero_studio_lsp_clang_ClangdNativeBridge_nativeRequestCompletion(
     JNIEnv* env,
     jclass clazz,
     jstring fileUri,
@@ -303,7 +303,7 @@ Java_com_wuxianggujun_tinaide_lsp_LspService_nativeRequestCompletion(
 }
 
 extern "C" JNIEXPORT jlong JNICALL
-Java_com_wuxianggujun_tinaide_lsp_LspService_nativeRequestDefinition(
+Java_android_zero_studio_lsp_clang_ClangdNativeBridge_nativeRequestDefinition(
     JNIEnv* env,
     jclass clazz,
     jstring fileUri,
@@ -317,7 +317,7 @@ Java_com_wuxianggujun_tinaide_lsp_LspService_nativeRequestDefinition(
 }
 
 extern "C" JNIEXPORT jlong JNICALL
-Java_com_wuxianggujun_tinaide_lsp_LspService_nativeRequestReferences(
+Java_android_zero_studio_lsp_clang_ClangdNativeBridge_nativeRequestReferences(
     JNIEnv* env,
     jclass clazz,
     jstring fileUri,
@@ -337,7 +337,7 @@ Java_com_wuxianggujun_tinaide_lsp_LspService_nativeRequestReferences(
 // ============================================================================
 
 extern "C" JNIEXPORT jstring JNICALL
-Java_com_wuxianggujun_tinaide_lsp_LspService_nativeGetResult(
+Java_android_zero_studio_lsp_clang_ClangdNativeBridge_nativeGetResult(
     JNIEnv* env,
     jclass clazz,
     jlong requestId
@@ -357,7 +357,7 @@ Java_com_wuxianggujun_tinaide_lsp_LspService_nativeGetResult(
 // ============================================================================
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_wuxianggujun_tinaide_lsp_LspService_nativeDidOpen(
+Java_android_zero_studio_lsp_clang_ClangdNativeBridge_nativeDidOpen(
     JNIEnv* env,
     jclass clazz,
     jstring fileUri,
@@ -376,7 +376,7 @@ Java_com_wuxianggujun_tinaide_lsp_LspService_nativeDidOpen(
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_wuxianggujun_tinaide_lsp_LspService_nativeDidChange(
+Java_android_zero_studio_lsp_clang_ClangdNativeBridge_nativeDidChange(
     JNIEnv* env,
     jclass clazz,
     jstring fileUri,
@@ -391,7 +391,7 @@ Java_com_wuxianggujun_tinaide_lsp_LspService_nativeDidChange(
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_wuxianggujun_tinaide_lsp_LspService_nativeDidClose(
+Java_android_zero_studio_lsp_clang_ClangdNativeBridge_nativeDidClose(
     JNIEnv* env,
     jclass clazz,
     jstring fileUri
@@ -407,7 +407,7 @@ Java_com_wuxianggujun_tinaide_lsp_LspService_nativeDidClose(
 // ============================================================================
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_wuxianggujun_tinaide_lsp_LspService_nativeCancelRequestInternal(
+Java_android_zero_studio_lsp_clang_ClangdNativeBridge_nativeCancelRequestInternal(
     JNIEnv* env,
     jclass clazz,
     jlong requestId
@@ -417,7 +417,7 @@ Java_com_wuxianggujun_tinaide_lsp_LspService_nativeCancelRequestInternal(
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_wuxianggujun_tinaide_lsp_LspService_nativeNotifyRequestTimeout(
+Java_android_zero_studio_lsp_clang_ClangdNativeBridge_nativeNotifyRequestTimeout(
     JNIEnv* env,
     jclass clazz,
     jlong requestId
