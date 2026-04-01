@@ -17,11 +17,11 @@
 package com.rk.filetree.model
 
 data class Node<T>(
-    var value: T,
-    var parent: Node<T>? = null,
-    var child: List<Node<T>>? = null,
-    var isExpand: Boolean = false,
-    var level: Int = 0,
+  var value: T,
+  var parent: Node<T>? = null,
+  var child: List<Node<T>>? = null,
+  var isExpand: Boolean = false,
+  var level: Int = 0,
 ) {
 
   override fun equals(other: Any?): Boolean {
@@ -30,22 +30,21 @@ data class Node<T>(
 
     other as Node<*>
 
-    return value == other.value &&
-        parent == other.parent &&
-        child == other.child &&
-        isExpand == other.isExpand &&
-        level == other.level
+    return value == other.value && parent == other.parent && child == other.child && isExpand == other.isExpand && level == other.level
   }
 
   override fun hashCode(): Int {
     return value.hashCode()
   }
+
 }
 
 object TreeViewModel {
 
   // add child node
-  fun <T> add(parent: Node<T>, child: List<Node<T>>? = null) {
+  fun <T> add(
+    parent: Node<T>, child: List<Node<T>>? = null
+  ) {
     // check
     child?.let {
       if (it.isNotEmpty()) {
@@ -55,9 +54,7 @@ object TreeViewModel {
 
     parent.parent?.let {
       val nodes = it.child
-      if (
-          nodes != null && nodes.size == 1 && ((child != null && child.isEmpty()) || child == null)
-      ) {
+      if (nodes != null && nodes.size == 1 && ((child != null && child.isEmpty()) || child == null)) {
         parent.isExpand = true
       }
     }
@@ -72,7 +69,9 @@ object TreeViewModel {
   }
 
   // remove child node
-  fun <T> remove(parent: Node<T>, child: List<Node<T>>? = null) {
+  fun <T> remove(
+    parent: Node<T>, child: List<Node<T>>? = null
+  ) {
     parent.child?.let {
       if (it.isNotEmpty()) {
         parent.isExpand = false
@@ -85,13 +84,17 @@ object TreeViewModel {
       childNode.level = 0
       if (childNode.isExpand) {
         childNode.isExpand = false
-        childNode.child?.let { listNodes -> remove(childNode, listNodes) }
+        childNode.child?.let { listNodes ->
+          remove(childNode, listNodes)
+        }
       }
     }
   }
 
   // Get all child nodes of the parent node
-  private fun <T> getChildren(parent: Node<T>, result: MutableList<Node<T>>): List<Node<T>> {
+  private fun <T> getChildren(
+    parent: Node<T>, result: MutableList<Node<T>>
+  ): List<Node<T>> {
     parent.child?.let { result.addAll(it) }
 
     parent.child?.forEach {
