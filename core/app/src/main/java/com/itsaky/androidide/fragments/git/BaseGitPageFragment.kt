@@ -25,7 +25,6 @@ import android.widget.HorizontalScrollView
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.Toast
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.Fragment
 import com.itsaky.androidide.R
 
@@ -110,11 +109,6 @@ abstract class BaseGitPageFragment : Fragment() {
       startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
     } catch (e: ActivityNotFoundException) {
       Toast.makeText(requireContext(), errorTip, Toast.LENGTH_SHORT).show()
-      uiEventViewModel.emit(GitUiEvent.Error(errorTip))
     }
-  }
-
-  protected fun emitGitOperation(section: String, action: String) {
-    uiEventViewModel.emit(GitUiEvent.Operation(section, action))
   }
 }

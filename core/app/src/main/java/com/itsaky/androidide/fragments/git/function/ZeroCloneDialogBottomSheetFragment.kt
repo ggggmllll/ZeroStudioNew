@@ -918,7 +918,6 @@ private fun CloneScreenContent(
                 )
                 return@IconButton
               }
-              cloneStatus.value = activityContext.getString(R.string.cloning)
               doSave()
             },
             // Keep clickable even when not ready so user gets explicit feedback.
