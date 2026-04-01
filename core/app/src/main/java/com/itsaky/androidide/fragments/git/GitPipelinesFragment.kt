@@ -1,25 +1,15 @@
 /*
  *  This file is part of AndroidIDE.
- *
- *  AndroidIDE is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  AndroidIDE is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *   along with AndroidIDE.  If not, see <https://www.gnu.org/licenses/>.
  */
 package com.itsaky.androidide.fragments.git
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -57,9 +47,9 @@ class GitPipelinesFragment : BaseGitPageFragment() {
       openIfAny(links?.actionsUrl, "No workflow URL detected")
     }
 
-    addToolbarAction(R.drawable.ic_add_24, "New Task + Run YAML") {
+    addToolbarAction(R.drawable.ic_add_24, "Task + Run YAML") {
       emitGitOperation("pipelines", "create_task_and_run_yaml")
-      createTaskAndOpenWorkflow()
+      showRunWorkflowDialog()
     }
   }
 
@@ -73,22 +63,53 @@ class GitPipelinesFragment : BaseGitPageFragment() {
     }
   }
 
-  private fun createTaskAndOpenWorkflow() {
+  private fun showRunWorkflowDialog() {
     val target = links
     if (target == null) {
       Toast.makeText(context, "No remote repository detected", Toast.LENGTH_SHORT).show()
       return
     }
 
-    val branch = GitHostWebLinks.getCurrentBranchName()
-    val taskTitle = "CI Task: run YAML on $branch"
-    val taskBody = "Created from AndroidIDE GitPipelinesFragment."
-    val yaml = "ci.yml"
+    val ctx = requireContext()
+    val container =
+        LinearLayout(ctx).apply {
+          orientation = LinearLayout.VERTICAL
+          val p = (16 * resources.displayMetrics.density).toInt()
+          setPadding(p, p, p, p)
+        }
 
+    val taskInput = EditText(ctx).apply { hint = "Task title" }
+    val yamlInput = EditText(ctx).apply { hint = "YAML file, e.g. ci.yml" }
+    val refInput = EditText(ctx).apply { hint = "Branch/ref" }
+
+    val defaultRef = GitHostWebLinks.getCurrentBranchName()
+    taskInput.setText("CI Task: run yaml on $defaultRef")
+    yamlInput.setText("ci.yml")
+    refInput.setText(defaultRef)
+
+    container.addView(taskInput)
+    container.addView(yamlInput)
+    container.addView(refInput)
+
+    AlertDialog.Builder(ctx)
+        .setTitle("Create Task & Run Workflow")
+        .setView(container)
+        .setNegativeButton(android.R.string.cancel, null)
+        .setPositiveButton("Open") { _, _ ->
+          val taskTitle = taskInput.text?.toString()?.trim().orEmpty().ifBlank { "CI Task" }
+          val yaml = yamlInput.text?.toString()?.trim().orEmpty().ifBlank { "ci.yml" }
+          val ref = refInput.text?.toString()?.trim().orEmpty().ifBlank { defaultRef }
+          openTaskAndWorkflow(target, taskTitle, yaml, ref)
+        }
+        .show()
+  }
+
+  private fun openTaskAndWorkflow(target: GitHostLinks, taskTitle: String, yaml: String, ref: String) {
+    val taskBody =
+        "Created from AndroidIDE. Remote=${target.remoteName}, ref=$ref, yaml=$yaml"
     val issueUrl = target.newTaskUrl(taskTitle, taskBody)
-    val workflowUrl = target.workflowRunUrl(yamlFile = yaml, ref = branch)
+    val workflowUrl = target.workflowRunUrl(yamlFile = yaml, ref = ref)
 
-    // 先创建工作任务，再打开 workflow 页面，用户可直接点击 Run workflow / Run pipeline
     openExternalLink(issueUrl)
     openExternalLink(workflowUrl)
   }
@@ -106,7 +127,7 @@ class GitPipelinesFragment : BaseGitPageFragment() {
         listOf(
             "Open Pipelines",
             "Open Actions",
-            "Create Task + Run ci.yml",
+            "Create Task + Run YAML",
         )
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder {
@@ -116,13 +137,12 @@ class GitPipelinesFragment : BaseGitPageFragment() {
     }
 
     override fun onBindViewHolder(holder: Holder, position: Int) {
-      val text = items[position]
-      holder.title.text = text
+      holder.title.text = items[position]
       holder.itemView.setOnClickListener {
         when (position) {
           0 -> openIfAny(links?.pipelinesUrl, "No remote repository detected")
           1 -> openIfAny(links?.actionsUrl, "No workflow URL detected")
-          else -> createTaskAndOpenWorkflow()
+          else -> showRunWorkflowDialog()
         }
       }
     }

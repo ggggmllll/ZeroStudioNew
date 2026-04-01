@@ -14,6 +14,7 @@ internal enum class GitHostKind {
 
 internal data class GitHostLinks(
     val hostKind: GitHostKind,
+    val remoteName: String,
     val baseHttpUrl: String,
     val pullRequestsUrl: String,
     val pipelinesUrl: String,
@@ -26,15 +27,16 @@ internal data class GitHostLinks(
     val encodedBody = Uri.encode(body)
     return when (hostKind) {
       GitHostKind.GITLAB -> "$issuesUrl/new?issue[title]=$encodedTitle&issue[description]=$encodedBody"
-      GitHostKind.GITEE -> "$issuesUrl/new?title=$encodedTitle&body=$encodedBody"
       else -> "$issuesUrl/new?title=$encodedTitle&body=$encodedBody"
     }
   }
 
+  /** 返回一个可在浏览器触发 workflow/pipeline 的入口页面。 */
   fun workflowRunUrl(yamlFile: String, ref: String): String {
     val safeRef = Uri.encode(ref.ifBlank { "main" })
+    val safeYaml = Uri.encode(yamlFile)
     return when (hostKind) {
-      GitHostKind.GITHUB -> "$baseHttpUrl/actions/workflows/${Uri.encode(yamlFile)}?query=branch%3A$safeRef"
+      GitHostKind.GITHUB -> "$baseHttpUrl/actions/workflows/$safeYaml?query=branch%3A$safeRef"
       GitHostKind.GITLAB -> "$baseHttpUrl/-/pipelines/new?ref=$safeRef"
       GitHostKind.GITEE -> "$baseHttpUrl/actions"
       GitHostKind.UNKNOWN -> actionsUrl
@@ -43,19 +45,18 @@ internal data class GitHostLinks(
 }
 
 internal object GitHostWebLinks {
+
   fun resolveForCurrentProject(): GitHostLinks? {
     val projectPath = IProjectManager.getInstance().projectDirPath ?: return null
     val configFile = File(projectPath, ".git/config")
     if (!configFile.exists()) return null
 
-    val config = configFile.readText()
-    val remoteUrl =
-        Regex("""url\s*=\s*(.+)""").find(config)?.groupValues?.getOrNull(1)?.trim() ?: return null
+    val configText = configFile.readText()
+    val remote = resolvePreferredRemote(configText) ?: return null
+    val base = normalizeRemoteToHttp(remote.url) ?: return null
 
-    val base = normalizeRemoteToHttp(remoteUrl) ?: return null
-    val uri = Uri.parse(base)
-    val host = (uri.host ?: "").lowercase()
-    val hostKind = resolveHostKind(host)
+    val host = (Uri.parse(base).host ?: "").lowercase()
+    val kind = resolveHostKind(host)
 
     val pullRequestsUrl: String
     val mergeRequestsUrl: String
@@ -63,7 +64,7 @@ internal object GitHostWebLinks {
     val actionsUrl: String
     val issuesUrl: String
 
-    when (hostKind) {
+    when (kind) {
       GitHostKind.GITLAB -> {
         pullRequestsUrl = "$base/-/merge_requests"
         mergeRequestsUrl = "$base/-/merge_requests"
@@ -88,7 +89,8 @@ internal object GitHostWebLinks {
     }
 
     return GitHostLinks(
-        hostKind = hostKind,
+        hostKind = kind,
+        remoteName = remote.name,
         baseHttpUrl = base,
         pullRequestsUrl = pullRequestsUrl,
         pipelinesUrl = pipelinesUrl,
@@ -108,6 +110,43 @@ internal object GitHostWebLinks {
         .getOrDefault("main")
         .ifBlank { "main" }
   }
+
+  private fun resolvePreferredRemote(configText: String): GitRemoteConfig? {
+    val remoteBlocks =
+        Regex("""\[remote\s+\"([^\"]+)\"\]([\s\S]*?)(?=\n\[|$)""")
+            .findAll(configText)
+            .mapNotNull { m ->
+              val name = m.groupValues[1]
+              val body = m.groupValues[2]
+              val url = Regex("""\n\s*url\s*=\s*(.+)""").find("\n$body")?.groupValues?.getOrNull(1)?.trim()
+              if (url.isNullOrBlank()) null else GitRemoteConfig(name, url)
+            }
+            .toList()
+
+    if (remoteBlocks.isEmpty()) return null
+
+    val branchRemote =
+        Regex("""\[branch\s+\"[^\"]+\"\]([\s\S]*?)(?=\n\[|$)""")
+            .findAll(configText)
+            .mapNotNull { block ->
+              Regex("""\n\s*remote\s*=\s*(.+)""")
+                  .find("\n${block.groupValues[1]}")
+                  ?.groupValues
+                  ?.getOrNull(1)
+                  ?.trim()
+            }
+            .firstOrNull()
+
+    val preferredName = when {
+      !branchRemote.isNullOrBlank() -> branchRemote
+      remoteBlocks.any { it.name == "origin" } -> "origin"
+      else -> remoteBlocks.first().name
+    }
+
+    return remoteBlocks.firstOrNull { it.name == preferredName } ?: remoteBlocks.firstOrNull()
+  }
+
+  private data class GitRemoteConfig(val name: String, val url: String)
 
   private fun resolveHostKind(host: String): GitHostKind {
     return when {
