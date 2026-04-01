@@ -4,7 +4,7 @@ version = "1.0.0"
 
 plugins {
   alias(libs.plugins.android.library)
-  alias(libs.plugins.jetbrains.kotlin.android)
+  alias(libs.plugins.kotlin.android)
   `maven-publish`
 }
 
