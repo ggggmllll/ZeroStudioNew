@@ -61,9 +61,17 @@ class KotlinServerProcessManager(context: Context) {
 
   /** 检查安装是否就绪。由于我们通过网络下载，环境存在缺失的可能。 */
   fun isInstalled(): Boolean {
-    val serverHome = Environment.SERVERS_KOTLIN_DIR // 如果使用全局KOTLIN_LSP_HOME请替换
+    val serverHome = Environment.SERVERS_KOTLIN_DIR
     val libDir = File(serverHome, "lib")
-    return serverHome.exists() && libDir.exists() && libDir.listFiles()?.isNotEmpty() == true
+    val launcher = File(serverHome, "bin/${KotlinServerConstants.LAUNCHER_SCRIPT_NAME}")
+
+    if (!serverHome.exists() || !libDir.exists() || !launcher.exists()) {
+      return false
+    }
+
+    return KotlinServerConstants.REQUIRED_LIB_JARS.all { jarName ->
+      File(libDir, jarName).exists()
+    }
   }
 
   /** 触发 UI 的安装弹窗 (基于 Kotlin SharedFlow)。 */
@@ -78,8 +86,7 @@ class KotlinServerProcessManager(context: Context) {
     isInstallPromptShowing = true
     KslLogs.info("Requesting KLS installation UI...")
 
-    val downloadUrl =
-        "https://github.com/msmt2018/SDK-tool-for-Android-platform/releases/download/kotlin-lsp/kotlinLanguageServices.zip"
+    val downloadUrl = KotlinServerConstants.DOWNLOAD_URL
     val installDir = Environment.SERVERS_KOTLIN_DIR
 
     val event =
@@ -98,7 +105,7 @@ class KotlinServerProcessManager(context: Context) {
               isInstallPromptShowing = false
               userDeclinedInstall = false // 重置状态，因为已经成功安装
 
-              val launcher = File(installDir, "bin/kotlin-language-server")
+              val launcher = File(installDir, "bin/${KotlinServerConstants.LAUNCHER_SCRIPT_NAME}")
               if (launcher.exists()) {
                 launcher.setExecutable(true, false)
               }
@@ -133,21 +140,14 @@ class KotlinServerProcessManager(context: Context) {
     KslLogs.info("Starting Kotlin Language Server...")
 
     val serverHome = Environment.SERVERS_KOTLIN_DIR
-    val libDir = File(serverHome, "lib")
+    val launcherScript = File(serverHome, "bin/${KotlinServerConstants.LAUNCHER_SCRIPT_NAME}")
 
-    if (!serverHome.exists() || !libDir.exists()) {
+    if (!serverHome.exists() || !launcherScript.exists()) {
       KslLogs.error("Server not found at: {}", serverHome.absolutePath)
       return
     }
 
-    val jars = libDir.listFiles { file: File -> file.name.endsWith(".jar") }
-    if (jars == null || jars.isEmpty()) {
-      KslLogs.error("No JAR files found in: {}", libDir.absolutePath)
-      return
-    }
-
-    val classpath = jars.joinToString(":") { jar -> jar.absolutePath }
-    val javaExec = findJavaExecutable()
+    launcherScript.setExecutable(true, false)
     val androidClasspath = classpathProvider.getClasspath()
 
     // Get Java home directory
@@ -160,13 +160,11 @@ class KotlinServerProcessManager(context: Context) {
 
     val command =
         listOf(
-            javaExec,
+            Environment.BASH_SHELL.absolutePath,
+            launcherScript.absolutePath,
             "-DkotlinLanguageServer.version=1.3.13",
             "-DkotlinLanguageServer.skipClasspathResolution=true",
             "-DkotlinLanguageServer.predefinedClasspath=$androidClasspath",
-            "-classpath",
-            classpath,
-            "org.javacs.kt.MainKt",
         )
 
     val processBuilder =
@@ -176,9 +174,8 @@ class KotlinServerProcessManager(context: Context) {
           environment().apply {
             put("JAVA_HOME", javaHome)
 
-            val javaBinPath = File(javaExec).parent ?: ""
             val currentPath = get("PATH") ?: ""
-            put("PATH", "$javaBinPath:$currentPath")
+            put("PATH", "${Environment.BIN_DIR.absolutePath}:$currentPath")
 
             put("KOTLIN_LSP_DISABLE_DEPENDENCY_RESOLUTION", "true")
             put("KOTLIN_LSP_USE_PREDEFINED_CLASSPATH", "true")

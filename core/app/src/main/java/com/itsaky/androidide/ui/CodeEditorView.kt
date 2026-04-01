@@ -445,16 +445,18 @@ class CodeEditorView(context: Context, file: File, selection: Range) :
       return null
     }
 
-    val serverID: String =
-        when (file.extension) {
-          "java" -> JavaLanguageServer.SERVER_ID
-          "xml" -> XMLLanguageServer.SERVER_ID
-          "kt",
-          "kts" -> KotlinLanguageServer.SERVER_ID
-          else -> return null
-        }
+    val registry = ILanguageServerRegistry.getDefault()
 
-    return ILanguageServerRegistry.getDefault().getServer(serverID)
+    return when (file.extension.lowercase()) {
+      "java" -> registry.getServer(JavaLanguageServer.SERVER_ID)
+      "xml" -> registry.getServer(XMLLanguageServer.SERVER_ID)
+      "kt",
+      "kts" -> {
+        registry.getServer(KotlinLanguageServer.SERVER_ID)
+            ?: KotlinLanguageServer(context).also { registry.register(it) }
+      }
+      else -> null
+    }
   }
 
   private fun configureEditorIfNeeded() {
