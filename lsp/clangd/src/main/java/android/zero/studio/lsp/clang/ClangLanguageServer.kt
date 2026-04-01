@@ -18,6 +18,7 @@ import com.itsaky.androidide.lsp.models.FormatCodeParams
 import com.itsaky.androidide.lsp.models.LSPFailure
 import com.itsaky.androidide.lsp.models.MarkupContent
 import com.itsaky.androidide.lsp.models.MarkupKind
+import com.itsaky.androidide.lsp.models.MatchLevel
 import com.itsaky.androidide.lsp.models.ReferenceParams
 import com.itsaky.androidide.lsp.models.ReferenceResult
 import com.itsaky.androidide.lsp.models.SignatureHelp
@@ -30,15 +31,11 @@ import java.nio.file.Path
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.io.path.exists
 import kotlin.io.path.readText
+import kotlinx.coroutines.runBlocking
 import org.json.JSONArray
 import org.json.JSONObject
 
-/**
- * clangd-backed language server for C/C++/Objective-C/Objective-C++.
- */
-class ClangLanguageServer(
-    initialSettings: ClangdServerSettings,
-) : ILanguageServer {
+class ClangLanguageServer(initialSettings: ClangdServerSettings) : ILanguageServer {
 
     override val serverId: String = SERVER_ID
     override var client: ILanguageClient? = null
@@ -49,6 +46,9 @@ class ClangLanguageServer(
 
     private val diagnosticsCache = ConcurrentHashMap<Path, List<DiagnosticItem>>()
     private val fileVersions = ConcurrentHashMap<Path, Int>()
+    private val resultCache = ClangdResultCache()
+    private val requestDispatcher = ClangdRequestDispatcher()
+    val healthMonitor = ClangdHealthMonitor()
 
     private val diagnosticsListener = ClangdNativeBridge.DiagnosticsListener { uri, diagnostics ->
         val path = uriToPath(uri) ?: return@DiagnosticsListener
@@ -57,24 +57,33 @@ class ClangLanguageServer(
         client?.publishDiagnostics(DiagnosticResult(path, mapped))
     }
 
+    private val healthListener = ClangdNativeBridge.HealthListener { type, message ->
+        healthMonitor.onNativeHealth(type, message)
+        if (type == "CLANGD_EXIT" && workspaceRoot != null) {
+            initializeNative(workspaceRoot!!)
+        }
+    }
+
     companion object {
         const val SERVER_ID = "ide.lsp.clangd"
     }
 
     init {
         ClangdNativeBridge.addDiagnosticsListener(diagnosticsListener)
-        ClangdNativeBridge.addHealthListener { type, _ ->
-            if (type == "CLANGD_EXIT") {
-                fileVersions.clear()
-            }
-        }
+        ClangdNativeBridge.addHealthListener(healthListener)
     }
 
     override fun shutdown() {
         ClangdNativeBridge.removeDiagnosticsListener(diagnosticsListener)
+        ClangdNativeBridge.removeHealthListener(healthListener)
+        fileVersions.keys.forEach { file ->
+            ClangdNativeBridge.nativeDidClose(toFileUri(file))
+        }
         ClangdNativeBridge.nativeShutdown()
+        healthMonitor.onShutdown()
         diagnosticsCache.clear()
         fileVersions.clear()
+        resultCache.clear()
     }
 
     override fun connectClient(client: ILanguageClient?) {
@@ -84,32 +93,27 @@ class ClangLanguageServer(
     override fun applySettings(settings: IServerSettings?) {
         if (settings is ClangdServerSettings) {
             this.settings = settings
-            if (workspaceRoot != null) {
-                ClangdNativeBridge.nativeInitialize(
-                    settings.clangdPath,
-                    workspaceRoot.toString(),
-                    settings.completionLimit,
-                )
-            }
+            workspaceRoot?.let { initializeNative(it) }
         }
     }
 
     override fun setupWorkspace(workspace: IWorkspace) {
         workspaceRoot = workspace.getRootProject().path
-        ClangdNativeBridge.nativeInitialize(settings.clangdPath, workspaceRoot.toString(), settings.completionLimit)
+        initializeNative(workspaceRoot!!)
     }
 
     override fun complete(params: CompletionParams?): CompletionResult {
         if (params == null || !settings.completionsEnabled()) return CompletionResult.EMPTY
         syncFile(params.file, params.content?.toString())
+        val key = "completion:${params.file}:${params.position.line}:${params.position.column}:${params.prefix.orEmpty()}"
+        resultCache.get(key)?.let { return parseCompletionResponse(it, params.prefix.orEmpty()) }
 
-        val requestId = ClangdNativeBridge.nativeRequestCompletion(
-            toFileUri(params.file),
-            params.position.line,
-            params.position.column,
-            null,
-        )
-        val response = awaitResult(requestId, settings.requestTimeoutMs, params.cancelChecker) ?: return CompletionResult.EMPTY
+        val requestId = ClangdNativeBridge.nativeRequestCompletion(toFileUri(params.file), params.position.line, params.position.column, null)
+        val response = runBlocking {
+            requestDispatcher.await(requestId, settings.requestTimeoutMs, params.cancelChecker)
+        } ?: return CompletionResult.EMPTY
+
+        resultCache.put(key, response)
         return parseCompletionResponse(response, params.prefix.orEmpty())
     }
 
@@ -117,43 +121,30 @@ class ClangLanguageServer(
         if (!settings.referencesEnabled()) return ReferenceResult(emptyList())
         syncFile(params.file, null)
         val requestId = ClangdNativeBridge.nativeRequestReferences(
-            toFileUri(params.file),
-            params.position.line,
-            params.position.column,
-            params.includeDeclaration,
+            toFileUri(params.file), params.position.line, params.position.column, params.includeDeclaration
         )
-        val response = awaitResult(requestId, settings.requestTimeoutMs, params.cancelChecker) ?: return ReferenceResult(emptyList())
+        val response = requestDispatcher.await(requestId, settings.requestTimeoutMs, params.cancelChecker)
+            ?: return ReferenceResult(emptyList())
         return ReferenceResult(parseLocations(response))
     }
 
     override suspend fun findDefinition(params: DefinitionParams): DefinitionResult {
         if (!settings.definitionsEnabled()) return DefinitionResult(emptyList())
         syncFile(params.file, null)
-        val requestId = ClangdNativeBridge.nativeRequestDefinition(
-            toFileUri(params.file),
-            params.position.line,
-            params.position.column,
-        )
-        val response = awaitResult(requestId, settings.requestTimeoutMs, params.cancelChecker) ?: return DefinitionResult(emptyList())
+        val requestId = ClangdNativeBridge.nativeRequestDefinition(toFileUri(params.file), params.position.line, params.position.column)
+        val response = requestDispatcher.await(requestId, settings.requestTimeoutMs, params.cancelChecker)
+            ?: return DefinitionResult(emptyList())
         return DefinitionResult(parseLocations(response))
     }
 
-    override suspend fun expandSelection(params: ExpandSelectionParams): Range {
-        return params.selection
-    }
+    override suspend fun expandSelection(params: ExpandSelectionParams): Range = params.selection
 
-    override suspend fun signatureHelp(params: SignatureHelpParams): SignatureHelp {
-        return SignatureHelp(emptyList(), -1, -1)
-    }
+    override suspend fun signatureHelp(params: SignatureHelpParams): SignatureHelp = SignatureHelp(emptyList(), -1, -1)
 
     override suspend fun hover(params: DefinitionParams): MarkupContent {
         syncFile(params.file, null)
-        val requestId = ClangdNativeBridge.nativeRequestHover(
-            toFileUri(params.file),
-            params.position.line,
-            params.position.column,
-        )
-        val response = awaitResult(requestId, settings.requestTimeoutMs, params.cancelChecker) ?: return MarkupContent()
+        val requestId = ClangdNativeBridge.nativeRequestHover(toFileUri(params.file), params.position.line, params.position.column)
+        val response = requestDispatcher.await(requestId, settings.requestTimeoutMs, params.cancelChecker) ?: return MarkupContent()
         return parseHoverResponse(response)
     }
 
@@ -163,11 +154,15 @@ class ClangLanguageServer(
         return DiagnosticResult(file, diagnosticsCache[file] ?: emptyList())
     }
 
-    override fun formatCode(params: FormatCodeParams?): CodeFormatResult {
-        return CodeFormatResult(false, mutableListOf())
-    }
+    override fun formatCode(params: FormatCodeParams?): CodeFormatResult = CodeFormatResult(false, mutableListOf())
 
     override fun handleFailure(failure: LSPFailure?): Boolean = false
+
+    private fun initializeNative(root: Path) {
+        healthMonitor.onInitialize()
+        val ok = ClangdNativeBridge.nativeInitialize(settings.clangdPath, root.toString(), settings.completionLimit)
+        healthMonitor.onInitialized(ok)
+    }
 
     private fun syncFile(file: Path, content: String?) {
         if (!file.exists()) return
@@ -183,18 +178,7 @@ class ClangLanguageServer(
         }
 
         ClangdNativeBridge.nativeDidChange(uri, newContent, nextVersion)
-    }
-
-    private fun awaitResult(requestId: Long, timeoutMs: Long, cancelChecker: com.itsaky.androidide.progress.ICancelChecker): String? {
-        val start = System.currentTimeMillis()
-        while (System.currentTimeMillis() - start <= timeoutMs) {
-            cancelChecker.abortIfCancelled()
-            val result = ClangdNativeBridge.nativeGetResult(requestId)
-            if (result != null) return result
-            Thread.sleep(20)
-        }
-        ClangdNativeBridge.nativeNotifyRequestTimeout(requestId)
-        return null
+        resultCache.invalidateByPrefix("completion:${file}:")
     }
 
     private fun parseCompletionResponse(raw: String, prefix: String): CompletionResult {
@@ -213,10 +197,7 @@ class ClangLanguageServer(
             val matchToken = if (settings.shouldMatchAllLowerCase()) prefix.lowercase() else prefix
             val candidate = if (settings.shouldMatchAllLowerCase()) label.lowercase() else label
             val match = CompletionItem.matchLevel(candidate, matchToken, settings.completionFuzzyMatchMinRatio())
-
-            if (prefix.isNotBlank() && match == com.itsaky.androidide.lsp.models.MatchLevel.NO_MATCH) {
-                continue
-            }
+            if (prefix.isNotBlank() && match == MatchLevel.NO_MATCH) continue
 
             completionItems += CompletionItem(
                 label,
@@ -235,15 +216,13 @@ class ClangLanguageServer(
         return CompletionResult(completionItems)
     }
 
-    private fun mapKind(kind: Int): CompletionItemKind {
-        return when (kind) {
-            3, 10 -> CompletionItemKind.FUNCTION
-            6 -> CompletionItemKind.VARIABLE
-            7, 8 -> CompletionItemKind.CLASS
-            9 -> CompletionItemKind.MODULE
-            14 -> CompletionItemKind.KEYWORD
-            else -> CompletionItemKind.NONE
-        }
+    private fun mapKind(kind: Int): CompletionItemKind = when (kind) {
+        3, 10 -> CompletionItemKind.FUNCTION
+        6 -> CompletionItemKind.VARIABLE
+        7, 8 -> CompletionItemKind.CLASS
+        9 -> CompletionItemKind.MODULE
+        14 -> CompletionItemKind.KEYWORD
+        else -> CompletionItemKind.NONE
     }
 
     private fun parseHoverResponse(raw: String): MarkupContent {
@@ -279,11 +258,10 @@ class ClangLanguageServer(
         val locations = mutableListOf<Location>()
         for (i in 0 until array.length()) {
             val item = array.optJSONObject(i) ?: continue
-            val uri = item.optString("uri")
+            val file = uriToPath(item.optString("uri")) ?: continue
             val rangeJson = item.optJSONObject("range") ?: continue
             val start = rangeJson.optJSONObject("start") ?: continue
             val end = rangeJson.optJSONObject("end") ?: continue
-            val file = uriToPath(uri) ?: continue
             locations += Location(
                 file,
                 Range(
