@@ -191,6 +191,13 @@ dependencies {
     implementation(project(":sora-editor:language-treesitter"))
 
     implementation(project(":treeview"))
+    implementation(project(":core:lsp-api"))
+    implementation(project(":core:lsp-models"))
+    implementation(project(":core:projects"))
+    implementation(project(":editor:api"))
+    implementation(project(":editor:editor-lsp"))
+    implementation(project(":editor:impl"))
+
 
     // JSON processing for configuration
     implementation("com.google.code.gson:gson:2.11.0")
