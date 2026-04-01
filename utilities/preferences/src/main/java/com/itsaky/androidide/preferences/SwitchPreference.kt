@@ -18,7 +18,6 @@ package com.itsaky.androidide.preferences
 
 import android.content.Context
 import androidx.preference.Preference
-import androidx.preference.PreferenceViewHolder
 import androidx.preference.TwoStatePreference
 import kotlin.reflect.KMutableProperty0
 
@@ -35,18 +34,15 @@ constructor(val setValue: ((Boolean) -> Unit)? = null, val getValue: (() -> Bool
   constructor(property: KMutableProperty0<Boolean>) : this(property::set, property::get)
 
   override fun onCreatePreference(context: Context): Preference {
-    return object : androidx.preference.SwitchPreference(context) {
-        
-        override fun onBindViewHolder(holder: PreferenceViewHolder) {
-            val currentValue = getValue?.invoke() ?: false
-            if (isChecked != currentValue) {
-                isChecked = currentValue
-            }
-            super.onBindViewHolder(holder)
-        }
-    }.apply {
+    return androidx.preference.SwitchPreference(context).apply {
         isPersistent = false
-        isChecked = getValue?.invoke() ?: false
+    }
+  }
+
+  override fun onBindProperty(preference: Preference) {
+    if (preference is androidx.preference.SwitchPreference) {
+        val currentValue = getValue?.invoke() ?: false
+        preference.isChecked = currentValue
     }
   }
 

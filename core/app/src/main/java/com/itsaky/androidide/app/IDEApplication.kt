@@ -80,15 +80,13 @@ class IDEApplication : TermuxApplication() {
     instance = this
     super.onCreate()
 
-    Environment.init(this)
-
     applyPersistedLocale()
 
     uncaughtExceptionHandler = Thread.getDefaultUncaughtExceptionHandler()
     Thread.setDefaultUncaughtExceptionHandler { thread, th -> handleCrash(thread, th) }
 
     GlobalScope.launch(Dispatchers.IO) {
-      delay(3000)
+      delay(500)
       if (!VMUtils.isJvm()) {
         ToolsManager.init(this@IDEApplication, null)
       }
@@ -124,6 +122,7 @@ class IDEApplication : TermuxApplication() {
       ReflectionUtils.bypassHiddenAPIReflectionRestrictions()
       IDEColorSchemeProvider.init()
     }
+        Environment.init(this)
   }
 
   /**
