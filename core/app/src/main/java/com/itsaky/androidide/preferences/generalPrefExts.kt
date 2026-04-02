@@ -17,7 +17,6 @@
 
 package com.itsaky.androidide.preferences
 
-import android.content.Context
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import androidx.preference.Preference
@@ -204,13 +203,10 @@ class OpenLastProject(
     override val title: Int = string.title_open_projects,
     override val summary: Int? = string.msg_open_projects,
     override val icon: Int? = drawable.ic_open_project,
-) : SwitchPreference() {
-
-  override fun onCreatePreference(context: Context): Preference {
-    val pref = super.onCreatePreference(context) as androidx.preference.SwitchPreference
-    pref.isChecked = GeneralPreferences.autoOpenProjects
-    return pref
-  }
+) : SwitchPreference(
+    setValue = { GeneralPreferences.autoOpenProjects = it },
+    getValue = { GeneralPreferences.autoOpenProjects },
+) {
 
   override fun onPreferenceChanged(preference: Preference, newValue: Any?): Boolean {
     GeneralPreferences.autoOpenProjects =
@@ -225,13 +221,10 @@ class ConfirmProjectOpen(
     override val title: Int = string.title_confirm_project_open,
     override val summary: Int? = string.msg_confirm_project_open,
     override val icon: Int? = drawable.ic_open_project,
-) : SwitchPreference() {
-
-  override fun onCreatePreference(context: Context): Preference {
-    val pref = super.onCreatePreference(context) as androidx.preference.SwitchPreference
-    pref.isChecked = GeneralPreferences.confirmProjectOpen
-    return pref
-  }
+) : SwitchPreference(
+    setValue = { GeneralPreferences.confirmProjectOpen = it },
+    getValue = { GeneralPreferences.confirmProjectOpen },
+) {
 
   override fun onPreferenceChanged(preference: Preference, newValue: Any?): Boolean {
     GeneralPreferences.confirmProjectOpen =
@@ -246,13 +239,10 @@ class UseSytemShell(
     override val title: Int = string.title_default_shell,
     override val summary: Int? = string.msg_default_shell,
     override val icon: Int? = drawable.ic_bash_commands,
-) : SwitchPreference() {
-
-  override fun onCreatePreference(context: Context): Preference {
-    val pref = super.onCreatePreference(context) as androidx.preference.SwitchPreference
-    pref.isChecked = GeneralPreferences.useSystemShell
-    return pref
-  }
+) : SwitchPreference(
+    setValue = { GeneralPreferences.useSystemShell = it },
+    getValue = { GeneralPreferences.useSystemShell },
+) {
 
   override fun onPreferenceChanged(preference: Preference, newValue: Any?): Boolean {
     GeneralPreferences.useSystemShell = newValue as Boolean? ?: GeneralPreferences.useSystemShell
