@@ -21,8 +21,8 @@ import android.content.Context
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.itsaky.androidide.R
-import com.itsaky.androidide.fragments.sidebar.FileTreeFragment
 import kotlin.reflect.KClass
+import com.itsaky.androidide.fragments.git.GitHostFragment;
 
 /**
  * Sidebar action for showing file tree.
@@ -36,7 +36,7 @@ class FileTreeSidebarAction(context: Context, override val order: Int) : Abstrac
   }
 
   override val id: String = ID
-  override val fragmentClass: KClass<out Fragment> = FileTreeFragment::class
+  override val fragmentClass: KClass<out Fragment> = GitHostFragment::class
 
   init {
     label = context.getString(R.string.msg_file_tree)

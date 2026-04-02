@@ -11,25 +11,27 @@
     android:paddingEnd="8dp"
     android:paddingVertical="6dp"
     android:minHeight="40dp"
-    android:background="?attr/selectableItemBackground">
+    android:clickable="true"
+    android:focusable="true"
+    android:background="?attr/selectableItemBackground"> <!-- 必须使用 match_parent 和 ripple 背景 -->
 
     <ViewFlipper
         android:id="@+id/chevronLoadingSwitcher"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:layout_marginEnd="8dp">
+        android:layout_width="18dp"
+        android:layout_height="18dp"
+        android:layout_marginEnd="6dp">
 
         <ImageView
             android:id="@+id/filetree_chevron"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
             android:src="@drawable/ic_chevron_right"
             app:tint="?attr/colorOnSurfaceVariant" />
 
         <ProgressBar
             android:id="@+id/loading_progress"
-            android:layout_width="16dp"
-            android:layout_height="16dp"
+            android:layout_width="14dp"
+            android:layout_height="14dp"
             android:layout_gravity="center"
             android:indeterminate="true"
             android:indeterminateTint="?attr/colorPrimary" />
@@ -38,14 +40,14 @@
 
     <ImageView
         android:id="@+id/filetree_icon"
-        android:layout_width="22dp"
-        android:layout_height="22dp"
-        android:layout_marginEnd="12dp"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginEnd="10dp"
         tools:src="@drawable/ic_language_java" />
 
     <TextView
         android:id="@+id/filetree_name"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
         android:textColor="?attr/colorOnSurface"

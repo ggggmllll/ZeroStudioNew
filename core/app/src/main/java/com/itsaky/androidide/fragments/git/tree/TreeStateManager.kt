@@ -4,54 +4,42 @@ import com.rk.filetree.widget.FileTree
 import java.util.Stack
 
 /**
+ * 高级状态管理器：实现文件树节点展开/折叠的 撤销(Undo) 和 重做(Redo)。
+ * 
  * @author android_zero
  */
 class TreeStateManager {
-
   private val undoStack = Stack<String>()
   private val redoStack = Stack<String>()
   private val MAX_HISTORY_SIZE = 50
 
-  fun saveState(treeView: FileTree) {
+  /** 记录当前状态（在发生展开/折叠动作前调用） */
+  fun pushState(treeView: FileTree) {
     val state = treeView.getSaveState()
-
-    // 只有当状态真正改变时才保存
-    if (undoStack.isNotEmpty() && undoStack.peek() == state) {
-      return
-    }
+    if (undoStack.isNotEmpty() && undoStack.peek() == state) return
 
     undoStack.push(state)
-    if (undoStack.size > MAX_HISTORY_SIZE) {
-      undoStack.removeAt(0)
-    }
-    // 新操作会清空重做栈
+    if (undoStack.size > MAX_HISTORY_SIZE) undoStack.removeAt(0)
     redoStack.clear()
   }
 
-  fun undo(currentState: String): String? {
-    if (undoStack.isEmpty()) return null
-
-    // 将当前状态压入 Redo 栈，以便可以重做回当前状态
+  fun undo(treeView: FileTree) {
+    if (undoStack.isEmpty()) return
+    val currentState = treeView.getSaveState()
     redoStack.push(currentState)
-
-    return undoStack.pop()
+    
+    val previousState = undoStack.pop()
+    treeView.collapseAll()
+    treeView.restoreState(previousState)
   }
 
-  fun redo(currentState: String): String? {
-    if (redoStack.isEmpty()) return null
-
-    // 将当前状态压入 Undo 栈，以便可以再次撤销
+  fun redo(treeView: FileTree) {
+    if (redoStack.isEmpty()) return
+    val currentState = treeView.getSaveState()
     undoStack.push(currentState)
-
-    return redoStack.pop()
-  }
-
-  fun canUndo(): Boolean = undoStack.isNotEmpty()
-
-  fun canRedo(): Boolean = redoStack.isNotEmpty()
-
-  fun clear() {
-    undoStack.clear()
-    redoStack.clear()
+    
+    val nextState = redoStack.pop()
+    treeView.collapseAll()
+    treeView.restoreState(nextState)
   }
 }

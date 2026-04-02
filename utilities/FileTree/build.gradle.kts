@@ -1,14 +1,10 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-group = "com.github.RohitKushvaha01"
-
-version = "1.0.0"
 
 plugins {
   alias(libs.plugins.android.library)
   alias(libs.plugins.kotlin.android)
-  `maven-publish`
 }
 
 android {
@@ -32,16 +28,6 @@ android {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
   }
-}
-
-publishing {
-  publications {
-    create<MavenPublication>("maven") {
-      // Use the correct component for Android libraries (usually "release" or "debug")
-      from(components.findByName("release"))
-    }
-  }
-  repositories { maven { url = uri("https://jitpack.io") } }
 }
 
 dependencies {

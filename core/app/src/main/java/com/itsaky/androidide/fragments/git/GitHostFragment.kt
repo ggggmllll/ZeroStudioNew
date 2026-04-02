@@ -97,6 +97,7 @@ class GitHostFragment : Fragment() {
                 3 -> getString(R.string.git_collaboration) // collaboration
                 4 -> getString(R.string.branches) // Branches
                 5 -> getString(R.string.stash) // Stash
+                6 -> getString("Diff") // GitDiffFragment
                 else -> getString(R.string.other)
               }
         }
@@ -126,6 +127,7 @@ class GitHostFragment : Fragment() {
         3 -> GitCollaborationFragment()
         4 -> GitBranchesFragment()
         5 -> GitStashFragment()
+        6 -> GitDiffFragment()
         else -> Fragment()
       }
     }

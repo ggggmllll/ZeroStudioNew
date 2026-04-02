@@ -60,8 +60,8 @@ public class EditorBottomSheetTabAdapter extends FragmentStateAdapter {
         IDELogFragment.class, ++index));
      
      //git版本控制
-    this.fragments.add(new Tab(fragmentActivity.getString(R.string.title_git), 
-       GitHostFragment.class, ++index));
+    // this.fragments.add(new Tab(fragmentActivity.getString(R.string.title_git), 
+       // GitHostFragment.class, ++index));
        
        //正则表达式可视化调试与预览
     this.fragments.add(new Tab(fragmentActivity.getString(R.string.title_regular_preview), 

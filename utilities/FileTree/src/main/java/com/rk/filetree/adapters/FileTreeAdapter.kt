@@ -1,7 +1,11 @@
 package com.rk.filetree.adapters
 
+import android.animation.ArgbEvaluator
+import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Color
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -24,6 +28,7 @@ class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {
   val expandView: ImageView = v.findViewById(R.id.expand)
   val fileView: ImageView = v.findViewById(R.id.file_view)
   val textView: TextView = v.findViewById(R.id.text_view)
+  val rootContainer: View = v
 }
 
 class NodeDiffCallback : DiffUtil.ItemCallback<Node<FileObject>>() {
@@ -32,7 +37,7 @@ class NodeDiffCallback : DiffUtil.ItemCallback<Node<FileObject>>() {
   }
 
   override fun areContentsTheSame(oldItem: Node<FileObject>, newItem: Node<FileObject>): Boolean {
-    return oldItem == newItem
+    return oldItem == newItem && oldItem.isHighlighted == newItem.isHighlighted
   }
 }
 
@@ -44,6 +49,15 @@ class FileTreeAdapter(private val context: Context, val fileTree: FileTree) :
   var iconProvider: FileIconProvider? = null
 
   private var animator = fileTree.itemAnimator
+
+  private val highlightColor: Int by lazy {
+      val typedValue = TypedValue()
+      if (context.theme.resolveAttribute(android.R.attr.colorControlHighlight, typedValue, true)) {
+          typedValue.data
+      } else {
+          Color.parseColor("#40888888")
+      }
+  }
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
     val view: View =
@@ -123,6 +137,23 @@ class FileTreeAdapter(private val context: Context, val fileTree: FileTree) :
     }
 
     holder.textView.text = "  ${node.value.getName()}  "
+
+    // 处理定位高亮效果 (闪烁动画)
+    if (node.isHighlighted) {
+        val animator = ObjectAnimator.ofObject(
+            holder.rootContainer,
+            "backgroundColor",
+            ArgbEvaluator(),
+            Color.TRANSPARENT,
+            highlightColor,
+            Color.TRANSPARENT
+        )
+        animator.duration = 1200 // 1.2s 闪烁一次
+        animator.repeatCount = 1
+        animator.start()
+    } else {
+        holder.rootContainer.setBackgroundColor(Color.TRANSPARENT)
+    }
   }
 
   fun expandNode(clickedNode: Node<FileObject>) {

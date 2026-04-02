@@ -1,6 +1,8 @@
 package com.rk.filetree.widget
 
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
 import android.util.AttributeSet
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -22,7 +24,8 @@ import com.rk.filetree.util.Sorter
  */
 class FileTree : RecyclerView {
 
-  private var fileTreeAdapter: FileTreeAdapter
+  var fileTreeAdapter: FileTreeAdapter
+    private set
   private lateinit var rootFileObject: FileObject
 
   private var isTreeInitialized = false
@@ -108,19 +111,34 @@ class FileTree : RecyclerView {
     }
   }
 
-  fun reloadFileTree() {
+  fun reloadFileTreeSilently() {
+    //记忆滚动状态
+    val layoutManager = this.layoutManager as LinearLayoutManager
+    val firstVisiblePosition = layoutManager.findFirstVisibleItemPosition()
+    val topOffset = layoutManager.findViewByPosition(firstVisiblePosition)?.top ?: 0
+    val savedState = getSaveState()
+
+    //重新加载根节点数据
     val nodes: List<Node<FileObject>> =
         if (isRootNodeVisible) {
           mutableListOf<Node<FileObject>>().apply { add(Node(rootFileObject)) }
         } else {
           Sorter.sort(rootFileObject)
         }
-    fileTreeAdapter.submitList(nodes)
+
+    fileTreeAdapter.submitList(nodes) {
+      //恢复展开状态
+      restoreState(savedState)
+      //恢复 Y 轴滚动位置
+      post { layoutManager.scrollToPositionWithOffset(firstVisiblePosition, topOffset) }
+    }
   }
 
 
   fun expandNode(node: Node<FileObject>) {
-    fileTreeAdapter.expandNode(node)
+    if (!node.isExpand) {
+        fileTreeAdapter.expandNode(node)
+    }
   }
 
   fun collapseNode(node: Node<FileObject>) {
@@ -160,10 +178,57 @@ class FileTree : RecyclerView {
     if (state.isNullOrEmpty()) return
     val pathsToExpand = state.split(";").toSet()
 
-    for (node in fileTreeAdapter.currentList.toList()) {
+    val currentList = fileTreeAdapter.currentList.toList()
+    for (node in currentList) {
       if (pathsToExpand.contains(node.value.getAbsolutePath()) && !node.isExpand) {
         expandNode(node)
       }
     }
+  }
+
+  /**
+   * 精准定位文件位置。通过路径逐级比对并展开父目录，最后滚动到目标。
+   */
+  fun locateFileAndScroll(targetAbsolutePath: String) {
+      post {
+          var targetIndex = -1
+
+          var retry = true
+          while (retry) {
+              retry = false
+              val list = fileTreeAdapter.currentList.toList()
+              for ((index, node) in list.withIndex()) {
+                  val path = node.value.getAbsolutePath()
+                  if (path == targetAbsolutePath) {
+                      targetIndex = index
+                      break
+                  }
+
+                  if (targetAbsolutePath.startsWith(path + "/") && !node.isExpand) {
+                      expandNode(node)
+                      retry = true
+                      break
+                  }
+              }
+          }
+
+          if (targetIndex != -1) {
+              val lm = layoutManager as LinearLayoutManager
+              val offset = (height / 2) // 居中显示
+              lm.scrollToPositionWithOffset(targetIndex, offset)
+              
+              val targetNode = fileTreeAdapter.currentList[targetIndex]
+              targetNode.isHighlighted = true
+              fileTreeAdapter.notifyItemChanged(targetIndex)
+              
+              Handler(Looper.getMainLooper()).postDelayed({
+                  targetNode.isHighlighted = false
+                  val currentPos = fileTreeAdapter.currentList.indexOf(targetNode)
+                  if (currentPos != -1) {
+                      fileTreeAdapter.notifyItemChanged(currentPos)
+                  }
+              }, 2500)
+          }
+      }
   }
 }

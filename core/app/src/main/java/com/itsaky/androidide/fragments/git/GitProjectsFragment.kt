@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.view.isVisible
+import androidx.fragment.app.viewModels
 import com.itsaky.androidide.R
 import com.itsaky.androidide.activities.editor.EditorHandlerActivity
 import com.itsaky.androidide.databinding.FragmentGitProjectsBinding
@@ -15,7 +16,9 @@ import com.itsaky.androidide.eventbus.events.filetree.FileLongClickEvent
 import com.itsaky.androidide.fragments.git.function.ZeroCloneDialogBottomSheetFragment
 import com.itsaky.androidide.fragments.git.menu.GitBranchPopupManager
 import com.itsaky.androidide.fragments.git.tree.ListProjectFilesRequestEvent
-import com.itsaky.androidide.interfaces.IEditorHandler
+import com.itsaky.androidide.viewmodel.FileTreeViewModel
+import com.itsaky.androidide.provider.IDEFileIconProvider
+import com.itsaky.androidide.fragments.git.tree.TreeStateManager
 import com.itsaky.androidide.projects.IProjectManager
 import com.rk.filetree.interfaces.FileClickListener
 import com.rk.filetree.interfaces.FileLongClickListener
@@ -34,36 +37,38 @@ import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 
 /**
+ * Git 项目侧边栏。 
+ * 
  * @author android_zero
  */
 class GitProjectsFragment : BaseGitPageFragment(), FileClickListener, FileLongClickListener {
 
   private var _binding: FragmentGitProjectsBinding? = null
-  private val binding
-    get() = _binding!!
+  private val binding get() = _binding!!
 
   private var fileTreeView: FileTree? = null
   private var loadingJob: Job? = null
   private var tvCurrentBranch: android.widget.TextView? = null
   private var branchPopupManager: GitBranchPopupManager? = null
 
-  override fun onCreateView(
-      inflater: LayoutInflater,
-      container: ViewGroup?,
-      savedInstanceState: Bundle?,
-  ): View {
+  private val viewModel: FileTreeViewModel by viewModels({ requireActivity() })
+  private val stateManager = TreeStateManager()
+
+  override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
     _binding = FragmentGitProjectsBinding.inflate(inflater, container, false)
     return binding.root
   }
 
   override fun onStart() {
-    super.onStart()
+    super.onStart()-
     if (!EventBus.getDefault().isRegistered(this)) EventBus.getDefault().register(this)
   }
 
   override fun onStop() {
     super.onStop()
     if (EventBus.getDefault().isRegistered(this)) EventBus.getDefault().unregister(this)
+    // 自动保存状态
+    fileTreeView?.let { viewModel.saveState(it) }
   }
 
   override fun setupToolbar() {
@@ -80,12 +85,46 @@ class GitProjectsFragment : BaseGitPageFragment(), FileClickListener, FileLongCl
     }
     addToolbarCustomView(branchView)
 
-    addToolbarAction(R.drawable.ic_target_positioning_24dp, "Locate File") { locateCurrentFile() }
-
+    // 刷新
     addToolbarAction(R.drawable.ic_refresh_file_24dp, getString(R.string.refresh)) {
-      refreshFileTree()
+      fileTreeView?.reloadFileTreeSilently()
+      Toast.makeText(context, "Refreshed silently", Toast.LENGTH_SHORT).show()
     }
 
+    // 定位文件
+    addToolbarAction(R.drawable.ic_target_positioning_24dp, "Locate Current File") {
+      val activity = context as? EditorHandlerActivity
+      val currentFile = activity?.getCurrentEditor()?.file
+      if (currentFile != null && currentFile.exists()) {
+        fileTreeView?.locateFileAndScroll(currentFile.absolutePath)
+      } else {
+        Toast.makeText(context, "No active file in editor", Toast.LENGTH_SHORT).show()
+      }
+    }
+
+    // 展开全部 / 折叠全部 (长按清除记忆)
+    val btnCollapse = addToolbarAction(R.drawable.ic_chevron_right, "Collapse All") {
+      fileTreeView?.let { stateManager.pushState(it); it.collapseAll() }
+    }
+    btnCollapse.setOnLongClickListener {
+      fileTreeView?.let { stateManager.clear(); it.collapseAll(); viewModel.treeState.value = "" }
+      Toast.makeText(context, "Cleared memory and collapsed all", Toast.LENGTH_SHORT).show()
+      true
+    }
+
+    addToolbarAction(R.drawable.ic_chevron_down, "Expand All") {
+      fileTreeView?.let { stateManager.pushState(it); it.expandAll() }
+    }
+
+    //撤销 / 重做节点状态
+    addToolbarAction(R.drawable.ic_undo_24, "Undo Node Action") {
+      fileTreeView?.let { stateManager.undo(it) }
+    }
+    addToolbarAction(R.drawable.ic_redo_24, "Redo Node Action") {
+      fileTreeView?.let { stateManager.redo(it) }
+    }
+
+    // Git 操作...
     addToolbarAction(R.drawable.ic_git_clone_24dp, getString(R.string.git_clone)) {
       ZeroCloneDialogBottomSheetFragment.newInstance(repoId = "")
           .show(childFragmentManager, "GitProjectsCloneBottomSheet")
@@ -107,66 +146,46 @@ class GitProjectsFragment : BaseGitPageFragment(), FileClickListener, FileLongCl
     view.post { listProjectFiles() }
   }
 
-  private fun refreshFileTree() {
-    listProjectFiles()
-  }
-
-  private fun locateCurrentFile() {
-    val activity = context as? EditorHandlerActivity
-    val currentFile = activity?.getCurrentEditor()?.file
-    
-    if (currentFile == null || !currentFile.exists()) {
-      Toast.makeText(context, "No active file", Toast.LENGTH_SHORT).show()
-      return
-    }
-    Toast.makeText(context, "Located: ${currentFile.name}", Toast.LENGTH_SHORT).show()
-  }
-
   private fun listProjectFiles() {
     if (loadingJob?.isActive == true) return
 
-    loadingJob =
-        CoroutineScope(Dispatchers.Main).launch {
-          setLoading(true)
-          val root =
-              withContext(Dispatchers.IO) {
-                IProjectManager.getInstance()
-                    .projectDirPath
-                    ?.takeIf { it.isNotBlank() }
-                    ?.let(::File)
-              }
+    loadingJob = CoroutineScope(Dispatchers.Main).launch {
+      setLoading(true)
+      val root = withContext(Dispatchers.IO) {
+        IProjectManager.getInstance().projectDirPath?.takeIf { it.isNotBlank() }?.let(::File)
+      }
 
-          if (root == null || !root.exists()) {
-            binding.treeContainer.removeAllViews()
-            binding.tvEmpty.isVisible = true
-            binding.tvEmpty.text = "No project opened"
-            setLoading(false)
-            return@launch
-          }
+      if (root == null || !root.exists()) {
+        binding.treeContainer.removeAllViews()
+        binding.tvEmpty.isVisible = true
+        binding.tvEmpty.text = "No project opened"
+        setLoading(false)
+        return@launch
+      }
 
-          binding.tvEmpty.isVisible = false
-          setupFileTree(requireContext(), root)
-          setLoading(false)
-        }
+      binding.tvEmpty.isVisible = false
+      setupFileTree(requireContext(), root)
+      setLoading(false)
+    }
   }
 
   private fun setupFileTree(ctx: Context, projectRoot: File) {
-    val tree =
-        (fileTreeView ?: FileTree(ctx).also { fileTreeView = it }).apply {
-          setOnFileClickListener(this@GitProjectsFragment)
-          setOnFileLongClickListener(this@GitProjectsFragment)
-          loadFiles(file(projectRoot), true)
-        }
+    val tree = (fileTreeView ?: FileTree(ctx).also { fileTreeView = it }).apply {
+      setIconProvider(IDEFileIconProvider(ctx))
+      setOnFileClickListener(this@GitProjectsFragment)
+      setOnFileLongClickListener(this@GitProjectsFragment)
+      loadFiles(file(projectRoot), true)
+    }
 
     if (tree.parent == null) {
       binding.treeContainer.removeAllViews()
       binding.treeContainer.addView(
           tree,
-          ViewGroup.LayoutParams(
-              ViewGroup.LayoutParams.MATCH_PARENT,
-              ViewGroup.LayoutParams.MATCH_PARENT,
-          ),
+          ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
       )
+      
+      // 恢复状态
+      tree.post { tree.restoreState(viewModel.savedState) }
     }
   }
 
@@ -176,20 +195,27 @@ class GitProjectsFragment : BaseGitPageFragment(), FileClickListener, FileLongCl
   }
 
   override fun onClick(node: Node<FileObject>) {
-    val target = (node.value as? file)?.getNativeFile() ?: return
+    fileTreeView?.let { stateManager.pushState(it) } // 记录点击前的状态
+
+    val target = IDEFileIconProvider.extractNativeFile(node.value) ?: return
     if (target.isFile) {
-      EventBus.getDefault().post(FileClickEvent(target))
+      val event = FileClickEvent(target)
+      event.put(Context::class.java, requireContext())
+      EventBus.getDefault().post(event)
     }
   }
 
   override fun onLongClick(node: Node<FileObject>) {
-    val target = (node.value as? file)?.getNativeFile() ?: return
-    EventBus.getDefault().post(FileLongClickEvent(target))
+    val target = IDEFileIconProvider.extractNativeFile(node.value) ?: return
+    val event = FileLongClickEvent(target)
+    event.put(Context::class.java, requireContext())
+    event.put(Node::class.java, node)
+    EventBus.getDefault().post(event)
   }
 
   @Subscribe(threadMode = ThreadMode.MAIN)
   fun onListProjectFilesRequest(event: ListProjectFilesRequestEvent?) {
-    listProjectFiles()
+    fileTreeView?.reloadFileTreeSilently()
   }
 
   override fun onDestroyView() {
