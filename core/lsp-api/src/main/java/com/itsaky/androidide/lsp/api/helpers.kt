@@ -17,8 +17,12 @@
 
 package com.itsaky.androidide.lsp.api
 
+import com.itsaky.androidide.lsp.models.DocumentSymbolsResult
+import com.itsaky.androidide.lsp.models.SemanticTokens
+import com.itsaky.androidide.lsp.models.SemanticTokensParams
 import com.itsaky.androidide.lsp.models.SnippetDescription
 import io.github.rosemoe.sora.lang.completion.snippet.CodeSnippet
+import java.nio.file.Path
 
 @JvmOverloads
 fun describeSnippet(
@@ -27,3 +31,10 @@ fun describeSnippet(
     snippet: CodeSnippet? = null,
     allowCommandExecution: Boolean = false,
 ) = SnippetDescription(prefix.length, deleteSelected, snippet, allowCommandExecution)
+
+/** Capability helpers for newly added extended protocol surfaces. */
+suspend fun ILanguageServer.safeDocumentSymbols(file: Path): DocumentSymbolsResult =
+    runCatching { documentSymbols(file) }.getOrDefault(DocumentSymbolsResult())
+
+suspend fun ILanguageServer.safeSemanticTokens(params: SemanticTokensParams): SemanticTokens =
+    runCatching { semanticTokensFull(params) }.getOrDefault(SemanticTokens())

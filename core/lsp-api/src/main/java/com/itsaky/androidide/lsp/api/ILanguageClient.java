@@ -22,6 +22,12 @@ import com.itsaky.androidide.lsp.models.CodeActionItem;
 import com.itsaky.androidide.lsp.models.DiagnosticItem;
 import com.itsaky.androidide.lsp.models.DiagnosticResult;
 import com.itsaky.androidide.lsp.models.PerformCodeActionParams;
+import com.itsaky.androidide.lsp.models.LogMessageParams;
+import com.itsaky.androidide.lsp.models.ShowMessageParams;
+import com.itsaky.androidide.lsp.models.WorkDoneProgressBegin;
+import com.itsaky.androidide.lsp.models.WorkDoneProgressEnd;
+import com.itsaky.androidide.lsp.models.WorkDoneProgressReport;
+import com.itsaky.androidide.lsp.models.WorkspaceEdit;
 import com.itsaky.androidide.lsp.models.ShowDocumentParams;
 import com.itsaky.androidide.lsp.models.ShowDocumentResult;
 import com.itsaky.androidide.models.Location;
@@ -95,4 +101,23 @@ public interface ILanguageClient {
    * @param locations The location to show.
    */
   void showLocations(List<Location> locations);
+
+  /** Apply a workspace edit (documentChanges/resource operations). */
+  default boolean applyWorkspaceEdit(WorkspaceEdit edit) {
+    return false;
+  }
+
+  /** Show a user-visible message from server. */
+  default void showMessage(ShowMessageParams params) {}
+
+  /** Log message from server. */
+  default void logMessage(LogMessageParams params) {}
+
+  /** Work done progress lifecycle. */
+  default void workDoneProgressBegin(WorkDoneProgressBegin params) {}
+
+  default void workDoneProgressReport(WorkDoneProgressReport params) {}
+
+  default void workDoneProgressEnd(WorkDoneProgressEnd params) {}
+
 }

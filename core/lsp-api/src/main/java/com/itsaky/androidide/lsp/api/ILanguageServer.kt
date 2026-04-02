@@ -44,6 +44,23 @@ import com.itsaky.androidide.lsp.models.LSPFailure
 import com.itsaky.androidide.lsp.models.ReferenceParams
 import com.itsaky.androidide.lsp.models.ReferenceResult
 import com.itsaky.androidide.lsp.models.SignatureHelp
+import com.itsaky.androidide.lsp.models.CallHierarchyItem
+import com.itsaky.androidide.lsp.models.CodeLens
+import com.itsaky.androidide.lsp.models.DocumentLink
+import com.itsaky.androidide.lsp.models.DocumentSymbolsResult
+import com.itsaky.androidide.lsp.models.FoldingRange
+import com.itsaky.androidide.lsp.models.InlayHint
+import com.itsaky.androidide.lsp.models.InlayHintParams
+import com.itsaky.androidide.lsp.models.PrepareRenameResult
+import com.itsaky.androidide.lsp.models.RenameParams
+import com.itsaky.androidide.lsp.models.SelectionRange
+import com.itsaky.androidide.lsp.models.SelectionRangesParams
+import com.itsaky.androidide.lsp.models.SemanticTokens
+import com.itsaky.androidide.lsp.models.SemanticTokensDelta
+import com.itsaky.androidide.lsp.models.SemanticTokensParams
+import com.itsaky.androidide.lsp.models.TypeHierarchyItem
+import com.itsaky.androidide.lsp.models.WorkspaceEdit
+import com.itsaky.androidide.lsp.models.WorkspaceSymbolsResult
 import com.itsaky.androidide.lsp.models.SignatureHelpParams
 import com.itsaky.androidide.models.Range
 import com.itsaky.androidide.projects.IWorkspace
@@ -171,6 +188,78 @@ interface ILanguageServer {
    * @param failure [LSPFailure] describing the failure.
    * @return `true` if the failure was handled. `false` otherwise.
    */
+
+
+  /** Document symbols for outline/tree view. */
+  suspend fun documentSymbols(file: Path): DocumentSymbolsResult {
+    return DocumentSymbolsResult()
+  }
+
+  /** Workspace-wide symbol search. */
+  suspend fun workspaceSymbols(query: String): WorkspaceSymbolsResult {
+    return WorkspaceSymbolsResult()
+  }
+
+  /** Prepare rename at cursor. */
+  suspend fun prepareRename(params: DefinitionParams): PrepareRenameResult? {
+    return null
+  }
+
+  /** Apply rename and return workspace edits. */
+  suspend fun rename(params: RenameParams): WorkspaceEdit {
+    return WorkspaceEdit()
+  }
+
+  /** Folding ranges in a document. */
+  suspend fun foldingRanges(file: Path): List<FoldingRange> {
+    return emptyList()
+  }
+
+  /** Selection ranges for multiple positions. */
+  suspend fun selectionRanges(params: SelectionRangesParams): List<SelectionRange> {
+    return emptyList()
+  }
+
+  /** Full semantic tokens. */
+  suspend fun semanticTokensFull(params: SemanticTokensParams): SemanticTokens {
+    return SemanticTokens()
+  }
+
+  /** Semantic tokens in range. */
+  suspend fun semanticTokensRange(params: SemanticTokensParams): SemanticTokens {
+    return SemanticTokens()
+  }
+
+  /** Delta semantic tokens update. */
+  suspend fun semanticTokensDelta(params: SemanticTokensParams): SemanticTokensDelta {
+    return SemanticTokensDelta()
+  }
+
+  /** Inlay hints in range. */
+  suspend fun inlayHints(params: InlayHintParams): List<InlayHint> {
+    return emptyList()
+  }
+
+  /** Document links with optional targets. */
+  suspend fun documentLinks(file: Path): List<DocumentLink> {
+    return emptyList()
+  }
+
+  /** Code lens entries for document. */
+  suspend fun codeLens(file: Path): List<CodeLens> {
+    return emptyList()
+  }
+
+  /** Call hierarchy prepare. */
+  suspend fun callHierarchy(params: DefinitionParams): List<CallHierarchyItem> {
+    return emptyList()
+  }
+
+  /** Type hierarchy prepare. */
+  suspend fun typeHierarchy(params: DefinitionParams): List<TypeHierarchyItem> {
+    return emptyList()
+  }
+
   fun handleFailure(failure: LSPFailure?): Boolean {
     return false
   }

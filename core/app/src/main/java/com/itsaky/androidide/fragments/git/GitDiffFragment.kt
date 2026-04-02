@@ -90,14 +90,15 @@ class GitDiffFragment : BaseGitPageFragment() {
     val file = changedFiles[currentIndex]
     
     val diffItem = runBlocking {
-        Libgit2Helper.getSingleDiffItem(
-            repo = repo,
-            relativePathUnderRepo = file.relativePathUnderRepo,
-            fromTo = Cons.gitDiffFromIndexToWorktree,
-            loadChannel = null,
-            checkChannelLinesLimit = 200,
-            checkChannelSizeLimit = 1024 * 64,
-        )
+      Libgit2Helper.getSingleDiffItem(
+          repo = repo,
+          relativePathUnderRepo = file.relativePathUnderRepo,
+          fromTo = Cons.gitDiffFromIndexToWorktree,
+          loadChannel = null,
+          checkChannelLinesLimit = 200,
+          checkChannelSizeLimit = 1024 * 64,
+      )
+    }
 
     val rendered = mutableListOf<DiffLine>()
     rendered.add(DiffLine(-1, -1, "File: ${file.relativePathUnderRepo}", DiffType.HUNK_HEADER))
@@ -226,5 +227,4 @@ class GitDiffFragment : BaseGitPageFragment() {
     super.onDestroyView()
     _binding = null
   }
-}
 }
