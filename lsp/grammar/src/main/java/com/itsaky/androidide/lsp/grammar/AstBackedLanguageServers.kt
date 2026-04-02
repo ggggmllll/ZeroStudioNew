@@ -11,6 +11,11 @@ import com.itsaky.androidide.projects.IWorkspace
 import java.nio.file.Path
 import kotlin.io.path.exists
 
+/**
+ * Generic AST-backed language server family for lightweight lexers.
+ *
+ * 当前先统一实现 ILanguageServer 已暴露的能力：completion / diagnostics / hover / basic navigation placeholders。
+ */
 abstract class BaseAstLanguageServer(
     override val serverId: String,
     private val keywords: List<String>,
