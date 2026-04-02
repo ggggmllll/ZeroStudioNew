@@ -35,10 +35,17 @@ import com.itsaky.androidide.lsp.api.ILanguageClient;
 import com.itsaky.androidide.lsp.models.CodeActionItem;
 import com.itsaky.androidide.lsp.models.DiagnosticItem;
 import com.itsaky.androidide.lsp.models.DiagnosticResult;
+import com.itsaky.androidide.lsp.models.LogMessageParams;
+import com.itsaky.androidide.lsp.models.MessageType;
 import com.itsaky.androidide.lsp.models.PerformCodeActionParams;
+import com.itsaky.androidide.lsp.models.ShowMessageParams;
 import com.itsaky.androidide.lsp.models.ShowDocumentParams;
 import com.itsaky.androidide.lsp.models.ShowDocumentResult;
 import com.itsaky.androidide.lsp.models.TextEdit;
+import com.itsaky.androidide.lsp.models.WorkDoneProgressBegin;
+import com.itsaky.androidide.lsp.models.WorkDoneProgressEnd;
+import com.itsaky.androidide.lsp.models.WorkDoneProgressReport;
+import com.itsaky.androidide.lsp.models.WorkspaceEdit;
 import com.itsaky.androidide.lsp.util.DiagnosticUtil;
 import com.itsaky.androidide.models.DiagnosticGroup;
 import com.itsaky.androidide.models.Location;
@@ -462,5 +469,57 @@ public void publishDiagnostics(DiagnosticResult result) {
 
   private Unit noOp(final Object obj) {
     return Unit.INSTANCE;
+  }
+  @Override
+  public boolean applyWorkspaceEdit(WorkspaceEdit edit) {
+    if (edit == null || edit.getDocumentChanges() == null || edit.getDocumentChanges().isEmpty()) {
+      return false;
+    }
+    final var action = new CodeActionItem();
+    action.setTitle("workspace-edit");
+    action.setChanges(edit.getDocumentChanges());
+    performCodeAction(new PerformCodeActionParams(false, action));
+    return true;
+  }
+
+  @Override
+  public void showMessage(ShowMessageParams params) {
+    if (params == null) return;
+    if (params.getType() == MessageType.Error) {
+      FlashbarUtilsKt.flashError(params.getMessage());
+    } else {
+      LOG.info(params.getMessage());
+    }
+  }
+
+  @Override
+  public void logMessage(LogMessageParams params) {
+    if (params == null) return;
+    switch (params.getType()) {
+      case Error -> LOG.error(params.getMessage());
+      case Warning -> LOG.warn(params.getMessage());
+      default -> LOG.info(params.getMessage());
+    }
+  }
+
+  @Override
+  public void workDoneProgressBegin(WorkDoneProgressBegin params) {
+    if (params != null) {
+      LOG.info("[LSP Progress] BEGIN {} {}", params.getTitle(), params.getMessage());
+    }
+  }
+
+  @Override
+  public void workDoneProgressReport(WorkDoneProgressReport params) {
+    if (params != null) {
+      LOG.info("[LSP Progress] REPORT {}% {}", params.getPercentage(), params.getMessage());
+    }
+  }
+
+  @Override
+  public void workDoneProgressEnd(WorkDoneProgressEnd params) {
+    if (params != null) {
+      LOG.info("[LSP Progress] END {}", params.getMessage());
+    }
   }
 }
