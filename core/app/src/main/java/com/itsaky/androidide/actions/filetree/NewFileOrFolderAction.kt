@@ -29,8 +29,8 @@ import com.itsaky.androidide.resources.R
 import com.itsaky.androidide.utils.DialogUtils
 import com.itsaky.androidide.utils.flashError
 import com.itsaky.androidide.utils.flashSuccess
-import com.rk.filetree.interfaces.FileObject
-import com.rk.filetree.model.Node
+import android.zero.studio.view.filetree.interfaces.FileObject
+import android.zero.studio.view.filetree.model.Node
 import java.io.File
 import java.io.IOException
 /**

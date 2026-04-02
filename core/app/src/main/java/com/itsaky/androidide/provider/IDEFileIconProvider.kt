@@ -5,10 +5,10 @@ import android.graphics.drawable.Drawable
 import androidx.core.content.ContextCompat
 import com.itsaky.androidide.R
 import com.itsaky.androidide.models.FileExtension
-import com.rk.filetree.interfaces.FileIconProvider
-import com.rk.filetree.interfaces.FileObject
-import com.rk.filetree.model.Node
-import com.rk.filetree.provider.file
+import android.zero.studio.view.filetree.interfaces.FileIconProvider
+import android.zero.studio.view.filetree.interfaces.FileObject
+import android.zero.studio.view.filetree.model.Node
+import android.zero.studio.view.filetree.provider.file
 import java.io.File
 
 /**
@@ -36,7 +36,7 @@ class IDEFileIconProvider(private val context: Context) : FileIconProvider {
 
     companion object {
         fun extractNativeFile(fileObj: FileObject): File? {
-            // 支持 com.rk.filetree 的原生 file 以及 DataTree 里的自定义虚拟类
+            // 支持 android.zero.studio.view.filetree 的原生 file 以及 DataTree 里的自定义虚拟类
             if (fileObj is file) return fileObj.getNativeFile()
             if (fileObj is File) return fileObj
             // 通过反射或路径降级提取

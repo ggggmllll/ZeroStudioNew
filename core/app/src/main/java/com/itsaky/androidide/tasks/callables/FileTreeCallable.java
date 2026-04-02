@@ -21,8 +21,8 @@
 package com.itsaky.androidide.tasks.callables;
 
 import android.content.Context;
-import com.rk.filetree.interfaces.FileObject;
-import com.rk.filetree.model.Node;
+import android.zero.studio.view.filetree.interfaces.FileObject;
+import android.zero.studio.view.filetree.model.Node;
 import java.io.File;
 import java.io.FileFilter;
 import java.util.Arrays;
@@ -31,7 +31,7 @@ import java.util.concurrent.Callable;
 
 /**
  * [Deprecated] 
- * 随着项目重构至 com.rk.filetree，树状结构的遍历加载已被新 API 内部集成。
+ * 随着项目重构至 android.zero.studio.view.filetree，树状结构的遍历加载已被新 API 内部集成。
  * 保留该类以防止任何意外的依赖中断。
  * 
  * @author android_zero

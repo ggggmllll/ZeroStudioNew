@@ -1,6 +1,6 @@
 package com.itsaky.androidide.fragments.git.tree
 
-import com.rk.filetree.widget.FileTree
+import android.zero.studio.view.filetree.widget.FileTree
 import java.util.Stack
 
 /**

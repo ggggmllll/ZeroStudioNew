@@ -29,8 +29,8 @@ import com.itsaky.androidide.actions.markInvisible
 import com.itsaky.androidide.eventbus.events.Event
 import com.itsaky.androidide.events.ExpandTreeNodeRequestEvent
 import com.itsaky.androidide.events.ListProjectFilesRequestEvent
-import com.rk.filetree.model.Node
-import com.rk.filetree.interfaces.FileObject
+import android.zero.studio.view.filetree.model.Node
+import android.zero.studio.view.filetree.interfaces.FileObject
 import java.io.File
 import org.greenrobot.eventbus.EventBus
 

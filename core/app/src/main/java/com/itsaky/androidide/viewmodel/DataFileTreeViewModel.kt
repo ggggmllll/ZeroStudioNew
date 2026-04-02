@@ -19,7 +19,7 @@ package com.itsaky.androidide.viewmodel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.itsaky.androidide.tasks.executeAsync
-import com.rk.filetree.widget.FileTree
+import android.zero.studio.view.filetree.widget.FileTree
 
 /**
  * ViewModel for the internal data file tree fragment.

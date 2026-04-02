@@ -3,7 +3,7 @@ package com.itsaky.androidide.fragments.sidebar.datatree
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.itsaky.androidide.tasks.executeAsync
-import com.rk.filetree.widget.FileTree
+import android.zero.studio.view.filetree.widget.FileTree
 
 /**
  * @author android_zero

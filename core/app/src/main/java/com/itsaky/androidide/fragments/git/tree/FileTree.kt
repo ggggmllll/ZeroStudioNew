@@ -19,8 +19,8 @@ package com.itsaky.androidide.fragments.git.tree
 
 import com.itsaky.androidide.eventbus.events.Event
 import com.itsaky.androidide.models.SheetOption
-import com.rk.filetree.interfaces.FileObject
-import com.rk.filetree.model.Node
+import android.zero.studio.view.filetree.interfaces.FileObject
+import android.zero.studio.view.filetree.model.Node
 
 /**
  * Git 专属的 FileTree 事件总线定义

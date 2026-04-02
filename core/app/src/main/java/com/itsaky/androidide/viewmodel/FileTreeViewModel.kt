@@ -21,7 +21,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.itsaky.androidide.tasks.executeAsync
 import com.itsaky.androidide.tasks.runOnUiThread
-import com.rk.filetree.widget.FileTree
+import android.zero.studio.view.filetree.widget.FileTree
 
 /**
  * [ViewModel] for the file tree fragment.

@@ -34,8 +34,8 @@ import com.itsaky.androidide.utils.ProjectWriter
 import com.itsaky.androidide.utils.SingleTextWatcher
 import com.itsaky.androidide.utils.flashError
 import com.itsaky.androidide.utils.flashSuccess
-import com.rk.filetree.interfaces.FileObject
-import com.rk.filetree.model.Node
+import android.zero.studio.view.filetree.interfaces.FileObject
+import android.zero.studio.view.filetree.model.Node
 import java.io.File
 import java.util.Objects
 import java.util.regex.Pattern
