@@ -19,10 +19,16 @@ package com.itsaky.androidide.fragments.git.tree
 
 import com.itsaky.androidide.eventbus.events.Event
 import com.itsaky.androidide.models.SheetOption
-import com.unnamed.b.atv.model.TreeNode
+import com.rk.filetree.interfaces.FileObject
+import com.rk.filetree.model.Node
 
+/**
+ * Git 专属的 FileTree 事件总线定义
+ *
+ * @author android_zero
+ */
 internal data class FileContextMenuItemClickEvent(val option: SheetOption) : Event()
 
-data class ExpandTreeNodeRequestEvent(val node: TreeNode) : Event()
+data class ExpandTreeNodeRequestEvent(val node: Node<FileObject>) : Event()
 
 class ListProjectFilesRequestEvent : Event()

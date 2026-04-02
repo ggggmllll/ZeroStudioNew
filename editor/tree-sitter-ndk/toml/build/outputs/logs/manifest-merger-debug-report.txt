@@ -1,16 +1,16 @@
 -- Merging decision tree log ---
 manifest
-ADDED from /root/ZeroStudio-main/editor/tree-sitter-ndk/toml/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest4137122872100287698.xml:2:13-83
-INJECTED from /root/ZeroStudio-main/editor/tree-sitter-ndk/toml/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest4137122872100287698.xml:2:13-83
+ADDED from /root/ZeroStudio/editor/tree-sitter-ndk/toml/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest12847657245943894338.xml:2:13-83
+INJECTED from /root/ZeroStudio/editor/tree-sitter-ndk/toml/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest12847657245943894338.xml:2:13-83
 	package
-		INJECTED from /root/ZeroStudio-main/editor/tree-sitter-ndk/toml/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest4137122872100287698.xml
+		INJECTED from /root/ZeroStudio/editor/tree-sitter-ndk/toml/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest12847657245943894338.xml
 	xmlns:android
-		ADDED from /root/ZeroStudio-main/editor/tree-sitter-ndk/toml/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest4137122872100287698.xml:2:23-81
+		ADDED from /root/ZeroStudio/editor/tree-sitter-ndk/toml/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest12847657245943894338.xml:2:23-81
 uses-sdk
-INJECTED from /root/ZeroStudio-main/editor/tree-sitter-ndk/toml/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest4137122872100287698.xml reason: use-sdk injection requested
-INJECTED from /root/ZeroStudio-main/editor/tree-sitter-ndk/toml/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest4137122872100287698.xml
-INJECTED from /root/ZeroStudio-main/editor/tree-sitter-ndk/toml/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest4137122872100287698.xml
+INJECTED from /root/ZeroStudio/editor/tree-sitter-ndk/toml/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest12847657245943894338.xml reason: use-sdk injection requested
+INJECTED from /root/ZeroStudio/editor/tree-sitter-ndk/toml/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest12847657245943894338.xml
+INJECTED from /root/ZeroStudio/editor/tree-sitter-ndk/toml/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest12847657245943894338.xml
 	android:targetSdkVersion
-		INJECTED from /root/ZeroStudio-main/editor/tree-sitter-ndk/toml/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest4137122872100287698.xml
+		INJECTED from /root/ZeroStudio/editor/tree-sitter-ndk/toml/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest12847657245943894338.xml
 	android:minSdkVersion
-		INJECTED from /root/ZeroStudio-main/editor/tree-sitter-ndk/toml/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest4137122872100287698.xml
+		INJECTED from /root/ZeroStudio/editor/tree-sitter-ndk/toml/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest12847657245943894338.xml

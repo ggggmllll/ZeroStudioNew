@@ -14,19 +14,31 @@
  *  You should have received a copy of the GNU General Public License
  *   along with AndroidIDE.  If not, see <https://www.gnu.org/licenses/>.
  */
+package com.itsaky.androidide.viewmodel
 
-package com.itsaky.androidide.events
-
-import com.itsaky.androidide.eventbus.events.Event
-import com.itsaky.androidide.models.SheetOption
-import com.rk.filetree.interfaces.FileObject
-import com.rk.filetree.model.Node
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import com.itsaky.androidide.tasks.executeAsync
+import com.rk.filetree.widget.FileTree
 
 /**
+ * ViewModel for the internal data file tree fragment.
  * @author android_zero
  */
-internal data class FileContextMenuItemClickEvent(val option: SheetOption) : Event()
+internal class DataFileTreeViewModel : ViewModel() {
+  private val _treeState = MutableLiveData<String?>()
+  val treeState: MutableLiveData<String?>
+    get() = _treeState
 
-data class ExpandTreeNodeRequestEvent(val node: Node<FileObject>) : Event()
+  val savedState: String
+    get() = _treeState.value ?: ""
 
-class ListProjectFilesRequestEvent : Event()
+  fun saveState(treeView: FileTree?) {
+    treeView?.let { tree ->
+      executeAsync(
+          { tree.getSaveState() }, 
+          { result -> _treeState.value = result }
+      )
+    }
+  }
+}

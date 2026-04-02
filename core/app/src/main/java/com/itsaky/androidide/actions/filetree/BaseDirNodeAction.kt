@@ -27,7 +27,7 @@ import com.itsaky.androidide.actions.requireFile
 /**
  * Base class for action items for directory nodes.
  *
- * @author Akash Yadav
+ * @author android_zero
  */
 abstract class BaseDirNodeAction(
     context: Context,

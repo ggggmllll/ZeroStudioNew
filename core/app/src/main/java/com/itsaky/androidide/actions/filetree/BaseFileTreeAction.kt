@@ -29,14 +29,15 @@ import com.itsaky.androidide.actions.markInvisible
 import com.itsaky.androidide.eventbus.events.Event
 import com.itsaky.androidide.events.ExpandTreeNodeRequestEvent
 import com.itsaky.androidide.events.ListProjectFilesRequestEvent
-import com.unnamed.b.atv.model.TreeNode
+import com.rk.filetree.model.Node
+import com.rk.filetree.interfaces.FileObject
 import java.io.File
 import org.greenrobot.eventbus.EventBus
 
 /**
  * Base class for actions related to the file tree.
- *
- * @author Akash Yadav
+ * 
+ * @author android_zero
  */
 abstract class BaseFileTreeAction(
     context: Context,
@@ -64,14 +65,15 @@ abstract class BaseFileTreeAction(
   }
 
   protected open fun ActionData.hasFileTreeData(): Boolean {
-    return hasRequiredData(Context::class.java, File::class.java, TreeNode::class.java)
+    return hasRequiredData(Context::class.java, File::class.java, Node::class.java)
   }
 
-  protected fun ActionData.getTreeNode(): TreeNode? {
-    return this[TreeNode::class.java]
+  @Suppress("UNCHECKED_CAST")
+  protected fun ActionData.getTreeNode(): Node<FileObject>? {
+    return this[Node::class.java] as? Node<FileObject>
   }
 
-  protected fun ActionData.requireTreeNode(): TreeNode {
+  protected fun ActionData.requireTreeNode(): Node<FileObject> {
     return getTreeNode()!!
   }
 
@@ -84,7 +86,7 @@ abstract class BaseFileTreeAction(
     EventBus.getDefault().post(ListProjectFilesRequestEvent())
   }
 
-  protected fun requestExpandNode(node: TreeNode) {
-    EventBus.getDefault().post(ExpandTreeNodeRequestEvent(node))
+  protected fun requestExpandNode(node: Node<FileObject>) {
+      EventBus.getDefault().post(ListProjectFilesRequestEvent())
   }
 }

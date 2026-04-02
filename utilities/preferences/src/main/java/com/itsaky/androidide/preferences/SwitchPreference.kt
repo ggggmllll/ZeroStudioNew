@@ -25,7 +25,6 @@ import kotlin.reflect.KMutableProperty0
 /**
  * A switch preference
  *
- * @author Akash Yadav
  * @author android_zero
  */
 abstract class SwitchPreference

@@ -16,12 +16,17 @@
 
 package com.rk.filetree.model
 
+/**
+ * @author android_zero
+ */
 data class Node<T>(
     var value: T,
     var parent: Node<T>? = null,
     var child: List<Node<T>>? = null,
     var isExpand: Boolean = false,
     var level: Int = 0,
+    var isSelected: Boolean = false,
+    var isHighlighted: Boolean = false
 ) {
 
   override fun equals(other: Any?): Boolean {
@@ -40,6 +45,20 @@ data class Node<T>(
   override fun hashCode(): Int {
     return value.hashCode()
   }
+  
+  fun deleteChild(childNode: Node<T>) {
+      val currentChildren = child?.toMutableList() ?: return
+      currentChildren.remove(childNode)
+      child = currentChildren
+  }
+  
+  fun addChild(childNode: Node<T>) {
+      val currentChildren = child?.toMutableList() ?: mutableListOf()
+      childNode.parent = this
+      childNode.level = this.level + 1
+      currentChildren.add(childNode)
+      child = currentChildren
+  }
 }
 
 object TreeViewModel {
@@ -48,16 +67,12 @@ object TreeViewModel {
   fun <T> add(parent: Node<T>, child: List<Node<T>>? = null) {
     // check
     child?.let {
-      if (it.isNotEmpty()) {
-        parent.isExpand = true
-      }
+      if (it.isNotEmpty()) parent.isExpand = true
     }
 
     parent.parent?.let {
       val nodes = it.child
-      if (
-          nodes != null && nodes.size == 1 && ((child != null && child.isEmpty()) || child == null)
-      ) {
+      if (nodes != null && nodes.size == 1 && ((child != null && child.isEmpty()) || child == null)) {
         parent.isExpand = true
       }
     }
@@ -90,10 +105,8 @@ object TreeViewModel {
     }
   }
 
-  // Get all child nodes of the parent node
   private fun <T> getChildren(parent: Node<T>, result: MutableList<Node<T>>): List<Node<T>> {
     parent.child?.let { result.addAll(it) }
-
     parent.child?.forEach {
       if (it.isExpand) {
         getChildren(it, result)

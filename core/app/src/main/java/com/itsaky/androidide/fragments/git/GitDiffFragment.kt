@@ -22,9 +22,12 @@ import com.itsaky.androidide.databinding.FragmentGitDiffBinding
 import com.itsaky.androidide.projects.IProjectManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 
-/** Diff 查看器页面。 */
+/** Diff 查看器页面。 
+ * @author android_zero
+ */
 class GitDiffFragment : BaseGitPageFragment() {
 
   private var _binding: FragmentGitDiffBinding? = null
@@ -85,7 +88,8 @@ class GitDiffFragment : BaseGitPageFragment() {
     }
 
     val file = changedFiles[currentIndex]
-    val diffItem =
+    
+    val diffItem = runBlocking {
         Libgit2Helper.getSingleDiffItem(
             repo = repo,
             relativePathUnderRepo = file.relativePathUnderRepo,
@@ -177,12 +181,9 @@ class GitDiffFragment : BaseGitPageFragment() {
 
   data class DiffLine(val oldLine: Int, val newLine: Int, val content: String, val type: DiffType)
 
-  inner class DiffAdapter(private val data: List<DiffLine>) :
-      RecyclerView.Adapter<DiffAdapter.ViewHolder>() {
-
+  inner class DiffAdapter(private val data: List<DiffLine>) : RecyclerView.Adapter<DiffAdapter.ViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-      val v =
-          LayoutInflater.from(parent.context).inflate(R.layout.item_git_diff_line, parent, false)
+      val v = LayoutInflater.from(parent.context).inflate(R.layout.item_git_diff_line, parent, false)
       return ViewHolder(v)
     }
 
@@ -225,4 +226,5 @@ class GitDiffFragment : BaseGitPageFragment() {
     super.onDestroyView()
     _binding = null
   }
+}
 }

@@ -1,16 +1,19 @@
 package com.itsaky.androidide.fragments.git.tree
 
-import com.unnamed.b.atv.view.AndroidTreeView
+import com.rk.filetree.widget.FileTree
 import java.util.Stack
 
+/**
+ * @author android_zero
+ */
 class TreeStateManager {
 
   private val undoStack = Stack<String>()
   private val redoStack = Stack<String>()
   private val MAX_HISTORY_SIZE = 50
 
-  fun saveState(treeView: AndroidTreeView) {
-    val state = treeView.saveState ?: ""
+  fun saveState(treeView: FileTree) {
+    val state = treeView.getSaveState()
 
     // 只有当状态真正改变时才保存
     if (undoStack.isNotEmpty() && undoStack.peek() == state) {

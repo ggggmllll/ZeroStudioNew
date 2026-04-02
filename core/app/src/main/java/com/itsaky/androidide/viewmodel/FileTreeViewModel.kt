@@ -21,26 +21,25 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.itsaky.androidide.tasks.executeAsync
 import com.itsaky.androidide.tasks.runOnUiThread
-import com.unnamed.b.atv.view.AndroidTreeView
+import com.rk.filetree.widget.FileTree
 
 /**
  * [ViewModel] for the file tree fragment.
  *
- * @author Akash Yadav
+ * @author android_zero
  */
-internal class FileTreeViewModel : ViewModel() {
+class FileTreeViewModel : ViewModel() {
 
   val treeState = MutableLiveData<String>(null)
 
   val savedState: String
     get() = treeState.value ?: ""
 
-  fun saveState(treeView: AndroidTreeView?) {
+  fun saveState(treeView: FileTree?) {
     treeView?.let { tree ->
       executeAsync({
-        // if a large number of directories have been expanded in the tree
-        // this could block teh UI thread
-        return@executeAsync tree.saveState
+        // Extract expanded paths from the new FileTree architecture
+        return@executeAsync tree.getSaveState()
       }) { result ->
         runOnUiThread { treeState.value = result }
       }

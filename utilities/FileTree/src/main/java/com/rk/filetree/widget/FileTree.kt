@@ -17,45 +17,23 @@ import com.rk.filetree.util.Sorter
  * A custom RecyclerView widget that displays a hierarchical file structure. This view allows users
  * to interact with files in a tree-like format, supporting both click and long-click events on
  * individual file nodes.
+ *
+ * @author android_zero
  */
 class FileTree : RecyclerView {
 
   private var fileTreeAdapter: FileTreeAdapter
   private lateinit var rootFileObject: FileObject
 
-  // Constructors
+  private var isTreeInitialized = false
+  private var isRootNodeVisible: Boolean = true
 
-  /**
-   * Constructor used when creating the view programmatically.
-   *
-   * @param context The Context the view is running in, through which it can access the current
-   *   theme, resources, etc.
-   */
+  // 恢复原有的三个次级构造函数，避免与残留代码发生冲突
   constructor(context: Context) : super(context)
-
-  /**
-   * Constructor that is called when inflating the view from XML.
-   *
-   * @param context The Context the view is running in, through which it can access the current
-   *   theme, resources, etc.
-   * @param attrs The attributes of the XML tag that is inflating the view.
-   */
-  constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
-
-  /**
-   * Constructor called when inflating from XML with a default style attribute.
-   *
-   * @param context The Context the view is running in, through which it can access the current
-   *   theme, resources, etc.
-   * @param attrs The attributes of the XML tag that is inflating the view.
-   * @param defStyleAttr An attribute in the current theme that contains a reference to a style
-   *   resource that supplies default values for the view.
-   */
-  constructor(
-      context: Context,
-      attrs: AttributeSet,
-      defStyleAttr: Int,
-  ) : super(context, attrs, defStyleAttr)
+  
+  constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
+  
+  constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
 
   // Initialization block
   init {
@@ -107,36 +85,85 @@ class FileTree : RecyclerView {
   fun loadFiles(file: FileObject, showRootNodeX: Boolean? = null) {
     rootFileObject = file
 
-    showRootNodeX?.let { showRootNode = it }
+    showRootNodeX?.let { isRootNodeVisible = it }
 
     val nodes: List<Node<FileObject>> =
-        if (showRootNode) {
+        if (isRootNodeVisible) {
           mutableListOf<Node<FileObject>>().apply { add(Node(file)) }
         } else {
           Sorter.sort(file)
         }
 
-    if (!init) {
+    if (!isTreeInitialized) {
       if (fileTreeAdapter.iconProvider == null) {
         fileTreeAdapter.iconProvider = DefaultFileIconProvider(context)
       }
       adapter = fileTreeAdapter
-      init = true
+      isTreeInitialized = true
     }
+
     fileTreeAdapter.submitList(nodes)
-    if (showRootNode) {
+    if (isRootNodeVisible && nodes.isNotEmpty()) {
       fileTreeAdapter.expandNode(nodes[0])
     }
   }
 
-  /** Reloads the file tree, refreshing the display with the current state of the root directory. */
   fun reloadFileTree() {
     val nodes: List<Node<FileObject>> =
-        if (showRootNode) {
+        if (isRootNodeVisible) {
           mutableListOf<Node<FileObject>>().apply { add(Node(rootFileObject)) }
         } else {
           Sorter.sort(rootFileObject)
         }
     fileTreeAdapter.submitList(nodes)
+  }
+
+
+  fun expandNode(node: Node<FileObject>) {
+    fileTreeAdapter.expandNode(node)
+  }
+
+  fun collapseNode(node: Node<FileObject>) {
+    try {
+      val method = fileTreeAdapter.javaClass.getDeclaredMethod("collapseNode", Node::class.java)
+      method.isAccessible = true
+      method.invoke(fileTreeAdapter, node)
+    } catch (e: Exception) {
+      e.printStackTrace()
+    }
+  }
+
+  fun collapseAll() {
+    fileTreeAdapter.currentList.filter { it.isExpand }.reversed().forEach { collapseNode(it) }
+  }
+
+  fun expandAll() {
+    val list = fileTreeAdapter.currentList.toMutableList()
+    list.forEach {
+      if (it.value.isDirectory() && !it.isExpand) {
+        expandNode(it)
+      }
+    }
+  }
+
+  fun getSaveState(): String {
+    val sb = java.lang.StringBuilder()
+    fileTreeAdapter.currentList.forEach { node ->
+      if (node.isExpand) {
+        sb.append(node.value.getAbsolutePath()).append(";")
+      }
+    }
+    return sb.toString().trimEnd(';')
+  }
+
+  fun restoreState(state: String?) {
+    if (state.isNullOrEmpty()) return
+    val pathsToExpand = state.split(";").toSet()
+
+    for (node in fileTreeAdapter.currentList.toList()) {
+      if (pathsToExpand.contains(node.value.getAbsolutePath()) && !node.isExpand) {
+        expandNode(node)
+      }
+    }
   }
 }

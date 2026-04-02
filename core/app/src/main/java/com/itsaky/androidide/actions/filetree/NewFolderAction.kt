@@ -21,33 +21,24 @@ import android.content.Context
 import android.view.LayoutInflater
 import com.itsaky.androidide.actions.ActionData
 import com.itsaky.androidide.actions.requireFile
-import com.itsaky.androidide.adapters.viewholders.FileTreeViewHolder
 import com.itsaky.androidide.preferences.databinding.LayoutDialogTextInputBinding
 import com.itsaky.androidide.resources.R
 import com.itsaky.androidide.utils.DialogUtils
 import com.itsaky.androidide.utils.flashError
 import com.itsaky.androidide.utils.flashSuccess
-import com.unnamed.b.atv.model.TreeNode
 import java.io.File
-
 /**
- * File tree action to create a new folder.
  *
- * @author Akash Yadav
+ * @author android_zero
  */
 class NewFolderAction(context: Context, override val order: Int) :
-    BaseDirNodeAction(
-        context = context,
-        labelRes = R.string.new_folder,
-        iconRes = R.drawable.ic_new_folder,
-    ) {
+    BaseDirNodeAction(context = context, labelRes = R.string.new_folder, iconRes = R.drawable.ic_new_folder) {
 
   override val id: String = "ide.editor.fileTree.newFolder"
 
   override suspend fun execAction(data: ActionData) {
     val context = data.requireActivity()
     val currentDir = data.requireFile()
-    val lastHeld = data.getTreeNode()
     val binding = LayoutDialogTextInputBinding.inflate(LayoutInflater.from(context))
     val builder = DialogUtils.newMaterialDialogBuilder(context)
     binding.name.editText!!.setHint(R.string.folder_name)
@@ -75,14 +66,7 @@ class NewFolderAction(context: Context, override val order: Int) :
       }
 
       flashSuccess(R.string.msg_folder_created)
-      if (lastHeld != null) {
-        val node = TreeNode(newDir)
-        node.viewHolder = FileTreeViewHolder(context)
-        lastHeld.addChild(node)
-        requestExpandNode(lastHeld)
-      } else {
-        requestFileListing()
-      }
+      requestFileListing()
     }
     builder.setNegativeButton(android.R.string.cancel, null)
     builder.create().show()

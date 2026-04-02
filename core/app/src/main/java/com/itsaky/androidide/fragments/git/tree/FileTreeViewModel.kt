@@ -19,9 +19,7 @@ package com.itsaky.androidide.fragments.git.tree
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.itsaky.androidide.tasks.executeAsync
-import com.itsaky.androidide.tasks.runOnUiThread
-import com.unnamed.b.atv.view.AndroidTreeView
+import com.rk.filetree.widget.FileTree
 
 /**
  * [ViewModel] for the file tree fragment.
@@ -31,19 +29,9 @@ import com.unnamed.b.atv.view.AndroidTreeView
 internal class FileTreeViewModel : ViewModel() {
 
   val treeState = MutableLiveData<String>(null)
+  val savedState: String get() = treeState.value ?: ""
 
-  val savedState: String
-    get() = treeState.value ?: ""
-
-  fun saveState(treeView: AndroidTreeView?) {
-    treeView?.let { tree ->
-      executeAsync({
-        // if a large number of directories have been expanded in the tree
-        // this could block teh UI thread
-        return@executeAsync tree.saveState
-      }) { result ->
-        runOnUiThread { treeState.value = result }
-      }
-    }
+  fun saveState(treeView: FileTree?) {
+    treeView?.let { treeState.value = it.getSaveState() }
   }
 }

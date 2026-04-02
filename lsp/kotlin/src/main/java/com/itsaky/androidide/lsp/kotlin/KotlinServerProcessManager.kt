@@ -92,7 +92,7 @@ class KotlinServerProcessManager(context: Context) {
     val event =
         LspInstallRequestEvent(
             serverId = "kotlin-lsp-manager",
-            serverName = "Kotlin Language Server (v1.3.13)",
+            serverName = "Kotlin Language Server (v1.6.5)",
             dialogTitle = "Install Kotlin LSP",
             dialogMessage =
                 "Kotlin Language Server is required to provide full code completion, auto-import, and diagnostics for .kt/.kts files.\n\nIt will be installed to: ${installDir.absolutePath}",

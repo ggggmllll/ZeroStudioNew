@@ -35,7 +35,8 @@ import com.itsaky.androidide.models.SheetOption
 import com.itsaky.androidide.utils.ApkInstaller
 import com.itsaky.androidide.utils.InstallationResultHandler
 import com.itsaky.androidide.utils.flashError
-import com.unnamed.b.atv.model.TreeNode as LegacyTreeNode
+import com.rk.filetree.interfaces.FileObject
+import com.rk.filetree.model.Node
 import java.io.File
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
@@ -44,12 +45,12 @@ import org.greenrobot.eventbus.ThreadMode.MAIN
 /**
  * Handles events related to files in filetree.
  *
- * @author Akash Yadav
+ * @author android_zero
  */
 @Suppress("unused")
 class FileTreeActionHandler : BaseEventHandler() {
 
-  private var lastHeld: Any? = null
+  private var lastHeld: Node<FileObject>? = null
 
   companion object {
 
@@ -64,9 +65,7 @@ class FileTreeActionHandler : BaseEventHandler() {
       return
     }
 
-    if (event.file.isDirectory) {
-      return
-    }
+    if (event.file.isDirectory) return
 
     val context = event[Context::class.java]!! as EditorHandlerActivity
     context.binding.root.closeDrawer(GravityCompat.START)
@@ -82,17 +81,14 @@ class FileTreeActionHandler : BaseEventHandler() {
 
     if (MB_10 < event.file.length()) {
       flashError("File is too big!")
-      log.warn(
-          "Cannot open {} as it is too big. File size: {} bytes",
-          event.file,
-          event.file.length(),
-      )
+      log.warn("Cannot open {} as it is too big. File size: {} bytes", event.file, event.file.length())
       return
     }
 
     context.openFile(event.file)
   }
 
+  @Suppress("UNCHECKED_CAST")
   @Subscribe(threadMode = MAIN)
   fun onFileLongClicked(event: FileLongClickEvent) {
     if (!checkIsEditorActivity(event)) {
@@ -100,8 +96,7 @@ class FileTreeActionHandler : BaseEventHandler() {
       return
     }
 
-    this.lastHeld =
-        event[LegacyTreeNode::class.java] ?: event[com.unnamed.b.atv.model.TreeNode::class.java]
+    this.lastHeld = event[Node::class.java] as? Node<FileObject>
     val context = event[Context::class.java]!! as EditorHandlerActivity
     createFileOptionsFragment(context, event.file)
         .show(context.supportFragmentManager, TAG_FILE_OPTIONS_FRAGMENT)
@@ -118,22 +113,14 @@ class FileTreeActionHandler : BaseEventHandler() {
     data.apply {
       put(Context::class.java, context)
       put(File::class.java, file)
-      val held = lastHeld
-      if (held is LegacyTreeNode) {
-        put(LegacyTreeNode::class.java, held)
-      } else if (held is com.unnamed.b.atv.model.TreeNode) {
-        put(com.unnamed.b.atv.model.TreeNode::class.java, held)
-      }
+      lastHeld?.let { put(Node::class.java, it) }
     }
 
     for (action in actions.values) {
-
       check(action !is ActionMenu) { "File tree actions do not support action menus" }
 
       action.prepare(data)
-      if (!action.enabled || !action.visible) {
-        continue
-      }
+      if (!action.enabled || !action.visible) continue
 
       fragment.addOption(
           SheetOption(action.id, action.icon, action.label, file).apply { this.extra = data }
@@ -146,9 +133,7 @@ class FileTreeActionHandler : BaseEventHandler() {
   @Subscribe(threadMode = MAIN)
   internal fun onFileOptionClicked(event: FileContextMenuItemClickEvent) {
     val option = event.option
-    if (option.extra !is ActionData) {
-      return
-    }
+    if (option.extra !is ActionData) return
 
     val data = option.extra!! as ActionData
     val registry = ActionsRegistry.getInstance() as DefaultActionsRegistry
@@ -168,15 +153,10 @@ class FileTreeActionHandler : BaseEventHandler() {
   }
 
   private fun requestExpandHeldNode() {
-    requestExpandNode(lastHeld!!)
+    lastHeld?.let { requestExpandNode(it) }
   }
 
-  private fun requestExpandNode(node: Any) {
-    when (node) {
-      is LegacyTreeNode -> EventBus.getDefault().post(ExpandTreeNodeRequestEvent(node))
-      is com.unnamed.b.atv.model.TreeNode ->
-          EventBus.getDefault()
-              .post(com.itsaky.androidide.fragments.git.tree.ExpandTreeNodeRequestEvent(node))
-    }
+  private fun requestExpandNode(node: Node<FileObject>) {
+    EventBus.getDefault().post(ExpandTreeNodeRequestEvent(node))
   }
 }

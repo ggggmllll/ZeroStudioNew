@@ -17,47 +17,51 @@
 package com.itsaky.androidide.fragments.sidebar
 
 import android.content.Context
+import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.core.view.WindowInsetsCompat.Type.statusBars
 import androidx.core.view.updatePadding
 import androidx.fragment.app.viewModels
-import androidx.transition.ChangeBounds
-import androidx.transition.TransitionManager
 import com.blankj.utilcode.util.SizeUtils
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.itsaky.androidide.adapters.viewholders.FileTreeViewHolder
+import com.itsaky.androidide.R
 import com.itsaky.androidide.databinding.LayoutEditorFileTreeBinding
 import com.itsaky.androidide.eventbus.events.filetree.FileClickEvent
 import com.itsaky.androidide.eventbus.events.filetree.FileLongClickEvent
 import com.itsaky.androidide.events.ExpandTreeNodeRequestEvent
 import com.itsaky.androidide.events.ListProjectFilesRequestEvent
+import com.itsaky.androidide.models.FileExtension
 import com.itsaky.androidide.projects.IProjectManager
-import com.itsaky.androidide.resources.R.drawable
-import com.itsaky.androidide.tasks.TaskExecutor.executeAsync
-import com.itsaky.androidide.tasks.callables.FileTreeCallable
-import com.itsaky.androidide.tasks.callables.FileTreeCallable.SortFileName
-import com.itsaky.androidide.tasks.callables.FileTreeCallable.SortFolder
 import com.itsaky.androidide.utils.doOnApplyWindowInsets
 import com.itsaky.androidide.viewmodel.FileTreeViewModel
-import com.unnamed.b.atv.model.TreeNode
-import com.unnamed.b.atv.model.TreeNode.TreeNodeClickListener
-import com.unnamed.b.atv.model.TreeNode.TreeNodeLongClickListener
-import com.unnamed.b.atv.view.AndroidTreeView
+import com.rk.filetree.interfaces.FileClickListener
+import com.rk.filetree.interfaces.FileIconProvider
+import com.rk.filetree.interfaces.FileLongClickListener
+import com.rk.filetree.interfaces.FileObject
+import com.rk.filetree.model.Node
+import com.rk.filetree.provider.file
+import com.rk.filetree.widget.FileTree
 import java.io.File
-import java.util.Arrays
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode.MAIN
 
-class FileTreeFragment :
-    BottomSheetDialogFragment(), TreeNodeClickListener, TreeNodeLongClickListener {
+/**
+ * Fragment that displays the project file tree.
+ * @author android_zero
+ */
+class FileTreeFragment : BottomSheetDialogFragment(), FileClickListener, FileLongClickListener {
 
   private var binding: LayoutEditorFileTreeBinding? = null
-  private var fileTreeView: AndroidTreeView? = null
+  private var fileTreeView: FileTree? = null
 
   private val viewModel by viewModels<FileTreeViewModel>(ownerProducer = { requireActivity() })
 
@@ -96,94 +100,25 @@ class FileTreeFragment :
     viewModel.saveState(fileTreeView)
   }
 
-  override fun onClick(node: TreeNode, p2: Any) {
-    val file = p2 as File
-    if (!file.exists()) {
+  override fun onClick(node: Node<FileObject>) {
+    val targetFile = (node.value as? file)?.getNativeFile() ?: return
+    if (!targetFile.exists()) {
       return
     }
-    if (file.isDirectory) {
-      if (node.isExpanded) {
-        collapseNode(node)
-      } else {
-        setLoading(node)
-        listNode(node) { expandNode(node) }
-      }
+    
+    if (targetFile.isFile) {
+      val event = FileClickEvent(targetFile)
+      event.put(Context::class.java, requireContext())
+      EventBus.getDefault().post(event)
     }
-    val event = FileClickEvent(file)
+  }
+
+  override fun onLongClick(node: Node<FileObject>) {
+    val targetFile = (node.value as? file)?.getNativeFile() ?: return
+    val event = FileLongClickEvent(targetFile)
     event.put(Context::class.java, requireContext())
+    event.put(Node::class.java, node)
     EventBus.getDefault().post(event)
-  }
-
-  private fun updateChevron(node: TreeNode) {
-    if (node.viewHolder is FileTreeViewHolder) {
-      (node.viewHolder as FileTreeViewHolder).updateChevron(node.isExpanded)
-    }
-  }
-
-  private fun expandNode(node: TreeNode, animate: Boolean = true) {
-    if (fileTreeView == null) {
-      return
-    }
-    if (animate) {
-      TransitionManager.beginDelayedTransition(binding!!.root, ChangeBounds())
-    }
-    fileTreeView!!.expandNode(node)
-    updateChevron(node)
-  }
-
-  private fun collapseNode(node: TreeNode, animate: Boolean = true) {
-    if (fileTreeView == null) {
-      return
-    }
-    if (animate) {
-      TransitionManager.beginDelayedTransition(binding!!.root, ChangeBounds())
-    }
-    fileTreeView!!.collapseNode(node)
-    updateChevron(node)
-  }
-
-  private fun setLoading(node: TreeNode) {
-    if (node.viewHolder is FileTreeViewHolder) {
-      (node.viewHolder as FileTreeViewHolder).setLoading(true)
-    }
-  }
-
-  private fun listNode(node: TreeNode, whenDone: Runnable) {
-    node.children.clear()
-    node.isExpanded = false
-    executeAsync({
-      listFilesForNode(node.value.listFiles() ?: return@executeAsync null, node)
-      var temp = node
-      while (temp.size() == 1) {
-        temp = temp.childAt(0)
-        if (!temp.value.isDirectory) {
-          break
-        }
-        listFilesForNode(temp.value.listFiles() ?: continue, temp)
-        temp.isExpanded = true
-      }
-      null
-    }) {
-      whenDone.run()
-    }
-  }
-
-  private fun listFilesForNode(files: Array<File>, parent: TreeNode) {
-    Arrays.sort(files, SortFileName())
-    Arrays.sort(files, SortFolder())
-    for (file in files) {
-      val node = TreeNode(file)
-      node.viewHolder = FileTreeViewHolder(context)
-      parent.addChild(node, false)
-    }
-  }
-
-  override fun onLongClick(node: TreeNode, value: Any): Boolean {
-    val event = FileLongClickEvent((value as File))
-    event.put(Context::class.java, requireContext())
-    event.put(TreeNode::class.java, node)
-    EventBus.getDefault().post(event)
-    return true
   }
 
   @Suppress("unused", "UNUSED_PARAMETER")
@@ -200,88 +135,55 @@ class FileTreeFragment :
   fun onGetExpandTreeNodeRequest(event: ExpandTreeNodeRequestEvent) {
     if (!isVisible || context == null) {
       return
-    } else {
-      event.node
     }
-    expandNode(event.node)
+    fileTreeView?.expandNode(event.node)
   }
 
   fun listProjectFiles() {
     if (binding == null) {
-      // Fragment has been destroyed
       return
     }
-    val projectDirPath = IProjectManager.getInstance().projectDirPath
-    val projectDir = File(projectDirPath)
-    val rootNode = TreeNode(File(""))
-    rootNode.viewHolder = FileTreeViewHolder(requireContext())
+    
+    CoroutineScope(Dispatchers.Main).launch {
+        binding!!.horizontalCroll.visibility = View.GONE
+        binding!!.loading.visibility = View.VISIBLE
 
-    val projectRoot = TreeNode.root(projectDir)
-    projectRoot.viewHolder = FileTreeViewHolder(context)
-    rootNode.addChild(projectRoot, false)
+        val projectDirPath = withContext(Dispatchers.IO) { IProjectManager.getInstance().projectDirPath }
+        val projectDir = File(projectDirPath)
 
-    binding!!.horizontalCroll.visibility = View.GONE
-    binding!!.horizontalCroll.visibility = View.VISIBLE
-    executeAsync(FileTreeCallable(context, projectRoot, projectDir)) {
-      if (binding == null) {
-        // Fragment has been destroyed
-        return@executeAsync
-      }
-      binding!!.horizontalCroll.visibility = View.VISIBLE
-      binding!!.loading.visibility = View.GONE
-      val tree = createTreeView(rootNode)
-      if (tree != null) {
-        tree.setUseAutoToggle(false)
-        tree.setDefaultNodeClickListener(this@FileTreeFragment)
-        tree.setDefaultNodeLongClickListener(this@FileTreeFragment)
-        binding!!.horizontalCroll.removeAllViews()
-        val view = tree.view
-        binding!!.horizontalCroll.addView(view)
-        view.post { tryRestoreState(rootNode) }
-      }
-    }
-  }
-
-  private fun createTreeView(node: TreeNode): AndroidTreeView? {
-    return if (context == null) {
-      null
-    } else AndroidTreeView(context, node, drawable.bg_ripple).also { fileTreeView = it }
-  }
-
-  private fun tryRestoreState(rootNode: TreeNode, state: String? = viewModel.savedState) {
-    if (!TextUtils.isEmpty(state) && fileTreeView != null) {
-      fileTreeView!!.collapseAll()
-      val openNodes =
-          state!!.split(AndroidTreeView.NODES_PATH_SEPARATOR.toRegex()).dropLastWhile {
-            it.isEmpty()
-          }
-      restoreNodeState(rootNode, HashSet(openNodes))
-    }
-
-    if (rootNode.children.isNotEmpty()) {
-      rootNode.childAt(0)?.let { projectRoot -> expandNode(projectRoot, false) }
-    }
-  }
-
-  private fun restoreNodeState(root: TreeNode, openNodes: Set<String>) {
-    val children = root.children
-    var i = 0
-    val childrenSize = children.size
-    while (i < childrenSize) {
-      val node = children[i]
-      if (openNodes.contains(node.path)) {
-        listNode(node) {
-          expandNode(node, false)
-          restoreNodeState(node, openNodes)
+        if (!projectDir.exists()) {
+            binding!!.loading.visibility = View.GONE
+            return@launch
         }
-      }
-      i++
+
+        val tree = createTreeView(file(projectDir))
+        
+        binding!!.horizontalCroll.removeAllViews()
+        if (tree != null) {
+             binding!!.horizontalCroll.addView(
+                tree,
+                ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+            )
+            tree.post { tree.restoreState(viewModel.savedState) }
+        }
+
+        binding!!.horizontalCroll.visibility = View.VISIBLE
+        binding!!.loading.visibility = View.GONE
+    }
+  }
+
+  private fun createTreeView(rootObj: FileObject): FileTree? {
+    val ctx = context ?: return null
+    return FileTree(ctx).also {
+      it.setIconProvider(IDEFileIconProvider(ctx))
+      it.setOnFileClickListener(this)
+      it.setOnFileLongClickListener(this)
+      it.loadFiles(rootObj, true)
+      fileTreeView = it
     }
   }
 
   companion object {
-
-    // Should be same as defined in layout/activity_editor.xml
     const val TAG = "editor.fileTree"
 
     @JvmStatic
@@ -289,4 +191,23 @@ class FileTreeFragment :
       return FileTreeFragment()
     }
   }
+}
+
+/** 提供 IDE 专属的文件图标 */
+class IDEFileIconProvider(private val context: Context) : FileIconProvider {
+  private val chevronRight = ContextCompat.getDrawable(context, R.drawable.ic_chevron_right)
+  private val expandMore = ContextCompat.getDrawable(context, R.drawable.ic_chevron_down)
+
+  override fun getIcon(node: Node<FileObject>): Drawable? {
+    val fileObj = (node.value as? file)?.getNativeFile() ?: return ContextCompat.getDrawable(context, R.drawable.ic_file_unknown)
+    val iconRes = if (fileObj.isDirectory) {
+       R.drawable.ic_folder
+    } else {
+       FileExtension.Factory.forFile(fileObj).icon
+    }
+    return ContextCompat.getDrawable(context, iconRes)
+  }
+
+  override fun getChevronRight(): Drawable? = chevronRight
+  override fun getExpandMore(): Drawable? = expandMore
 }

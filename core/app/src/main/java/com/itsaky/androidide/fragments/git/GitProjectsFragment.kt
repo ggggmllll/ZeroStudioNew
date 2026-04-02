@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.view.isVisible
 import com.itsaky.androidide.R
+import com.itsaky.androidide.activities.editor.EditorHandlerActivity
 import com.itsaky.androidide.databinding.FragmentGitProjectsBinding
 import com.itsaky.androidide.eventbus.events.filetree.FileClickEvent
 import com.itsaky.androidide.eventbus.events.filetree.FileLongClickEvent
@@ -32,6 +33,9 @@ import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 
+/**
+ * @author android_zero
+ */
 class GitProjectsFragment : BaseGitPageFragment(), FileClickListener, FileLongClickListener {
 
   private var _binding: FragmentGitProjectsBinding? = null
@@ -108,7 +112,9 @@ class GitProjectsFragment : BaseGitPageFragment(), FileClickListener, FileLongCl
   }
 
   private fun locateCurrentFile() {
-    val currentFile = IEditorHandler.getEditorFile()
+    val activity = context as? EditorHandlerActivity
+    val currentFile = activity?.getCurrentEditor()?.file
+    
     if (currentFile == null || !currentFile.exists()) {
       Toast.makeText(context, "No active file", Toast.LENGTH_SHORT).show()
       return

@@ -21,20 +21,28 @@
 package com.itsaky.androidide.tasks.callables;
 
 import android.content.Context;
-import com.itsaky.androidide.adapters.viewholders.FileTreeViewHolder;
-import com.unnamed.b.atv.model.TreeNode;
+import com.rk.filetree.interfaces.FileObject;
+import com.rk.filetree.model.Node;
 import java.io.File;
 import java.io.FileFilter;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.concurrent.Callable;
 
+/**
+ * [Deprecated] 
+ * 随着项目重构至 com.rk.filetree，树状结构的遍历加载已被新 API 内部集成。
+ * 保留该类以防止任何意外的依赖中断。
+ * 
+ * @author android_zero
+ */
+@Deprecated
 public class FileTreeCallable implements Callable<Boolean> {
   private final Context ctx;
-  private final TreeNode parent;
+  private final Node<FileObject> parent;
   private final File file;
 
-  public FileTreeCallable(Context ctx, TreeNode parent, File file) {
+  public FileTreeCallable(Context ctx, Node<FileObject> parent, File file) {
     this.ctx = ctx;
     this.parent = parent;
     this.file = file;
@@ -42,22 +50,10 @@ public class FileTreeCallable implements Callable<Boolean> {
 
   @Override
   public Boolean call() throws Exception {
-    getNodeFromArray(file.listFiles(/*new HiddenFilesFilter()*/ ), parent);
-    return true;
-  }
-
-  private void getNodeFromArray(File[] files, TreeNode parent) {
-    Arrays.sort(files, new SortFileName());
-    Arrays.sort(files, new SortFolder());
-    for (File file : files) {
-      TreeNode node = new TreeNode(file);
-      node.setViewHolder(new FileTreeViewHolder(ctx));
-      parent.addChild(node, false);
-    }
+    return true; // 现由 API 代管加载工作
   }
 
   public static class HiddenFilesFilter implements FileFilter {
-
     @Override
     public boolean accept(File p1) {
       return !p1.getName().startsWith(".");
