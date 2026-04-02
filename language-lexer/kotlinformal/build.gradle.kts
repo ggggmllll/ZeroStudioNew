@@ -16,4 +16,5 @@ android {
 
 dependencies {
   implementation(project(":editor:lexers"))
+  implementation(project(":kotlin"))
 }

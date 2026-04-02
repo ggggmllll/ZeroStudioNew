@@ -201,6 +201,7 @@ include(
     ":lsp:toml",
     ":lsp:smali",
     ":lsp:groovy",
+    ":lsp:grammar",
     ":logging:idestats",
     ":logging:logger",
     ":logging:logsender",
