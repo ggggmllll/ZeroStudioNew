@@ -1,3 +1,0 @@
-import java.*
-
-println("hello")
