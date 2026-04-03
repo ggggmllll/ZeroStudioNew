@@ -5,9 +5,7 @@ plugins {
   id("kotlin-android")
 }
 
-android {
-  namespace = "${BuildConfig.packageName}.lsp.toml"
-}
+android { namespace = "${BuildConfig.packageName}.lsp.toml" }
 
 dependencies {
   implementation(projects.core.lspApi)

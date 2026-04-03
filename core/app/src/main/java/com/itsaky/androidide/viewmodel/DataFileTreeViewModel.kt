@@ -16,13 +16,14 @@
  */
 package com.itsaky.androidide.viewmodel
 
+import android.zero.studio.view.filetree.widget.FileTree
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.itsaky.androidide.tasks.executeAsync
-import android.zero.studio.view.filetree.widget.FileTree
 
 /**
  * ViewModel for the internal data file tree fragment.
+ *
  * @author android_zero
  */
 internal class DataFileTreeViewModel : ViewModel() {
@@ -35,10 +36,7 @@ internal class DataFileTreeViewModel : ViewModel() {
 
   fun saveState(treeView: FileTree?) {
     treeView?.let { tree ->
-      executeAsync(
-          { tree.getSaveState() }, 
-          { result -> _treeState.value = result }
-      )
+      executeAsync({ tree.getSaveState() }, { result -> _treeState.value = result })
     }
   }
 }

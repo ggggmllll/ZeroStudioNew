@@ -624,7 +624,8 @@ private fun AddModelButton(
                                         ModelRegistry.MODEL_OUTPUT_MODALITIES.getData(
                                             model.modelId
                                         ),
-                                    abilities = ModelRegistry.MODEL_ABILITIES.getData(model.modelId),
+                                    abilities =
+                                        ModelRegistry.MODEL_ABILITIES.getData(model.modelId),
                                 )
                               }
               )

@@ -5,9 +5,7 @@ plugins {
   id("kotlin-android")
 }
 
-android {
-  namespace = "${BuildConfig.packageName}.lsp.smali"
-}
+android { namespace = "${BuildConfig.packageName}.lsp.smali" }
 
 dependencies {
   implementation(projects.core.lspApi)

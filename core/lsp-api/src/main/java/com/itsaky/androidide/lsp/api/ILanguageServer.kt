@@ -32,36 +32,36 @@
  */
 package com.itsaky.androidide.lsp.api
 
+import com.itsaky.androidide.lsp.models.CallHierarchyItem
 import com.itsaky.androidide.lsp.models.CodeFormatResult
+import com.itsaky.androidide.lsp.models.CodeLens
 import com.itsaky.androidide.lsp.models.CompletionParams
 import com.itsaky.androidide.lsp.models.CompletionResult
 import com.itsaky.androidide.lsp.models.DefinitionParams
 import com.itsaky.androidide.lsp.models.DefinitionResult
 import com.itsaky.androidide.lsp.models.DiagnosticResult
-import com.itsaky.androidide.lsp.models.ExpandSelectionParams
-import com.itsaky.androidide.lsp.models.FormatCodeParams
-import com.itsaky.androidide.lsp.models.LSPFailure
-import com.itsaky.androidide.lsp.models.ReferenceParams
-import com.itsaky.androidide.lsp.models.ReferenceResult
-import com.itsaky.androidide.lsp.models.SignatureHelp
-import com.itsaky.androidide.lsp.models.CallHierarchyItem
-import com.itsaky.androidide.lsp.models.CodeLens
 import com.itsaky.androidide.lsp.models.DocumentLink
 import com.itsaky.androidide.lsp.models.DocumentSymbolsResult
+import com.itsaky.androidide.lsp.models.ExpandSelectionParams
 import com.itsaky.androidide.lsp.models.FoldingRange
+import com.itsaky.androidide.lsp.models.FormatCodeParams
 import com.itsaky.androidide.lsp.models.InlayHint
 import com.itsaky.androidide.lsp.models.InlayHintParams
+import com.itsaky.androidide.lsp.models.LSPFailure
 import com.itsaky.androidide.lsp.models.PrepareRenameResult
+import com.itsaky.androidide.lsp.models.ReferenceParams
+import com.itsaky.androidide.lsp.models.ReferenceResult
 import com.itsaky.androidide.lsp.models.RenameParams
 import com.itsaky.androidide.lsp.models.SelectionRange
 import com.itsaky.androidide.lsp.models.SelectionRangesParams
 import com.itsaky.androidide.lsp.models.SemanticTokens
 import com.itsaky.androidide.lsp.models.SemanticTokensDelta
 import com.itsaky.androidide.lsp.models.SemanticTokensParams
+import com.itsaky.androidide.lsp.models.SignatureHelp
+import com.itsaky.androidide.lsp.models.SignatureHelpParams
 import com.itsaky.androidide.lsp.models.TypeHierarchyItem
 import com.itsaky.androidide.lsp.models.WorkspaceEdit
 import com.itsaky.androidide.lsp.models.WorkspaceSymbolsResult
-import com.itsaky.androidide.lsp.models.SignatureHelpParams
 import com.itsaky.androidide.models.Range
 import com.itsaky.androidide.projects.IWorkspace
 import java.nio.file.Path
@@ -188,7 +188,6 @@ interface ILanguageServer {
    * @param failure [LSPFailure] describing the failure.
    * @return `true` if the failure was handled. `false` otherwise.
    */
-
 
   /** Document symbols for outline/tree view. */
   suspend fun documentSymbols(file: Path): DocumentSymbolsResult {

@@ -5,32 +5,31 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 
-/**
- * Centralized request polling/cancellation logic for clangd native requests.
- */
+/** Centralized request polling/cancellation logic for clangd native requests. */
 class ClangdRequestDispatcher(
     private val pollIntervalMs: Long = 20L,
 ) {
 
-    suspend fun await(
-        requestId: Long,
-        timeoutMs: Long,
-        cancelChecker: ICancelChecker,
-    ): String? = withContext(Dispatchers.IO) {
+  suspend fun await(
+      requestId: Long,
+      timeoutMs: Long,
+      cancelChecker: ICancelChecker,
+  ): String? =
+      withContext(Dispatchers.IO) {
         val start = System.currentTimeMillis()
         while (System.currentTimeMillis() - start <= timeoutMs) {
-            cancelChecker.abortIfCancelled()
-            val result = ClangdNativeBridge.nativeGetResult(requestId)
-            if (result != null) {
-                return@withContext result
-            }
-            delay(pollIntervalMs)
+          cancelChecker.abortIfCancelled()
+          val result = ClangdNativeBridge.nativeGetResult(requestId)
+          if (result != null) {
+            return@withContext result
+          }
+          delay(pollIntervalMs)
         }
         ClangdNativeBridge.nativeNotifyRequestTimeout(requestId)
         return@withContext null
-    }
+      }
 
-    fun cancel(requestId: Long) {
-        ClangdNativeBridge.nativeCancelRequestInternal(requestId)
-    }
+  fun cancel(requestId: Long) {
+    ClangdNativeBridge.nativeCancelRequestInternal(requestId)
+  }
 }

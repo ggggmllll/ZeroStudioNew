@@ -69,9 +69,7 @@ class KotlinServerProcessManager(context: Context) {
       return false
     }
 
-    return KotlinServerConstants.REQUIRED_LIB_JARS.all { jarName ->
-      File(libDir, jarName).exists()
-    }
+    return KotlinServerConstants.REQUIRED_LIB_JARS.all { jarName -> File(libDir, jarName).exists() }
   }
 
   /** 触发 UI 的安装弹窗 (基于 Kotlin SharedFlow)。 */

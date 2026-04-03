@@ -72,6 +72,8 @@ fun ConversationSizeWarningDialog(sizeInfo: ConversationSizeInfo, onDismiss: () 
       },
       title = { Text(text = stringResource(R.string.chat_size_dialog_title)) },
       text = { Text(text = stringResource(R.string.chat_size_dialog_content, sizeInfo.nodeCount)) },
-      confirmButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.confirm)) } },
+      confirmButton = {
+        TextButton(onClick = onDismiss) { Text(stringResource(R.string.confirm)) }
+      },
   )
 }

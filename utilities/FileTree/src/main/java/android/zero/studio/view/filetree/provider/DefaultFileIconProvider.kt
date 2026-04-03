@@ -18,11 +18,11 @@ package android.zero.studio.view.filetree.provider
 
 import android.content.Context
 import android.graphics.drawable.Drawable
-import androidx.core.content.ContextCompat
 import android.zero.studio.view.filetree.R
 import android.zero.studio.view.filetree.interfaces.FileIconProvider
 import android.zero.studio.view.filetree.interfaces.FileObject
 import android.zero.studio.view.filetree.model.Node
+import androidx.core.content.ContextCompat
 
 class DefaultFileIconProvider(context: Context) : FileIconProvider {
   private val file = ContextCompat.getDrawable(context, R.drawable.file)

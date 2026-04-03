@@ -18,6 +18,8 @@
 package com.itsaky.androidide.actions.filetree
 
 import android.content.Context
+import android.zero.studio.view.filetree.interfaces.FileObject
+import android.zero.studio.view.filetree.model.Node
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
@@ -27,16 +29,13 @@ import com.itsaky.androidide.actions.EditorActivityAction
 import com.itsaky.androidide.actions.hasRequiredData
 import com.itsaky.androidide.actions.markInvisible
 import com.itsaky.androidide.eventbus.events.Event
-import com.itsaky.androidide.events.ExpandTreeNodeRequestEvent
 import com.itsaky.androidide.events.ListProjectFilesRequestEvent
-import android.zero.studio.view.filetree.model.Node
-import android.zero.studio.view.filetree.interfaces.FileObject
 import java.io.File
 import org.greenrobot.eventbus.EventBus
 
 /**
  * Base class for actions related to the file tree.
- * 
+ *
  * @author android_zero
  */
 abstract class BaseFileTreeAction(
@@ -87,6 +86,6 @@ abstract class BaseFileTreeAction(
   }
 
   protected fun requestExpandNode(node: Node<FileObject>) {
-      EventBus.getDefault().post(ListProjectFilesRequestEvent())
+    EventBus.getDefault().post(ListProjectFilesRequestEvent())
   }
 }

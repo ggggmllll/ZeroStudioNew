@@ -20,8 +20,6 @@ import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.util.AttributeSet
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import android.zero.studio.view.filetree.adapters.FileTreeAdapter
 import android.zero.studio.view.filetree.interfaces.FileClickListener
 import android.zero.studio.view.filetree.interfaces.FileIconProvider
@@ -30,6 +28,8 @@ import android.zero.studio.view.filetree.interfaces.FileObject
 import android.zero.studio.view.filetree.model.Node
 import android.zero.studio.view.filetree.provider.DefaultFileIconProvider
 import android.zero.studio.view.filetree.util.Sorter
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 
 /**
  * A custom RecyclerView widget that displays a hierarchical file structure. This view allows users
@@ -42,16 +42,21 @@ class FileTree : RecyclerView {
 
   var fileTreeAdapter: FileTreeAdapter
     private set
+
   private lateinit var rootFileObject: FileObject
 
   private var isTreeInitialized = false
   private var isRootNodeVisible: Boolean = true
 
   constructor(context: Context) : super(context)
-  
+
   constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
-  
-  constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
+
+  constructor(
+      context: Context,
+      attrs: AttributeSet?,
+      defStyleAttr: Int,
+  ) : super(context, attrs, defStyleAttr)
 
   // Initialization block
   init {
@@ -127,13 +132,13 @@ class FileTree : RecyclerView {
   }
 
   fun reloadFileTreeSilently() {
-    //记忆滚动状态
+    // 记忆滚动状态
     val layoutManager = this.layoutManager as LinearLayoutManager
     val firstVisiblePosition = layoutManager.findFirstVisibleItemPosition()
     val topOffset = layoutManager.findViewByPosition(firstVisiblePosition)?.top ?: 0
     val savedState = getSaveState()
 
-    //重新加载根节点数据
+    // 重新加载根节点数据
     val nodes: List<Node<FileObject>> =
         if (isRootNodeVisible) {
           mutableListOf<Node<FileObject>>().apply { add(Node(rootFileObject)) }
@@ -142,17 +147,16 @@ class FileTree : RecyclerView {
         }
 
     fileTreeAdapter.submitList(nodes) {
-      //恢复展开状态
+      // 恢复展开状态
       restoreState(savedState)
-      //恢复 Y 轴滚动位置
+      // 恢复 Y 轴滚动位置
       post { layoutManager.scrollToPositionWithOffset(firstVisiblePosition, topOffset) }
     }
   }
 
-
   fun expandNode(node: Node<FileObject>) {
     if (!node.isExpand) {
-        fileTreeAdapter.expandNode(node)
+      fileTreeAdapter.expandNode(node)
     }
   }
 
@@ -201,49 +205,51 @@ class FileTree : RecyclerView {
     }
   }
 
-  /**
-   * 精准定位文件位置。通过路径逐级比对并展开父目录，最后滚动到目标。
-   */
+  /** 精准定位文件位置。通过路径逐级比对并展开父目录，最后滚动到目标。 */
   fun locateFileAndScroll(targetAbsolutePath: String) {
-      post {
-          var targetIndex = -1
+    post {
+      var targetIndex = -1
 
-          var retry = true
-          while (retry) {
-              retry = false
-              val list = fileTreeAdapter.currentList.toList()
-              for ((index, node) in list.withIndex()) {
-                  val path = node.value.getAbsolutePath()
-                  if (path == targetAbsolutePath) {
-                      targetIndex = index
-                      break
-                  }
-
-                  if (targetAbsolutePath.startsWith(path + "/") && !node.isExpand) {
-                      expandNode(node)
-                      retry = true
-                      break
-                  }
-              }
+      var retry = true
+      while (retry) {
+        retry = false
+        val list = fileTreeAdapter.currentList.toList()
+        for ((index, node) in list.withIndex()) {
+          val path = node.value.getAbsolutePath()
+          if (path == targetAbsolutePath) {
+            targetIndex = index
+            break
           }
 
-          if (targetIndex != -1) {
-              val lm = layoutManager as LinearLayoutManager
-              val offset = (height / 2) // 居中显示
-              lm.scrollToPositionWithOffset(targetIndex, offset)
-              
-              val targetNode = fileTreeAdapter.currentList[targetIndex]
-              targetNode.isHighlighted = true
-              fileTreeAdapter.notifyItemChanged(targetIndex)
-              
-              Handler(Looper.getMainLooper()).postDelayed({
+          if (targetAbsolutePath.startsWith(path + "/") && !node.isExpand) {
+            expandNode(node)
+            retry = true
+            break
+          }
+        }
+      }
+
+      if (targetIndex != -1) {
+        val lm = layoutManager as LinearLayoutManager
+        val offset = (height / 2) // 居中显示
+        lm.scrollToPositionWithOffset(targetIndex, offset)
+
+        val targetNode = fileTreeAdapter.currentList[targetIndex]
+        targetNode.isHighlighted = true
+        fileTreeAdapter.notifyItemChanged(targetIndex)
+
+        Handler(Looper.getMainLooper())
+            .postDelayed(
+                {
                   targetNode.isHighlighted = false
                   val currentPos = fileTreeAdapter.currentList.indexOf(targetNode)
                   if (currentPos != -1) {
-                      fileTreeAdapter.notifyItemChanged(currentPos)
+                    fileTreeAdapter.notifyItemChanged(currentPos)
                   }
-              }, 2500)
-          }
+                },
+                2500,
+            )
       }
+    }
   }
 }

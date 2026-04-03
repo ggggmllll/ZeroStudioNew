@@ -17,10 +17,8 @@
 
 package com.itsaky.androidide.lsp.ui
 
-
 import android.content.Context
 import android.content.SharedPreferences
-import androidx.core.content.edit
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -30,13 +28,14 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.core.content.edit
 import com.itsaky.androidide.lsp.BaseLspServer
 import com.itsaky.androidide.lsp.LspManager
 import com.itsaky.androidide.lsp.model.ExternalServerData
@@ -83,9 +82,7 @@ fun LspSettingsScreen() {
           )
         }
 
-        item {
-          ClangdSettingsCard()
-        }
+        item { ClangdSettingsCard() }
 
         // Group 1: Built-in & Extension Servers (Start with standard ID, not "ext_")
         val builtIn = allServers.filter { !it.id.startsWith("ext_") }
@@ -223,7 +220,6 @@ fun EditExtensionsDialog(server: BaseLspServer, onDismiss: () -> Unit) {
   )
 }
 
-
 private object ClangdPrefKeys {
   const val ENABLED = "lsp.clangd.enabled"
   const val CLANGD_PATH = "lsp.clangd.binary_path"
@@ -259,7 +255,8 @@ private data class ClangdSettingsUiState(
 @Composable
 private fun ClangdSettingsCard() {
   val context = LocalContext.current
-  val prefs = remember(context) { context.getSharedPreferences("lsp_manager_prefs", Context.MODE_PRIVATE) }
+  val prefs =
+      remember(context) { context.getSharedPreferences("lsp_manager_prefs", Context.MODE_PRIVATE) }
   var state by remember { mutableStateOf(prefs.readClangdSettings()) }
   var completionLimitText by remember { mutableStateOf(state.completionLimit.toString()) }
   var timeoutText by remember { mutableStateOf(state.requestTimeoutMs.toString()) }
@@ -296,7 +293,11 @@ private fun ClangdSettingsCard() {
           value = completionLimitText,
           onValueChange = {
             completionLimitText = it.filter { c -> c.isDigit() }
-            state = state.copy(completionLimit = completionLimitText.toIntOrNull()?.coerceIn(1, 500) ?: state.completionLimit)
+            state =
+                state.copy(
+                    completionLimit =
+                        completionLimitText.toIntOrNull()?.coerceIn(1, 500) ?: state.completionLimit
+                )
           },
           label = { Text(stringResource(R.string.lsp_clangd_completion_limit)) },
           modifier = Modifier.fillMaxWidth(),
@@ -307,22 +308,77 @@ private fun ClangdSettingsCard() {
           value = timeoutText,
           onValueChange = {
             timeoutText = it.filter { c -> c.isDigit() }
-            state = state.copy(requestTimeoutMs = timeoutText.toLongOrNull()?.coerceIn(200L, 15000L) ?: state.requestTimeoutMs)
+            state =
+                state.copy(
+                    requestTimeoutMs =
+                        timeoutText.toLongOrNull()?.coerceIn(200L, 15000L) ?: state.requestTimeoutMs
+                )
           },
           label = { Text(stringResource(R.string.lsp_clangd_request_timeout)) },
           modifier = Modifier.fillMaxWidth(),
           enabled = state.enabled,
       )
 
-      Text(text = stringResource(R.string.lsp_clangd_features), style = MaterialTheme.typography.labelLarge)
-      SettingSwitchRow(stringResource(R.string.lsp_clangd_feature_diagnostics), state.diagnostics, state.enabled) { state = state.copy(diagnostics = it) }
-      SettingSwitchRow(stringResource(R.string.lsp_clangd_feature_completion), state.completion, state.enabled) { state = state.copy(completion = it) }
-      SettingSwitchRow(stringResource(R.string.lsp_clangd_feature_definition), state.definition, state.enabled) { state = state.copy(definition = it) }
-      SettingSwitchRow(stringResource(R.string.lsp_clangd_feature_references), state.references, state.enabled) { state = state.copy(references = it) }
-      SettingSwitchRow(stringResource(R.string.lsp_clangd_feature_signature), state.signatureHelp, state.enabled) { state = state.copy(signatureHelp = it) }
-      SettingSwitchRow(stringResource(R.string.lsp_clangd_feature_selection), state.smartSelection, state.enabled) { state = state.copy(smartSelection = it) }
-      SettingSwitchRow(stringResource(R.string.lsp_clangd_feature_actions), state.codeActions, state.enabled) { state = state.copy(codeActions = it) }
-      SettingSwitchRow(stringResource(R.string.lsp_clangd_feature_match_lowercase), state.matchLowercase, state.enabled) { state = state.copy(matchLowercase = it) }
+      Text(
+          text = stringResource(R.string.lsp_clangd_features),
+          style = MaterialTheme.typography.labelLarge,
+      )
+      SettingSwitchRow(
+          stringResource(R.string.lsp_clangd_feature_diagnostics),
+          state.diagnostics,
+          state.enabled,
+      ) {
+        state = state.copy(diagnostics = it)
+      }
+      SettingSwitchRow(
+          stringResource(R.string.lsp_clangd_feature_completion),
+          state.completion,
+          state.enabled,
+      ) {
+        state = state.copy(completion = it)
+      }
+      SettingSwitchRow(
+          stringResource(R.string.lsp_clangd_feature_definition),
+          state.definition,
+          state.enabled,
+      ) {
+        state = state.copy(definition = it)
+      }
+      SettingSwitchRow(
+          stringResource(R.string.lsp_clangd_feature_references),
+          state.references,
+          state.enabled,
+      ) {
+        state = state.copy(references = it)
+      }
+      SettingSwitchRow(
+          stringResource(R.string.lsp_clangd_feature_signature),
+          state.signatureHelp,
+          state.enabled,
+      ) {
+        state = state.copy(signatureHelp = it)
+      }
+      SettingSwitchRow(
+          stringResource(R.string.lsp_clangd_feature_selection),
+          state.smartSelection,
+          state.enabled,
+      ) {
+        state = state.copy(smartSelection = it)
+      }
+      SettingSwitchRow(
+          stringResource(R.string.lsp_clangd_feature_actions),
+          state.codeActions,
+          state.enabled,
+      ) {
+        state = state.copy(codeActions = it)
+      }
+      SettingSwitchRow(
+          stringResource(R.string.lsp_clangd_feature_match_lowercase),
+          state.matchLowercase,
+          state.enabled,
+      ) {
+        state = state.copy(matchLowercase = it)
+      }
 
       Text(
           text = stringResource(R.string.lsp_clangd_fuzzy_ratio, state.fuzzyMatchRatio),
@@ -336,18 +392,22 @@ private fun ClangdSettingsCard() {
       )
 
       Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        Button(onClick = {
-          prefs.writeClangdSettings(state)
-          completionLimitText = state.completionLimit.toString()
-          timeoutText = state.requestTimeoutMs.toString()
-        }) {
+        Button(
+            onClick = {
+              prefs.writeClangdSettings(state)
+              completionLimitText = state.completionLimit.toString()
+              timeoutText = state.requestTimeoutMs.toString()
+            }
+        ) {
           Text(stringResource(R.string.lsp_btn_save))
         }
-        OutlinedButton(onClick = {
-          state = ClangdSettingsUiState()
-          completionLimitText = state.completionLimit.toString()
-          timeoutText = state.requestTimeoutMs.toString()
-        }) {
+        OutlinedButton(
+            onClick = {
+              state = ClangdSettingsUiState()
+              completionLimitText = state.completionLimit.toString()
+              timeoutText = state.requestTimeoutMs.toString()
+            }
+        ) {
           Text(stringResource(R.string.lsp_clangd_reset_defaults))
         }
       }
@@ -361,7 +421,12 @@ private fun ClangdSettingsCard() {
 }
 
 @Composable
-private fun SettingSwitchRow(label: String, checked: Boolean, enabled: Boolean = true, onChecked: (Boolean) -> Unit) {
+private fun SettingSwitchRow(
+    label: String,
+    checked: Boolean,
+    enabled: Boolean = true,
+    onChecked: (Boolean) -> Unit,
+) {
   Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
     Text(text = label, modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium)
     Switch(checked = checked, onCheckedChange = onChecked, enabled = enabled)

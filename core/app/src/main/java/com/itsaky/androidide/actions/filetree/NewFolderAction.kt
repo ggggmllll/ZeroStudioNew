@@ -27,12 +27,14 @@ import com.itsaky.androidide.utils.DialogUtils
 import com.itsaky.androidide.utils.flashError
 import com.itsaky.androidide.utils.flashSuccess
 import java.io.File
-/**
- *
- * @author android_zero
- */
+
+/** @author android_zero */
 class NewFolderAction(context: Context, override val order: Int) :
-    BaseDirNodeAction(context = context, labelRes = R.string.new_folder, iconRes = R.drawable.ic_new_folder) {
+    BaseDirNodeAction(
+        context = context,
+        labelRes = R.string.new_folder,
+        iconRes = R.drawable.ic_new_folder,
+    ) {
 
   override val id: String = "ide.editor.fileTree.newFolder"
 

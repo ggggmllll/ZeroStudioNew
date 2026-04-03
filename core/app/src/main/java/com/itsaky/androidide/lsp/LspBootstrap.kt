@@ -21,8 +21,8 @@ import android.content.Context
 import com.itsaky.androidide.lsp.servers.*
 import com.itsaky.androidide.lsp.servers.kotlin.*
 import com.itsaky.androidide.lsp.servers.lua.*
-import com.itsaky.androidide.lsp.servers.toml.TomlServer
 import com.itsaky.androidide.lsp.servers.smali.SmaliServer
+import com.itsaky.androidide.lsp.servers.toml.TomlServer
 import com.itsaky.androidide.lsp.util.Logger
 
 /**

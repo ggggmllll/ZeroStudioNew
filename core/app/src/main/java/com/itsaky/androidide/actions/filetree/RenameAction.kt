@@ -35,12 +35,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.greenrobot.eventbus.EventBus
 
-/**
- *
- * @author android_zero
- */
+/** @author android_zero */
 class RenameAction(context: Context, override val order: Int) :
-    BaseFileTreeAction(context, labelRes = R.string.rename_file, iconRes = R.drawable.ic_file_rename) {
+    BaseFileTreeAction(
+        context,
+        labelRes = R.string.rename_file,
+        iconRes = R.drawable.ic_file_rename,
+    ) {
 
   override val id: String = "ide.editor.fileTree.rename"
 
@@ -49,16 +50,21 @@ class RenameAction(context: Context, override val order: Int) :
     val file = data.requireFile()
     val binding = LayoutDialogTextInputBinding.inflate(LayoutInflater.from(context))
     val builder = DialogUtils.newMaterialDialogBuilder(context)
-    binding.name.editText!!.hint = context.getString(com.itsaky.androidide.resources.R.string.new_name)
+    binding.name.editText!!.hint =
+        context.getString(com.itsaky.androidide.resources.R.string.new_name)
     binding.name.editText!!.setText(file.name)
     builder.setTitle(com.itsaky.androidide.resources.R.string.rename_file)
     builder.setMessage(com.itsaky.androidide.resources.R.string.msg_rename_file)
     builder.setView(binding.root)
     builder.setNegativeButton(android.R.string.cancel, null)
-    builder.setPositiveButton(com.itsaky.androidide.resources.R.string.rename_file) { dialogInterface, _ ->
+    builder.setPositiveButton(com.itsaky.androidide.resources.R.string.rename_file) {
+        dialogInterface,
+        _ ->
       dialogInterface.dismiss()
       actionScope.launchAsyncWithProgress(
-          configureFlashbar = { builder, _ -> builder.message(com.itsaky.androidide.resources.R.string.please_wait) },
+          configureFlashbar = { builder, _ ->
+            builder.message(com.itsaky.androidide.resources.R.string.please_wait)
+          },
           action = { _, _ ->
             val name: String = binding.name.editText!!.text.toString().trim()
             val renamed = name.length in 1..40 && FileUtils.rename(file, name)
@@ -69,7 +75,8 @@ class RenameAction(context: Context, override val order: Int) :
 
             withContext(Dispatchers.Main) {
               flashMessage(
-                  if (renamed) com.itsaky.androidide.resources.R.string.renamed else com.itsaky.androidide.resources.R.string.rename_failed,
+                  if (renamed) com.itsaky.androidide.resources.R.string.renamed
+                  else com.itsaky.androidide.resources.R.string.rename_failed,
                   if (renamed) FlashType.SUCCESS else FlashType.ERROR,
               )
               if (renamed) {

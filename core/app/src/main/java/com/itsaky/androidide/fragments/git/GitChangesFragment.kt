@@ -219,7 +219,8 @@ class GitChangesFragment : BaseGitPageFragment() {
     val context = context ?: return
     GitAuthConfig.ensureConfigured(context) { cfg ->
       withRepo { repo ->
-        val branch = repo.head()?.shorthand()?.removePrefix("refs/heads/")?.ifBlank { "main" } ?: "main"
+        val branch =
+            repo.head()?.shorthand()?.removePrefix("refs/heads/")?.ifBlank { "main" } ?: "main"
         val refspec = "refs/heads/$branch:refs/heads/$branch"
         val credential = GitAuthConfig.toHttpCredential(cfg)
         Libgit2Helper.push(repo, "origin", listOf(refspec), credential, force)
@@ -317,7 +318,8 @@ class GitChangesFragment : BaseGitPageFragment() {
             selectedPaths.remove(item.relativePathUnderRepo)
           }
           notifyItemChanged(bindingAdapterPosition)
-          Toast.makeText(context, "Selected ${selectedPaths.size} file(s)", Toast.LENGTH_SHORT).show()
+          Toast.makeText(context, "Selected ${selectedPaths.size} file(s)", Toast.LENGTH_SHORT)
+              .show()
         }
 
         itemView.setOnLongClickListener {

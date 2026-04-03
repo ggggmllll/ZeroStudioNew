@@ -5,9 +5,7 @@ plugins {
   id("kotlin-android")
 }
 
-android {
-  namespace = "${BuildConfig.packageName}.lsp.groovy"
-}
+android { namespace = "${BuildConfig.packageName}.lsp.groovy" }
 
 dependencies {
   implementation(projects.core.lspApi)

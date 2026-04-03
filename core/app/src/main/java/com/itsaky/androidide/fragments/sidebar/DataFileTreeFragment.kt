@@ -8,6 +8,12 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.zero.studio.view.filetree.interfaces.FileClickListener
+import android.zero.studio.view.filetree.interfaces.FileLongClickListener
+import android.zero.studio.view.filetree.interfaces.FileObject
+import android.zero.studio.view.filetree.model.Node
+import android.zero.studio.view.filetree.provider.file
+import android.zero.studio.view.filetree.widget.FileTree
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
 import androidx.fragment.app.viewModels
@@ -18,14 +24,8 @@ import com.itsaky.androidide.eventbus.events.filetree.FileClickEvent
 import com.itsaky.androidide.eventbus.events.filetree.FileLongClickEvent
 import com.itsaky.androidide.events.ExpandTreeNodeRequestEvent
 import com.itsaky.androidide.events.ListProjectFilesRequestEvent
-import com.itsaky.androidide.viewmodel.DataFileTreeViewModel
 import com.itsaky.androidide.utils.doOnApplyWindowInsets
-import android.zero.studio.view.filetree.interfaces.FileClickListener
-import android.zero.studio.view.filetree.interfaces.FileLongClickListener
-import android.zero.studio.view.filetree.interfaces.FileObject
-import android.zero.studio.view.filetree.model.Node
-import android.zero.studio.view.filetree.provider.file
-import android.zero.studio.view.filetree.widget.FileTree
+import com.itsaky.androidide.viewmodel.DataFileTreeViewModel
 import java.io.File
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
@@ -33,6 +33,7 @@ import org.greenrobot.eventbus.ThreadMode.MAIN
 
 /**
  * 用于访问特殊权限才能访问的私有目录
+ *
  * @author android_zero
  */
 class DataFileTreeFragment : BottomSheetDialogFragment(), FileClickListener, FileLongClickListener {
@@ -94,19 +95,19 @@ class DataFileTreeFragment : BottomSheetDialogFragment(), FileClickListener, Fil
           requireContext().filesDir.parentFile
         }
     if (internalDataDir?.exists() == true) {
-        roots.add(RenamedFileObject(internalDataDir, "Internal Data"))
+      roots.add(RenamedFileObject(internalDataDir, "Internal Data"))
     }
 
     // 外部数据目录 (Android Data)
     val externalDataDir = requireContext().getExternalFilesDir(null)?.parentFile
     if (externalDataDir?.exists() == true) {
-        roots.add(RenamedFileObject(externalDataDir, "Android Data"))
+      roots.add(RenamedFileObject(externalDataDir, "Android Data"))
     }
 
     // OBB 目录 (Android OBB)
     val obbDir = requireContext().obbDir
     if (obbDir?.exists() == true) {
-        roots.add(RenamedFileObject(obbDir, "Android OBB"))
+      roots.add(RenamedFileObject(obbDir, "Android OBB"))
     }
 
     // 用户加密存储 (User DE Data)
@@ -120,10 +121,10 @@ class DataFileTreeFragment : BottomSheetDialogFragment(), FileClickListener, Fil
     // 内部存储根目录 (Sdcard)
     val sdcard = Environment.getExternalStorageDirectory()
     if (sdcard.exists()) {
-        roots.add(RenamedFileObject(sdcard, "Internal Storage"))
+      roots.add(RenamedFileObject(sdcard, "Internal Storage"))
     }
 
-    // 系统根目录 (Root /) 
+    // 系统根目录 (Root /)
     roots.add(RenamedFileObject(File("/"), "Device Root (/)"))
 
     // 系统目录 (System)
@@ -134,42 +135,58 @@ class DataFileTreeFragment : BottomSheetDialogFragment(), FileClickListener, Fil
     binding!!.loading.visibility = View.GONE
     binding!!.horizontalCroll.visibility = View.VISIBLE
 
-    val tree = FileTree(requireContext()).apply {
-        setIconProvider(IDEFileIconProvider(requireContext()))
-        setOnFileClickListener(this@DataFileTreeFragment)
-        setOnFileLongClickListener(this@DataFileTreeFragment)
-        loadFiles(virtualRoot, false) // false 意味着隐藏顶级 "Root" 虚拟节点，直接展示盘符
-        fileTreeView = this
-    }
-    
-    binding!!.horizontalCroll.addView(
-        tree,
-        ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
-    )
+    val tree =
+        FileTree(requireContext()).apply {
+          setIconProvider(IDEFileIconProvider(requireContext()))
+          setOnFileClickListener(this@DataFileTreeFragment)
+          setOnFileLongClickListener(this@DataFileTreeFragment)
+          loadFiles(virtualRoot, false) // false 意味着隐藏顶级 "Root" 虚拟节点，直接展示盘符
+          fileTreeView = this
+        }
+
+    binding!!
+        .horizontalCroll
+        .addView(
+            tree,
+            ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT,
+            ),
+        )
 
     tree.post { tree.restoreState(viewModel.savedState) }
   }
 
   // 虚拟根目录包装类 (用于容纳多个磁盘入口)
   private class VirtualRootFileObject(private val children: List<FileObject>) : FileObject {
-      override fun listFiles(): List<FileObject> = children
-      override fun isDirectory(): Boolean = true
-      override fun isFile(): Boolean = false
-      override fun getName(): String = "Root"
-      override fun getParentFile(): FileObject? = null
-      override fun getAbsolutePath(): String = "/"
+    override fun listFiles(): List<FileObject> = children
+
+    override fun isDirectory(): Boolean = true
+
+    override fun isFile(): Boolean = false
+
+    override fun getName(): String = "Root"
+
+    override fun getParentFile(): FileObject? = null
+
+    override fun getAbsolutePath(): String = "/"
   }
 
   // 重命名文件包装类 (为 / 目录赋予更友好的名字)
   class RenamedFileObject(val file: File, val displayName: String) : FileObject {
-      override fun listFiles(): List<FileObject> {
-          return file.listFiles()?.map { file(it) } ?: emptyList()
-      }
-      override fun isDirectory(): Boolean = file.isDirectory
-      override fun isFile(): Boolean = file.isFile
-      override fun getName(): String = displayName
-      override fun getParentFile(): FileObject? = file.parentFile?.let { file(it) }
-      override fun getAbsolutePath(): String = file.absolutePath
+    override fun listFiles(): List<FileObject> {
+      return file.listFiles()?.map { file(it) } ?: emptyList()
+    }
+
+    override fun isDirectory(): Boolean = file.isDirectory
+
+    override fun isFile(): Boolean = file.isFile
+
+    override fun getName(): String = displayName
+
+    override fun getParentFile(): FileObject? = file.parentFile?.let { file(it) }
+
+    override fun getAbsolutePath(): String = file.absolutePath
   }
 
   fun saveTreeState() {
@@ -179,7 +196,8 @@ class DataFileTreeFragment : BottomSheetDialogFragment(), FileClickListener, Fil
   override fun onClick(node: Node<FileObject>) {
     val fObj = node.value
     // 解析出实际的 java.io.File 对象
-    val targetFile = (fObj as? file)?.getNativeFile() ?: (fObj as? RenamedFileObject)?.file ?: return
+    val targetFile =
+        (fObj as? file)?.getNativeFile() ?: (fObj as? RenamedFileObject)?.file ?: return
 
     if (!targetFile.exists()) {
       Log.w(TAG, "File does not exist: ${targetFile.path}")
@@ -194,8 +212,9 @@ class DataFileTreeFragment : BottomSheetDialogFragment(), FileClickListener, Fil
 
   override fun onLongClick(node: Node<FileObject>) {
     val fObj = node.value
-    val targetFile = (fObj as? file)?.getNativeFile() ?: (fObj as? RenamedFileObject)?.file ?: return
-    
+    val targetFile =
+        (fObj as? file)?.getNativeFile() ?: (fObj as? RenamedFileObject)?.file ?: return
+
     val event = FileLongClickEvent(targetFile)
     event.put(Context::class.java, requireContext())
     event.put(Node::class.java, node)

@@ -250,7 +250,11 @@ private fun EmojiModifierPicker(
   Popup(
       onDismissRequest = onDismiss,
       properties =
-          PopupProperties(focusable = true, dismissOnBackPress = true, dismissOnClickOutside = true),
+          PopupProperties(
+              focusable = true,
+              dismissOnBackPress = true,
+              dismissOnClickOutside = true,
+          ),
   ) {
     Surface(
         modifier = Modifier.wrapContentSize().padding(16.dp),

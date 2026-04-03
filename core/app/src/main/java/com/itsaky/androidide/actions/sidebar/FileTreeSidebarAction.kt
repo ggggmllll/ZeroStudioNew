@@ -21,8 +21,8 @@ import android.content.Context
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.itsaky.androidide.R
+import com.itsaky.androidide.fragments.git.GitHostFragment
 import kotlin.reflect.KClass
-import com.itsaky.androidide.fragments.git.GitHostFragment;
 
 /**
  * Sidebar action for showing file tree.

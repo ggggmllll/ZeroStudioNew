@@ -17,14 +17,12 @@
 
 package com.itsaky.androidide.events
 
-import com.itsaky.androidide.eventbus.events.Event
-import com.itsaky.androidide.models.SheetOption
 import android.zero.studio.view.filetree.interfaces.FileObject
 import android.zero.studio.view.filetree.model.Node
+import com.itsaky.androidide.eventbus.events.Event
+import com.itsaky.androidide.models.SheetOption
 
-/**
- * @author android_zero
- */
+/** @author android_zero */
 internal data class FileContextMenuItemClickEvent(val option: SheetOption) : Event()
 
 data class ExpandTreeNodeRequestEvent(val node: Node<FileObject>) : Event()

@@ -27,9 +27,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
-import androidx.recyclerview.widget.RecyclerView
 import android.zero.studio.view.filetree.R
 import android.zero.studio.view.filetree.interfaces.FileClickListener
 import android.zero.studio.view.filetree.interfaces.FileIconProvider
@@ -39,6 +36,9 @@ import android.zero.studio.view.filetree.model.Node
 import android.zero.studio.view.filetree.model.TreeViewModel
 import android.zero.studio.view.filetree.util.Sorter
 import android.zero.studio.view.filetree.widget.FileTree
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
 
 class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {
   val expandView: ImageView = v.findViewById(R.id.expand)
@@ -67,12 +67,12 @@ class FileTreeAdapter(private val context: Context, val fileTree: FileTree) :
   private var animator = fileTree.itemAnimator
 
   private val highlightColor: Int by lazy {
-      val typedValue = TypedValue()
-      if (context.theme.resolveAttribute(android.R.attr.colorControlHighlight, typedValue, true)) {
-          typedValue.data
-      } else {
-          Color.parseColor("#40888888")
-      }
+    val typedValue = TypedValue()
+    if (context.theme.resolveAttribute(android.R.attr.colorControlHighlight, typedValue, true)) {
+      typedValue.data
+    } else {
+      Color.parseColor("#40888888")
+    }
   }
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -156,19 +156,20 @@ class FileTreeAdapter(private val context: Context, val fileTree: FileTree) :
 
     // 处理定位高亮效果 (闪烁动画)
     if (node.isHighlighted) {
-        val animator = ObjectAnimator.ofObject(
-            holder.rootContainer,
-            "backgroundColor",
-            ArgbEvaluator(),
-            Color.TRANSPARENT,
-            highlightColor,
-            Color.TRANSPARENT
-        )
-        animator.duration = 1200 // 1.2s 闪烁一次
-        animator.repeatCount = 1
-        animator.start()
+      val animator =
+          ObjectAnimator.ofObject(
+              holder.rootContainer,
+              "backgroundColor",
+              ArgbEvaluator(),
+              Color.TRANSPARENT,
+              highlightColor,
+              Color.TRANSPARENT,
+          )
+      animator.duration = 1200 // 1.2s 闪烁一次
+      animator.repeatCount = 1
+      animator.start()
     } else {
-        holder.rootContainer.setBackgroundColor(Color.TRANSPARENT)
+      holder.rootContainer.setBackgroundColor(Color.TRANSPARENT)
     }
   }
 

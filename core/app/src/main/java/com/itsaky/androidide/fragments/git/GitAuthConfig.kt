@@ -37,14 +37,27 @@ object GitAuthConfig {
   }
 
   private fun showConfigDialog(context: Context, initial: Config, onConfigured: (Config) -> Unit) {
-    val container = LinearLayout(context).apply {
-      orientation = LinearLayout.VERTICAL
-      val pad = (16 * resources.displayMetrics.density).toInt()
-      setPadding(pad, pad, pad, 0)
-    }
-    val usernameEt = EditText(context).apply { hint = "Git Username"; setText(initial.username) }
-    val emailEt = EditText(context).apply { hint = "Git Email"; setText(initial.email) }
-    val tokenEt = EditText(context).apply { hint = "Git Token / Password"; setText(initial.token) }
+    val container =
+        LinearLayout(context).apply {
+          orientation = LinearLayout.VERTICAL
+          val pad = (16 * resources.displayMetrics.density).toInt()
+          setPadding(pad, pad, pad, 0)
+        }
+    val usernameEt =
+        EditText(context).apply {
+          hint = "Git Username"
+          setText(initial.username)
+        }
+    val emailEt =
+        EditText(context).apply {
+          hint = "Git Email"
+          setText(initial.email)
+        }
+    val tokenEt =
+        EditText(context).apply {
+          hint = "Git Token / Password"
+          setText(initial.token)
+        }
 
     container.addView(usernameEt)
     container.addView(emailEt)

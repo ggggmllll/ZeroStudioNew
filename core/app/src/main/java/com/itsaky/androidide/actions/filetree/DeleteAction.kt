@@ -51,7 +51,14 @@ class DeleteAction(context: Context, override val order: Int) :
         .setNegativeButton(R.string.no, null)
         .setPositiveButton(R.string.yes) { dialogInterface, _ ->
           dialogInterface.dismiss()
-          val progressDialog = ProgressDialog.show(context, null, context.getString(R.string.please_wait), true, false)
+          val progressDialog =
+              ProgressDialog.show(
+                  context,
+                  null,
+                  context.getString(R.string.please_wait),
+                  true,
+                  false,
+              )
           executeAsync({ FileUtils.delete(file) }) { deleted ->
             progressDialog.dismiss()
             flashMessage(
@@ -71,7 +78,12 @@ class DeleteAction(context: Context, override val order: Int) :
           }
         }
         .setTitle(R.string.title_confirm_delete)
-        .setMessage(context.getString(R.string.msg_confirm_delete, String.format("%s [%s]", file.name, file.absolutePath)))
+        .setMessage(
+            context.getString(
+                R.string.msg_confirm_delete,
+                String.format("%s [%s]", file.name, file.absolutePath),
+            )
+        )
         .setCancelable(false)
         .create()
         .show()

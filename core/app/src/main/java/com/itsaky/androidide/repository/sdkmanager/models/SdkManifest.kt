@@ -4,6 +4,7 @@ import com.google.gson.annotations.SerializedName
 
 /**
  * 对应最新 JSON 结构的 SDK 清单模型。
+ *
  * @author android_zero
  */
 data class SdkManifest(
@@ -20,5 +21,5 @@ data class SdkManifest(
     @SerializedName("jdk_23") val jdk23: Map<String, String>?,
     @SerializedName("jdk_24") val jdk24: Map<String, String>?,
     @SerializedName("jdk_25") val jdk25: Map<String, String>?,
-    @SerializedName("jdk_26") val jdk26: Map<String, String>?
+    @SerializedName("jdk_26") val jdk26: Map<String, String>?,
 )

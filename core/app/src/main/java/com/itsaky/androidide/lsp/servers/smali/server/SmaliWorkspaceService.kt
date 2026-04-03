@@ -5,6 +5,7 @@ import org.eclipse.lsp4j.DidChangeWatchedFilesParams
 import org.eclipse.lsp4j.services.WorkspaceService
 
 class SmaliWorkspaceService : WorkspaceService {
-    override fun didChangeConfiguration(params: DidChangeConfigurationParams) = Unit
-    override fun didChangeWatchedFiles(params: DidChangeWatchedFilesParams) = Unit
+  override fun didChangeConfiguration(params: DidChangeConfigurationParams) = Unit
+
+  override fun didChangeWatchedFiles(params: DidChangeWatchedFilesParams) = Unit
 }

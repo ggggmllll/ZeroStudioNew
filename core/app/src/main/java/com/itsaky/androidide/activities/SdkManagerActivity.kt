@@ -6,9 +6,7 @@ import android.widget.FrameLayout
 import com.itsaky.androidide.app.EdgeToEdgeIDEActivity
 import com.itsaky.androidide.repository.sdkmanager.SdkHostFragment
 
-/**
- * @author android_zero
- */
+/** @author android_zero */
 class SdkManagerActivity : EdgeToEdgeIDEActivity() {
 
   override fun bindLayout(): View {
@@ -19,7 +17,8 @@ class SdkManagerActivity : EdgeToEdgeIDEActivity() {
     super.onCreate(savedInstanceState)
 
     if (savedInstanceState == null) {
-      supportFragmentManager.beginTransaction()
+      supportFragmentManager
+          .beginTransaction()
           .replace(android.R.id.content, SdkHostFragment())
           .commit()
     }

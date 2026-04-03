@@ -22,6 +22,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.zero.studio.view.filetree.interfaces.FileClickListener
+import android.zero.studio.view.filetree.interfaces.FileIconProvider
+import android.zero.studio.view.filetree.interfaces.FileLongClickListener
+import android.zero.studio.view.filetree.interfaces.FileObject
+import android.zero.studio.view.filetree.model.Node
+import android.zero.studio.view.filetree.provider.file
+import android.zero.studio.view.filetree.widget.FileTree
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowInsetsCompat.Type.statusBars
 import androidx.core.view.updatePadding
@@ -38,13 +45,6 @@ import com.itsaky.androidide.models.FileExtension
 import com.itsaky.androidide.projects.IProjectManager
 import com.itsaky.androidide.utils.doOnApplyWindowInsets
 import com.itsaky.androidide.viewmodel.FileTreeViewModel
-import android.zero.studio.view.filetree.interfaces.FileClickListener
-import android.zero.studio.view.filetree.interfaces.FileIconProvider
-import android.zero.studio.view.filetree.interfaces.FileLongClickListener
-import android.zero.studio.view.filetree.interfaces.FileObject
-import android.zero.studio.view.filetree.model.Node
-import android.zero.studio.view.filetree.provider.file
-import android.zero.studio.view.filetree.widget.FileTree
 import java.io.File
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -56,6 +56,7 @@ import org.greenrobot.eventbus.ThreadMode.MAIN
 
 /**
  * Fragment that displays the project file tree.
+ *
  * @author android_zero
  */
 class FileTreeFragment : BottomSheetDialogFragment(), FileClickListener, FileLongClickListener {
@@ -105,7 +106,7 @@ class FileTreeFragment : BottomSheetDialogFragment(), FileClickListener, FileLon
     if (!targetFile.exists()) {
       return
     }
-    
+
     if (targetFile.isFile) {
       val event = FileClickEvent(targetFile)
       event.put(Context::class.java, requireContext())
@@ -143,32 +144,38 @@ class FileTreeFragment : BottomSheetDialogFragment(), FileClickListener, FileLon
     if (binding == null) {
       return
     }
-    
+
     CoroutineScope(Dispatchers.Main).launch {
-        binding!!.horizontalCroll.visibility = View.GONE
-        binding!!.loading.visibility = View.VISIBLE
+      binding!!.horizontalCroll.visibility = View.GONE
+      binding!!.loading.visibility = View.VISIBLE
 
-        val projectDirPath = withContext(Dispatchers.IO) { IProjectManager.getInstance().projectDirPath }
-        val projectDir = File(projectDirPath)
+      val projectDirPath =
+          withContext(Dispatchers.IO) { IProjectManager.getInstance().projectDirPath }
+      val projectDir = File(projectDirPath)
 
-        if (!projectDir.exists()) {
-            binding!!.loading.visibility = View.GONE
-            return@launch
-        }
-
-        val tree = createTreeView(file(projectDir))
-        
-        binding!!.horizontalCroll.removeAllViews()
-        if (tree != null) {
-             binding!!.horizontalCroll.addView(
-                tree,
-                ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
-            )
-            tree.post { tree.restoreState(viewModel.savedState) }
-        }
-
-        binding!!.horizontalCroll.visibility = View.VISIBLE
+      if (!projectDir.exists()) {
         binding!!.loading.visibility = View.GONE
+        return@launch
+      }
+
+      val tree = createTreeView(file(projectDir))
+
+      binding!!.horizontalCroll.removeAllViews()
+      if (tree != null) {
+        binding!!
+            .horizontalCroll
+            .addView(
+                tree,
+                ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                ),
+            )
+        tree.post { tree.restoreState(viewModel.savedState) }
+      }
+
+      binding!!.horizontalCroll.visibility = View.VISIBLE
+      binding!!.loading.visibility = View.GONE
     }
   }
 
@@ -199,15 +206,19 @@ class IDEFileIconProvider(private val context: Context) : FileIconProvider {
   private val expandMore = ContextCompat.getDrawable(context, R.drawable.ic_chevron_down)
 
   override fun getIcon(node: Node<FileObject>): Drawable? {
-    val fileObj = (node.value as? file)?.getNativeFile() ?: return ContextCompat.getDrawable(context, R.drawable.ic_file_type_unknown)
-    val iconRes = if (fileObj.isDirectory) {
-       R.drawable.ic_folder
-    } else {
-       FileExtension.Factory.forFile(fileObj).icon
-    }
+    val fileObj =
+        (node.value as? file)?.getNativeFile()
+            ?: return ContextCompat.getDrawable(context, R.drawable.ic_file_type_unknown)
+    val iconRes =
+        if (fileObj.isDirectory) {
+          R.drawable.ic_folder
+        } else {
+          FileExtension.Factory.forFile(fileObj).icon
+        }
     return ContextCompat.getDrawable(context, iconRes)
   }
 
   override fun getChevronRight(): Drawable? = chevronRight
+
   override fun getExpandMore(): Drawable? = expandMore
 }

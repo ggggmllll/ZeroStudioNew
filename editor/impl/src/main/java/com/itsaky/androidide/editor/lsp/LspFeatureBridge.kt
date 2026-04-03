@@ -8,9 +8,7 @@ import io.github.rosemoe.sora.lang.styling.Span
 import io.github.rosemoe.sora.lang.styling.SpanFactory
 import io.github.rosemoe.sora.lang.styling.TextStyle
 
-/**
- * Bridges new core/lsp-models features into editor-friendly structures.
- */
+/** Bridges new core/lsp-models features into editor-friendly structures. */
 object LspFeatureBridge {
 
   fun flattenSymbols(result: DocumentSymbolsResult): List<DocumentSymbol> {

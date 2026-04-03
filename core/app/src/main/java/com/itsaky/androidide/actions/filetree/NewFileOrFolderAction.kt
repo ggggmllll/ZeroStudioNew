@@ -29,16 +29,16 @@ import com.itsaky.androidide.resources.R
 import com.itsaky.androidide.utils.DialogUtils
 import com.itsaky.androidide.utils.flashError
 import com.itsaky.androidide.utils.flashSuccess
-import android.zero.studio.view.filetree.interfaces.FileObject
-import android.zero.studio.view.filetree.model.Node
 import java.io.File
 import java.io.IOException
-/**
- *
- * @author android_zero
- */
+
+/** @author android_zero */
 class NewFileOrFolderAction(context: Context, override val order: Int) :
-    BaseDirNodeAction(context = context, labelRes = R.string.action_create_file_folder, iconRes = R.drawable.ic_new_folder) {
+    BaseDirNodeAction(
+        context = context,
+        labelRes = R.string.action_create_file_folder,
+        iconRes = R.drawable.ic_new_folder,
+    ) {
 
   private val PREFS_NAME = "NewFileOrFolderActionPrefs"
   private val PREF_REMOVE_SPACES_CHECKED = "remove_spaces_checked"
@@ -52,9 +52,11 @@ class NewFileOrFolderAction(context: Context, override val order: Int) :
   override suspend fun execAction(data: ActionData) {
     val activityContext: Activity = data.getContext() as? Activity ?: return
     val currentDir = data.requireFile()
-    val prefs: SharedPreferences = activityContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+    val prefs: SharedPreferences =
+        activityContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
-    val dialogView = LayoutInflater.from(activityContext).inflate(layout.layout_dialog_fodle_orfile, null)
+    val dialogView =
+        LayoutInflater.from(activityContext).inflate(layout.layout_dialog_fodle_orfile, null)
     val builder = DialogUtils.newMaterialDialogBuilder(activityContext)
 
     val editText = dialogView.findViewById<TextInputEditText>(R.id.edit_text_name_input)
@@ -72,16 +74,21 @@ class NewFileOrFolderAction(context: Context, override val order: Int) :
     builder.setCancelable(false)
 
     val allowedChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_./"
-    editText.filters = arrayOf(InputFilter { source: CharSequence, start: Int, end: Int, _: Spanned, _: Int, _: Int ->
-      for (i in start until end) {
-        val char = source[i]
-        if (!allowedChars.contains(char)) {
-          flashError(activityContext.getString(R.string.msg_unsupported_characters, "'$char'"))
-          return@InputFilter ""
-        }
-      }
-      null
-    })
+    editText.filters =
+        arrayOf(
+            InputFilter { source: CharSequence, start: Int, end: Int, _: Spanned, _: Int, _: Int ->
+              for (i in start until end) {
+                val char = source[i]
+                if (!allowedChars.contains(char)) {
+                  flashError(
+                      activityContext.getString(R.string.msg_unsupported_characters, "'$char'")
+                  )
+                  return@InputFilter ""
+                }
+              }
+              null
+            }
+        )
 
     checkboxRemoveSpaces.isChecked = prefs.getBoolean(PREF_REMOVE_SPACES_CHECKED, false)
     checkboxRemoveSpaces.setOnCheckedChangeListener { _: CompoundButton, isChecked: Boolean ->
@@ -90,7 +97,8 @@ class NewFileOrFolderAction(context: Context, override val order: Int) :
     checkboxDotsToSlashes.isChecked = false
 
     btnPaste.setOnClickListener { _: View ->
-      val clipboard = activityContext.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+      val clipboard =
+          activityContext.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
       if (clipboard.hasPrimaryClip() && clipboard.primaryClip?.itemCount ?: 0 > 0) {
         val pasteData = clipboard.primaryClip?.getItemAt(0)?.text
         if (pasteData != null) {
@@ -103,7 +111,9 @@ class NewFileOrFolderAction(context: Context, override val order: Int) :
       }
     }
 
-    dropdownArrow.setOnClickListener { view: View -> showSuffixHistoryPopup(activityContext, view, editText, prefs) }
+    dropdownArrow.setOnClickListener { view: View ->
+      showSuffixHistoryPopup(activityContext, view, editText, prefs)
+    }
 
     val dialog = builder.create()
 
@@ -128,8 +138,17 @@ class NewFileOrFolderAction(context: Context, override val order: Int) :
     dialog.show()
   }
 
-  private fun handleCreation(context: Context, currentDir: File, inputName: String, isFileToCreate: Boolean, convertDotsToSlashes: Boolean) {
-    if (inputName.isEmpty()) { flashError(R.string.msg_invalid_name); return }
+  private fun handleCreation(
+      context: Context,
+      currentDir: File,
+      inputName: String,
+      isFileToCreate: Boolean,
+      convertDotsToSlashes: Boolean,
+  ) {
+    if (inputName.isEmpty()) {
+      flashError(R.string.msg_invalid_name)
+      return
+    }
 
     val processedPath: String
     if (isFileToCreate) {
@@ -140,10 +159,18 @@ class NewFileOrFolderAction(context: Context, override val order: Int) :
       processedPath = tempPath.trimStart('/').trimEnd('/')
     }
 
-    if (processedPath.isEmpty()) { flashError(R.string.msg_invalid_name); return }
+    if (processedPath.isEmpty()) {
+      flashError(R.string.msg_invalid_name)
+      return
+    }
 
     if (!isValidFileName(processedPath)) {
-      flashError(context.getString(R.string.msg_unsupported_characters, getUnsupportedCharacters(processedPath)))
+      flashError(
+          context.getString(
+              R.string.msg_unsupported_characters,
+              getUnsupportedCharacters(processedPath),
+          )
+      )
       return
     }
 
@@ -154,11 +181,17 @@ class NewFileOrFolderAction(context: Context, override val order: Int) :
 
     if (isFileToCreate) {
       val lastSlashIndex = processedPath.lastIndexOf('/')
-      val parentPathSegment = if (lastSlashIndex != -1) processedPath.substring(0, lastSlashIndex) else ""
-      val fileName = if (lastSlashIndex != -1) processedPath.substring(lastSlashIndex + 1) else processedPath
+      val parentPathSegment =
+          if (lastSlashIndex != -1) processedPath.substring(0, lastSlashIndex) else ""
+      val fileName =
+          if (lastSlashIndex != -1) processedPath.substring(lastSlashIndex + 1) else processedPath
 
-      if (fileName.isEmpty()) { flashError(R.string.msg_invalid_name); return }
-      val finalParentDir = if (parentPathSegment.isNotEmpty()) File(currentDir, parentPathSegment) else currentDir
+      if (fileName.isEmpty()) {
+        flashError(R.string.msg_invalid_name)
+        return
+      }
+      val finalParentDir =
+          if (parentPathSegment.isNotEmpty()) File(currentDir, parentPathSegment) else currentDir
       createFile(context, File(finalParentDir, fileName))
     } else {
       createFolder(context, File(currentDir, processedPath))
@@ -169,11 +202,19 @@ class NewFileOrFolderAction(context: Context, override val order: Int) :
     try {
       val parentDir = targetFile.parentFile
       if (parentDir != null && !parentDir.exists() && !parentDir.mkdirs()) {
-        flashError(context.getString(R.string.msg_folder_creation_failed_for_parent, parentDir.absolutePath))
+        flashError(
+            context.getString(
+                R.string.msg_folder_creation_failed_for_parent,
+                parentDir.absolutePath,
+            )
+        )
         return
       }
 
-      if (targetFile.exists()) { flashError(R.string.msg_file_exists); return }
+      if (targetFile.exists()) {
+        flashError(R.string.msg_file_exists)
+        return
+      }
 
       if (targetFile.createNewFile()) {
         flashSuccess(R.string.msg_file_created)
@@ -182,12 +223,17 @@ class NewFileOrFolderAction(context: Context, override val order: Int) :
         flashError(R.string.msg_file_creation_failed)
       }
     } catch (e: IOException) {
-      flashError(context.getString(R.string.msg_file_creation_exception, e.localizedMessage ?: "未知错误"))
+      flashError(
+          context.getString(R.string.msg_file_creation_exception, e.localizedMessage ?: "未知错误")
+      )
     }
   }
 
   private fun createFolder(context: Context, targetFolder: File) {
-    if (targetFolder.exists()) { flashError(R.string.msg_folder_exists); return }
+    if (targetFolder.exists()) {
+      flashError(R.string.msg_folder_exists)
+      return
+    }
 
     try {
       if (targetFolder.mkdirs()) {
@@ -197,16 +243,40 @@ class NewFileOrFolderAction(context: Context, override val order: Int) :
         flashError(R.string.msg_folder_creation_failed)
       }
     } catch (e: IOException) {
-      flashError(context.getString(R.string.msg_folder_creation_exception, e.localizedMessage ?: "未知错误"))
+      flashError(
+          context.getString(R.string.msg_folder_creation_exception, e.localizedMessage ?: "未知错误")
+      )
     }
   }
 
-  private class ItemAdapter(private var items: List<String>, private val onItemClick: (String) -> Unit) : RecyclerView.Adapter<ItemAdapter.ItemViewHolder>() {
-    class ItemViewHolder(view: View) : RecyclerView.ViewHolder(view) { val textView: android.widget.TextView = view.findViewById(android.R.id.text1) }
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder { return ItemViewHolder(LayoutInflater.from(parent.context).inflate(android.R.layout.simple_list_item_1, parent, false) as android.widget.TextView) }
-    override fun onBindViewHolder(holder: ItemViewHolder, position: Int) { val item = items[position]; holder.textView.text = item; holder.itemView.setOnClickListener { onItemClick(item) } }
+  private class ItemAdapter(
+      private var items: List<String>,
+      private val onItemClick: (String) -> Unit,
+  ) : RecyclerView.Adapter<ItemAdapter.ItemViewHolder>() {
+    class ItemViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+      val textView: android.widget.TextView = view.findViewById(android.R.id.text1)
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder {
+      return ItemViewHolder(
+          LayoutInflater.from(parent.context)
+              .inflate(android.R.layout.simple_list_item_1, parent, false)
+              as android.widget.TextView
+      )
+    }
+
+    override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
+      val item = items[position]
+      holder.textView.text = item
+      holder.itemView.setOnClickListener { onItemClick(item) }
+    }
+
     override fun getItemCount(): Int = items.size
-    fun updateData(newItems: List<String>) { items = newItems; notifyDataSetChanged() }
+
+    fun updateData(newItems: List<String>) {
+      items = newItems
+      notifyDataSetChanged()
+    }
   }
 
   private fun addHistoryEntry(prefs: SharedPreferences, entry: String) {
@@ -220,13 +290,23 @@ class NewFileOrFolderAction(context: Context, override val order: Int) :
 
   private fun getHistoryEntries(prefs: SharedPreferences): List<String> {
     val jsonString = prefs.getString(PREF_HISTORY_LIST, null)
-    return if (jsonString != null) gson.fromJson(jsonString, object : TypeToken<List<String>>() {}.type) else emptyList()
+    return if (jsonString != null)
+        gson.fromJson(jsonString, object : TypeToken<List<String>>() {}.type)
+    else emptyList()
   }
 
-  private fun showSuffixHistoryPopup(context: Context, anchorView: View, editText: TextInputEditText, prefs: SharedPreferences) {
+  private fun showSuffixHistoryPopup(
+      context: Context,
+      anchorView: View,
+      editText: TextInputEditText,
+      prefs: SharedPreferences,
+  ) {
     val popupView = LayoutInflater.from(context).inflate(R.layout.layout_suffix_history_popup, null)
-    val popupWindow = PopupWindow(popupView, anchorView.width * 2, RecyclerView.LayoutParams.WRAP_CONTENT, true)
-    popupWindow.isOutsideTouchable = true; popupWindow.isFocusable = true; popupWindow.setBackgroundDrawable(null)
+    val popupWindow =
+        PopupWindow(popupView, anchorView.width * 2, RecyclerView.LayoutParams.WRAP_CONTENT, true)
+    popupWindow.isOutsideTouchable = true
+    popupWindow.isFocusable = true
+    popupWindow.setBackgroundDrawable(null)
 
     val radioGroup = popupView.findViewById<RadioGroup>(R.id.radio_group_list_type)
     val radioSuffix = popupView.findViewById<RadioButton>(R.id.radio_suffix)
@@ -237,31 +317,82 @@ class NewFileOrFolderAction(context: Context, override val order: Int) :
     recyclerViewSuffix.layoutManager = LinearLayoutManager(context)
     recyclerViewHistory.layoutManager = LinearLayoutManager(context)
 
-    val suffixList = listOf(".txt", ".java", ".kt", ".xml", ".gradle", ".gradle.kts", ".md", ".html", ".css", ".js", ".json", ".py", ".c", ".cpp", ".h", ".sh", ".go", ".rs", ".rb", ".php", ".swift", ".dart", ".yml", ".gitignore", ".properties")
-    recyclerViewSuffix.adapter = ItemAdapter(suffixList) { editText.append(it); popupWindow.dismiss() }
+    val suffixList =
+        listOf(
+            ".txt",
+            ".java",
+            ".kt",
+            ".xml",
+            ".gradle",
+            ".gradle.kts",
+            ".md",
+            ".html",
+            ".css",
+            ".js",
+            ".json",
+            ".py",
+            ".c",
+            ".cpp",
+            ".h",
+            ".sh",
+            ".go",
+            ".rs",
+            ".rb",
+            ".php",
+            ".swift",
+            ".dart",
+            ".yml",
+            ".gitignore",
+            ".properties",
+        )
+    recyclerViewSuffix.adapter =
+        ItemAdapter(suffixList) {
+          editText.append(it)
+          popupWindow.dismiss()
+        }
 
     val historyList = getHistoryEntries(prefs).toMutableList()
-    val historyAdapter = ItemAdapter(historyList) { editText.setText(it); editText.text?.length?.let { len -> editText.setSelection(len) }; popupWindow.dismiss() }
+    val historyAdapter =
+        ItemAdapter(historyList) {
+          editText.setText(it)
+          editText.text?.length?.let { len -> editText.setSelection(len) }
+          popupWindow.dismiss()
+        }
     recyclerViewHistory.adapter = historyAdapter
 
     if (prefs.getInt(PREF_SELECTED_LIST_TYPE, 0) == 0) {
-      radioSuffix.isChecked = true; recyclerViewSuffix.visibility = View.VISIBLE; recyclerViewHistory.visibility = View.GONE
+      radioSuffix.isChecked = true
+      recyclerViewSuffix.visibility = View.VISIBLE
+      recyclerViewHistory.visibility = View.GONE
     } else {
-      radioHistory.isChecked = true; recyclerViewSuffix.visibility = View.GONE; recyclerViewHistory.visibility = View.VISIBLE
+      radioHistory.isChecked = true
+      recyclerViewSuffix.visibility = View.GONE
+      recyclerViewHistory.visibility = View.VISIBLE
     }
 
     radioGroup.setOnCheckedChangeListener { _, checkedId ->
       if (checkedId == R.id.radio_suffix) {
-        recyclerViewSuffix.visibility = View.VISIBLE; recyclerViewHistory.visibility = View.GONE; prefs.edit().putInt(PREF_SELECTED_LIST_TYPE, 0).apply()
+        recyclerViewSuffix.visibility = View.VISIBLE
+        recyclerViewHistory.visibility = View.GONE
+        prefs.edit().putInt(PREF_SELECTED_LIST_TYPE, 0).apply()
       } else {
         historyAdapter.updateData(getHistoryEntries(prefs))
-        recyclerViewSuffix.visibility = View.GONE; recyclerViewHistory.visibility = View.VISIBLE; prefs.edit().putInt(PREF_SELECTED_LIST_TYPE, 1).apply()
+        recyclerViewSuffix.visibility = View.GONE
+        recyclerViewHistory.visibility = View.VISIBLE
+        prefs.edit().putInt(PREF_SELECTED_LIST_TYPE, 1).apply()
       }
     }
 
     popupWindow.showAsDropDown(anchorView)
   }
 
-  private fun isValidFileName(fileName: String): Boolean = fileName.none { it in charArrayOf('\\', ':', '*', '?', '"', '<', '>', '|', '\u0000') }
-  private fun getUnsupportedCharacters(fileName: String): String = fileName.filter { it in charArrayOf('\\', ':', '*', '?', '"', '<', '>', '|', '\u0000') }.toSet().joinToString(" ") { "'$it'" }
+  private fun isValidFileName(fileName: String): Boolean = fileName.none {
+    it in charArrayOf('\\', ':', '*', '?', '"', '<', '>', '|', '\u0000')
+  }
+
+  private fun getUnsupportedCharacters(fileName: String): String =
+      fileName
+          .filter { it in charArrayOf('\\', ':', '*', '?', '"', '<', '>', '|', '\u0000') }
+          .toSet()
+          .joinToString(" ") { "'$it'" }
 }

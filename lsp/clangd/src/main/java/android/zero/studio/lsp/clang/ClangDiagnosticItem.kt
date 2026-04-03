@@ -1,8 +1,6 @@
 package android.zero.studio.lsp.clang
 
-/**
- * JNI bridge model for diagnostics emitted by native clangd bridge.
- */
+/** JNI bridge model for diagnostics emitted by native clangd bridge. */
 data class ClangDiagnosticItem(
     val startLine: Int,
     val startCharacter: Int,

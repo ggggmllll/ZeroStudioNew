@@ -17,11 +17,11 @@
 
 package com.itsaky.androidide.viewmodel
 
+import android.zero.studio.view.filetree.widget.FileTree
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.itsaky.androidide.tasks.executeAsync
 import com.itsaky.androidide.tasks.runOnUiThread
-import android.zero.studio.view.filetree.widget.FileTree
 
 /**
  * [ViewModel] for the file tree fragment.

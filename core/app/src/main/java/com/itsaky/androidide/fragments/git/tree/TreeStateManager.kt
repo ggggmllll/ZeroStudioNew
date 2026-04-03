@@ -5,7 +5,7 @@ import java.util.Stack
 
 /**
  * 高级状态管理器：实现文件树节点展开/折叠的 撤销(Undo) 和 重做(Redo)。
- * 
+ *
  * @author android_zero
  */
 class TreeStateManager {
@@ -27,7 +27,7 @@ class TreeStateManager {
     if (undoStack.isEmpty()) return
     val currentState = treeView.getSaveState()
     redoStack.push(currentState)
-    
+
     val previousState = undoStack.pop()
     treeView.collapseAll()
     treeView.restoreState(previousState)
@@ -37,7 +37,7 @@ class TreeStateManager {
     if (redoStack.isEmpty()) return
     val currentState = treeView.getSaveState()
     undoStack.push(currentState)
-    
+
     val nextState = redoStack.pop()
     treeView.collapseAll()
     treeView.restoreState(nextState)

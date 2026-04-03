@@ -14,26 +14,27 @@ import com.itsaky.androidide.repository.sdkmanager.viewmodel.SdkManagerViewModel
 
 /**
  * 承载纯 Compose 界面的 Fragment 容器。
+ *
  * @author android_zero
  */
 class SdkHostFragment : Fragment() {
-    private val sdkManagerViewModel: SdkManagerViewModel by viewModels()
+  private val sdkManagerViewModel: SdkManagerViewModel by viewModels()
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        return ComposeView(requireContext()).apply {
-            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-            setContent {
-                MaterialTheme {
-                    SdkManagerScreen(
-                        onClose = { requireActivity().finish() },
-                        viewModel = sdkManagerViewModel
-                    )
-                }
-            }
+  override fun onCreateView(
+      inflater: LayoutInflater,
+      container: ViewGroup?,
+      savedInstanceState: Bundle?,
+  ): View {
+    return ComposeView(requireContext()).apply {
+      setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+      setContent {
+        MaterialTheme {
+          SdkManagerScreen(
+              onClose = { requireActivity().finish() },
+              viewModel = sdkManagerViewModel,
+          )
         }
+      }
     }
+  }
 }

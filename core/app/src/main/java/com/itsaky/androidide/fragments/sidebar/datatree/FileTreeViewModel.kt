@@ -1,13 +1,11 @@
 package com.itsaky.androidide.fragments.sidebar.datatree
 
+import android.zero.studio.view.filetree.widget.FileTree
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.itsaky.androidide.tasks.executeAsync
-import android.zero.studio.view.filetree.widget.FileTree
 
-/**
- * @author android_zero
- */
+/** @author android_zero */
 internal class FileTreeViewModel : ViewModel() {
   private val _treeState = MutableLiveData<String?>()
   val treeState: MutableLiveData<String?>

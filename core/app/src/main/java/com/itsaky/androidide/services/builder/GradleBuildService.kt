@@ -650,8 +650,8 @@ class GradleBuildService :
             val exitCode = process.waitFor()
 
             kotlinx.coroutines.runBlocking {
-                outputReaderJob.join()
-                errorReaderJob.join()
+              outputReaderJob.join()
+              errorReaderJob.join()
             }
             currentBuildProcess = null
 

@@ -18,6 +18,8 @@
 package com.itsaky.androidide.handlers
 
 import android.content.Context
+import android.zero.studio.view.filetree.interfaces.FileObject
+import android.zero.studio.view.filetree.model.Node
 import androidx.core.view.GravityCompat
 import com.itsaky.androidide.actions.ActionData
 import com.itsaky.androidide.actions.ActionItem.Location.EDITOR_FILE_TREE
@@ -35,8 +37,6 @@ import com.itsaky.androidide.models.SheetOption
 import com.itsaky.androidide.utils.ApkInstaller
 import com.itsaky.androidide.utils.InstallationResultHandler
 import com.itsaky.androidide.utils.flashError
-import android.zero.studio.view.filetree.interfaces.FileObject
-import android.zero.studio.view.filetree.model.Node
 import java.io.File
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
@@ -81,7 +81,11 @@ class FileTreeActionHandler : BaseEventHandler() {
 
     if (MB_10 < event.file.length()) {
       flashError("File is too big!")
-      log.warn("Cannot open {} as it is too big. File size: {} bytes", event.file, event.file.length())
+      log.warn(
+          "Cannot open {} as it is too big. File size: {} bytes",
+          event.file,
+          event.file.length(),
+      )
       return
     }
 
