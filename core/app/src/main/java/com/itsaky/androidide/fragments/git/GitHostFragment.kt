@@ -116,7 +116,7 @@ class GitHostFragment : Fragment() {
   }
 
   private inner class GitPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
-    // 页面数量为 7 (0-5)
+    // 页面数量为 7 (0-6)
     override fun getItemCount(): Int = 7
 
     override fun createFragment(position: Int): Fragment {
