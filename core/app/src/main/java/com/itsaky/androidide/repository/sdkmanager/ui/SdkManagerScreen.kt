@@ -19,12 +19,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.DialogProperties
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.itsaky.androidide.R
 import com.itsaky.androidide.repository.sdkmanager.models.SdkTreeNode
 import com.itsaky.androidide.repository.sdkmanager.tree.SdkTreeView
 import com.itsaky.androidide.repository.sdkmanager.services.SdkInstallerManager
-import com.itsaky.androidide.repository.sdkmanager.viewmodel.SdkManagerViewModel // 修复：补充 ViewModel 导包
+import com.itsaky.androidide.repository.sdkmanager.viewmodel.SdkManagerViewModel
 import kotlinx.coroutines.launch
 
 /**
@@ -35,7 +34,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun SdkManagerScreen(
     onClose: () -> Unit,
-    viewModel: SdkManagerViewModel = viewModel()
+    viewModel: SdkManagerViewModel
 ) {
     var selectedTabIndex by remember { mutableStateOf(0) }
     val tabs = listOf("SDK Platforms", "SDK Tools", "SDK Update Sites")
