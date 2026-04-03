@@ -1,12 +1,14 @@
 package com.itsaky.androidide.cursor
 
+import android.app.Activity
+import android.content.Context
+import android.content.ContextWrapper
 import io.github.rosemoe.sora.event.EventReceiver
 import io.github.rosemoe.sora.event.SelectionChangeEvent
 import io.github.rosemoe.sora.event.Unsubscribe
 import io.github.rosemoe.sora.text.CharPosition
 import io.github.rosemoe.sora.widget.CodeEditor
 import java.util.WeakHashMap
-import kotlin.math.abs
 
 /**
  * 光标历史记录管理器。 用于实现类似撤销/重做的光标位置回退与前进功能。
@@ -28,10 +30,7 @@ object CursorHistoryManager {
 
     override fun onReceive(event: SelectionChangeEvent, unsubscribe: Unsubscribe) {
       if (isNavigating) return
-      if (
-          event.cause == SelectionChangeEvent.CAUSE_TEXT_MODIFICATION ||
-              event.cause == SelectionChangeEvent.CAUSE_UNKNOWN
-      ) {
+      if (event.cause == SelectionChangeEvent.CAUSE_TEXT_MODIFICATION) {
         return
       }
       recordPosition(event.left.fromThis())
@@ -40,9 +39,8 @@ object CursorHistoryManager {
     private fun recordPosition(pos: CharPosition) {
       if (currentIndex >= 0 && currentIndex < history.size) {
         val last = history[currentIndex]
-        // 防抖：同行内移动小于10字符，直接覆盖最新位置，不新增历史记录
-        if (last.line == pos.line && abs(last.column - pos.column) < 10) {
-          history[currentIndex] = pos
+        // 连续重复位置不重复入栈
+        if (last.line == pos.line && last.column == pos.column) {
           return
         }
       }
@@ -56,12 +54,15 @@ object CursorHistoryManager {
       } else {
         currentIndex++
       }
+
+      notifyStateChanged()
     }
 
     fun goBack() {
       if (currentIndex > 0) {
         currentIndex--
         navigate()
+        notifyStateChanged()
       }
     }
 
@@ -69,6 +70,7 @@ object CursorHistoryManager {
       if (currentIndex < history.size - 1) {
         currentIndex++
         navigate()
+        notifyStateChanged()
       }
     }
 
@@ -80,6 +82,10 @@ object CursorHistoryManager {
         editor.ensurePositionVisible(pos.line, pos.column)
       }
       isNavigating = false
+    }
+
+    private fun notifyStateChanged() {
+      editor.context.findActivity()?.invalidateOptionsMenu()
     }
 
     fun canGoBack() = currentIndex > 0
@@ -96,5 +102,13 @@ object CursorHistoryManager {
       trackers[editor] = tracker
     }
     return tracker
+  }
+}
+
+private tailrec fun Context.findActivity(): Activity? {
+  return when (this) {
+    is Activity -> this
+    is ContextWrapper -> baseContext.findActivity()
+    else -> null
   }
 }

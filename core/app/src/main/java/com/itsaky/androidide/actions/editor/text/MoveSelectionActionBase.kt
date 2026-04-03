@@ -1,5 +1,7 @@
 package com.itsaky.androidide.actions.editor.text
 
+import android.app.Activity
+import android.content.Context
 import android.graphics.drawable.Drawable
 import com.itsaky.androidide.actions.ActionData
 import com.itsaky.androidide.actions.ActionItem
@@ -58,6 +60,10 @@ abstract class MoveSelectionActionBase : EditorActionItem {
     editor.ensurePositionVisible(finalStart.line, finalStart.column)
 
     return true
+  }
+
+  override fun postExec(data: ActionData, result: Any) {
+    (data.get(Context::class.java) as? Activity?)?.invalidateOptionsMenu()
   }
 
   /**
