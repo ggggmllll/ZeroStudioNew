@@ -117,6 +117,7 @@ class GitProjectsFragment : BaseGitPageFragment(), FileClickListener, FileLongCl
       true
     }
 
+
     addToolbarAction(R.drawable.ic_chevron_down, "Expand All") {
       fileTreeView?.let { stateManager.pushState(it); it.expandAll() }
     }

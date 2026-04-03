@@ -24,7 +24,7 @@ import com.itsaky.androidide.R
 import com.itsaky.androidide.repository.sdkmanager.models.SdkTreeNode
 import com.itsaky.androidide.repository.sdkmanager.tree.SdkTreeView
 import com.itsaky.androidide.repository.sdkmanager.services.SdkInstallerManager
-import com.itsaky.androidide.viewmodel.SdkManagerViewModel
+import com.itsaky.androidide.repository.sdkmanager.viewmodel.SdkManagerViewModel // 修复：补充 ViewModel 导包
 import kotlinx.coroutines.launch
 
 /**
@@ -122,7 +122,7 @@ fun SdkToolsTab(viewModel: SdkManagerViewModel) {
 }
 
 /**
- * 将底层的 RecyclerView (SdkTreeView) 包裹进 Compose，并绘制 Material 风格的多列表头。
+ * 将底层的 RecyclerView (SdkTreeView) 包裹进 Compose，并绘制 Material 3 风格的多列表头。
  */
 @Composable
 fun SdkTreeViewWrapper(
@@ -194,6 +194,7 @@ fun BottomActionRow(hasPendingChanges: Boolean, onCancel: () -> Unit, onApply: (
 
 /** 
  * 任务执行弹出框
+ * 结合 SdkInstallerManager 执行真实的下载、Shell 解压与删除。
  */
 @Composable
 fun ActionConfirmAndRunDialog(
