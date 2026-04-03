@@ -79,7 +79,7 @@ abstract class EmptyStateFragment<T : ViewBinding> : FragmentWithBinding<T> {
     }
 
     emptyStateUiState.emptyMessage.observe(viewLifecycleOwner) { message ->
-      emptyStateBinding?.emptyView?.message = message.orEmpty()
+      emptyStateBinding?.emptyView?.message = message ?: ""
     }
   }
 
