@@ -1,11 +1,11 @@
-package com.itsaky.androidide.viewmodel
+package com.itsaky.androidide.repository.sdkmanager.viewmodel
 
 import androidx.compose.ui.state.ToggleableState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.itsaky.androidide.repository.sdkmanager.models.InstallStatus
 import com.itsaky.androidide.repository.sdkmanager.models.SdkTreeNode
-import com.itsaky.androidide.repo.SdkRepository
+import com.itsaky.androidide.repository.sdkmanager.SdkRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

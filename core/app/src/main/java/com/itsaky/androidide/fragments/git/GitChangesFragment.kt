@@ -227,7 +227,7 @@ class GitChangesFragment : BaseGitPageFragment() {
     }
   }
 
-  private fun withRepo(action: (Repository) -> Unit, onSuccess: (() -> Unit)? = null) {
+  private fun withRepo(onSuccess: (() -> Unit)? = null, action: (Repository) -> Unit) {
     val projectDir = IProjectManager.getInstance().projectDirPath
     if (projectDir.isNullOrBlank()) {
       Toast.makeText(context, "No opened project", Toast.LENGTH_SHORT).show()
