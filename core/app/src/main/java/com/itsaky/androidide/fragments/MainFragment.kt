@@ -208,8 +208,8 @@ class MainFragment : BaseFragment() {
                     .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
         ) {
           Surface(
-              modifier = Modifier.matchParentSize().blur(radius = 20.dp), // 模糊半径
-              color = Color.White.copy(alpha = 0.6f),
+              modifier = Modifier.matchParentSize().blur(radius = 24.dp), // 模糊半径
+              color = Color.White.copy(alpha = 0.8f),
           ) {}
 
           Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp)) {
