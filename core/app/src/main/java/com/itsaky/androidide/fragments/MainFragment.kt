@@ -38,6 +38,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -204,8 +205,11 @@ class MainFragment : BaseFragment() {
             modifier =
                 Modifier.align(Alignment.BottomCenter)
                     .fillMaxWidth()
-                    // 全透明白色背景
-                    .background(Color.Transparent)
+                    .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)) 
+                    // 设置模糊半径
+                    .blur(radius = 20.dp) 
+                    // 设置半透明背景色，让毛玻璃有「白色雾面」感
+                    .background(Color.White.copy(alpha = 0.6f))
                     .padding(horizontal = 16.dp, vertical = 8.dp)
         ) {
           SectionTitle(stringResource(R.string.main_tools_services))

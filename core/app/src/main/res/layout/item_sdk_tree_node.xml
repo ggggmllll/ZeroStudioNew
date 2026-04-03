@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+  @author android_zero
+  独立的 SDK 树形节点布局。包含动态缩进、折叠箭头、三态复选框和多列表格。
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?android:attr/selectableItemBackground"
+    android:gravity="center_vertical"
+    android:minHeight="40dp"
+    android:orientation="horizontal"
+    android:paddingEnd="16dp">
+
+    <!-- 用于树形层级缩进的占位 View -->
+    <Space
+        android:id="@+id/indent_space"
+        android:layout_width="0dp"
+        android:layout_height="match_parent" />
+
+    <!-- 展开/折叠 箭头 -->
+    <ImageView
+        android:id="@+id/iv_expand"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="4dp"
+        android:padding="4dp"
+        android:src="@drawable/ic_chevron_right"
+        app:tint="?attr/colorOnSurfaceVariant" />
+
+    <!-- 三态复选框 -->
+    <com.google.android.material.checkbox.MaterialCheckBox
+        android:id="@+id/cb_node"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginStart="4dp" />
+
+    <!-- Name 列 -->
+    <TextView
+        android:id="@+id/tv_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.45"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:layout_marginStart="8dp"
+        android:textColor="?android:attr/textColorPrimary"
+        android:textSize="13sp" />
+
+    <!-- API Level 列 -->
+    <TextView
+        android:id="@+id/tv_api_level"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.15"
+        android:textColor="?android:attr/textColorSecondary"
+        android:textSize="12sp" />
+
+    <!-- Revision 列 -->
+    <TextView
+        android:id="@+id/tv_revision"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.15"
+        android:textColor="?android:attr/textColorSecondary"
+        android:textSize="12sp" />
+
+    <!-- Status 列 -->
+    <TextView
+        android:id="@+id/tv_status"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.25"
+        android:textSize="12sp" />
+
+</LinearLayout>

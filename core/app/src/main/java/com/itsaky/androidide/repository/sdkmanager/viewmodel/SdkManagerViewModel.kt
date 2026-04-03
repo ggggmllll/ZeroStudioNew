@@ -1,0 +1,135 @@
+package com.itsaky.androidide.repository.sdkmanager.viewmodel
+
+import androidx.compose.ui.state.ToggleableState
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.itsaky.androidide.repository.sdkmanager.models.InstallStatus
+import com.itsaky.androidide.repository.sdkmanager.models.SdkTreeNode
+import com.itsaky.androidide.repository.sdkmanager.SdkRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+
+/**
+ * sdkmanager状态管理器。
+ * 负责初始化状态、联级推导（点选父项全选子项等），以及过滤计算待安装/待卸载的任务队列。
+ * @author android_zero
+ */
+class SdkManagerViewModel : ViewModel() {
+
+    private val _platformsTree = MutableStateFlow<List<SdkTreeNode>>(emptyList())
+    val platformsTree: StateFlow<List<SdkTreeNode>> = _platformsTree.asStateFlow()
+
+    private val _toolsTree = MutableStateFlow<List<SdkTreeNode>>(emptyList())
+    val toolsTree: StateFlow<List<SdkTreeNode>> = _toolsTree.asStateFlow()
+
+    private val _isLoading = MutableStateFlow(true)
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+
+    private val _hasPendingChanges = MutableStateFlow(false)
+    val hasPendingChanges: StateFlow<Boolean> = _hasPendingChanges.asStateFlow()
+
+    init {
+        loadData()
+    }
+
+    fun loadData() {
+        viewModelScope.launch {
+            _isLoading.value = true
+            try {
+                val platforms = SdkRepository.getSdkPlatformsTree()
+                val tools = SdkRepository.getSdkToolsTree()
+                
+                initCheckboxStates(platforms)
+                initCheckboxStates(tools)
+
+                _platformsTree.value = platforms
+                _toolsTree.value = tools
+                checkPendingChanges()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
+    private fun initCheckboxStates(nodes: List<SdkTreeNode>) {
+        nodes.forEach { node ->
+            if (node.isGroup) {
+                initCheckboxStates(node.children)
+                node.updateParentState()
+            } else {
+                node.checkedState = if (node.status == InstallStatus.INSTALLED) ToggleableState.On else ToggleableState.Off
+            }
+        }
+    }
+
+    fun toggleExpand(node: SdkTreeNode, isPlatformsTab: Boolean) {
+        node.isExpanded = !node.isExpanded
+        forceTreeUpdate(isPlatformsTab)
+    }
+
+    fun toggleCheck(node: SdkTreeNode, isPlatformsTab: Boolean) {
+        val nextState = when (node.checkedState) {
+            ToggleableState.On -> ToggleableState.Off
+            ToggleableState.Off, ToggleableState.Indeterminate -> ToggleableState.On
+        }
+        
+        node.updateChildrenState(nextState)
+        node.updateParentState()
+        
+        checkPendingChanges()
+        forceTreeUpdate(isPlatformsTab)
+    }
+
+    private fun forceTreeUpdate(isPlatformsTab: Boolean) {
+        if (isPlatformsTab) {
+            _platformsTree.value = _platformsTree.value.toList()
+        } else {
+            _toolsTree.value = _toolsTree.value.toList()
+        }
+    }
+
+    private fun checkPendingChanges() {
+        var hasChanges = false
+        fun checkNode(node: SdkTreeNode) {
+            if (!node.isGroup) {
+                if (node.checkedState != node.originalCheckedState) {
+                    hasChanges = true
+                }
+            }
+            node.children.forEach { checkNode(it) }
+        }
+
+        _platformsTree.value.forEach { checkNode(it) }
+        _toolsTree.value.forEach { checkNode(it) }
+
+        _hasPendingChanges.value = hasChanges
+    }
+
+    fun getPendingTasks(): Pair<List<SdkTreeNode>, List<SdkTreeNode>> {
+        val toInstall = mutableListOf<SdkTreeNode>()
+        val toDelete = mutableListOf<SdkTreeNode>()
+
+        fun collect(node: SdkTreeNode) {
+            if (!node.isGroup) {
+                val wantsInstall = node.checkedState == ToggleableState.On
+                val isInstalled = node.status == InstallStatus.INSTALLED
+                
+                if (wantsInstall && !isInstalled) {
+                    toInstall.add(node)
+                } else if (!wantsInstall && isInstalled) {
+                    toDelete.add(node)
+                }
+            }
+            node.children.forEach { collect(it) }
+        }
+
+        _platformsTree.value.forEach { collect(it) }
+        _toolsTree.value.forEach { collect(it) }
+        
+        return Pair(toInstall, toDelete)
+    }
+}
