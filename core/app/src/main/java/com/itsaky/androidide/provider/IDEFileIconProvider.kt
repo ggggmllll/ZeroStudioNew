@@ -21,7 +21,7 @@ class IDEFileIconProvider(private val context: Context) : FileIconProvider {
     private val expandMore = ContextCompat.getDrawable(context, R.drawable.ic_chevron_down)
 
     override fun getIcon(node: Node<FileObject>): Drawable? {
-        val fileObj = extractNativeFile(node.value) ?: return ContextCompat.getDrawable(context, R.drawable.ic_file_unknown)
+        val fileObj = extractNativeFile(node.value) ?: return ContextCompat.getDrawable(context, R.drawable.ic_file_type_unknown)
         
         val iconRes = when {
             fileObj.isDirectory -> R.drawable.ic_folder

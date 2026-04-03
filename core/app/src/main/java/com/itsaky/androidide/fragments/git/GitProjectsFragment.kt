@@ -117,10 +117,10 @@ class GitProjectsFragment : BaseGitPageFragment(), FileClickListener, FileLongCl
     }
 
     //撤销 / 重做节点状态
-    addToolbarAction(R.drawable.ic_undo_24, "Undo Node Action") {
+    addToolbarAction(R.drawable.ic_undo, "Undo Node Action") {
       fileTreeView?.let { stateManager.undo(it) }
     }
-    addToolbarAction(R.drawable.ic_redo_24, "Redo Node Action") {
+    addToolbarAction(R.drawable.ic_redo, "Redo Node Action") {
       fileTreeView?.let { stateManager.redo(it) }
     }
 
