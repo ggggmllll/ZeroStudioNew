@@ -4,8 +4,11 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.graphics.drawable.Drawable
+import android.graphics.drawable.GradientDrawable
 import android.os.Build
+import android.util.TypedValue
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
@@ -16,7 +19,6 @@ import android.widget.ScrollView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import io.github.rosemoe.sora.widget.CodeEditor
-import com.itsaky.androidide.resources.R
 
 /**
  * 使用传统 View 实现系统文本扩展动作弹窗，避免在 PopupWindow 中挂载 Compose 导致
@@ -51,7 +53,12 @@ class SystemTextActionsPopup(
           orientation = LinearLayout.VERTICAL
           minimumWidth = minWidth
           setPadding((8 * density).toInt(), (8 * density).toInt(), (8 * density).toInt(), (8 * density).toInt())
-          background = ContextCompat.getDrawable(context, R.drawable.bg_ripple_material)
+          background =
+              GradientDrawable().apply {
+                shape = GradientDrawable.RECTANGLE
+                cornerRadius = 12f * density
+                setColor(Color.WHITE)
+              }
         }
 
     if (actions.isEmpty()) {
@@ -87,7 +94,7 @@ class SystemTextActionsPopup(
       orientation = LinearLayout.HORIZONTAL
       gravity = Gravity.CENTER_VERTICAL
       setPadding((12 * density).toInt(), (10 * density).toInt(), (12 * density).toInt(), (10 * density).toInt())
-      background = ContextCompat.getDrawable(context, R.drawable.bg_ripple_material)
+      background = getSelectableItemBackground()
 
       action.icon?.let { iconDrawable ->
         addView(
@@ -157,5 +164,14 @@ class SystemTextActionsPopup(
 
   fun show(anchor: View, x: Int, y: Int) {
     showAtLocation(anchor, Gravity.NO_GRAVITY, x, y)
+  }
+
+  private fun getSelectableItemBackground(): Drawable? {
+    val typedValue = TypedValue()
+    return if (context.theme.resolveAttribute(android.R.attr.selectableItemBackground, typedValue, true)) {
+      ContextCompat.getDrawable(context, typedValue.resourceId)
+    } else {
+      null
+    }
   }
 }
