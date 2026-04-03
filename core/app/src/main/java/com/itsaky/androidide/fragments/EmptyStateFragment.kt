@@ -21,10 +21,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.viewModels
+import androidx.lifecycle.MutableLiveData
 import androidx.viewbinding.ViewBinding
 import com.itsaky.androidide.databinding.FragmentEmptyStateBinding
-import com.itsaky.androidide.viewmodel.EmptyStateFragmentViewModel
 
 /**
  * A fragment that shows a message when there is no data to show in the subclass fragment.
@@ -40,12 +39,18 @@ abstract class EmptyStateFragment<T : ViewBinding> : FragmentWithBinding<T> {
   protected var emptyStateBinding: FragmentEmptyStateBinding? = null
     private set
 
-  protected val emptyStateViewModel by viewModels<EmptyStateFragmentViewModel>()
+  private val emptyStateUiState = EmptyStateUiState()
 
   internal var isEmpty: Boolean
-    get() = emptyStateViewModel.isEmpty.value ?: false
+    get() = emptyStateUiState.isEmpty.value ?: false
     set(value) {
-      emptyStateViewModel.isEmpty.value = value
+      emptyStateUiState.isEmpty.value = value
+    }
+
+  protected var emptyMessage: CharSequence?
+    get() = emptyStateUiState.emptyMessage.value
+    set(value) {
+      emptyStateUiState.emptyMessage.value = value
     }
 
   override fun onCreateView(
@@ -69,17 +74,52 @@ abstract class EmptyStateFragment<T : ViewBinding> : FragmentWithBinding<T> {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
-    emptyStateViewModel.isEmpty.observe(viewLifecycleOwner) { isEmpty ->
+    emptyStateUiState.isEmpty.observe(viewLifecycleOwner) { isEmpty ->
       emptyStateBinding?.apply { root.displayedChild = if (isEmpty) 0 else 1 }
     }
 
-    emptyStateViewModel.emptyMessage.observe(viewLifecycleOwner) { message ->
-      emptyStateBinding?.emptyView?.message = message
+    emptyStateUiState.emptyMessage.observe(viewLifecycleOwner) { message ->
+      emptyStateBinding?.emptyView?.message = message.orEmpty()
     }
   }
 
   override fun onDestroyView() {
     this.emptyStateBinding = null
     super.onDestroyView()
+  }
+
+  override fun onDestroy() {
+    clearLegacyEmptyStateDelegate()
+    super.onDestroy()
+  }
+
+  private fun clearLegacyEmptyStateDelegate() {
+    // Backward-safe cleanup: if an older build variant still has the delegated
+    // `emptyStateViewModel` field, clear it to avoid retaining a cleared ViewModel.
+    runCatching {
+      val delegateField = findFieldInHierarchy("emptyStateViewModel\$delegate") ?: return@runCatching
+      delegateField.isAccessible = true
+      val delegate = delegateField.get(this@EmptyStateFragment) ?: return@runCatching
+
+      // `ViewModelLazy.cached` holds the cleared ViewModel reference.
+      val cachedField = delegate.javaClass.getDeclaredField("cached")
+      cachedField.isAccessible = true
+      cachedField.set(delegate, null)
+      delegateField.set(this@EmptyStateFragment, null)
+    }
+  }
+
+  private fun findFieldInHierarchy(name: String): java.lang.reflect.Field? {
+    var type: Class<*>? = javaClass
+    while (type != null) {
+      runCatching { type.getDeclaredField(name) }.getOrNull()?.let { return it }
+      type = type.superclass
+    }
+    return null
+  }
+
+  protected class EmptyStateUiState {
+    val isEmpty = MutableLiveData(true)
+    val emptyMessage = MutableLiveData<CharSequence?>("")
   }
 }

@@ -22,7 +22,7 @@ abstract class NonEditableEditorFragment :
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-    emptyStateViewModel.emptyMessage.value = createEmptyStateMessage()
+    emptyMessage = createEmptyStateMessage()
 
     binding.editor.apply {
       isEditable = false
@@ -57,7 +57,7 @@ abstract class NonEditableEditorFragment :
       // This is a good and robust way to clear the text.
       text.delete(0, text.length)
 
-      emptyStateViewModel.isEmpty.value = true
+      isEmpty = true
     }
   }
 }

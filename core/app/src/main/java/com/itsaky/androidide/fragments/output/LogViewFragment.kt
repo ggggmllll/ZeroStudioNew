@@ -176,7 +176,7 @@ abstract class LogViewFragment :
   private fun append(chars: CharSequence?) {
     chars?.let {
       ThreadUtils.runOnUiThread {
-        _binding?.editor?.append(chars)?.also { emptyStateViewModel.isEmpty.value = false }
+        _binding?.editor?.append(chars)?.also { isEmpty = false }
       }
     }
   }
@@ -290,6 +290,6 @@ abstract class LogViewFragment :
   }
 
   override fun clearOutput() {
-    _binding?.editor?.setText("")?.also { emptyStateViewModel.isEmpty.value = true }
+    _binding?.editor?.setText("")?.also { isEmpty = true }
   }
 }

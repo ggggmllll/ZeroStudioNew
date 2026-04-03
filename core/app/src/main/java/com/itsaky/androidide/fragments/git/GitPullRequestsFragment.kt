@@ -30,6 +30,7 @@ import com.itsaky.androidide.R
 class GitPullRequestsFragment : BaseGitPageFragment() {
 
   private var links: GitHostLinks? = null
+  private var linksAdapter: QuickLinksAdapter? = null
 
   // 这里复用一个简单的 RecyclerView 布局，实际开发建议创建 fragment_git_pull_requests.xml
   override fun onCreateView(
@@ -66,10 +67,11 @@ class GitPullRequestsFragment : BaseGitPageFragment() {
     links = GitHostWebLinks.resolveForCurrentProject()
     view.findViewById<RecyclerView>(R.id.rv_branches)?.apply {
       layoutManager = LinearLayoutManager(context)
-      adapter =
+      linksAdapter =
           QuickLinksAdapter(
               listOf("Open Pull Requests in Browser", "Create Task (Issue)", "Open Merge Requests")
           )
+      adapter = linksAdapter
     }
   }
 
@@ -125,5 +127,12 @@ class GitPullRequestsFragment : BaseGitPageFragment() {
     inner class Holder(view: View) : RecyclerView.ViewHolder(view) {
       val text: TextView = view.findViewById(android.R.id.text1)
     }
+  }
+
+  override fun onDestroyView() {
+    view?.findViewById<RecyclerView>(R.id.rv_branches)?.adapter = null
+    linksAdapter = null
+    links = null
+    super.onDestroyView()
   }
 }

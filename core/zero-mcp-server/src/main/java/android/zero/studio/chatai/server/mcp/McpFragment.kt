@@ -44,7 +44,7 @@ class McpFragment : Fragment() {
 
   private var mcpService: McpService? = null
   private var isBound = false
-  private val logAdapter = LogAdapter()
+  private var logAdapter: LogAdapter? = null
 
   private val handler = Handler(Looper.getMainLooper())
   private val updateRunnable =
@@ -106,13 +106,16 @@ class McpFragment : Fragment() {
   }
 
   private fun setupUI() {
+    val adapter = LogAdapter()
+    logAdapter = adapter
+
     // Logs Recycler
     binding.recyclerView.layoutManager =
         LinearLayoutManager(requireContext()).apply { stackFromEnd = true }
-    binding.recyclerView.adapter = logAdapter
+    binding.recyclerView.adapter = adapter
 
     // Buttons
-    binding.clearLogs.setOnClickListener { logAdapter.clear() }
+    binding.clearLogs.setOnClickListener { adapter.clear() }
     binding.copyLocal.setOnClickListener { copyToClipboard(binding.localUrl.text.toString()) }
     binding.copyWifi.setOnClickListener { copyToClipboard(binding.wifiUrl.text.toString()) }
 
@@ -210,12 +213,12 @@ class McpFragment : Fragment() {
   private fun setupServiceObservation() {
     val service = mcpService ?: return
 
-    lifecycleScope.launch {
+    viewLifecycleOwner.lifecycleScope.launch {
       service.logFlow.collectLatest { msg ->
-        if (_binding != null) {
-          logAdapter.addLog(msg)
-          binding.recyclerView.scrollToPosition(logAdapter.itemCount - 1)
-        }
+        val adapter = logAdapter ?: return@collectLatest
+        val safeBinding = _binding ?: return@collectLatest
+        adapter.addLog(msg)
+        safeBinding.recyclerView.scrollToPosition(adapter.itemCount - 1)
       }
     }
     handler.post(updateRunnable)
@@ -287,9 +290,16 @@ class McpFragment : Fragment() {
   }
 
   override fun onDestroyView() {
-    super.onDestroyView()
     handler.removeCallbacks(updateRunnable)
+    _binding?.clearLogs?.setOnClickListener(null)
+    _binding?.copyLocal?.setOnClickListener(null)
+    _binding?.copyWifi?.setOnClickListener(null)
+    _binding?.switchWorkspace?.setOnClickListener(null)
+    _binding?.fabAction?.setOnClickListener(null)
+    _binding?.recyclerView?.adapter = null
+    logAdapter = null
     _binding = null
+    super.onDestroyView()
   }
 
   override fun onDestroy() {

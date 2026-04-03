@@ -460,6 +460,30 @@ constructor(
       editorScope.cancelIfActive("Editor is releasing resources.")
     }
 
+    unregisterFromEventBusIfNeeded()
+  }
+
+  override fun onAttachedToWindow() {
+    super.onAttachedToWindow()
+    registerToEventBusIfNeeded()
+  }
+
+  override fun onDetachedFromWindow() {
+    unregisterFromEventBusIfNeeded()
+    super.onDetachedFromWindow()
+  }
+
+  private fun registerToEventBusIfNeeded() {
+    try {
+      if (!EventBus.getDefault().isRegistered(this)) {
+        EventBus.getDefault().register(this)
+      }
+    } catch (e: Exception) {
+      log.debug("EventBus register failed", e)
+    }
+  }
+
+  private fun unregisterFromEventBusIfNeeded() {
     try {
       if (EventBus.getDefault().isRegistered(this)) {
         EventBus.getDefault().unregister(this)
@@ -759,7 +783,7 @@ constructor(
       }
     }
 
-    EventBus.getDefault().register(this)
+    registerToEventBusIfNeeded()
   }
 
   private fun isSystemInDarkMode(): Boolean {

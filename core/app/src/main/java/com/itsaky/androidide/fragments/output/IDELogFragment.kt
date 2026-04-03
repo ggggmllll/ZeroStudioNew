@@ -41,7 +41,7 @@ class IDELogFragment : LogViewFragment() {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-    emptyStateViewModel.emptyMessage.value = getString(R.string.msg_emptyview_idelogs)
+    emptyMessage = getString(R.string.msg_emptyview_idelogs)
 
     lifecycleAwareAppender.consumer = this::appendLine
     lifecycleAwareAppender.attachTo(viewLifecycleOwner)

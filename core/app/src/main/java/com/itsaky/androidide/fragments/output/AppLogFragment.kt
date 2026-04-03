@@ -93,7 +93,7 @@ class AppLogFragment : LogViewFragment() {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-    emptyStateViewModel.emptyMessage.value =
+    emptyMessage =
         if (DevOpsPreferences.logsenderEnabled) {
           getString(R.string.msg_emptyview_applogs)
         } else {

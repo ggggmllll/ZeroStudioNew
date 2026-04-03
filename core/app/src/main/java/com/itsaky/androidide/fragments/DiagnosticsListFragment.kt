@@ -30,6 +30,6 @@ class DiagnosticsListFragment : RecyclerViewFragment<DiagnosticsAdapter>() {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-    emptyStateViewModel.emptyMessage.value = getString(R.string.msg_emptyview_diagnostics)
+    emptyMessage = getString(R.string.msg_emptyview_diagnostics)
   }
 }
