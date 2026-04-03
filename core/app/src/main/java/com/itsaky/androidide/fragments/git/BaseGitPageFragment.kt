@@ -36,7 +36,6 @@ import com.itsaky.androidide.R
  */
 abstract class BaseGitPageFragment : Fragment() {
 
-  protected var toolbarContainer: LinearLayout? = null
   private val uiEventViewModel: GitUiEventViewModel by lazy {
     ViewModelProvider(requireActivity())[GitUiEventViewModel::class.java]
   }
@@ -45,9 +44,6 @@ abstract class BaseGitPageFragment : Fragment() {
     super.onViewCreated(view, savedInstanceState)
 
     runCatching { GitRuntimeBootstrap.ensureLoaded() }
-
-    val scrollView = view.findViewById<HorizontalScrollView>(R.id.git_mini_toolbar_scroll)
-    toolbarContainer = scrollView?.findViewById(R.id.git_mini_toolbar_container)
 
     setupToolbar()
   }
@@ -101,12 +97,12 @@ abstract class BaseGitPageFragment : Fragment() {
           setColorFilter(typedValue.data)
         }
 
-    toolbarContainer?.addView(button)
+    findToolbarContainer()?.addView(button)
     return button
   }
 
   protected fun addToolbarCustomView(view: View) {
-    toolbarContainer?.addView(view)
+    findToolbarContainer()?.addView(view)
   }
 
   protected fun openExternalLink(url: String, errorTip: String = "No browser available") {
@@ -120,5 +116,16 @@ abstract class BaseGitPageFragment : Fragment() {
 
   protected fun emitGitOperation(section: String, action: String) {
     uiEventViewModel.emit(GitUiEvent.Operation(section, action))
+  }
+
+  override fun onDestroyView() {
+    findToolbarContainer()?.removeAllViews()
+    super.onDestroyView()
+  }
+
+  private fun findToolbarContainer(): LinearLayout? {
+    val rootView = view ?: return null
+    val scrollView = rootView.findViewById<HorizontalScrollView>(R.id.git_mini_toolbar_scroll)
+    return scrollView?.findViewById(R.id.git_mini_toolbar_container)
   }
 }

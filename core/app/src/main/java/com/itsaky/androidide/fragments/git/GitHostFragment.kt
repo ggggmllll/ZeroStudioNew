@@ -43,7 +43,9 @@ class GitHostFragment : Fragment() {
   private val binding
     get() = _binding!!
 
-  private lateinit var popupManager: GitPopupManager
+  private var popupManager: GitPopupManager? = null
+  private var gitPagerAdapter: GitPagerAdapter? = null
+  private var tabLayoutMediator: TabLayoutMediator? = null
   private val gitUiEventViewModel by activityViewModels<GitUiEventViewModel>()
 
   override fun onCreateView(
@@ -84,33 +86,41 @@ class GitHostFragment : Fragment() {
   }
 
   private fun setupViewPager() {
-    val adapter = GitPagerAdapter(this)
-    binding.gitViewPager.adapter = adapter
+    gitPagerAdapter = GitPagerAdapter(this)
+    binding.gitViewPager.adapter = gitPagerAdapter
     binding.gitViewPager.offscreenPageLimit = 1
 
-    TabLayoutMediator(binding.gitTabLayout, binding.gitViewPager) { tab, position ->
-          tab.text =
-              when (position) {
-                0 -> getString(R.string.title_projects) // Project/Files
-                1 -> getString(R.string.changelist) // Changes
-                2 -> getString(R.string.commits) // History
-                3 -> getString(R.string.git_collaboration) // collaboration
-                4 -> getString(R.string.branches) // Branches
-                5 -> getString(R.string.stash) // Stash
-                6 -> "Diff" // GitDiffFragment
-                else -> getString(R.string.other)
-              }
-        }
-        .attach()
+    tabLayoutMediator =
+        TabLayoutMediator(binding.gitTabLayout, binding.gitViewPager) { tab, position ->
+              tab.text =
+                  when (position) {
+                    0 -> getString(R.string.title_projects) // Project/Files
+                    1 -> getString(R.string.changelist) // Changes
+                    2 -> getString(R.string.commits) // History
+                    3 -> getString(R.string.git_collaboration) // collaboration
+                    4 -> getString(R.string.branches) // Branches
+                    5 -> getString(R.string.stash) // Stash
+                    6 -> "Diff" // GitDiffFragment
+                    else -> getString(R.string.other)
+                  }
+            }
+            .also { it.attach() }
   }
 
   private fun setupPopupMenu() {
     popupManager = GitPopupManager(requireContext())
 
-    binding.btnGitMenu.setOnClickListener { anchorView -> popupManager.show(anchorView) }
+    binding.btnGitMenu.setOnClickListener { anchorView -> popupManager?.show(anchorView) }
   }
 
   override fun onDestroyView() {
+    tabLayoutMediator?.detach()
+    tabLayoutMediator = null
+    binding.gitViewPager.adapter = null
+    gitPagerAdapter = null
+    binding.btnGitMenu.setOnClickListener(null)
+    popupManager?.dismiss()
+    popupManager = null
     super.onDestroyView()
     _binding = null
   }

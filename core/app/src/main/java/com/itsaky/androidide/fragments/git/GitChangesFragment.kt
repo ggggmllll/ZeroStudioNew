@@ -337,6 +337,9 @@ class GitChangesFragment : BaseGitPageFragment() {
   }
 
   override fun onDestroyView() {
+    binding.rvChanges.adapter = null
+    selectedPaths.clear()
+    rows.clear()
     super.onDestroyView()
     _binding = null
   }

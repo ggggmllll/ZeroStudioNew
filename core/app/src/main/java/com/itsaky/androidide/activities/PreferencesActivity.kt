@@ -33,7 +33,7 @@ class PreferencesActivity : EdgeToEdgeIDEActivity() {
   private val binding: ActivityPreferencesBinding
     get() = checkNotNull(_binding) { "Activity has been destroyed" }
 
-  private val rootFragment by lazy { IDEPreferencesFragment() }
+  private var rootFragment: IDEPreferencesFragment? = null
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -55,8 +55,11 @@ class PreferencesActivity : EdgeToEdgeIDEActivity() {
     val args = Bundle()
     args.putParcelableArrayList(IDEPreferencesFragment.EXTRA_CHILDREN, ArrayList(prefs.children))
 
-    rootFragment.arguments = args
-    loadFragment(rootFragment)
+    val fragment = IDEPreferencesFragment().also { createdFragment ->
+      createdFragment.arguments = args
+      rootFragment = createdFragment
+    }
+    loadFragment(fragment)
   }
 
   override fun onApplySystemBarInsets(insets: Insets) {
@@ -91,7 +94,9 @@ class PreferencesActivity : EdgeToEdgeIDEActivity() {
   }
 
   override fun onDestroy() {
-    super.onDestroy()
+    _binding?.toolbar?.setNavigationOnClickListener(null)
+    rootFragment = null
     _binding = null
+    super.onDestroy()
   }
 }

@@ -38,6 +38,7 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.viewpager.widget.ViewPager;
 
 import java.io.File;
+import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
@@ -148,7 +149,7 @@ public class TermuxFragment extends BaseIDEFragment implements ServiceConnection
      * The last toast shown, used cancel current toast before showing new in {@link
      * #showToast(String, boolean)}.
      */
-    protected Toast mLastToast;
+    protected WeakReference<Toast> mLastToast;
 
     /**
      * If between onResume() and onStop(). Note that only one session is in the foreground of the
@@ -601,7 +602,9 @@ public class TermuxFragment extends BaseIDEFragment implements ServiceConnection
         Logger.logDebug(LOG_TAG, "onDestroyView");
 
         if (mLastToast != null) {
-            mLastToast.cancel();
+            Toast lastToast = mLastToast.get();
+            if (lastToast != null) lastToast.cancel();
+            mLastToast.clear();
             mLastToast = null;
         }
         if (mSessionTabManager != null) mSessionTabManager.detach();
@@ -619,11 +622,24 @@ public class TermuxFragment extends BaseIDEFragment implements ServiceConnection
             // ignore.
         }
 
+        if (mTerminalView != null) {
+            try {
+                unregisterForContextMenu(mTerminalView);
+            } catch (Exception ignored) {
+                // ignore.
+            }
+            mTerminalView.setTerminalViewClient(null);
+            mTerminalView = null;
+        }
+
         // Clear view references to prevent leaks
         mRootView = null;
         mTermuxActivityRootView = null;
         mTermuxActivityBottomSpaceView = null;
         mExtraKeysView = null;
+        mTermuxTerminalExtraKeys = null;
+        mTermuxTerminalViewClient = null;
+        mTermuxTerminalSessionActivityClient = null;
         mTabsView = null;
         
         mBottomSheetContainer = null;
@@ -885,10 +901,15 @@ public class TermuxFragment extends BaseIDEFragment implements ServiceConnection
     /** Show a toast and dismiss the last one if still visible. */
     public void showToast(String text, boolean longDuration) {
         if (text == null || text.isEmpty()) return;
-        if (mLastToast != null) mLastToast.cancel();
-        mLastToast = Toast.makeText(requireActivity(), text, longDuration ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT);
-        mLastToast.setGravity(Gravity.TOP, 0, 0);
-        mLastToast.show();
+        if (mLastToast != null) {
+            Toast lastToast = mLastToast.get();
+            if (lastToast != null) lastToast.cancel();
+            mLastToast.clear();
+        }
+        Toast toast = Toast.makeText(requireActivity(), text, longDuration ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT);
+        toast.setGravity(Gravity.TOP, 0, 0);
+        toast.show();
+        mLastToast = new WeakReference<>(toast);
     }
 
     @Override

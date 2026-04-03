@@ -108,6 +108,12 @@ class GitBranchPopupManager(
     popupWindow?.showAsDropDown(anchor, 0, 12)
   }
 
+  fun dismiss() {
+    popupWindow?.dismiss()
+    popupWindow = null
+    adapter = null
+  }
+
   data class BranchModel(val name: String, val isCurrent: Boolean, val isLocal: Boolean)
 
   private inner class BranchAdapter(

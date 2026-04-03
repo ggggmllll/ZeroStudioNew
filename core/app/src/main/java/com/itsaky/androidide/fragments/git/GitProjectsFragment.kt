@@ -274,6 +274,10 @@ class GitProjectsFragment : BaseGitPageFragment(), FileClickListener, FileLongCl
   override fun onDestroyView() {
     loadingJob?.cancel()
     loadingJob = null
+    tvCurrentBranch?.setOnClickListener(null)
+    tvCurrentBranch = null
+    branchPopupManager?.dismiss()
+    branchPopupManager = null
     fileTreeView = null
     _binding = null
     super.onDestroyView()
