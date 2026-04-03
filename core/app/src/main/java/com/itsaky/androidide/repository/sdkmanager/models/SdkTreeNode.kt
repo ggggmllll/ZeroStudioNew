@@ -10,7 +10,7 @@ enum class InstallStatus {
 }
 
 /**
- * SDK 管理器设计的独立树节点数据模型。
+ * 专为 SDK 管理器设计的独立树节点数据模型。
  * 包含层级属性、组件信息以及级联状态逻辑。
  *
  * @author android_zero

@@ -15,7 +15,7 @@ import com.itsaky.androidide.repository.sdkmanager.models.InstallStatus
 import com.itsaky.androidide.repository.sdkmanager.models.SdkTreeNode
 
 /**
- * SDK 树形列表适配器。
+ * 独立的 SDK 树形列表适配器。
  *
  * @author android_zero
  */
@@ -116,10 +116,10 @@ class SdkTreeAdapter(
             holder.ivExpand.visibility = View.INVISIBLE
         }
 
-        // 复选框状态 (支持三态)
+        // 复选框状态 (支持三态) 
         holder.cbNode.checkedState = when (node.checkedState) {
             androidx.compose.ui.state.ToggleableState.On -> MaterialCheckBox.STATE_CHECKED
-            androidx.compose.ui.state.ToggleableState.Indeterminate -> MaterialCheckBox.STATE_HALF_CHECKED
+            androidx.compose.ui.state.ToggleableState.Indeterminate -> MaterialCheckBox.STATE_INDETERMINATE
             androidx.compose.ui.state.ToggleableState.Off -> MaterialCheckBox.STATE_UNCHECKED
         }
 
@@ -165,7 +165,6 @@ class SdkTreeAdapter(
         val index = visibleNodes.indexOf(node)
         
         var removeCount = 0
-        // Find all descendants currently visible
         var nextIndex = index + 1
         while (nextIndex < visibleNodes.size && visibleNodes[nextIndex].level > node.level) {
             removeCount++

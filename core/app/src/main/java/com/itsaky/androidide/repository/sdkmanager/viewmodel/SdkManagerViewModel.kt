@@ -1,19 +1,18 @@
-package com.itsaky.androidide.repository.sdkmanager.viewmodel
+package com.itsaky.androidide.viewmodel
 
 import androidx.compose.ui.state.ToggleableState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.itsaky.androidide.repository.sdkmanager.models.InstallStatus
 import com.itsaky.androidide.repository.sdkmanager.models.SdkTreeNode
-import com.itsaky.androidide.repository.sdkmanager.SdkRepository
+import com.itsaky.androidide.repo.SdkRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 /**
- * sdkmanager状态管理器。
- * 负责初始化状态、联级推导（点选父项全选子项等），以及过滤计算待安装/待卸载的任务队列。
+ * 专为 Compose UI 优化的状态管理器。
  * @author android_zero
  */
 class SdkManagerViewModel : ViewModel() {

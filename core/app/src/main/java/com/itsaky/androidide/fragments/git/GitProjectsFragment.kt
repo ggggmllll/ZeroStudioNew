@@ -52,7 +52,7 @@ class GitProjectsFragment : BaseGitPageFragment(), FileClickListener, FileLongCl
   private var branchPopupManager: GitBranchPopupManager? = null
 
   private val viewModel: FileTreeViewModel by viewModels({ requireActivity() })
-  private val stateManager = TreeStateManager()
+  private var stateManager = TreeStateManager()
 
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
     _binding = FragmentGitProjectsBinding.inflate(inflater, container, false)
@@ -60,7 +60,7 @@ class GitProjectsFragment : BaseGitPageFragment(), FileClickListener, FileLongCl
   }
 
   override fun onStart() {
-    super.onStart()-
+    super.onStart()
     if (!EventBus.getDefault().isRegistered(this)) EventBus.getDefault().register(this)
   }
 
@@ -107,10 +107,15 @@ class GitProjectsFragment : BaseGitPageFragment(), FileClickListener, FileLongCl
       fileTreeView?.let { stateManager.pushState(it); it.collapseAll() }
     }
     btnCollapse.setOnLongClickListener {
-      fileTreeView?.let { stateManager.clear(); it.collapseAll(); viewModel.treeState.value = "" }
+      fileTreeView?.let {
+        stateManager = TreeStateManager()
+        it.collapseAll()
+        viewModel.treeState.value = ""
+      }
       Toast.makeText(context, "Cleared memory and collapsed all", Toast.LENGTH_SHORT).show()
       true
     }
+
 
     addToolbarAction(R.drawable.ic_chevron_down, "Expand All") {
       fileTreeView?.let { stateManager.pushState(it); it.expandAll() }
