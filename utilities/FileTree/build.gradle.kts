@@ -8,7 +8,7 @@ plugins {
 }
 
 android {
-  namespace = "com.rk.filetree"
+  namespace = "android.zero.studio.view.filetree"
   compileSdk = 34
 
   defaultConfig {

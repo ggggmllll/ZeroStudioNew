@@ -1,4 +1,20 @@
-package com.rk.filetree.adapters
+/*
+ *  This file is part of AndroidIDE.
+ *
+ *  AndroidIDE is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  AndroidIDE is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *   along with AndroidIDE.  If not, see <https://www.gnu.org/licenses/>.
+ */
+package android.zero.studio.view.filetree.adapters
 
 import android.animation.ArgbEvaluator
 import android.animation.ObjectAnimator
@@ -14,15 +30,15 @@ import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.rk.filetree.R
-import com.rk.filetree.interfaces.FileClickListener
-import com.rk.filetree.interfaces.FileIconProvider
-import com.rk.filetree.interfaces.FileLongClickListener
-import com.rk.filetree.interfaces.FileObject
-import com.rk.filetree.model.Node
-import com.rk.filetree.model.TreeViewModel
-import com.rk.filetree.util.Sorter
-import com.rk.filetree.widget.FileTree
+import android.zero.studio.view.filetree.R
+import android.zero.studio.view.filetree.interfaces.FileClickListener
+import android.zero.studio.view.filetree.interfaces.FileIconProvider
+import android.zero.studio.view.filetree.interfaces.FileLongClickListener
+import android.zero.studio.view.filetree.interfaces.FileObject
+import android.zero.studio.view.filetree.model.Node
+import android.zero.studio.view.filetree.model.TreeViewModel
+import android.zero.studio.view.filetree.util.Sorter
+import android.zero.studio.view.filetree.widget.FileTree
 
 class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {
   val expandView: ImageView = v.findViewById(R.id.expand)
