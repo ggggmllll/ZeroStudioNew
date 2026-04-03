@@ -42,6 +42,7 @@ import com.itsaky.androidide.editor.ui.updateEditorDiagnostics
 import com.itsaky.androidide.editor.utils.ContentReadWrite.readContent
 import com.itsaky.androidide.editor.utils.ContentReadWrite.writeTo
 import com.itsaky.androidide.eventbus.events.preferences.PreferenceChangeEvent
+import com.itsaky.androidide.cursor.CursorHistoryManager
 import com.itsaky.androidide.lsp.IDELanguageClientImpl
 import com.itsaky.androidide.lsp.api.ILanguageServer
 import com.itsaky.androidide.lsp.api.ILanguageServerRegistry
@@ -58,6 +59,7 @@ import com.itsaky.androidide.treesitter.TreeSitter
 import com.itsaky.androidide.utils.customOrJBMono
 import io.github.rosemoe.sora.event.ContentChangeEvent
 import io.github.rosemoe.sora.event.EditorFocusChangeEvent
+import io.github.rosemoe.sora.event.SelectionChangeEvent
 import io.github.rosemoe.sora.text.Content
 import io.github.rosemoe.sora.text.LineSeparator
 import io.github.rosemoe.sora.widget.CodeEditor
@@ -177,7 +179,15 @@ class CodeEditorView(context: Context, file: File, selection: Range) :
           codeEditorScope.launch { save() }
         }
       }
+
+      // Keep action enabled/disabled states in sync with cursor/selection changes.
+      subscribeEvent(SelectionChangeEvent::class.java) { _, _ ->
+        (context as? Activity?)?.invalidateOptionsMenu()
+      }
     }
+
+    // Ensure cursor history listener is attached as soon as the editor is created.
+    CursorHistoryManager.getTracker(binding.editor)
 
     _searchLayout = EditorSearchLayout(context, binding.editor)
 

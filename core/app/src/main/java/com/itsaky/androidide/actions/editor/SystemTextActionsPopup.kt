@@ -1,41 +1,27 @@
 package com.itsaky.androidide.actions.editor
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
+import android.os.Build
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.PopupWindow
-import androidx.compose.animation.*
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
-import androidx.core.graphics.drawable.toBitmap
-import androidx.lifecycle.findViewTreeLifecycleOwner
-import androidx.lifecycle.findViewTreeViewModelStoreOwner
-import androidx.lifecycle.setViewTreeLifecycleOwner
-import androidx.lifecycle.setViewTreeViewModelStoreOwner
-import androidx.savedstate.findViewTreeSavedStateRegistryOwner
-import androidx.savedstate.setViewTreeSavedStateRegistryOwner
+import android.widget.ScrollView
+import android.widget.TextView
+import androidx.core.content.ContextCompat
 import io.github.rosemoe.sora.widget.CodeEditor
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import com.itsaky.androidide.resources.R
 
+/**
+ * 使用传统 View 实现系统文本扩展动作弹窗，避免在 PopupWindow 中挂载 Compose 导致
+ * ViewTreeLifecycleOwner 缺失引发崩溃。
+ */
 class SystemTextActionsPopup(
     private val context: Context,
     private val editor: CodeEditor,
@@ -44,140 +30,132 @@ class SystemTextActionsPopup(
 
   data class ProcessTextAction(val label: String, val icon: Drawable?, val intent: Intent)
 
-  private val composeView: ComposeView
-  private val isVisibleState = mutableStateOf(false)
+  private val actions: List<ProcessTextAction> = getSystemTextActions()
 
   init {
-    val actions = getSystemTextActions()
-
-    composeView =
-        ComposeView(context).apply {
-          layoutParams =
-              ViewGroup.LayoutParams(
-                  ViewGroup.LayoutParams.WRAP_CONTENT,
-                  ViewGroup.LayoutParams.WRAP_CONTENT,
-              )
-          setContent { MaterialTheme { SystemActionsMenu(actions) } }
-        }
-
-    composeView.setViewTreeLifecycleOwner(editor.findViewTreeLifecycleOwner())
-    composeView.setViewTreeViewModelStoreOwner(editor.findViewTreeViewModelStoreOwner())
-    composeView.setViewTreeSavedStateRegistryOwner(editor.findViewTreeSavedStateRegistryOwner())
-
-    contentView = composeView
+    contentView = buildContentView()
     width = ViewGroup.LayoutParams.WRAP_CONTENT
     height = ViewGroup.LayoutParams.WRAP_CONTENT
     isFocusable = true
     isOutsideTouchable = true
-    elevation = 0f
-    setBackgroundDrawable(null)
+    elevation = 8f
+    setBackgroundDrawable(ContextCompat.getDrawable(context, android.R.color.transparent))
+  }
 
-    setOnDismissListener { isVisibleState.value = false }
+  private fun buildContentView(): View {
+    val density = context.resources.displayMetrics.density
+    val minWidth = (160 * density).toInt()
+
+    val container =
+        LinearLayout(context).apply {
+          orientation = LinearLayout.VERTICAL
+          minimumWidth = minWidth
+          setPadding((8 * density).toInt(), (8 * density).toInt(), (8 * density).toInt(), (8 * density).toInt())
+          background = ContextCompat.getDrawable(context, R.drawable.bg_ripple_material)
+        }
+
+    if (actions.isEmpty()) {
+      container.addView(
+          TextView(context).apply {
+            text = "无可用系统动作"
+            setPadding((12 * density).toInt(), (8 * density).toInt(), (12 * density).toInt(), (8 * density).toInt())
+          })
+      return container
+    }
+
+    val listContainer = LinearLayout(context).apply { orientation = LinearLayout.VERTICAL }
+    actions.forEach { action ->
+      listContainer.addView(createActionRow(action, density))
+    }
+
+    val scrollView = ScrollView(context).apply {
+      isVerticalScrollBarEnabled = true
+      addView(listContainer)
+      layoutParams =
+          ViewGroup.LayoutParams(
+              ViewGroup.LayoutParams.WRAP_CONTENT,
+              ViewGroup.LayoutParams.WRAP_CONTENT,
+          )
+    }
+
+    container.addView(scrollView)
+    return container
+  }
+
+  private fun createActionRow(action: ProcessTextAction, density: Float): View {
+    return LinearLayout(context).apply {
+      orientation = LinearLayout.HORIZONTAL
+      gravity = Gravity.CENTER_VERTICAL
+      setPadding((12 * density).toInt(), (10 * density).toInt(), (12 * density).toInt(), (10 * density).toInt())
+      background = ContextCompat.getDrawable(context, R.drawable.bg_ripple_material)
+
+      action.icon?.let { iconDrawable ->
+        addView(
+            ImageView(context).apply {
+              setImageDrawable(iconDrawable)
+              layoutParams =
+                  LinearLayout.LayoutParams((20 * density).toInt(), (20 * density).toInt()).apply {
+                    marginEnd = (10 * density).toInt()
+                  }
+            })
+      }
+
+      addView(
+          TextView(context).apply {
+            text = action.label
+            setSingleLine(true)
+            ellipsize = android.text.TextUtils.TruncateAt.END
+          })
+
+      setOnClickListener {
+        executeAction(action.intent)
+        dismiss()
+      }
+    }
   }
 
   private fun getSystemTextActions(): List<ProcessTextAction> {
     val pm: PackageManager = context.packageManager
-    val intent = Intent(Intent.ACTION_PROCESS_TEXT).setType("text/plain")
-    val resolveInfos = pm.queryIntentActivities(intent, 0)
+    val queryIntent = Intent(Intent.ACTION_PROCESS_TEXT).setType("text/plain")
+    val resolveInfos =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+          pm.queryIntentActivities(queryIntent, PackageManager.ResolveInfoFlags.of(0))
+        } else {
+          @Suppress("DEPRECATION") pm.queryIntentActivities(queryIntent, 0)
+        }
 
     return resolveInfos
+        .asSequence()
         .mapNotNull { info ->
-          val label = info.loadLabel(pm).toString()
-          val icon = info.loadIcon(pm)
+          val packageName = info.activityInfo?.packageName ?: return@mapNotNull null
+          val className = info.activityInfo?.name ?: return@mapNotNull null
+          val label = info.loadLabel(pm)?.toString().orEmpty().ifBlank { className }
+          val icon = runCatching { info.loadIcon(pm) }.getOrNull()
+
           val actionIntent =
-              Intent().apply {
-                setClassName(info.activityInfo.packageName, info.activityInfo.name)
-                action = Intent.ACTION_PROCESS_TEXT
+              Intent(Intent.ACTION_PROCESS_TEXT).apply {
+                setClassName(packageName, className)
                 type = "text/plain"
                 putExtra(Intent.EXTRA_PROCESS_TEXT, selectedText)
-                putExtra(Intent.EXTRA_PROCESS_TEXT_READONLY, true)
+                putExtra(Intent.EXTRA_PROCESS_TEXT_READONLY, !editor.isEditable)
               }
-          ProcessTextAction(label, icon, actionIntent)
+
+          ProcessTextAction(label = label, icon = icon, intent = actionIntent)
         }
-        .distinctBy { it.label }
-  }
-
-  @Composable
-  private fun SystemActionsMenu(actions: List<ProcessTextAction>) {
-    val isVisible by isVisibleState
-    val coroutineScope = rememberCoroutineScope()
-
-    AnimatedVisibility(
-        visible = isVisible,
-        enter =
-            expandVertically(animationSpec = tween(250), expandFrom = Alignment.Top) +
-                fadeIn(animationSpec = tween(200)),
-        exit =
-            shrinkVertically(animationSpec = tween(200), shrinkTowards = Alignment.Top) +
-                fadeOut(animationSpec = tween(150)),
-    ) {
-      Surface(
-          modifier = Modifier.widthIn(min = 160.dp, max = 240.dp).padding(8.dp),
-          shape = RoundedCornerShape(12.dp),
-          color = MaterialTheme.colorScheme.surfaceContainerHigh,
-          tonalElevation = 6.dp,
-          shadowElevation = 8.dp,
-      ) {
-        if (actions.isEmpty()) {
-          Box(modifier = Modifier.padding(16.dp), contentAlignment = Alignment.Center) {
-            Text("无可用系统动作", style = MaterialTheme.typography.bodyMedium)
-          }
-        } else {
-          LazyColumn(modifier = Modifier.padding(vertical = 8.dp)) {
-            items(actions) { action ->
-              ActionItemRow(action) {
-                executeAction(action.intent)
-                coroutineScope.launch {
-                  isVisibleState.value = false
-                  delay(200)
-                  super@SystemTextActionsPopup.dismiss()
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-
-  @Composable
-  private fun ActionItemRow(action: ProcessTextAction, onClick: () -> Unit) {
-    Row(
-        modifier =
-            Modifier.fillMaxWidth()
-                .clip(RoundedCornerShape(8.dp))
-                .clickable { onClick() }
-                .padding(horizontal = 16.dp, vertical = 12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-      if (action.icon != null) {
-        Image(
-            bitmap = action.icon.toBitmap().asImageBitmap(),
-            contentDescription = action.label,
-            modifier = Modifier.size(20.dp),
-        )
-        Spacer(modifier = Modifier.width(12.dp))
-      }
-      Text(
-          text = action.label,
-          style = MaterialTheme.typography.bodyLarge,
-          color = MaterialTheme.colorScheme.onSurface,
-          maxLines = 1,
-          overflow = TextOverflow.Ellipsis,
-      )
-    }
+        .distinctBy { "${it.label}:${it.intent.component?.flattenToShortString()}" }
+        .sortedBy { it.label.lowercase() }
+        .toList()
   }
 
   private fun executeAction(intent: Intent) {
-    try {
-      context.startActivity(intent)
-    } catch (e: Exception) {
-      e.printStackTrace()
+    val launchIntent = Intent(intent)
+    if (context !is Activity) {
+      launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     }
+    runCatching { context.startActivity(launchIntent) }
   }
 
   fun show(anchor: View, x: Int, y: Int) {
     showAtLocation(anchor, Gravity.NO_GRAVITY, x, y)
-    isVisibleState.value = true
   }
 }

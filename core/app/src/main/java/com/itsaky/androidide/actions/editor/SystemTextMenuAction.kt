@@ -62,7 +62,7 @@ class SystemTextMenuAction(context: Context, override val order: Int) : EditorAc
     // 加上行高，使其显示在光标下方
     val posY = (screenPos[1] + layoutOffset[0] - editor.offsetY + editor.rowHeight).toInt()
 
-    // 实例化并显示 Compose 浮窗，动态从 data 获取 context
+    // 实例化并显示系统动作浮窗，动态从 data 获取 context
     val popup = SystemTextActionsPopup(data.requireContext(), editor, selectedText)
     popup.show(editor, posX, posY)
 
