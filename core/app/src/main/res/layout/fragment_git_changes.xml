@@ -1,58 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-     xmlns:app="http://schemas.android.com/apk/res-auto"
-     android:layout_width="match_parent"
-     android:layout_height="match_parent"
-     android:orientation="vertical"
-     android:background="?attr/colorSurface">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/colorSurface"
+    android:orientation="vertical">
 
-     <include layout="@layout/layout_git_mini_toolbar" />
+    <include layout="@layout/layout_git_mini_toolbar" />
 
-     <androidx.recyclerview.widget.RecyclerView
-          android:id="@+id/rv_changes"
-          android:layout_width="match_parent"
-          android:layout_height="0dp"
-          android:layout_weight="1"
-          android:clipToPadding="false"
-          android:paddingBottom="8dp" />
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_changes"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:paddingBottom="8dp" />
 
-     <androidx.cardview.widget.CardView
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:layout_marginHorizontal="12dp"
-          android:layout_marginTop="8dp"
-          android:layout_marginBottom="12dp"
-          app:cardBackgroundColor="?attr/colorOnSurfaceVariant"
-          app:cardCornerRadius="8dp"
-          app:cardElevation="4dp">
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/card_commit_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="12dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="12dp"
+        app:cardBackgroundColor="?attr/colorSurfaceContainerHigh"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="2dp">
 
-          <LinearLayout
-               android:layout_width="match_parent"
-               android:layout_height="wrap_content"
-               android:orientation="vertical"
-               android:padding="12dp">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="12dp">
 
-               <EditText
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/input_your_commit_message"
+                app:boxBackgroundMode="filled"
+                app:boxStrokeWidth="0dp">
+
+                <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/et_commit_message"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="?attr/colorSurface"
-                    android:hint="@string/input_your_commit_message"
-                    android:textColor="?attr/colorOnSecondary"
-                    android:textColorHint="?attr/colorOnSurfaceVariant"
-                    android:textSize="14sp"
+                    android:background="@android:color/transparent"
+                    android:gravity="top|start"
+                    android:inputType="textMultiLine|textCapSentences"
                     android:minLines="3"
-                    android:gravity="top|start" />
-
-               <CheckBox
-                    android:id="@+id/cb_amend"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/amend"
                     android:textColor="?attr/colorOnSurface"
-                    android:buttonTint="?attr/colorSecondary"
-                    android:layout_marginTop="8dp" />
-          </LinearLayout>
-     </androidx.cardview.widget.CardView>
+                    android:textColorHint="?attr/colorOnSurfaceVariant"
+                    android:textSize="14sp" />
+            </com.google.android.material.textfield.TextInputLayout>
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <CheckBox
+                    android:id="@+id/cb_amend"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:buttonTint="?attr/colorSecondary"
+                    android:text="@string/amend"
+                    android:textColor="?attr/colorOnSurface" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_commit_and_push_inline"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:contentDescription="Commit and push"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:minWidth="40dp"
+                    android:minHeight="40dp"
+                    app:backgroundTint="?attr/colorSecondaryContainer"
+                    app:icon="@drawable/ic_cloud_download_24"
+                    app:iconTint="?attr/colorOnSecondaryContainer" />
+            </LinearLayout>
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
 </LinearLayout>

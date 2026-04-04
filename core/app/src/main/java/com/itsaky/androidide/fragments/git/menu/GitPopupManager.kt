@@ -23,6 +23,12 @@ import com.catpuppyapp.puppygit.utils.Libgit2Helper
 import com.catpuppyapp.puppygit.utils.Msg
 import com.catpuppyapp.puppygit.utils.doJobThenOffLoading
 import com.itsaky.androidide.R
+import com.itsaky.androidide.fragments.git.GitAuthConfig
+import com.itsaky.androidide.projects.IProjectManager
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * Git 弹出菜单管理器 (Native View 实现)。
@@ -54,22 +60,19 @@ class GitPopupManager(private val context: Context) {
 
     addMenuItem(
         iconRes = R.drawable.ic_key_24,
-        title = context.getString(R.string.credentials),
-        subtitle = "Manage HTTPS credentials",
+        title = "Token 凭据",
+        subtitle = "管理 HTTPS Token/密钥",
     ) {
-      Msg.requireShowLongDuration("Credentials manager is under construction")
+      showTokenCredentialDialog()
       dismiss()
     }
 
-    addMenuItem(
-        iconRes = R.drawable.ic_lock_24,
-        title = context.getString(R.string.ssh_credential),
-        subtitle = "Manage SSH keys",
-    ) {
-      Msg.requireShowLongDuration("SSH manager is under construction")
+    addDivider()
+    addSectionTitle("Git 操作区")
+    addMenuItem(iconRes = R.drawable.ic_initialize_target_24dp, title = "Git 初始化", subtitle = "创建 .git 仓库") {
+      initRepositoryIfNeeded()
       dismiss()
     }
-
     addDivider()
 
     addMenuItem(iconRes = R.drawable.ic_settings_24, title = context.getString(R.string.settings)) {
@@ -214,6 +217,40 @@ class GitPopupManager(private val context: Context) {
     composeHostDialog.show()
   }
 
+  private fun showTokenCredentialDialog() {
+    GitAuthConfig.ensureConfigured(context) {
+      Msg.requireShowLongDuration("Token 凭据已更新，可用于 Push/Pull。")
+    }
+  }
+
+  private fun initRepositoryIfNeeded() {
+    val projectDir = IProjectManager.getInstance().getWorkspace()?.getProjectDir()?.path
+    val repoPath =
+        projectDir?.takeIf { it.isNotBlank() }
+            ?: IProjectManager.getInstance().projectDirPath.takeIf { it.isNotBlank() }
+
+    if (repoPath.isNullOrBlank()) {
+      Msg.requireShowLongDuration("No opened project")
+      return
+    }
+
+    CoroutineScope(Dispatchers.IO).launch {
+      val msg =
+          runCatching {
+                val gitDir = java.io.File(repoPath, ".git")
+                if (gitDir.exists()) {
+                  "Repository already initialized"
+                } else {
+                  Libgit2Helper.initGitRepo(repoPath)
+                  "Repository initialized"
+                }
+              }
+              .getOrElse { it.localizedMessage ?: "Git init failed" }
+
+      withContext(Dispatchers.Main) { Msg.requireShowLongDuration(msg) }
+    }
+  }
+
   private fun addMenuItem(
       iconRes: Int = 0,
       title: String,
@@ -252,6 +289,22 @@ class GitPopupManager(private val context: Context) {
     val divider =
         LayoutInflater.from(context).inflate(R.layout.item_git_popup_divider, container, false)
     container?.addView(divider)
+  }
+
+  private fun addSectionTitle(title: String) {
+    val textView =
+        TextView(context).apply {
+          text = title
+          setTextColor(
+              com.google.android.material.color.MaterialColors.getColor(
+                  this,
+                  com.google.android.material.R.attr.colorOnSurfaceVariant,
+              )
+          )
+          textSize = 12f
+          setPadding(16, 10, 16, 6)
+        }
+    container?.addView(textView)
   }
 
   fun dismiss() {

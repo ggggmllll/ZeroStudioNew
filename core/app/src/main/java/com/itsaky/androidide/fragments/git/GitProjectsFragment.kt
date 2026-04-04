@@ -142,41 +142,95 @@ class GitProjectsFragment : BaseGitPageFragment(), FileClickListener, FileLongCl
     }
 
     // Git 操作...
+    addToolbarAction(R.drawable.ic_cloud_download_24, "Fetch Origin") { fetchOrigin() }
+    addToolbarAction(R.drawable.ic_arrow_upward_24, "Push Origin") { pushOrigin() }
     addToolbarAction(R.drawable.ic_git_clone_24dp, getString(R.string.git_clone)) {
       ZeroCloneDialogBottomSheetFragment.newInstance(repoId = "")
           .show(childFragmentManager, "GitProjectsCloneBottomSheet")
     }
-    addToolbarAction(R.drawable.ic_initialize_target_24dp, "Init Repo") { initRepositoryIfNeeded() }
     addToolbarAction(R.drawable.ic_check_24, "Quick Commit") {
       emitGitOperation("project", "open_commit_page")
-      Toast.makeText(context, "Please use Changes page for commit/push actions", Toast.LENGTH_SHORT)
+      Toast.makeText(
+              context,
+              "Use Changes page commit panel; history/diff will auto-sync after commit.",
+              Toast.LENGTH_SHORT,
+          )
           .show()
     }
   }
 
-  private fun initRepositoryIfNeeded() {
-    val projectDir = IProjectManager.getInstance().projectDirPath
-    if (projectDir.isNullOrBlank()) {
+  private fun fetchOrigin() {
+    val ctx = context ?: return
+    GitAuthConfig.ensureConfigured(ctx) { cfg ->
+      withRepo(
+          action = { repo ->
+            if (Libgit2Helper.resolveRemote(repo, "origin") == null) {
+              throw IllegalStateException("Remote origin not found")
+            }
+            val repoEntity =
+                com.catpuppyapp.puppygit.data.entity.RepoEntity(
+                    repoName =
+                        File(
+                                repo.workdir()
+                                    ?: throw IllegalStateException("Repository workdir is null")
+                            )
+                            .name,
+                    fullSavePath =
+                        repo.workdir() ?: throw IllegalStateException("Repository workdir is null"),
+                    branch = repo.head()?.shorthand().orEmpty(),
+                )
+            Libgit2Helper.fetchRemoteForRepo(
+                repo = repo,
+                remoteName = "origin",
+                credential = GitAuthConfig.toHttpCredential(cfg),
+                repoFromDb = repoEntity,
+            )
+          },
+          successTip = "Fetched origin",
+      )
+    }
+  }
+
+  private fun pushOrigin() {
+    val ctx = context ?: return
+    GitAuthConfig.ensureConfigured(ctx) { cfg ->
+      withRepo(
+          action = { repo ->
+            if (Libgit2Helper.resolveRemote(repo, "origin") == null) {
+              throw IllegalStateException("Remote origin not found")
+            }
+            val branch =
+                repo.head()?.shorthand()?.removePrefix("refs/heads/")?.ifBlank { "main" } ?: "main"
+            val refspec = "refs/heads/$branch:refs/heads/$branch"
+            Libgit2Helper.push(
+                repo,
+                "origin",
+                listOf(refspec),
+                GitAuthConfig.toHttpCredential(cfg),
+                false,
+            )
+          },
+          successTip = "Pushed origin",
+      )
+    }
+  }
+
+  private fun withRepo(action: (com.github.git24j.core.Repository) -> Unit, successTip: String) {
+    val projectDir = IProjectManager.getInstance().getWorkspace()?.getProjectDir()?.path
+    val repoPath = projectDir?.takeIf { it.isNotBlank() } ?: IProjectManager.getInstance().projectDirPath
+    if (repoPath.isBlank()) {
       Toast.makeText(context, "No opened project", Toast.LENGTH_SHORT).show()
       return
     }
 
     CoroutineScope(Dispatchers.IO).launch {
-      val ret = runCatching {
-        if (java.io.File(projectDir, ".git").exists()) {
-          "Repository already initialized"
-        } else {
-          Libgit2Helper.initGitRepo(projectDir)
-          "Repository initialized"
-        }
-      }
+      val ret = runCatching { com.github.git24j.core.Repository.open(repoPath).use(action) }
       withContext(Dispatchers.Main) {
-        Toast.makeText(
-                context,
-                ret.getOrElse { it.localizedMessage ?: "init failed" },
-                Toast.LENGTH_LONG,
-            )
-            .show()
+        ret.onSuccess { Toast.makeText(context, successTip, Toast.LENGTH_SHORT).show() }
+        ret.onFailure {
+          Toast.makeText(context, it.localizedMessage ?: "Git operation failed", Toast.LENGTH_LONG)
+              .show()
+        }
       }
     }
   }

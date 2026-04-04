@@ -32,8 +32,12 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.catpuppyapp.puppygit.utils.Libgit2Helper
+import com.github.git24j.core.Branch
+import com.github.git24j.core.Repository
 import com.google.android.material.color.MaterialColors
 import com.itsaky.androidide.R
+import com.itsaky.androidide.projects.IProjectManager
 import java.util.ArrayList
 import java.util.Locale
 
@@ -50,17 +54,13 @@ class GitBranchPopupManager(
   private var popupWindow: PopupWindow? = null
   private var adapter: BranchAdapter? = null
 
-  // 模拟数据
-  private val allBranches =
-      listOf(
-          BranchModel("feature/ui-v2", isCurrent = true, isLocal = true),
-          BranchModel("main", isCurrent = false, isLocal = true),
-          BranchModel("dev", isCurrent = false, isLocal = true),
-          BranchModel("origin/main", isCurrent = false, isLocal = false),
-          BranchModel("origin/feature/ui-v2", isCurrent = false, isLocal = false),
-      )
-
   fun show(anchor: View) {
+    val allBranches = loadBranches()
+    if (allBranches.isEmpty()) {
+      Toast.makeText(context, "No git branches found", Toast.LENGTH_SHORT).show()
+      return
+    }
+
     val view = LayoutInflater.from(context).inflate(R.layout.layout_git_branch_popup, null)
 
     val rvBranches = view.findViewById<RecyclerView>(R.id.rv_branch_list)
@@ -106,6 +106,37 @@ class GitBranchPopupManager(
             }
 
     popupWindow?.showAsDropDown(anchor, 0, 12)
+  }
+
+  private fun loadBranches(): List<BranchModel> {
+    val projectDir = IProjectManager.getInstance().getWorkspace()?.getProjectDir()?.path
+    val repoPath =
+        projectDir?.takeIf { it.isNotBlank() }
+            ?: IProjectManager.getInstance().projectDirPath.takeIf { it.isNotBlank() }
+            ?: return emptyList()
+
+    return runCatching {
+          Repository.open(repoPath).use { repo ->
+            Libgit2Helper.getBranchList(repo, Branch.BranchType.ALL, excludeRemoteHead = true)
+                .map {
+                  BranchModel(
+                      name = it.shortName,
+                      isCurrent = it.isCurrent,
+                      isLocal = it.type == Branch.BranchType.LOCAL,
+                  )
+                }
+                .sortedWith(
+                    compareByDescending<BranchModel> { it.isCurrent }
+                        .thenByDescending { it.isLocal }
+                        .thenBy { it.name.lowercase(Locale.getDefault()) }
+                )
+          }
+        }
+        .getOrElse {
+          Toast.makeText(context, it.localizedMessage ?: "Failed to load branches", Toast.LENGTH_LONG)
+              .show()
+          emptyList()
+        }
   }
 
   fun dismiss() {

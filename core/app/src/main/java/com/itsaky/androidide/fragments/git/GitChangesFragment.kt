@@ -23,9 +23,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.catpuppyapp.puppygit.data.entity.RepoEntity
 import com.catpuppyapp.puppygit.git.StatusTypeEntrySaver
 import com.catpuppyapp.puppygit.settings.SettingsUtil
 import com.catpuppyapp.puppygit.utils.Libgit2Helper
@@ -33,7 +37,10 @@ import com.github.git24j.core.Repository
 import com.itsaky.androidide.R
 import com.itsaky.androidide.databinding.FragmentGitChangesBinding
 import com.itsaky.androidide.projects.IProjectManager
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -47,6 +54,8 @@ class GitChangesFragment : BaseGitPageFragment() {
   private val rows = mutableListOf<ChangeRow>()
   private val selectedPaths = mutableSetOf<String>()
   private val adapter = ChangeAdapter(rows)
+  private var watchJob: Job? = null
+  private var lastSnapshotSignature: String? = null
 
   override fun onCreateView(
       inflater: LayoutInflater,
@@ -66,6 +75,11 @@ class GitChangesFragment : BaseGitPageFragment() {
     addToolbarAction(R.drawable.ic_arrow_upward_24, getString(R.string.push)) {
       emitGitOperation("changes", "push")
       pushCurrentBranch(force = false)
+    }
+
+    addToolbarAction(R.drawable.ic_cloud_download_24, getString(R.string.pull)) {
+      emitGitOperation("changes", "pull_fetch_origin")
+      pullFromOrigin()
     }
 
     addToolbarAction(R.drawable.ic_warning_24, "Force Push") {
@@ -103,12 +117,28 @@ class GitChangesFragment : BaseGitPageFragment() {
     super.onViewCreated(view, savedInstanceState)
     binding.rvChanges.layoutManager = LinearLayoutManager(context)
     binding.rvChanges.adapter = adapter
-    loadChanges()
+    binding.btnCommitAndPushInline.setOnClickListener {
+      emitGitOperation("changes", "commit_and_push_inline")
+      commitThenPush()
+    }
+    bindImeInsets()
+    loadChanges(force = true)
   }
 
-  private fun loadChanges() {
-    val projectDir = IProjectManager.getInstance().projectDirPath
-    if (projectDir.isNullOrBlank()) {
+  override fun onStart() {
+    super.onStart()
+    startChangesWatcher()
+  }
+
+  override fun onStop() {
+    watchJob?.cancel()
+    watchJob = null
+    super.onStop()
+  }
+
+  private fun loadChanges(force: Boolean = false) {
+    val projectDir = resolveWorkspaceDirPath()
+    if (projectDir == null) {
       Toast.makeText(context, "No opened project", Toast.LENGTH_SHORT).show()
       return
     }
@@ -116,26 +146,17 @@ class GitChangesFragment : BaseGitPageFragment() {
     viewLifecycleOwner.lifecycleScope.launch {
       val ret =
           withContext(Dispatchers.IO) {
-            runCatching {
-              Repository.open(projectDir).use { repo ->
-                val statusList = Libgit2Helper.getWorkdirStatusList(repo)
-                val unstaged = Libgit2Helper.getWorktreeChangeList(repo, statusList, repoId = "")
-                val (_, staged) =
-                    Libgit2Helper.checkIndexIsEmptyAndGetIndexList(
-                        repo = repo,
-                        repoId = "",
-                        onlyCheckEmpty = false,
-                    )
-
-                buildRows(staged.orEmpty(), unstaged)
-              }
-            }
+            runCatching { readChangeSnapshot(projectDir) }
           }
 
       ret.onSuccess {
+        if (!force && it.signature == lastSnapshotSignature) {
+          return@onSuccess
+        }
+        lastSnapshotSignature = it.signature
         selectedPaths.clear()
         rows.clear()
-        rows.addAll(it)
+        rows.addAll(it.rows)
         adapter.notifyDataSetChanged()
       }
       ret.onFailure {
@@ -219,8 +240,22 @@ class GitChangesFragment : BaseGitPageFragment() {
     val context = context ?: return
     GitAuthConfig.ensureConfigured(context) { cfg ->
       withRepo { repo ->
+        if (Libgit2Helper.resolveRemote(repo, "origin") == null) {
+          throw IllegalStateException("Remote origin not found")
+        }
+
         val branch =
             repo.head()?.shorthand()?.removePrefix("refs/heads/")?.ifBlank { "main" } ?: "main"
+        val hasLocalBranch =
+            Libgit2Helper.getBranchList(repo)
+                .any {
+                  it.type == com.github.git24j.core.Branch.BranchType.LOCAL &&
+                      it.shortName == branch
+                }
+        if (!hasLocalBranch) {
+          throw IllegalStateException("Current branch '$branch' is invalid")
+        }
+
         val refspec = "refs/heads/$branch:refs/heads/$branch"
         val credential = GitAuthConfig.toHttpCredential(cfg)
         Libgit2Helper.push(repo, "origin", listOf(refspec), credential, force)
@@ -228,9 +263,33 @@ class GitChangesFragment : BaseGitPageFragment() {
     }
   }
 
+  private fun pullFromOrigin() {
+    val context = context ?: return
+    GitAuthConfig.ensureConfigured(context) { cfg ->
+      withRepo { repo ->
+        if (Libgit2Helper.resolveRemote(repo, "origin") == null) {
+          throw IllegalStateException("Remote origin not found")
+        }
+        val workdir = repo.workdir() ?: throw IllegalStateException("Repository workdir is null")
+        val repoEntity =
+            RepoEntity(
+                repoName = java.io.File(workdir).name,
+                fullSavePath = workdir,
+                branch = repo.head()?.shorthand().orEmpty(),
+            )
+        Libgit2Helper.fetchRemoteForRepo(
+            repo = repo,
+            remoteName = "origin",
+            credential = GitAuthConfig.toHttpCredential(cfg),
+            repoFromDb = repoEntity,
+        )
+      }
+    }
+  }
+
   private fun withRepo(onSuccess: (() -> Unit)? = null, action: (Repository) -> Unit) {
-    val projectDir = IProjectManager.getInstance().projectDirPath
-    if (projectDir.isNullOrBlank()) {
+    val projectDir = resolveWorkspaceDirPath()
+    if (projectDir == null) {
       Toast.makeText(context, "No opened project", Toast.LENGTH_SHORT).show()
       return
     }
@@ -239,7 +298,7 @@ class GitChangesFragment : BaseGitPageFragment() {
       val ret = runCatching { Repository.open(projectDir).use(action) }
       withContext(Dispatchers.Main) {
         ret.onSuccess {
-          loadChanges()
+          loadChanges(force = true)
           onSuccess?.invoke()
           Toast.makeText(context, "Git operation completed", Toast.LENGTH_SHORT).show()
         }
@@ -249,6 +308,85 @@ class GitChangesFragment : BaseGitPageFragment() {
         }
       }
     }
+  }
+
+  private fun startChangesWatcher() {
+    if (watchJob?.isActive == true) return
+    watchJob =
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+          while (isActive) {
+            val projectDir = resolveWorkspaceDirPath()
+            if (projectDir != null) {
+              runCatching { readChangeSnapshot(projectDir) }
+                  .onSuccess { snapshot ->
+                    if (snapshot.signature != lastSnapshotSignature && isAdded) {
+                      withContext(Dispatchers.Main) {
+                        if (!isAdded || view == null) return@withContext
+                        lastSnapshotSignature = snapshot.signature
+                        selectedPaths.clear()
+                        rows.clear()
+                        rows.addAll(snapshot.rows)
+                        adapter.notifyDataSetChanged()
+                      }
+                    }
+                  }
+            }
+
+            delay(1500)
+          }
+        }
+  }
+
+  private fun resolveWorkspaceDirPath(): String? {
+    val workspaceDir = IProjectManager.getInstance().getWorkspace()?.getProjectDir()?.path
+    return workspaceDir?.takeIf { it.isNotBlank() }
+        ?: IProjectManager.getInstance().projectDirPath.takeIf { it.isNotBlank() }
+  }
+
+  private fun readChangeSnapshot(projectDir: String): ChangeSnapshot {
+    return Repository.open(projectDir).use { repo ->
+      val statusList = Libgit2Helper.getWorkdirStatusList(repo)
+      val unstaged = Libgit2Helper.getWorktreeChangeList(repo, statusList, repoId = "")
+      val (_, staged) =
+          Libgit2Helper.checkIndexIsEmptyAndGetIndexList(
+              repo = repo,
+              repoId = "",
+              onlyCheckEmpty = false,
+          )
+
+      val stagedRows = staged.orEmpty()
+      val builtRows = buildRows(stagedRows, unstaged)
+      val head =
+          runCatching { repo.head()?.target()?.toString() ?: "" }
+              .getOrDefault("")
+      val signature = buildSignature(head, stagedRows, unstaged)
+      ChangeSnapshot(rows = builtRows, signature = signature)
+    }
+  }
+
+  private fun buildSignature(
+      head: String,
+      staged: List<StatusTypeEntrySaver>,
+      unstaged: List<StatusTypeEntrySaver>,
+  ): String {
+    val stagedSig =
+        staged.joinToString("|") { "${it.relativePathUnderRepo}:${it.changeType.orEmpty()}" }
+    val unstagedSig =
+        unstaged.joinToString("|") { "${it.relativePathUnderRepo}:${it.changeType.orEmpty()}" }
+    return "$head#$stagedSig#$unstagedSig"
+  }
+
+  private fun bindImeInsets() {
+    val commitCard = binding.cardCommitInput
+    val defaultBottomMargin = (commitCard.layoutParams as ViewGroup.MarginLayoutParams).bottomMargin
+    ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, insets ->
+      val imeBottom = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom
+      commitCard.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+        bottomMargin = defaultBottomMargin + imeBottom
+      }
+      insets
+    }
+    ViewCompat.requestApplyInsets(binding.root)
   }
 
   private fun buildRows(
@@ -268,6 +406,11 @@ class GitChangesFragment : BaseGitPageFragment() {
 
     data class Entry(val item: StatusTypeEntrySaver, val staged: Boolean) : ChangeRow()
   }
+
+  private data class ChangeSnapshot(
+      val rows: List<ChangeRow>,
+      val signature: String,
+  )
 
   private inner class ChangeAdapter(private val data: List<ChangeRow>) :
       RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -314,12 +457,18 @@ class GitChangesFragment : BaseGitPageFragment() {
         subtitle.text = "$state · ${item.changeType.orEmpty()}"
 
         itemView.setOnClickListener {
-          if (!selectedPaths.add(item.relativePathUnderRepo)) {
-            selectedPaths.remove(item.relativePathUnderRepo)
-          }
-          notifyItemChanged(bindingAdapterPosition)
-          Toast.makeText(context, "Selected ${selectedPaths.size} file(s)", Toast.LENGTH_SHORT)
+          selectedPaths.clear()
+          selectedPaths.add(item.relativePathUnderRepo)
+          notifyDataSetChanged()
+          GitSharedState.openDiffForPath(item.relativePathUnderRepo)
+          emitGitOperation("changes", "open_diff")
+          Toast.makeText(context, "Open diff: ${item.relativePathUnderRepo}", Toast.LENGTH_SHORT)
               .show()
+          (requireActivity() as? androidx.fragment.app.FragmentActivity)
+              ?.let {
+                androidx.lifecycle.ViewModelProvider(it)[GitUiEventViewModel::class.java]
+                    .emit(GitUiEvent.OpenDiff(item.relativePathUnderRepo))
+              }
         }
 
         itemView.setOnLongClickListener {
