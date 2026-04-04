@@ -23,6 +23,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -108,6 +111,11 @@ class GitChangesFragment : BaseGitPageFragment() {
     super.onViewCreated(view, savedInstanceState)
     binding.rvChanges.layoutManager = LinearLayoutManager(context)
     binding.rvChanges.adapter = adapter
+    binding.btnCommitAndPushInline.setOnClickListener {
+      emitGitOperation("changes", "commit_and_push_inline")
+      commitThenPush()
+    }
+    bindImeInsets()
     loadChanges(force = true)
   }
 
@@ -322,6 +330,19 @@ class GitChangesFragment : BaseGitPageFragment() {
     val unstagedSig =
         unstaged.joinToString("|") { "${it.relativePathUnderRepo}:${it.changeType.orEmpty()}" }
     return "$head#$stagedSig#$unstagedSig"
+  }
+
+  private fun bindImeInsets() {
+    val commitCard = binding.cardCommitInput
+    val defaultBottomMargin = (commitCard.layoutParams as ViewGroup.MarginLayoutParams).bottomMargin
+    ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, insets ->
+      val imeBottom = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom
+      commitCard.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+        bottomMargin = defaultBottomMargin + imeBottom
+      }
+      insets
+    }
+    ViewCompat.requestApplyInsets(binding.root)
   }
 
   private fun buildRows(

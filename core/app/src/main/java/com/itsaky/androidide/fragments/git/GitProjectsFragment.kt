@@ -14,7 +14,6 @@ import android.zero.studio.view.filetree.provider.file
 import android.zero.studio.view.filetree.widget.FileTree
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
-import com.catpuppyapp.puppygit.utils.Libgit2Helper
 import com.itsaky.androidide.R
 import com.itsaky.androidide.activities.editor.EditorHandlerActivity
 import com.itsaky.androidide.databinding.FragmentGitProjectsBinding
@@ -28,7 +27,6 @@ import com.itsaky.androidide.projects.IProjectManager
 import com.itsaky.androidide.provider.IDEFileIconProvider
 import com.itsaky.androidide.viewmodel.FileTreeViewModel
 import java.io.File
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -146,38 +144,10 @@ class GitProjectsFragment : BaseGitPageFragment(), FileClickListener, FileLongCl
       ZeroCloneDialogBottomSheetFragment.newInstance(repoId = "")
           .show(childFragmentManager, "GitProjectsCloneBottomSheet")
     }
-    addToolbarAction(R.drawable.ic_initialize_target_24dp, "Init Repo") { initRepositoryIfNeeded() }
     addToolbarAction(R.drawable.ic_check_24, "Quick Commit") {
       emitGitOperation("project", "open_commit_page")
       Toast.makeText(context, "Please use Changes page for commit/push actions", Toast.LENGTH_SHORT)
           .show()
-    }
-  }
-
-  private fun initRepositoryIfNeeded() {
-    val projectDir = IProjectManager.getInstance().projectDirPath
-    if (projectDir.isNullOrBlank()) {
-      Toast.makeText(context, "No opened project", Toast.LENGTH_SHORT).show()
-      return
-    }
-
-    CoroutineScope(Dispatchers.IO).launch {
-      val ret = runCatching {
-        if (java.io.File(projectDir, ".git").exists()) {
-          "Repository already initialized"
-        } else {
-          Libgit2Helper.initGitRepo(projectDir)
-          "Repository initialized"
-        }
-      }
-      withContext(Dispatchers.Main) {
-        Toast.makeText(
-                context,
-                ret.getOrElse { it.localizedMessage ?: "init failed" },
-                Toast.LENGTH_LONG,
-            )
-            .show()
-      }
     }
   }
 
