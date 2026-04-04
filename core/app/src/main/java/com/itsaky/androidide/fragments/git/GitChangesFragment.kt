@@ -234,8 +234,22 @@ class GitChangesFragment : BaseGitPageFragment() {
     val context = context ?: return
     GitAuthConfig.ensureConfigured(context) { cfg ->
       withRepo { repo ->
+        if (Libgit2Helper.resolveRemote(repo, "origin") == null) {
+          throw IllegalStateException("Remote origin not found")
+        }
+
         val branch =
             repo.head()?.shorthand()?.removePrefix("refs/heads/")?.ifBlank { "main" } ?: "main"
+        val hasLocalBranch =
+            Libgit2Helper.getBranchList(repo)
+                .any {
+                  it.type == com.github.git24j.core.Branch.BranchType.LOCAL &&
+                      it.shortName == branch
+                }
+        if (!hasLocalBranch) {
+          throw IllegalStateException("Current branch '$branch' is invalid")
+        }
+
         val refspec = "refs/heads/$branch:refs/heads/$branch"
         val credential = GitAuthConfig.toHttpCredential(cfg)
         Libgit2Helper.push(repo, "origin", listOf(refspec), credential, force)

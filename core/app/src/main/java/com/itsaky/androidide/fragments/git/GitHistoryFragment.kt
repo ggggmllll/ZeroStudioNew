@@ -17,6 +17,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.catpuppyapp.puppygit.data.entity.RepoEntity
 import com.catpuppyapp.puppygit.settings.SettingsUtil
 import com.catpuppyapp.puppygit.utils.Libgit2Helper
 import com.github.git24j.core.Repository
@@ -54,8 +55,8 @@ class GitHistoryFragment : BaseGitPageFragment() {
     }
 
     addToolbarAction(R.drawable.ic_cloud_download_24, getString(R.string.fetch)) {
-      emitGitOperation("history", "fetch_placeholder")
-      Toast.makeText(context, "Fetch UI is pending backend binding", Toast.LENGTH_SHORT).show()
+      emitGitOperation("history", "fetch_origin")
+      fetchOriginAndRefresh()
     }
 
     addToolbarAction(R.drawable.ic_filter_list_24, getString(R.string.filter)) {
@@ -136,6 +137,33 @@ class GitHistoryFragment : BaseGitPageFragment() {
           }
         }
       }
+    }
+  }
+
+  private fun fetchOriginAndRefresh() {
+    val ctx = context ?: return
+    GitAuthConfig.ensureConfigured(ctx) { cfg ->
+      withRepo { repo ->
+        val remote = Libgit2Helper.resolveRemote(repo, "origin")
+        if (remote == null) {
+          throw IllegalStateException("Remote origin not found")
+        }
+
+        val repoPath = repo.workdir()
+        val repoEntity =
+            RepoEntity(
+                repoName = java.io.File(repoPath).name,
+                fullSavePath = repoPath,
+                branch = repo.head()?.shorthand().orEmpty(),
+            )
+        Libgit2Helper.fetchRemoteForRepo(
+            repo = repo,
+            remoteName = "origin",
+            credential = GitAuthConfig.toHttpCredential(cfg),
+            repoFromDb = repoEntity,
+        )
+      }
+      loadCommits(limit = 150)
     }
   }
 
