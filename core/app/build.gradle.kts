@@ -219,6 +219,7 @@ dependencies {
   implementation(projects.java.javacServices)
   implementation(projects.java.lsp)
   implementation(projects.lsp.kotlin)
+  implementation(projects.lsp.toml)
   implementation(projects.logging.idestats)
   implementation(projects.logging.logsender)
   implementation(projects.termux.application)

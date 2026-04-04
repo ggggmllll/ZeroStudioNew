@@ -80,6 +80,7 @@ dependencies {
   implementation(projects.utilities.shared)
   implementation(projects.xml.lsp)
   implementation(projects.lsp.kotlin)
+  implementation(projects.lsp.toml)
 
   // tree sitter
   // api(projects.editor.treeSitterNdk.androidTreeSitter)
