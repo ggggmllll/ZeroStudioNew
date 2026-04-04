@@ -44,23 +44,13 @@ dependencies {
     compileOnly files('libs/the-unsafe.jar')
     api files('libs/kotlin-compiler-embeddable-2.3.0.jar')
     implementation files('libs/jps-model-impl-253.28294.357.jar') 
-    implementation(libs.compositeJavaStubs2)
-    implementation(libs.compositeJavac2)
-    implementation(libs.commonJaxpInternal)
-    implementation(libs.commonJaxpXml)
-    compileOnly project(path: ':utilities:framework-stubs')
+    implementation(libs.composite.java.stubsb)
+    implementation(libs.composite.javacb)
+    implementation(libs.composite.jaxpb.jaxp.internal)
+    implementation(libs.composite.jaxpb.xml)
+
+    compileOnly project(":utilities:framework-stubs")
+
 
     
-}
-
-repositories {
-    mavenCentral()
-    maven { url = 'https://www.jetbrains.com/intellij-repository/releases/'} 
-}
-
-spotless {
-		java {
-			target "**/*.java"
-			googleJavaFormat()
-			}
 }

@@ -5206,6 +5206,7 @@ drawable ic_settings_24
 drawable ic_share
 drawable ic_sora_handle_drop
 drawable ic_space
+drawable ic_splash_logo
 drawable ic_sticky_scroll
 drawable ic_stop_daemons
 drawable ic_sweep_delete

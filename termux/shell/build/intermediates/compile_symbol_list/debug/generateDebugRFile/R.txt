@@ -5205,6 +5205,7 @@ int drawable ic_settings_24 0x0
 int drawable ic_share 0x0
 int drawable ic_sora_handle_drop 0x0
 int drawable ic_space 0x0
+int drawable ic_splash_logo 0x0
 int drawable ic_sticky_scroll 0x0
 int drawable ic_stop_daemons 0x0
 int drawable ic_sweep_delete 0x0

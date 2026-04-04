@@ -53,19 +53,19 @@ include(
     ":logback-core",
     ":compose-pullrefresh",
     ":editor",
-    ":java-stubs2",
-    ":javac2",
-    ":javapoet2",
-    ":jaxp2:jaxp-internal",
-    ":jaxp2:xml",
+    ":java-stubsb",
+    ":javacb",
+    ":javapoetb",
+    ":jaxpb-jaxp-internal",
+    ":jaxpb-xml",
     ":soraLanguageTextmate",
     ":soraOnigurumaNative",
-    ":kotlinc",
+    // ":kotlinc",
 )
 
 // 注册项目主构建模块到复合构建内
 project(":soraOnigurumaNative").projectDir = file("../../modules/soraOnigurumaNative")
-project(":kotlinc").projectDir = file("../../modules/kotlinc")
+// project(":kotlinc").projectDir = file("../../modules/kotlinc")
 
 rootProject.name = "build-deps"
 

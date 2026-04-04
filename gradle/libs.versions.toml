@@ -85,7 +85,7 @@ lottie-animation = "6.6.10"
 io-markwon = "4.6.2"
 koin-bom = "4.1.1"
 retrofit = "2.10.0"
-iorealm = "10.19.0" 
+iorealm = "10.19.0"
 slf4j-api = "2.0.12"
 jrubyJoni = "2.2.6"
 orgEclipseJdtAnnotation = "2.3.100"
@@ -172,12 +172,12 @@ composite-composePullrefresh = { module = "com.itsaky.androidide.build:compose-p
 common-editor = { module = "com.itsaky.androidide.build:editor" }
 common-soraLanguageTextmate = { module = "com.itsaky.androidide.build:soraLanguageTextmate" }
 
-composite-kotlinc = { module = "com.itsaky.androidide.build:kotlinc" }
-composite-java-stubs2 = { module = "com.itsaky.androidide.build:java-stubs2" }
-composite-javac2 = { module = "com.itsaky.androidide.build:javac2" }
-common-javapoet2 = { module = "com.itsaky.androidide.build:javapoet2" }
-common-jaxp-internal = { group = "com.itsaky.androidide.build.jaxp2", name = "jaxp-internal" }
-common-jaxp-xml = { group = "com.itsaky.androidide.build.jaxp2", name = "xml" }
+# composite-kotlinc = { module = "com.itsaky.androidide.build:kotlinc" }
+composite-java-stubsb = { module = "com.itsaky.androidide.build:java-stubsb" }
+composite-javacb = { module = "com.itsaky.androidide.build:javacb" }
+composite-javapoetb = { module = "com.itsaky.androidide.build:javapoetb" }
+composite-jaxpb-jaxp-internal = { module = "com.itsaky.androidide.build:jaxpb-jaxp-internal" }
+composite-jaxpb-xml = { module = "com.itsaky.androidide.build:jaxpb-xml" }
 
 
 # AndroidIDE

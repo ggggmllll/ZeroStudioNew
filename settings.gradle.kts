@@ -46,31 +46,28 @@ dependencyResolutionManagement {
                   "editor",
                   "compose-pullrefresh",
                   
-                  "java-stubs2",
-                  "javac2",
-                  "javapoet2",
-                  "jaxp2:jaxp-internal",
-                  "jaxp2:xml",
+                  "java-stubsb",
+                  "javacb",
+                  "javapoetb",
+                  "jaxpb-jaxp-internal",
+                  "jaxpb-xml",
                   
                   "soraLanguageTextmate",
-                  "kotlinc",
+                  // "kotlinc",
 
               ),
           "build-deps-common" to arrayOf("desugaring-core"),
       )
 
-  for ((build, modules) in dependencySubstitutions) {
+    for ((build, modules) in dependencySubstitutions) {
     includeBuild("composite-builds/${build}") {
       this.name = build
       dependencySubstitution {
         for (module in modules) {
-          val parts = module.split(":")
-          val artifact = parts.last()
-          val groupSuffix =
-              if (parts.size > 1) ".${parts.dropLast(1).joinToString(".")}" else ""
-          val moduleNotation = "com.itsaky.androidide.build${groupSuffix}:${artifact}"
-          substitute(module(moduleNotation)).using(project(":${module}"))
+          substitute(module("com.itsaky.androidide.build:${module}"))
+            .using(project(":${module}"))
         }
+        
       }
     }
   }
@@ -84,6 +81,7 @@ dependencyResolutionManagement {
     maven("https://repo1.maven.org/maven2/")
     maven("https://repo.itextsupport.com/android")
     maven(url = "https://repo.gradle.org/gradle/libs-releases/")
+    maven(url = "https://www.jetbrains.com/intellij-repository/releases/")
     maven { url = uri("${rootProject.projectDir}/gradle/libs") }
   }
   // versionCatalogs { create("ktlib") { from(files("gradle/kotlin.versions.toml")) } }
