@@ -210,7 +210,7 @@ include(
     ":java:javac-services",
     ":java:lsp",
     ":lsp:kotlin",
-    // ":lsp:toml",
+    ":lsp:toml",
     // ":lsp:smali",
     // ":lsp:groovy",
     // ":lsp:grammar",
