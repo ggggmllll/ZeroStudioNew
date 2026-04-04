@@ -83,6 +83,7 @@ class GitDiffFragment : BaseGitPageFragment() {
     binding.rvDiffLines.adapter = adapter
     reloadChangedFilesAndDiff()
     observeDiffTargets()
+    observeCommitTargets()
   }
 
   private fun reloadChangedFilesAndDiff() {
@@ -201,6 +202,35 @@ class GitDiffFragment : BaseGitPageFragment() {
           if (idx >= 0) {
             currentIndex = idx
             reloadChangedFilesAndDiff()
+          }
+        }
+      }
+    }
+  }
+
+  private fun observeCommitTargets() {
+    viewLifecycleOwner.lifecycleScope.launch {
+      viewLifecycleOwner.repeatOnLifecycle(androidx.lifecycle.Lifecycle.State.STARTED) {
+        GitSharedState.selectedCommitHash.collect { commitHash ->
+          if (commitHash.isNullOrBlank()) return@collect
+          withRepo { repo ->
+            val settings = com.catpuppyapp.puppygit.settings.SettingsUtil.getSettingsSnapshot()
+            val dto =
+                Libgit2Helper.getSingleCommitSimple(
+                    repo = repo,
+                    repoId = "",
+                    commitOidStr = commitHash,
+                    settings = settings,
+                )
+            allLines =
+                listOf(
+                    DiffLine(-1, -1, "Commit: ${dto.shortOidStr}", DiffType.HUNK_HEADER),
+                    DiffLine(-1, -1, "Author: ${dto.author}", DiffType.CONTEXT),
+                    DiffLine(-1, -1, "Branches: ${dto.branchShortNameList.joinToString()}", DiffType.CONTEXT),
+                    DiffLine(-1, -1, "Parents: ${dto.parentShortOidStrList.joinToString()}", DiffType.CONTEXT),
+                    DiffLine(-1, -1, dto.msg, DiffType.CONTEXT),
+                )
+            applyFilter()
           }
         }
       }
