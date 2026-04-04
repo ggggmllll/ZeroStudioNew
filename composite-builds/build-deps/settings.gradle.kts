@@ -52,14 +52,14 @@ include(
     ":layoutlib-api",
     ":logback-core",
     ":compose-pullrefresh",
-    ":soraLanguageTextmate",
     ":editor",
-    ":kotlinc",
     ":java-stubs2",
     ":javac2",
     ":javapoet2",
     ":jaxp2:jaxp-internal",
     ":jaxp2:xml",
+    ":soraLanguageTextmate",
+    ":kotlinc",
 )
 
 // 注册项目主构建模块到复合构建内
