@@ -21,6 +21,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.Lifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.tabs.TabLayoutMediator
 import com.itsaky.androidide.R
@@ -36,6 +38,8 @@ class GitCollaborationFragment : Fragment() {
   private var _binding: FragmentGitCollaborationBinding? = null
   private val binding
     get() = _binding!!
+  private var collaborationPagerAdapter: CollaborationPagerAdapter? = null
+  private var tabLayoutMediator: TabLayoutMediator? = null
 
   override fun onCreateView(
       inflater: LayoutInflater,
@@ -52,32 +56,40 @@ class GitCollaborationFragment : Fragment() {
   }
 
   private fun setupViewPager() {
-    // 使用 childFragmentManager 因为这是嵌套在 Fragment 中的 ViewPager
-    val adapter = CollaborationPagerAdapter(this)
-    binding.pagerCollab.adapter = adapter
+    // 绑定到 viewLifecycleOwner，避免 View 已销毁后适配器仍观察 Fragment 生命周期。
+    collaborationPagerAdapter =
+        CollaborationPagerAdapter(childFragmentManager, viewLifecycleOwner.lifecycle)
+    binding.pagerCollab.adapter = collaborationPagerAdapter
 
     // 绑定 Tab 标题
-    TabLayoutMediator(binding.tabLayoutCollab, binding.pagerCollab) { tab, position ->
-          tab.text =
-              when (position) {
-                0 -> getString(R.string.collab_tab_pr) // Pull Requests
-                1 -> getString(R.string.collab_tab_pipelines) // CD/CI
-                2 -> getString(R.string.collab_tab_conflicts) // 冲突解决
-                3 -> getString(R.string.collab_tab_review) // 代码审查
-                else -> ""
-              }
-        }
-        .attach()
+    tabLayoutMediator =
+        TabLayoutMediator(binding.tabLayoutCollab, binding.pagerCollab) { tab, position ->
+              tab.text =
+                  when (position) {
+                    0 -> getString(R.string.collab_tab_pr) // Pull Requests
+                    1 -> getString(R.string.collab_tab_pipelines) // CD/CI
+                    2 -> getString(R.string.collab_tab_conflicts) // 冲突解决
+                    3 -> getString(R.string.collab_tab_review) // 代码审查
+                    else -> ""
+                  }
+            }
+            .also { it.attach() }
   }
 
   override fun onDestroyView() {
+    tabLayoutMediator?.detach()
+    tabLayoutMediator = null
+    binding.pagerCollab.adapter = null
+    collaborationPagerAdapter = null
     super.onDestroyView()
     _binding = null
   }
 
   /** 协作子页面的适配器 */
-  private inner class CollaborationPagerAdapter(fragment: Fragment) :
-      FragmentStateAdapter(fragment) {
+  private class CollaborationPagerAdapter(
+      fragmentManager: FragmentManager,
+      lifecycle: Lifecycle,
+  ) : FragmentStateAdapter(fragmentManager, lifecycle) {
     override fun getItemCount(): Int = 4
 
     override fun createFragment(position: Int): Fragment {
