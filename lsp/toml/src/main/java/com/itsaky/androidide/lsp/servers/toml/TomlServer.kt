@@ -32,6 +32,14 @@ class TomlServer : ILanguageServer {
 
   override fun setupWorkspace(workspace: IWorkspace) = delegate.setupWorkspace(workspace)
 
+  override fun didOpen(params: DidOpenTextDocumentParams) = delegate.didOpen(params)
+
+  override fun didChange(params: DidChangeTextDocumentParams) = delegate.didChange(params)
+
+  override fun didClose(params: DidCloseTextDocumentParams) = delegate.didClose(params)
+
+  override fun didSave(params: DidSaveTextDocumentParams) = delegate.didSave(params)
+
   override fun complete(params: CompletionParams?): CompletionResult = delegate.complete(params)
 
   override suspend fun findReferences(params: ReferenceParams): ReferenceResult =
@@ -89,4 +97,6 @@ class TomlServer : ILanguageServer {
 
   override suspend fun typeHierarchy(params: DefinitionParams): List<TypeHierarchyItem> =
     delegate.typeHierarchy(params)
+
+  fun onWorkspaceChanged() = delegate.onWorkspaceChanged()
 }

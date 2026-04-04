@@ -14,6 +14,8 @@ import java.nio.file.Path
 class TomlLanguageServer : ILanguageServer {
 
   private var _client: ILanguageClient? = null
+  private val textDocuments = TomlTextDocumentService()
+  private val workspaceService = TomlWorkspaceService()
 
   override val serverId: String = SERVER_ID
   override val client: ILanguageClient?
@@ -30,6 +32,23 @@ class TomlLanguageServer : ILanguageServer {
   override fun applySettings(settings: IServerSettings?) = Unit
 
   override fun setupWorkspace(workspace: IWorkspace) = Unit
+
+  override fun didOpen(params: DidOpenTextDocumentParams) {
+    textDocuments.open(params.file, params.text)
+  }
+
+  override fun didChange(params: DidChangeTextDocumentParams) {
+    val latest = params.contentChanges.lastOrNull()?.text ?: return
+    textDocuments.change(params.file, latest)
+  }
+
+  override fun didClose(params: DidCloseTextDocumentParams) {
+    textDocuments.close(params.file)
+  }
+
+  override fun didSave(params: DidSaveTextDocumentParams) {
+    params.text?.let { textDocuments.change(params.file, it) }
+  }
 
   override fun complete(params: CompletionParams?): CompletionResult {
     if (params == null) return CompletionResult.EMPTY
@@ -92,6 +111,10 @@ class TomlLanguageServer : ILanguageServer {
   override suspend fun documentLinks(file: Path): List<DocumentLink> {
     val content = TomlDocumentCache.get(file).orEmpty()
     return TomlFeatureEngine.documentLinks(content, file)
+  }
+
+  fun onWorkspaceChanged() {
+    workspaceService.onWorkspaceChanged()
   }
 
   companion object {

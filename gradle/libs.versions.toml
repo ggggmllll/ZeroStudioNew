@@ -176,8 +176,8 @@ composite-kotlinc = { module = "com.itsaky.androidide.build:kotlinc" }
 composite-java-stubs2 = { module = "com.itsaky.androidide.build:java-stubs2" }
 composite-javac2 = { module = "com.itsaky.androidide.build:javac2" }
 common-javapoet2 = { module = "com.itsaky.androidide.build:javapoet2" }
-common-jaxp-internal = { module = "com.itsaky.androidide.build:jaxp2:jaxp-internal" }
-common-jaxp-xml = { module = "com.itsaky.androidide.build:jaxp2:xml" }
+common-jaxp-internal = { group = "com.itsaky.androidide.build.jaxp2", name = "jaxp-internal" }
+common-jaxp-xml = { group = "com.itsaky.androidide.build.jaxp2", name = "xml" }
 
 
 # AndroidIDE
@@ -607,5 +607,4 @@ com-jaredsburrows-license = { id = "com.jaredsburrows.license", version = "0.8.4
 gradle-publish = { id = "com.gradle.plugin-publish", version = "1.2.1" }
 realm-gradle-plugin = { id = "io.realm:realm-gradle-plugin", version.ref = "iorealm" }
 baselineprofile = { id = "androidx.baselineprofile", version.ref = "baselineprofile" }
-
 
