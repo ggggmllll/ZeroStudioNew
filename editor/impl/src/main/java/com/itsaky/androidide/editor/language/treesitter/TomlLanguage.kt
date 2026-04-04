@@ -19,6 +19,9 @@ package com.itsaky.androidide.editor.language.treesitter
 
 import android.content.Context
 import com.itsaky.androidide.editor.language.treesitter.TreeSitterLanguage.Factory
+import com.itsaky.androidide.lsp.api.ILanguageServer
+import com.itsaky.androidide.lsp.api.ILanguageServerRegistry
+import com.itsaky.androidide.lsp.servers.toml.server.TomlLanguageServer
 import com.itsaky.androidide.treesitter.toml.TSLanguageToml
 import io.github.rosemoe.sora.lang.Language.INTERRUPTION_LEVEL_STRONG
 import io.github.rosemoe.sora.util.MyCharacter
@@ -32,6 +35,9 @@ import io.github.rosemoe.sora.widget.SymbolPairMatch
 class TomlLanguage(context: Context) :
     TreeSitterLanguage(context, lang = TSLanguageToml.getInstance(), langType = TOML_TYPE) {
 
+  override val languageServer: ILanguageServer?
+    get() = ILanguageServerRegistry.getDefault().getServer(TomlLanguageServer.SERVER_ID)
+
   companion object {
 
     const val TOML_TYPE = "toml"
@@ -40,7 +46,7 @@ class TomlLanguage(context: Context) :
   }
 
   override fun getSymbolPairs(): SymbolPairMatch {
-    return return SymbolPairMatch().apply {
+    return SymbolPairMatch().apply {
       putPair('(', SymbolPairMatch.SymbolPair("(", ")"))
       putPair('[', SymbolPairMatch.SymbolPair("[", "]"))
       putPair('{', SymbolPairMatch.SymbolPair("{", "}"))
