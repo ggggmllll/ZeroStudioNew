@@ -14,6 +14,7 @@ import com.catpuppyapp.puppygit.utils.AppModel
 import com.catpuppyapp.puppygit.utils.ContextUtil
 import com.catpuppyapp.puppygit.utils.MyLog
 import com.catpuppyapp.puppygit.utils.showToast
+import java.lang.ref.WeakReference
 import kotlinx.coroutines.CoroutineExceptionHandler
 
 open class BaseComposeActivity : ComponentActivity() {
@@ -31,7 +32,7 @@ open class BaseComposeActivity : ComponentActivity() {
 
     AppModel.init_1(
         realAppContext = applicationContext,
-        exitApp = { finish() },
+        exitApp = createExitAppAction(),
         initActivity = true,
     )
 
@@ -64,7 +65,12 @@ open class BaseComposeActivity : ComponentActivity() {
   override fun onResume() {
     super.onResume()
 
-    AppModel.updateExitApp { finish() }
+    AppModel.updateExitApp(createExitAppAction())
+  }
+
+  private fun createExitAppAction(): () -> Unit {
+    val activityRef = WeakReference(this)
+    return { activityRef.get()?.finish() }
   }
 
   /** can't promise 100% catch app crash, but have maybe 30% chance to caught */
