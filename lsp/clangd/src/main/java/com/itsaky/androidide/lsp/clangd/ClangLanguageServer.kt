@@ -13,6 +13,10 @@ import com.itsaky.androidide.lsp.models.DefinitionResult
 import com.itsaky.androidide.lsp.models.DiagnosticItem
 import com.itsaky.androidide.lsp.models.DiagnosticResult
 import com.itsaky.androidide.lsp.models.DiagnosticSeverity
+import com.itsaky.androidide.lsp.models.DidChangeTextDocumentParams
+import com.itsaky.androidide.lsp.models.DidCloseTextDocumentParams
+import com.itsaky.androidide.lsp.models.DidOpenTextDocumentParams
+import com.itsaky.androidide.lsp.models.DidSaveTextDocumentParams
 import com.itsaky.androidide.lsp.models.ExpandSelectionParams
 import com.itsaky.androidide.lsp.models.FormatCodeParams
 import com.itsaky.androidide.lsp.models.LSPFailure
@@ -101,6 +105,32 @@ class ClangLanguageServer(initialSettings: ClangdServerSettings) : ILanguageServ
   override fun setupWorkspace(workspace: IWorkspace) {
     workspaceRoot = workspace.getRootProject().path
     initializeNative(workspaceRoot!!)
+  }
+
+  override fun didOpen(params: DidOpenTextDocumentParams) {
+    fileVersions[params.file] = params.version
+    ClangdNativeBridge.nativeDidOpen(toFileUri(params.file), params.text, params.languageId)
+  }
+
+  override fun didChange(params: DidChangeTextDocumentParams) {
+    val latest = params.contentChanges.lastOrNull()?.text ?: return
+    fileVersions[params.file] = params.version
+    ClangdNativeBridge.nativeDidChange(toFileUri(params.file), latest, params.version)
+    resultCache.invalidateByPrefix("completion:${params.file}:")
+  }
+
+  override fun didClose(params: DidCloseTextDocumentParams) {
+    fileVersions.remove(params.file)
+    diagnosticsCache.remove(params.file)
+    ClangdNativeBridge.nativeDidClose(toFileUri(params.file))
+  }
+
+  override fun didSave(params: DidSaveTextDocumentParams) {
+    params.text?.let { text ->
+      val version = (fileVersions[params.file] ?: 0) + 1
+      fileVersions[params.file] = version
+      ClangdNativeBridge.nativeDidChange(toFileUri(params.file), text, version)
+    }
   }
 
   override fun complete(params: CompletionParams?): CompletionResult {

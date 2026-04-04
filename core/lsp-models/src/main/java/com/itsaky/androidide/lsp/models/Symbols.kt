@@ -8,6 +8,7 @@ data class DocumentSymbol(
     var name: String,
     var detail: String = "",
     var kind: SymbolKind = SymbolKind.Null,
+    var tags: List<SymbolTag> = emptyList(),
     var range: Range = Range.NONE,
     var selectionRange: Range = Range.NONE,
     var children: List<DocumentSymbol> = emptyList(),
@@ -16,6 +17,7 @@ data class DocumentSymbol(
 data class SymbolInformation(
     var name: String,
     var kind: SymbolKind,
+    var tags: List<SymbolTag> = emptyList(),
     var location: Location,
     var containerName: String? = null,
 )
@@ -23,6 +25,7 @@ data class SymbolInformation(
 data class WorkspaceSymbol(
     var name: String,
     var kind: SymbolKind,
+    var tags: List<SymbolTag> = emptyList(),
     var location: Location,
     var containerName: String? = null,
 )
