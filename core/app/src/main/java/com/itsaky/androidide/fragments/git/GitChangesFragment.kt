@@ -413,12 +413,18 @@ class GitChangesFragment : BaseGitPageFragment() {
         subtitle.text = "$state · ${item.changeType.orEmpty()}"
 
         itemView.setOnClickListener {
-          if (!selectedPaths.add(item.relativePathUnderRepo)) {
-            selectedPaths.remove(item.relativePathUnderRepo)
-          }
-          notifyItemChanged(bindingAdapterPosition)
-          Toast.makeText(context, "Selected ${selectedPaths.size} file(s)", Toast.LENGTH_SHORT)
+          selectedPaths.clear()
+          selectedPaths.add(item.relativePathUnderRepo)
+          notifyDataSetChanged()
+          GitSharedState.openDiffForPath(item.relativePathUnderRepo)
+          emitGitOperation("changes", "open_diff")
+          Toast.makeText(context, "Open diff: ${item.relativePathUnderRepo}", Toast.LENGTH_SHORT)
               .show()
+          (requireActivity() as? androidx.fragment.app.FragmentActivity)
+              ?.let {
+                androidx.lifecycle.ViewModelProvider(it)[GitUiEventViewModel::class.java]
+                    .emit(GitUiEvent.OpenDiff(item.relativePathUnderRepo))
+              }
         }
 
         itemView.setOnLongClickListener {

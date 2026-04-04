@@ -9,6 +9,8 @@ internal sealed class GitUiEvent {
   data class Operation(val section: String, val action: String) : GitUiEvent()
 
   data class Error(val message: String) : GitUiEvent()
+
+  data class OpenDiff(val path: String) : GitUiEvent()
 }
 
 internal class GitUiEventViewModel : ViewModel() {

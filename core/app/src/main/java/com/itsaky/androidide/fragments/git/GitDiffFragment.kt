@@ -3,14 +3,18 @@
  */
 package com.itsaky.androidide.fragments.git
 
+import android.app.AlertDialog
 import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.graphics.ColorUtils
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.catpuppyapp.puppygit.constants.Cons
@@ -39,7 +43,10 @@ class GitDiffFragment : BaseGitPageFragment() {
   private val changedFiles = mutableListOf<StatusTypeEntrySaver>()
   private var currentIndex = 0
   private val lines = mutableListOf<DiffLine>()
+  private var allLines = listOf<DiffLine>()
   private val adapter = DiffAdapter(lines)
+  private var filterKeyword = ""
+  private var compactMode = false
 
   override fun onCreateView(
       inflater: LayoutInflater,
@@ -62,6 +69,12 @@ class GitDiffFragment : BaseGitPageFragment() {
     addToolbarAction(R.drawable.ic_chevron_right_24, getString(R.string.next_page)) {
       navigateDiff(1)
     }
+    addToolbarAction(R.drawable.ic_refresh_24, getString(R.string.refresh)) { reloadChangedFilesAndDiff() }
+    addToolbarAction(R.drawable.ic_filter_list_24, getString(R.string.search)) { showSearchDialog() }
+    addToolbarAction(R.drawable.ic_warning_24, "Style") {
+      compactMode = !compactMode
+      adapter.notifyDataSetChanged()
+    }
   }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -69,6 +82,7 @@ class GitDiffFragment : BaseGitPageFragment() {
     binding.rvDiffLines.layoutManager = LinearLayoutManager(context)
     binding.rvDiffLines.adapter = adapter
     reloadChangedFilesAndDiff()
+    observeDiffTargets()
   }
 
   private fun reloadChangedFilesAndDiff() {
@@ -86,6 +100,7 @@ class GitDiffFragment : BaseGitPageFragment() {
     if (changedFiles.isEmpty()) {
       lines.clear()
       lines.add(DiffLine(-1, -1, "No changed files", DiffType.HUNK_HEADER))
+      allLines = lines.toList()
       return
     }
 
@@ -124,8 +139,8 @@ class GitDiffFragment : BaseGitPageFragment() {
       }
     }
 
-    lines.clear()
-    lines.addAll(rendered)
+    allLines = rendered
+    applyFilter()
   }
 
   private fun stageCurrentFile() {
@@ -157,8 +172,10 @@ class GitDiffFragment : BaseGitPageFragment() {
   }
 
   private fun withRepo(action: suspend (Repository) -> Unit) {
-    val projectDir = IProjectManager.getInstance().projectDirPath
-    if (projectDir.isNullOrBlank()) {
+    val projectDir =
+        IProjectManager.getInstance().getWorkspace()?.getProjectDir()?.path
+            ?: IProjectManager.getInstance().projectDirPath
+    if (projectDir.isBlank()) {
       Toast.makeText(context, "No opened project", Toast.LENGTH_SHORT).show()
       return
     }
@@ -173,6 +190,45 @@ class GitDiffFragment : BaseGitPageFragment() {
         }
       }
     }
+  }
+
+  private fun observeDiffTargets() {
+    viewLifecycleOwner.lifecycleScope.launch {
+      viewLifecycleOwner.repeatOnLifecycle(androidx.lifecycle.Lifecycle.State.STARTED) {
+        GitSharedState.selectedDiffPath.collect { targetPath ->
+          if (targetPath.isNullOrBlank()) return@collect
+          val idx = changedFiles.indexOfFirst { it.relativePathUnderRepo == targetPath }
+          if (idx >= 0) {
+            currentIndex = idx
+            reloadChangedFilesAndDiff()
+          }
+        }
+      }
+    }
+  }
+
+  private fun showSearchDialog() {
+    val input = EditText(requireContext()).apply { setText(filterKeyword) }
+    AlertDialog.Builder(requireContext())
+        .setTitle(getString(R.string.search))
+        .setView(input)
+        .setPositiveButton(android.R.string.ok) { _, _ ->
+          filterKeyword = input.text?.toString().orEmpty().trim()
+          applyFilter()
+        }
+        .setNegativeButton(android.R.string.cancel, null)
+        .show()
+  }
+
+  private fun applyFilter() {
+    val filtered =
+        if (filterKeyword.isBlank()) {
+          allLines
+        } else {
+          allLines.filter { it.content.contains(filterKeyword, ignoreCase = true) }
+        }
+    lines.clear()
+    lines.addAll(filtered)
   }
 
   enum class DiffType {
@@ -200,11 +256,17 @@ class GitDiffFragment : BaseGitPageFragment() {
 
       when (item.type) {
         DiffType.ADD -> {
-          holder.itemView.setBackgroundColor(Color.parseColor("#1A4CAF50"))
+          holder.itemView.setBackgroundColor(
+              if (compactMode) ColorUtils.setAlphaComponent(Color.parseColor("#4CAF50"), 20)
+              else Color.parseColor("#1A4CAF50")
+          )
           holder.tvContent.setTextColor(Color.parseColor("#A5D6A7"))
         }
         DiffType.DELETE -> {
-          holder.itemView.setBackgroundColor(Color.parseColor("#1AF44336"))
+          holder.itemView.setBackgroundColor(
+              if (compactMode) ColorUtils.setAlphaComponent(Color.parseColor("#F44336"), 20)
+              else Color.parseColor("#1AF44336")
+          )
           holder.tvContent.setTextColor(Color.parseColor("#EF9A9A"))
         }
         DiffType.HUNK_HEADER -> {

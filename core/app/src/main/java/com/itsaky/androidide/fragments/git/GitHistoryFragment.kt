@@ -3,6 +3,7 @@
  */
 package com.itsaky.androidide.fragments.git
 
+import android.app.AlertDialog
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -13,6 +14,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.catpuppyapp.puppygit.settings.SettingsUtil
@@ -46,6 +48,11 @@ class GitHistoryFragment : BaseGitPageFragment() {
   }
 
   override fun setupToolbar() {
+    addToolbarAction(R.drawable.ic_refresh_24, getString(R.string.refresh)) {
+      emitGitOperation("history", "refresh")
+      loadCommits(limit = 150)
+    }
+
     addToolbarAction(R.drawable.ic_cloud_download_24, getString(R.string.fetch)) {
       emitGitOperation("history", "fetch_placeholder")
       Toast.makeText(context, "Fetch UI is pending backend binding", Toast.LENGTH_SHORT).show()
@@ -67,6 +74,7 @@ class GitHistoryFragment : BaseGitPageFragment() {
     binding.rvHistory.layoutManager = LinearLayoutManager(context)
     binding.rvHistory.adapter = adapter
     loadCommits(limit = 100)
+    observeGitEvents()
   }
 
   private fun loadCommits(limit: Int) {
@@ -92,6 +100,8 @@ class GitHistoryFragment : BaseGitPageFragment() {
                 shortHash = dto.shortOidStr,
                 subject = dto.shortMsg,
                 author = dto.author,
+                statusBadge = resolveStatusBadge(dto.branchShortNameList),
+                message = dto.msg,
             )
         )
         next = rw.next()
@@ -116,9 +126,29 @@ class GitHistoryFragment : BaseGitPageFragment() {
     Toast.makeText(context, "Copied ${commit.shortHash}", Toast.LENGTH_SHORT).show()
   }
 
+  private fun observeGitEvents() {
+    val vm = androidx.lifecycle.ViewModelProvider(requireActivity())[GitUiEventViewModel::class.java]
+    viewLifecycleOwner.lifecycleScope.launch {
+      viewLifecycleOwner.repeatOnLifecycle(androidx.lifecycle.Lifecycle.State.STARTED) {
+        vm.events.collect { event ->
+          if (event is GitUiEvent.Operation && event.section == "changes") {
+            loadCommits(limit = 150)
+          }
+        }
+      }
+    }
+  }
+
+  private fun resolveStatusBadge(branchNames: List<String>): String {
+    val hasRemote = branchNames.any { it.startsWith("origin/") }
+    return if (hasRemote) "REMOTE" else "LOCAL"
+  }
+
   private fun withRepo(action: (Repository) -> Unit) {
-    val projectDir = IProjectManager.getInstance().projectDirPath
-    if (projectDir.isNullOrBlank()) {
+    val projectDir =
+        IProjectManager.getInstance().getWorkspace()?.getProjectDir()?.path
+            ?: IProjectManager.getInstance().projectDirPath
+    if (projectDir.isBlank()) {
       Toast.makeText(context, "No opened project", Toast.LENGTH_SHORT).show()
       return
     }
@@ -143,6 +173,8 @@ class GitHistoryFragment : BaseGitPageFragment() {
       val shortHash: String,
       val subject: String,
       val author: String,
+      val statusBadge: String,
+      val message: String,
   )
 
   private inner class CommitAdapter(private val data: List<CommitRow>) :
@@ -159,10 +191,11 @@ class GitHistoryFragment : BaseGitPageFragment() {
       val active = selectedCommit?.hash == item.hash
       holder.title.text =
           if (active) "✓ ${item.shortHash} ${item.subject}" else "${item.shortHash} ${item.subject}"
-      holder.subtitle.text = item.author
+      holder.subtitle.text = "[${item.statusBadge}] ${item.author}"
       holder.itemView.setOnClickListener {
         selectedCommit = item
         notifyDataSetChanged()
+        showCommitDetails(item)
       }
     }
 
@@ -172,6 +205,19 @@ class GitHistoryFragment : BaseGitPageFragment() {
       val title: TextView = view.findViewById(android.R.id.text1)
       val subtitle: TextView = view.findViewById(android.R.id.text2)
     }
+  }
+
+  private fun showCommitDetails(item: CommitRow) {
+    AlertDialog.Builder(requireContext())
+        .setTitle(item.shortHash)
+        .setMessage("Status: ${item.statusBadge}\nAuthor: ${item.author}\n\n${item.message}")
+        .setPositiveButton("Open Diff") { _, _ ->
+          GitSharedState.openDiffForCommit(item.hash)
+          androidx.lifecycle.ViewModelProvider(requireActivity())[GitUiEventViewModel::class.java]
+              .emit(GitUiEvent.OpenDiff(item.hash))
+        }
+        .setNegativeButton(android.R.string.cancel, null)
+        .show()
   }
 
   override fun onDestroyView() {

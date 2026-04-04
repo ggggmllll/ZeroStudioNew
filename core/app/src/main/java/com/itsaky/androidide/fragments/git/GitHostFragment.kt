@@ -79,6 +79,7 @@ class GitHostFragment : Fragment() {
                     .show()
             is GitUiEvent.Error ->
                 Toast.makeText(requireContext(), event.message, Toast.LENGTH_SHORT).show()
+            is GitUiEvent.OpenDiff -> binding.gitViewPager.setCurrentItem(6, true)
           }
         }
       }
