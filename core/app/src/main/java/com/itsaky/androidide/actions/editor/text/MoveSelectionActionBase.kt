@@ -6,7 +6,6 @@ import android.graphics.drawable.Drawable
 import com.itsaky.androidide.actions.ActionData
 import com.itsaky.androidide.actions.ActionItem
 import com.itsaky.androidide.actions.EditorActionItem
-import com.itsaky.androidide.actions.getActivity
 import io.github.rosemoe.sora.text.CharPosition
 import io.github.rosemoe.sora.widget.CodeEditor
 
