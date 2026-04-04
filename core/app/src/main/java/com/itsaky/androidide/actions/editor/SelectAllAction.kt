@@ -40,7 +40,11 @@ class SelectAllAction(context: Context, override val order: Int) : BaseEditorAct
 
   init {
     label = context.getString(android.R.string.selectAll)
-    icon = null
+
+    val arr = context.obtainStyledAttributes(intArrayOf(android.R.attr.actionModeSelectAllDrawable))
+    icon = arr.getDrawable(0)?.let { tintDrawable(context, it) }
+    arr.recycle()
+
     style = ActionStyle(textSizeSp = 10f, paddingHorizontalDp = 2)
   }
 

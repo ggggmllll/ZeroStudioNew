@@ -35,7 +35,8 @@ class ExpandSelectionAction(context: Context, override val order: Int) : EditorR
 
   init {
     label = context.getString(R.string.action_expand_selection)
-    icon = null
+
+    icon = ContextCompat.getDrawable(context, R.drawable.ic_expand_selection)
 
     style = ActionStyle(textSizeSp = 10f, paddingHorizontalDp = 2)
   }

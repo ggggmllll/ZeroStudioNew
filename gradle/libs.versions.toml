@@ -172,6 +172,14 @@ composite-composePullrefresh = { module = "com.itsaky.androidide.build:compose-p
 common-editor = { module = "com.itsaky.androidide.build:editor" }
 common-soraLanguageTextmate = { module = "com.itsaky.androidide.build:soraLanguageTextmate" }
 
+composite-kotlinc = { module = "com.itsaky.androidide.build:kotlinc" }
+composite-java-stubs2 = { module = "com.itsaky.androidide.build:java-stubs2" }
+composite-javac2 = { module = "com.itsaky.androidide.build:javac2" }
+common-javapoet2 = { module = "com.itsaky.androidide.build:javapoet2" }
+common-jaxp-internal = { module = "com.itsaky.androidide.build:jaxp2:jaxp-internal" }
+common-jaxp-xml = { module = "com.itsaky.androidide.build:jaxp2:xml" }
+
+
 # AndroidIDE
 androidide-ts = { module = "com.itsaky.androidide.treesitter:android-tree-sitter", version.ref = "tree-sitter" }
 androidide-ts-java = { module = "com.itsaky.androidide.treesitter:tree-sitter-java", version.ref = "tree-sitter" }

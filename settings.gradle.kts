@@ -46,6 +46,15 @@ dependencyResolutionManagement {
                   "editor",
                   "soraLanguageTextmate",
                   "compose-pullrefresh",
+                  
+                  ":kotlinc",
+                  ":java-stubs2",
+                  ":javac2",
+                  ":javapoet2",
+                  ":jaxp2:jaxp-internal",
+                  ":jaxp2:xml",
+                  
+                  
               ),
           "build-deps-common" to arrayOf("desugaring-core"),
       )
@@ -250,6 +259,7 @@ include(
     ":modules:thinkmap-treeview",
     ":modules:compose-preview",
     // ":modules:colorpicker",
+    ":modules:kotlinc",
 
 )
 

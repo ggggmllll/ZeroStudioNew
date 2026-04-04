@@ -29,7 +29,9 @@ class CopyAction(context: Context, override val order: Int) : BaseEditorAction()
   init {
     label = context.getString(R.string.copy)
 
-    icon = null
+    val arr = context.obtainStyledAttributes(intArrayOf(android.R.attr.actionModeCopyDrawable))
+    icon = arr.getDrawable(0)?.let { tintDrawable(context, it) }
+    arr.recycle()
 
     style = ActionStyle(textSizeSp = 10f, paddingHorizontalDp = 2)
   }

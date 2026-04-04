@@ -28,7 +28,9 @@ class PasteAction(context: Context, override val order: Int) : BaseEditorAction(
   init {
     label = context.getString(android.R.string.paste)
 
-    icon = null
+    val arr = context.obtainStyledAttributes(intArrayOf(android.R.attr.actionModePasteDrawable))
+    icon = arr.getDrawable(0)?.let { tintDrawable(context, it) }
+    arr.recycle()
 
     style = ActionStyle(textSizeSp = 10f, paddingHorizontalDp = 2)
   }

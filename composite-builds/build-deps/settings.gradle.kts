@@ -54,11 +54,17 @@ include(
     ":compose-pullrefresh",
     "soraLanguageTextmate",
     ":editor",
-    ":soraOnigurumaNative", // 来自  root/:modules:soraOnigurumaNative
+    ":kotlinc",
+    ":java-stubs2",
+    ":javac2",
+    ":javapoet2",
+    ":jaxp2:jaxp-internal",
+    ":jaxp2:xml",
 )
 
 // 注册项目主构建模块到复合构建内
 project(":soraOnigurumaNative").projectDir = file("../../modules/soraOnigurumaNative")
+project(":kotlinc").projectDir = file("../../modules/kotlinc")
 
 rootProject.name = "build-deps"
 
