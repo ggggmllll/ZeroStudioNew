@@ -25,6 +25,12 @@ object StoragePathsMan {
   private lateinit var paths: StoragePaths
   private val lock = Mutex()
 
+  private fun ensurePathsInitialized() {
+    if (!::paths.isInitialized) {
+      paths = StoragePaths()
+    }
+  }
+
   /**
    * should run this method after AppModel and Settings and MyLog init done
    *
@@ -48,6 +54,10 @@ object StoragePathsMan {
   }
 
   private fun getFile(): File {
+    if (!::_saveDir.isInitialized || !::_file.isInitialized) {
+      throw IllegalStateException("StoragePathsMan is not initialized")
+    }
+
     if (_saveDir.exists().not()) {
       _saveDir.mkdirs()
     }
@@ -78,6 +88,7 @@ object StoragePathsMan {
   }
 
   fun get(): StoragePaths {
+    ensurePathsInitialized()
     return paths.copy()
   }
 
@@ -86,6 +97,11 @@ object StoragePathsMan {
     doJobThenOffLoading {
       try {
         paths = newPaths
+        if (!::_saveDir.isInitialized || !::_file.isInitialized) {
+          MyLog.e(TAG, "#save: skipped persisting storage paths because manager is not initialized")
+          return@doJobThenOffLoading
+        }
+
         lock.withLock { JsonUtil.j.encodeToStream(newPaths, getFile().outputStream()) }
       } catch (e: Exception) {
         MyLog.e(TAG, "#save: save storage paths err: ${e.localizedMessage}")
