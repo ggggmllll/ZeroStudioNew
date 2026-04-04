@@ -36,6 +36,8 @@ class GitCollaborationFragment : Fragment() {
   private var _binding: FragmentGitCollaborationBinding? = null
   private val binding
     get() = _binding!!
+  private var collaborationPagerAdapter: CollaborationPagerAdapter? = null
+  private var tabLayoutMediator: TabLayoutMediator? = null
 
   override fun onCreateView(
       inflater: LayoutInflater,
@@ -53,24 +55,29 @@ class GitCollaborationFragment : Fragment() {
 
   private fun setupViewPager() {
     // 使用 childFragmentManager 因为这是嵌套在 Fragment 中的 ViewPager
-    val adapter = CollaborationPagerAdapter(this)
-    binding.pagerCollab.adapter = adapter
+    collaborationPagerAdapter = CollaborationPagerAdapter(this)
+    binding.pagerCollab.adapter = collaborationPagerAdapter
 
     // 绑定 Tab 标题
-    TabLayoutMediator(binding.tabLayoutCollab, binding.pagerCollab) { tab, position ->
-          tab.text =
-              when (position) {
-                0 -> getString(R.string.collab_tab_pr) // Pull Requests
-                1 -> getString(R.string.collab_tab_pipelines) // CD/CI
-                2 -> getString(R.string.collab_tab_conflicts) // 冲突解决
-                3 -> getString(R.string.collab_tab_review) // 代码审查
-                else -> ""
-              }
-        }
-        .attach()
+    tabLayoutMediator =
+        TabLayoutMediator(binding.tabLayoutCollab, binding.pagerCollab) { tab, position ->
+              tab.text =
+                  when (position) {
+                    0 -> getString(R.string.collab_tab_pr) // Pull Requests
+                    1 -> getString(R.string.collab_tab_pipelines) // CD/CI
+                    2 -> getString(R.string.collab_tab_conflicts) // 冲突解决
+                    3 -> getString(R.string.collab_tab_review) // 代码审查
+                    else -> ""
+                  }
+            }
+            .also { it.attach() }
   }
 
   override fun onDestroyView() {
+    tabLayoutMediator?.detach()
+    tabLayoutMediator = null
+    binding.pagerCollab.adapter = null
+    collaborationPagerAdapter = null
     super.onDestroyView()
     _binding = null
   }
