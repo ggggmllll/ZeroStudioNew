@@ -123,7 +123,7 @@ class GitHistoryFragment : BaseGitPageFragment() {
           throw IllegalStateException("Remote origin not found")
         }
 
-        val repoPath = repo.workdir()
+        val repoPath = repo.workdir() ?: throw IllegalStateException("Repository workdir is null")
         val repoEntity =
             RepoEntity(
                 repoName = java.io.File(repoPath).name,

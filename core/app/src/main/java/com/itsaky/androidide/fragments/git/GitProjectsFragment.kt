@@ -169,8 +169,14 @@ class GitProjectsFragment : BaseGitPageFragment(), FileClickListener, FileLongCl
             }
             val repoEntity =
                 com.catpuppyapp.puppygit.data.entity.RepoEntity(
-                    repoName = File(repo.workdir()).name,
-                    fullSavePath = repo.workdir(),
+                    repoName =
+                        File(
+                                repo.workdir()
+                                    ?: throw IllegalStateException("Repository workdir is null")
+                            )
+                            .name,
+                    fullSavePath =
+                        repo.workdir() ?: throw IllegalStateException("Repository workdir is null"),
                     branch = repo.head()?.shorthand().orEmpty(),
                 )
             Libgit2Helper.fetchRemoteForRepo(

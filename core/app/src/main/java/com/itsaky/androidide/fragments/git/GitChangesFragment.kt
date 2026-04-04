@@ -270,7 +270,7 @@ class GitChangesFragment : BaseGitPageFragment() {
         if (Libgit2Helper.resolveRemote(repo, "origin") == null) {
           throw IllegalStateException("Remote origin not found")
         }
-        val workdir = repo.workdir()
+        val workdir = repo.workdir() ?: throw IllegalStateException("Repository workdir is null")
         val repoEntity =
             RepoEntity(
                 repoName = java.io.File(workdir).name,
