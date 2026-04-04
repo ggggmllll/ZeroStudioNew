@@ -222,6 +222,41 @@ class GitDiffFragment : BaseGitPageFragment() {
                     commitOidStr = commitHash,
                     settings = settings,
                 )
+            val parentOid = dto.parentOidStrList.firstOrNull().orEmpty()
+            val patchLines =
+                if (parentOid.isNotBlank()) {
+                  val tree1 = Libgit2Helper.resolveTree(repo, parentOid)
+                  val tree2 = Libgit2Helper.resolveTree(repo, dto.oidStr)
+                  if (tree1 != null && tree2 != null) {
+                    val patchRet =
+                        Libgit2Helper.savePatchToFileAndGetContent(
+                            repo = repo,
+                            tree1 = tree1,
+                            tree2 = tree2,
+                            fromTo = Cons.gitDiffFromTreeToTree,
+                            returnDiffContent = true,
+                        )
+                    patchRet.data?.content
+                        ?.lineSequence()
+                        ?.take(600)
+                        ?.map { line ->
+                          when {
+                            line.startsWith("+") && !line.startsWith("+++") ->
+                                DiffLine(-1, -1, line, DiffType.ADD)
+                            line.startsWith("-") && !line.startsWith("---") ->
+                                DiffLine(-1, -1, line, DiffType.DELETE)
+                            line.startsWith("@@") -> DiffLine(-1, -1, line, DiffType.HUNK_HEADER)
+                            else -> DiffLine(-1, -1, line, DiffType.CONTEXT)
+                          }
+                        }
+                        ?.toList()
+                        .orEmpty()
+                  } else {
+                    emptyList()
+                  }
+                } else {
+                  emptyList()
+                }
             allLines =
                 listOf(
                     DiffLine(-1, -1, "Commit: ${dto.shortOidStr}", DiffType.HUNK_HEADER),
@@ -229,7 +264,7 @@ class GitDiffFragment : BaseGitPageFragment() {
                     DiffLine(-1, -1, "Branches: ${dto.branchShortNameList.joinToString()}", DiffType.CONTEXT),
                     DiffLine(-1, -1, "Parents: ${dto.parentShortOidStrList.joinToString()}", DiffType.CONTEXT),
                     DiffLine(-1, -1, dto.msg, DiffType.CONTEXT),
-                )
+                ) + patchLines
             applyFilter()
           }
         }
