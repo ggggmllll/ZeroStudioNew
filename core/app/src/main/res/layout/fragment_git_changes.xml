@@ -71,12 +71,14 @@
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_commit_and_push_inline"
-                    style="@style/Widget.Material3.Button.IconButton.FilledTonal"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:contentDescription="Commit and push"
                     android:insetTop="0dp"
                     android:insetBottom="0dp"
+                    android:minWidth="40dp"
+                    android:minHeight="40dp"
+                    app:backgroundTint="?attr/colorSecondaryContainer"
                     app:icon="@drawable/ic_cloud_download_24"
                     app:iconTint="?attr/colorOnSecondaryContainer" />
             </LinearLayout>
