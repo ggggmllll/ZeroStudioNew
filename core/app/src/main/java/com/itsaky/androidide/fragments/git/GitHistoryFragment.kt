@@ -20,6 +20,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.catpuppyapp.puppygit.data.entity.RepoEntity
 import com.catpuppyapp.puppygit.settings.SettingsUtil
 import com.catpuppyapp.puppygit.utils.Libgit2Helper
+import com.github.git24j.core.Branch
+import com.github.git24j.core.Oid
 import com.github.git24j.core.Repository
 import com.itsaky.androidide.R
 import com.itsaky.androidide.databinding.FragmentGitHistoryBinding
@@ -80,37 +82,9 @@ class GitHistoryFragment : BaseGitPageFragment() {
 
   private fun loadCommits(limit: Int) {
     withRepo { repo ->
-      val headOid = repo.head()?.id() ?: return@withRepo
-      val rw = Libgit2Helper.createRevwalk(repo, headOid) ?: return@withRepo
-      val settings = SettingsUtil.getSettingsSnapshot()
-
-      val list = mutableListOf<CommitRow>()
-      var count = 0
-      var next = rw.next()
-      while (next != null && count < limit) {
-        val dto =
-            Libgit2Helper.getSingleCommitSimple(
-                repo,
-                repoId = "",
-                commitOidStr = next.toString(),
-                settings,
-            )
-        list.add(
-            CommitRow(
-                hash = dto.oidStr,
-                shortHash = dto.shortOidStr,
-                subject = dto.shortMsg,
-                author = dto.author,
-                statusBadge = resolveStatusBadge(dto.branchShortNameList),
-                message = dto.msg,
-            )
-        )
-        next = rw.next()
-        count++
-      }
-
+      val merged = loadMergedLocalRemoteCommits(repo, limit)
       commits.clear()
-      commits.addAll(list)
+      commits.addAll(merged)
       selectedCommit = commits.firstOrNull()
     }
   }
@@ -167,9 +141,80 @@ class GitHistoryFragment : BaseGitPageFragment() {
     }
   }
 
-  private fun resolveStatusBadge(branchNames: List<String>): String {
-    val hasRemote = branchNames.any { it.startsWith("origin/") }
-    return if (hasRemote) "REMOTE" else "LOCAL"
+  private fun resolveStatusBadge(hasLocal: Boolean, hasRemote: Boolean): String =
+      when {
+        hasLocal && hasRemote -> "SYNCED"
+        hasLocal -> "LOCAL_ONLY"
+        hasRemote -> "REMOTE_ONLY"
+        else -> "UNKNOWN"
+      }
+
+  private fun loadMergedLocalRemoteCommits(repo: Repository, limit: Int): List<CommitRow> {
+    val settings = SettingsUtil.getSettingsSnapshot()
+    val localHead = repo.head()?.id() ?: return emptyList()
+    val branch = repo.head()?.shorthand()?.removePrefix("refs/heads/").orEmpty()
+    val remoteBranchShort = "origin/$branch"
+
+    val remoteHeadOid =
+        Libgit2Helper.getBranchList(repo)
+            .firstOrNull {
+              it.type == Branch.BranchType.REMOTE && it.shortName == remoteBranchShort
+            }
+            ?.oidStr
+            ?.takeIf { it.isNotBlank() }
+            ?.let { Oid.of(it) }
+
+    val merged = linkedMapOf<String, Pair<CommitRow, Pair<Boolean, Boolean>>>()
+
+    collectCommits(repo, localHead, limit, settings).forEach { row ->
+      merged[row.hash] = row to (true to false)
+    }
+
+    remoteHeadOid?.let { remoteOid ->
+      collectCommits(repo, remoteOid, limit, settings).forEach { row ->
+        val old = merged[row.hash]
+        if (old == null) {
+          merged[row.hash] = row.copy(statusBadge = "REMOTE_ONLY") to (false to true)
+        } else {
+          merged[row.hash] = old.first.copy(statusBadge = "SYNCED") to (true to true)
+        }
+      }
+    }
+
+    return merged.values
+        .map { (row, flags) ->
+          row.copy(statusBadge = resolveStatusBadge(flags.first, flags.second))
+        }
+        .take(limit)
+  }
+
+  private fun collectCommits(
+      repo: Repository,
+      startOid: Oid,
+      limit: Int,
+      settings: com.catpuppyapp.puppygit.settings.AppSettings,
+  ): List<CommitRow> {
+    val rw = Libgit2Helper.createRevwalk(repo, startOid) ?: return emptyList()
+    val list = mutableListOf<CommitRow>()
+    var count = 0
+    var next = rw.next()
+    while (next != null && count < limit) {
+      val dto =
+          Libgit2Helper.getSingleCommitSimple(repo = repo, repoId = "", commitOidStr = next.toString(), settings = settings)
+      list.add(
+          CommitRow(
+              hash = dto.oidStr,
+              shortHash = dto.shortOidStr,
+              subject = dto.shortMsg,
+              author = dto.author,
+              statusBadge = "LOCAL_ONLY",
+              message = dto.msg,
+          )
+      )
+      next = rw.next()
+      count++
+    }
+    return list
   }
 
   private fun withRepo(action: (Repository) -> Unit) {
