@@ -5,16 +5,14 @@ plugins {
   id("kotlin-android")
 }
 
-android { namespace = "${BuildConfig.packageName}.lsp.toml" }
+android { namespace = "${BuildConfig.packageName}.lsp.lua" }
 
 dependencies {
-  implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
   implementation(projects.core.lspApi)
   implementation(projects.core.lspModels)
   implementation(projects.core.projects)
   implementation(projects.editor.api)
   implementation(projects.editor.impl)
   implementation(projects.editor.lexers)
-  implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
   implementation(libs.common.kotlin)
 }

@@ -132,6 +132,7 @@ open class CompletionItem(
     var additionalTextEdits: List<TextEdit>?,
     var data: ICompletionData?,
     var editHandler: IEditHandler = DefaultEditHandler(),
+    var tags: List<CompletionItemTag> = emptyList(),
 ) :
     io.github.rosemoe.sora.lang.completion.CompletionItem(ideLabel, detail),
     Comparable<CompletionItem> {
@@ -235,6 +236,7 @@ open class CompletionItem(
     if (ideSortText != other.ideSortText) return false
     if (insertText != other.insertText) return false
     if (insertTextFormat != other.insertTextFormat) return false
+    if (tags != other.tags) return false
     if (editHandler != other.editHandler) return false
     if (additionalEditHandler != other.additionalEditHandler) return false
     if (overrideTypeText != other.overrideTypeText) return false
@@ -253,6 +255,7 @@ open class CompletionItem(
     result = 31 * result + (ideSortText?.hashCode() ?: 0)
     result = 31 * result + insertText.hashCode()
     result = 31 * result + insertTextFormat.hashCode()
+    result = 31 * result + tags.hashCode()
     result = 31 * result + editHandler.hashCode()
     result = 31 * result + (additionalEditHandler?.hashCode() ?: 0)
     result = 31 * result + (overrideTypeText?.hashCode() ?: 0)

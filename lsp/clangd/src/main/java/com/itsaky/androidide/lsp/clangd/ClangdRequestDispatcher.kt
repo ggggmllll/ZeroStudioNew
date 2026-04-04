@@ -1,4 +1,4 @@
-package android.zero.studio.lsp.clang
+package com.itsaky.androidide.lsp.clangd
 
 import com.itsaky.androidide.progress.ICancelChecker
 import kotlinx.coroutines.Dispatchers

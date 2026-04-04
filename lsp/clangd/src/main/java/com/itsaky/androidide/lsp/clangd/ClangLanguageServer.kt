@@ -1,4 +1,4 @@
-package android.zero.studio.lsp.clang
+package com.itsaky.androidide.lsp.clangd
 
 import com.itsaky.androidide.lsp.api.ILanguageClient
 import com.itsaky.androidide.lsp.api.ILanguageServer
@@ -13,6 +13,10 @@ import com.itsaky.androidide.lsp.models.DefinitionResult
 import com.itsaky.androidide.lsp.models.DiagnosticItem
 import com.itsaky.androidide.lsp.models.DiagnosticResult
 import com.itsaky.androidide.lsp.models.DiagnosticSeverity
+import com.itsaky.androidide.lsp.models.DidChangeTextDocumentParams
+import com.itsaky.androidide.lsp.models.DidCloseTextDocumentParams
+import com.itsaky.androidide.lsp.models.DidOpenTextDocumentParams
+import com.itsaky.androidide.lsp.models.DidSaveTextDocumentParams
 import com.itsaky.androidide.lsp.models.ExpandSelectionParams
 import com.itsaky.androidide.lsp.models.FormatCodeParams
 import com.itsaky.androidide.lsp.models.LSPFailure
@@ -21,8 +25,13 @@ import com.itsaky.androidide.lsp.models.MarkupKind
 import com.itsaky.androidide.lsp.models.MatchLevel
 import com.itsaky.androidide.lsp.models.ReferenceParams
 import com.itsaky.androidide.lsp.models.ReferenceResult
+import com.itsaky.androidide.lsp.models.RenameParams
 import com.itsaky.androidide.lsp.models.SignatureHelp
 import com.itsaky.androidide.lsp.models.SignatureHelpParams
+import com.itsaky.androidide.lsp.models.SymbolKind
+import com.itsaky.androidide.lsp.models.WorkspaceEdit
+import com.itsaky.androidide.lsp.models.WorkspaceSymbol
+import com.itsaky.androidide.lsp.models.WorkspaceSymbolsResult
 import com.itsaky.androidide.models.Location
 import com.itsaky.androidide.models.Position
 import com.itsaky.androidide.models.Range
@@ -32,8 +41,6 @@ import java.util.concurrent.ConcurrentHashMap
 import kotlin.io.path.exists
 import kotlin.io.path.readText
 import kotlinx.coroutines.runBlocking
-import org.json.JSONArray
-import org.json.JSONObject
 
 class ClangLanguageServer(initialSettings: ClangdServerSettings) : ILanguageServer {
 
@@ -100,6 +107,32 @@ class ClangLanguageServer(initialSettings: ClangdServerSettings) : ILanguageServ
     initializeNative(workspaceRoot!!)
   }
 
+  override fun didOpen(params: DidOpenTextDocumentParams) {
+    fileVersions[params.file] = params.version
+    ClangdNativeBridge.nativeDidOpen(toFileUri(params.file), params.text, params.languageId)
+  }
+
+  override fun didChange(params: DidChangeTextDocumentParams) {
+    val latest = params.contentChanges.lastOrNull()?.text ?: return
+    fileVersions[params.file] = params.version
+    ClangdNativeBridge.nativeDidChange(toFileUri(params.file), latest, params.version)
+    resultCache.invalidateByPrefix("completion:${params.file}:")
+  }
+
+  override fun didClose(params: DidCloseTextDocumentParams) {
+    fileVersions.remove(params.file)
+    diagnosticsCache.remove(params.file)
+    ClangdNativeBridge.nativeDidClose(toFileUri(params.file))
+  }
+
+  override fun didSave(params: DidSaveTextDocumentParams) {
+    params.text?.let { text ->
+      val version = (fileVersions[params.file] ?: 0) + 1
+      fileVersions[params.file] = version
+      ClangdNativeBridge.nativeDidChange(toFileUri(params.file), text, version)
+    }
+  }
+
   override fun complete(params: CompletionParams?): CompletionResult {
     if (params == null || !settings.completionsEnabled()) return CompletionResult.EMPTY
     syncFile(params.file, params.content?.toString())
@@ -138,7 +171,7 @@ class ClangLanguageServer(initialSettings: ClangdServerSettings) : ILanguageServ
     val response =
         requestDispatcher.await(requestId, settings.requestTimeoutMs, params.cancelChecker)
             ?: return ReferenceResult(emptyList())
-    return ReferenceResult(parseLocations(response))
+    return ReferenceResult(ClangdJsonAdapter.parseLocations(response))
   }
 
   override suspend fun findDefinition(params: DefinitionParams): DefinitionResult {
@@ -153,7 +186,7 @@ class ClangLanguageServer(initialSettings: ClangdServerSettings) : ILanguageServ
     val response =
         requestDispatcher.await(requestId, settings.requestTimeoutMs, params.cancelChecker)
             ?: return DefinitionResult(emptyList())
-    return DefinitionResult(parseLocations(response))
+    return DefinitionResult(ClangdJsonAdapter.parseLocations(response))
   }
 
   override suspend fun expandSelection(params: ExpandSelectionParams): Range = params.selection
@@ -183,6 +216,47 @@ class ClangLanguageServer(initialSettings: ClangdServerSettings) : ILanguageServ
 
   override fun formatCode(params: FormatCodeParams?): CodeFormatResult =
       CodeFormatResult(false, mutableListOf())
+
+  override suspend fun workspaceSymbols(query: String): WorkspaceSymbolsResult {
+    if (query.isBlank()) return WorkspaceSymbolsResult()
+    val fromDiagnostics =
+        diagnosticsCache
+            .flatMap { (file, diagnostics) ->
+              diagnostics
+                  .filter { it.message.contains(query, ignoreCase = true) }
+                  .map {
+                    WorkspaceSymbol(
+                        name = it.message,
+                        kind = SymbolKind.Variable,
+                        location = Location(file, it.range),
+                        containerName = "clangd-diagnostic",
+                    )
+                  }
+            }
+    return WorkspaceSymbolsResult(fromDiagnostics)
+  }
+
+  override suspend fun rename(params: RenameParams): WorkspaceEdit {
+    val refs =
+        findReferences(
+            ReferenceParams(
+                file = params.file,
+                position = params.position,
+                includeDeclaration = true,
+                cancelChecker = params.cancelChecker,
+            )
+        )
+    val edits =
+        refs.locations
+            .groupBy { it.file }
+            .map { (file, locations) ->
+              com.itsaky.androidide.lsp.models.DocumentChange(
+                  file = file,
+                  edits = locations.map { com.itsaky.androidide.lsp.models.TextEdit(it.range, params.newName) },
+              )
+            }
+    return WorkspaceEdit(edits)
+  }
 
   override fun handleFailure(failure: LSPFailure?): Boolean = false
 
@@ -215,18 +289,15 @@ class ClangLanguageServer(initialSettings: ClangdServerSettings) : ILanguageServ
   }
 
   private fun parseCompletionResponse(raw: String, prefix: String): CompletionResult {
-    val root = JSONObject(raw)
-    val result = root.optJSONObject("result") ?: return CompletionResult.EMPTY
-    val itemsArray = result.optJSONArray("items") ?: return CompletionResult.EMPTY
+    val nativeResult = ClangdJsonAdapter.parseCompletion(raw)
     val completionItems = mutableListOf<CompletionItem>()
 
-    for (i in 0 until itemsArray.length()) {
-      val item = itemsArray.optJSONObject(i) ?: continue
-      val label = item.optString("label")
+    for (item in nativeResult.items) {
+      val label = item.label
       if (label.isBlank()) continue
-      val detail = item.optString("detail")
-      val insertText = item.optString("insertText", label)
-      val kind = mapKind(item.optInt("kind", 0))
+      val detail = item.detail
+      val insertText = item.insertText
+      val kind = mapKind(item.kind)
       val matchToken = if (settings.shouldMatchAllLowerCase()) prefix.lowercase() else prefix
       val candidate = if (settings.shouldMatchAllLowerCase()) label.lowercase() else label
       val match =
@@ -239,7 +310,7 @@ class ClangLanguageServer(initialSettings: ClangdServerSettings) : ILanguageServ
               detail,
               insertText,
               null,
-              item.optString("sortText", label),
+              label,
               null,
               kind,
               match,
@@ -264,54 +335,8 @@ class ClangLanguageServer(initialSettings: ClangdServerSettings) : ILanguageServ
       }
 
   private fun parseHoverResponse(raw: String): MarkupContent {
-    val result = JSONObject(raw).optJSONObject("result") ?: return MarkupContent()
-    val contents = result.opt("contents") ?: return MarkupContent()
-
-    return when (contents) {
-      is JSONObject -> {
-        val kind =
-            if (contents.optString("kind") == "markdown") MarkupKind.MARKDOWN else MarkupKind.PLAIN
-        MarkupContent(contents.optString("value"), kind)
-      }
-      is JSONArray -> {
-        val joined = buildString {
-          for (i in 0 until contents.length()) {
-            if (i > 0) append('\n')
-            append(contents.opt(i).toString())
-          }
-        }
-        MarkupContent(joined, MarkupKind.PLAIN)
-      }
-      else -> MarkupContent(contents.toString(), MarkupKind.PLAIN)
-    }
-  }
-
-  private fun parseLocations(raw: String): List<Location> {
-    val result = JSONObject(raw).opt("result") ?: return emptyList()
-    val array =
-        when (result) {
-          is JSONArray -> result
-          is JSONObject -> JSONArray().put(result)
-          else -> JSONArray()
-        }
-
-    val locations = mutableListOf<Location>()
-    for (i in 0 until array.length()) {
-      val item = array.optJSONObject(i) ?: continue
-      val file = uriToPath(item.optString("uri")) ?: continue
-      val rangeJson = item.optJSONObject("range") ?: continue
-      val start = rangeJson.optJSONObject("start") ?: continue
-      val end = rangeJson.optJSONObject("end") ?: continue
-      locations +=
-          Location(
-              file,
-              Range(
-                  Position(start.optInt("line"), start.optInt("character")),
-                  Position(end.optInt("line"), end.optInt("character")),
-              ),
-          )
-    }
-    return locations
+    val hover = ClangdJsonAdapter.parseHover(raw) ?: return MarkupContent()
+    return MarkupContent(hover.content, MarkupKind.MARKDOWN)
   }
 
   private fun ClangDiagnosticItem.toDiagnosticItem(): DiagnosticItem {

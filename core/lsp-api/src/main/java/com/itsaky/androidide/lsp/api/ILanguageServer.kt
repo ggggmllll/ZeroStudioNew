@@ -39,6 +39,10 @@ import com.itsaky.androidide.lsp.models.CompletionParams
 import com.itsaky.androidide.lsp.models.CompletionResult
 import com.itsaky.androidide.lsp.models.DefinitionParams
 import com.itsaky.androidide.lsp.models.DefinitionResult
+import com.itsaky.androidide.lsp.models.DidChangeTextDocumentParams
+import com.itsaky.androidide.lsp.models.DidCloseTextDocumentParams
+import com.itsaky.androidide.lsp.models.DidOpenTextDocumentParams
+import com.itsaky.androidide.lsp.models.DidSaveTextDocumentParams
 import com.itsaky.androidide.lsp.models.DiagnosticResult
 import com.itsaky.androidide.lsp.models.DocumentLink
 import com.itsaky.androidide.lsp.models.DocumentSymbolsResult
@@ -114,6 +118,15 @@ interface ILanguageServer {
    * @param workspace The initialized workspace.
    */
   fun setupWorkspace(workspace: IWorkspace)
+
+  /** Text document lifecycle notifications (LSP didOpen/didChange/didClose/didSave). */
+  fun didOpen(params: DidOpenTextDocumentParams) {}
+
+  fun didChange(params: DidChangeTextDocumentParams) {}
+
+  fun didClose(params: DidCloseTextDocumentParams) {}
+
+  fun didSave(params: DidSaveTextDocumentParams) {}
 
   /**
    * Compute code completions for the given completion params.

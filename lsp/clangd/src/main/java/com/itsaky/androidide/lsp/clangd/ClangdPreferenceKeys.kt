@@ -1,4 +1,4 @@
-package android.zero.studio.lsp.clang
+package com.itsaky.androidide.lsp.clangd
 
 object ClangdPreferenceKeys {
   const val ENABLED = "lsp.clangd.enabled"

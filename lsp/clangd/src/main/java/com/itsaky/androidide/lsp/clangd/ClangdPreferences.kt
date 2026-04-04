@@ -1,4 +1,4 @@
-package android.zero.studio.lsp.clang
+package com.itsaky.androidide.lsp.clangd
 
 import android.content.Context
 import android.content.SharedPreferences

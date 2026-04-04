@@ -36,7 +36,13 @@ class DiagnosticWindow(editor: IDEEditor) : BaseEditorWindow(editor) {
       }
       return
     }
-    val message = diagnostic.message
+    val tagPrefix =
+        if (diagnostic.tags.isEmpty()) {
+          ""
+        } else {
+          "[${diagnostic.tags.joinToString(",")}] "
+        }
+    val message = tagPrefix + diagnostic.message
     text.text = message
     displayWindow()
   }

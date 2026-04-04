@@ -36,6 +36,7 @@ data class DiagnosticItem(
     var range: Range,
     var source: String,
     var severity: DiagnosticSeverity,
+    var tags: List<DiagnosticTag> = emptyList(),
 ) {
 
   var extra: Any = Any()

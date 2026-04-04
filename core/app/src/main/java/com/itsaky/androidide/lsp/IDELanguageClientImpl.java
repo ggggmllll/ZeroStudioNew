@@ -84,6 +84,7 @@ public class IDELanguageClientImpl implements ILanguageClient {
   private static IDELanguageClientImpl mInstance;
   private final Map<File, List<DiagnosticItem>> diagnostics = new HashMap<>();
   protected EditorHandlerActivity activity;
+  private ProgressSheet lspProgressSheet;
 
   private IDELanguageClientImpl(EditorHandlerActivity provider) {
     setActivity(provider);
@@ -485,11 +486,12 @@ public void publishDiagnostics(DiagnosticResult result) {
   @Override
   public void showMessage(ShowMessageParams params) {
     if (params == null) return;
-    if (params.getType() == MessageType.Error) {
-      FlashbarUtilsKt.flashError(params.getMessage());
-    } else {
-      LOG.info(params.getMessage());
+    switch (params.getType()) {
+      case Error -> FlashbarUtilsKt.flashError(params.getMessage());
+      case Warning -> FlashbarUtilsKt.flashMessage(params.getMessage(), com.itsaky.androidide.utils.FlashType.INFO);
+      default -> FlashbarUtilsKt.flashInfo(params.getMessage());
     }
+    LOG.info("[LSP Message] {}: {}", params.getType(), params.getMessage());
   }
 
   @Override
@@ -505,6 +507,18 @@ public void publishDiagnostics(DiagnosticResult result) {
   @Override
   public void workDoneProgressBegin(WorkDoneProgressBegin params) {
     if (params != null) {
+      if (canUseActivity()) {
+        if (lspProgressSheet == null) {
+          lspProgressSheet = new ProgressSheet();
+          lspProgressSheet.setSubMessageEnabled(true);
+          lspProgressSheet.setCancelable(true);
+        }
+        lspProgressSheet.setMessage(params.getTitle());
+        lspProgressSheet.setSubMessage(params.getMessage());
+        if (!lspProgressSheet.isAdded()) {
+          lspProgressSheet.show(activity.getSupportFragmentManager(), "lsp_work_done_progress");
+        }
+      }
       LOG.info("[LSP Progress] BEGIN {} {}", params.getTitle(), params.getMessage());
     }
   }
@@ -512,6 +526,9 @@ public void publishDiagnostics(DiagnosticResult result) {
   @Override
   public void workDoneProgressReport(WorkDoneProgressReport params) {
     if (params != null) {
+      if (lspProgressSheet != null) {
+        lspProgressSheet.setSubMessage(params.getMessage());
+      }
       LOG.info("[LSP Progress] REPORT {}% {}", params.getPercentage(), params.getMessage());
     }
   }
@@ -519,6 +536,9 @@ public void publishDiagnostics(DiagnosticResult result) {
   @Override
   public void workDoneProgressEnd(WorkDoneProgressEnd params) {
     if (params != null) {
+      if (lspProgressSheet != null && lspProgressSheet.isAdded()) {
+        lspProgressSheet.dismiss();
+      }
       LOG.info("[LSP Progress] END {}", params.getMessage());
     }
   }

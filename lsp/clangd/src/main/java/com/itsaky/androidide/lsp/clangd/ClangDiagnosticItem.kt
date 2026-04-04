@@ -1,4 +1,4 @@
-package android.zero.studio.lsp.clang
+package com.itsaky.androidide.lsp.clangd
 
 /** JNI bridge model for diagnostics emitted by native clangd bridge. */
 data class ClangDiagnosticItem(
