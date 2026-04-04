@@ -59,6 +59,7 @@ include(
     ":jaxp2:jaxp-internal",
     ":jaxp2:xml",
     ":soraLanguageTextmate",
+    ":soraOnigurumaNative",
     ":kotlinc",
 )
 
