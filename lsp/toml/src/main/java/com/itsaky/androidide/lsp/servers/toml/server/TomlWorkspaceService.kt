@@ -1,19 +1,14 @@
 package com.itsaky.androidide.lsp.servers.toml.server
 
 import com.itsaky.androidide.lsp.util.Logger
-import org.eclipse.lsp4j.DidChangeConfigurationParams
-import org.eclipse.lsp4j.DidChangeWatchedFilesParams
-import org.eclipse.lsp4j.services.WorkspaceService
 
-class TomlWorkspaceService(private val server: TomlLanguageServer) : WorkspaceService {
+/**
+ * TOML 工作区服务（AndroidIDE 协议层）。
+ */
+class TomlWorkspaceService {
+  private val log = Logger.instance("TomlWorkspaceService")
 
-  private val LOG = Logger.instance("TomlWorkspaceService")
-
-  override fun didChangeConfiguration(params: DidChangeConfigurationParams) {
-    LOG.debug("Configuration changed: ${params.settings}")
-  }
-
-  override fun didChangeWatchedFiles(params: DidChangeWatchedFilesParams) {
-    // Handle external file changes if needed
+  fun onWorkspaceChanged() {
+    log.info("TOML workspace change received")
   }
 }

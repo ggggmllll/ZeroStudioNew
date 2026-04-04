@@ -1,151 +1,92 @@
-/*
- *  This file is part of AndroidIDE.
- *
- *  AndroidIDE is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  AndroidIDE is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *   along with AndroidIDE.  If not, see <https://www.gnu.org/licenses/>.
- */
-
 package com.itsaky.androidide.lsp.servers.toml
 
-import android.content.Context
-import com.itsaky.androidide.lsp.BaseLspServer
-import com.itsaky.androidide.lsp.core.LspConnectionFactory
+import com.itsaky.androidide.lsp.api.ILanguageClient
+import com.itsaky.androidide.lsp.api.ILanguageServer
+import com.itsaky.androidide.lsp.api.IServerSettings
+import com.itsaky.androidide.lsp.models.*
 import com.itsaky.androidide.lsp.servers.toml.server.TomlLanguageServer
-import com.itsaky.androidide.lsp.util.Logger
-import io.github.rosemoe.sora.lsp.client.connection.StreamConnectionProvider
-import java.io.File
-import java.io.IOException
-import java.io.InputStream
-import java.io.OutputStream
-import java.io.PipedInputStream
-import java.io.PipedOutputStream
-import java.util.concurrent.Executors
-import java.util.concurrent.Future
-import org.eclipse.lsp4j.jsonrpc.Launcher
-import org.eclipse.lsp4j.services.LanguageClient
+import com.itsaky.androidide.models.Range
+import com.itsaky.androidide.projects.IWorkspace
+import java.nio.file.Path
 
 /**
- * An In-Process implementation of [BaseLspServer] for TOML.
+ * TOML Server facade.
  *
- * This server runs the logic extracted from IntelliJ's TOML plugin directly inside the AndroidIDE
- * process, without requiring external binaries like `taplo`. It uses in-memory piped streams for
- * zero-overhead communication between the LSP client and server threads.
- *
- * @author android_zero
+ * 使用 AndroidIDE 的 ILanguageServer 协议对外提供能力，
+ * 内部委托给 [TomlLanguageServer]。
  */
-class TomlServer : BaseLspServer() {
+class TomlServer : ILanguageServer {
+  private val delegate = TomlLanguageServer()
 
-  override val id: String = "toml-lsp-internal"
-  override val languageName: String = "TOML (Embedded)"
-  override val serverName: String = "androidide-toml-server"
-  override val supportedExtensions: List<String> = listOf("toml", "tml", "lock")
+  override val serverId: String?
+    get() = delegate.serverId
 
-  private val LOG = Logger.instance("TomlServer")
+  override val client: ILanguageClient?
+    get() = delegate.client
 
-  override fun isInstalled(context: Context): Boolean = true
+  override fun shutdown() = delegate.shutdown()
 
-  override fun install(context: Context) {
-    // No-op
-  }
+  override fun connectClient(client: ILanguageClient?) = delegate.connectClient(client)
 
-  override fun getConnectionFactory(): LspConnectionFactory {
-    return LspConnectionFactory { _ -> InProcessTomlStreamProvider() }
-  }
+  override fun applySettings(settings: IServerSettings?) = delegate.applySettings(settings)
 
-  override fun isSupported(file: File): Boolean {
-    return supportedExtensions.contains(file.extension.lowercase()) ||
-        file.name == "Cargo.lock" ||
-        file.name == "Gopkg.lock"
-  }
+  override fun setupWorkspace(workspace: IWorkspace) = delegate.setupWorkspace(workspace)
 
-  private inner class InProcessTomlStreamProvider : StreamConnectionProvider {
-    private val executorService = Executors.newSingleThreadExecutor { r ->
-      Thread(r, "TomlServerThread")
-    }
-    private var serverThread: Future<*>? = null
+  override fun complete(params: CompletionParams?): CompletionResult = delegate.complete(params)
 
-    @Volatile private var _isClosed = true
+  override suspend fun findReferences(params: ReferenceParams): ReferenceResult =
+    delegate.findReferences(params)
 
-    private val clientOutputStream = PipedOutputStream()
-    private val serverInputStream = PipedInputStream()
+  override suspend fun findDefinition(params: DefinitionParams): DefinitionResult =
+    delegate.findDefinition(params)
 
-    private val serverOutputStream = PipedOutputStream()
-    private val clientInputStream = PipedInputStream()
+  override suspend fun expandSelection(params: ExpandSelectionParams): Range =
+    delegate.expandSelection(params)
 
-    init {
-      try {
-        serverInputStream.connect(clientOutputStream)
-        clientInputStream.connect(serverOutputStream)
-      } catch (e: IOException) {
-        LOG.error("Failed to create pipes for TOML LSP", e)
-        throw RuntimeException("Could not initialize TOML LSP pipes", e)
-      }
-    }
+  override suspend fun signatureHelp(params: SignatureHelpParams): SignatureHelp =
+    delegate.signatureHelp(params)
 
-    override fun start() {
-      _isClosed = false
-      serverThread = executorService.submit {
-        try {
-          LOG.info("Starting Embedded TomlLanguageServer...")
-          val server = TomlLanguageServer()
+  override suspend fun hover(params: DefinitionParams): MarkupContent = delegate.hover(params)
 
-          val launcher =
-              Launcher.createLauncher(
-                  server,
-                  LanguageClient::class.java,
-                  serverInputStream,
-                  serverOutputStream,
-              )
+  override suspend fun analyze(file: Path): DiagnosticResult = delegate.analyze(file)
 
-          server.connect(launcher.remoteProxy)
+  override fun formatCode(params: FormatCodeParams?): CodeFormatResult = delegate.formatCode(params)
 
-          launcher.startListening().get()
-        } catch (e: InterruptedException) {
-          Thread.currentThread().interrupt()
-          LOG.info("TomlLanguageServer thread was interrupted.")
-        } catch (e: Exception) {
-          LOG.error("TomlLanguageServer crashed or stopped unexpectedly", e)
-        } finally {
-          LOG.info("TomlLanguageServer thread finished.")
-          _isClosed = true
-        }
-      }
-    }
+  override suspend fun documentSymbols(file: Path): DocumentSymbolsResult =
+    delegate.documentSymbols(file)
 
-    override val inputStream: InputStream
-      get() = clientInputStream
+  override suspend fun workspaceSymbols(query: String): WorkspaceSymbolsResult =
+    delegate.workspaceSymbols(query)
 
-    override val outputStream: OutputStream
-      get() = clientOutputStream
+  override suspend fun prepareRename(params: DefinitionParams): PrepareRenameResult? =
+    delegate.prepareRename(params)
 
-    override val isClosed: Boolean
-      get() = _isClosed
+  override suspend fun rename(params: RenameParams): WorkspaceEdit = delegate.rename(params)
 
-    override fun close() {
-      _isClosed = true
-      LOG.info("Closing InProcessTomlStreamProvider...")
+  override suspend fun foldingRanges(file: Path): List<FoldingRange> = delegate.foldingRanges(file)
 
-      serverThread?.cancel(true)
-      executorService.shutdownNow()
+  override suspend fun selectionRanges(params: SelectionRangesParams): List<SelectionRange> =
+    delegate.selectionRanges(params)
 
-      try {
-        clientInputStream.close()
-        clientOutputStream.close()
-        serverInputStream.close()
-        serverOutputStream.close()
-      } catch (e: IOException) {
-        // Ignore
-      }
-    }
-  }
+  override suspend fun semanticTokensFull(params: SemanticTokensParams): SemanticTokens =
+    delegate.semanticTokensFull(params)
+
+  override suspend fun semanticTokensRange(params: SemanticTokensParams): SemanticTokens =
+    delegate.semanticTokensRange(params)
+
+  override suspend fun semanticTokensDelta(params: SemanticTokensParams): SemanticTokensDelta =
+    delegate.semanticTokensDelta(params)
+
+  override suspend fun inlayHints(params: InlayHintParams): List<InlayHint> =
+    delegate.inlayHints(params)
+
+  override suspend fun documentLinks(file: Path): List<DocumentLink> = delegate.documentLinks(file)
+
+  override suspend fun codeLens(file: Path): List<CodeLens> = delegate.codeLens(file)
+
+  override suspend fun callHierarchy(params: DefinitionParams): List<CallHierarchyItem> =
+    delegate.callHierarchy(params)
+
+  override suspend fun typeHierarchy(params: DefinitionParams): List<TypeHierarchyItem> =
+    delegate.typeHierarchy(params)
 }

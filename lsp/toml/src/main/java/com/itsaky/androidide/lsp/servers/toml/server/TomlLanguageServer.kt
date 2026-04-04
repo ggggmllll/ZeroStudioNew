@@ -1,86 +1,100 @@
-/*
- *  This file is part of AndroidIDE.
- *
- *  AndroidIDE is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  AndroidIDE is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *  Lesser General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *   along with AndroidIDE.  If not, see <https://www.gnu.org/licenses/>.
- */
-
 package com.itsaky.androidide.lsp.servers.toml.server
 
-import com.itsaky.androidide.lsp.util.Logger
-import java.util.concurrent.CompletableFuture
-import org.eclipse.lsp4j.*
-import org.eclipse.lsp4j.jsonrpc.messages.Either
-import org.eclipse.lsp4j.services.LanguageClient
-import org.eclipse.lsp4j.services.LanguageClientAware
-import org.eclipse.lsp4j.services.LanguageServer
-import org.eclipse.lsp4j.services.TextDocumentService
-import org.eclipse.lsp4j.services.WorkspaceService
+import com.itsaky.androidide.lsp.api.ILanguageClient
+import com.itsaky.androidide.lsp.api.ILanguageServer
+import com.itsaky.androidide.lsp.api.IServerSettings
+import com.itsaky.androidide.lsp.models.*
+import com.itsaky.androidide.models.Range
+import com.itsaky.androidide.projects.IWorkspace
+import java.nio.file.Path
 
 /**
- * 嵌入式 TOML LSP 服务器。
- *
- * @author android_zero
+ * TOML 语言服务器（AndroidIDE 原生协议实现）。
  */
-class TomlLanguageServer : LanguageServer, LanguageClientAware {
-  private val LOG = Logger.instance("TomlLanguageServer")
-  private var client: LanguageClient? = null
+class TomlLanguageServer : ILanguageServer {
 
-  private val textDocumentService = TomlTextDocumentService(this)
-  private val workspaceService = TomlWorkspaceService(this)
+  private var _client: ILanguageClient? = null
 
-  override fun initialize(params: InitializeParams): CompletableFuture<InitializeResult> {
-    val caps = ServerCapabilities()
-    caps.textDocumentSync = Either.forLeft(TextDocumentSyncKind.Full)
+  override val serverId: String = SERVER_ID
+  override val client: ILanguageClient?
+    get() = _client
 
-    // ----------------- 开启支持的必做功能 -----------------
-    caps.completionProvider = CompletionOptions(false, listOf(".", "="))
-    caps.hoverProvider = Either.forLeft(true)
-    caps.documentHighlightProvider = Either.forLeft(true)
-    caps.definitionProvider = Either.forLeft(true)
-    caps.renameProvider = Either.forLeft(true)
-    caps.documentSymbolProvider = Either.forLeft(true)
-    caps.foldingRangeProvider = Either.forLeft(true)
-    caps.documentFormattingProvider = Either.forLeft(true)
-    caps.documentLinkProvider = DocumentLinkOptions(false)
-    caps.codeActionProvider = Either.forLeft(true)
-
-    // ----------------- 明确关闭不支持的功能 -----------------
-    caps.signatureHelpProvider = null
-    caps.referencesProvider = Either.forLeft(false)
-    caps.implementationProvider = Either.forLeft(false)
-    caps.typeDefinitionProvider = Either.forLeft(false)
-    caps.declarationProvider = Either.forLeft(false)
-    caps.callHierarchyProvider = Either.forLeft(false)
-    caps.inlayHintProvider = Either.forLeft(false)
-    caps.codeLensProvider = null
-    caps.semanticTokensProvider = null
-    caps.workspaceSymbolProvider = Either.forLeft(false)
-
-    return CompletableFuture.completedFuture(InitializeResult(caps))
+  override fun shutdown() {
+    TomlDocumentCache.clear()
   }
 
-  override fun shutdown(): CompletableFuture<Any> = CompletableFuture.completedFuture(null)
-
-  override fun exit() {}
-
-  override fun getTextDocumentService(): TextDocumentService = textDocumentService
-
-  override fun getWorkspaceService(): WorkspaceService = workspaceService
-
-  override fun connect(client: LanguageClient) {
-    this.client = client
+  override fun connectClient(client: ILanguageClient?) {
+    _client = client
   }
 
-  fun getClient() = client
+  override fun applySettings(settings: IServerSettings?) = Unit
+
+  override fun setupWorkspace(workspace: IWorkspace) = Unit
+
+  override fun complete(params: CompletionParams?): CompletionResult {
+    if (params == null) return CompletionResult.EMPTY
+    val content = params.content?.toString() ?: TomlDocumentCache.get(params.file).orEmpty()
+    return TomlFeatureEngine.completion(content, params)
+  }
+
+  override suspend fun findReferences(params: ReferenceParams): ReferenceResult {
+    return ReferenceResult(emptyList())
+  }
+
+  override suspend fun findDefinition(params: DefinitionParams): DefinitionResult {
+    val content = TomlDocumentCache.get(params.file).orEmpty()
+    return TomlFeatureEngine.definition(content, params.file, params.position)
+  }
+
+  override suspend fun expandSelection(params: ExpandSelectionParams): Range {
+    return params.selection
+  }
+
+  override suspend fun signatureHelp(params: SignatureHelpParams): SignatureHelp {
+    return SignatureHelp(emptyList(), 0, 0)
+  }
+
+  override suspend fun hover(params: DefinitionParams): MarkupContent {
+    val content = TomlDocumentCache.get(params.file).orEmpty()
+    return TomlFeatureEngine.hover(content, params.position)
+  }
+
+  override suspend fun analyze(file: Path): DiagnosticResult {
+    val content = TomlDocumentCache.get(file).orEmpty()
+    return TomlDiagnostics.compute(file, content)
+  }
+
+  override fun formatCode(params: FormatCodeParams?): CodeFormatResult {
+    if (params == null) return CodeFormatResult.NONE
+    return TomlFeatureEngine.format(params.content.toString())
+  }
+
+  override suspend fun documentSymbols(file: Path): DocumentSymbolsResult {
+    val content = TomlDocumentCache.get(file).orEmpty()
+    return TomlFeatureEngine.documentSymbols(content)
+  }
+
+  override suspend fun rename(params: RenameParams): WorkspaceEdit {
+    val content = TomlDocumentCache.get(params.file).orEmpty()
+    return TomlFeatureEngine.rename(content, params.file, params.position, params.newName)
+  }
+
+  override suspend fun foldingRanges(file: Path): List<FoldingRange> {
+    val content = TomlDocumentCache.get(file).orEmpty()
+    return TomlFeatureEngine.foldingRanges(content)
+  }
+
+  override suspend fun semanticTokensFull(params: SemanticTokensParams): SemanticTokens {
+    val content = TomlDocumentCache.get(params.file).orEmpty()
+    return SemanticTokens(data = TomlSemanticTokens(content).compute())
+  }
+
+  override suspend fun documentLinks(file: Path): List<DocumentLink> {
+    val content = TomlDocumentCache.get(file).orEmpty()
+    return TomlFeatureEngine.documentLinks(content, file)
+  }
+
+  companion object {
+    const val SERVER_ID = "toml"
+  }
 }

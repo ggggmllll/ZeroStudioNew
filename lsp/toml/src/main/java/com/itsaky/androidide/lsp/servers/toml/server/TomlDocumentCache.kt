@@ -1,29 +1,22 @@
 package com.itsaky.androidide.lsp.servers.toml.server
 
+import java.nio.file.Path
 import java.util.concurrent.ConcurrentHashMap
 
-/**
- * A thread-safe cache to store the current content of documents. Since we use
- * TextDocumentSyncKind.Full, we simply replace the content on change.
- *
- * @author android_zero
- */
 object TomlDocumentCache {
-  private val documents = ConcurrentHashMap<String, String>()
+  private val cache = ConcurrentHashMap<Path, String>()
 
-  fun update(uri: String, content: String) {
-    documents[uri] = content
+  fun put(file: Path, content: String) {
+    cache[file] = content
   }
 
-  fun get(uri: String): String? {
-    return documents[uri]
-  }
+  fun get(file: Path): String? = cache[file]
 
-  fun remove(uri: String) {
-    documents.remove(uri)
+  fun remove(file: Path) {
+    cache.remove(file)
   }
 
   fun clear() {
-    documents.clear()
+    cache.clear()
   }
 }
