@@ -165,7 +165,7 @@ void dispatchDiagnosticsToJava(const std::string& file_uri,
 // ============================================================================
 
 extern "C" JNIEXPORT jint JNICALL
-Java_android_zero_studio_lsp_clang_ClangdNativeBridge_nativeOnLoad(JNIEnv* env, jclass clazz) {
+Java_com_itsaky_androidide_lsp_clangd_ClangdNativeBridge_nativeOnLoad(JNIEnv* env, jclass clazz) {
     if (env->GetJavaVM(&g_java_vm) != JNI_OK) {
         return JNI_ERR;
     }
@@ -189,7 +189,7 @@ Java_android_zero_studio_lsp_clang_ClangdNativeBridge_nativeOnLoad(JNIEnv* env, 
     
     // 初始化 DiagnosticItem 类引用
     jclass diagnosticItemLocalClass = env->FindClass(
-        "android/zero/studio/lsp/clang/ClangDiagnosticItem"
+        "com/itsaky/androidide/lsp/clangd/ClangDiagnosticItem"
     );
     if (diagnosticItemLocalClass) {
         g_diagnosticItemClass = reinterpret_cast<jclass>(
@@ -219,7 +219,7 @@ Java_android_zero_studio_lsp_clang_ClangdNativeBridge_nativeOnLoad(JNIEnv* env, 
 // ============================================================================
 
 extern "C" JNIEXPORT jboolean JNICALL
-Java_android_zero_studio_lsp_clang_ClangdNativeBridge_nativeInitialize(
+Java_com_itsaky_androidide_lsp_clangd_ClangdNativeBridge_nativeInitialize(
     JNIEnv* env,
     jclass clazz,
     jstring clangdPath,
@@ -250,7 +250,7 @@ Java_android_zero_studio_lsp_clang_ClangdNativeBridge_nativeInitialize(
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_android_zero_studio_lsp_clang_ClangdNativeBridge_nativeShutdown(
+Java_com_itsaky_androidide_lsp_clangd_ClangdNativeBridge_nativeShutdown(
     JNIEnv* env,
     jclass clazz
 ) {
@@ -260,7 +260,7 @@ Java_android_zero_studio_lsp_clang_ClangdNativeBridge_nativeShutdown(
 }
 
 extern "C" JNIEXPORT jboolean JNICALL
-Java_android_zero_studio_lsp_clang_ClangdNativeBridge_nativeIsInitialized(
+Java_com_itsaky_androidide_lsp_clangd_ClangdNativeBridge_nativeIsInitialized(
     JNIEnv* env,
     jclass clazz
 ) {
@@ -273,7 +273,7 @@ Java_android_zero_studio_lsp_clang_ClangdNativeBridge_nativeIsInitialized(
 // ============================================================================
 
 extern "C" JNIEXPORT jlong JNICALL
-Java_android_zero_studio_lsp_clang_ClangdNativeBridge_nativeRequestHover(
+Java_com_itsaky_androidide_lsp_clangd_ClangdNativeBridge_nativeRequestHover(
     JNIEnv* env,
     jclass clazz,
     jstring fileUri,
@@ -287,7 +287,7 @@ Java_android_zero_studio_lsp_clang_ClangdNativeBridge_nativeRequestHover(
 }
 
 extern "C" JNIEXPORT jlong JNICALL
-Java_android_zero_studio_lsp_clang_ClangdNativeBridge_nativeRequestCompletion(
+Java_com_itsaky_androidide_lsp_clangd_ClangdNativeBridge_nativeRequestCompletion(
     JNIEnv* env,
     jclass clazz,
     jstring fileUri,
@@ -303,7 +303,7 @@ Java_android_zero_studio_lsp_clang_ClangdNativeBridge_nativeRequestCompletion(
 }
 
 extern "C" JNIEXPORT jlong JNICALL
-Java_android_zero_studio_lsp_clang_ClangdNativeBridge_nativeRequestDefinition(
+Java_com_itsaky_androidide_lsp_clangd_ClangdNativeBridge_nativeRequestDefinition(
     JNIEnv* env,
     jclass clazz,
     jstring fileUri,
@@ -317,7 +317,7 @@ Java_android_zero_studio_lsp_clang_ClangdNativeBridge_nativeRequestDefinition(
 }
 
 extern "C" JNIEXPORT jlong JNICALL
-Java_android_zero_studio_lsp_clang_ClangdNativeBridge_nativeRequestReferences(
+Java_com_itsaky_androidide_lsp_clangd_ClangdNativeBridge_nativeRequestReferences(
     JNIEnv* env,
     jclass clazz,
     jstring fileUri,
@@ -337,7 +337,7 @@ Java_android_zero_studio_lsp_clang_ClangdNativeBridge_nativeRequestReferences(
 // ============================================================================
 
 extern "C" JNIEXPORT jstring JNICALL
-Java_android_zero_studio_lsp_clang_ClangdNativeBridge_nativeGetResult(
+Java_com_itsaky_androidide_lsp_clangd_ClangdNativeBridge_nativeGetResult(
     JNIEnv* env,
     jclass clazz,
     jlong requestId
@@ -357,7 +357,7 @@ Java_android_zero_studio_lsp_clang_ClangdNativeBridge_nativeGetResult(
 // ============================================================================
 
 extern "C" JNIEXPORT void JNICALL
-Java_android_zero_studio_lsp_clang_ClangdNativeBridge_nativeDidOpen(
+Java_com_itsaky_androidide_lsp_clangd_ClangdNativeBridge_nativeDidOpen(
     JNIEnv* env,
     jclass clazz,
     jstring fileUri,
@@ -376,7 +376,7 @@ Java_android_zero_studio_lsp_clang_ClangdNativeBridge_nativeDidOpen(
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_android_zero_studio_lsp_clang_ClangdNativeBridge_nativeDidChange(
+Java_com_itsaky_androidide_lsp_clangd_ClangdNativeBridge_nativeDidChange(
     JNIEnv* env,
     jclass clazz,
     jstring fileUri,
@@ -391,7 +391,7 @@ Java_android_zero_studio_lsp_clang_ClangdNativeBridge_nativeDidChange(
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_android_zero_studio_lsp_clang_ClangdNativeBridge_nativeDidClose(
+Java_com_itsaky_androidide_lsp_clangd_ClangdNativeBridge_nativeDidClose(
     JNIEnv* env,
     jclass clazz,
     jstring fileUri
@@ -407,7 +407,7 @@ Java_android_zero_studio_lsp_clang_ClangdNativeBridge_nativeDidClose(
 // ============================================================================
 
 extern "C" JNIEXPORT void JNICALL
-Java_android_zero_studio_lsp_clang_ClangdNativeBridge_nativeCancelRequestInternal(
+Java_com_itsaky_androidide_lsp_clangd_ClangdNativeBridge_nativeCancelRequestInternal(
     JNIEnv* env,
     jclass clazz,
     jlong requestId
@@ -417,7 +417,7 @@ Java_android_zero_studio_lsp_clang_ClangdNativeBridge_nativeCancelRequestInterna
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_android_zero_studio_lsp_clang_ClangdNativeBridge_nativeNotifyRequestTimeout(
+Java_com_itsaky_androidide_lsp_clangd_ClangdNativeBridge_nativeNotifyRequestTimeout(
     JNIEnv* env,
     jclass clazz,
     jlong requestId
