@@ -29,6 +29,7 @@ import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.catpuppyapp.puppygit.data.entity.RepoEntity
 import com.catpuppyapp.puppygit.git.StatusTypeEntrySaver
 import com.catpuppyapp.puppygit.settings.SettingsUtil
 import com.catpuppyapp.puppygit.utils.Libgit2Helper
@@ -74,6 +75,11 @@ class GitChangesFragment : BaseGitPageFragment() {
     addToolbarAction(R.drawable.ic_arrow_upward_24, getString(R.string.push)) {
       emitGitOperation("changes", "push")
       pushCurrentBranch(force = false)
+    }
+
+    addToolbarAction(R.drawable.ic_cloud_download_24, getString(R.string.pull)) {
+      emitGitOperation("changes", "pull_fetch_origin")
+      pullFromOrigin()
     }
 
     addToolbarAction(R.drawable.ic_warning_24, "Force Push") {
@@ -253,6 +259,30 @@ class GitChangesFragment : BaseGitPageFragment() {
         val refspec = "refs/heads/$branch:refs/heads/$branch"
         val credential = GitAuthConfig.toHttpCredential(cfg)
         Libgit2Helper.push(repo, "origin", listOf(refspec), credential, force)
+      }
+    }
+  }
+
+  private fun pullFromOrigin() {
+    val context = context ?: return
+    GitAuthConfig.ensureConfigured(context) { cfg ->
+      withRepo { repo ->
+        if (Libgit2Helper.resolveRemote(repo, "origin") == null) {
+          throw IllegalStateException("Remote origin not found")
+        }
+        val workdir = repo.workdir()
+        val repoEntity =
+            RepoEntity(
+                repoName = java.io.File(workdir).name,
+                fullSavePath = workdir,
+                branch = repo.head()?.shorthand().orEmpty(),
+            )
+        Libgit2Helper.fetchRemoteForRepo(
+            repo = repo,
+            remoteName = "origin",
+            credential = GitAuthConfig.toHttpCredential(cfg),
+            repoFromDb = repoEntity,
+        )
       }
     }
   }
