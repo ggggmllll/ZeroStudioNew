@@ -460,10 +460,7 @@ class CodeEditorView(context: Context, file: File, selection: Range) :
     return when (file.extension.lowercase()) {
       "java" -> registry.getServer(JavaLanguageServer.SERVER_ID)
       "xml" -> registry.getServer(XMLLanguageServer.SERVER_ID)
-      "kt",
-      "kts" -> {
-        registry.getServer(KotlinLanguageServer.SERVER_ID)
-            ?: KotlinLanguageServer(context).also { registry.register(it) }
+      "kt", "kts" -> registry.getServer(KotlinLanguageServer.SERVER_ID)
       }
       else -> null
     }

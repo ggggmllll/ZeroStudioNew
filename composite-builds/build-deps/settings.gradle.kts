@@ -52,7 +52,7 @@ include(
     ":layoutlib-api",
     ":logback-core",
     ":compose-pullrefresh",
-    "soraLanguageTextmate",
+    ":soraLanguageTextmate",
     ":editor",
     ":kotlinc",
     ":java-stubs2",

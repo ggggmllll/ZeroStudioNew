@@ -205,11 +205,11 @@ class MainFragment : BaseFragment() {
             modifier =
                 Modifier.align(Alignment.BottomCenter)
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
+                    .clip(RoundedCornerShape(topStart = 18.dp, topEnd = 20.dp))
         ) {
           Surface(
-              modifier = Modifier.matchParentSize().blur(radius = 24.dp), // 模糊半径
-              color = Color.White.copy(alpha = 0.8f),
+              modifier = Modifier.matchParentSize().blur(radius = 18.dp), // 模糊半径
+              color = Color.White.copy(alpha = 0.9f),
           ) {}
 
           Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp)) {
