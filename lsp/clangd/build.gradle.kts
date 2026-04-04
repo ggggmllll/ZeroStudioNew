@@ -106,36 +106,7 @@ android {
     }
   }
 
-  // Define signing config before buildTypes so it can be referenced below
-  if (keystoreProps.isNotEmpty()) {
-    signingConfigs {
-      create("release") {
-        val storeFileProp = keystoreProps.getProperty("storeFile")
-        val storePasswordProp = keystoreProps.getProperty("storePassword")
-        val keyAliasProp = keystoreProps.getProperty("keyAlias")
-        val keyPasswordProp = keystoreProps.getProperty("keyPassword")
 
-        if (!storeFileProp.isNullOrBlank()) storeFile = rootProject.file(storeFileProp)
-        if (!storePasswordProp.isNullOrBlank()) storePassword = storePasswordProp
-        if (!keyAliasProp.isNullOrBlank()) keyAlias = keyAliasProp
-        if (!keyPasswordProp.isNullOrBlank()) keyPassword = keyPasswordProp
-      }
-    }
-  }
-
-  buildTypes {
-    release {
-      // 启用代码压缩和混淆
-      isMinifyEnabled = true
-      // 启用资源压缩（移除未使用的资源）
-      isShrinkResources = true
-      proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-      // Attach signing config when keystore.properties is available
-      if (keystoreProps.isNotEmpty()) {
-        signingConfig = signingConfigs.getByName("release")
-      }
-    }
-  }
   compileOptions {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
