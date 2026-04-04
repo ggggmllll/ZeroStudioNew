@@ -64,7 +64,12 @@ dependencyResolutionManagement {
       this.name = build
       dependencySubstitution {
         for (module in modules) {
-          substitute(module("com.itsaky.androidide.build:${module}")).using(project(":${module}"))
+          val parts = module.split(":")
+          val artifact = parts.last()
+          val groupSuffix =
+              if (parts.size > 1) ".${parts.dropLast(1).joinToString(".")}" else ""
+          val moduleNotation = "com.itsaky.androidide.build${groupSuffix}:${artifact}"
+          substitute(module(moduleNotation)).using(project(":${module}"))
         }
       }
     }
