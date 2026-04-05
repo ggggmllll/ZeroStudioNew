@@ -79,7 +79,7 @@ class TomlSemanticTokens(private val content: String) {
         val start = lexer.tokenStart
         val length = lexer.tokenEnd - start
 
-        // 计算行号和列号 (简单实现，优化性能)
+        // 计算行号和列号
         val (line, col) = getLineCol(content, start)
 
         val deltaLine = line - prevLine
