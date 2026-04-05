@@ -4,100 +4,134 @@ import com.itsaky.androidide.lsp.api.ILanguageClient
 import com.itsaky.androidide.lsp.api.ILanguageServer
 import com.itsaky.androidide.lsp.api.IServerSettings
 import com.itsaky.androidide.lsp.models.*
-import com.itsaky.androidide.lsp.servers.toml.server.TomlLanguageServer
+import com.itsaky.androidide.lsp.servers.toml.server.*
 import com.itsaky.androidide.models.Range
 import com.itsaky.androidide.projects.IWorkspace
 import java.nio.file.Path
 
 /**
- * TOML 服务器外观 (Facade)。
+ * TOML 语言服务器（原生 AndroidIDE 协议实现）。
  *
- * 实现了 AndroidIDE 的 [ILanguageServer] 协议，作为公共 API 对外提供能力。
- * 其内部将所有请求都委托给 [TomlLanguageServer] 的一个实例来处理。
- * 这种设计将公共接口与具体实现解耦，便于维护和测试。
+ * 这是一个轻量级的 TOML 语言服务器，不依赖于重量级的外部进程。
+ * 所有功能（如语法高亮、诊断、代码补全等）都在同进程内通过直接调用方法实现。
+ *
+ * @author android_zero
  */
 class TomlServer : ILanguageServer {
-    private val delegate = TomlLanguageServer()
+
+    private var _client: ILanguageClient? = null
+    private val textDocuments = TomlTextDocumentService()
+    private val workspaceService = TomlWorkspaceService()
 
     override val serverId: String
-        get() = TomlLanguageServer.SERVER_ID
+        get() = SERVER_ID
 
     override val client: ILanguageClient?
-        get() = delegate.client
+        get() = _client
 
-    override fun shutdown() = delegate.shutdown()
+    override fun shutdown() {
+        TomlDocumentCache.clear()
+        _client = null
+    }
 
-    override fun connectClient(client: ILanguageClient?) = delegate.connectClient(client)
+    override fun connectClient(client: ILanguageClient?) {
+        _client = client
+    }
 
-    override fun applySettings(settings: IServerSettings?) = delegate.applySettings(settings)
+    override fun applySettings(settings: IServerSettings?) {
+        // 当前为轻量级实现，没有复杂的配置项，预留此方法用于未来扩展
+    }
 
-    override fun setupWorkspace(workspace: IWorkspace) = delegate.setupWorkspace(workspace)
+    override fun setupWorkspace(workspace: IWorkspace) {
+        // TOML 服务目前不依赖复杂的项目/模块结构分析，暂为空
+    }
 
-    override fun didOpen(params: DidOpenTextDocumentParams) = delegate.didOpen(params)
+    // --- 文档生命周期事件 ---
 
-    override fun didChange(params: DidChangeTextDocumentParams) = delegate.didChange(params)
+    override fun didOpen(params: DidOpenTextDocumentParams) = textDocuments.open(params.file, params.text)
 
-    override fun didClose(params: DidCloseTextDocumentParams) = delegate.didClose(params)
+    override fun didChange(params: DidChangeTextDocumentParams) {
+        val latest = params.contentChanges.lastOrNull()?.text ?: return
+        textDocuments.change(params.file, latest)
+    }
 
-    override fun didSave(params: DidSaveTextDocumentParams) = delegate.didSave(params)
+    override fun didClose(params: DidCloseTextDocumentParams) = textDocuments.close(params.file)
 
-    override fun complete(params: CompletionParams?): CompletionResult = delegate.complete(params)
+    override fun didSave(params: DidSaveTextDocumentParams) {
+        params.text?.let { textDocuments.change(params.file, it) }
+    }
 
-    override suspend fun findReferences(params: ReferenceParams): ReferenceResult =
-        delegate.findReferences(params)
+    // --- 核心 LSP 功能实现 ---
 
-    override suspend fun findDefinition(params: DefinitionParams): DefinitionResult =
-        delegate.findDefinition(params)
+    override fun complete(params: CompletionParams?): CompletionResult {
+        if (params == null) return CompletionResult.EMPTY
+        val content = params.content?.toString() ?: TomlDocumentCache.get(params.file).orEmpty()
+        return TomlFeatureEngine.completion(content, params)
+    }
 
-    override suspend fun expandSelection(params: ExpandSelectionParams): Range =
-        delegate.expandSelection(params)
+    override suspend fun findDefinition(params: DefinitionParams): DefinitionResult {
+        val content = TomlDocumentCache.get(params.file).orEmpty()
+        return TomlFeatureEngine.definition(content, params.file, params.position)
+    }
 
-    override suspend fun signatureHelp(params: SignatureHelpParams): SignatureHelp =
-        delegate.signatureHelp(params)
+    override suspend fun hover(params: DefinitionParams): MarkupContent {
+        val content = TomlDocumentCache.get(params.file).orEmpty()
+        return TomlFeatureEngine.hover(content, params.file, params.position)
+    }
 
-    override suspend fun hover(params: DefinitionParams): MarkupContent = delegate.hover(params)
-
-    override suspend fun analyze(file: Path): DiagnosticResult = delegate.analyze(file)
-
-    override fun formatCode(params: FormatCodeParams?): CodeFormatResult = delegate.formatCode(params)
-
-    override suspend fun documentSymbols(file: Path): DocumentSymbolsResult =
-        delegate.documentSymbols(file)
-
-    override suspend fun workspaceSymbols(query: String): WorkspaceSymbolsResult =
-        delegate.workspaceSymbols(query)
-
-    override suspend fun prepareRename(params: DefinitionParams): PrepareRenameResult? =
-        delegate.prepareRename(params)
-
-    override suspend fun rename(params: RenameParams): WorkspaceEdit = delegate.rename(params)
-
-    override suspend fun foldingRanges(file: Path): List<FoldingRange> = delegate.foldingRanges(file)
-
-    override suspend fun selectionRanges(params: SelectionRangesParams): List<SelectionRange> =
-        delegate.selectionRanges(params)
-
-    override suspend fun semanticTokensFull(params: SemanticTokensParams): SemanticTokens =
-        delegate.semanticTokensFull(params)
-
-    override suspend fun semanticTokensRange(params: SemanticTokensParams): SemanticTokens =
-        delegate.semanticTokensRange(params)
-
-    override suspend fun semanticTokensDelta(params: SemanticTokensParams): SemanticTokensDelta =
-        delegate.semanticTokensDelta(params)
-
-    override suspend fun inlayHints(params: InlayHintParams): List<InlayHint> =
-        delegate.inlayHints(params)
-
-    override suspend fun documentLinks(file: Path): List<DocumentLink> = delegate.documentLinks(file)
-
-    override suspend fun codeLens(file: Path): List<CodeLens> = delegate.codeLens(file)
-
-    override suspend fun callHierarchy(params: DefinitionParams): List<CallHierarchyItem> =
-        delegate.callHierarchy(params)
-
-    override suspend fun typeHierarchy(params: DefinitionParams): List<TypeHierarchyItem> =
-        delegate.typeHierarchy(params)
+    override suspend fun analyze(file: Path): DiagnosticResult {
+        val content = TomlDocumentCache.get(file).orEmpty()
+        return TomlDiagnostics.compute(file, content)
+    }
     
-    fun onWorkspaceChanged() = delegate.onWorkspaceChanged()
+    override fun formatCode(params: FormatCodeParams?): CodeFormatResult {
+        if (params == null) return CodeFormatResult.NONE
+        return TomlFeatureEngine.format(params.content.toString())
+    }
+
+    override suspend fun documentSymbols(file: Path): DocumentSymbolsResult {
+        val content = TomlDocumentCache.get(file).orEmpty()
+        return TomlFeatureEngine.documentSymbols(content)
+    }
+
+    override suspend fun rename(params: RenameParams): WorkspaceEdit {
+        val content = TomlDocumentCache.get(params.file).orEmpty()
+        return TomlFeatureEngine.rename(content, params.file, params.position, params.newName)
+    }
+    
+    override suspend fun foldingRanges(file: Path): List<FoldingRange> {
+        val content = TomlDocumentCache.get(file).orEmpty()
+        return TomlFeatureEngine.foldingRanges(content)
+    }
+
+    override suspend fun semanticTokensFull(params: SemanticTokensParams): SemanticTokens {
+        val content = TomlDocumentCache.get(params.file).orEmpty()
+        return SemanticTokens(data = TomlSemanticTokens(content).compute())
+    }
+
+    override suspend fun documentLinks(file: Path): List<DocumentLink> {
+        val content = TomlDocumentCache.get(file).orEmpty()
+        return TomlFeatureEngine.documentLinks(content, file)
+    }
+
+    fun onWorkspaceChanged() = workspaceService.onWorkspaceChanged()
+
+    // --- 以下为尚未实现或 TOML 不需要的 LSP 功能，均返回安全空值 ---
+
+    override suspend fun findReferences(params: ReferenceParams) = ReferenceResult(emptyList())
+    override suspend fun expandSelection(params: ExpandSelectionParams) = params.selection
+    override suspend fun signatureHelp(params: SignatureHelpParams) = SignatureHelp(emptyList(), 0, 0)
+    override suspend fun workspaceSymbols(query: String) = WorkspaceSymbolsResult()
+    override suspend fun prepareRename(params: DefinitionParams): PrepareRenameResult? = null
+    override suspend fun selectionRanges(params: SelectionRangesParams): List<SelectionRange> = emptyList()
+    override suspend fun semanticTokensRange(params: SemanticTokensParams): SemanticTokens = SemanticTokens()
+    override suspend fun semanticTokensDelta(params: SemanticTokensParams): SemanticTokensDelta = SemanticTokensDelta()
+    override suspend fun inlayHints(params: InlayHintParams): List<InlayHint> = emptyList()
+    override suspend fun codeLens(file: Path): List<CodeLens> = emptyList()
+    override suspend fun callHierarchy(params: DefinitionParams): List<CallHierarchyItem> = emptyList()
+    override suspend fun typeHierarchy(params: DefinitionParams): List<TypeHierarchyItem> = emptyList()
+
+    companion object {
+        const val SERVER_ID = "lsp.toml"
+    }
 }
