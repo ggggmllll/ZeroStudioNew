@@ -132,6 +132,6 @@ class TomlServer : ILanguageServer {
     override suspend fun typeHierarchy(params: DefinitionParams): List<TypeHierarchyItem> = emptyList()
 
     companion object {
-        const val SERVER_ID = "lsp.toml"
+        const val SERVER_ID = "toml"
     }
 }
