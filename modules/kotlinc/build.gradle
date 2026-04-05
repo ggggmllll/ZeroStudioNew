@@ -25,6 +25,42 @@ android {
         jvmTarget = '17'
     }
 }
+    packagingOptions {
+        
+        exclude 'org/jetbrains/kotlin/cli/jvm/compiler/jarfs/*.class'
+        
+        exclude 'org/jetbrains/kotlin/cli/jvm/config/JvmContentRoots.class'
+        exclude 'org/jetbrains/kotlin/cli/jvm/config/JvmContentRoots$*.class'
+        
+        exclude 'org/jetbrains/kotlin/cli/jvm/javac/JavacLogger.class'
+        exclude 'org/jetbrains/kotlin/cli/jvm/javac/JavacLogger$*.class'
+        
+        exclude 'org/jetbrains/kotlin/com/intellij/openapi/util/LowMemoryWatcherManager.class'
+        exclude 'org/jetbrains/kotlin/com/intellij/openapi/util/LowMemoryWatcherManager$*.class'
+        exclude 'org/jetbrains/kotlin/com/intellij/openapi/util/NullableLazyValue.class'
+        exclude 'org/jetbrains/kotlin/com/intellij/openapi/util/NullableLazyValue$*.class'
+        exclude 'org/jetbrains/kotlin/com/intellij/util/containers/ConcurrentIntObjectHashMap.class'
+        exclude 'org/jetbrains/kotlin/com/intellij/util/containers/ConcurrentIntObjectHashMap$*.class'
+        exclude 'org/jetbrains/kotlin/com/intellij/util/containers/ConcurrentLongObjectHashMap.class'
+        exclude 'org/jetbrains/kotlin/com/intellij/util/containers/ConcurrentLongObjectHashMap$*.class'
+        exclude 'org/jetbrains/kotlin/com/intellij/util/containers/Unsafe.class'
+        exclude 'org/jetbrains/kotlin/com/intellij/util/containers/UnsafeUtil.class'
+        exclude 'org/jetbrains/kotlin/com/intellij/util/lang/JavaVersion.class'
+        exclude 'org/jetbrains/kotlin/com/intellij/util/lang/JavaVersion$*.class'
+        
+        exclude 'org/jetbrains/kotlin/reflection/android/AndroidSupport.class'
+        exclude 'org/jetbrains/kotlin/reflection/android/AndroidSupport$*.class'
+        
+        exclude 'org/jetbrains/kotlin/util/PerformanceManager.class'
+        exclude 'org/jetbrains/kotlin/util/PerformanceManager$*.class'
+        exclude 'org/jetbrains/kotlin/util/ServiceLoaderLite.class'
+        exclude 'org/jetbrains/kotlin/util/ServiceLoaderLite$*.class'
+        exclude 'org/jetbrains/kotlin/utils/PathUtil.class'
+        exclude 'org/jetbrains/kotlin/utils/PathUtil$*.class'
+
+        pickFirst 'org/jetbrains/kotlin/**/*.class'
+    }
+
 
 configurations.all {
     resolutionStrategy {
@@ -39,7 +75,6 @@ dependencies {
     api("org.jetbrains.intellij.deps:trove4j:1.0.20200330") 
     implementation 'org.jetbrains:annotations:26.0.2'
     runtimeOnly ('org.jetbrains.kotlin:kotlin-reflect:2.3.0')
-
      
     compileOnly files('libs/the-unsafe.jar')
     api files('libs/kotlin-compiler-embeddable-2.3.0.jar')
