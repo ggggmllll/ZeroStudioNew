@@ -28,7 +28,7 @@ import com.itsaky.androidide.actions.ActionData
 import com.itsaky.androidide.actions.ActionItem
 import com.itsaky.androidide.actions.requireContext
 import com.itsaky.androidide.actions.requireFile
-import com.itsaky.androidide.lsp.util.Logger
+import com.itsaky.androidide.utils.Logger
 import com.itsaky.androidide.projects.IProjectManager
 import com.itsaky.androidide.resources.R
 import com.itsaky.androidide.utils.flashError

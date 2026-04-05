@@ -23,6 +23,7 @@ import com.itsaky.androidide.actions.ActionItem
 import com.itsaky.androidide.actions.ActionStyle
 import com.itsaky.androidide.actions.EditorRelatedAction
 import com.itsaky.androidide.resources.R
+import androidx.core.content.ContextCompat
 
 /**
  * Expands the current selection using the language server set in editor.
