@@ -6,12 +6,10 @@ import com.itsaky.androidide.models.Position
 import com.itsaky.androidide.models.Range
 import java.nio.file.Path
 import java.util.regex.Pattern
-
+import io.github.rosemoe.sora.lang.completion.CompletionItemKind
 /**
  * TOML 特性引擎（AndroidIDE LSP 模型版）。
  *
- * 完全使用 core/lsp-api 与 core/lsp-models 定义的数据结构，
- * 不再依赖 org.eclipse.lsp4j 协议模型。
  */
 object TomlFeatureEngine {
 

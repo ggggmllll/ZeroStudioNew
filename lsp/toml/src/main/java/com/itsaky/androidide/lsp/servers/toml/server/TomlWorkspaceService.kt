@@ -1,6 +1,6 @@
 package com.itsaky.androidide.lsp.servers.toml.server
 
-import com.itsaky.androidide.lsp.util.Logger
+import com.itsaky.androidide.lsp.servers.toml.server.Logger
 
 /**
  * TOML 工作区服务（AndroidIDE 协议层）。
