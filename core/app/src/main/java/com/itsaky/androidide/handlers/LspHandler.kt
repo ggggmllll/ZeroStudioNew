@@ -33,7 +33,7 @@ object LspHandler {
       getServer(JavaLanguageServer.SERVER_ID) ?: register(JavaLanguageServer())
       getServer(XMLLanguageServer.SERVER_ID) ?: register(XMLLanguageServer())
       getServer(KotlinLanguageServer.SERVER_ID) ?: register(KotlinLanguageServer(context))
-      getServer(TomlServer.SERVER_ID) ?: register(TomlServer())
+      getServer(TomlServer.serverId) ?: register(TomlServer())
     }
   }
 

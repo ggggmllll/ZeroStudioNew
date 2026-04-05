@@ -462,7 +462,7 @@ class CodeEditorView(context: Context, file: File, selection: Range) :
       "java" -> registry.getServer(JavaLanguageServer.SERVER_ID)
       "xml" -> registry.getServer(XMLLanguageServer.SERVER_ID)
       "kt", "kts" -> registry.getServer(KotlinLanguageServer.SERVER_ID)
-      "toml" -> registry.getServer(TomlServer.SERVER_ID)
+      "toml" -> registry.getServer(TomlServer.serverId)
       else -> null
     }
   }

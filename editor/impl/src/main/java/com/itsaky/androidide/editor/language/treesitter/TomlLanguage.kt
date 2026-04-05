@@ -36,7 +36,7 @@ class TomlLanguage(context: Context) :
     TreeSitterLanguage(context, lang = TSLanguageToml.getInstance(), langType = TOML_TYPE) {
 
   override val languageServer: ILanguageServer?
-    get() = ILanguageServerRegistry.getDefault().getServer(TomlServer.SERVER_ID)
+    get() = ILanguageServerRegistry.getDefault().getServer(TomlServer.serverId)
 
   companion object {
 
