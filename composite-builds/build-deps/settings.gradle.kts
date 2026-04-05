@@ -57,7 +57,6 @@ include(
     ":javacb",
     ":javapoetb",
     ":jaxpb-jaxp-internal",
-    ":jaxpb-xml",
     ":soraLanguageTextmate",
     ":soraOnigurumaNative",
     // ":kotlinc",

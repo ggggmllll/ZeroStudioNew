@@ -47,7 +47,7 @@ dependencies {
     implementation(libs.composite.java.stubsb)
     implementation(libs.composite.javacb)
     implementation(libs.composite.jaxpb.jaxp.internal)
-    implementation(libs.composite.jaxpb.xml)
+    implementation(libs.composite.jaxp)
 
     compileOnly project(":utilities:framework-stubs")
 
