@@ -14,6 +14,5 @@ dependencies {
   implementation(projects.core.projects)
   implementation(libs.common.editor)
   implementation(projects.editor.lexers)
-  implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
   implementation(libs.common.kotlin)
 }
