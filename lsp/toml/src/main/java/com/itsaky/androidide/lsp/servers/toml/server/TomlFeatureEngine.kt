@@ -6,7 +6,7 @@ import com.itsaky.androidide.models.Position
 import com.itsaky.androidide.models.Range
 import java.nio.file.Path
 import java.util.regex.Pattern
-import io.github.rosemoe.sora.lang.completion.CompletionItemKind
+import com.itsaky.androidide.lsp.models.CompletionItemKind
 /**
  * TOML 特性引擎（AndroidIDE LSP 模型版）。
  *
@@ -52,7 +52,7 @@ object TomlFeatureEngine {
             insertTextFormat = InsertTextFormat.PLAIN_TEXT,
             sortText = key,
             command = null,
-            completionKind = CompletionItemKind.Property,
+            completionKind = CompletionItemKind.PROPERTY,
             matchLevel = level,
             additionalTextEdits = emptyList(),
             data = null,
