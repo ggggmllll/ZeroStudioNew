@@ -2,113 +2,99 @@ package com.itsaky.androidide.lsp.servers.toml.server
 
 import java.io.StringReader
 import org.toml.lang.lexer._TomlLexer
-import org.toml.lang.psi.TomlElementTypes
 
 /**
- * 基于 org.toml.lang.lexer._TomlLexer 的语义高亮计算器
+ * 基于 org.toml.lang.lexer._TomlLexer 的语义高亮计算器。
  *
+ * 此类负责将 TOML 文件的文本内容转换为 LSP `textDocument/semanticTokens`
+ * 协议要求的整数数组格式，用于在客户端实现精确的语法高亮。
+ *
+ * @param content 要分析的 TOML 文件内容。
  * @author android_zero
  */
 class TomlSemanticTokens(private val content: String) {
 
-  fun compute(): List<Int> {
-    val data = ArrayList<Int>()
-    if (content.isBlank()) return data
+    /**
+     * 计算并生成语义 Token 数据。
+     * @return 一个整数列表，每 5 个整数代表一个 Token。
+     */
+    fun compute(): List<Int> {
+        val data = ArrayList<Int>()
+        if (content.isBlank()) return data
 
-    val lexer = _TomlLexer(StringReader(content))
-    lexer.reset(content, 0, content.length, _TomlLexer.YYINITIAL)
+        val lexer = _TomlLexer(StringReader(content))
+        lexer.reset(content, 0, content.length, _TomlLexer.YYINITIAL)
 
-    var prevLine = 0
-    var prevStart = 0
+        var prevLine = 0
+        var prevStart = 0
 
-    while (true) {
-      val tokenType =
-          try {
-            lexer.advance()
-          } catch (e: Exception) {
-            null
-          } ?: break
+        // 预先计算每行的起始偏移量，以优化行列号的转换
+        val lineOffsets = calculateLineOffsets(content)
 
-      // 映射 IElementType 到 LSP Token Index
-      val tokenIndex =
-          when (tokenType) {
-            // Keywords & Headers
-            TomlElementTypes.TABLE_HEADER,
-            TomlElementTypes.L_BRACKET,
-            TomlElementTypes.R_BRACKET,
-            TomlElementTypes.L_CURLY,
-            TomlElementTypes.R_CURLY,
-            TomlElementTypes.INLINE_TABLE,
-            TomlElementTypes.ARRAY,
-            TomlElementTypes.ARRAY_TABLE -> 0 // keyword
+        while (true) {
+            val tokenType = try {
+                lexer.advance()
+            } catch (e: Exception) {
+                // Lexer 可能会在解析不完整或错误代码时抛出异常
+                null
+            } ?: break
 
-            // Strings
-            TomlElementTypes.BASIC_STRING,
-            TomlElementTypes.LITERAL_STRING,
-            TomlElementTypes.MULTILINE_BASIC_STRING,
-            TomlElementTypes.MULTILINE_LITERAL_STRING -> 1 // string
+            val tokenIndex = TokenMapping.getTokenTypeIndex(tokenType)
 
-            // Numbers
-            TomlElementTypes.NUMBER,
-            TomlElementTypes.BARE_KEY_OR_NUMBER -> 2 // number
+            if (tokenIndex != -1) {
+                val start = lexer.tokenStart
+                val length = lexer.tokenEnd - start
 
-            // Comments
-            TomlElementTypes.COMMENT -> 3 // comment
+                if (length <= 0) continue
 
-            // Keys / Properties
-            TomlElementTypes.KEY,
-            TomlElementTypes.BARE_KEY,
-            TomlElementTypes.KEY_SEGMENT -> 4 // property
+                val (line, col) = getPosition(start, lineOffsets)
 
-            // Booleans
-            TomlElementTypes.BOOLEAN -> 5 // boolean
+                val deltaLine = line - prevLine
+                val deltaStart = if (deltaLine == 0) col - prevStart else col
 
-            // Operators
-            TomlElementTypes.EQ,
-            TomlElementTypes.COMMA,
-            TomlElementTypes.DOT -> 6 // operator
+                data.add(deltaLine)
+                data.add(deltaStart)
+                data.add(length)
+                data.add(tokenIndex)
+                data.add(0) // modifiers (例如：粗体，斜体等，此处为0)
 
-            // Date Time
-            TomlElementTypes.DATE_TIME,
-            TomlElementTypes.BARE_KEY_OR_DATE -> 7 // type
-
-            else -> -1
-          }
-
-      if (tokenIndex != -1) {
-        val start = lexer.tokenStart
-        val length = lexer.tokenEnd - start
-
-        // 计算行号和列号
-        val (line, col) = getLineCol(content, start)
-
-        val deltaLine = line - prevLine
-        val deltaStart = if (deltaLine == 0) col - prevStart else col
-
-        data.add(deltaLine)
-        data.add(deltaStart)
-        data.add(length)
-        data.add(tokenIndex)
-        data.add(0) // modifiers
-
-        prevLine = line
-        prevStart = col
-      }
+                prevLine = line
+                prevStart = col
+            }
+        }
+        return data
     }
-    return data
-  }
-
-  private fun getLineCol(text: String, offset: Int): Pair<Int, Int> {
-    var line = 0
-    var col = 0
-    for (i in 0 until offset) {
-      if (text[i] == '\n') {
-        line++
-        col = 0
-      } else {
-        col++
-      }
+    
+    /**
+     * 预计算文本中每一行起始点的偏移量。
+     * @return 包含每行起始偏移量的列表。
+     */
+    private fun calculateLineOffsets(text: String): List<Int> {
+        val offsets = mutableListOf<Int>()
+        offsets.add(0)
+        text.forEachIndexed { i, char ->
+            if (char == '\n') {
+                offsets.add(i + 1)
+            }
+        }
+        return offsets
     }
-    return line to col
-  }
+
+    /**
+     * 将绝对偏移量转换为行号和列号。
+     * 使用预计算的行偏移量列表，通过二分查找来提高效率。
+     *
+     * @param offset 字符在文本中的绝对偏移量。
+     * @param lineOffsets 预计算的行起始偏移量列表。
+     * @return 一个 Pair，包含行号 (从0开始) 和列号 (从0开始)。
+     */
+    private fun getPosition(offset: Int, lineOffsets: List<Int>): Pair<Int, Int> {
+        val line = lineOffsets.binarySearch(offset).let {
+            if (it < 0) -it - 2 else it
+        }.coerceAtLeast(0)
+        
+        val lineStart = lineOffsets.getOrElse(line) { 0 }
+        val char = (offset - lineStart).coerceAtLeast(0)
+        return line to char
+    }
 }

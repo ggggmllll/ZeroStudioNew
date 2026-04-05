@@ -15,4 +15,5 @@ dependencies {
   implementation(libs.common.editor)
   implementation(projects.editor.lexers)
   implementation(libs.common.kotlin)
+  implementation(libs.androidx.core.ktx)
 }

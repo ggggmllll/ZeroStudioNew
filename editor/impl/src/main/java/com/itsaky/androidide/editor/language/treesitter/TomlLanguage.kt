@@ -21,7 +21,7 @@ import android.content.Context
 import com.itsaky.androidide.editor.language.treesitter.TreeSitterLanguage.Factory
 import com.itsaky.androidide.lsp.api.ILanguageServer
 import com.itsaky.androidide.lsp.api.ILanguageServerRegistry
-import com.itsaky.androidide.lsp.servers.toml.server.TomlLanguageServer
+import com.itsaky.androidide.lsp.servers.toml.TomlServer
 import com.itsaky.androidide.treesitter.toml.TSLanguageToml
 import io.github.rosemoe.sora.lang.Language.INTERRUPTION_LEVEL_STRONG
 import io.github.rosemoe.sora.util.MyCharacter
@@ -36,7 +36,7 @@ class TomlLanguage(context: Context) :
     TreeSitterLanguage(context, lang = TSLanguageToml.getInstance(), langType = TOML_TYPE) {
 
   override val languageServer: ILanguageServer?
-    get() = ILanguageServerRegistry.getDefault().getServer(TomlLanguageServer.SERVER_ID)
+    get() = ILanguageServerRegistry.getDefault().getServer(TomlServer.SERVER_ID)
 
   companion object {
 
