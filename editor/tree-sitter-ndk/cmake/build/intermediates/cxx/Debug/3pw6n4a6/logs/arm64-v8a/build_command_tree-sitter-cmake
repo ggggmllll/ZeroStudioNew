@@ -1,4 +1,4 @@
 /bin/ninja \
   -C \
-  /root/ZeroStudio-ZeroStudio-devs/editor/tree-sitter-ndk/cmake/.cxx/Debug/3pw6n4a6/arm64-v8a \
+  /root/ZeroStudio/editor/tree-sitter-ndk/cmake/.cxx/Debug/3pw6n4a6/arm64-v8a \
   tree-sitter-cmake

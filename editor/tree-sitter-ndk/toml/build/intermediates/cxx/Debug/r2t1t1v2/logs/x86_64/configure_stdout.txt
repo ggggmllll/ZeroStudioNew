@@ -10,7 +10,7 @@
 -- Check for working CXX compiler: /root/Android/Sdk/ndk/27.1.12297006/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++ - skipped
 -- Detecting CXX compile features
 -- Detecting CXX compile features - done
--- Tree-Sitter Lib Dir: /root/ZeroStudio-ZeroStudio-devs/editor/tree-sitter-ndk/tree-sitter-lib
+-- Tree-Sitter Lib Dir: /root/ZeroStudio/editor/tree-sitter-ndk/tree-sitter-lib
 -- Configuring done
 -- Generating done
--- Build files have been written to: /root/ZeroStudio-ZeroStudio-devs/editor/tree-sitter-ndk/toml/.cxx/Debug/r2t1t1v2/x86_64
+-- Build files have been written to: /root/ZeroStudio/editor/tree-sitter-ndk/toml/.cxx/Debug/r2t1t1v2/x86_64

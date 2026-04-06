@@ -1,5 +1,5 @@
 /bin/cmake \
-  -H/root/ZeroStudio-ZeroStudio-devs/editor/tree-sitter-ndk/cmake/src/main/cpp \
+  -H/root/ZeroStudio/editor/tree-sitter-ndk/cmake/src/main/cpp \
   -DCMAKE_SYSTEM_NAME=Android \
   -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
   -DCMAKE_SYSTEM_VERSION=26 \
@@ -10,9 +10,9 @@
   -DCMAKE_ANDROID_NDK=/root/Android/Sdk/ndk/27.1.12297006 \
   -DCMAKE_TOOLCHAIN_FILE=/root/Android/Sdk/ndk/27.1.12297006/build/cmake/android.toolchain.cmake \
   -DCMAKE_MAKE_PROGRAM=/bin/ninja \
-  -DCMAKE_LIBRARY_OUTPUT_DIRECTORY=/root/ZeroStudio-ZeroStudio-devs/editor/tree-sitter-ndk/cmake/build/intermediates/cxx/Debug/3pw6n4a6/obj/arm64-v8a \
-  -DCMAKE_RUNTIME_OUTPUT_DIRECTORY=/root/ZeroStudio-ZeroStudio-devs/editor/tree-sitter-ndk/cmake/build/intermediates/cxx/Debug/3pw6n4a6/obj/arm64-v8a \
+  -DCMAKE_LIBRARY_OUTPUT_DIRECTORY=/root/ZeroStudio/editor/tree-sitter-ndk/cmake/build/intermediates/cxx/Debug/3pw6n4a6/obj/arm64-v8a \
+  -DCMAKE_RUNTIME_OUTPUT_DIRECTORY=/root/ZeroStudio/editor/tree-sitter-ndk/cmake/build/intermediates/cxx/Debug/3pw6n4a6/obj/arm64-v8a \
   -DCMAKE_BUILD_TYPE=Debug \
-  -B/root/ZeroStudio-ZeroStudio-devs/editor/tree-sitter-ndk/cmake/.cxx/Debug/3pw6n4a6/arm64-v8a \
+  -B/root/ZeroStudio/editor/tree-sitter-ndk/cmake/.cxx/Debug/3pw6n4a6/arm64-v8a \
   -GNinja \
   -DCMAKE_CXX_FLAGS=-std=c++17

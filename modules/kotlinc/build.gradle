@@ -24,7 +24,7 @@ android {
     kotlinOptions {
         jvmTarget = '17'
     }
-}
+
     packagingOptions {
         
         exclude 'org/jetbrains/kotlin/cli/jvm/compiler/jarfs/*.class'
@@ -61,7 +61,7 @@ android {
         pickFirst 'org/jetbrains/kotlin/**/*.class'
     }
 
-
+}
 configurations.all {
     resolutionStrategy {
         force("org.jetbrains:annotations:26.0.2")
