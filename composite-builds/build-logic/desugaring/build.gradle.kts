@@ -31,13 +31,7 @@ dependencies {
 
 kotlin { jvmToolchain(17) }
 
-tasks.withType<KotlinCompile>().configureEach {
-    compilerOptions {
-        jvmTarget.set(JvmTarget.JVM_17)
-        apiVersion.set(KotlinVersion.KOTLIN_2_0)
-        languageVersion.set(KotlinVersion.KOTLIN_2_0)
-    }
-}
+tasks.withType<KotlinCompile>().configureEach { compilerOptions.jvmTarget.set(JvmTarget.JVM_17) }
 gradlePlugin {
   plugins {
     create("desugaring") {
