@@ -1,8 +1,0 @@
-com.itsaky.androidide.treesitter.xxx.tree-sitter-jnilibs-pngs-0 /root/ZeroStudio-ZeroStudio-devs/editor/tree-sitter-ndk/tree-sitter-jnilibs/build/generated/res/pngs/dev
-com.itsaky.androidide.treesitter.xxx.tree-sitter-jnilibs-resValues-1 /root/ZeroStudio-ZeroStudio-devs/editor/tree-sitter-ndk/tree-sitter-jnilibs/build/generated/res/resValues/dev
-com.itsaky.androidide.treesitter.xxx.tree-sitter-jnilibs-updated_navigation_xml-2 /root/ZeroStudio-ZeroStudio-devs/editor/tree-sitter-ndk/tree-sitter-jnilibs/build/generated/updated_navigation_xml/dev
-com.itsaky.androidide.treesitter.xxx.tree-sitter-jnilibs-mergeDevResources-3 /root/ZeroStudio-ZeroStudio-devs/editor/tree-sitter-ndk/tree-sitter-jnilibs/build/intermediates/incremental/dev/mergeDevResources/merged.dir
-com.itsaky.androidide.treesitter.xxx.tree-sitter-jnilibs-mergeDevResources-4 /root/ZeroStudio-ZeroStudio-devs/editor/tree-sitter-ndk/tree-sitter-jnilibs/build/intermediates/incremental/dev/mergeDevResources/stripped.dir
-com.itsaky.androidide.treesitter.xxx.tree-sitter-jnilibs-dev-5 /root/ZeroStudio-ZeroStudio-devs/editor/tree-sitter-ndk/tree-sitter-jnilibs/build/intermediates/merged_res/dev/mergeDevResources
-com.itsaky.androidide.treesitter.xxx.tree-sitter-jnilibs-dev-6 /root/ZeroStudio-ZeroStudio-devs/editor/tree-sitter-ndk/tree-sitter-jnilibs/src/dev/res
-com.itsaky.androidide.treesitter.xxx.tree-sitter-jnilibs-main-7 /root/ZeroStudio-ZeroStudio-devs/editor/tree-sitter-ndk/tree-sitter-jnilibs/src/main/res

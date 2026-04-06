@@ -1,2 +1,0 @@
-ninja: Entering directory `/root/ZeroStudio-ZeroStudio-devs/editor/tree-sitter-ndk/toml/.cxx/Debug/3v32i6p4/x86_64'
-ninja: no work to do.

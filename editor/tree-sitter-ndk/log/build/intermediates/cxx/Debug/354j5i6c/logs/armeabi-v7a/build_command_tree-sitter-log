@@ -1,4 +1,0 @@
-/root/android-sdk/cmake/3.22.1/bin/ninja \
-  -C \
-  /root/android-tree-sitter/grammar-modules/log/.cxx/Debug/354j5i6c/armeabi-v7a \
-  tree-sitter-log

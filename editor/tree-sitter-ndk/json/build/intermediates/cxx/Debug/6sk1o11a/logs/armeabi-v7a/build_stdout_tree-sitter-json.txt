@@ -1,6 +1,0 @@
-ninja: Entering directory `/root/android-tree-sitter/grammar-modules/json/.cxx/Debug/6sk1o11a/armeabi-v7a'
-[1/2] Building CXX object CMakeFiles/tree-sitter-json.dir/tree-sitter-json.cpp.o
-WARNING: linker: Warning: failed to find generated linker configuration from "/linkerconfig/ld.config.txt"
-[2/2] Linking CXX shared library /root/android-tree-sitter/grammar-modules/json/build/intermediates/cxx/Debug/6sk1o11a/obj/armeabi-v7a/libtree-sitter-json.so
-WARNING: linker: Warning: failed to find generated linker configuration from "/linkerconfig/ld.config.txt"
-WARNING: linker: Warning: failed to find generated linker configuration from "/linkerconfig/ld.config.txt"

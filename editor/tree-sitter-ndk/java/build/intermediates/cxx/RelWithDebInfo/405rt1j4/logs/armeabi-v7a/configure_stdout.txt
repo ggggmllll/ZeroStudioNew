@@ -1,3 +1,0 @@
--- Configuring done
--- Generating done
--- Build files have been written to: /root/android-tree-sitter/grammar-modules/java/.cxx/RelWithDebInfo/405rt1j4/armeabi-v7a

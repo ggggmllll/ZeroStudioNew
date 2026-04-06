@@ -1,8 +1,0 @@
-com.itsaky.androidide.treesitter.toml-pngs-0 /root/ZeroStudio-ZeroStudio-devs/editor/tree-sitter-ndk/toml/build/generated/res/pngs/release
-com.itsaky.androidide.treesitter.toml-resValues-1 /root/ZeroStudio-ZeroStudio-devs/editor/tree-sitter-ndk/toml/build/generated/res/resValues/release
-com.itsaky.androidide.treesitter.toml-updated_navigation_xml-2 /root/ZeroStudio-ZeroStudio-devs/editor/tree-sitter-ndk/toml/build/generated/updated_navigation_xml/release
-com.itsaky.androidide.treesitter.toml-mergeReleaseResources-3 /root/ZeroStudio-ZeroStudio-devs/editor/tree-sitter-ndk/toml/build/intermediates/incremental/release/mergeReleaseResources/merged.dir
-com.itsaky.androidide.treesitter.toml-mergeReleaseResources-4 /root/ZeroStudio-ZeroStudio-devs/editor/tree-sitter-ndk/toml/build/intermediates/incremental/release/mergeReleaseResources/stripped.dir
-com.itsaky.androidide.treesitter.toml-release-5 /root/ZeroStudio-ZeroStudio-devs/editor/tree-sitter-ndk/toml/build/intermediates/merged_res/release/mergeReleaseResources
-com.itsaky.androidide.treesitter.toml-main-6 /root/ZeroStudio-ZeroStudio-devs/editor/tree-sitter-ndk/toml/src/main/res
-com.itsaky.androidide.treesitter.toml-release-7 /root/ZeroStudio-ZeroStudio-devs/editor/tree-sitter-ndk/toml/src/release/res

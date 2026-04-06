@@ -1,4 +1,0 @@
-/bin/ninja \
-  -C \
-  /root/ZeroStudio-ZeroStudio-devs/editor/tree-sitter-ndk/cmake/.cxx/RelWithDebInfo/4r27662t/x86 \
-  tree-sitter-cmake

@@ -1,4 +1,0 @@
-/bin/ninja \
-  -C \
-  /root/ZeroStudio-ZeroStudio-devs/editor/tree-sitter-ndk/toml/.cxx/RelWithDebInfo/4b5b2t51/x86 \
-  tree-sitter-toml

@@ -1,3 +1,0 @@
--- Configuring done
--- Generating done
--- Build files have been written to: /root/android-tree-sitter/grammar-modules/xml/.cxx/RelWithDebInfo/5n4t431i/x86

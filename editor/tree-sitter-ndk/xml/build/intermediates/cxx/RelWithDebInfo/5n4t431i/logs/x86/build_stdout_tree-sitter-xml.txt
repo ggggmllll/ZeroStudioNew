@@ -1,6 +1,0 @@
-ninja: Entering directory `/root/android-tree-sitter/grammar-modules/xml/.cxx/RelWithDebInfo/5n4t431i/x86'
-[1/2] Building CXX object CMakeFiles/tree-sitter-xml.dir/tree-sitter-xml.cpp.o
-WARNING: linker: Warning: failed to find generated linker configuration from "/linkerconfig/ld.config.txt"
-[2/2] Linking CXX shared library /root/android-tree-sitter/grammar-modules/xml/build/intermediates/cxx/RelWithDebInfo/5n4t431i/obj/x86/libtree-sitter-xml.so
-WARNING: linker: Warning: failed to find generated linker configuration from "/linkerconfig/ld.config.txt"
-WARNING: linker: Warning: failed to find generated linker configuration from "/linkerconfig/ld.config.txt"

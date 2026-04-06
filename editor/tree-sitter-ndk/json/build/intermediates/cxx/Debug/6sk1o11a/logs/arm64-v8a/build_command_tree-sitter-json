@@ -1,4 +1,0 @@
-/root/android-sdk/cmake/3.22.1/bin/ninja \
-  -C \
-  /root/android-tree-sitter/grammar-modules/json/.cxx/Debug/6sk1o11a/arm64-v8a \
-  tree-sitter-json

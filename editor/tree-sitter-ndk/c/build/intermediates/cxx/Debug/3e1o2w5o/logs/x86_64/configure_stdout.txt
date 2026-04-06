@@ -1,3 +1,0 @@
--- Configuring done
--- Generating done
--- Build files have been written to: /root/android-tree-sitter/grammar-modules/c/.cxx/Debug/3e1o2w5o/x86_64

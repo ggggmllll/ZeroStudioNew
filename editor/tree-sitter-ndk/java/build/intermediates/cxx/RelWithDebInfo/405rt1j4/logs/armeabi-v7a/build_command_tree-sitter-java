@@ -1,4 +1,0 @@
-/root/android-sdk/cmake/3.22.1/bin/ninja \
-  -C \
-  /root/android-tree-sitter/grammar-modules/java/.cxx/RelWithDebInfo/405rt1j4/armeabi-v7a \
-  tree-sitter-java

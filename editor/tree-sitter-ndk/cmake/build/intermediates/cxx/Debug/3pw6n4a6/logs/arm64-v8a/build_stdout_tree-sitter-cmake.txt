@@ -1,2 +1,0 @@
-ninja: Entering directory `/root/ZeroStudio/editor/tree-sitter-ndk/cmake/.cxx/Debug/3pw6n4a6/arm64-v8a'
-ninja: no work to do.

@@ -1,4 +1,0 @@
-/root/android-sdk/cmake/3.22.1/bin/ninja \
-  -C \
-  /root/android-tree-sitter/grammar-modules/kotlin/.cxx/Debug/2i5r505r/arm64-v8a \
-  tree-sitter-kotlin

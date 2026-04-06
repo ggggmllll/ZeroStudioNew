@@ -1,8 +1,0 @@
-com.itsaky.androidide.treesitter.cmake-pngs-0 /root/ZeroStudio-ZeroStudio-devs/editor/tree-sitter-ndk/cmake/build/generated/res/pngs/release
-com.itsaky.androidide.treesitter.cmake-resValues-1 /root/ZeroStudio-ZeroStudio-devs/editor/tree-sitter-ndk/cmake/build/generated/res/resValues/release
-com.itsaky.androidide.treesitter.cmake-updated_navigation_xml-2 /root/ZeroStudio-ZeroStudio-devs/editor/tree-sitter-ndk/cmake/build/generated/updated_navigation_xml/release
-com.itsaky.androidide.treesitter.cmake-mergeReleaseResources-3 /root/ZeroStudio-ZeroStudio-devs/editor/tree-sitter-ndk/cmake/build/intermediates/incremental/release/mergeReleaseResources/merged.dir
-com.itsaky.androidide.treesitter.cmake-mergeReleaseResources-4 /root/ZeroStudio-ZeroStudio-devs/editor/tree-sitter-ndk/cmake/build/intermediates/incremental/release/mergeReleaseResources/stripped.dir
-com.itsaky.androidide.treesitter.cmake-release-5 /root/ZeroStudio-ZeroStudio-devs/editor/tree-sitter-ndk/cmake/build/intermediates/merged_res/release/mergeReleaseResources
-com.itsaky.androidide.treesitter.cmake-main-6 /root/ZeroStudio-ZeroStudio-devs/editor/tree-sitter-ndk/cmake/src/main/res
-com.itsaky.androidide.treesitter.cmake-release-7 /root/ZeroStudio-ZeroStudio-devs/editor/tree-sitter-ndk/cmake/src/release/res

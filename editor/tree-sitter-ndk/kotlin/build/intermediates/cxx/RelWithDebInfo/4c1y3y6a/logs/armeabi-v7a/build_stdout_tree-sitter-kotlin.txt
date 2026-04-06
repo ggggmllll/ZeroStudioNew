@@ -1,6 +1,0 @@
-ninja: Entering directory `/root/android-tree-sitter/grammar-modules/kotlin/.cxx/RelWithDebInfo/4c1y3y6a/armeabi-v7a'
-[1/2] Building CXX object CMakeFiles/tree-sitter-kotlin.dir/tree-sitter-kotlin.cpp.o
-WARNING: linker: Warning: failed to find generated linker configuration from "/linkerconfig/ld.config.txt"
-[2/2] Linking CXX shared library /root/android-tree-sitter/grammar-modules/kotlin/build/intermediates/cxx/RelWithDebInfo/4c1y3y6a/obj/armeabi-v7a/libtree-sitter-kotlin.so
-WARNING: linker: Warning: failed to find generated linker configuration from "/linkerconfig/ld.config.txt"
-WARNING: linker: Warning: failed to find generated linker configuration from "/linkerconfig/ld.config.txt"
