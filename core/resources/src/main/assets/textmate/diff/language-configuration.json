@@ -1,11 +1,23 @@
 {
-	"comments": {
-		"lineComment": "#",
-		"blockComment": [ "#", " " ]
-	},
-	"brackets": [
-		["{", "}"],
-		["[", "]"],
-		["(", ")"]
-	]
+  "comments": {
+    "lineComment": "#",
+    "blockComment": [
+      "#",
+      " "
+    ]
+  },
+  "brackets": [
+    [
+      "{",
+      "}"
+    ],
+    [
+      "[",
+      "]"
+    ],
+    [
+      "(",
+      ")"
+    ]
+  ]
 }

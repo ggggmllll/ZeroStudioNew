@@ -19,7 +19,7 @@
 
 package com.intellij.util.containers;
 
-import com.intellij.util.ReflectionUtil;
+import org.jetbrains.kotlin.com.intellij.util.ReflectionUtil;
 import java.lang.reflect.Field;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;

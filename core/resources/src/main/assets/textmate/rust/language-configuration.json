@@ -1,67 +1,25 @@
 {
 	"comments": {
 		"lineComment": "//",
-		"blockComment": [
-			"/*",
-			"*/"
-		]
+		"blockComment": [ "/*", "*/" ]
 	},
 	"brackets": [
-		[
-			"{",
-			"}"
-		],
-		[
-			"[",
-			"]"
-		],
-		[
-			"(",
-			")"
-		]
+		["{", "}"],
+		["[", "]"],
+		["(", ")"]
 	],
 	"autoClosingPairs": [
-		[
-			"{",
-			"}"
-		],
-		[
-			"[",
-			"]"
-		],
-		[
-			"(",
-			")"
-		],
-		{
-			"open": "\"",
-			"close": "\"",
-			"notIn": [
-				"string"
-			]
-		}
+		["{", "}"],
+		["[", "]"],
+		["(", ")"],
+		{ "open": "\"", "close": "\"", "notIn": ["string"] }
 	],
 	"surroundingPairs": [
-		[
-			"{",
-			"}"
-		],
-		[
-			"[",
-			"]"
-		],
-		[
-			"(",
-			")"
-		],
-		[
-			"\"",
-			"\""
-		],
-		[
-			"<",
-			">"
-		]
+		["{", "}"],
+		["[", "]"],
+		["(", ")"],
+		["\"", "\""],
+		["<", ">"]
 	],
 	"indentationRules": {
 		"increaseIndentPattern": "^.*\\{[^}\"']*$|^.*\\([^\\)\"']*$",
@@ -72,19 +30,5 @@
 			"start": "^\\s*//\\s*#?region\\b",
 			"end": "^\\s*//\\s*#?endregion\\b"
 		}
-	},
-	"onEnterRules": [
-		{
-			"beforeText": {
-				"pattern": "\/\/.*"
-			},
-			"afterText": {
-				"pattern": "^(?!\\s*$).+"
-			},
-			"action": {
-				"indent": "none",
-				"appendText": "// "
-			}
-		}
-	]
+	}
 }
