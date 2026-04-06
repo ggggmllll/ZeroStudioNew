@@ -1,62 +1,73 @@
-// Copyright 2000-2023 JetBrains s.r.o. and contributors. Use of this source code is governed by the Apache 2.0 license.
-package com.intellij.util.lang;
+// Copyright 2000-2023 JetBrains s.r.o. and contributors. Use of this source code is governed by the
+// Apache 2.0 license.
+/*
+ * Modifications Copyright 2026 KodTik-Innovations
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
+package org.jetbrains.kotlin.com.intellij.util.lang;
 
 import static org.jetbrains.kotlin.reflection.android.AndroidSupport.isDalvik;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
+// import org.jetbrains.kotlin.com.intellij.ReviseWhenPortedToJDK;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * <b>NB: copied from intellij to workaround KT-73967.</b>
  *
- * <p>Can be removed as soon as Kotlin depends on intellij of at least 243.23654.3.</p>
+ * <p>Can be removed as soon as Kotlin depends on intellij of at least 243.23654.3.
  *
+ * <p>A class representing a version of some Java platform - e.g. the runtime the class is loaded
+ * into, or some installed JRE.
  *
+ * <p>Based on <a href="http://openjdk.org/jeps/322">JEP 322 "Time-Based Release Versioning"</a>
+ * (Java 10+), but also supports JEP 223 "New Version-String Scheme" (Java 9), as well as earlier
+ * version's formats.
  *
- * <p>A class representing a version of some Java platform - e.g. the runtime the class is loaded into, or some installed JRE.</p>
- *
- * <p>Based on <a href="http://openjdk.org/jeps/322">JEP 322 "Time-Based Release Versioning"</a> (Java 10+), but also supports JEP 223
- * "New Version-String Scheme" (Java 9), as well as earlier version's formats.</p>
- *
- * <p>See {@link #parse(String)} for examples of supported version strings.</p>
+ * <p>See {@link #parse(String)} for examples of supported version strings.
  *
  * @implNote the class is used in bootstrap - please use only JDK API
  */
 @SuppressWarnings("DuplicatedCode")
 public final class JavaVersion implements Comparable<JavaVersion> {
   /**
-   * The major version.
-   * Corresponds to the first number of the 9+ format (<b>9</b>.0.1) / the second number of the 1.x format (1.<b>8</b>.0_60).
+   * The major version. Corresponds to the first number of the 9+ format (<b>9</b>.0.1) / the second
+   * number of the 1.x format (1.<b>8</b>.0_60).
    */
   public final int feature;
 
   /**
-   * The minor version.
-   * Corresponds to the second number of the 9+ format (9.<b>0</b>.1) / the third number of 1.x the format (1.8.<b>0</b>_60).
-   * Was used in version strings prior to 1.5, in newer strings is always {@code 0}.
+   * The minor version. Corresponds to the second number of the 9+ format (9.<b>0</b>.1) / the third
+   * number of 1.x the format (1.8.<b>0</b>_60). Was used in version strings prior to 1.5, in newer
+   * strings is always {@code 0}.
    */
   public final int minor;
 
   /**
-   * The patch version.
-   * Corresponds to the third number of the 9+ format (9.0.<b>1</b>) / the number after an underscore of the 1.x format (1.8.0_<b>60</b>).
+   * The patch version. Corresponds to the third number of the 9+ format (9.0.<b>1</b>) / the number
+   * after an underscore of the 1.x format (1.8.0_<b>60</b>).
    */
   public final int update;
 
   /**
-   * The build number.
-   * Corresponds to a number prefixed by the "plus" sign in the 9+ format (9.0.1+<b>7</b>) /
-   * by "-b" string in the 1.x format (1.8.0_60-b<b>12</b>).
+   * The build number. Corresponds to a number prefixed by the "plus" sign in the 9+ format
+   * (9.0.1+<b>7</b>) / by "-b" string in the 1.x format (1.8.0_60-b<b>12</b>).
    */
   public final int build;
 
   /**
-   * {@code true} if the platform is an early access release, {@code false} otherwise (or when not known).
+   * {@code true} if the platform is an early access release, {@code false} otherwise (or when not
+   * known).
    */
   public final boolean ea;
 
@@ -89,12 +100,12 @@ public final class JavaVersion implements Comparable<JavaVersion> {
   public boolean equals(Object o) {
     if (this == o) return true;
     if (!(o instanceof JavaVersion)) return false;
-    JavaVersion other = (JavaVersion)o;
-    return feature == other.feature &&
-           minor == other.minor &&
-           update == other.update &&
-           build == other.build &&
-           ea == other.ea;
+    JavaVersion other = (JavaVersion) o;
+    return feature == other.feature
+        && minor == other.minor
+        && update == other.update
+        && build == other.build
+        && ea == other.ea;
   }
 
   @Override
@@ -115,8 +126,8 @@ public final class JavaVersion implements Comparable<JavaVersion> {
   }
 
   /**
-   * @return feature, minor and update components of the version string, e.g.
-   * <b>1.8.0_242</b> or <b>11.0.5</b>
+   * @return feature, minor and update components of the version string, e.g. <b>1.8.0_242</b> or
+   *     <b>11.0.5</b>
    */
   public @NotNull String toFeatureMinorUpdateString() {
     return formatVersionTo(false, true);
@@ -139,8 +150,7 @@ public final class JavaVersion implements Comparable<JavaVersion> {
           if (build > 0) sb.append('+').append(build);
         }
       }
-    }
-    else {
+    } else {
       sb.append("1.").append(feature);
       if (!upToFeature) {
         if (minor > 0 || update > 0 || ea || build > 0) sb.append('.').append(minor);
@@ -159,7 +169,8 @@ public final class JavaVersion implements Comparable<JavaVersion> {
    *
    * @throws IllegalArgumentException when any of the numbers is negative
    */
-  public static @NotNull JavaVersion compose(int feature, int minor, int update, int build, boolean ea) throws IllegalArgumentException {
+  public static @NotNull JavaVersion compose(
+      int feature, int minor, int update, int build, boolean ea) throws IllegalArgumentException {
     if (feature < 0) throw new IllegalArgumentException();
     if (minor < 0) throw new IllegalArgumentException();
     if (update < 0) throw new IllegalArgumentException();
@@ -174,68 +185,79 @@ public final class JavaVersion implements Comparable<JavaVersion> {
   private static JavaVersion current;
 
   /**
-   * Returns the version of a Java runtime the class is loaded into.
-   * The method attempts to parse {@code "java.runtime.version"} system property first (usually, it is more complete),
-   * and falls back to {@code "java.version"} if the former is invalid or differs in {@link #feature} or {@link #minor} numbers.
+   * Returns the version of a Java runtime the class is loaded into. The method attempts to parse
+   * {@code "java.runtime.version"} system property first (usually, it is more complete), and falls
+   * back to {@code "java.version"} if the former is invalid or differs in {@link #feature} or
+   * {@link #minor} numbers.
    */
   public static @NotNull JavaVersion current() {
     if (current == null) {
       JavaVersion fallback = parse(System.getProperty("java.version"));
       JavaVersion rt = rtVersion();
       if (rt == null) {
-        try { rt = parse(System.getProperty("java.runtime.version")); }
-        catch (Throwable ignored) { }
+        try {
+          rt = parse(System.getProperty("java.runtime.version"));
+        } catch (Throwable ignored) {
+        }
       }
-      current = rt != null && rt.feature == fallback.feature && rt.minor == fallback.minor ? rt : fallback;
+      current =
+          rt != null && rt.feature == fallback.feature && rt.minor == fallback.minor
+              ? rt
+              : fallback;
     }
     return current;
   }
 
-  /**
-   * Attempts to use Runtime.version() method available since Java 9.
-   */
-    private static @Nullable JavaVersion rtVersion() {
+  /** Attempts to use Runtime.version() method available since Java 9. */
+  private static @Nullable JavaVersion rtVersion() {
     try {
       Object version = Runtime.class.getMethod("version").invoke(null);
-      int major = (Integer)version.getClass().getMethod("major").invoke(version);
-      int minor = (Integer)version.getClass().getMethod("minor").invoke(version);
-      int security = (Integer)version.getClass().getMethod("security").invoke(version);
+      int major = (Integer) version.getClass().getMethod("major").invoke(version);
+      int minor = (Integer) version.getClass().getMethod("minor").invoke(version);
+      int security = (Integer) version.getClass().getMethod("security").invoke(version);
       Object buildOpt = version.getClass().getMethod("build").invoke(version);
-      int build = (Integer)buildOpt.getClass().getMethod("orElse", Object.class).invoke(buildOpt, Integer.valueOf(0));
+      int build =
+          (Integer)
+              buildOpt
+                  .getClass()
+                  .getMethod("orElse", Object.class)
+                  .invoke(buildOpt, Integer.valueOf(0));
       Object preOpt = version.getClass().getMethod("pre").invoke(version);
-      boolean ea = (Boolean)preOpt.getClass().getMethod("isPresent").invoke(preOpt);
+      boolean ea = (Boolean) preOpt.getClass().getMethod("isPresent").invoke(preOpt);
       return new JavaVersion(major, minor, security, build, ea);
-    }
-    catch (Throwable ignored) {
+    } catch (Throwable ignored) {
       return null;
     }
   }
 
-  private static final int MAX_ACCEPTED_VERSION = 50;  // sanity check
+  private static final int MAX_ACCEPTED_VERSION = 50; // sanity check
 
   /**
-   * <p>Parses a Java version string.</p>
+   * Parses a Java version string.
    *
    * <p>Supports various sources, including (but not limited to):<br>
-   *   - {@code "java.*version"} system properties (a version number without any decoration)<br>
-   *   - values of Java compiler -source/-target/--release options ("$MAJOR", "1.$MAJOR")<br>
-   *   - output of "{@code java -version}" (usually "java version \"$VERSION\"")<br>
-   *   - a second line of the above command (something like to "Java(TM) SE Runtime Environment (build $VERSION)")<br>
-   *   - output of "{@code java --full-version}" ("java $VERSION")<br>
-   *   - a line of "release" file ("JAVA_VERSION=\"$VERSION\"")</p>
+   * - {@code "java.*version"} system properties (a version number without any decoration)<br>
+   * - values of Java compiler -source/-target/--release options ("$MAJOR", "1.$MAJOR")<br>
+   * - output of "{@code java -version}" (usually "java version \"$VERSION\"")<br>
+   * - a second line of the above command (something like to "Java(TM) SE Runtime Environment (build
+   * $VERSION)")<br>
+   * - output of "{@code java --full-version}" ("java $VERSION")<br>
+   * - a line of "release" file ("JAVA_VERSION=\"$VERSION\"")
    *
-   * <p>See com.intellij.util.lang.JavaVersionTest for examples.</p>
+   * <p>See org.jetbrains.kotlin.com.intellij.util.lang.JavaVersionTest for examples.
    *
    * @throws IllegalArgumentException if failed to recognize the number.
    */
-  public static @NotNull JavaVersion parse(@NotNull String versionString) throws IllegalArgumentException {
+  public static @NotNull JavaVersion parse(@NotNull String versionString)
+      throws IllegalArgumentException {
     if (isDalvik()) {
       return new JavaVersion(8, 0, 0, 69, false);
     }
 
     // trimming
     String str = versionString.trim();
-    Map<String, String> trimmingMap = new HashMap<>(); // "substring to detect" to "substring from which to trim"
+    Map<String, String> trimmingMap =
+        new HashMap<>(); // "substring to detect" to "substring from which to trim"
     trimmingMap.put("Runtime Environment", "(build ");
     trimmingMap.put("OpenJ9", "version ");
     trimmingMap.put("GraalVM", "Java ");
@@ -281,13 +303,18 @@ public final class JavaVersion implements Comparable<JavaVersion> {
               }
               p++;
             }
-            if (build == 0 && p < separators.size() && p < numbers.size() && "+".equals(separators.get(p))) {
+            if (build == 0
+                && p < separators.size()
+                && p < numbers.size()
+                && "+".equals(separators.get(p))) {
               build = Integer.parseInt(numbers.get(p));
             }
           }
           return new JavaVersion(feature, minor, update, build, ea);
-        }
-        else if (feature == 1 && numbers.size() > 1 && separators.size() > 1 && ".".equals(separators.get(1))) {
+        } else if (feature == 1
+            && numbers.size() > 1
+            && separators.size() > 1
+            && ".".equals(separators.get(1))) {
           // Java 1.0 .. 1.4; Java 5+ (prefixed format)
           feature = Integer.parseInt(numbers.get(1));
           if (feature <= MAX_ACCEPTED_VERSION) {
@@ -311,26 +338,28 @@ public final class JavaVersion implements Comparable<JavaVersion> {
             return new JavaVersion(feature, minor, update, build, ea);
           }
         }
+      } catch (NumberFormatException ignored) {
       }
-      catch (NumberFormatException ignored) { }
     }
 
     throw new IllegalArgumentException(versionString);
   }
 
   private static boolean startsWithWord(String s, String word) {
-    return s.startsWith(word) && (s.length() == word.length() || !Character.isLetterOrDigit(s.charAt(word.length())));
+    return s.startsWith(word)
+        && (s.length() == word.length() || !Character.isLetterOrDigit(s.charAt(word.length())));
   }
 
   /**
-   * A safe version of {@link #parse(String)} - returns {@code null} when unable to parse a version string.
+   * A safe version of {@link #parse(String)} - returns {@code null} when unable to parse a version
+   * string.
    */
   public static @Nullable JavaVersion tryParse(String versionString) {
     if (versionString != null) {
       try {
         return parse(versionString);
+      } catch (IllegalArgumentException ignored) {
       }
-      catch (IllegalArgumentException ignored) { }
     }
 
     return null;

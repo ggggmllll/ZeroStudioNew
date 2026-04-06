@@ -18,7 +18,7 @@ package org.jetbrains.kotlin.utils
 
 import java.io.File
 import java.lang.IllegalStateException
-import com.intellij.util.lang.JavaVersion
+import org.jetbrains.kotlin.com.intellij.util.lang.JavaVersion
 
 interface KotlinPaths {
     val homePath: File
