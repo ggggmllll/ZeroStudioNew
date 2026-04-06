@@ -74,7 +74,7 @@ dependencies {
     api("org.lsposed.hiddenapibypass:hiddenapibypass:6.1")
     api("org.jetbrains.intellij.deps:trove4j:1.0.20200330") 
     implementation 'org.jetbrains:annotations:26.0.2'
-    runtimeOnly ('org.jetbrains.kotlin:kotlin-reflect:2.3.0')
+    runtimeOnly ('org.jetbrains.kotlin:kotlin-reflect:2.2.0')
      
     compileOnly files('libs/the-unsafe.jar')
         api files('libs/kotlin-compiler-embeddable-2.3.0.jar')
@@ -101,7 +101,6 @@ dependencies {
             exclude 'org/jetbrains/kotlin/utils/PathUtil*'
         }
     }
-
 
     implementation files('libs/jps-model-impl-253.28294.357.jar') 
     implementation(libs.composite.java.stubsb)
