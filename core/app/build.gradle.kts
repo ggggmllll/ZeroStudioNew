@@ -161,10 +161,10 @@ dependencies {
   implementation(libs.google.auto.service.annotations)
   implementation(libs.google.gson)
   implementation(libs.google.guava)
-  implementation(platform("com.google.firebase:firebase-bom:34.10.0"))
-  // Add the dependency for the Performance Monitoring library
-  // When using the BoM, you don't specify versions in Firebase library dependencies
-  implementation("com.google.firebase:firebase-perf")
+  // implementation(platform("com.google.firebase:firebase-bom:34.10.0"))
+  // // Add the dependency for the Performance Monitoring library
+  // // When using the BoM, you don't specify versions in Firebase library dependencies
+  // implementation("com.google.firebase:firebase-perf")
 
   // AndroidX
   implementation(libs.androidx.splashscreen)

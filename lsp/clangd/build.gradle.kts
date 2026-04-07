@@ -7,8 +7,9 @@ plugins {
 
 android {
   namespace = "${BuildConfig.packageName}.lsp.clangd"
-  compileSdk = 36
-
+  compileSdk = 35
+  ndkVersion = BuildConfig.ndkVersion
+  
   defaultConfig {
     minSdk = 28
 
@@ -19,7 +20,7 @@ android {
       }
     }
 
-    ndk { abiFilters += listOf("arm64-v8a", "x86_64") }
+    ndk { abiFilters += listOf("arm64-v8a", "armeabi-v7a" , "x86_64") }
   }
 
   externalNativeBuild {
@@ -29,7 +30,7 @@ android {
     }
   }
 
-  buildFeatures { buildConfig = true }
+  buildFeatures { buildConfig = false }
 
   compileOptions {
     sourceCompatibility = JavaVersion.VERSION_17

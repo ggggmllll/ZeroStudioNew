@@ -1,11 +1,5 @@
 package com.itsaky.androidide.lsp.models
 
-// enum class MessageType {
-  // Error,
-  // Warning,
-  // Info,
-  // Log,
-// }
 
 data class LogMessageParams(
     var type: MessageType,

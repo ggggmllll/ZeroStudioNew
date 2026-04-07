@@ -474,6 +474,11 @@ okhttp-logging = { group = "com.squareup.okhttp3", name = "logging-interceptor",
 org-jetbrains-fernflower = { module = "zerostudio:fernflower", version = "1.0" }
 org-benf-cfr = { module = "org.benf:cfr", version = "0.152" }
 org-bitbucket-mstrobel-procyon-compilertools = { module = "org.bitbucket.mstrobel:procyon-compilertools", version = "0.6.0" }
+#smali反编译器
+google-baksmali = { module = "com.android.tools.smali:smali-baksmali", version = "3.0.9" }
+google-smali = { module = "com.android.tools.smali:smali", version = "3.0.9" }
+google-smali-dexlib2 = { module = "com.android.tools.smali:smali-dexlib2", version = "3.0.9" }
+google-smali-util = { module = "com.android.tools.smali:smali-util", version = "3.0.9" }
 
 # Github来源的sdk
 github-juniversalchardet = { group = "com.github.albfernandez", name = "juniversalchardet", version.ref = "com-github-Juniversalchardet" }
