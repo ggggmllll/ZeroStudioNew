@@ -4,11 +4,6 @@ plugins {
 
 }
 
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
-    }
-}
 
 tasks.named("shadowJar") {
     dependsOn(":lib:remap")
