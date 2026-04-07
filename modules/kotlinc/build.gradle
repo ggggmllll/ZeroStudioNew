@@ -1,5 +1,6 @@
 plugins {
     id 'com.android.library'
+    java
 }
 apply plugin: 'kotlin-android'
 
@@ -77,31 +78,9 @@ dependencies {
     runtimeOnly ('org.jetbrains.kotlin:kotlin-reflect:2.2.0')
      
     compileOnly files('libs/the-unsafe.jar')
-       // api files('libs/kotlin-compiler-embeddable-2.2.0.jar')
-    implementation fileTree(dir: 'libs', include: ['kotlin-compiler-embeddable-2.2.0.jar']).collect { jarFile ->
-        zipTree(jarFile).matching {
-            exclude 'org/jetbrains/kotlin/cli/jvm/compiler/jarfs/**'
-            exclude 'org/jetbrains/kotlin/cli/jvm/config/JvmContentRoots*'
-            exclude 'org/jetbrains/kotlin/cli/jvm/javac/JavacLogger*'
-            exclude 'org/jetbrains/kotlin/com/intellij/openapi/util/LowMemoryWatcherManager*'
-            exclude 'org/jetbrains/kotlin/com/intellij/openapi/util/NullableLazyValue*'
-            exclude 'org/jetbrains/kotlin/com/intellij/util/containers/ConcurrentIntObjectHashMap*'
-            exclude 'org/jetbrains/kotlin/com/intellij/util/containers/ConcurrentLongObjectHashMap*'
-            exclude 'org/jetbrains/kotlin/com/intellij/util/containers/Unsafe*'
-            exclude 'org/jetbrains/kotlin/com/intellij/util/containers/UnsafeUtil*'
-            exclude 'org/jetbrains/kotlin/com/intellij/util/lang/JavaVersion*'
-            exclude 'org/jetbrains/kotlin/reflection/android/AndroidSupport*'
-            
-            exclude 'org/jetbrains/kotlin/util/PerformanceManager*'
-            exclude 'org/jetbrains/kotlin/util/PerformanceManagerImpl*'
-            exclude 'org/jetbrains/kotlin/util/PerformanceManagerKt*'
-            exclude 'org/jetbrains/kotlin/util/ServiceLoaderLite*'
-            exclude 'org/jetbrains/kotlin/util/DeprecatedMeasurementForBackCompatibility*'
-            exclude 'org/jetbrains/kotlin/util/PotentiallyIncorrectPhaseTimeMeasurement*'
-            exclude 'org/jetbrains/kotlin/utils/PathUtil*'
-        }
-    }
-
+    
+    extractDeps(libs.org.jetbrains.kotlin.compiler.embeddable)
+    
     implementation files('libs/jps-model-impl-253.28294.357.jar') 
     implementation(libs.composite.java.stubsb)
     implementation(libs.composite.javacb)
@@ -112,4 +91,48 @@ dependencies {
 
 
     
+}
+
+
+val extractDeps by configurations.creating {
+    isCanBeResolved = true
+    isCanBeConsumed = false
+    isTransitive = false
+}
+
+
+tasks.register<Jar>("minifiedKotlinJar") {
+    group = "build"
+    description = "生成精简版的 Kotlin Compiler Embeddable"
+
+    archiveBaseName.set("kotlin-compiler-custom")
+    archiveClassifier.set("minified")
+
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    val rootFiles = provider { extractDeps.files }
+    
+    from(rootFiles.get().map { zipTree(it) }) {
+        exclude("org/jetbrains/kotlin/cli/jvm/compiler/jarfs/**")
+        exclude("org/jetbrains/kotlin/cli/jvm/config/JvmContentRoots*")
+        exclude("org/jetbrains/kotlin/cli/jvm/javac/JavacLogger*")
+        exclude("org/jetbrains/kotlin/com/intellij/openapi/util/LowMemoryWatcherManager*")
+        exclude("org/jetbrains/kotlin/com/intellij/openapi/util/NullableLazyValue*")
+        exclude("org/jetbrains/kotlin/com/intellij/util/containers/ConcurrentIntObjectHashMap*")
+        exclude("org/jetbrains/kotlin/com/intellij/util/containers/ConcurrentLongObjectHashMap*")
+        exclude("org/jetbrains/kotlin/com/intellij/util/containers/Unsafe*")
+        exclude("org/jetbrains/kotlin/com/intellij/util/containers/UnsafeUtil*")
+        exclude("org/jetbrains/kotlin/com/intellij/util/lang/JavaVersion*")
+        exclude("org/jetbrains/kotlin/reflection/android/AndroidSupport*")
+        
+        exclude("org/jetbrains/kotlin/util/PerformanceManager*")
+        exclude("org/jetbrains/kotlin/util/PerformanceManagerImpl*")
+        exclude("org/jetbrains/kotlin/util/PerformanceManagerKt*")
+        exclude("org/jetbrains/kotlin/util/ServiceLoaderLite*")
+        exclude("org/jetbrains/kotlin/util/DeprecatedMeasurementForBackCompatibility*")
+        exclude("org/jetbrains/kotlin/util/PotentiallyIncorrectPhaseTimeMeasurement*")
+        exclude("org/jetbrains/kotlin/utils/PathUtil*")
+
+        exclude("META-INF/*.SF", "META-INF/*.DSA", "META-INF/*.RSA")
+    }
 }
