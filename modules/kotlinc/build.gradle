@@ -5,11 +5,6 @@ plugins {
 }
 
 
-tasks.named("shadowJar") {
-    dependsOn(":lib:remap")
-}
-
-
 tasks.assemble.dependsOn tasks.shadowJar
 tasks.build.dependsOn tasks.shadowJar
 
