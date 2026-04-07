@@ -7,8 +7,9 @@ package org.jetbrains.kotlin.cli.jvm.compiler.jarfs
 class ByteArrayCharSequence(
     private val bytes: ByteArray,
     private val start: Int = 0,
-    private val end: Int = bytes.size,
+    private val end: Int = bytes.size
 ) : CharSequence {
+
     override fun hashCode(): Int {
         error("Do not try computing hashCode ByteArrayCharSequence")
     }
@@ -21,10 +22,7 @@ class ByteArrayCharSequence(
 
     override fun get(index: Int): Char = bytes[index + start].toInt().toChar()
 
-    override fun subSequence(
-        startIndex: Int,
-        endIndex: Int,
-    ): CharSequence {
+    override fun subSequence(startIndex: Int, endIndex: Int): CharSequence {
         if (startIndex == 0 && endIndex == length) return this
         return ByteArrayCharSequence(bytes, start + startIndex, start + endIndex)
     }
@@ -39,3 +37,4 @@ class ByteArrayCharSequence(
         return String(chars)
     }
 }
+

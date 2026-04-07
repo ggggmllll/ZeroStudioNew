@@ -8,26 +8,19 @@ package org.jetbrains.kotlin.util
 import org.jetbrains.kotlin.platform.TargetPlatform
 import org.jetbrains.kotlin.platform.isCommon
 import org.jetbrains.kotlin.platform.isJs
-import org.jetbrains.kotlin.stats.MarkdownReportRenderer
-import org.jetbrains.kotlin.stats.SingleReportsData
-import org.jetbrains.kotlin.stats.StatsCalculator
 import java.io.File
 import java.lang.management.CompilationMXBean
 import java.lang.management.GarbageCollectorMXBean
 import java.lang.management.ManagementFactory
 import java.lang.management.ThreadMXBean
-import java.text.SimpleDateFormat
-import java.util.*
+import java.util.SortedMap
+import kotlin.collections.set
 
 /**
  * The class is not thread-safe; all functions should be called sequentially phase-by-phase within a specific module
  * to get reliable performance measurements.
  */
 abstract class PerformanceManager(val targetPlatform: TargetPlatform, val presentableName: String) {
-    companion object {
-        private const val DEBUG_MODE: Boolean = false
-    }
-
     private lateinit var thread: Thread
     private lateinit var threadMXBean: ThreadMXBean
 
@@ -49,10 +42,6 @@ abstract class PerformanceManager(val targetPlatform: TargetPlatform, val presen
     private var jitTimeMillis: Long? = null
     private val extendedStats: MutableList<String> = mutableListOf()
 
-    private var currentDynamicPhaseTime: Time? = null
-    private var currentDynamicPhase: String? = null
-    private val dynamicPhaseMeasurements = LinkedHashMap<Pair<PhaseType, String>, Time>()
-
     var isExtendedStatsEnabled: Boolean = false
         private set
     var compilerType: CompilerType = CompilerType.K2
@@ -60,7 +49,6 @@ abstract class PerformanceManager(val targetPlatform: TargetPlatform, val presen
         private set
 
     var targetDescription: String? = null
-    var outputKind: String? = null
     var files: Int = 0
         private set
     var lines: Int = 0
@@ -69,10 +57,9 @@ abstract class PerformanceManager(val targetPlatform: TargetPlatform, val presen
         private set
     val isPhaseMeasuring: Boolean
         get() = phaseStartTime != null
-    var detailedPerf: Boolean = false
 
     fun getTargetInfo(): String =
-        listOfNotNull(targetDescription, outputKind).joinToString("-") + " $files files ($lines lines)"
+        "$targetDescription, $files files ($lines lines)"
 
     fun initializeCurrentThread() {
         thread = Thread.currentThread()
@@ -87,9 +74,6 @@ abstract class PerformanceManager(val targetPlatform: TargetPlatform, val presen
         var initTime: Time? = null
         var analysisTime: Time? = null
         var translationToIrTime: Time? = null
-        var irPreLoweringTime: Time? = null
-        var irSerializationTime: Time? = null
-        var klibWritingTime: Time? = null
         var irLoweringTime: Time? = null
         var backendTime: Time? = null
 
@@ -98,9 +82,6 @@ abstract class PerformanceManager(val targetPlatform: TargetPlatform, val presen
                 PhaseType.Initialization -> initTime = time
                 PhaseType.Analysis -> analysisTime = time
                 PhaseType.TranslationToIr -> translationToIrTime = time
-                PhaseType.IrPreLowering -> irPreLoweringTime = time
-                PhaseType.IrSerialization -> irSerializationTime = time
-                PhaseType.KlibWriting -> klibWritingTime = time
                 PhaseType.IrLowering -> irLoweringTime = time
                 PhaseType.Backend -> backendTime = time
             }
@@ -118,8 +99,6 @@ abstract class PerformanceManager(val targetPlatform: TargetPlatform, val presen
 
         UnitStats(
             targetDescription,
-            outputKind,
-            System.currentTimeMillis(),
             targetPlatform.getPlatformEnumValue(),
             compilerType,
             hasErrors,
@@ -128,15 +107,8 @@ abstract class PerformanceManager(val targetPlatform: TargetPlatform, val presen
             initTime,
             analysisTime,
             translationToIrTime,
-            irPreLoweringTime,
-            irSerializationTime,
-            klibWritingTime,
             irLoweringTime,
             backendTime,
-            dynamicPhaseMeasurements.map { (key, time) ->
-                val (phaseType, name) = key
-                DynamicStats(phaseType, name, time)
-            },
             findJavaClassStats,
             findKotlinClassStats,
             gcMeasurements.values.toList(),
@@ -150,7 +122,7 @@ abstract class PerformanceManager(val targetPlatform: TargetPlatform, val presen
 
         if (otherUnitStats == null) return
 
-        assertIfDebug(targetPlatform.getPlatformEnumValue() == otherUnitStats.platform)
+        assert(targetPlatform.getPlatformEnumValue() == otherUnitStats.platform)
         compilerType += otherUnitStats.compilerType
         hasErrors = hasErrors || otherUnitStats.hasErrors
 
@@ -160,10 +132,6 @@ abstract class PerformanceManager(val targetPlatform: TargetPlatform, val presen
             if (time != null) {
                 phaseMeasurements[phaseType] = (phaseMeasurements[phaseType] ?: Time.ZERO) + time
             }
-        }
-
-        otherUnitStats.dynamicStats?.forEach { (phaseType, name, time) ->
-            dynamicPhaseMeasurements[phaseType to name] = (dynamicPhaseMeasurements[phaseType to name] ?: Time.ZERO) + time
         }
 
         otherUnitStats.forEachPhaseSideMeasurement { phaseSideType, sideStats ->
@@ -221,33 +189,15 @@ abstract class PerformanceManager(val targetPlatform: TargetPlatform, val presen
         this.lines += lines
     }
 
-    fun notifyDynamicPhaseStarted(name: String) {
-        currentDynamicPhaseTime = currentTime()
-        currentDynamicPhase = name
-    }
-
-    fun notifyDynamicPhaseFinished(name: String, parentPhaseType: PhaseType) {
-        assertIfDebug(currentDynamicPhaseTime != null)
-        assertIfDebug(currentDynamicPhase == name)
-
-        val localCurrentDynamicPhaseTime = currentDynamicPhaseTime
-        assertIfDebug(localCurrentDynamicPhaseTime != null) { "Dynamic measurement $name must have been started before finishing" }
-        if (localCurrentDynamicPhaseTime != null) {
-            dynamicPhaseMeasurements[parentPhaseType to name] =
-                (dynamicPhaseMeasurements[parentPhaseType to name] ?: Time.ZERO) + (currentTime() - localCurrentDynamicPhaseTime)
-        }
-        currentDynamicPhaseTime = null
-    }
-
     fun notifyPhaseStarted(newPhaseType: PhaseType) {
-        assertIfDebug(phaseStartTime == null) { "The measurement for phase $currentPhaseType must have been finished before starting $newPhaseType" }
+        assert(phaseStartTime == null) { "The measurement for phase $currentPhaseType must have been finished before starting $newPhaseType" }
 
-        // All phases should always be executed sequentially.
-        // TODO KT-75227 However, some Web pipelines are written in a way where `BackendGeneration` executed before `Analysis` or `IrLowering`.
-        //   Consider using multiple `PerformanceManager` for measuring times per each unit
-        //   or fix a time measurement bug where `BackendGeneration` is measured before `Analysis` or `IrLowering`
+        // Ideally, all phases always should be executed sequentially.
+        // However, some pipelines are written in a way where `BackendGeneration` executed before `Analysis` or `IrLowering` (Web).
+        // TODO: KT-75227 Consider using multiple `PerformanceManager` for measuring times per each unit
+        // or fixing a time measurement bug where `BackendGeneration` is executed before `Analysis` or `IrLowering`
         if (!targetPlatform.isJs()) {
-            assertIfDebug(newPhaseType >= currentPhaseType) { "The measurement for phase $newPhaseType must be performed before $currentPhaseType" }
+            assert(newPhaseType >= currentPhaseType) { "The measurement for phase $newPhaseType must be performed before $currentPhaseType" }
         }
 
         phaseStartTime = currentTime()
@@ -257,7 +207,7 @@ abstract class PerformanceManager(val targetPlatform: TargetPlatform, val presen
     fun notifyPhaseFinished(phaseType: PhaseType) {
         ensureNotFinalizedAndSameThread()
 
-        assertIfDebug(phaseStartTime != null) { "The measurement for phase $phaseType hasn't been started or already finished" }
+        assert(phaseStartTime != null) { "The measurement for phase $phaseType hasn't been started or already finished" }
         finishPhase(phaseType)
     }
 
@@ -286,10 +236,8 @@ abstract class PerformanceManager(val targetPlatform: TargetPlatform, val presen
             )
         }
 
-        val localCompilationMXBean = compilationMXBean
-        val localJitStartTime = jitStartTime
-        if (localCompilationMXBean != null && localJitStartTime != null) {
-            jitTimeMillis = localCompilationMXBean.totalCompilationTime - localJitStartTime
+        if (compilationMXBean != null && jitStartTime != null) {
+            jitTimeMillis = compilationMXBean!!.totalCompilationTime - jitStartTime!!
         }
 
         if (!compilerType.isK2) {
@@ -306,13 +254,9 @@ abstract class PerformanceManager(val targetPlatform: TargetPlatform, val presen
 
     private fun finishPhase(phaseType: PhaseType) {
         if (phaseType != currentPhaseType) { // It's allowed to measure the same phase multiple times (although it's better to avoid that)
-            assertIfDebug(!phaseMeasurements.containsKey(phaseType)) { "The measurement for phase $phaseType is already performed" }
+            assert(!phaseMeasurements.containsKey(phaseType)) { "The measurement for phase $phaseType is already performed" }
         }
-        val localPhaseStartTime = phaseStartTime
-        assertIfDebug(localPhaseStartTime != null) { "Measurement of $phaseType must have been started before finishing" }
-        if (localPhaseStartTime != null) {
-            phaseMeasurements[phaseType] = (phaseMeasurements[phaseType] ?: Time.ZERO) + (currentTime() - localPhaseStartTime)
-        }
+        phaseMeasurements[phaseType] = (phaseMeasurements[phaseType] ?: Time.ZERO) + (currentTime() - phaseStartTime!!)
         phaseStartTime = null
     }
 
@@ -335,78 +279,24 @@ abstract class PerformanceManager(val targetPlatform: TargetPlatform, val presen
         }
     }
 
-    fun dumpPerformanceReport(destFileNameOrPlaceholder: String) {
-        val refinedFileName: String = if (File(destFileNameOrPlaceholder).isDirectory) {
-            // We can't use `Paths.get` because of its absence in earlier Android SDKs
-            val separator = if (destFileNameOrPlaceholder.lastOrNull().let { it == null || it == File.separatorChar }) {
-                ""
-            } else {
-                File.separatorChar
-            }
-            destFileNameOrPlaceholder + separator + generateFileName() + ".json"
-        } else {
-            val lastSlashIndex = destFileNameOrPlaceholder.indexOfLast { it == File.separatorChar }
-            val extensionDotIndex =
-                destFileNameOrPlaceholder.indexOf('.', lastSlashIndex).let { if (it == -1) destFileNameOrPlaceholder.length else it }
-            // It's ok if `lastSlashIndex` == -1
-            val fileNameOrPlaceholder = destFileNameOrPlaceholder.substring(lastSlashIndex + 1, extensionDotIndex)
-            if (fileNameOrPlaceholder == "*") {
-                val pathString = if (lastSlashIndex != -1) destFileNameOrPlaceholder.take(lastSlashIndex + 1) else ""
-                val fileName = generateFileName()
-                val extension = destFileNameOrPlaceholder.substring(extensionDotIndex)
-                pathString + fileName + extension
-            } else {
-                destFileNameOrPlaceholder
-            }
-        }
-
-        val destinationFile = File(refinedFileName)
-        val dumpFormat = DumpFormat.entries.firstOrNull { it.extension == destinationFile.extension } ?: DumpFormat.PlainText
-        destinationFile.writeBytes(createPerformanceReport(dumpFormat).toByteArray())
+    fun dumpPerformanceReport(destination: File) {
+        destination.writeBytes(createPerformanceReport(destination.extension == "json").toByteArray())
     }
 
-    /**
-     * Generate a unique name to avoid files overwriting.
-     * Use the current date-time stamp with millis precision as a part of the unique name.
-     */
-    private fun generateFileName(): String {
-        return "${unitStats.name}_${dateFormatterForFileName.format(unitStats.timeStampMs)}"
-    }
-
-    private val dateFormatterForFileName by lazy(LazyThreadSafetyMode.PUBLICATION) {
-        SimpleDateFormat("yyyy-MM-dd-HH-mm-ss")
-    }
-
-    enum class DumpFormat(val extension: String) {
-        PlainText("log"),
-        Json("json"),
-        Markdown("md"),
-    }
-
-    fun createPerformanceReport(dumpFormat: DumpFormat): String = when (dumpFormat) {
-        DumpFormat.PlainText -> buildString {
+    fun createPerformanceReport(isJson: Boolean): String = if (isJson) {
+        UnitStatsJsonDumper.dump(unitStats)
+    } else {
+        buildString {
             append("$presentableName performance report\n")
-            forEachStringMeasurement { appendLine(it) }
+            unitStats.forEachStringMeasurement { appendLine(it) }
         }
-        DumpFormat.Json -> UnitStatsJsonDumper.dump(unitStats)
-        DumpFormat.Markdown -> MarkdownReportRenderer(StatsCalculator(SingleReportsData(unitStats))).render()
     }
 
     private fun ensureNotFinalizedAndSameThread() {
         if (!targetPlatform.isJs()) { // TODO: KT-75227
-            assertIfDebug(!isFinalized) { "Cannot add a performance measurements because it's already finalized" }
+            assert(!isFinalized) { "Cannot add a performance measurements because it's already finalized" }
         }
-        assertIfDebug(Thread.currentThread() == thread) { "PerformanceManager functions can be run only from the same thread" }
-    }
-
-    private fun assertIfDebug(value: Boolean, lazyMessage: (() -> Any)? = null) {
-        if (DEBUG_MODE) {
-            if (lazyMessage != null) {
-                assert(value, lazyMessage)
-            } else {
-                assert(value)
-            }
-        }
+        assert(Thread.currentThread() == thread) { "PerformanceManager functions can be run only from the same thread" }
     }
 }
 
@@ -415,14 +305,9 @@ class PerformanceManagerImpl(targetPlatform: TargetPlatform, presentableName: St
         /**
          * Useful for measuring time when a pipeline is split on multiple parallel steps (in multithread mode or not)
          */
-        fun createChildIfNeeded(mainPerformanceManager: PerformanceManager?, start: Boolean): PerformanceManagerImpl? {
+        fun createAndEnableChildIfNeeded(mainPerformanceManager: PerformanceManager?): PerformanceManagerImpl? {
             return if (mainPerformanceManager != null) {
                 PerformanceManagerImpl(mainPerformanceManager.targetPlatform, mainPerformanceManager.presentableName + " (Child)").also {
-                    if (!start) {
-                        // Currently, the perf manager is implemented in a way to start the initial measurement immediately after creating.
-                        // If we don't need to measure the initial phase, the only thing we can do is to stop it immediately.
-                        it.notifyPhaseFinished(PhaseType.Initialization)
-                    }
                     it.compilerType = mainPerformanceManager.compilerType
                 }
             } else {
@@ -444,17 +329,6 @@ inline fun <T> PerformanceManager?.tryMeasurePhaseTime(phaseType: PhaseType, blo
         return block()
     } finally {
         notifyPhaseFinished(phaseType)
-    }
-}
-
-inline fun <T> PerformanceManager?.tryMeasureDynamicPhaseTime(name: String, parentPhaseType: PhaseType, block: () -> T): T {
-    if (this == null) return block()
-
-    try {
-        notifyDynamicPhaseStarted(name)
-        return block()
-    } finally {
-        notifyDynamicPhaseFinished(name, parentPhaseType)
     }
 }
 

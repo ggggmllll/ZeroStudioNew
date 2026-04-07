@@ -1,6 +1,6 @@
 /*
  * Copyright 2010-2017 JetBrains s.r.o.
- * Modifications Copyright 2026 KodTik-Innovations
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,6 +19,7 @@ package org.jetbrains.kotlin.utils
 import org.jetbrains.kotlin.com.intellij.openapi.application.ApplicationManager
 import org.jetbrains.kotlin.com.intellij.openapi.application.PathManager
 import org.jetbrains.kotlin.reflection.android.AndroidSupport.isDalvik
+
 import java.io.File
 import java.nio.file.Paths
 import java.util.regex.Pattern
@@ -79,17 +80,12 @@ object PathUtil {
     const val KOTLINX_COROUTINES_CORE_JAR = "$KOTLINX_COROUTINES_CORE_NAME.jar"
     const val KOTLIN_SCRIPTING_COMPILER_IMPL_NAME = "kotlin-scripting-compiler-impl"
     const val KOTLIN_SCRIPTING_COMPILER_IMPL_JAR = "$KOTLIN_SCRIPTING_COMPILER_IMPL_NAME.jar"
-    const val JS_ENGINES_NAME = "js.engines"
-    const val JS_ENGINES_JAR = "$JS_ENGINES_NAME.jar"
     const val MAIN_KTS_NAME = "kotlin-main-kts"
 
-    val KOTLIN_SCRIPTING_PLUGIN_CLASSPATH_JARS =
-        arrayOf(
-            KOTLIN_SCRIPTING_COMPILER_PLUGIN_JAR,
-            KOTLIN_SCRIPTING_COMPILER_IMPL_JAR,
-            KOTLIN_SCRIPTING_COMMON_JAR,
-            KOTLIN_SCRIPTING_JVM_JAR,
-        )
+    val KOTLIN_SCRIPTING_PLUGIN_CLASSPATH_JARS = arrayOf(
+        KOTLIN_SCRIPTING_COMPILER_PLUGIN_JAR, KOTLIN_SCRIPTING_COMPILER_IMPL_JAR,
+        KOTLIN_SCRIPTING_COMMON_JAR, KOTLIN_SCRIPTING_JVM_JAR,
+    )
 
     const val KOTLIN_TEST_NAME = "kotlin-test"
     const val KOTLIN_TEST_JAR = "$KOTLIN_TEST_NAME.jar"
@@ -99,9 +95,6 @@ object PathUtil {
     const val KOTLIN_TEST_JS_JAR = "$KOTLIN_TEST_JS_NAME.jar"
 
     const val KOTLIN_JAVA_STDLIB_SRC_JAR_OLD = "kotlin-runtime-sources.jar"
-
-    const val TROVE4J_NAME = "trove4j"
-    const val TROVE4J_JAR = "$TROVE4J_NAME.jar"
 
     const val KOTLIN_COMPILER_NAME = "kotlin-compiler"
     const val KOTLIN_COMPILER_JAR = "$KOTLIN_COMPILER_NAME.jar"
@@ -117,23 +110,19 @@ object PathUtil {
 
     @JvmStatic
     val kotlinPathsForIdeaPlugin: KotlinPaths
-        get() =
-            if (ApplicationManager.getApplication().isUnitTestMode) {
-                kotlinPathsForDistDirectory
-            } else {
-                KotlinPathsFromHomeDir(compilerPathForIdeaPlugin)
-            }
+        get() = if (ApplicationManager.getApplication().isUnitTestMode)
+            kotlinPathsForDistDirectory
+        else
+            KotlinPathsFromHomeDir(compilerPathForIdeaPlugin)
 
     @JvmStatic
     val kotlinPathsForCompiler: KotlinPaths
-        get() =
-            if (!pathUtilJar.isFile || !pathUtilJar.name.startsWith(KOTLIN_COMPILER_NAME)) {
-                // PathUtil.class is located not in the kotlin-compiler*.jar, so it must be a test and we'll take KotlinPaths from "dist/"
-                // (when running tests, PathUtil.class is in its containing module's artifact, i.e. util-{version}.jar)
-                kotlinPathsForDistDirectory
-            } else {
-                KotlinPathsFromHomeDir(compilerPathForCompilerJar)
-            }
+        get() = if (!pathUtilJar.isFile || !pathUtilJar.name.startsWith(KOTLIN_COMPILER_NAME)) {
+            // PathUtil.class is located not in the kotlin-compiler*.jar, so it must be a test and we'll take KotlinPaths from "dist/"
+            // (when running tests, PathUtil.class is in its containing module's artifact, i.e. util-{version}.jar)
+            kotlinPathsForDistDirectory
+        }
+        else KotlinPathsFromHomeDir(compilerPathForCompilerJar)
 
     @JvmStatic
     val kotlinPathsForDistDirectory: KotlinPaths
@@ -172,26 +161,22 @@ object PathUtil {
 
     @JvmStatic
     fun getResourcePathForClass(aClass: Class<*>): File {
-        val path =
-            "/" + aClass.name.replace('.', '/') +
-                if (isDalvik()) ".clazz" else ".class"
-
-        val resourceRoot =
-            PathManager.getResourceRoot(aClass, path)
-                ?: throw IllegalStateException("Resource not found: $path")
-
+        val path = "/" + aClass.name.replace('.', '/') + if (isDalvik()) ".clazz" else ".class"
+        val resourceRoot = PathManager.getResourceRoot(aClass, path) ?: throw IllegalStateException("Resource not found: $path")
         return File(resourceRoot).absoluteFile
     }
 
     @JvmStatic
-    fun getJdkClassesRootsFromCurrentJre(): List<File> = getJdkClassesRootsFromJre(System.getProperty("java.home"))
+    fun getJdkClassesRootsFromCurrentJre(): List<File> =
+            getJdkClassesRootsFromJre(System.getProperty("java.home"))
 
     @JvmStatic
     fun getJdkClassesRootsFromJre(javaHome: String): List<File> =
-        JavaSdkUtil.getJdkClassesRoots(Paths.get(javaHome), true).map { it.toFile() }
+            JavaSdkUtil.getJdkClassesRoots(Paths.get(javaHome), true).map { it.toFile() }
 
     @JvmStatic
-    fun getJdkClassesRoots(jdkHome: File): List<File> = JavaSdkUtil.getJdkClassesRoots(jdkHome.toPath(), false).map { it.toFile() }
+    fun getJdkClassesRoots(jdkHome: File): List<File> =
+            JavaSdkUtil.getJdkClassesRoots(jdkHome.toPath(), false).map { it.toFile() }
 
     @JvmStatic
     fun getJdkClassesRootsFromJdkOrJre(javaRoot: File): List<File> {

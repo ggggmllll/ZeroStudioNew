@@ -18,7 +18,7 @@ class JavacLogger(
     errorWriter: PrintWriter,
     warningWriter: PrintWriter,
     infoWriter: PrintWriter
-) : Log(context, infoWriter, errorWriter) {
+) : Log(context, errorWriter, warningWriter, infoWriter) {
     init {
         context.put(Log.outKey, infoWriter)
     }
@@ -27,7 +27,7 @@ class JavacLogger(
 
     companion object {
         fun preRegister(context: Context, messageCollector: MessageCollector) {
-            context.put(logKey, Context.Factory {
+            context.put(Log.logKey, Context.Factory<Log> {
                 JavacLogger(
                     it,
                     PrintWriter(MessageCollectorAdapter(messageCollector, CompilerMessageSeverity.ERROR)),
