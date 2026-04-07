@@ -1,138 +1,57 @@
-plugins {
-    id 'com.android.library'
-    java
-}
-apply plugin: 'kotlin-android'
+plugins { 
+    id 'java-library'   
+    id 'com.github.johnrengelman.shadow' version '8.1.1' 
 
-android {
-    compileSdkVersion 35
-	namespace = "org.jetbrains.kotlin"
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+tasks.named("shadowJar") {
+    dependsOn(":lib:remap")
+}
+
+
+tasks.assemble.dependsOn tasks.shadowJar
+tasks.build.dependsOn tasks.shadowJar
+
+shadowJar {
+    exclude 'kotlin/**'    
+    
+    dependencies {
+        exclude(dependency("org.jetbrains.kotlin:kotlin-compiler:2.2.20")) 
+        exclude(dependency("org.jetbrains:annotations:13.0")) 
+        exclude(dependency("org.jetbrains:annotations:23.0.0"))   
+        exclude(dependency("org.jetbrains:annotations:24.0.1"))    
+        exclude(dependency("org.jetbrains.intellij.deps:trove4j:1.0.20200330"))            
+        exclude(dependency("org.jetbrains.kotlin:kotlin-reflect:2.2.20"))     
+        exclude(dependency("org.jetbrains.kotlin:kotlin-stdlib:2.2.20")) 
+        exclude(dependency("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.2.20"))
+        exclude(dependency("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.0"))
+        exclude(dependency("org.jetbrains.kotlin:kotlin-stdlib-common:2.2.20"))
+        exclude(dependency("org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.2.20"))
+        exclude(dependency("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.0"))
+        exclude(dependency("org.jetbrains.kotlin:kotlin-reflect:1.6.10"))         
+        exclude(dependency("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.8.0"))
+        exclude(dependency("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.6.4"))
+        exclude(dependency("org.jetbrains.kotlin:kotlin-script-runtime:2.2.20"))        
+        exclude(dependency("org.jetbrains.kotlin:kotlin-scripting-common:2.2.20"))
+        exclude(dependency("org.jetbrains.kotlin:kotlin-scripting-compiler:2.2.20"))
+        exclude(dependency("org.jetbrains.kotlin:kotlin-scripting-compiler-impl:2.2.20"))
+        exclude(dependency("org.jetbrains.kotlin:kotlin-scripting-jvm:2.2.20"))
+        exclude(dependency("org.jetbrains.kotlin:kotlin-scripting-jvm-host:2.2.20"))
+        exclude(dependency("org.jetbrains.kotlin:kotlin-daemon-embeddable:2.2.20"))
+    
+        exclude(dependency("com.github.KodTik-Innovations:java-stubs:1.2.0"))
+        exclude(dependency("com.github.KodTik-Innovations:the-unsafe:1.0.0"))
+    }
+                       
+    archiveFileName.set("${project.parent.name}-${project.name}.jar")   
+}
 	
-    defaultConfig {
-        minSdk 26
-        targetSdk 35
-    }
-
-    buildTypes {
-        release {
-            minifyEnabled false
-        }
-    }
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17 
-        targetCompatibility JavaVersion.VERSION_17
-    }
-    kotlinOptions {
-        jvmTarget = '17'
-    }
-
-    packagingOptions {
-        
-        exclude 'org/jetbrains/kotlin/cli/jvm/compiler/jarfs/*.class'
-        
-        exclude 'org/jetbrains/kotlin/cli/jvm/config/JvmContentRoots.class'
-        exclude 'org/jetbrains/kotlin/cli/jvm/config/JvmContentRoots$*.class'
-        
-        exclude 'org/jetbrains/kotlin/cli/jvm/javac/JavacLogger.class'
-        exclude 'org/jetbrains/kotlin/cli/jvm/javac/JavacLogger$*.class'
-        
-        exclude 'org/jetbrains/kotlin/com/intellij/openapi/util/LowMemoryWatcherManager.class'
-        exclude 'org/jetbrains/kotlin/com/intellij/openapi/util/LowMemoryWatcherManager$*.class'
-        exclude 'org/jetbrains/kotlin/com/intellij/openapi/util/NullableLazyValue.class'
-        exclude 'org/jetbrains/kotlin/com/intellij/openapi/util/NullableLazyValue$*.class'
-        exclude 'org/jetbrains/kotlin/com/intellij/util/containers/ConcurrentIntObjectHashMap.class'
-        exclude 'org/jetbrains/kotlin/com/intellij/util/containers/ConcurrentIntObjectHashMap$*.class'
-        exclude 'org/jetbrains/kotlin/com/intellij/util/containers/ConcurrentLongObjectHashMap.class'
-        exclude 'org/jetbrains/kotlin/com/intellij/util/containers/ConcurrentLongObjectHashMap$*.class'
-        exclude 'org/jetbrains/kotlin/com/intellij/util/containers/Unsafe.class'
-        exclude 'org/jetbrains/kotlin/com/intellij/util/containers/UnsafeUtil.class'
-        exclude 'org/jetbrains/kotlin/com/intellij/util/lang/JavaVersion.class'
-        exclude 'org/jetbrains/kotlin/com/intellij/util/lang/JavaVersion$*.class'
-        
-        exclude 'org/jetbrains/kotlin/reflection/android/AndroidSupport.class'
-        exclude 'org/jetbrains/kotlin/reflection/android/AndroidSupport$*.class'
-        
-        exclude 'org/jetbrains/kotlin/util/PerformanceManager.class'
-        exclude 'org/jetbrains/kotlin/util/PerformanceManager$*.class'
-        exclude 'org/jetbrains/kotlin/util/ServiceLoaderLite.class'
-        exclude 'org/jetbrains/kotlin/util/ServiceLoaderLite$*.class'
-        exclude 'org/jetbrains/kotlin/utils/PathUtil.class'
-        exclude 'org/jetbrains/kotlin/utils/PathUtil$*.class'
-
-        pickFirst 'org/jetbrains/kotlin/**/*.class'
-    }
-
-}
-configurations.all {
-    resolutionStrategy {
-        force("org.jetbrains:annotations:26.0.2")
-    }
-}
-
-dependencies {
-    implementation ('com.github.marschall:zipfilesystem-standalone:1.0.1')
-    implementation 'androidx.annotation:annotation:1.9.1'
-    api("org.lsposed.hiddenapibypass:hiddenapibypass:6.1")
-    api("org.jetbrains.intellij.deps:trove4j:1.0.20200330") 
-    implementation 'org.jetbrains:annotations:26.0.2'
-    runtimeOnly ('org.jetbrains.kotlin:kotlin-reflect:2.2.0')
-     
-    compileOnly files('libs/the-unsafe.jar')
-    
-    extractDeps(libs.org.jetbrains.kotlin.compiler.embeddable)
-    
-    implementation files('libs/jps-model-impl-253.28294.357.jar') 
-    implementation(libs.composite.java.stubsb)
-    implementation(libs.composite.javacb)
-    implementation(libs.composite.jaxpb.jaxp.internal)
-    implementation(libs.composite.jaxp)
-
-    compileOnly project(":utilities:framework-stubs")
-
-
-    
-}
-
-
-val extractDeps by configurations.creating {
-    isCanBeResolved = true
-    isCanBeConsumed = false
-    isTransitive = false
-}
-
-
-tasks.register<Jar>("minifiedKotlinJar") {
-    group = "build"
-    description = "生成精简版的 Kotlin Compiler Embeddable"
-
-    archiveBaseName.set("kotlin-compiler-custom")
-    archiveClassifier.set("minified")
-
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-
-    val rootFiles = provider { extractDeps.files }
-    
-    from(rootFiles.get().map { zipTree(it) }) {
-        exclude("org/jetbrains/kotlin/cli/jvm/compiler/jarfs/**")
-        exclude("org/jetbrains/kotlin/cli/jvm/config/JvmContentRoots*")
-        exclude("org/jetbrains/kotlin/cli/jvm/javac/JavacLogger*")
-        exclude("org/jetbrains/kotlin/com/intellij/openapi/util/LowMemoryWatcherManager*")
-        exclude("org/jetbrains/kotlin/com/intellij/openapi/util/NullableLazyValue*")
-        exclude("org/jetbrains/kotlin/com/intellij/util/containers/ConcurrentIntObjectHashMap*")
-        exclude("org/jetbrains/kotlin/com/intellij/util/containers/ConcurrentLongObjectHashMap*")
-        exclude("org/jetbrains/kotlin/com/intellij/util/containers/Unsafe*")
-        exclude("org/jetbrains/kotlin/com/intellij/util/containers/UnsafeUtil*")
-        exclude("org/jetbrains/kotlin/com/intellij/util/lang/JavaVersion*")
-        exclude("org/jetbrains/kotlin/reflection/android/AndroidSupport*")
-        
-        exclude("org/jetbrains/kotlin/util/PerformanceManager*")
-        exclude("org/jetbrains/kotlin/util/PerformanceManagerImpl*")
-        exclude("org/jetbrains/kotlin/util/PerformanceManagerKt*")
-        exclude("org/jetbrains/kotlin/util/ServiceLoaderLite*")
-        exclude("org/jetbrains/kotlin/util/DeprecatedMeasurementForBackCompatibility*")
-        exclude("org/jetbrains/kotlin/util/PotentiallyIncorrectPhaseTimeMeasurement*")
-        exclude("org/jetbrains/kotlin/utils/PathUtil*")
-
-        exclude("META-INF/*.SF", "META-INF/*.DSA", "META-INF/*.RSA")
-    }
+dependencies { 
+    api files('libs/kotlinc-embeddable.jar')
 }
