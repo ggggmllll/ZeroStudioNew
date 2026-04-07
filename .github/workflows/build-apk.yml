@@ -6,7 +6,7 @@ on:
       build_type:
         description: 'Choose the compilation type (assembleDebug or assembleRelease)'
         required: true
-        default: 'assembleRelease'
+        default: 'assemble'
         type: choice
         options:
           - assemble
