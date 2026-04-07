@@ -77,7 +77,7 @@ dependencies {
     runtimeOnly ('org.jetbrains.kotlin:kotlin-reflect:2.2.0')
      
     compileOnly files('libs/the-unsafe.jar')
-        api files('libs/kotlin-compiler-embeddable-2.2.0.jar')
+       // api files('libs/kotlin-compiler-embeddable-2.2.0.jar')
     implementation fileTree(dir: 'libs', include: ['kotlin-compiler-embeddable-2.2.0.jar']).collect { jarFile ->
         zipTree(jarFile).matching {
             exclude 'org/jetbrains/kotlin/cli/jvm/compiler/jarfs/**'
