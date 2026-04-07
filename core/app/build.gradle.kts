@@ -124,6 +124,7 @@ configurations.all {
 
     force(libs.google.protobuf)
   }
+  exclude group: 'org.jetbrains.kotlin', module: 'kotlin-android-extensions-runtime'
   // exclude(group = "org.jetbrains.kotlin", module = "kotlin-compiler")
   // exclude(group = "org.jetbrains.kotlin", module = "kotlin-compiler-embeddable")
   exclude(group = "com.google.firebase", module = "protolite-well-known-types")
