@@ -15,7 +15,9 @@
  *   along with AndroidIDE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-plugins { id("java-library") }
+plugins {
+  id("java-library")
+}
 
 java {
   sourceCompatibility = JavaVersion.VERSION_1_8

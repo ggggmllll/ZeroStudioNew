@@ -25,4 +25,6 @@ java {
   targetCompatibility = JavaVersion.VERSION_1_8
 }
 
-dependencies { api(projects.buildDeps.javaCompiler) }
+dependencies {
+  api(projects.buildDeps.javaCompiler)
+}

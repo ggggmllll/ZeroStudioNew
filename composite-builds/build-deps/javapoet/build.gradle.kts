@@ -15,6 +15,10 @@
  *   along with AndroidIDE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-plugins { kotlin("jvm") }
+plugins {
+  kotlin("jvm")
+}
 
-dependencies { api(projects.buildDeps.javaCompiler) }
+dependencies {
+  api(projects.buildDeps.javaCompiler)
+}

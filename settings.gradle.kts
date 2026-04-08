@@ -46,11 +46,6 @@ dependencyResolutionManagement {
                   "editor",
                   "compose-pullrefresh",
                   
-                  "java-stubsb",
-                  "javacb",
-                  "javapoetb",
-                  "jaxpb-jaxp-internal",
-                  
                   "soraLanguageTextmate",
                   // "kotlinc",
 

@@ -39,27 +39,23 @@ dependencyResolutionManagement {
 }
 
 include(
-    ":appintro",
-    ":fuzzysearch",
-    ":google-java-format",
-    ":javac",
-    ":javapoet",
-    ":jaxp",
-    ":java-compiler",
-    ":jdk-compiler",
-    ":jdk-jdeps",
-    ":jdt",
-    ":layoutlib-api",
-    ":logback-core",
-    ":compose-pullrefresh",
-    ":editor",
-    ":java-stubsb",
-    ":javacb",
-    ":javapoetb",
-    ":jaxpb-jaxp-internal",
-    ":soraLanguageTextmate",
-    ":soraOnigurumaNative",
-    // ":kotlinc",
+  ":appintro",
+  ":fuzzysearch",
+  ":google-java-format",
+  ":javac",
+  ":javapoet",
+  ":jaxp",
+  ":java-compiler",
+  ":jdk-compiler",
+  ":jdk-jdeps",
+  ":jdt",
+  ":layoutlib-api",
+  ":logback-core",
+  ":compose-pullrefresh",
+    "soraLanguageTextmate",
+  ":editor",
+  
+    ":soraOnigurumaNative" //来自  root/:modules:soraOnigurumaNative
 )
 
 // 注册项目主构建模块到复合构建内
