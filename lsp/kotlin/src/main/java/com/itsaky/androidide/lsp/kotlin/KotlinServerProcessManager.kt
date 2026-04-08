@@ -24,6 +24,7 @@ import com.itsaky.androidide.lsp.kotlin.events.LspEventBus
 import com.itsaky.androidide.lsp.kotlin.events.LspInstallRequestEvent
 import com.itsaky.androidide.lsp.models.DiagnosticResult
 import com.itsaky.androidide.utils.Environment
+import com.itsaky.androidide.utils.executioncommand.FireAndForgetRunner
 import java.io.*
 import java.nio.charset.StandardCharsets
 import java.util.concurrent.ConcurrentHashMap
@@ -70,6 +71,12 @@ class KotlinServerProcessManager(context: Context) {
     }
 
     return KotlinServerConstants.REQUIRED_LIB_JARS.all { jarName -> File(libDir, jarName).exists() }
+  }
+
+  fun shouldPromptInstallFor(file: File): Boolean {
+    val isKotlinFile = file.name.endsWith(".kt") || file.name.endsWith(".kts")
+    if (!isKotlinFile) return false
+    return !isInstalled()
   }
 
   /** 触发 UI 的安装弹窗 (基于 Kotlin SharedFlow)。 */
@@ -205,6 +212,32 @@ class KotlinServerProcessManager(context: Context) {
       KslLogs.info("Server started successfully with JAVA_HOME: {}", javaHome)
     } catch (e: Exception) {
       KslLogs.error("Failed to start server", e)
+      startLauncherInBackground(launcherScript, androidClasspath, classpathProvider)
+    }
+  }
+
+  private fun startLauncherInBackground(
+      launcherScript: File,
+      androidClasspath: String,
+      classpathProvider: KotlinClasspathProvider,
+  ) {
+    try {
+      val args =
+          arrayOf(
+              launcherScript.absolutePath,
+              "-DkotlinLanguageServer.version=1.3.13",
+              "-DkotlinLanguageServer.skipClasspathResolution=true",
+              "-DkotlinLanguageServer.predefinedClasspath=$androidClasspath",
+          )
+      FireAndForgetRunner.fire(context, Environment.BASH_SHELL.absolutePath, args)
+      val sdkPath = classpathProvider.getAndroidSdkPath()
+      KslLogs.warn(
+          "Fallback: launched Kotlin LSP in background via Termux shell API. script={}, sdkPath={}",
+          launcherScript.absolutePath,
+          sdkPath,
+      )
+    } catch (fallbackError: Exception) {
+      KslLogs.error("Fallback start via Termux shell API failed", fallbackError)
     }
   }
 

@@ -381,6 +381,12 @@ class KotlinLanguageServer(private val context: Context) : ILanguageServer {
     }
   }
 
+  private fun ensureKotlinLspInstalledIfNeeded(file: Path) {
+    if (!processManager.shouldPromptInstallFor(file.toFile())) return
+    KslLogs.warn("Kotlin file detected but Kotlin LSP files are missing. Prompting install.")
+    processManager.install {}
+  }
+
   private fun analyzeSelected() {
     val file = selectedFile ?: return
     val client = _client ?: return
@@ -414,6 +420,7 @@ class KotlinLanguageServer(private val context: Context) : ILanguageServer {
             event.openedFile.toString().endsWith(".kts"))
     )
         return
+    ensureKotlinLspInstalledIfNeeded(event.openedFile)
     selectedFile = event.openedFile
     startOrRestartAnalyzeTimer()
   }
@@ -426,6 +433,7 @@ class KotlinLanguageServer(private val context: Context) : ILanguageServer {
         event.selectedFile.toString().endsWith(".kt") ||
             event.selectedFile.toString().endsWith(".kts")
     ) {
+      ensureKotlinLspInstalledIfNeeded(event.selectedFile)
       documentManager.ensureDocumentOpen(event.selectedFile)
     }
   }
