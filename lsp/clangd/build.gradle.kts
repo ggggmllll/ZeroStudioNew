@@ -50,8 +50,6 @@ dependencies {
   implementation(projects.core.lspModels)
   implementation(projects.core.projects)
   implementation(projects.editor.api)
-  implementation(projects.editor.editorLsp)
-  implementation(projects.editor.impl)
 
   implementation(libs.common.kotlin)
   implementation(libs.androidx.core.ktx)
