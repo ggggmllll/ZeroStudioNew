@@ -17,6 +17,7 @@
 
 package com.itsaky.androidide.fragments.onboarding
 
+import android.app.Application
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -44,6 +45,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
@@ -57,24 +59,38 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.DialogProperties
 import androidx.core.content.getSystemService
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
+import androidx.compose.ui.state.ToggleableState
 import com.github.appintro.SlidePolicy
+import com.google.gson.Gson
 import com.itsaky.androidide.R
 import com.itsaky.androidide.activities.OnboardingActivity
+import com.itsaky.androidide.app.configuration.IDEBuildConfigProvider
+import com.itsaky.androidide.repository.sdkmanager.models.InstallStatus
+import com.itsaky.androidide.repository.sdkmanager.models.SdkManifest
 import com.itsaky.androidide.repository.sdkmanager.models.SdkTreeNode
 import com.itsaky.androidide.repository.sdkmanager.services.SdkInstallerManager
 import com.itsaky.androidide.repository.sdkmanager.tree.SdkTreeView
-import com.itsaky.androidide.repository.sdkmanager.viewmodel.SdkManagerViewModel
 import com.itsaky.androidide.utils.ConnectionInfo
 import com.itsaky.androidide.utils.Environment
 import com.itsaky.androidide.utils.executioncommand.TermuxCommand
 import com.itsaky.androidide.utils.flashError
 import com.itsaky.androidide.utils.getConnectionInfo
+import java.io.File
+import java.io.InputStreamReader
+import java.net.HttpURLConnection
+import java.net.URL
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
- * AndroidIDE 引导页全新 SDK、构建工具及环境配置模块
+ * 全新精简版 SDK 与环境安装 Fragment。
+ * 替代原先的 IdeSetupConfigurationFragment，提供高度定制化的单列表 UI 以及深度的 Shell 环境部署还原。
  *
  * @author android_zero
  */
@@ -82,10 +98,9 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
 
   private var backgroundDataRestrictionReceiver: BroadcastReceiver? = null
   private var networkStateChangeCallback: ConnectivityManager.NetworkCallback? = null
-
   private val netStateFlow = MutableStateFlow(ConnectionInfo.UNKNOWN)
 
-  private val sdkManagerViewModel: SdkManagerViewModel by viewModels()
+  private val setupViewModel: OdSdkSetupViewModel by viewModels()
 
   companion object {
     @JvmStatic
@@ -110,9 +125,7 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
     }
   }
 
-  // 桩方法：保留以确保 OnboardingActivity 的兼容性编译不报错
   fun isAutoInstall(): Boolean = false
-
   fun buildIdeSetupArguments(): Array<String> = emptyArray()
 
   override fun createContentView(parent: ViewGroup, attachToParent: Boolean) {
@@ -161,7 +174,6 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
           ) {
             updateConnectionStatus(networkCapabilities)
           }
-
           override fun onLost(network: Network) {
             netStateFlow.value = ConnectionInfo.UNKNOWN
           }
@@ -175,14 +187,6 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
             .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
             .build()
     connectivityManager.registerNetworkCallback(networkRequest, networkStateChangeCallback!!)
-
-    backgroundDataRestrictionReceiver?.also {
-      try {
-        requireContext().unregisterReceiver(it)
-      } catch (err: Throwable) {
-        /*ignored*/
-      }
-    }
 
     backgroundDataRestrictionReceiver =
         object : BroadcastReceiver() {
@@ -219,105 +223,158 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
   @Composable
   private fun SetupConfigurationScreen() {
     val netState by netStateFlow.collectAsState()
-    val isLoading by sdkManagerViewModel.isLoading.collectAsState()
-    val hasPendingChanges by sdkManagerViewModel.hasPendingChanges.collectAsState()
+    val isLoading by setupViewModel.isLoading.collectAsState()
+    val treeNodes by setupViewModel.treeNodes.collectAsState()
+    val hasPendingChanges by setupViewModel.hasPendingChanges.collectAsState()
 
     var installGit by remember { mutableStateOf(true) }
     var installSsh by remember { mutableStateOf(true) }
     var applyNdkFix by remember { mutableStateOf(true) }
     var applyCmakePatch by remember { mutableStateOf(true) }
-
     var showActionDialog by remember { mutableStateOf(false) }
 
-    Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 8.dp)) {
-      // 网络提示区域
+    var selectedJdk by remember { mutableStateOf("17") }
+    var jdkExpanded by remember { mutableStateOf(false) }
+
+    val currentAbi = IDEBuildConfigProvider.getInstance().cpuAbiName
+
+    Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp)) {
+      
+      // 头部栏：标题 + ABI 信息
+      Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+          Text(
+              text = "Select SDKs & Tools:",
+              style = MaterialTheme.typography.titleMedium,
+              fontWeight = FontWeight.Bold,
+          )
+          Surface(
+              color = MaterialTheme.colorScheme.secondaryContainer,
+              shape = RoundedCornerShape(8.dp)
+          ) {
+              Text(
+                  text = "ABI: $currentAbi", 
+                  fontSize = 10.sp, 
+                  color = MaterialTheme.colorScheme.onSecondaryContainer,
+                  modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+              )
+          }
+      }
+
       NetworkWarnings(netState)
 
-      Spacer(modifier = Modifier.height(16.dp))
+      Spacer(modifier = Modifier.height(8.dp))
 
-      //  核心 SDK 树状视图区
-      Text(
-          text = "Select SDKs & Tools:",
-          style = MaterialTheme.typography.titleMedium,
-          fontWeight = FontWeight.Bold,
-          modifier = Modifier.padding(start = 8.dp, bottom = 8.dp),
-      )
-
+      // 核心 SDK 树状视图区
       Surface(
           shape = RoundedCornerShape(12.dp),
           color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
-          modifier = Modifier.fillMaxWidth().heightIn(min = 160.dp, max = 220.dp),
+          modifier = Modifier.fillMaxWidth().heightIn(min = 160.dp, max = 200.dp), // 减小高度
       ) {
         if (isLoading) {
           Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-              CircularProgressIndicator()
-              Spacer(modifier = Modifier.height(8.dp))
-              Text("Loading SDK definitions...", style = MaterialTheme.typography.bodySmall)
-            }
+            CircularProgressIndicator(modifier = Modifier.size(32.dp))
           }
         } else {
-          SdkTreeTabs(sdkManagerViewModel)
+          AndroidView(
+              factory = { context ->
+                  SdkTreeView(context).apply {
+                      isNestedScrollingEnabled = false
+                      bindData(treeNodes) { clickedNode ->
+                          setupViewModel.toggleCheck(clickedNode)
+                          refreshViews()
+                      }
+                  }
+              },
+              update = { view ->
+                  view.bindData(treeNodes) { clickedNode ->
+                      setupViewModel.toggleCheck(clickedNode)
+                      view.refreshViews()
+                  }
+              },
+              modifier = Modifier.fillMaxSize()
+          )
         }
       }
 
-      Spacer(modifier = Modifier.height(16.dp))
+      Spacer(modifier = Modifier.height(12.dp))
 
-      // 附加工具区域与修复选项
+      // 附加配置区域 (缩小尺寸 30%)
       Text(
           text = "Additional Configurations:",
-          style = MaterialTheme.typography.titleMedium,
+          style = MaterialTheme.typography.titleSmall,
           fontWeight = FontWeight.Bold,
-          modifier = Modifier.padding(start = 8.dp, bottom = 8.dp),
       )
 
-      Row(verticalAlignment = Alignment.CenterVertically) {
-        Checkbox(checked = installGit, onCheckedChange = { installGit = it })
-        Text("Install Git (Version Control)", modifier = Modifier.clickable { installGit = !installGit })
+      // JDK 选择
+      Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
+          Text("Java Development Kit: ", fontSize = 12.sp)
+          Box {
+              OutlinedButton(
+                  onClick = { jdkExpanded = true },
+                  modifier = Modifier.height(32.dp),
+                  contentPadding = PaddingValues(horizontal = 8.dp)
+              ) {
+                  Text("OpenJDK $selectedJdk", fontSize = 11.sp)
+              }
+              DropdownMenu(expanded = jdkExpanded, onDismissRequest = { jdkExpanded = false }) {
+                  DropdownMenuItem(
+                      text = { Text("OpenJDK 17 (Recommended)", fontSize = 12.sp) },
+                      onClick = { selectedJdk = "17"; jdkExpanded = false }
+                  )
+                  DropdownMenuItem(
+                      text = { Text("OpenJDK 21 (Experimental)", fontSize = 12.sp) },
+                      onClick = { selectedJdk = "21"; jdkExpanded = false }
+                  )
+              }
+          }
       }
 
-      Row(verticalAlignment = Alignment.CenterVertically) {
-        Checkbox(checked = installSsh, onCheckedChange = { installSsh = it })
-        Text("Install OpenSSH (Remote Auth)", modifier = Modifier.clickable { installSsh = !installSsh })
+      // 复选框组：调整缩放比例和间距以达到缩小效果
+      Column(verticalArrangement = Arrangement.spacedBy((-8).dp)) {
+          Row(verticalAlignment = Alignment.CenterVertically) {
+              Checkbox(checked = installGit, onCheckedChange = { installGit = it }, modifier = Modifier.scale(0.8f))
+              Text("Install Git (Version Control)", fontSize = 11.sp, modifier = Modifier.clickable { installGit = !installGit })
+          }
+          Row(verticalAlignment = Alignment.CenterVertically) {
+              Checkbox(checked = installSsh, onCheckedChange = { installSsh = it }, modifier = Modifier.scale(0.8f))
+              Text("Install OpenSSH (Remote Auth)", fontSize = 11.sp, modifier = Modifier.clickable { installSsh = !installSsh })
+          }
+          Row(verticalAlignment = Alignment.CenterVertically) {
+              Checkbox(checked = applyNdkFix, onCheckedChange = { applyNdkFix = it }, modifier = Modifier.scale(0.8f))
+              Text("Apply NDK Fixes (symlinks & patches)", fontSize = 11.sp, modifier = Modifier.clickable { applyNdkFix = !applyNdkFix })
+          }
+          Row(verticalAlignment = Alignment.CenterVertically) {
+              Checkbox(checked = applyCmakePatch, onCheckedChange = { applyCmakePatch = it }, modifier = Modifier.scale(0.8f))
+              Text("Apply CMake Patches", fontSize = 11.sp, modifier = Modifier.clickable { applyCmakePatch = !applyCmakePatch })
+          }
       }
 
-      Row(verticalAlignment = Alignment.CenterVertically) {
-        Checkbox(checked = applyNdkFix, onCheckedChange = { applyNdkFix = it })
-        Text("Apply NDK Fixes (symlinks & patches)", modifier = Modifier.clickable { applyNdkFix = !applyNdkFix })
-      }
-
-      Row(verticalAlignment = Alignment.CenterVertically) {
-        Checkbox(checked = applyCmakePatch, onCheckedChange = { applyCmakePatch = it })
-        Text("Apply CMake Patches", modifier = Modifier.clickable { applyCmakePatch = !applyCmakePatch })
-      }
-
-      Spacer(modifier = Modifier.height(24.dp))
+      Spacer(modifier = Modifier.weight(1f))
 
       // 底部执行按钮
       Button(
           onClick = { showActionDialog = true },
           enabled = hasPendingChanges || installGit || installSsh,
-          modifier = Modifier.fillMaxWidth().height(48.dp),
+          modifier = Modifier.fillMaxWidth().height(42.dp), // 减小按钮高度
       ) {
-        Text("Start Environment Setup")
+          Text("Start Environment Setup", fontSize = 13.sp)
       }
     }
 
     if (showActionDialog) {
-      val (toInstall, toDelete) = sdkManagerViewModel.getPendingTasks()
+      val toInstall = setupViewModel.getInstallTasks()
       ActionConfirmAndRunDialog(
           toInstall = toInstall,
-          toDelete = toDelete,
           installGit = installGit,
           installSsh = installSsh,
           applyNdkFix = applyNdkFix,
           applyCmakePatch = applyCmakePatch,
+          jdkVersion = selectedJdk,
           onDismiss = {
             showActionDialog = false
-            sdkManagerViewModel.loadData()
+            setupViewModel.loadData()
           },
           onSuccess = {
-            // 直接触发父级 Activity 的安装完成回调进入主界面流程
             (requireActivity() as? OnboardingActivity)?.onSetupCompleted()
           },
       )
@@ -329,8 +386,7 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
     val context = LocalContext.current
     if (!netState.isConnected || netState === ConnectionInfo.UNKNOWN) {
       ErrorChip(
-          text =
-              "${stringResource(R.string.msg_no_internet)} ${stringResource(R.string.action_open_settings)}",
+          text = "${stringResource(R.string.msg_no_internet)} ${stringResource(R.string.action_open_settings)}",
           isError = true,
           onClick = { context.startActivity(Intent(Settings.ACTION_WIFI_SETTINGS)) },
       )
@@ -350,92 +406,30 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
   private fun ErrorChip(text: String, isError: Boolean = true, onClick: (() -> Unit)? = null) {
     val color = if (isError) Color(0xFFF44336) else Color(0xFFFF9800)
     Surface(
-        modifier =
-            Modifier.padding(vertical = 4.dp).fillMaxWidth().clickable(enabled = onClick != null) {
-              onClick?.invoke()
-            },
+        modifier = Modifier.padding(top = 4.dp).fillMaxWidth().clickable(enabled = onClick != null) { onClick?.invoke() },
         shape = RoundedCornerShape(8.dp),
         border = BorderStroke(1.dp, color),
         color = Color.Transparent,
     ) {
       Row(
-          modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+          modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp),
           verticalAlignment = Alignment.CenterVertically,
       ) {
-        Icon(
-            Icons.Default.Info,
-            contentDescription = null,
-            tint = color,
-            modifier = Modifier.size(18.dp),
-        )
-        Spacer(Modifier.width(8.dp))
-        Text(text, color = MaterialTheme.colorScheme.onSurface, fontSize = 12.sp)
+        Icon(Icons.Default.Info, contentDescription = null, tint = color, modifier = Modifier.size(16.dp))
+        Spacer(Modifier.width(6.dp))
+        Text(text, color = MaterialTheme.colorScheme.onSurface, fontSize = 11.sp)
       }
     }
-  }
-
-  @Composable
-  private fun SdkTreeTabs(viewModel: SdkManagerViewModel) {
-    var selectedTabIndex by remember { mutableStateOf(0) }
-    Column {
-      TabRow(selectedTabIndex = selectedTabIndex, modifier = Modifier.fillMaxWidth()) {
-        Tab(
-            selected = selectedTabIndex == 0,
-            onClick = { selectedTabIndex = 0 },
-            text = { Text("Platforms", fontSize = 12.sp) },
-        )
-        Tab(
-            selected = selectedTabIndex == 1,
-            onClick = { selectedTabIndex = 1 },
-            text = { Text("Tools", fontSize = 12.sp) },
-        )
-      }
-      Box(modifier = Modifier.fillMaxSize().padding(top = 8.dp)) {
-        if (selectedTabIndex == 0) {
-          val nodes by viewModel.platformsTree.collectAsState()
-          SdkTreeViewSub(nodes, true, viewModel)
-        } else {
-          val nodes by viewModel.toolsTree.collectAsState()
-          SdkTreeViewSub(nodes, false, viewModel)
-        }
-      }
-    }
-  }
-
-  @Composable
-  private fun SdkTreeViewSub(
-      nodes: List<SdkTreeNode>,
-      isPlatformsTab: Boolean,
-      viewModel: SdkManagerViewModel,
-  ) {
-    AndroidView(
-        factory = { context ->
-          SdkTreeView(context).apply {
-            isNestedScrollingEnabled = false // 防止与外层 ScrollView 冲突
-            bindData(nodes) { clickedNode ->
-              viewModel.toggleCheck(clickedNode, isPlatformsTab)
-              refreshViews()
-            }
-          }
-        },
-        update = { view ->
-          view.bindData(nodes) { clickedNode ->
-            viewModel.toggleCheck(clickedNode, isPlatformsTab)
-            view.refreshViews()
-          }
-        },
-        modifier = Modifier.fillMaxSize(),
-    )
   }
 
   @Composable
   private fun ActionConfirmAndRunDialog(
       toInstall: List<SdkTreeNode>,
-      toDelete: List<SdkTreeNode>,
       installGit: Boolean,
       installSsh: Boolean,
       applyNdkFix: Boolean,
       applyCmakePatch: Boolean,
+      jdkVersion: String,
       onDismiss: () -> Unit,
       onSuccess: () -> Unit,
   ) {
@@ -448,62 +442,43 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
     var currentTaskName by remember { mutableStateOf("") }
     val consoleLogs = remember { mutableStateListOf<String>() }
 
-    fun addLog(msg: String) {
-      consoleLogs.add(msg)
-    }
+    fun addLog(msg: String) { consoleLogs.add(msg) }
 
     AlertDialog(
         onDismissRequest = { if (!isRunning) onDismiss() },
-        properties =
-            DialogProperties(dismissOnBackPress = !isRunning, dismissOnClickOutside = !isRunning),
-        title = { Text(if (isFinished) "Setup Completed" else "Confirm Installation") },
+        properties = DialogProperties(dismissOnBackPress = !isRunning, dismissOnClickOutside = !isRunning),
+        title = { Text(if (isFinished) "Setup Completed" else "Confirm Installation", fontSize = 16.sp) },
         text = {
           Column(modifier = Modifier.fillMaxWidth()) {
             if (!isRunning && !isFinished) {
-              Text("Components to install/update:", fontWeight = FontWeight.Bold, fontSize = 14.sp)
-              toInstall.forEach { Text("- ${it.name}", fontSize = 13.sp) }
-              if (installGit) Text("- Git Version Control", fontSize = 13.sp)
-              if (installSsh) Text("- OpenSSH Remote Auth", fontSize = 13.sp)
-              if (toInstall.isEmpty() && !installGit && !installSsh) {
-                Text("  (None)", color = Color.Gray, fontSize = 13.sp)
-              }
-
-              if (toDelete.isNotEmpty()) {
-                Spacer(modifier = Modifier.height(12.dp))
-                Text("Components to remove:", fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                toDelete.forEach {
-                  Text("- ${it.name}", color = MaterialTheme.colorScheme.error, fontSize = 13.sp)
-                }
-              }
+              Text("Components to install/update:", fontWeight = FontWeight.Bold, fontSize = 13.sp)
+              toInstall.forEach { Text("- ${it.name}", fontSize = 12.sp) }
+              Text("- OpenJDK $jdkVersion", fontSize = 12.sp)
+              if (installGit) Text("- Git Version Control", fontSize = 12.sp)
+              if (installSsh) Text("- OpenSSH Remote Auth", fontSize = 12.sp)
               
               val installingNdk = toInstall.any { it.componentType == "ndk" }
               val installingCmake = toInstall.any { it.componentType == "cmake" }
               
               if (installingNdk || installingCmake) {
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(12.dp))
                 Divider()
-                Spacer(modifier = Modifier.height(8.dp))
-                Text("Additional Configurations:", fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                Spacer(modifier = Modifier.height(6.dp))
+                Text("Additional Configurations:", fontWeight = FontWeight.Bold, fontSize = 13.sp)
                 if (installingNdk) {
-                  Row(verticalAlignment = Alignment.CenterVertically) {
-                    Checkbox(checked = applyNdkFix, onCheckedChange = { /* Disabled override */ }, enabled = false)
-                    Text("Apply NDK Fixes (symlinks & patches)", fontSize = 13.sp)
-                  }
+                    Text("• Apply NDK Fixes (symlinks & patches)", fontSize = 11.sp, color = if(applyNdkFix) MaterialTheme.colorScheme.onSurface else Color.Gray)
                 }
                 if (installingCmake) {
-                  Row(verticalAlignment = Alignment.CenterVertically) {
-                    Checkbox(checked = applyCmakePatch, onCheckedChange = { /* Disabled override */ }, enabled = false)
-                    Text("Apply CMake Patches", fontSize = 13.sp)
-                  }
+                    Text("• Apply CMake Patches", fontSize = 11.sp, color = if(applyCmakePatch) MaterialTheme.colorScheme.onSurface else Color.Gray)
                 }
               }
             }
 
             if (isRunning || isFinished) {
-              Text(text = "Current: $currentTaskName", style = MaterialTheme.typography.labelMedium)
+              Text(text = "Current: $currentTaskName", style = MaterialTheme.typography.labelSmall)
               LinearProgressIndicator(
                   progress = { currentProgress },
-                  modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                  modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp),
               )
 
               val listState = rememberLazyListState()
@@ -511,27 +486,17 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
                 if (consoleLogs.isNotEmpty()) listState.animateScrollToItem(consoleLogs.lastIndex)
               }
               Box(
-                  modifier =
-                      Modifier.fillMaxWidth()
-                          .height(200.dp)
-                          .background(Color(0xFF1E1E1E), shape = MaterialTheme.shapes.small)
-                          .padding(8.dp)
+                  modifier = Modifier.fillMaxWidth().height(180.dp)
+                          .background(Color(0xFF1E1E1E), shape = MaterialTheme.shapes.small).padding(6.dp)
               ) {
                 LazyColumn(state = listState) {
                   items(consoleLogs) { msg ->
-                    val textColor =
-                        when {
+                    val textColor = when {
                           msg.startsWith("ERR") || msg.startsWith("WARN") -> Color(0xFFFF5252)
                           msg.startsWith(">>") -> Color(0xFF64B5F6)
                           else -> Color(0xFFA5D6A7)
                         }
-                    Text(
-                        text = msg,
-                        color = textColor,
-                        fontSize = 11.sp,
-                        fontFamily = FontFamily.Monospace,
-                        lineHeight = 14.sp,
-                    )
+                    Text(text = msg, color = textColor, fontSize = 10.sp, fontFamily = FontFamily.Monospace, lineHeight = 12.sp)
                   }
                 }
               }
@@ -544,13 +509,90 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
                 onClick = {
                   isRunning = true
                   coroutineScope.launch(Dispatchers.IO) {
-                    for (node in toDelete) {
-                      currentTaskName = "Removing ${node.name}"
-                      currentProgress = 0f
-                      SdkInstallerManager.deletePackage(node, ::addLog)
-                      currentProgress = 1f
+                    
+                    //系统依赖与包管理器更新 (Bash 脚本环境准备)
+                    currentTaskName = "Configuring APT environment..."
+                    currentProgress = -1f 
+                    addLog(">> Updating APT repositories...")
+                    TermuxCommand.run(context) { executable(Environment.BASH_SHELL.absolutePath); args("-c", "apt update && apt upgrade -y") }.also {
+                        if (it.stdout.isNotBlank()) addLog(it.stdout)
                     }
 
+                    // 安装基础包 (jq, tar, unzip, libcurl)
+                    addLog(">> Installing required base packages...")
+                    TermuxCommand.run(context) { executable(Environment.BASH_SHELL.absolutePath); args("-c", "apt install jq tar unzip libcurl -y") }.also {
+                        if (it.stdout.isNotBlank()) addLog(it.stdout)
+                    }
+
+                    // P7Zip 安装逻辑 (从 Github 下载指定 deb)
+                    currentTaskName = "Installing p7zip..."
+                    addLog(">> Installing p7zip manually for 7z extraction support...")
+                    val arch = IDEBuildConfigProvider.getInstance().cpuAbiName
+                    val p7zipUrl = when {
+                        arch.contains("aarch64") || arch.contains("arm64") -> "https://github.com/msmt2018/termux-packages/releases/download/p7zip-17.06-1/debs-aarch64-e9f3af7af65c6f737f41404dbd6babf727147861.deb"
+                        arch.contains("arm") -> "https://github.com/msmt2018/termux-packages/releases/download/p7zip-17.06-1/debs-arm-e9f3af7af65c6f737f41404dbd6babf727147861.deb"
+                        arch.contains("x86_64") -> "https://github.com/msmt2018/termux-packages/releases/download/p7zip-17.06-1/debs-x86_64-e9f3af7af65c6f737f41404dbd6babf727147861.deb"
+                        else -> ""
+                    }
+                    if (p7zipUrl.isNotEmpty()) {
+                        val p7zipScript = """
+                            #!/bin/bash
+                            tmp_p7zip_dir="${Environment.HOME.absolutePath}/tmp_p7zip_${System.currentTimeMillis()}"
+                            mkdir -p "${'$'}tmp_p7zip_dir"
+                            cd "${'$'}tmp_p7zip_dir"
+                            curl -L -o "p7zip.zip" "$p7zipUrl" --http1.1
+                            unzip -q p7zip.zip
+                            apt install ./debs/*.deb -y || dpkg -i ./debs/*.deb
+                            cd - > /dev/null
+                            rm -rf "${'$'}tmp_p7zip_dir"
+                            echo "p7zip installed successfully."
+                        """.trimIndent()
+                        val p7ScriptFile = File(Environment.TMP_DIR, "p7_install.sh")
+                        p7ScriptFile.writeText(p7zipScript)
+                        p7ScriptFile.setExecutable(true)
+                        TermuxCommand.run(context) { executable(Environment.BASH_SHELL.absolutePath); args(p7ScriptFile.absolutePath) }.also {
+                            if (it.stdout.isNotBlank()) addLog(it.stdout)
+                            if (it.stderr.isNotBlank()) addLog("WARN/ERR p7zip: ${it.stderr}")
+                        }
+                        p7ScriptFile.delete()
+                    } else {
+                        addLog("WARN: No p7zip available for architecture $arch")
+                    }
+
+                    // 4. Git 和 OpenSSH
+                    if (installGit) {
+                        currentTaskName = "Installing Git..."
+                        addLog(">> Installing Git...")
+                        TermuxCommand.run(context) { executable(Environment.BASH_SHELL.absolutePath); args("-c", "apt install git -y") }
+                    }
+                    if (installSsh) {
+                        currentTaskName = "Installing OpenSSH..."
+                        addLog(">> Installing OpenSSH...")
+                        TermuxCommand.run(context) { executable(Environment.BASH_SHELL.absolutePath); args("-c", "apt install openssh -y") }
+                    }
+
+                    // 5. 安装 JDK
+                    currentTaskName = "Installing OpenJDK $jdkVersion..."
+                    addLog(">> Installing package: 'openjdk-$jdkVersion'")
+                    TermuxCommand.run(context) { executable(Environment.BASH_SHELL.absolutePath); args("-c", "apt install openjdk-$jdkVersion -y") }.also {
+                        addLog(">> JDK $jdkVersion has been installed.")
+                    }
+
+                    // 更新 ide-environment.properties
+                    addLog(">> Updating ide-environment.properties...")
+                    val jdkDir = "${Environment.PREFIX.absolutePath}/opt/openjdk"
+                    val propsDir = File(Environment.PREFIX, "etc")
+                    if (!propsDir.exists()) propsDir.mkdirs()
+                    val propsFile = File(propsDir, "ide-environment.properties")
+                    try {
+                        propsFile.writeText("JAVA_HOME=$jdkDir\n")
+                        addLog(">> JAVA_HOME=$jdkDir")
+                        addLog(">> Properties file updated successfully!")
+                    } catch (e: Exception) {
+                        addLog("WARN: Failed to write ide-environment.properties: ${e.message}")
+                    }
+
+                    // 6. 执行 SDK/NDK/CMake 安装
                     for (node in toInstall) {
                       currentTaskName = "Installing ${node.name}"
                       currentProgress = 0f
@@ -568,70 +610,202 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
                       }
                     }
 
-                    // 安装 Git & OpenSSH
-                    if (installGit || installSsh) {
-                      currentTaskName = "Configuring APT environment..."
-                      currentProgress = -1f // indeterminate
-                      addLog(">> Updating APT repositories...")
-
-                      TermuxCommand.run(context) {
-                            label("APT Update")
-                            executable(Environment.BASH_SHELL.absolutePath)
-                            args("-c", "apt update")
-                          }
-                          .also {
-                            if (it.stdout.isNotBlank()) addLog(it.stdout)
-                            if (it.stderr.isNotBlank()) addLog("WARN/ERR: ${it.stderr}")
-                          }
-
-                      if (installGit) {
-                        currentTaskName = "Installing Git..."
-                        addLog(">> Installing Git...")
-                        TermuxCommand.run(context) {
-                              label("APT Install Git")
-                              executable(Environment.BASH_SHELL.absolutePath)
-                              args("-c", "apt install git -y")
-                            }
-                            .also {
-                              if (it.stdout.isNotBlank()) addLog(it.stdout)
-                              if (it.stderr.isNotBlank()) addLog("WARN/ERR: ${it.stderr}")
-                            }
-                      }
-
-                      if (installSsh) {
-                        currentTaskName = "Installing OpenSSH..."
-                        addLog(">> Installing OpenSSH...")
-                        TermuxCommand.run(context) {
-                              label("APT Install SSH")
-                              executable(Environment.BASH_SHELL.absolutePath)
-                              args("-c", "apt install openssh -y")
-                            }
-                            .also {
-                              if (it.stdout.isNotBlank()) addLog(it.stdout)
-                              if (it.stderr.isNotBlank()) addLog("WARN/ERR: ${it.stderr}")
-                            }
-                      }
-                    }
-
                     isFinished = true
                     isRunning = false
-                    currentTaskName = "All tasks completed."
+                    currentTaskName = "All tasks completed. Environment is ready!"
                     currentProgress = 1f
                   }
                 },
                 enabled = !isRunning,
             ) {
-              Text("Execute")
+              Text("Execute", fontSize = 13.sp)
             }
           } else {
-            Button(onClick = onSuccess) { Text("Finish & Launch") }
+            Button(onClick = onSuccess) { Text("Finish & Launch", fontSize = 13.sp) }
           }
         },
         dismissButton = {
           if (!isRunning && !isFinished) {
-            TextButton(onClick = onDismiss) { Text("Cancel") }
+            TextButton(onClick = onDismiss) { Text("Cancel", fontSize = 13.sp) }
           }
         },
     )
+  }
+}
+
+/** 专门针对引导页的精简版 ViewModel */
+class OdSdkSetupViewModel : AndroidViewModel(Application()) {
+
+  private val _treeNodes = MutableStateFlow<List<SdkTreeNode>>(emptyList())
+  val treeNodes: StateFlow<List<SdkTreeNode>> = _treeNodes.asStateFlow()
+
+  private val _isLoading = MutableStateFlow(true)
+  val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+
+  private val _hasPendingChanges = MutableStateFlow(false)
+  val hasPendingChanges: StateFlow<Boolean> = _hasPendingChanges.asStateFlow()
+
+  init {
+    loadData()
+  }
+
+  fun loadData() {
+    viewModelScope.launch {
+      _isLoading.value = true
+      try {
+        val rootNodes = mutableListOf<SdkTreeNode>()
+        val manifest = fetchManifest()
+
+        if (manifest != null) {
+            val arch = getArch()
+            val queryArch = if (arch == "armv7l" || arch == "armv8l") "arm" else arch
+
+            // Android SDK (强制)
+            val sdkUrl = manifest.androidSdk
+            if (!sdkUrl.isNullOrBlank() && sdkUrl.lowercase() != "x") {
+                rootNodes.add(
+                    SdkTreeNode(name = "Android SDK Platform", revision = "Latest", downloadUrl = sdkUrl, componentType = "android-sdk", checkedState = ToggleableState.On)
+                )
+            }
+
+            // Cmdline Tools (强制)
+            val cmdUrl = manifest.cmdlineTools
+            if (!cmdUrl.isNullOrBlank() && cmdUrl.lowercase() != "x") {
+                rootNodes.add(
+                    SdkTreeNode(name = "Command-line Tools", revision = "Latest", downloadUrl = cmdUrl, componentType = "cmdline-tools", checkedState = ToggleableState.On)
+                )
+            }
+
+            // Build Tools
+            manifest.buildTools?.get(queryArch)?.let { map ->
+                val group = SdkTreeNode(name = "Build-Tools", isGroup = true, isExpanded = true)
+                map.forEach { (k, url) ->
+                    if (url.isNotBlank() && url.lowercase() != "x") {
+                        val ver = k.replace("_", ".").trimStart('.')
+                        group.children.add(SdkTreeNode(name = "Build-Tools $ver", revision = ver, downloadUrl = url, componentType = "build-tools", parent = group))
+                    }
+                }
+                group.children.sortByDescending { it.revision }
+                // 默认勾选最新
+                group.children.firstOrNull()?.let { it.checkedState = ToggleableState.On }
+                group.updateParentState()
+                if (group.children.isNotEmpty()) rootNodes.add(group)
+            }
+
+            // Platform Tools
+            manifest.platformTools?.get(queryArch)?.let { map ->
+                val group = SdkTreeNode(name = "Platform-Tools", isGroup = true, isExpanded = true)
+                map.forEach { (k, url) ->
+                    if (url.isNotBlank() && url.lowercase() != "x") {
+                        val ver = k.replace("_", ".").trimStart('.')
+                        group.children.add(SdkTreeNode(name = "Platform-Tools $ver", revision = ver, downloadUrl = url, componentType = "platform-tools", parent = group))
+                    }
+                }
+                group.children.sortByDescending { it.revision }
+                // 默认勾选最新
+                group.children.firstOrNull()?.let { it.checkedState = ToggleableState.On }
+                group.updateParentState()
+                if (group.children.isNotEmpty()) rootNodes.add(group)
+            }
+
+            // NDK
+            manifest.androidNdk?.get(queryArch)?.let { map ->
+                val group = SdkTreeNode(name = "NDK (Side by side)", isGroup = true, isExpanded = false)
+                map.forEach { (k, url) ->
+                    if (url.isNotBlank() && url.lowercase() != "x") {
+                        val ver = k.replace("_", ".").trimStart('.')
+                        group.children.add(SdkTreeNode(name = "NDK $ver", revision = ver, downloadUrl = url, componentType = "ndk", parent = group))
+                    }
+                }
+                group.children.sortByDescending { it.revision }
+                group.updateParentState()
+                if (group.children.isNotEmpty()) rootNodes.add(group)
+            }
+
+            // CMake
+            manifest.androidCmake?.get(queryArch)?.let { map ->
+                val group = SdkTreeNode(name = "CMake", isGroup = true, isExpanded = false)
+                map.forEach { (k, url) ->
+                    if (url.isNotBlank() && url.lowercase() != "x") {
+                        val ver = k.replace("_", ".").trimStart('.')
+                        group.children.add(SdkTreeNode(name = "CMake $ver", revision = ver, downloadUrl = url, componentType = "cmake", parent = group))
+                    }
+                }
+                group.children.sortByDescending { it.revision }
+                group.updateParentState()
+                if (group.children.isNotEmpty()) rootNodes.add(group)
+            }
+        }
+
+        _treeNodes.value = rootNodes
+        checkPendingChanges()
+      } catch (e: Exception) {
+        e.printStackTrace()
+      } finally {
+        _isLoading.value = false
+      }
+    }
+  }
+
+  private suspend fun fetchManifest(): SdkManifest? = withContext(Dispatchers.IO) {
+      try {
+          val url = URL("https://github.com/msmt2018/SDK-tool-for-Android-platform/releases/download/IDESdkDownJson2.3/manifest.json")
+          val connection = url.openConnection() as HttpURLConnection
+          connection.connectTimeout = 10000
+          connection.readTimeout = 10000
+          if (connection.responseCode == 200) {
+              val json = connection.inputStream.bufferedReader().readText()
+              Gson().fromJson(json, SdkManifest::class.java)
+          } else null
+      } catch (e: Exception) {
+          null
+      }
+  }
+
+  private fun getArch(): String = IDEBuildConfigProvider.getInstance().cpuArch.name.lowercase()
+
+  fun toggleCheck(node: SdkTreeNode) {
+    // 拦截不可取消的必选节点
+    if (node.componentType == "android-sdk" || node.componentType == "cmdline-tools") return
+
+    if (node.isGroup) {
+        node.isExpanded = !node.isExpanded
+    } else {
+        val nextState = when (node.checkedState) {
+            ToggleableState.On -> ToggleableState.Off
+            ToggleableState.Off, ToggleableState.Indeterminate -> ToggleableState.On
+        }
+        node.updateChildrenState(nextState)
+        node.updateParentState()
+        checkPendingChanges()
+    }
+    _treeNodes.value = _treeNodes.value.toList() // force recomposition
+  }
+
+  private fun checkPendingChanges() {
+    var hasChanges = false
+    fun checkNode(node: SdkTreeNode) {
+      if (!node.isGroup) {
+        // 引导页无视 installed 状态，只要有勾选的就视为 pending
+        if (node.checkedState == ToggleableState.On) {
+          hasChanges = true
+        }
+      }
+      node.children.forEach { checkNode(it) }
+    }
+    _treeNodes.value.forEach { checkNode(it) }
+    _hasPendingChanges.value = hasChanges
+  }
+
+  fun getInstallTasks(): List<SdkTreeNode> {
+    val toInstall = mutableListOf<SdkTreeNode>()
+    fun collect(node: SdkTreeNode) {
+      if (!node.isGroup && node.checkedState == ToggleableState.On) {
+          toInstall.add(node)
+      }
+      node.children.forEach { collect(it) }
+    }
+    _treeNodes.value.forEach { collect(it) }
+    return toInstall
   }
 }
