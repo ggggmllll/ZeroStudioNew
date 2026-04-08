@@ -2,6 +2,8 @@ package com.itsaky.androidide.repository.sdkmanager.services
 
 import android.content.Context
 import com.blankj.utilcode.util.FileUtils
+import com.blankj.utilcode.util.ResourceUtils
+import com.blankj.utilcode.util.ZipUtils
 import com.itsaky.androidide.repository.sdkmanager.models.SdkTreeNode
 import com.itsaky.androidide.utils.Environment
 import com.itsaky.androidide.utils.executioncommand.TermuxCommand
@@ -16,15 +18,18 @@ import kotlinx.coroutines.withContext
 
 /**
  * 轻量级 SDK 安装管理器。 采用 Kotlin 下载 (保证高可用度与精准进度回报) + Termux Shell (高效强健解压)。
+ * 包含 NDK 和 CMake 的定制化修复与补丁应用。
  *
  * @author android_zero
  */
 object SdkInstallerManager {
 
-  /** 下载 + 创建解压脚本 + Termux执行 */
+  /** 下载 + 创建解压脚本 + Termux执行 + 可选后置修复 */
   suspend fun downloadAndInstall(
       context: Context,
       node: SdkTreeNode,
+      applyNdkFix: Boolean = true,
+      applyCmakePatch: Boolean = true,
       onProgress: (Float) -> Unit,
       onLog: (String) -> Unit,
   ): Boolean =
@@ -118,9 +123,9 @@ object SdkInstallerManager {
             
             # Strip top-level directory if there is exactly one
             INNER_COUNT=${'$'}(ls -1 "${"$"}TMP_EXTRACT" | wc -l)
-            if [ "${"$"}INNER_COUNT" -eq 1 ]; then
+            if[ "${"$"}INNER_COUNT" -eq 1 ]; then
               INNER_DIR="${"$"}TMP_EXTRACT/${'$'}(ls -1 "${"$"}TMP_EXTRACT")"
-              if [ -d "${"$"}INNER_DIR" ]; then
+              if[ -d "${"$"}INNER_DIR" ]; then
                 cp -r "${"$"}INNER_DIR"/* "${"$"}DEST_DIR"/ 2>/dev/null || true
               else
                 cp -r "${"$"}TMP_EXTRACT"/* "${"$"}DEST_DIR"/ 2>/dev/null || true
@@ -161,8 +166,161 @@ object SdkInstallerManager {
           return@withContext false
         }
 
+        // Execute post-installation fixes
+        if (node.componentType == "ndk" && applyNdkFix) {
+          applyNdkFixes(context, destDir, onLog)
+        } else if (node.componentType == "cmake" && applyCmakePatch) {
+          applyCmakePatches(context, destDir, onLog)
+        }
+
         return@withContext true
       }
+
+  /**
+   * 执行 NDK 核心修复：
+   * 1. 根据当前架构建立丢失的软链接 (x86_64, aarch64, arm64 等)。
+   * 2. 使用 sed 动态替换 toolchain 文件内的标识，支持编译 Android 工程。
+   */
+  private suspend fun applyNdkFixes(context: Context, ndkDir: File, onLog: (String) -> Unit) {
+    onLog(">> Applying NDK fixes and symlinks...")
+    val script =
+        """
+        #!/bin/bash
+        set -eu
+        NDK_DIR="${ndkDir.absolutePath}"
+        
+        echo "Creating missing architecture symlinks..."
+        if[ -d "${'$'}NDK_DIR/toolchains/llvm/prebuilt" ]; then
+            cd "${'$'}NDK_DIR/toolchains/llvm/prebuilt" || exit 0
+            if [ -d "linux-aarch64" ] && [ ! -e "linux-x86_64" ]; then ln -s linux-aarch64 linux-x86_64; fi
+            if[ -d "linux-arm64" ] && [ ! -e "linux-aarch64" ]; then ln -s linux-arm64 linux-aarch64; fi
+        fi
+        
+        if[ -d "${'$'}NDK_DIR/prebuilt" ]; then
+            cd "${'$'}NDK_DIR/prebuilt" || exit 0
+            if [ -d "linux-aarch64" ] &&[ ! -e "linux-x86_64" ]; then ln -s linux-aarch64 linux-x86_64; fi
+            if [ -d "linux-arm64" ] &&[ ! -e "linux-aarch64" ]; then ln -s linux-arm64 linux-aarch64; fi
+        fi
+        
+        if[ -d "${'$'}NDK_DIR/shader-tools" ]; then
+            cd "${'$'}NDK_DIR/shader-tools" || exit 0
+            if [ -d "linux-arm64" ] &&[ ! -e "linux-aarch64" ]; then ln -s linux-arm64 linux-aarch64; fi
+        fi
+        
+        echo "Patching CMAKE Android Toolchain config..."
+        for cmake_file in "${'$'}NDK_DIR/build/cmake/android-legacy.toolchain.cmake" "${'$'}NDK_DIR/build/cmake/android.toolchain.cmake"; do
+            if [ -f "${'$'}cmake_file" ]; then
+                sed -i 's/if(CMAKE_HOST_SYSTEM_NAME STREQUAL Linux)/if(CMAKE_HOST_SYSTEM_NAME STREQUAL Android)\nset(ANDROID_HOST_TAG linux-aarch64)\nelseif(CMAKE_HOST_SYSTEM_NAME STREQUAL Linux)/g' "${'$'}cmake_file"
+                echo "Patched: ${'$'}cmake_file"
+            fi
+        done
+        echo "NDK fixes applied successfully."
+    """
+            .trimIndent()
+
+    val scriptFile = File(Environment.TMP_DIR, "ndk_fix_${System.currentTimeMillis()}.sh")
+    scriptFile.writeText(script)
+    scriptFile.setExecutable(true)
+
+    val result = TermuxCommand.run(context) {
+      label("NDK Fix")
+      executable(Environment.BASH_SHELL.absolutePath)
+      args(scriptFile.absolutePath)
+    }
+
+    if (result.stdout.isNotBlank()) onLog(result.stdout)
+    if (!result.isSuccess) {
+      onLog("WARN/ERR NDK Fix: ${result.stderr}")
+    }
+
+    scriptFile.delete()
+  }
+
+  /**
+   * 执行 CMake 修补：
+   * 赋予 /bin 下文件执行权限。
+   * 从 assets 解压 cmake_patches.zip 到临时目录，并使用 patch -p1 应用补丁。
+   */
+  private suspend fun applyCmakePatches(context: Context, cmakeDir: File, onLog: (String) -> Unit) {
+    onLog(">> Preparing to apply CMake patches...")
+
+    val patchZip = File(Environment.TMP_DIR, "cmake_patches_${System.currentTimeMillis()}.zip")
+    val patchExtractedDir =
+        File(Environment.TMP_DIR, "cmake_patches_ext_${System.currentTimeMillis()}")
+
+    try {
+      val success =
+          ResourceUtils.copyFileFromAssets("data/common/cmake_patches.zip", patchZip.absolutePath)
+      if (success) {
+        ZipUtils.unzipFile(patchZip, patchExtractedDir)
+        onLog(">> Extracted patch zip successfully.")
+      } else {
+        onLog(
+            "WARN: 'data/common/cmake_patches.zip' not found in assets, skipping CMake patches."
+        )
+        return
+      }
+    } catch (e: Exception) {
+      onLog("WARN: Failed to extract cmake patches: ${e.message}")
+      patchZip.delete()
+      patchExtractedDir.deleteRecursively()
+      return
+    }
+
+    val script =
+        """
+        #!/bin/bash
+        set -eu
+        CMAKE_DIR="${cmakeDir.absolutePath}"
+        PATCH_DIR="${patchExtractedDir.absolutePath}"
+        
+        echo "Setting executable permissions for bin..."
+        chmod -R +x "${'$'}CMAKE_DIR"/bin/* 2>/dev/null || true
+        
+        echo "Searching for target share directory..."
+        SHARE_DIR="${'$'}CMAKE_DIR/share"
+        if [ -d "${'$'}SHARE_DIR" ]; then
+            # Find cmake-3.xx directory dynamically
+            CMAKE_SHARE_SUBDIR=${'$'}(ls -1 "${'$'}SHARE_DIR" | grep cmake | head -n 1)
+            if[ -n "${'$'}CMAKE_SHARE_SUBDIR" ]; then
+                TARGET_DIR="${'$'}SHARE_DIR/${'$'}CMAKE_SHARE_SUBDIR"
+                cd "${'$'}TARGET_DIR"
+                echo "Applying patches in ${'$'}TARGET_DIR..."
+                for p in "${'$'}PATCH_DIR"/*.patch; do
+                    if[ -f "${'$'}p" ]; then
+                        echo "Applying ${'$'}p..."
+                        patch -p1 < "${'$'}p" || echo "WARN: Failed to apply ${'$'}p"
+                    fi
+                done
+            else
+                echo "WARN: No cmake-X.X directory found inside share/"
+            fi
+        else
+            echo "WARN: share/ directory not found in CMake."
+        fi
+        echo "CMake patches applied."
+    """
+            .trimIndent()
+
+    val scriptFile = File(Environment.TMP_DIR, "cmake_patch_${System.currentTimeMillis()}.sh")
+    scriptFile.writeText(script)
+    scriptFile.setExecutable(true)
+
+    val result = TermuxCommand.run(context) {
+      label("CMake Patch")
+      executable(Environment.BASH_SHELL.absolutePath)
+      args(scriptFile.absolutePath)
+    }
+
+    if (result.stdout.isNotBlank()) onLog(result.stdout)
+    if (!result.isSuccess) {
+      onLog("WARN/ERR CMake Patch: ${result.stderr}")
+    }
+
+    scriptFile.delete()
+    patchZip.delete()
+    patchExtractedDir.deleteRecursively()
+  }
 
   /** 卸载任务 */
   suspend fun deletePackage(node: SdkTreeNode, onLog: (String) -> Unit): Boolean =

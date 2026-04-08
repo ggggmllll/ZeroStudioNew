@@ -1,6 +1,7 @@
 package com.itsaky.androidide.repository.sdkmanager.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -224,6 +225,12 @@ fun ActionConfirmAndRunDialog(
   var currentProgress by remember { mutableStateOf(0f) }
   var currentTaskName by remember { mutableStateOf("") }
 
+  // 修复选项
+  var applyNdkFix by remember { mutableStateOf(true) }
+  var applyCmakePatch by remember { mutableStateOf(true) }
+  val installingNdk = toInstall.any { it.componentType == "ndk" }
+  val installingCmake = toInstall.any { it.componentType == "cmake" }
+
   val consoleLogs = remember { mutableStateListOf<String>() }
 
   fun addLog(msg: String) {
@@ -237,7 +244,7 @@ fun ActionConfirmAndRunDialog(
       title = { Text(if (isFinished) "Tasks Completed" else "Confirm Changes") },
       text = {
         Column(modifier = Modifier.fillMaxWidth()) {
-          // 状态一：任务确认预览阶段
+          // 任务确认预览阶段
           if (!isRunning && !isFinished) {
             Text(
                 "The following packages will be installed/updated:",
@@ -257,13 +264,32 @@ fun ActionConfirmAndRunDialog(
               Text("- ${it.name}", color = MaterialTheme.colorScheme.error, fontSize = 13.sp)
             }
             if (toDelete.isEmpty()) Text("  (None)", color = Color.Gray, fontSize = 13.sp)
+
+            if (installingNdk || installingCmake) {
+              Spacer(modifier = Modifier.height(16.dp))
+              Divider()
+              Spacer(modifier = Modifier.height(8.dp))
+              Text("Additional Configurations:", fontWeight = FontWeight.Bold, fontSize = 14.sp)
+              if (installingNdk) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                  Checkbox(checked = applyNdkFix, onCheckedChange = { applyNdkFix = it })
+                  Text("Apply NDK Fixes (symlinks & patches)", fontSize = 13.sp, modifier = Modifier.clickable { applyNdkFix = !applyNdkFix })
+                }
+              }
+              if (installingCmake) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                  Checkbox(checked = applyCmakePatch, onCheckedChange = { applyCmakePatch = it })
+                  Text("Apply CMake Patches", fontSize = 13.sp, modifier = Modifier.clickable { applyCmakePatch = !applyCmakePatch })
+                }
+              }
+            }
           }
 
-          // 状态二：任务执行及日志面板阶段
+          // 任务执行及日志面板阶段
           if (isRunning || isFinished) {
             Text(text = "Current: $currentTaskName", style = MaterialTheme.typography.labelMedium)
             LinearProgressIndicator(
-                progress = currentProgress,
+                progress = { currentProgress },
                 modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
             )
 
@@ -322,6 +348,8 @@ fun ActionConfirmAndRunDialog(
                         SdkInstallerManager.downloadAndInstall(
                             context = context,
                             node = node,
+                            applyNdkFix = applyNdkFix,
+                            applyCmakePatch = applyCmakePatch,
                             onProgress = { currentProgress = it },
                             onLog = ::addLog,
                         )
