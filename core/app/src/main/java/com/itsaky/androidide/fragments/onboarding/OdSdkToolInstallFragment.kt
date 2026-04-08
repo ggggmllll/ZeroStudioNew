@@ -59,7 +59,7 @@ import androidx.core.content.getSystemService
 import androidx.fragment.app.viewModels
 import com.github.appintro.SlidePolicy
 import com.itsaky.androidide.R
-import com.itsaky.androidide.activities.MainActivity
+import com.itsaky.androidide.activities.OnboardingActivity
 import com.itsaky.androidide.repository.sdkmanager.models.SdkTreeNode
 import com.itsaky.androidide.repository.sdkmanager.services.SdkInstallerManager
 import com.itsaky.androidide.repository.sdkmanager.tree.SdkTreeView
@@ -74,12 +74,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
 /**
- * AndroidIDE Setup Configuration Fragment.
- * 结合了 Compose 与 SdkManager 引擎，提供树状选单式的 SDK、工具和依赖安装界面。
- * 新增对 CMake 和 NDK 的安装修复开关支持。
+ * AndroidIDE 引导页全新 SDK、构建工具及环境配置模块
  *
- * @author Akash Yadav (Original)
- * @author android_zero (Refactored)
+ * @author android_zero
  */
 class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
 
@@ -320,10 +317,8 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
             sdkManagerViewModel.loadData()
           },
           onSuccess = {
-            requireActivity().apply {
-              startActivity(Intent(this, MainActivity::class.java))
-              finishAffinity()
-            }
+            // 直接触发父级 Activity 的安装完成回调进入主界面流程
+            (requireActivity() as? OnboardingActivity)?.onSetupCompleted()
           },
       )
     }
@@ -478,6 +473,28 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
                 Text("Components to remove:", fontWeight = FontWeight.Bold, fontSize = 14.sp)
                 toDelete.forEach {
                   Text("- ${it.name}", color = MaterialTheme.colorScheme.error, fontSize = 13.sp)
+                }
+              }
+              
+              val installingNdk = toInstall.any { it.componentType == "ndk" }
+              val installingCmake = toInstall.any { it.componentType == "cmake" }
+              
+              if (installingNdk || installingCmake) {
+                Spacer(modifier = Modifier.height(16.dp))
+                Divider()
+                Spacer(modifier = Modifier.height(8.dp))
+                Text("Additional Configurations:", fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                if (installingNdk) {
+                  Row(verticalAlignment = Alignment.CenterVertically) {
+                    Checkbox(checked = applyNdkFix, onCheckedChange = { /* Disabled override */ }, enabled = false)
+                    Text("Apply NDK Fixes (symlinks & patches)", fontSize = 13.sp)
+                  }
+                }
+                if (installingCmake) {
+                  Row(verticalAlignment = Alignment.CenterVertically) {
+                    Checkbox(checked = applyCmakePatch, onCheckedChange = { /* Disabled override */ }, enabled = false)
+                    Text("Apply CMake Patches", fontSize = 13.sp)
+                  }
                 }
               }
             }

@@ -25,7 +25,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import androidx.activity.result.contract.ActivityResultContracts
+// import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
@@ -38,7 +38,7 @@ import com.itsaky.androidide.R.string
 import com.itsaky.androidide.app.configuration.IDEBuildConfigProvider
 import com.itsaky.androidide.app.configuration.IJdkDistributionProvider
 import com.itsaky.androidide.fragments.onboarding.GreetingFragment
-import com.itsaky.androidide.fragments.onboarding.IdeSetupConfigurationFragment
+import com.itsaky.androidide.fragments.onboarding.OdSdkToolInstallFragment
 import com.itsaky.androidide.fragments.onboarding.OnboardingInfoFragment
 import com.itsaky.androidide.fragments.onboarding.PermissionsFragment
 import com.itsaky.androidide.models.JdkDistribution
@@ -47,9 +47,9 @@ import com.itsaky.androidide.tasks.launchAsyncWithProgress
 import com.itsaky.androidide.ui.themes.IThemeManager
 import com.itsaky.androidide.utils.*
 import com.itsaky.androidide.utils.Environment
-import com.itsaky.androidide.utils.isAtLeastV
-import com.itsaky.androidide.utils.isSystemInDarkMode
-import com.itsaky.androidide.utils.resolveAttr
+// import com.itsaky.androidide.utils.isAtLeastV
+// import com.itsaky.androidide.utils.isSystemInDarkMode
+// import com.itsaky.androidide.utils.resolveAttr
 import com.termux.shared.android.PackageUtils
 import com.termux.shared.markdown.MarkdownUtils
 import com.termux.shared.termux.TermuxConstants
@@ -62,13 +62,13 @@ import kotlinx.coroutines.withContext
 
 class OnboardingActivity : AppIntro2() {
 
-  private val terminalActivityCallback =
-      registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-        Log.d(TAG, "TerminalActivity: resultCode=${it.resultCode}")
-        if (!isFinishing) {
-          reloadJdkDistInfo { tryNavigateToMainIfSetupIsCompleted() }
-        }
-      }
+  // private val terminalActivityCallback =
+      // registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        // Log.d(TAG, "TerminalActivity: resultCode=${it.resultCode}")
+        // if (!isFinishing) {
+          // reloadJdkDistInfo { tryNavigateToMainIfSetupIsCompleted() }
+        // }
+      // }
 
   private val activityScope = CoroutineScope(Dispatchers.Main + CoroutineName("OnboardingActivity"))
 
@@ -168,7 +168,7 @@ class OnboardingActivity : AppIntro2() {
     }
 
     if (!checkToolsIsInstalled()) {
-      addSlide(IdeSetupConfigurationFragment.newInstance(this))
+      addSlide(OdSdkToolInstallFragment.newInstance(this))
     }
   }
 
@@ -189,20 +189,20 @@ class OnboardingActivity : AppIntro2() {
       return
     }
 
-    if (!checkToolsIsInstalled() && currentFragment is IdeSetupConfigurationFragment) {
-      val intent = Intent(this, TerminalActivity::class.java)
-      if (currentFragment.isAutoInstall()) {
-        intent.putExtra(TerminalActivity.EXTRA_ONBOARDING_RUN_IDESETUP, true)
-        intent.putExtra(
-            TerminalActivity.EXTRA_ONBOARDING_RUN_IDESETUP_ARGS,
-            currentFragment.buildIdeSetupArguments(),
-        )
-      }
-      terminalActivityCallback.launch(intent)
+    if (!checkToolsIsInstalled() && currentFragment is OdSdkToolInstallFragment) {
+      flashError(getString(string.msg_install_tools))
       return
     }
 
     tryNavigateToMainIfSetupIsCompleted()
+  }
+
+  /**
+   * 提供给 OdSdkToolInstallFragment 安装完成后的回调。
+   * 这将触发重新加载 JDK 并检查是否能进入 MainActivity。
+   */
+  fun onSetupCompleted() {
+    reloadJdkDistInfo { tryNavigateToMainIfSetupIsCompleted() }
   }
 
   /** 严格检查所有权限 */
@@ -232,11 +232,9 @@ class OnboardingActivity : AppIntro2() {
               Manifest.permission.READ_EXTERNAL_STORAGE,
               Manifest.permission.WRITE_EXTERNAL_STORAGE,
           )
-      if (
-          legacyPerms.any {
+      if (legacyPerms.any {
             ContextCompat.checkSelfPermission(context, it) != PackageManager.PERMISSION_GRANTED
-          }
-      ) {
+          }) {
         return false
       }
     }
