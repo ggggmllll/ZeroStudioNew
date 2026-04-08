@@ -33,6 +33,7 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: '21'
+          cache: 'gradle'
 
       - name: Configuring a Gradle 8.13 environment
         uses: gradle/actions/setup-gradle@v4
