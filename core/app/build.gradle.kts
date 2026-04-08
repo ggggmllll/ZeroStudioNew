@@ -15,7 +15,7 @@ plugins {
   alias(libs.plugins.google.services)
   alias(libs.plugins.firebase.crashlytics)
   id("org.jetbrains.kotlin.plugin.compose")
-  id("com.google.firebase.firebase-perf")
+  // id("com.google.firebase.firebase-perf")
 }
 
 apply { plugin(AndroidIDEAssetsPlugin::class.java) }
