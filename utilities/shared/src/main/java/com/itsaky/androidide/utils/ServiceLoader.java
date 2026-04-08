@@ -50,6 +50,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Iterator;
@@ -300,7 +301,7 @@ public final class ServiceLoader<S> implements Iterable<S> {
     BufferedReader r = null;
     ArrayList<String> names = new ArrayList<>();
     try {
-      in = u.openStream();
+      in = openUrlStreamSafely(u);
       r = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
       int lc = 1;
 
@@ -322,6 +323,23 @@ public final class ServiceLoader<S> implements Iterable<S> {
       }
     }
     return names.iterator();
+  }
+
+  /**
+   * Use reflection to open URL stream to avoid hard-linking calls that may be bytecode-rewritten
+   * to optional Firebase Performance classes on some build variants.
+   */
+  private InputStream openUrlStreamSafely(URL url) throws IOException {
+    try {
+      Method openStream = URL.class.getMethod("openStream");
+      Object value = openStream.invoke(url);
+      if (value instanceof InputStream) {
+        return (InputStream) value;
+      }
+      throw new IOException("Unexpected stream type from URL.openStream()");
+    } catch (ReflectiveOperationException e) {
+      throw new IOException("Failed to open service configuration stream", e);
+    }
   }
 
   // Private inner class implementing fully-lazy provider lookup
