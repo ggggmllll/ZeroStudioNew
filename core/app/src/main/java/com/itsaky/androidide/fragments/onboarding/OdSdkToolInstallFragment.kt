@@ -81,7 +81,6 @@ import com.itsaky.androidide.utils.executioncommand.TermuxCommand
 import com.itsaky.androidide.utils.flashError
 import com.itsaky.androidide.utils.getConnectionInfo
 import java.io.File
-import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
 import kotlinx.coroutines.Dispatchers
@@ -93,8 +92,7 @@ import kotlinx.coroutines.withContext
 
 /**
  * 全新精简版 SDK 与环境安装 Fragment。
- * 替代原先的 IdeSetupConfigurationFragment，提供单列无分组展开的工具树 UI 
- * 并内置 GitHub 镜像加速和 JDK 等完整底层部署还原。
+ * 替代原先的 IdeSetupConfigurationFragment。
  *
  * @author android_zero
  */
@@ -112,18 +110,7 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
       return OdSdkToolInstallFragment().also {
         it.arguments =
             Bundle().apply {
-              putCharSequence(KEY_ONBOARDING_TITLE, context.getString(R.string.title_install_tools))
-              putCharSequence(
-                  KEY_ONBOARDING_SUBTITLE,
-                  context.getString(R.string.subtitle_install_tools),
-              )
-              putCharSequence(
-                  KEY_ONBOARDING_EXTRA_INFO,
-                  Html.fromHtml(
-                      context.getString(R.string.msg_install_tools),
-                      Html.FROM_HTML_MODE_COMPACT,
-                  ),
-              )
+              putCharSequence(KEY_ONBOARDING_EXTRA_INFO, "")
             }
       }
     }
@@ -141,11 +128,13 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
             MaterialTheme(colorScheme = colorScheme) { SetupConfigurationScreen() }
           }
         }
+    
+    // 强制占满可用高度，保证滚动正常
     parent.addView(
         composeView,
         ViewGroup.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT,
+            ViewGroup.LayoutParams.MATCH_PARENT,
         ),
     )
     updateConnectionStatus()
@@ -244,7 +233,6 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
     var jdkExpanded by remember { mutableStateOf(false) }
 
     val currentAbi = IDEBuildConfigProvider.getInstance().cpuAbiName
-    val scrollState = rememberScrollState()
 
     fun getValidMirror(): String {
       if (!useGithubMirror) return ""
@@ -255,13 +243,32 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
       return t
     }
 
-    Column(modifier = Modifier.fillMaxSize().padding(horizontal = 12.dp, vertical = 8.dp).verticalScroll(scrollState)) {
+    Column(modifier = Modifier.fillMaxSize().padding(horizontal = 12.dp, vertical = 8.dp)) {
       
       // 头部栏：标题 + ABI 信息
       Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
           Text(
+              text = "SDK 安装与配置",
+              style = MaterialTheme.typography.titleLarge,
+              fontWeight = FontWeight.Bold,
+          )
+      }
+      
+      Text(
+          text = "必须安装开发工具才能使 IDE 正常工作。请勾选所需的组件并在最后执行安装。",
+          style = MaterialTheme.typography.bodySmall,
+          color = MaterialTheme.colorScheme.onSurfaceVariant,
+          modifier = Modifier.padding(top = 4.dp, bottom = 12.dp)
+      )
+
+      NetworkWarnings(netState)
+
+      Spacer(modifier = Modifier.height(8.dp))
+
+      Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+          Text(
               text = "Select SDKs & Tools:",
-              style = MaterialTheme.typography.titleMedium,
+              style = MaterialTheme.typography.titleSmall,
               fontWeight = FontWeight.Bold,
           )
           Surface(
@@ -277,15 +284,11 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
           }
       }
 
-      NetworkWarnings(netState)
-
-      Spacer(modifier = Modifier.height(8.dp))
-
-      // 核心 SDK 树状视图区 (合并为单一列表显示，高度给足)
+      // 核心 SDK 树状视图区 (占据剩余动态高度，让 SdkTreeView 自己滚动)
       Surface(
           shape = RoundedCornerShape(12.dp),
           color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
-          modifier = Modifier.fillMaxWidth().height(320.dp), 
+          modifier = Modifier.fillMaxWidth().weight(1f).padding(top = 8.dp), 
       ) {
         if (isLoading) {
           Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -346,7 +349,7 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
           }
       }
 
-      // 2. 基础修复与安装开关
+      // 基础修复与安装开关
       Column(verticalArrangement = Arrangement.spacedBy((-12).dp)) {
           Row(verticalAlignment = Alignment.CenterVertically) {
               Checkbox(checked = installGit, onCheckedChange = { installGit = it }, modifier = Modifier.scale(0.8f))
@@ -365,7 +368,7 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
               Text("Apply CMake Patches", fontSize = 11.sp, modifier = Modifier.clickable { applyCmakePatch = !applyCmakePatch })
           }
           
-          // GitHub 镜像加速选项
+          //GitHub 镜像加速选项
           Row(verticalAlignment = Alignment.CenterVertically) {
               Checkbox(checked = useGithubMirror, onCheckedChange = { useGithubMirror = it }, modifier = Modifier.scale(0.8f))
               Text("Use Github Mirror (加速下载)", fontSize = 11.sp, modifier = Modifier.clickable { useGithubMirror = !useGithubMirror })
@@ -395,7 +398,7 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
           }
       }
 
-      Spacer(modifier = Modifier.height(16.dp))
+      Spacer(modifier = Modifier.height(12.dp))
 
       // 底部执行按钮
       Button(
@@ -562,7 +565,7 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
                   isRunning = true
                   coroutineScope.launch(Dispatchers.IO) {
                     
-                    // 1. 系统依赖与包管理器更新
+                    // 系统依赖与包管理器更新
                     currentTaskName = "Configuring APT environment..."
                     currentProgress = -1f 
                     addLog(">> Updating APT repositories...")
@@ -570,13 +573,13 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
                         if (it.stdout.isNotBlank()) addLog(it.stdout)
                     }
 
-                    // 2. 安装基础包 (jq, tar, unzip, libcurl)
+                    // 安装基础包 (jq, tar, unzip, libcurl)
                     addLog(">> Installing required base packages...")
                     TermuxCommand.run(context) { executable(Environment.BASH_SHELL.absolutePath); args("-c", "apt install jq tar unzip libcurl -y") }.also {
                         if (it.stdout.isNotBlank()) addLog(it.stdout)
                     }
 
-                    // 3. P7Zip 镜像替换及安装
+                    //P7Zip 镜像替换及安装
                     currentTaskName = "Installing p7zip..."
                     addLog(">> Installing p7zip manually for 7z extraction support...")
                     val arch = IDEBuildConfigProvider.getInstance().cpuAbiName
@@ -645,7 +648,7 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
                         addLog("WARN: Failed to write ide-environment.properties: ${e.message}")
                     }
 
-                    // 6. 执行 SDK/NDK/CMake 安装
+                    // 执行 SDK/NDK/CMake 安装
                     for (node in toInstall) {
                       currentTaskName = "Installing ${node.name}"
                       currentProgress = 0f
@@ -686,6 +689,7 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
   }
 }
 
+/** 专门针对引导页的精简版 ViewModel (支持 GitHub 镜像参数) */
 class OdSdkSetupViewModel(application: Application) : AndroidViewModel(application) {
 
   private val _treeNodes = MutableStateFlow<List<SdkTreeNode>>(emptyList())
@@ -737,7 +741,7 @@ class OdSdkSetupViewModel(application: Application) : AndroidViewModel(applicati
 
             // Build Tools
             manifest.buildTools?.get(queryArch)?.let { map ->
-                val group = SdkTreeNode(name = "Build-Tools", isGroup = true, isExpanded = true)
+                val group = SdkTreeNode(name = "Build-Tools", isGroup = true, isExpanded = false)
                 map.forEach { (k, url) ->
                     if (url.isNotBlank() && url.lowercase() != "x") {
                         val ver = k.replace("_", ".").trimStart('.')
@@ -745,6 +749,7 @@ class OdSdkSetupViewModel(application: Application) : AndroidViewModel(applicati
                     }
                 }
                 group.children.sortByDescending { it.revision }
+                // 默认勾选最新
                 group.children.firstOrNull()?.let { it.checkedState = ToggleableState.On }
                 group.updateParentState()
                 if (group.children.isNotEmpty()) rootNodes.add(group)
@@ -752,7 +757,7 @@ class OdSdkSetupViewModel(application: Application) : AndroidViewModel(applicati
 
             // Platform Tools (特定推荐 35.0.2)
             manifest.platformTools?.get(queryArch)?.let { map ->
-                val group = SdkTreeNode(name = "Platform-Tools", isGroup = true, isExpanded = true)
+                val group = SdkTreeNode(name = "Platform-Tools", isGroup = true, isExpanded = false)
                 map.forEach { (k, url) ->
                     if (url.isNotBlank() && url.lowercase() != "x") {
                         val ver = k.replace("_", ".").trimStart('.')

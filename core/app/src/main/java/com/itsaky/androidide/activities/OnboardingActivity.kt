@@ -25,7 +25,6 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-// import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
@@ -47,9 +46,6 @@ import com.itsaky.androidide.tasks.launchAsyncWithProgress
 import com.itsaky.androidide.ui.themes.IThemeManager
 import com.itsaky.androidide.utils.*
 import com.itsaky.androidide.utils.Environment
-// import com.itsaky.androidide.utils.isAtLeastV
-// import com.itsaky.androidide.utils.isSystemInDarkMode
-// import com.itsaky.androidide.utils.resolveAttr
 import com.termux.shared.android.PackageUtils
 import com.termux.shared.markdown.MarkdownUtils
 import com.termux.shared.termux.TermuxConstants
@@ -62,20 +58,11 @@ import kotlinx.coroutines.withContext
 
 class OnboardingActivity : AppIntro2() {
 
-  // private val terminalActivityCallback =
-      // registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-        // Log.d(TAG, "TerminalActivity: resultCode=${it.resultCode}")
-        // if (!isFinishing) {
-          // reloadJdkDistInfo { tryNavigateToMainIfSetupIsCompleted() }
-        // }
-      // }
-
   private val activityScope = CoroutineScope(Dispatchers.Main + CoroutineName("OnboardingActivity"))
 
   private var listJdkInstallationsJob: Job? = null
 
   companion object {
-
     private const val TAG = "OnboardingActivity"
     private const val KEY_ARCHCONFIG_WARNING_IS_SHOWN = "ide.archConfig.experimentalWarning.isShown"
   }
@@ -112,12 +99,14 @@ class OnboardingActivity : AppIntro2() {
       return
     }
 
-    setSwipeLock(true)
+    // 允许用户左右滑动切换引导页
+    isWizardMode = false
+    setSwipeLock(false) 
+
     setTransformer(AppIntroPageTransformerType.Fade)
     setProgressIndicator()
     showStatusBar(true)
     isIndicatorEnabled = true
-    isWizardMode = true
 
     addSlide(GreetingFragment())
 
@@ -159,14 +148,12 @@ class OnboardingActivity : AppIntro2() {
       return
     }
 
-    // ===免责与隐私协议 ===
-    // addSlide(DisclaimerFragment.newInstance(this))
-
     // 如果权限未全部满足，则显示权限页
     if (!checkAllPermissionsGranted()) {
       addSlide(PermissionsFragment.newInstance(this))
     }
 
+    // 若尚未安装环境，添加全新的环境配置 Fragment
     if (!checkToolsIsInstalled()) {
       addSlide(OdSdkToolInstallFragment.newInstance(this))
     }
@@ -183,7 +170,6 @@ class OnboardingActivity : AppIntro2() {
   }
 
   override fun onDonePressed(currentFragment: Fragment?) {
-
     if (!IDEBuildConfigProvider.getInstance().supportsCpuAbi()) {
       finishAffinity()
       return
