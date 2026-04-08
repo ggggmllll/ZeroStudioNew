@@ -24,6 +24,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
@@ -31,13 +32,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import com.blankj.utilcode.util.FileUtils
-import com.blankj.utilcode.util.ZipUtils
 import com.itsaky.androidide.lsp.kotlin.events.LspInstallRequestEvent
+import com.itsaky.androidide.utils.executioncommand.TermuxCommand
 import com.itsaky.androidide.utils.Environment
 import java.io.File
-import java.io.FileOutputStream
-import java.net.HttpURLConnection
-import java.net.URL
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -49,6 +47,7 @@ import kotlinx.coroutines.withContext
  */
 @Composable
 fun LspInstallerDialog(request: LspInstallRequestEvent, onDismiss: () -> Unit) {
+  val context = LocalContext.current
   val coroutineScope = rememberCoroutineScope()
 
   // 状态管理
@@ -147,74 +146,67 @@ fun LspInstallerDialog(request: LspInstallRequestEvent, onDismiss: () -> Unit) {
               statusMessage = "Initializing..."
 
               coroutineScope.launch(Dispatchers.IO) {
-                var tempFile: File? = null
+                var tmpZip: File? = null
                 try {
-                  log("Starting download sequence for ${request.serverName}...")
-
-                  tempFile =
+                  val targetDir = request.installPath
+                  tmpZip =
                       File(
                           Environment.TMP_DIR,
-                          "${request.serverId}-${System.currentTimeMillis()}.tmp",
+                          "${request.serverId}-${System.currentTimeMillis()}.zip",
                       )
-                  FileUtils.createOrExistsFile(tempFile)
+                  FileUtils.createOrExistsDir(tmpZip.parentFile)
 
-                  val url = URL(request.downloadUrl)
-                  val connection = url.openConnection() as HttpURLConnection
-                  connection.connectTimeout = 10000
-                  connection.readTimeout = 10000
-                  connection.connect()
+                  fun shellQuote(value: String): String = "'${value.replace("'", "'\"'\"'")}'"
 
-                  if (connection.responseCode != HttpURLConnection.HTTP_OK) {
-                    throw Exception(
-                        "Server returned HTTP ${connection.responseCode}: ${connection.responseMessage}"
-                    )
-                  }
-
-                  val fileLength = connection.contentLength
-                  val input = connection.inputStream
-                  val output = FileOutputStream(tempFile)
-
-                  val data = ByteArray(8192)
-                  var total: Long = 0
-                  var count: Int
-
+                  progress = 0.2f
+                  statusMessage = "Downloading..."
                   log("Downloading from: ${request.downloadUrl}")
 
-                  while (input.read(data).also { count = it } != -1) {
-                    if (!isInstalling) throw Exception("Installation cancelled")
+                  val downloadCmd =
+                      """
+                      set -e
+                      if command -v curl >/dev/null 2>&1; then
+                        curl -L --fail ${shellQuote(request.downloadUrl)} -o ${shellQuote(tmpZip!!.absolutePath)}
+                      elif command -v wget >/dev/null 2>&1; then
+                        wget -O ${shellQuote(tmpZip!!.absolutePath)} ${shellQuote(request.downloadUrl)}
+                      else
+                        echo "Neither curl nor wget found in PATH." >&2
+                        exit 127
+                      fi
+                      """.trimIndent()
 
-                    total += count.toLong()
-                    if (fileLength > 0) {
-                      val currentProg = total.toFloat() / fileLength.toFloat()
-                      if (Math.abs(currentProg - progress) > 0.01f) {
-                        progress = currentProg
+                  val downloadResult =
+                      TermuxCommand.run(context) {
+                        label("Download Kotlin LSP")
+                        executable("sh")
+                        args("-c", downloadCmd)
                       }
-                    }
-                    output.write(data, 0, count)
+                  if (!downloadResult.isSuccess) {
+                    throw IllegalStateException(downloadResult.stderr.ifBlank { downloadResult.stdout })
                   }
-                  output.flush()
-                  output.close()
-                  input.close()
+                  log("Download finished: ${tmpZip!!.absolutePath}")
 
-                  progress = 1.0f
-                  statusMessage = "Extracting..."
-                  log("Download completed. Size: ${total / 1024} KB")
-
-                  val targetDir = request.installPath
+                  progress = 0.6f
+                  statusMessage = "Preparing install directory..."
                   if (targetDir.exists()) {
-                    log("Cleaning up old version...")
-                    FileUtils.deleteAllInDir(targetDir)
-                  } else {
-                    FileUtils.createOrExistsDir(targetDir)
+                    FileUtils.delete(targetDir)
                   }
+                  FileUtils.createOrExistsDir(targetDir)
 
-                  if (request.isZipArchive) {
-                    log("Unzipping to ${targetDir.absolutePath}...")
-                    ZipUtils.unzipFile(tempFile, targetDir)
-                  } else {
-                    log("Moving binary to ${targetDir.absolutePath}...")
-                    val destFile = File(targetDir, request.downloadUrl.substringAfterLast("/"))
-                    FileUtils.move(tempFile, destFile)
+                  progress = 0.8f
+                  statusMessage = "Extracting..."
+                  log("Extracting archive to ${targetDir.absolutePath}")
+                  val unzipResult =
+                      TermuxCommand.run(context) {
+                        label("Extract Kotlin LSP")
+                        executable("sh")
+                        args(
+                            "-c",
+                            "set -e; unzip -o ${shellQuote(tmpZip!!.absolutePath)} -d ${shellQuote(targetDir.absolutePath)}",
+                        )
+                      }
+                  if (!unzipResult.isSuccess) {
+                    throw IllegalStateException(unzipResult.stderr.ifBlank { unzipResult.stdout })
                   }
 
                   val binDir = File(targetDir, "bin")
@@ -231,6 +223,7 @@ fun LspInstallerDialog(request: LspInstallRequestEvent, onDismiss: () -> Unit) {
 
                   log("Installation successfully finished.")
                   statusMessage = "Done."
+                  progress = 1.0f
 
                   // 标记为成功，防止取消回调被错误触发
                   isSuccess = true
@@ -249,7 +242,7 @@ fun LspInstallerDialog(request: LspInstallRequestEvent, onDismiss: () -> Unit) {
                     isInstalling = false
                   }
                 } finally {
-                  tempFile?.delete()
+                  tmpZip?.delete()
                 }
               }
             },
