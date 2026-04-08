@@ -38,9 +38,12 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -90,7 +93,8 @@ import kotlinx.coroutines.withContext
 
 /**
  * 全新精简版 SDK 与环境安装 Fragment。
- * 替代原先的 IdeSetupConfigurationFragment，提供高度定制化的单列表 UI 以及深度的 Shell 环境部署还原。
+ * 替代原先的 IdeSetupConfigurationFragment，提供单列无分组展开的工具树 UI 
+ * 并内置 GitHub 镜像加速和 JDK 等完整底层部署还原。
  *
  * @author android_zero
  */
@@ -231,14 +235,27 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
     var installSsh by remember { mutableStateOf(true) }
     var applyNdkFix by remember { mutableStateOf(true) }
     var applyCmakePatch by remember { mutableStateOf(true) }
+    
+    var useGithubMirror by remember { mutableStateOf(false) }
+    var githubMirrorUrl by remember { mutableStateOf("https://gh.llkk.cc/") }
+    
     var showActionDialog by remember { mutableStateOf(false) }
-
     var selectedJdk by remember { mutableStateOf("17") }
     var jdkExpanded by remember { mutableStateOf(false) }
 
     val currentAbi = IDEBuildConfigProvider.getInstance().cpuAbiName
+    val scrollState = rememberScrollState()
 
-    Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp)) {
+    fun getValidMirror(): String {
+      if (!useGithubMirror) return ""
+      val t = githubMirrorUrl.trim()
+      if (t.isBlank()) return ""
+      if (!t.startsWith("http://") && !t.startsWith("https://")) return ""
+      if (!t.endsWith("/")) return ""
+      return t
+    }
+
+    Column(modifier = Modifier.fillMaxSize().padding(horizontal = 12.dp, vertical = 8.dp).verticalScroll(scrollState)) {
       
       // 头部栏：标题 + ABI 信息
       Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
@@ -264,11 +281,11 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
 
       Spacer(modifier = Modifier.height(8.dp))
 
-      // 核心 SDK 树状视图区
+      // 核心 SDK 树状视图区 (合并为单一列表显示，高度给足)
       Surface(
           shape = RoundedCornerShape(12.dp),
           color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
-          modifier = Modifier.fillMaxWidth().heightIn(min = 160.dp, max = 200.dp), // 减小高度
+          modifier = Modifier.fillMaxWidth().height(320.dp), 
       ) {
         if (isLoading) {
           Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -278,7 +295,7 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
           AndroidView(
               factory = { context ->
                   SdkTreeView(context).apply {
-                      isNestedScrollingEnabled = false
+                      isNestedScrollingEnabled = true 
                       bindData(treeNodes) { clickedNode ->
                           setupViewModel.toggleCheck(clickedNode)
                           refreshViews()
@@ -298,7 +315,7 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
 
       Spacer(modifier = Modifier.height(12.dp))
 
-      // 附加配置区域 (缩小尺寸 30%)
+      // 附加配置区域 (缩小尺寸并加强布局)
       Text(
           text = "Additional Configurations:",
           style = MaterialTheme.typography.titleSmall,
@@ -311,7 +328,7 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
           Box {
               OutlinedButton(
                   onClick = { jdkExpanded = true },
-                  modifier = Modifier.height(32.dp),
+                  modifier = Modifier.height(30.dp),
                   contentPadding = PaddingValues(horizontal = 8.dp)
               ) {
                   Text("OpenJDK $selectedJdk", fontSize = 11.sp)
@@ -329,8 +346,8 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
           }
       }
 
-      // 复选框组：调整缩放比例和间距以达到缩小效果
-      Column(verticalArrangement = Arrangement.spacedBy((-8).dp)) {
+      // 2. 基础修复与安装开关
+      Column(verticalArrangement = Arrangement.spacedBy((-12).dp)) {
           Row(verticalAlignment = Alignment.CenterVertically) {
               Checkbox(checked = installGit, onCheckedChange = { installGit = it }, modifier = Modifier.scale(0.8f))
               Text("Install Git (Version Control)", fontSize = 11.sp, modifier = Modifier.clickable { installGit = !installGit })
@@ -347,15 +364,44 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
               Checkbox(checked = applyCmakePatch, onCheckedChange = { applyCmakePatch = it }, modifier = Modifier.scale(0.8f))
               Text("Apply CMake Patches", fontSize = 11.sp, modifier = Modifier.clickable { applyCmakePatch = !applyCmakePatch })
           }
+          
+          // GitHub 镜像加速选项
+          Row(verticalAlignment = Alignment.CenterVertically) {
+              Checkbox(checked = useGithubMirror, onCheckedChange = { useGithubMirror = it }, modifier = Modifier.scale(0.8f))
+              Text("Use Github Mirror (加速下载)", fontSize = 11.sp, modifier = Modifier.clickable { useGithubMirror = !useGithubMirror })
+          }
+      }
+      
+      if (useGithubMirror) {
+          Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(start = 12.dp, end = 8.dp, top = 4.dp)) {
+              OutlinedTextField(
+                  value = githubMirrorUrl,
+                  onValueChange = { githubMirrorUrl = it },
+                  modifier = Modifier.weight(1f).height(46.dp),
+                  textStyle = LocalTextStyle.current.copy(fontSize = 11.sp),
+                  singleLine = true,
+                  placeholder = { Text("https://gh.llkk.cc/", fontSize = 11.sp) }
+              )
+              Spacer(modifier = Modifier.width(8.dp))
+              Button(
+                  onClick = { setupViewModel.loadData(getValidMirror()) },
+                  modifier = Modifier.height(38.dp),
+                  contentPadding = PaddingValues(horizontal = 8.dp)
+              ) {
+                  Icon(Icons.Default.Refresh, contentDescription = "Reload", modifier = Modifier.size(16.dp))
+                  Spacer(Modifier.width(4.dp))
+                  Text("Reload", fontSize = 11.sp)
+              }
+          }
       }
 
-      Spacer(modifier = Modifier.weight(1f))
+      Spacer(modifier = Modifier.height(16.dp))
 
       // 底部执行按钮
       Button(
           onClick = { showActionDialog = true },
           enabled = hasPendingChanges || installGit || installSsh,
-          modifier = Modifier.fillMaxWidth().height(42.dp), // 减小按钮高度
+          modifier = Modifier.fillMaxWidth().height(42.dp), 
       ) {
           Text("Start Environment Setup", fontSize = 13.sp)
       }
@@ -370,9 +416,10 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
           applyNdkFix = applyNdkFix,
           applyCmakePatch = applyCmakePatch,
           jdkVersion = selectedJdk,
+          githubMirror = getValidMirror(),
           onDismiss = {
             showActionDialog = false
-            setupViewModel.loadData()
+            setupViewModel.loadData(getValidMirror())
           },
           onSuccess = {
             (requireActivity() as? OnboardingActivity)?.onSetupCompleted()
@@ -430,6 +477,7 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
       applyNdkFix: Boolean,
       applyCmakePatch: Boolean,
       jdkVersion: String,
+      githubMirror: String,
       onDismiss: () -> Unit,
       onSuccess: () -> Unit,
   ) {
@@ -472,6 +520,10 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
                     Text("• Apply CMake Patches", fontSize = 11.sp, color = if(applyCmakePatch) MaterialTheme.colorScheme.onSurface else Color.Gray)
                 }
               }
+              if (githubMirror.isNotEmpty()) {
+                  Spacer(modifier = Modifier.height(6.dp))
+                  Text("• Active Github Mirror: $githubMirror", fontSize = 11.sp, color = MaterialTheme.colorScheme.primary)
+              }
             }
 
             if (isRunning || isFinished) {
@@ -510,7 +562,7 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
                   isRunning = true
                   coroutineScope.launch(Dispatchers.IO) {
                     
-                    //系统依赖与包管理器更新 (Bash 脚本环境准备)
+                    // 1. 系统依赖与包管理器更新
                     currentTaskName = "Configuring APT environment..."
                     currentProgress = -1f 
                     addLog(">> Updating APT repositories...")
@@ -518,22 +570,24 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
                         if (it.stdout.isNotBlank()) addLog(it.stdout)
                     }
 
-                    // 安装基础包 (jq, tar, unzip, libcurl)
+                    // 2. 安装基础包 (jq, tar, unzip, libcurl)
                     addLog(">> Installing required base packages...")
                     TermuxCommand.run(context) { executable(Environment.BASH_SHELL.absolutePath); args("-c", "apt install jq tar unzip libcurl -y") }.also {
                         if (it.stdout.isNotBlank()) addLog(it.stdout)
                     }
 
-                    // P7Zip 安装逻辑 (从 Github 下载指定 deb)
+                    // 3. P7Zip 镜像替换及安装
                     currentTaskName = "Installing p7zip..."
                     addLog(">> Installing p7zip manually for 7z extraction support...")
                     val arch = IDEBuildConfigProvider.getInstance().cpuAbiName
-                    val p7zipUrl = when {
+                    val rawP7zipUrl = when {
                         arch.contains("aarch64") || arch.contains("arm64") -> "https://github.com/msmt2018/termux-packages/releases/download/p7zip-17.06-1/debs-aarch64-e9f3af7af65c6f737f41404dbd6babf727147861.deb"
                         arch.contains("arm") -> "https://github.com/msmt2018/termux-packages/releases/download/p7zip-17.06-1/debs-arm-e9f3af7af65c6f737f41404dbd6babf727147861.deb"
                         arch.contains("x86_64") -> "https://github.com/msmt2018/termux-packages/releases/download/p7zip-17.06-1/debs-x86_64-e9f3af7af65c6f737f41404dbd6babf727147861.deb"
                         else -> ""
                     }
+                    val p7zipUrl = if (githubMirror.isNotEmpty() && rawP7zipUrl.startsWith("https://github.com")) githubMirror + rawP7zipUrl else rawP7zipUrl
+                    
                     if (p7zipUrl.isNotEmpty()) {
                         val p7zipScript = """
                             #!/bin/bash
@@ -559,7 +613,7 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
                         addLog("WARN: No p7zip available for architecture $arch")
                     }
 
-                    // 4. Git 和 OpenSSH
+                    // Git 和 OpenSSH
                     if (installGit) {
                         currentTaskName = "Installing Git..."
                         addLog(">> Installing Git...")
@@ -571,14 +625,13 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
                         TermuxCommand.run(context) { executable(Environment.BASH_SHELL.absolutePath); args("-c", "apt install openssh -y") }
                     }
 
-                    // 5. 安装 JDK
+                    // 安装 JDK
                     currentTaskName = "Installing OpenJDK $jdkVersion..."
                     addLog(">> Installing package: 'openjdk-$jdkVersion'")
                     TermuxCommand.run(context) { executable(Environment.BASH_SHELL.absolutePath); args("-c", "apt install openjdk-$jdkVersion -y") }.also {
                         addLog(">> JDK $jdkVersion has been installed.")
                     }
 
-                    // 更新 ide-environment.properties
                     addLog(">> Updating ide-environment.properties...")
                     val jdkDir = "${Environment.PREFIX.absolutePath}/opt/openjdk"
                     val propsDir = File(Environment.PREFIX, "etc")
@@ -633,8 +686,7 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
   }
 }
 
-/** 专门针对引导页的精简版 ViewModel */
-class OdSdkSetupViewModel : AndroidViewModel(Application()) {
+class OdSdkSetupViewModel(application: Application) : AndroidViewModel(application) {
 
   private val _treeNodes = MutableStateFlow<List<SdkTreeNode>>(emptyList())
   val treeNodes: StateFlow<List<SdkTreeNode>> = _treeNodes.asStateFlow()
@@ -645,26 +697,33 @@ class OdSdkSetupViewModel : AndroidViewModel(Application()) {
   private val _hasPendingChanges = MutableStateFlow(false)
   val hasPendingChanges: StateFlow<Boolean> = _hasPendingChanges.asStateFlow()
 
+  private var currentMirror: String = ""
+
   init {
     loadData()
   }
 
-  fun loadData() {
+  fun loadData(mirrorUrl: String = currentMirror) {
+    currentMirror = mirrorUrl
     viewModelScope.launch {
       _isLoading.value = true
       try {
         val rootNodes = mutableListOf<SdkTreeNode>()
-        val manifest = fetchManifest()
+        val manifest = fetchManifest(mirrorUrl)
 
         if (manifest != null) {
             val arch = getArch()
             val queryArch = if (arch == "armv7l" || arch == "armv8l") "arm" else arch
 
+            fun applyMirror(url: String): String {
+                return if (mirrorUrl.isNotEmpty() && url.startsWith("https://github.com")) mirrorUrl + url else url
+            }
+
             // Android SDK (强制)
             val sdkUrl = manifest.androidSdk
             if (!sdkUrl.isNullOrBlank() && sdkUrl.lowercase() != "x") {
                 rootNodes.add(
-                    SdkTreeNode(name = "Android SDK Platform", revision = "Latest", downloadUrl = sdkUrl, componentType = "android-sdk", checkedState = ToggleableState.On)
+                    SdkTreeNode(name = "Android SDK Platform", revision = "Latest", downloadUrl = applyMirror(sdkUrl), componentType = "android-sdk", checkedState = ToggleableState.On)
                 )
             }
 
@@ -672,7 +731,7 @@ class OdSdkSetupViewModel : AndroidViewModel(Application()) {
             val cmdUrl = manifest.cmdlineTools
             if (!cmdUrl.isNullOrBlank() && cmdUrl.lowercase() != "x") {
                 rootNodes.add(
-                    SdkTreeNode(name = "Command-line Tools", revision = "Latest", downloadUrl = cmdUrl, componentType = "cmdline-tools", checkedState = ToggleableState.On)
+                    SdkTreeNode(name = "Command-line Tools", revision = "Latest", downloadUrl = applyMirror(cmdUrl), componentType = "cmdline-tools", checkedState = ToggleableState.On)
                 )
             }
 
@@ -682,28 +741,27 @@ class OdSdkSetupViewModel : AndroidViewModel(Application()) {
                 map.forEach { (k, url) ->
                     if (url.isNotBlank() && url.lowercase() != "x") {
                         val ver = k.replace("_", ".").trimStart('.')
-                        group.children.add(SdkTreeNode(name = "Build-Tools $ver", revision = ver, downloadUrl = url, componentType = "build-tools", parent = group))
+                        group.children.add(SdkTreeNode(name = "Build-Tools $ver", revision = ver, downloadUrl = applyMirror(url), componentType = "build-tools", parent = group))
                     }
                 }
                 group.children.sortByDescending { it.revision }
-                // 默认勾选最新
                 group.children.firstOrNull()?.let { it.checkedState = ToggleableState.On }
                 group.updateParentState()
                 if (group.children.isNotEmpty()) rootNodes.add(group)
             }
 
-            // Platform Tools
+            // Platform Tools (特定推荐 35.0.2)
             manifest.platformTools?.get(queryArch)?.let { map ->
                 val group = SdkTreeNode(name = "Platform-Tools", isGroup = true, isExpanded = true)
                 map.forEach { (k, url) ->
                     if (url.isNotBlank() && url.lowercase() != "x") {
                         val ver = k.replace("_", ".").trimStart('.')
-                        group.children.add(SdkTreeNode(name = "Platform-Tools $ver", revision = ver, downloadUrl = url, componentType = "platform-tools", parent = group))
+                        group.children.add(SdkTreeNode(name = "Platform-Tools $ver", revision = ver, downloadUrl = applyMirror(url), componentType = "platform-tools", parent = group))
                     }
                 }
                 group.children.sortByDescending { it.revision }
-                // 默认勾选最新
-                group.children.firstOrNull()?.let { it.checkedState = ToggleableState.On }
+                val targetNode = group.children.find { it.revision == "35.0.2" } ?: group.children.firstOrNull()
+                targetNode?.let { it.checkedState = ToggleableState.On }
                 group.updateParentState()
                 if (group.children.isNotEmpty()) rootNodes.add(group)
             }
@@ -714,7 +772,7 @@ class OdSdkSetupViewModel : AndroidViewModel(Application()) {
                 map.forEach { (k, url) ->
                     if (url.isNotBlank() && url.lowercase() != "x") {
                         val ver = k.replace("_", ".").trimStart('.')
-                        group.children.add(SdkTreeNode(name = "NDK $ver", revision = ver, downloadUrl = url, componentType = "ndk", parent = group))
+                        group.children.add(SdkTreeNode(name = "NDK $ver", revision = ver, downloadUrl = applyMirror(url), componentType = "ndk", parent = group))
                     }
                 }
                 group.children.sortByDescending { it.revision }
@@ -728,7 +786,7 @@ class OdSdkSetupViewModel : AndroidViewModel(Application()) {
                 map.forEach { (k, url) ->
                     if (url.isNotBlank() && url.lowercase() != "x") {
                         val ver = k.replace("_", ".").trimStart('.')
-                        group.children.add(SdkTreeNode(name = "CMake $ver", revision = ver, downloadUrl = url, componentType = "cmake", parent = group))
+                        group.children.add(SdkTreeNode(name = "CMake $ver", revision = ver, downloadUrl = applyMirror(url), componentType = "cmake", parent = group))
                     }
                 }
                 group.children.sortByDescending { it.revision }
@@ -747,9 +805,12 @@ class OdSdkSetupViewModel : AndroidViewModel(Application()) {
     }
   }
 
-  private suspend fun fetchManifest(): SdkManifest? = withContext(Dispatchers.IO) {
+  private suspend fun fetchManifest(mirrorUrl: String): SdkManifest? = withContext(Dispatchers.IO) {
       try {
-          val url = URL("https://github.com/msmt2018/SDK-tool-for-Android-platform/releases/download/IDESdkDownJson2.3/manifest.json")
+          val baseUrl = "https://github.com/msmt2018/SDK-tool-for-Android-platform/releases/download/IDESdkDownJson2.3/manifest.json"
+          val targetUrl = if (mirrorUrl.isNotEmpty() && baseUrl.startsWith("https://github.com")) mirrorUrl + baseUrl else baseUrl
+          
+          val url = URL(targetUrl)
           val connection = url.openConnection() as HttpURLConnection
           connection.connectTimeout = 10000
           connection.readTimeout = 10000
@@ -765,7 +826,6 @@ class OdSdkSetupViewModel : AndroidViewModel(Application()) {
   private fun getArch(): String = IDEBuildConfigProvider.getInstance().cpuArch.name.lowercase()
 
   fun toggleCheck(node: SdkTreeNode) {
-    // 拦截不可取消的必选节点
     if (node.componentType == "android-sdk" || node.componentType == "cmdline-tools") return
 
     if (node.isGroup) {
@@ -779,14 +839,13 @@ class OdSdkSetupViewModel : AndroidViewModel(Application()) {
         node.updateParentState()
         checkPendingChanges()
     }
-    _treeNodes.value = _treeNodes.value.toList() // force recomposition
+    _treeNodes.value = _treeNodes.value.toList()
   }
 
   private fun checkPendingChanges() {
     var hasChanges = false
     fun checkNode(node: SdkTreeNode) {
       if (!node.isGroup) {
-        // 引导页无视 installed 状态，只要有勾选的就视为 pending
         if (node.checkedState == ToggleableState.On) {
           hasChanges = true
         }
