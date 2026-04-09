@@ -657,13 +657,13 @@ class OdSdkToolInstallFragment : Fragment(), SlidePolicy {
 
                     // 安装基础包和解压工具
                     addLog(">> Installing required base packages...")
-                    TermuxCommand.run(context) { executable("sh"); args("-c", "pkg install -y bash curl wget jq tar unzip p7zip patch sed grep coreutils findutils diffutils") }.also {
+                    TermuxCommand.run(context) { executable("sh"); args("-c", "pkg install -y bash curl wget jq tar unzip p7zip xz-utils patch sed grep coreutils findutils diffutils") }.also {
                       if (it.stdout.isNotBlank()) addLog(it.stdout)
                     }
 
                     currentTaskName = "Checking extraction tools..."
                     addLog(">> Verifying unzip/7z/tar availability...")
-                    TermuxCommand.run(context) { executable("sh"); args("-c", "command -v unzip && command -v 7z && command -v tar") }.also {
+                    TermuxCommand.run(context) { executable("sh"); args("-c", "command -v unzip && command -v 7z && command -v tar && command -v xz") }.also {
                       if (it.stdout.isNotBlank()) addLog(it.stdout)
                       if (!it.isSuccess && it.stderr.isNotBlank()) addLog("WARN/ERR tools check: ${it.stderr}")
                     }

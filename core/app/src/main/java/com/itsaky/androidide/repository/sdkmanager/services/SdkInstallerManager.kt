@@ -121,7 +121,15 @@ object SdkInstallerManager {
             elif [ "${"$"}{ARCHIVE##*.}" = "tgz" ] || [ "${"$"}{ARCHIVE##*.}" = "gz" ]; then
               tar xzf "${"$"}ARCHIVE" -C "${"$"}TMP_EXTRACT"
             elif [ "${"$"}{ARCHIVE##*.}" = "xz" ]; then
-              tar xJf "${"$"}ARCHIVE" -C "${"$"}TMP_EXTRACT"
+              if command -v xz >/dev/null 2>&1; then
+                xz -dc "${"$"}ARCHIVE" | tar -xf - -C "${"$"}TMP_EXTRACT"
+              elif command -v 7z >/dev/null 2>&1; then
+                echo "WARN: xz command missing, falling back to 7z extraction..."
+                7z x "${"$"}ARCHIVE" -o"${"$"}TMP_EXTRACT"
+              else
+                echo "ERR: no extractor for .xz archives (need xz-utils or 7z)"
+                exit 127
+              fi
             else
               tar xf "${"$"}ARCHIVE" -C "${"$"}TMP_EXTRACT"
             fi
