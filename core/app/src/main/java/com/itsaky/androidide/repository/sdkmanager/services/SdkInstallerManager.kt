@@ -24,6 +24,12 @@ import kotlinx.coroutines.withContext
  */
 object SdkInstallerManager {
 
+  private fun getSdkTempDir(): File {
+    val sdkTemp = File(Environment.ANDROID_HOME, ".temp")
+    FileUtils.createOrExistsDir(sdkTemp)
+    return sdkTemp
+  }
+
   /** 下载 + 创建解压脚本 + Termux执行 + 可选后置修复 */
   suspend fun downloadAndInstall(
       context: Context,
@@ -37,12 +43,13 @@ object SdkInstallerManager {
         val urlStr = node.downloadUrl
         val destDir = getDestDir(node)
 
+        FileUtils.createOrExistsDir(destDir)
         onLog(">> Preparing to install: ${node.name}")
         onLog(">> Target directory: ${destDir.absolutePath}")
 
         // Download File
         val tempArchive =
-            File(Environment.TMP_DIR, "sdk_dl_${System.currentTimeMillis()}_${File(urlStr).name}")
+            File(getSdkTempDir(), "sdk_dl_${System.currentTimeMillis()}_${File(urlStr).name}")
         FileUtils.createOrExistsFile(tempArchive)
 
         try {
@@ -91,49 +98,44 @@ object SdkInstallerManager {
 
         // Generate robust Shell Script
         onLog(">> Generating robust extraction shell script...")
-        val extractScript = File(Environment.TMP_DIR, "extract_${System.currentTimeMillis()}.sh")
+        val extractScript = File(getSdkTempDir(), "extract_${System.currentTimeMillis()}.sh")
         val scriptContent =
             """
             #!/bin/bash
-            set -eu
-            
+            set -euo pipefail
+
             ARCHIVE="${tempArchive.absolutePath}"
             DEST_DIR="${destDir.absolutePath}"
-            
+            WORK_DIR="${getSdkTempDir().absolutePath}"
+
             echo "Extracting archive to target..."
             mkdir -p "${"$"}DEST_DIR"
-            
-            TMP_EXTRACT="${"$"}DEST_DIR/tmp_extract_${"$"}${"$"}"
+
+            TMP_EXTRACT="${"$"}WORK_DIR/extract_${'$'}${'$'}"
             mkdir -p "${"$"}TMP_EXTRACT"
-            
-            # Auto-detect archive type and extract
+
             if [[ "${"$"}ARCHIVE" == *.zip ]]; then
               unzip -q "${"$"}ARCHIVE" -d "${"$"}TMP_EXTRACT"
             elif [[ "${"$"}ARCHIVE" == *.7z ]]; then
               7z x "${"$"}ARCHIVE" -o"${"$"}TMP_EXTRACT"
             elif [[ "${"$"}ARCHIVE" == *.tar.gz ]] || [[ "${"$"}ARCHIVE" == *.tgz ]]; then
-              tar xvzf "${"$"}ARCHIVE" -C "${"$"}TMP_EXTRACT"
+              tar xzf "${"$"}ARCHIVE" -C "${"$"}TMP_EXTRACT"
             elif [[ "${"$"}ARCHIVE" == *.tar.xz ]]; then
-              tar xvJf "${"$"}ARCHIVE" -C "${"$"}TMP_EXTRACT"
+              tar xJf "${"$"}ARCHIVE" -C "${"$"}TMP_EXTRACT"
             else
-              tar xvf "${"$"}ARCHIVE" -C "${"$"}TMP_EXTRACT"
+              tar xf "${"$"}ARCHIVE" -C "${"$"}TMP_EXTRACT"
             fi
-            
+
             echo "Extraction done, organizing files..."
-            
-            # Strip top-level directory if there is exactly one
-            INNER_COUNT=${'$'}(ls -1 "${"$"}TMP_EXTRACT" | wc -l)
-            if[ "${"$"}INNER_COUNT" -eq 1 ]; then
-              INNER_DIR="${"$"}TMP_EXTRACT/${'$'}(ls -1 "${"$"}TMP_EXTRACT")"
-              if[ -d "${"$"}INNER_DIR" ]; then
-                cp -r "${"$"}INNER_DIR"/* "${"$"}DEST_DIR"/ 2>/dev/null || true
-              else
-                cp -r "${"$"}TMP_EXTRACT"/* "${"$"}DEST_DIR"/ 2>/dev/null || true
-              fi
+            shopt -s dotglob nullglob
+            children=("${"$"}TMP_EXTRACT"/*)
+            if [[ ${'$'}{#children[@]} -eq 1 && -d "${'$'}{children[0]}" ]]; then
+              cp -a "${'$'}{children[0]}"/. "${"$"}DEST_DIR"/
             else
-              cp -r "${"$"}TMP_EXTRACT"/* "${"$"}DEST_DIR"/ 2>/dev/null || true
+              cp -a "${"$"}TMP_EXTRACT"/. "${"$"}DEST_DIR"/
             fi
-            
+            shopt -u dotglob nullglob
+
             echo "Cleaning up temp files..."
             rm -rf "${"$"}TMP_EXTRACT"
             rm -f "${"$"}ARCHIVE"
@@ -186,25 +188,25 @@ object SdkInstallerManager {
     val script =
         """
         #!/bin/bash
-        set -eu
+        set -euo pipefail
         NDK_DIR="${ndkDir.absolutePath}"
         
         echo "Creating missing architecture symlinks..."
-        if[ -d "${'$'}NDK_DIR/toolchains/llvm/prebuilt" ]; then
+        if [ -d "${'$'}NDK_DIR/toolchains/llvm/prebuilt" ]; then
             cd "${'$'}NDK_DIR/toolchains/llvm/prebuilt" || exit 0
             if [ -d "linux-aarch64" ] && [ ! -e "linux-x86_64" ]; then ln -s linux-aarch64 linux-x86_64; fi
-            if[ -d "linux-arm64" ] && [ ! -e "linux-aarch64" ]; then ln -s linux-arm64 linux-aarch64; fi
+            if [ -d "linux-arm64" ] && [ ! -e "linux-aarch64" ]; then ln -s linux-arm64 linux-aarch64; fi
         fi
         
-        if[ -d "${'$'}NDK_DIR/prebuilt" ]; then
+        if [ -d "${'$'}NDK_DIR/prebuilt" ]; then
             cd "${'$'}NDK_DIR/prebuilt" || exit 0
-            if [ -d "linux-aarch64" ] &&[ ! -e "linux-x86_64" ]; then ln -s linux-aarch64 linux-x86_64; fi
-            if [ -d "linux-arm64" ] &&[ ! -e "linux-aarch64" ]; then ln -s linux-arm64 linux-aarch64; fi
+            if [ -d "linux-aarch64" ] && [ ! -e "linux-x86_64" ]; then ln -s linux-aarch64 linux-x86_64; fi
+            if [ -d "linux-arm64" ] && [ ! -e "linux-aarch64" ]; then ln -s linux-arm64 linux-aarch64; fi
         fi
         
-        if[ -d "${'$'}NDK_DIR/shader-tools" ]; then
+        if [ -d "${'$'}NDK_DIR/shader-tools" ]; then
             cd "${'$'}NDK_DIR/shader-tools" || exit 0
-            if [ -d "linux-arm64" ] &&[ ! -e "linux-aarch64" ]; then ln -s linux-arm64 linux-aarch64; fi
+            if [ -d "linux-arm64" ] && [ ! -e "linux-aarch64" ]; then ln -s linux-arm64 linux-aarch64; fi
         fi
         
         echo "Patching CMAKE Android Toolchain config..."
@@ -218,7 +220,7 @@ object SdkInstallerManager {
     """
             .trimIndent()
 
-    val scriptFile = File(Environment.TMP_DIR, "ndk_fix_${System.currentTimeMillis()}.sh")
+    val scriptFile = File(getSdkTempDir(), "ndk_fix_${System.currentTimeMillis()}.sh")
     scriptFile.writeText(script)
     scriptFile.setExecutable(true)
 
@@ -244,9 +246,9 @@ object SdkInstallerManager {
   private suspend fun applyCmakePatches(context: Context, cmakeDir: File, onLog: (String) -> Unit) {
     onLog(">> Preparing to apply CMake patches...")
 
-    val patchZip = File(Environment.TMP_DIR, "cmake_patches_${System.currentTimeMillis()}.zip")
+    val patchZip = File(getSdkTempDir(), "cmake_patches_${System.currentTimeMillis()}.zip")
     val patchExtractedDir =
-        File(Environment.TMP_DIR, "cmake_patches_ext_${System.currentTimeMillis()}")
+        File(getSdkTempDir(), "cmake_patches_ext_${System.currentTimeMillis()}")
 
     try {
       val success =
@@ -270,7 +272,7 @@ object SdkInstallerManager {
     val script =
         """
         #!/bin/bash
-        set -eu
+        set -euo pipefail
         CMAKE_DIR="${cmakeDir.absolutePath}"
         PATCH_DIR="${patchExtractedDir.absolutePath}"
         
@@ -282,12 +284,12 @@ object SdkInstallerManager {
         if [ -d "${'$'}SHARE_DIR" ]; then
             # Find cmake-3.xx directory dynamically
             CMAKE_SHARE_SUBDIR=${'$'}(ls -1 "${'$'}SHARE_DIR" | grep cmake | head -n 1)
-            if[ -n "${'$'}CMAKE_SHARE_SUBDIR" ]; then
+            if [ -n "${'$'}CMAKE_SHARE_SUBDIR" ]; then
                 TARGET_DIR="${'$'}SHARE_DIR/${'$'}CMAKE_SHARE_SUBDIR"
                 cd "${'$'}TARGET_DIR"
                 echo "Applying patches in ${'$'}TARGET_DIR..."
                 for p in "${'$'}PATCH_DIR"/*.patch; do
-                    if[ -f "${'$'}p" ]; then
+                    if [ -f "${'$'}p" ]; then
                         echo "Applying ${'$'}p..."
                         patch -p1 < "${'$'}p" || echo "WARN: Failed to apply ${'$'}p"
                     fi
@@ -302,7 +304,7 @@ object SdkInstallerManager {
     """
             .trimIndent()
 
-    val scriptFile = File(Environment.TMP_DIR, "cmake_patch_${System.currentTimeMillis()}.sh")
+    val scriptFile = File(getSdkTempDir(), "cmake_patch_${System.currentTimeMillis()}.sh")
     scriptFile.writeText(script)
     scriptFile.setExecutable(true)
 

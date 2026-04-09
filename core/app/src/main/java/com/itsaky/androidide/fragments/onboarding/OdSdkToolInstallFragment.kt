@@ -308,32 +308,23 @@ class OdSdkToolInstallFragment : Fragment(), SlidePolicy {
               },
               update = { view ->
                 if (view.tag != treeNodes && treeNodes.isNotEmpty()) {
-                  var listener: ((SdkTreeNode) -> Unit)? = null
-                  listener = { clickedNode ->
+                  val listener: (SdkTreeNode) -> Unit = { clickedNode ->
                     if (clickedNode.componentType != "android-sdk" && clickedNode.componentType != "cmdline-tools") {
-                      
-                      if (clickedNode.isGroup) {
-                        // 【如果点击组节点】直接控制展开折叠状态，并重算节点结构(bindData)
-                        clickedNode.isExpanded = !clickedNode.isExpanded
-                        view.bindData(treeNodes, listener!!)
-                      } else {
-                        // 【如果点击子节点】仅计算打钩状态，并刷新局部UI
-                        val nextState = when (clickedNode.checkedState) {
-                          ToggleableState.On -> ToggleableState.Off
-                          ToggleableState.Off, ToggleableState.Indeterminate -> ToggleableState.On
-                        }
-                        clickedNode.updateChildrenState(nextState)
-                        clickedNode.updateParentState()
-                        view.refreshViews()
+                      val nextState = when (clickedNode.checkedState) {
+                        ToggleableState.On -> ToggleableState.Off
+                        ToggleableState.Off, ToggleableState.Indeterminate -> ToggleableState.On
                       }
-                      
+                      clickedNode.updateChildrenState(nextState)
+                      clickedNode.updateParentState()
+                      view.refreshViews()
+
                       // 触发外部Compose底栏的按钮状态更新
                       setupViewModel.triggerPendingChangesCheck()
                     }
                   }
-                  
+
                   // 首次注入，记录标志位
-                  view.bindData(treeNodes, listener!!)
+                  view.bindData(treeNodes, listener)
                   view.tag = treeNodes
                 }
               },
@@ -794,6 +785,23 @@ class OdSdkSetupViewModel(application: Application) : AndroidViewModel(applicati
 
   private var currentMirror: String = ""
 
+  private fun normalizeVersion(rawVersion: String): String {
+    val noPrefix = rawVersion.trimStart('_', '-')
+    return noPrefix.replace("_", ".").trimStart('.')
+  }
+
+  private fun compareVersionDesc(a: String, b: String): Int {
+    val ap = a.split('.', '-', '_').mapNotNull { it.toIntOrNull() }
+    val bp = b.split('.', '-', '_').mapNotNull { it.toIntOrNull() }
+    val max = maxOf(ap.size, bp.size)
+    for (i in 0 until max) {
+      val av = ap.getOrElse(i) { 0 }
+      val bv = bp.getOrElse(i) { 0 }
+      if (av != bv) return bv.compareTo(av)
+    }
+    return b.compareTo(a)
+  }
+
   init {
     loadData()
   }
@@ -835,11 +843,11 @@ class OdSdkSetupViewModel(application: Application) : AndroidViewModel(applicati
             val group = SdkTreeNode(name = "Build-Tools", isGroup = true, isExpanded = false)
             map.forEach { (k, url) ->
               if (url.isNotBlank() && url.lowercase() != "x") {
-                val ver = k.replace("_", ".").trimStart('.')
+                val ver = normalizeVersion(k)
                 group.children.add(SdkTreeNode(name = "Build-Tools $ver", revision = ver, downloadUrl = applyMirror(url), componentType = "build-tools", parent = group))
               }
             }
-            group.children.sortByDescending { it.revision }
+            group.children.sortWith { a, b -> compareVersionDesc(a.revision, b.revision) }
             // 默认勾选最新
             group.children.firstOrNull()?.let { it.checkedState = ToggleableState.On }
             group.updateParentState()
@@ -851,11 +859,11 @@ class OdSdkSetupViewModel(application: Application) : AndroidViewModel(applicati
             val group = SdkTreeNode(name = "Platform-Tools", isGroup = true, isExpanded = false)
             map.forEach { (k, url) ->
               if (url.isNotBlank() && url.lowercase() != "x") {
-                val ver = k.replace("_", ".").trimStart('.')
+                val ver = normalizeVersion(k)
                 group.children.add(SdkTreeNode(name = "Platform-Tools $ver", revision = ver, downloadUrl = applyMirror(url), componentType = "platform-tools", parent = group))
               }
             }
-            group.children.sortByDescending { it.revision }
+            group.children.sortWith { a, b -> compareVersionDesc(a.revision, b.revision) }
             val targetNode = group.children.find { it.revision == "35.0.2" } ?: group.children.firstOrNull()
             targetNode?.let { it.checkedState = ToggleableState.On }
             group.updateParentState()
@@ -867,11 +875,11 @@ class OdSdkSetupViewModel(application: Application) : AndroidViewModel(applicati
             val group = SdkTreeNode(name = "NDK (Side by side)", isGroup = true, isExpanded = false)
             map.forEach { (k, url) ->
               if (url.isNotBlank() && url.lowercase() != "x") {
-                val ver = k.replace("_", ".").trimStart('.')
+                val ver = normalizeVersion(k)
                 group.children.add(SdkTreeNode(name = "NDK $ver", revision = ver, downloadUrl = applyMirror(url), componentType = "ndk", parent = group))
               }
             }
-            group.children.sortByDescending { it.revision }
+            group.children.sortWith { a, b -> compareVersionDesc(a.revision, b.revision) }
             group.updateParentState()
             if (group.children.isNotEmpty()) rootNodes.add(group)
           }
@@ -881,11 +889,11 @@ class OdSdkSetupViewModel(application: Application) : AndroidViewModel(applicati
             val group = SdkTreeNode(name = "CMake", isGroup = true, isExpanded = false)
             map.forEach { (k, url) ->
               if (url.isNotBlank() && url.lowercase() != "x") {
-                val ver = k.replace("_", ".").trimStart('.')
+                val ver = normalizeVersion(k)
                 group.children.add(SdkTreeNode(name = "CMake $ver", revision = ver, downloadUrl = applyMirror(url), componentType = "cmake", parent = group))
               }
             }
-            group.children.sortByDescending { it.revision }
+            group.children.sortWith { a, b -> compareVersionDesc(a.revision, b.revision) }
             group.updateParentState()
             if (group.children.isNotEmpty()) rootNodes.add(group)
           }
