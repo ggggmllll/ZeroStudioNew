@@ -23,7 +23,6 @@ import com.itsaky.androidide.databinding.FragmentOnboardingGreetingBinding
 import com.itsaky.androidide.fragments.FragmentWithBinding
 
 /**
- * @author Akash Yadav (Original Author)
  * @author android_zero (Modifier)
  *
  * This fragment displays a greeting screen with a Lottie animation. The animation is loaded

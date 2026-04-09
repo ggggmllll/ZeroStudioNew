@@ -101,7 +101,7 @@ class OnboardingActivity : AppIntro2() {
 
     // 允许用户左右滑动切换引导页
     isWizardMode = false
-    setSwipeLock(false) 
+    setSwipeLock(true) 
 
     setTransformer(AppIntroPageTransformerType.Fade)
     setProgressIndicator()

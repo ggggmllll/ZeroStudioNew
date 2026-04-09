@@ -28,7 +28,7 @@ import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import android.os.Bundle
 import android.provider.Settings
-import android.text.Html
+import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -38,9 +38,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Refresh
@@ -110,6 +108,9 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
       return OdSdkToolInstallFragment().also {
         it.arguments =
             Bundle().apply {
+              // 强行填充空字符串，防止预留位置为空导致宿主的 null-check exception
+              putCharSequence(KEY_ONBOARDING_TITLE, "")
+              putCharSequence(KEY_ONBOARDING_SUBTITLE, "")
               putCharSequence(KEY_ONBOARDING_EXTRA_INFO, "")
             }
       }
@@ -118,6 +119,14 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
 
   fun isAutoInstall(): Boolean = false
   fun buildIdeSetupArguments(): Array<String> = emptyArray()
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+    // 隐藏父类占用的大量空白标题区域组件，使其靠近系统状态栏下方
+    binding.onboardingTitle.visibility = View.GONE
+    binding.onboardingSubtitle.visibility = View.GONE
+    binding.onboardingExtraInfo.visibility = View.GONE
+  }
 
   override fun createContentView(parent: ViewGroup, attachToParent: Boolean) {
     val composeView =
@@ -128,8 +137,8 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
             MaterialTheme(colorScheme = colorScheme) { SetupConfigurationScreen() }
           }
         }
-    
-    // 强制占满可用高度，保证滚动正常
+
+    // 设置占满可用高度，保证滚动正常
     parent.addView(
         composeView,
         ViewGroup.LayoutParams(
@@ -224,10 +233,10 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
     var installSsh by remember { mutableStateOf(true) }
     var applyNdkFix by remember { mutableStateOf(true) }
     var applyCmakePatch by remember { mutableStateOf(true) }
-    
+
     var useGithubMirror by remember { mutableStateOf(false) }
     var githubMirrorUrl by remember { mutableStateOf("https://gh.llkk.cc/") }
-    
+
     var showActionDialog by remember { mutableStateOf(false) }
     var selectedJdk by remember { mutableStateOf("17") }
     var jdkExpanded by remember { mutableStateOf(false) }
@@ -243,19 +252,27 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
       return t
     }
 
-    Column(modifier = Modifier.fillMaxSize().padding(horizontal = 12.dp, vertical = 8.dp)) {
-      
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 12.dp, end = 12.dp, top = 8.dp, bottom = 80.dp)
+    ) {
+
       // 头部栏：标题 + ABI 信息
-      Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-          Text(
-              text = "SDK 安装与配置",
-              style = MaterialTheme.typography.titleLarge,
-              fontWeight = FontWeight.Bold,
-          )
+      Row(
+          modifier = Modifier.fillMaxWidth(),
+          horizontalArrangement = Arrangement.SpaceBetween,
+          verticalAlignment = Alignment.CenterVertically
+      ) {
+        Text(
+            text = "SDK Installation and Configuration",
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold,
+        )
       }
-      
+
       Text(
-          text = "必须安装开发工具才能使 IDE 正常工作。请勾选所需的组件并在最后执行安装。",
+          text = "The development tools must be installed for the IDE to function properly. Please select the required components and then perform the installation at the end.",
           style = MaterialTheme.typography.bodySmall,
           color = MaterialTheme.colorScheme.onSurfaceVariant,
           modifier = Modifier.padding(top = 4.dp, bottom = 12.dp)
@@ -265,30 +282,36 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
 
       Spacer(modifier = Modifier.height(8.dp))
 
-      Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+      Row(
+          modifier = Modifier.fillMaxWidth(),
+          horizontalArrangement = Arrangement.SpaceBetween,
+          verticalAlignment = Alignment.CenterVertically
+      ) {
+        Text(
+            text = "Select SDKs & Tools:",
+            style = MaterialTheme.typography.titleSmall,
+            fontWeight = FontWeight.Bold,
+        )
+        Surface(
+            color = MaterialTheme.colorScheme.secondaryContainer,
+            shape = RoundedCornerShape(8.dp)
+        ) {
           Text(
-              text = "Select SDKs & Tools:",
-              style = MaterialTheme.typography.titleSmall,
-              fontWeight = FontWeight.Bold,
+              text = "ABI: $currentAbi",
+              fontSize = 10.sp,
+              color = MaterialTheme.colorScheme.onSecondaryContainer,
+              modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
           )
-          Surface(
-              color = MaterialTheme.colorScheme.secondaryContainer,
-              shape = RoundedCornerShape(8.dp)
-          ) {
-              Text(
-                  text = "ABI: $currentAbi", 
-                  fontSize = 10.sp, 
-                  color = MaterialTheme.colorScheme.onSecondaryContainer,
-                  modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
-              )
-          }
+        }
       }
 
-      // 核心 SDK 树状视图区 (占据剩余动态高度，让 SdkTreeView 自己滚动)
       Surface(
           shape = RoundedCornerShape(12.dp),
           color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
-          modifier = Modifier.fillMaxWidth().weight(1f).padding(top = 8.dp), 
+          modifier = Modifier
+              .fillMaxWidth()
+              .height(350.dp)
+              .padding(top = 8.dp),
       ) {
         if (isLoading) {
           Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -297,19 +320,19 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
         } else {
           AndroidView(
               factory = { context ->
-                  SdkTreeView(context).apply {
-                      isNestedScrollingEnabled = true 
-                      bindData(treeNodes) { clickedNode ->
-                          setupViewModel.toggleCheck(clickedNode)
-                          refreshViews()
-                      }
+                SdkTreeView(context).apply {
+                  isNestedScrollingEnabled = true
+                  bindData(treeNodes) { clickedNode ->
+                    setupViewModel.toggleCheck(clickedNode)
+                    refreshViews()
                   }
+                }
               },
               update = { view ->
-                  view.bindData(treeNodes) { clickedNode ->
-                      setupViewModel.toggleCheck(clickedNode)
-                      view.refreshViews()
-                  }
+                view.bindData(treeNodes) { clickedNode ->
+                  setupViewModel.toggleCheck(clickedNode)
+                  view.refreshViews()
+                }
               },
               modifier = Modifier.fillMaxSize()
           )
@@ -326,76 +349,125 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
       )
 
       // JDK 选择
-      Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
-          Text("Java Development Kit: ", fontSize = 12.sp)
-          Box {
-              OutlinedButton(
-                  onClick = { jdkExpanded = true },
-                  modifier = Modifier.height(30.dp),
-                  contentPadding = PaddingValues(horizontal = 8.dp)
-              ) {
-                  Text("OpenJDK $selectedJdk", fontSize = 11.sp)
-              }
-              DropdownMenu(expanded = jdkExpanded, onDismissRequest = { jdkExpanded = false }) {
-                  DropdownMenuItem(
-                      text = { Text("OpenJDK 17 (Recommended)", fontSize = 12.sp) },
-                      onClick = { selectedJdk = "17"; jdkExpanded = false }
-                  )
-                  DropdownMenuItem(
-                      text = { Text("OpenJDK 21 (Experimental)", fontSize = 12.sp) },
-                      onClick = { selectedJdk = "21"; jdkExpanded = false }
-                  )
-              }
+      Row(
+          verticalAlignment = Alignment.CenterVertically,
+          modifier = Modifier
+              .fillMaxWidth()
+              .padding(vertical = 4.dp)
+      ) {
+        Text("Java Development Kit: ", fontSize = 12.sp)
+        Box {
+          OutlinedButton(
+              onClick = { jdkExpanded = true },
+              modifier = Modifier.height(30.dp),
+              contentPadding = PaddingValues(horizontal = 8.dp)
+          ) {
+            Text("OpenJDK $selectedJdk", fontSize = 11.sp)
           }
+          DropdownMenu(expanded = jdkExpanded, onDismissRequest = { jdkExpanded = false }) {
+            DropdownMenuItem(
+                text = { Text("OpenJDK 17 (Recommended)", fontSize = 12.sp) },
+                onClick = { selectedJdk = "17"; jdkExpanded = false }
+            )
+            DropdownMenuItem(
+                text = { Text("OpenJDK 21 (Experimental)", fontSize = 12.sp) },
+                onClick = { selectedJdk = "21"; jdkExpanded = false }
+            )
+          }
+        }
       }
 
       // 基础修复与安装开关
       Column(verticalArrangement = Arrangement.spacedBy((-12).dp)) {
-          Row(verticalAlignment = Alignment.CenterVertically) {
-              Checkbox(checked = installGit, onCheckedChange = { installGit = it }, modifier = Modifier.scale(0.8f))
-              Text("Install Git (Version Control)", fontSize = 11.sp, modifier = Modifier.clickable { installGit = !installGit })
-          }
-          Row(verticalAlignment = Alignment.CenterVertically) {
-              Checkbox(checked = installSsh, onCheckedChange = { installSsh = it }, modifier = Modifier.scale(0.8f))
-              Text("Install OpenSSH (Remote Auth)", fontSize = 11.sp, modifier = Modifier.clickable { installSsh = !installSsh })
-          }
-          Row(verticalAlignment = Alignment.CenterVertically) {
-              Checkbox(checked = applyNdkFix, onCheckedChange = { applyNdkFix = it }, modifier = Modifier.scale(0.8f))
-              Text("Apply NDK Fixes (symlinks & patches)", fontSize = 11.sp, modifier = Modifier.clickable { applyNdkFix = !applyNdkFix })
-          }
-          Row(verticalAlignment = Alignment.CenterVertically) {
-              Checkbox(checked = applyCmakePatch, onCheckedChange = { applyCmakePatch = it }, modifier = Modifier.scale(0.8f))
-              Text("Apply CMake Patches", fontSize = 11.sp, modifier = Modifier.clickable { applyCmakePatch = !applyCmakePatch })
-          }
-          
-          //GitHub 镜像加速选项
-          Row(verticalAlignment = Alignment.CenterVertically) {
-              Checkbox(checked = useGithubMirror, onCheckedChange = { useGithubMirror = it }, modifier = Modifier.scale(0.8f))
-              Text("Use Github Mirror (加速下载)", fontSize = 11.sp, modifier = Modifier.clickable { useGithubMirror = !useGithubMirror })
-          }
+        Row(verticalAlignment = Alignment.CenterVertically) {
+          Checkbox(
+              checked = installGit,
+              onCheckedChange = { installGit = it },
+              modifier = Modifier.scale(0.8f)
+          )
+          Text(
+              "Install Git (Version Control)",
+              fontSize = 11.sp,
+              modifier = Modifier.clickable { installGit = !installGit })
+        }
+        Row(verticalAlignment = Alignment.CenterVertically) {
+          Checkbox(
+              checked = installSsh,
+              onCheckedChange = { installSsh = it },
+              modifier = Modifier.scale(0.8f)
+          )
+          Text(
+              "Install OpenSSH (Remote Auth)",
+              fontSize = 11.sp,
+              modifier = Modifier.clickable { installSsh = !installSsh })
+        }
+        Row(verticalAlignment = Alignment.CenterVertically) {
+          Checkbox(
+              checked = applyNdkFix,
+              onCheckedChange = { applyNdkFix = it },
+              modifier = Modifier.scale(0.8f)
+          )
+          Text(
+              "Apply NDK Fixes (symlinks & patches)",
+              fontSize = 11.sp,
+              modifier = Modifier.clickable { applyNdkFix = !applyNdkFix })
+        }
+        Row(verticalAlignment = Alignment.CenterVertically) {
+          Checkbox(
+              checked = applyCmakePatch,
+              onCheckedChange = { applyCmakePatch = it },
+              modifier = Modifier.scale(0.8f)
+          )
+          Text(
+              "Apply CMake Patches",
+              fontSize = 11.sp,
+              modifier = Modifier.clickable { applyCmakePatch = !applyCmakePatch })
+        }
+
+        // GitHub 镜像加速选项
+        Row(verticalAlignment = Alignment.CenterVertically) {
+          Checkbox(
+              checked = useGithubMirror,
+              onCheckedChange = { useGithubMirror = it },
+              modifier = Modifier.scale(0.8f)
+          )
+          Text(
+              "Use Github Mirror (加速下载)",
+              fontSize = 11.sp,
+              modifier = Modifier.clickable { useGithubMirror = !useGithubMirror })
+        }
       }
-      
+
       if (useGithubMirror) {
-          Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(start = 12.dp, end = 8.dp, top = 4.dp)) {
-              OutlinedTextField(
-                  value = githubMirrorUrl,
-                  onValueChange = { githubMirrorUrl = it },
-                  modifier = Modifier.weight(1f).height(46.dp),
-                  textStyle = LocalTextStyle.current.copy(fontSize = 11.sp),
-                  singleLine = true,
-                  placeholder = { Text("https://gh.llkk.cc/", fontSize = 11.sp) }
-              )
-              Spacer(modifier = Modifier.width(8.dp))
-              Button(
-                  onClick = { setupViewModel.loadData(getValidMirror()) },
-                  modifier = Modifier.height(38.dp),
-                  contentPadding = PaddingValues(horizontal = 8.dp)
-              ) {
-                  Icon(Icons.Default.Refresh, contentDescription = "Reload", modifier = Modifier.size(16.dp))
-                  Spacer(Modifier.width(4.dp))
-                  Text("Reload", fontSize = 11.sp)
-              }
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(start = 12.dp, end = 8.dp, top = 4.dp)
+        ) {
+          OutlinedTextField(
+              value = githubMirrorUrl,
+              onValueChange = { githubMirrorUrl = it },
+              modifier = Modifier
+                  .weight(1f)
+                  .height(46.dp),
+              textStyle = LocalTextStyle.current.copy(fontSize = 11.sp),
+              singleLine = true,
+              placeholder = { Text("https://gh.llkk.cc/", fontSize = 11.sp) }
+          )
+          Spacer(modifier = Modifier.width(8.dp))
+          Button(
+              onClick = { setupViewModel.loadData(getValidMirror()) },
+              modifier = Modifier.height(38.dp),
+              contentPadding = PaddingValues(horizontal = 8.dp)
+          ) {
+            Icon(
+                Icons.Default.Refresh,
+                contentDescription = "Reload",
+                modifier = Modifier.size(16.dp)
+            )
+            Spacer(Modifier.width(4.dp))
+            Text("Reload", fontSize = 11.sp)
           }
+        }
       }
 
       Spacer(modifier = Modifier.height(12.dp))
@@ -404,9 +476,11 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
       Button(
           onClick = { showActionDialog = true },
           enabled = hasPendingChanges || installGit || installSsh,
-          modifier = Modifier.fillMaxWidth().height(42.dp), 
+          modifier = Modifier
+              .fillMaxWidth()
+              .height(42.dp),
       ) {
-          Text("Start Environment Setup", fontSize = 13.sp)
+        Text("Start Environment Setup", fontSize = 13.sp)
       }
     }
 
@@ -456,7 +530,10 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
   private fun ErrorChip(text: String, isError: Boolean = true, onClick: (() -> Unit)? = null) {
     val color = if (isError) Color(0xFFF44336) else Color(0xFFFF9800)
     Surface(
-        modifier = Modifier.padding(top = 4.dp).fillMaxWidth().clickable(enabled = onClick != null) { onClick?.invoke() },
+        modifier = Modifier
+            .padding(top = 4.dp)
+            .fillMaxWidth()
+            .clickable(enabled = onClick != null) { onClick?.invoke() },
         shape = RoundedCornerShape(8.dp),
         border = BorderStroke(1.dp, color),
         color = Color.Transparent,
@@ -507,25 +584,25 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
               Text("- OpenJDK $jdkVersion", fontSize = 12.sp)
               if (installGit) Text("- Git Version Control", fontSize = 12.sp)
               if (installSsh) Text("- OpenSSH Remote Auth", fontSize = 12.sp)
-              
+
               val installingNdk = toInstall.any { it.componentType == "ndk" }
               val installingCmake = toInstall.any { it.componentType == "cmake" }
-              
+
               if (installingNdk || installingCmake) {
                 Spacer(modifier = Modifier.height(12.dp))
                 Divider()
                 Spacer(modifier = Modifier.height(6.dp))
                 Text("Additional Configurations:", fontWeight = FontWeight.Bold, fontSize = 13.sp)
                 if (installingNdk) {
-                    Text("• Apply NDK Fixes (symlinks & patches)", fontSize = 11.sp, color = if(applyNdkFix) MaterialTheme.colorScheme.onSurface else Color.Gray)
+                  Text("• Apply NDK Fixes (symlinks & patches)", fontSize = 11.sp, color = if(applyNdkFix) MaterialTheme.colorScheme.onSurface else Color.Gray)
                 }
                 if (installingCmake) {
-                    Text("• Apply CMake Patches", fontSize = 11.sp, color = if(applyCmakePatch) MaterialTheme.colorScheme.onSurface else Color.Gray)
+                  Text("• Apply CMake Patches", fontSize = 11.sp, color = if(applyCmakePatch) MaterialTheme.colorScheme.onSurface else Color.Gray)
                 }
               }
               if (githubMirror.isNotEmpty()) {
-                  Spacer(modifier = Modifier.height(6.dp))
-                  Text("• Active Github Mirror: $githubMirror", fontSize = 11.sp, color = MaterialTheme.colorScheme.primary)
+                Spacer(modifier = Modifier.height(6.dp))
+                Text("• Active Github Mirror: $githubMirror", fontSize = 11.sp, color = MaterialTheme.colorScheme.primary)
               }
             }
 
@@ -533,7 +610,9 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
               Text(text = "Current: $currentTaskName", style = MaterialTheme.typography.labelSmall)
               LinearProgressIndicator(
                   progress = { currentProgress },
-                  modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp),
+                  modifier = Modifier
+                      .fillMaxWidth()
+                      .padding(vertical = 6.dp),
               )
 
               val listState = rememberLazyListState()
@@ -541,16 +620,19 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
                 if (consoleLogs.isNotEmpty()) listState.animateScrollToItem(consoleLogs.lastIndex)
               }
               Box(
-                  modifier = Modifier.fillMaxWidth().height(180.dp)
-                          .background(Color(0xFF1E1E1E), shape = MaterialTheme.shapes.small).padding(6.dp)
+                  modifier = Modifier
+                      .fillMaxWidth()
+                      .height(180.dp)
+                      .background(Color(0xFF1E1E1E), shape = MaterialTheme.shapes.small)
+                      .padding(6.dp)
               ) {
                 LazyColumn(state = listState) {
                   items(consoleLogs) { msg ->
                     val textColor = when {
-                          msg.startsWith("ERR") || msg.startsWith("WARN") -> Color(0xFFFF5252)
-                          msg.startsWith(">>") -> Color(0xFF64B5F6)
-                          else -> Color(0xFFA5D6A7)
-                        }
+                      msg.startsWith("ERR") || msg.startsWith("WARN") -> Color(0xFFFF5252)
+                      msg.startsWith(">>") -> Color(0xFF64B5F6)
+                      else -> Color(0xFFA5D6A7)
+                    }
                     Text(text = msg, color = textColor, fontSize = 10.sp, fontFamily = FontFamily.Monospace, lineHeight = 12.sp)
                   }
                 }
@@ -564,19 +646,19 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
                 onClick = {
                   isRunning = true
                   coroutineScope.launch(Dispatchers.IO) {
-                    
+
                     // 系统依赖与包管理器更新
                     currentTaskName = "Configuring APT environment..."
-                    currentProgress = -1f 
+                    currentProgress = -1f
                     addLog(">> Updating APT repositories...")
                     TermuxCommand.run(context) { executable(Environment.BASH_SHELL.absolutePath); args("-c", "apt update && apt upgrade -y") }.also {
-                        if (it.stdout.isNotBlank()) addLog(it.stdout)
+                      if (it.stdout.isNotBlank()) addLog(it.stdout)
                     }
 
                     // 安装基础包 (jq, tar, unzip, libcurl)
                     addLog(">> Installing required base packages...")
                     TermuxCommand.run(context) { executable(Environment.BASH_SHELL.absolutePath); args("-c", "apt install jq tar unzip libcurl -y") }.also {
-                        if (it.stdout.isNotBlank()) addLog(it.stdout)
+                      if (it.stdout.isNotBlank()) addLog(it.stdout)
                     }
 
                     //P7Zip 镜像替换及安装
@@ -584,15 +666,15 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
                     addLog(">> Installing p7zip manually for 7z extraction support...")
                     val arch = IDEBuildConfigProvider.getInstance().cpuAbiName
                     val rawP7zipUrl = when {
-                        arch.contains("aarch64") || arch.contains("arm64") -> "https://github.com/msmt2018/termux-packages/releases/download/p7zip-17.06-1/debs-aarch64-e9f3af7af65c6f737f41404dbd6babf727147861.deb"
-                        arch.contains("arm") -> "https://github.com/msmt2018/termux-packages/releases/download/p7zip-17.06-1/debs-arm-e9f3af7af65c6f737f41404dbd6babf727147861.deb"
-                        arch.contains("x86_64") -> "https://github.com/msmt2018/termux-packages/releases/download/p7zip-17.06-1/debs-x86_64-e9f3af7af65c6f737f41404dbd6babf727147861.deb"
-                        else -> ""
+                      arch.contains("aarch64") || arch.contains("arm64") -> "https://github.com/msmt2018/termux-packages/releases/download/p7zip-17.06-1/debs-aarch64-e9f3af7af65c6f737f41404dbd6babf727147861.deb"
+                      arch.contains("arm") -> "https://github.com/msmt2018/termux-packages/releases/download/p7zip-17.06-1/debs-arm-e9f3af7af65c6f737f41404dbd6babf727147861.deb"
+                      arch.contains("x86_64") -> "https://github.com/msmt2018/termux-packages/releases/download/p7zip-17.06-1/debs-x86_64-e9f3af7af65c6f737f41404dbd6babf727147861.deb"
+                      else -> ""
                     }
                     val p7zipUrl = if (githubMirror.isNotEmpty() && rawP7zipUrl.startsWith("https://github.com")) githubMirror + rawP7zipUrl else rawP7zipUrl
-                    
+
                     if (p7zipUrl.isNotEmpty()) {
-                        val p7zipScript = """
+                      val p7zipScript = """
                             #!/bin/bash
                             tmp_p7zip_dir="${Environment.HOME.absolutePath}/tmp_p7zip_${System.currentTimeMillis()}"
                             mkdir -p "${'$'}tmp_p7zip_dir"
@@ -604,35 +686,35 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
                             rm -rf "${'$'}tmp_p7zip_dir"
                             echo "p7zip installed successfully."
                         """.trimIndent()
-                        val p7ScriptFile = File(Environment.TMP_DIR, "p7_install.sh")
-                        p7ScriptFile.writeText(p7zipScript)
-                        p7ScriptFile.setExecutable(true)
-                        TermuxCommand.run(context) { executable(Environment.BASH_SHELL.absolutePath); args(p7ScriptFile.absolutePath) }.also {
-                            if (it.stdout.isNotBlank()) addLog(it.stdout)
-                            if (it.stderr.isNotBlank()) addLog("WARN/ERR p7zip: ${it.stderr}")
-                        }
-                        p7ScriptFile.delete()
+                      val p7ScriptFile = File(Environment.TMP_DIR, "p7_install.sh")
+                      p7ScriptFile.writeText(p7zipScript)
+                      p7ScriptFile.setExecutable(true)
+                      TermuxCommand.run(context) { executable(Environment.BASH_SHELL.absolutePath); args(p7ScriptFile.absolutePath) }.also {
+                        if (it.stdout.isNotBlank()) addLog(it.stdout)
+                        if (it.stderr.isNotBlank()) addLog("WARN/ERR p7zip: ${it.stderr}")
+                      }
+                      p7ScriptFile.delete()
                     } else {
-                        addLog("WARN: No p7zip available for architecture $arch")
+                      addLog("WARN: No p7zip available for architecture $arch")
                     }
 
                     // Git 和 OpenSSH
                     if (installGit) {
-                        currentTaskName = "Installing Git..."
-                        addLog(">> Installing Git...")
-                        TermuxCommand.run(context) { executable(Environment.BASH_SHELL.absolutePath); args("-c", "apt install git -y") }
+                      currentTaskName = "Installing Git..."
+                      addLog(">> Installing Git...")
+                      TermuxCommand.run(context) { executable(Environment.BASH_SHELL.absolutePath); args("-c", "apt install git -y") }
                     }
                     if (installSsh) {
-                        currentTaskName = "Installing OpenSSH..."
-                        addLog(">> Installing OpenSSH...")
-                        TermuxCommand.run(context) { executable(Environment.BASH_SHELL.absolutePath); args("-c", "apt install openssh -y") }
+                      currentTaskName = "Installing OpenSSH..."
+                      addLog(">> Installing OpenSSH...")
+                      TermuxCommand.run(context) { executable(Environment.BASH_SHELL.absolutePath); args("-c", "apt install openssh -y") }
                     }
 
                     // 安装 JDK
                     currentTaskName = "Installing OpenJDK $jdkVersion..."
                     addLog(">> Installing package: 'openjdk-$jdkVersion'")
                     TermuxCommand.run(context) { executable(Environment.BASH_SHELL.absolutePath); args("-c", "apt install openjdk-$jdkVersion -y") }.also {
-                        addLog(">> JDK $jdkVersion has been installed.")
+                      addLog(">> JDK $jdkVersion has been installed.")
                     }
 
                     addLog(">> Updating ide-environment.properties...")
@@ -641,11 +723,11 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
                     if (!propsDir.exists()) propsDir.mkdirs()
                     val propsFile = File(propsDir, "ide-environment.properties")
                     try {
-                        propsFile.writeText("JAVA_HOME=$jdkDir\n")
-                        addLog(">> JAVA_HOME=$jdkDir")
-                        addLog(">> Properties file updated successfully!")
+                      propsFile.writeText("JAVA_HOME=$jdkDir\n")
+                      addLog(">> JAVA_HOME=$jdkDir")
+                      addLog(">> Properties file updated successfully!")
                     } catch (e: Exception) {
-                        addLog("WARN: Failed to write ide-environment.properties: ${e.message}")
+                      addLog("WARN: Failed to write ide-environment.properties: ${e.message}")
                     }
 
                     // 执行 SDK/NDK/CMake 安装
@@ -716,88 +798,88 @@ class OdSdkSetupViewModel(application: Application) : AndroidViewModel(applicati
         val manifest = fetchManifest(mirrorUrl)
 
         if (manifest != null) {
-            val arch = getArch()
-            val queryArch = if (arch == "armv7l" || arch == "armv8l") "arm" else arch
+          val arch = getArch()
+          val queryArch = if (arch == "armv7l" || arch == "armv8l") "arm" else arch
 
-            fun applyMirror(url: String): String {
-                return if (mirrorUrl.isNotEmpty() && url.startsWith("https://github.com")) mirrorUrl + url else url
-            }
+          fun applyMirror(url: String): String {
+            return if (mirrorUrl.isNotEmpty() && url.startsWith("https://github.com")) mirrorUrl + url else url
+          }
 
-            // Android SDK (强制)
-            val sdkUrl = manifest.androidSdk
-            if (!sdkUrl.isNullOrBlank() && sdkUrl.lowercase() != "x") {
-                rootNodes.add(
-                    SdkTreeNode(name = "Android SDK Platform", revision = "Latest", downloadUrl = applyMirror(sdkUrl), componentType = "android-sdk", checkedState = ToggleableState.On)
-                )
-            }
+          // Android SDK (强制)
+          val sdkUrl = manifest.androidSdk
+          if (!sdkUrl.isNullOrBlank() && sdkUrl.lowercase() != "x") {
+            rootNodes.add(
+                SdkTreeNode(name = "Android SDK Platform", revision = "Latest", downloadUrl = applyMirror(sdkUrl), componentType = "android-sdk", checkedState = ToggleableState.On)
+            )
+          }
 
-            // Cmdline Tools (强制)
-            val cmdUrl = manifest.cmdlineTools
-            if (!cmdUrl.isNullOrBlank() && cmdUrl.lowercase() != "x") {
-                rootNodes.add(
-                    SdkTreeNode(name = "Command-line Tools", revision = "Latest", downloadUrl = applyMirror(cmdUrl), componentType = "cmdline-tools", checkedState = ToggleableState.On)
-                )
-            }
+          // Cmdline Tools (强制)
+          val cmdUrl = manifest.cmdlineTools
+          if (!cmdUrl.isNullOrBlank() && cmdUrl.lowercase() != "x") {
+            rootNodes.add(
+                SdkTreeNode(name = "Command-line Tools", revision = "Latest", downloadUrl = applyMirror(cmdUrl), componentType = "cmdline-tools", checkedState = ToggleableState.On)
+            )
+          }
 
-            // Build Tools
-            manifest.buildTools?.get(queryArch)?.let { map ->
-                val group = SdkTreeNode(name = "Build-Tools", isGroup = true, isExpanded = false)
-                map.forEach { (k, url) ->
-                    if (url.isNotBlank() && url.lowercase() != "x") {
-                        val ver = k.replace("_", ".").trimStart('.')
-                        group.children.add(SdkTreeNode(name = "Build-Tools $ver", revision = ver, downloadUrl = applyMirror(url), componentType = "build-tools", parent = group))
-                    }
-                }
-                group.children.sortByDescending { it.revision }
-                // 默认勾选最新
-                group.children.firstOrNull()?.let { it.checkedState = ToggleableState.On }
-                group.updateParentState()
-                if (group.children.isNotEmpty()) rootNodes.add(group)
+          // Build Tools
+          manifest.buildTools?.get(queryArch)?.let { map ->
+            val group = SdkTreeNode(name = "Build-Tools", isGroup = true, isExpanded = false)
+            map.forEach { (k, url) ->
+              if (url.isNotBlank() && url.lowercase() != "x") {
+                val ver = k.replace("_", ".").trimStart('.')
+                group.children.add(SdkTreeNode(name = "Build-Tools $ver", revision = ver, downloadUrl = applyMirror(url), componentType = "build-tools", parent = group))
+              }
             }
+            group.children.sortByDescending { it.revision }
+            // 默认勾选最新
+            group.children.firstOrNull()?.let { it.checkedState = ToggleableState.On }
+            group.updateParentState()
+            if (group.children.isNotEmpty()) rootNodes.add(group)
+          }
 
-            // Platform Tools (特定推荐 35.0.2)
-            manifest.platformTools?.get(queryArch)?.let { map ->
-                val group = SdkTreeNode(name = "Platform-Tools", isGroup = true, isExpanded = false)
-                map.forEach { (k, url) ->
-                    if (url.isNotBlank() && url.lowercase() != "x") {
-                        val ver = k.replace("_", ".").trimStart('.')
-                        group.children.add(SdkTreeNode(name = "Platform-Tools $ver", revision = ver, downloadUrl = applyMirror(url), componentType = "platform-tools", parent = group))
-                    }
-                }
-                group.children.sortByDescending { it.revision }
-                val targetNode = group.children.find { it.revision == "35.0.2" } ?: group.children.firstOrNull()
-                targetNode?.let { it.checkedState = ToggleableState.On }
-                group.updateParentState()
-                if (group.children.isNotEmpty()) rootNodes.add(group)
+          // Platform Tools (特定推荐 35.0.2)
+          manifest.platformTools?.get(queryArch)?.let { map ->
+            val group = SdkTreeNode(name = "Platform-Tools", isGroup = true, isExpanded = false)
+            map.forEach { (k, url) ->
+              if (url.isNotBlank() && url.lowercase() != "x") {
+                val ver = k.replace("_", ".").trimStart('.')
+                group.children.add(SdkTreeNode(name = "Platform-Tools $ver", revision = ver, downloadUrl = applyMirror(url), componentType = "platform-tools", parent = group))
+              }
             }
+            group.children.sortByDescending { it.revision }
+            val targetNode = group.children.find { it.revision == "35.0.2" } ?: group.children.firstOrNull()
+            targetNode?.let { it.checkedState = ToggleableState.On }
+            group.updateParentState()
+            if (group.children.isNotEmpty()) rootNodes.add(group)
+          }
 
-            // NDK
-            manifest.androidNdk?.get(queryArch)?.let { map ->
-                val group = SdkTreeNode(name = "NDK (Side by side)", isGroup = true, isExpanded = false)
-                map.forEach { (k, url) ->
-                    if (url.isNotBlank() && url.lowercase() != "x") {
-                        val ver = k.replace("_", ".").trimStart('.')
-                        group.children.add(SdkTreeNode(name = "NDK $ver", revision = ver, downloadUrl = applyMirror(url), componentType = "ndk", parent = group))
-                    }
-                }
-                group.children.sortByDescending { it.revision }
-                group.updateParentState()
-                if (group.children.isNotEmpty()) rootNodes.add(group)
+          // NDK
+          manifest.androidNdk?.get(queryArch)?.let { map ->
+            val group = SdkTreeNode(name = "NDK (Side by side)", isGroup = true, isExpanded = false)
+            map.forEach { (k, url) ->
+              if (url.isNotBlank() && url.lowercase() != "x") {
+                val ver = k.replace("_", ".").trimStart('.')
+                group.children.add(SdkTreeNode(name = "NDK $ver", revision = ver, downloadUrl = applyMirror(url), componentType = "ndk", parent = group))
+              }
             }
+            group.children.sortByDescending { it.revision }
+            group.updateParentState()
+            if (group.children.isNotEmpty()) rootNodes.add(group)
+          }
 
-            // CMake
-            manifest.androidCmake?.get(queryArch)?.let { map ->
-                val group = SdkTreeNode(name = "CMake", isGroup = true, isExpanded = false)
-                map.forEach { (k, url) ->
-                    if (url.isNotBlank() && url.lowercase() != "x") {
-                        val ver = k.replace("_", ".").trimStart('.')
-                        group.children.add(SdkTreeNode(name = "CMake $ver", revision = ver, downloadUrl = applyMirror(url), componentType = "cmake", parent = group))
-                    }
-                }
-                group.children.sortByDescending { it.revision }
-                group.updateParentState()
-                if (group.children.isNotEmpty()) rootNodes.add(group)
+          // CMake
+          manifest.androidCmake?.get(queryArch)?.let { map ->
+            val group = SdkTreeNode(name = "CMake", isGroup = true, isExpanded = false)
+            map.forEach { (k, url) ->
+              if (url.isNotBlank() && url.lowercase() != "x") {
+                val ver = k.replace("_", ".").trimStart('.')
+                group.children.add(SdkTreeNode(name = "CMake $ver", revision = ver, downloadUrl = applyMirror(url), componentType = "cmake", parent = group))
+              }
             }
+            group.children.sortByDescending { it.revision }
+            group.updateParentState()
+            if (group.children.isNotEmpty()) rootNodes.add(group)
+          }
         }
 
         _treeNodes.value = rootNodes
@@ -811,21 +893,21 @@ class OdSdkSetupViewModel(application: Application) : AndroidViewModel(applicati
   }
 
   private suspend fun fetchManifest(mirrorUrl: String): SdkManifest? = withContext(Dispatchers.IO) {
-      try {
-          val baseUrl = "https://github.com/msmt2018/SDK-tool-for-Android-platform/releases/download/IDESdkDownJson2.3/manifest.json"
-          val targetUrl = if (mirrorUrl.isNotEmpty() && baseUrl.startsWith("https://github.com")) mirrorUrl + baseUrl else baseUrl
-          
-          val url = URL(targetUrl)
-          val connection = url.openConnection() as HttpURLConnection
-          connection.connectTimeout = 10000
-          connection.readTimeout = 10000
-          if (connection.responseCode == 200) {
-              val json = connection.inputStream.bufferedReader().readText()
-              Gson().fromJson(json, SdkManifest::class.java)
-          } else null
-      } catch (e: Exception) {
-          null
-      }
+    try {
+      val baseUrl = "https://github.com/msmt2018/SDK-tool-for-Android-platform/releases/download/IDESdkDownJson2.3/manifest.json"
+      val targetUrl = if (mirrorUrl.isNotEmpty() && baseUrl.startsWith("https://github.com")) mirrorUrl + baseUrl else baseUrl
+
+      val url = URL(targetUrl)
+      val connection = url.openConnection() as HttpURLConnection
+      connection.connectTimeout = 10000
+      connection.readTimeout = 10000
+      if (connection.responseCode == 200) {
+        val json = connection.inputStream.bufferedReader().readText()
+        Gson().fromJson(json, SdkManifest::class.java)
+      } else null
+    } catch (e: Exception) {
+      null
+    }
   }
 
   private fun getArch(): String = IDEBuildConfigProvider.getInstance().cpuArch.name.lowercase()
@@ -833,17 +915,15 @@ class OdSdkSetupViewModel(application: Application) : AndroidViewModel(applicati
   fun toggleCheck(node: SdkTreeNode) {
     if (node.componentType == "android-sdk" || node.componentType == "cmdline-tools") return
 
-    if (node.isGroup) {
-        node.isExpanded = !node.isExpanded
-    } else {
-        val nextState = when (node.checkedState) {
-            ToggleableState.On -> ToggleableState.Off
-            ToggleableState.Off, ToggleableState.Indeterminate -> ToggleableState.On
-        }
-        node.updateChildrenState(nextState)
-        node.updateParentState()
-        checkPendingChanges()
+    val nextState = when (node.checkedState) {
+      ToggleableState.On -> ToggleableState.Off
+      ToggleableState.Off, ToggleableState.Indeterminate -> ToggleableState.On
     }
+    node.updateChildrenState(nextState)
+    node.updateParentState()
+    checkPendingChanges()
+    
+    // 触发刷新
     _treeNodes.value = _treeNodes.value.toList()
   }
 
@@ -865,7 +945,7 @@ class OdSdkSetupViewModel(application: Application) : AndroidViewModel(applicati
     val toInstall = mutableListOf<SdkTreeNode>()
     fun collect(node: SdkTreeNode) {
       if (!node.isGroup && node.checkedState == ToggleableState.On) {
-          toInstall.add(node)
+        toInstall.add(node)
       }
       node.children.forEach { collect(it) }
     }
