@@ -237,7 +237,7 @@ class OdSdkToolInstallFragment : Fragment(), SlidePolicy {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(start = 16.dp, end = 16.dp, top = 40.dp, bottom = 94.dp)
+            .padding(start = 16.dp, end = 16.dp, top = 40.dp, bottom = 98.dp)
     ) {
 
       // 头部区域
@@ -307,11 +307,33 @@ class OdSdkToolInstallFragment : Fragment(), SlidePolicy {
                 }
               },
               update = { view ->
-                if (view.tag != treeNodes) {
-                  view.bindData(treeNodes) { clickedNode ->
-                    setupViewModel.toggleCheck(clickedNode)
-                    view.refreshViews()
+                if (view.tag != treeNodes && treeNodes.isNotEmpty()) {
+                  var listener: ((SdkTreeNode) -> Unit)? = null
+                  listener = { clickedNode ->
+                    if (clickedNode.componentType != "android-sdk" && clickedNode.componentType != "cmdline-tools") {
+                      
+                      if (clickedNode.isGroup) {
+                        // 【如果点击组节点】直接控制展开折叠状态，并重算节点结构(bindData)
+                        clickedNode.isExpanded = !clickedNode.isExpanded
+                        view.bindData(treeNodes, listener)
+                      } else {
+                        // 【如果点击子节点】仅计算打钩状态，并刷新局部UI
+                        val nextState = when (clickedNode.checkedState) {
+                          ToggleableState.On -> ToggleableState.Off
+                          ToggleableState.Off, ToggleableState.Indeterminate -> ToggleableState.On
+                        }
+                        clickedNode.updateChildrenState(nextState)
+                        clickedNode.updateParentState()
+                        view.refreshViews()
+                      }
+                      
+                      // 触发外部Compose底栏的按钮状态更新
+                      setupViewModel.triggerPendingChangesCheck()
+                    }
                   }
+                  
+                  // 首次注入，记录标志位
+                  view.bindData(treeNodes, listener)
                   view.tag = treeNodes
                 }
               },
@@ -899,23 +921,7 @@ class OdSdkSetupViewModel(application: Application) : AndroidViewModel(applicati
 
   private fun getArch(): String = IDEBuildConfigProvider.getInstance().cpuArch.name.lowercase()
 
-  fun toggleCheck(node: SdkTreeNode) {
-    if (node.componentType == "android-sdk" || node.componentType == "cmdline-tools") return
-
-    if (node.isGroup) {
-      node.isExpanded = !node.isExpanded
-    } else {
-      val nextState = when (node.checkedState) {
-        ToggleableState.On -> ToggleableState.Off
-        ToggleableState.Off, ToggleableState.Indeterminate -> ToggleableState.On
-      }
-      node.updateChildrenState(nextState)
-      node.updateParentState()
-    }
-    checkPendingChanges()
-  }
-
-  private fun checkPendingChanges() {
+  fun triggerPendingChangesCheck() {
     var hasChanges = false
     fun checkNode(node: SdkTreeNode) {
       if (!node.isGroup) {
@@ -927,6 +933,10 @@ class OdSdkSetupViewModel(application: Application) : AndroidViewModel(applicati
     }
     _treeNodes.value.forEach { checkNode(it) }
     _hasPendingChanges.value = hasChanges
+  }
+
+  private fun checkPendingChanges() {
+    triggerPendingChangesCheck()
   }
 
   fun getInstallTasks(): List<SdkTreeNode> {
