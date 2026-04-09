@@ -28,7 +28,6 @@ import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import android.os.Bundle
 import android.provider.Settings
-import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -49,6 +48,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.stringResource
@@ -68,7 +68,6 @@ import com.google.gson.Gson
 import com.itsaky.androidide.R
 import com.itsaky.androidide.activities.OnboardingActivity
 import com.itsaky.androidide.app.configuration.IDEBuildConfigProvider
-import com.itsaky.androidide.repository.sdkmanager.models.InstallStatus
 import com.itsaky.androidide.repository.sdkmanager.models.SdkManifest
 import com.itsaky.androidide.repository.sdkmanager.models.SdkTreeNode
 import com.itsaky.androidide.repository.sdkmanager.services.SdkInstallerManager
@@ -120,14 +119,6 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
   fun isAutoInstall(): Boolean = false
   fun buildIdeSetupArguments(): Array<String> = emptyArray()
 
-  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-    super.onViewCreated(view, savedInstanceState)
-    // 隐藏父类占用的大量空白标题区域组件，使其靠近系统状态栏下方
-    binding.onboardingTitle.visibility = View.GONE
-    binding.onboardingSubtitle.visibility = View.GONE
-    binding.onboardingExtraInfo.visibility = View.GONE
-  }
-
   override fun createContentView(parent: ViewGroup, attachToParent: Boolean) {
     val composeView =
         ComposeView(requireContext()).apply {
@@ -138,12 +129,13 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
           }
         }
 
-    // 设置占满可用高度，保证滚动正常
+    parent.setPadding(0, 0, 0, 0)
+    
     parent.addView(
         composeView,
         ViewGroup.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT,
         ),
     )
     updateConnectionStatus()
@@ -242,6 +234,7 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
     var jdkExpanded by remember { mutableStateOf(false) }
 
     val currentAbi = IDEBuildConfigProvider.getInstance().cpuAbiName
+    val configuration = LocalConfiguration.current
 
     fun getValidMirror(): String {
       if (!useGithubMirror) return ""
@@ -255,24 +248,24 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
     Column(
         modifier = Modifier
             .fillMaxWidth()
+            .offset(y = (-40).dp)
             .padding(start = 12.dp, end = 12.dp, top = 8.dp, bottom = 80.dp)
     ) {
 
-      // 头部栏：标题 + ABI 信息
       Row(
           modifier = Modifier.fillMaxWidth(),
           horizontalArrangement = Arrangement.SpaceBetween,
           verticalAlignment = Alignment.CenterVertically
       ) {
         Text(
-            text = "SDK Installation and Configuration",
+            text = "SDK 安装与配置",
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
         )
       }
 
       Text(
-          text = "The development tools must be installed for the IDE to function properly. Please select the required components and then perform the installation at the end.",
+          text = "必须安装开发工具才能使 IDE 正常工作。请勾选所需的组件并在最后执行安装。",
           style = MaterialTheme.typography.bodySmall,
           color = MaterialTheme.colorScheme.onSurfaceVariant,
           modifier = Modifier.padding(top = 4.dp, bottom = 12.dp)
@@ -305,12 +298,14 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
         }
       }
 
+      val treeViewHeight = (configuration.screenHeightDp.dp * 0.42f)
+      
       Surface(
           shape = RoundedCornerShape(12.dp),
           color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
           modifier = Modifier
               .fillMaxWidth()
-              .height(350.dp)
+              .height(treeViewHeight)
               .padding(top = 8.dp),
       ) {
         if (isLoading) {
@@ -341,14 +336,12 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
 
       Spacer(modifier = Modifier.height(12.dp))
 
-      // 附加配置区域 (缩小尺寸并加强布局)
       Text(
           text = "Additional Configurations:",
           style = MaterialTheme.typography.titleSmall,
           fontWeight = FontWeight.Bold,
       )
 
-      // JDK 选择
       Row(
           verticalAlignment = Alignment.CenterVertically,
           modifier = Modifier
@@ -377,7 +370,6 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
         }
       }
 
-      // 基础修复与安装开关
       Column(verticalArrangement = Arrangement.spacedBy((-12).dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
           Checkbox(
@@ -424,7 +416,6 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
               modifier = Modifier.clickable { applyCmakePatch = !applyCmakePatch })
         }
 
-        // GitHub 镜像加速选项
         Row(verticalAlignment = Alignment.CenterVertically) {
           Checkbox(
               checked = useGithubMirror,
@@ -472,7 +463,6 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
 
       Spacer(modifier = Modifier.height(12.dp))
 
-      // 底部执行按钮
       Button(
           onClick = { showActionDialog = true },
           enabled = hasPendingChanges || installGit || installSsh,
@@ -922,8 +912,7 @@ class OdSdkSetupViewModel(application: Application) : AndroidViewModel(applicati
     node.updateChildrenState(nextState)
     node.updateParentState()
     checkPendingChanges()
-    
-    // 触发刷新
+
     _treeNodes.value = _treeNodes.value.toList()
   }
 
