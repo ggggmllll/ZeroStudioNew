@@ -24,6 +24,12 @@ import kotlinx.coroutines.withContext
  */
 object SdkInstallerManager {
 
+  private fun getSdkTempDir(): File {
+    val sdkTemp = File(Environment.ANDROID_HOME, ".temp")
+    FileUtils.createOrExistsDir(sdkTemp)
+    return sdkTemp
+  }
+
   /** 下载 + 创建解压脚本 + Termux执行 + 可选后置修复 */
   suspend fun downloadAndInstall(
       context: Context,
@@ -37,12 +43,13 @@ object SdkInstallerManager {
         val urlStr = node.downloadUrl
         val destDir = getDestDir(node)
 
+        FileUtils.createOrExistsDir(destDir)
         onLog(">> Preparing to install: ${node.name}")
         onLog(">> Target directory: ${destDir.absolutePath}")
 
         // Download File
         val tempArchive =
-            File(Environment.TMP_DIR, "sdk_dl_${System.currentTimeMillis()}_${File(urlStr).name}")
+            File(getSdkTempDir(), "sdk_dl_${System.currentTimeMillis()}_${File(urlStr).name}")
         FileUtils.createOrExistsFile(tempArchive)
 
         try {
@@ -91,49 +98,55 @@ object SdkInstallerManager {
 
         // Generate robust Shell Script
         onLog(">> Generating robust extraction shell script...")
-        val extractScript = File(Environment.TMP_DIR, "extract_${System.currentTimeMillis()}.sh")
+        val extractScript = File(getSdkTempDir(), "extract_${System.currentTimeMillis()}.sh")
         val scriptContent =
             """
-            #!/bin/bash
+            #!/system/bin/sh
             set -eu
-            
+
             ARCHIVE="${tempArchive.absolutePath}"
             DEST_DIR="${destDir.absolutePath}"
-            
+            WORK_DIR="${getSdkTempDir().absolutePath}"
+
             echo "Extracting archive to target..."
             mkdir -p "${"$"}DEST_DIR"
-            
-            TMP_EXTRACT="${"$"}DEST_DIR/tmp_extract_${"$"}${"$"}"
+
+            TMP_EXTRACT="${"$"}WORK_DIR/extract_${'$'}${'$'}"
             mkdir -p "${"$"}TMP_EXTRACT"
-            
-            # Auto-detect archive type and extract
-            if [[ "${"$"}ARCHIVE" == *.zip ]]; then
+
+            if [ "${"$"}{ARCHIVE##*.}" = "zip" ]; then
               unzip -q "${"$"}ARCHIVE" -d "${"$"}TMP_EXTRACT"
-            elif [[ "${"$"}ARCHIVE" == *.7z ]]; then
+            elif [ "${"$"}{ARCHIVE##*.}" = "7z" ]; then
               7z x "${"$"}ARCHIVE" -o"${"$"}TMP_EXTRACT"
-            elif [[ "${"$"}ARCHIVE" == *.tar.gz ]] || [[ "${"$"}ARCHIVE" == *.tgz ]]; then
-              tar xvzf "${"$"}ARCHIVE" -C "${"$"}TMP_EXTRACT"
-            elif [[ "${"$"}ARCHIVE" == *.tar.xz ]]; then
-              tar xvJf "${"$"}ARCHIVE" -C "${"$"}TMP_EXTRACT"
-            else
-              tar xvf "${"$"}ARCHIVE" -C "${"$"}TMP_EXTRACT"
-            fi
-            
-            echo "Extraction done, organizing files..."
-            
-            # Strip top-level directory if there is exactly one
-            INNER_COUNT=${'$'}(ls -1 "${"$"}TMP_EXTRACT" | wc -l)
-            if[ "${"$"}INNER_COUNT" -eq 1 ]; then
-              INNER_DIR="${"$"}TMP_EXTRACT/${'$'}(ls -1 "${"$"}TMP_EXTRACT")"
-              if[ -d "${"$"}INNER_DIR" ]; then
-                cp -r "${"$"}INNER_DIR"/* "${"$"}DEST_DIR"/ 2>/dev/null || true
+            elif [ "${"$"}{ARCHIVE##*.}" = "tgz" ] || [ "${"$"}{ARCHIVE##*.}" = "gz" ]; then
+              tar xzf "${"$"}ARCHIVE" -C "${"$"}TMP_EXTRACT"
+            elif [ "${"$"}{ARCHIVE##*.}" = "xz" ]; then
+              if command -v xz >/dev/null 2>&1; then
+                xz -dc "${"$"}ARCHIVE" | tar -xf - -C "${"$"}TMP_EXTRACT"
+              elif command -v 7z >/dev/null 2>&1; then
+                echo "WARN: xz command missing, falling back to 7z extraction..."
+                7z x "${"$"}ARCHIVE" -o"${"$"}TMP_EXTRACT"
               else
-                cp -r "${"$"}TMP_EXTRACT"/* "${"$"}DEST_DIR"/ 2>/dev/null || true
+                echo "ERR: no extractor for .xz archives (need xz-utils or 7z)"
+                exit 127
               fi
             else
-              cp -r "${"$"}TMP_EXTRACT"/* "${"$"}DEST_DIR"/ 2>/dev/null || true
+              tar xf "${"$"}ARCHIVE" -C "${"$"}TMP_EXTRACT"
             fi
-            
+
+            echo "Extraction done, organizing files..."
+            TOP_COUNT=$(find "${"$"}TMP_EXTRACT" -mindepth 1 -maxdepth 1 | wc -l)
+            if [ "${"$"}TOP_COUNT" -eq 1 ]; then
+              INNER_DIR=$(find "${"$"}TMP_EXTRACT" -mindepth 1 -maxdepth 1 | head -n 1)
+              if [ -d "${"$"}INNER_DIR" ]; then
+                cp -a "${"$"}INNER_DIR"/. "${"$"}DEST_DIR"/
+              else
+                cp -a "${"$"}TMP_EXTRACT"/. "${"$"}DEST_DIR"/
+              fi
+            else
+              cp -a "${"$"}TMP_EXTRACT"/. "${"$"}DEST_DIR"/
+            fi
+
             echo "Cleaning up temp files..."
             rm -rf "${"$"}TMP_EXTRACT"
             rm -f "${"$"}ARCHIVE"
@@ -149,7 +162,7 @@ object SdkInstallerManager {
         val cmdResult =
             TermuxCommand.run(context) {
               label("SDK_Extractor_${node.name}")
-              executable(Environment.BASH_SHELL.absolutePath)
+              executable("sh")
               args(extractScript.absolutePath)
               workingDir(Environment.HOME.absolutePath)
             }
@@ -185,26 +198,26 @@ object SdkInstallerManager {
     onLog(">> Applying NDK fixes and symlinks...")
     val script =
         """
-        #!/bin/bash
+        #!/system/bin/sh
         set -eu
         NDK_DIR="${ndkDir.absolutePath}"
         
         echo "Creating missing architecture symlinks..."
-        if[ -d "${'$'}NDK_DIR/toolchains/llvm/prebuilt" ]; then
+        if [ -d "${'$'}NDK_DIR/toolchains/llvm/prebuilt" ]; then
             cd "${'$'}NDK_DIR/toolchains/llvm/prebuilt" || exit 0
             if [ -d "linux-aarch64" ] && [ ! -e "linux-x86_64" ]; then ln -s linux-aarch64 linux-x86_64; fi
-            if[ -d "linux-arm64" ] && [ ! -e "linux-aarch64" ]; then ln -s linux-arm64 linux-aarch64; fi
+            if [ -d "linux-arm64" ] && [ ! -e "linux-aarch64" ]; then ln -s linux-arm64 linux-aarch64; fi
         fi
         
-        if[ -d "${'$'}NDK_DIR/prebuilt" ]; then
+        if [ -d "${'$'}NDK_DIR/prebuilt" ]; then
             cd "${'$'}NDK_DIR/prebuilt" || exit 0
-            if [ -d "linux-aarch64" ] &&[ ! -e "linux-x86_64" ]; then ln -s linux-aarch64 linux-x86_64; fi
-            if [ -d "linux-arm64" ] &&[ ! -e "linux-aarch64" ]; then ln -s linux-arm64 linux-aarch64; fi
+            if [ -d "linux-aarch64" ] && [ ! -e "linux-x86_64" ]; then ln -s linux-aarch64 linux-x86_64; fi
+            if [ -d "linux-arm64" ] && [ ! -e "linux-aarch64" ]; then ln -s linux-arm64 linux-aarch64; fi
         fi
         
-        if[ -d "${'$'}NDK_DIR/shader-tools" ]; then
+        if [ -d "${'$'}NDK_DIR/shader-tools" ]; then
             cd "${'$'}NDK_DIR/shader-tools" || exit 0
-            if [ -d "linux-arm64" ] &&[ ! -e "linux-aarch64" ]; then ln -s linux-arm64 linux-aarch64; fi
+            if [ -d "linux-arm64" ] && [ ! -e "linux-aarch64" ]; then ln -s linux-arm64 linux-aarch64; fi
         fi
         
         echo "Patching CMAKE Android Toolchain config..."
@@ -218,13 +231,13 @@ object SdkInstallerManager {
     """
             .trimIndent()
 
-    val scriptFile = File(Environment.TMP_DIR, "ndk_fix_${System.currentTimeMillis()}.sh")
+    val scriptFile = File(getSdkTempDir(), "ndk_fix_${System.currentTimeMillis()}.sh")
     scriptFile.writeText(script)
     scriptFile.setExecutable(true)
 
     val result = TermuxCommand.run(context) {
       label("NDK Fix")
-      executable(Environment.BASH_SHELL.absolutePath)
+      executable("sh")
       args(scriptFile.absolutePath)
     }
 
@@ -244,9 +257,9 @@ object SdkInstallerManager {
   private suspend fun applyCmakePatches(context: Context, cmakeDir: File, onLog: (String) -> Unit) {
     onLog(">> Preparing to apply CMake patches...")
 
-    val patchZip = File(Environment.TMP_DIR, "cmake_patches_${System.currentTimeMillis()}.zip")
+    val patchZip = File(getSdkTempDir(), "cmake_patches_${System.currentTimeMillis()}.zip")
     val patchExtractedDir =
-        File(Environment.TMP_DIR, "cmake_patches_ext_${System.currentTimeMillis()}")
+        File(getSdkTempDir(), "cmake_patches_ext_${System.currentTimeMillis()}")
 
     try {
       val success =
@@ -269,7 +282,7 @@ object SdkInstallerManager {
 
     val script =
         """
-        #!/bin/bash
+        #!/system/bin/sh
         set -eu
         CMAKE_DIR="${cmakeDir.absolutePath}"
         PATCH_DIR="${patchExtractedDir.absolutePath}"
@@ -282,12 +295,12 @@ object SdkInstallerManager {
         if [ -d "${'$'}SHARE_DIR" ]; then
             # Find cmake-3.xx directory dynamically
             CMAKE_SHARE_SUBDIR=${'$'}(ls -1 "${'$'}SHARE_DIR" | grep cmake | head -n 1)
-            if[ -n "${'$'}CMAKE_SHARE_SUBDIR" ]; then
+            if [ -n "${'$'}CMAKE_SHARE_SUBDIR" ]; then
                 TARGET_DIR="${'$'}SHARE_DIR/${'$'}CMAKE_SHARE_SUBDIR"
                 cd "${'$'}TARGET_DIR"
                 echo "Applying patches in ${'$'}TARGET_DIR..."
                 for p in "${'$'}PATCH_DIR"/*.patch; do
-                    if[ -f "${'$'}p" ]; then
+                    if [ -f "${'$'}p" ]; then
                         echo "Applying ${'$'}p..."
                         patch -p1 < "${'$'}p" || echo "WARN: Failed to apply ${'$'}p"
                     fi
@@ -302,13 +315,13 @@ object SdkInstallerManager {
     """
             .trimIndent()
 
-    val scriptFile = File(Environment.TMP_DIR, "cmake_patch_${System.currentTimeMillis()}.sh")
+    val scriptFile = File(getSdkTempDir(), "cmake_patch_${System.currentTimeMillis()}.sh")
     scriptFile.writeText(script)
     scriptFile.setExecutable(true)
 
     val result = TermuxCommand.run(context) {
       label("CMake Patch")
-      executable(Environment.BASH_SHELL.absolutePath)
+      executable("sh")
       args(scriptFile.absolutePath)
     }
 
