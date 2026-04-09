@@ -28,6 +28,8 @@ import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import android.os.Bundle
 import android.provider.Settings
+import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -37,7 +39,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Refresh
@@ -48,7 +52,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.stringResource
@@ -59,6 +62,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.DialogProperties
 import androidx.core.content.getSystemService
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -93,7 +97,7 @@ import kotlinx.coroutines.withContext
  *
  * @author android_zero
  */
-class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
+class OdSdkToolInstallFragment : Fragment(), SlidePolicy {
 
   private var backgroundDataRestrictionReceiver: BroadcastReceiver? = null
   private var networkStateChangeCallback: ConnectivityManager.NetworkCallback? = null
@@ -104,41 +108,25 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
   companion object {
     @JvmStatic
     fun newInstance(context: Context): OdSdkToolInstallFragment {
-      return OdSdkToolInstallFragment().also {
-        it.arguments =
-            Bundle().apply {
-              // 强行填充空字符串，防止预留位置为空导致宿主的 null-check exception
-              putCharSequence(KEY_ONBOARDING_TITLE, "")
-              putCharSequence(KEY_ONBOARDING_SUBTITLE, "")
-              putCharSequence(KEY_ONBOARDING_EXTRA_INFO, "")
-            }
-      }
+      return OdSdkToolInstallFragment()
     }
   }
 
   fun isAutoInstall(): Boolean = false
   fun buildIdeSetupArguments(): Array<String> = emptyArray()
 
-  override fun createContentView(parent: ViewGroup, attachToParent: Boolean) {
-    val composeView =
-        ComposeView(requireContext()).apply {
-          setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-          setContent {
-            val colorScheme = if (isSystemInDarkTheme()) darkColorScheme() else lightColorScheme()
-            MaterialTheme(colorScheme = colorScheme) { SetupConfigurationScreen() }
-          }
-        }
-
-    parent.setPadding(0, 0, 0, 0)
-    
-    parent.addView(
-        composeView,
-        ViewGroup.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT,
-        ),
-    )
-    updateConnectionStatus()
+  override fun onCreateView(
+      inflater: LayoutInflater,
+      container: ViewGroup?,
+      savedInstanceState: Bundle?
+  ): View {
+    return ComposeView(requireContext()).apply {
+      setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+      setContent {
+        val colorScheme = if (isSystemInDarkTheme()) darkColorScheme() else lightColorScheme()
+        MaterialTheme(colorScheme = colorScheme) { SetupConfigurationScreen() }
+      }
+    }
   }
 
   override fun onStart() {
@@ -234,7 +222,6 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
     var jdkExpanded by remember { mutableStateOf(false) }
 
     val currentAbi = IDEBuildConfigProvider.getInstance().cpuAbiName
-    val configuration = LocalConfiguration.current
 
     fun getValidMirror(): String {
       if (!useGithubMirror) return ""
@@ -245,13 +232,16 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
       return t
     }
 
+    val scrollState = rememberScrollState()
+
     Column(
         modifier = Modifier
-            .fillMaxWidth()
-            .offset(y = (-40).dp)
-            .padding(start = 12.dp, end = 12.dp, top = 8.dp, bottom = 80.dp)
+            .fillMaxSize()
+            .verticalScroll(scrollState)
+            .padding(start = 16.dp, end = 16.dp, top = 32.dp, bottom = 100.dp)
     ) {
 
+      // 头部栏：标题 + ABI 信息
       Row(
           modifier = Modifier.fillMaxWidth(),
           horizontalArrangement = Arrangement.SpaceBetween,
@@ -298,14 +288,14 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
         }
       }
 
-      val treeViewHeight = (configuration.screenHeightDp.dp * 0.42f)
-      
+      // 核心 SDK 树状视图区
+      // 指定一个固定高度 height(350.dp)，允许 RecyclerView (SdkTreeView) 在此区域内自我滚动
       Surface(
           shape = RoundedCornerShape(12.dp),
           color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
           modifier = Modifier
               .fillMaxWidth()
-              .height(treeViewHeight)
+              .height(350.dp)
               .padding(top = 8.dp),
       ) {
         if (isLoading) {
@@ -316,7 +306,7 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
           AndroidView(
               factory = { context ->
                 SdkTreeView(context).apply {
-                  isNestedScrollingEnabled = true
+                  isNestedScrollingEnabled = true // 开启嵌套滑动，防止在 Compose 中滑动冲突
                   bindData(treeNodes) { clickedNode ->
                     setupViewModel.toggleCheck(clickedNode)
                     refreshViews()
@@ -334,19 +324,21 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
         }
       }
 
-      Spacer(modifier = Modifier.height(12.dp))
+      Spacer(modifier = Modifier.height(16.dp))
 
+      // 附加配置区域
       Text(
           text = "Additional Configurations:",
           style = MaterialTheme.typography.titleSmall,
           fontWeight = FontWeight.Bold,
       )
 
+      // JDK 选择
       Row(
           verticalAlignment = Alignment.CenterVertically,
           modifier = Modifier
               .fillMaxWidth()
-              .padding(vertical = 4.dp)
+              .padding(vertical = 8.dp)
       ) {
         Text("Java Development Kit: ", fontSize = 12.sp)
         Box {
@@ -370,8 +362,9 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
         }
       }
 
-      Column(verticalArrangement = Arrangement.spacedBy((-12).dp)) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
+      // 基础修复与安装开关
+      Column {
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.height(36.dp)) {
           Checkbox(
               checked = installGit,
               onCheckedChange = { installGit = it },
@@ -382,7 +375,7 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
               fontSize = 11.sp,
               modifier = Modifier.clickable { installGit = !installGit })
         }
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.height(36.dp)) {
           Checkbox(
               checked = installSsh,
               onCheckedChange = { installSsh = it },
@@ -393,7 +386,7 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
               fontSize = 11.sp,
               modifier = Modifier.clickable { installSsh = !installSsh })
         }
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.height(36.dp)) {
           Checkbox(
               checked = applyNdkFix,
               onCheckedChange = { applyNdkFix = it },
@@ -404,7 +397,7 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
               fontSize = 11.sp,
               modifier = Modifier.clickable { applyNdkFix = !applyNdkFix })
         }
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.height(36.dp)) {
           Checkbox(
               checked = applyCmakePatch,
               onCheckedChange = { applyCmakePatch = it },
@@ -416,7 +409,8 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
               modifier = Modifier.clickable { applyCmakePatch = !applyCmakePatch })
         }
 
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        // GitHub 镜像加速选项
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.height(36.dp)) {
           Checkbox(
               checked = useGithubMirror,
               onCheckedChange = { useGithubMirror = it },
@@ -432,7 +426,7 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
       if (useGithubMirror) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(start = 12.dp, end = 8.dp, top = 4.dp)
+            modifier = Modifier.padding(start = 12.dp, top = 4.dp)
         ) {
           OutlinedTextField(
               value = githubMirrorUrl,
@@ -461,14 +455,15 @@ class OdSdkToolInstallFragment : OnboardingFragment(), SlidePolicy {
         }
       }
 
-      Spacer(modifier = Modifier.height(12.dp))
+      Spacer(modifier = Modifier.height(16.dp))
 
+      // 底部执行按钮 
       Button(
           onClick = { showActionDialog = true },
           enabled = hasPendingChanges || installGit || installSsh,
           modifier = Modifier
               .fillMaxWidth()
-              .height(42.dp),
+              .height(46.dp),
       ) {
         Text("Start Environment Setup", fontSize = 13.sp)
       }
@@ -905,14 +900,20 @@ class OdSdkSetupViewModel(application: Application) : AndroidViewModel(applicati
   fun toggleCheck(node: SdkTreeNode) {
     if (node.componentType == "android-sdk" || node.componentType == "cmdline-tools") return
 
-    val nextState = when (node.checkedState) {
-      ToggleableState.On -> ToggleableState.Off
-      ToggleableState.Off, ToggleableState.Indeterminate -> ToggleableState.On
+    // 恢复控制折叠状态的代码逻辑，保证在点击组节点时能够正确变更 isExpanded 的布尔值
+    if (node.isGroup) {
+      node.isExpanded = !node.isExpanded
+    } else {
+      val nextState = when (node.checkedState) {
+        ToggleableState.On -> ToggleableState.Off
+        ToggleableState.Off, ToggleableState.Indeterminate -> ToggleableState.On
+      }
+      node.updateChildrenState(nextState)
+      node.updateParentState()
+      checkPendingChanges()
     }
-    node.updateChildrenState(nextState)
-    node.updateParentState()
-    checkPendingChanges()
-
+    
+    // 强制触发 StateFlow 发送新列表以更新 UI 视图
     _treeNodes.value = _treeNodes.value.toList()
   }
 
