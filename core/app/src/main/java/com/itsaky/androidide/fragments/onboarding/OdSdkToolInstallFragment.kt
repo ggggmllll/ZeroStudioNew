@@ -232,30 +232,29 @@ class OdSdkToolInstallFragment : Fragment(), SlidePolicy {
       return t
     }
 
-    val scrollState = rememberScrollState()
-
+    // 主体容器：使用 fillMaxSize 撑满全屏
+    // top = 40.dp 留出状态栏空间；bottom = 100.dp 避开底部的 AppIntro 引导栏
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .verticalScroll(scrollState)
-            .padding(start = 16.dp, end = 16.dp, top = 32.dp, bottom = 100.dp)
+            .padding(start = 16.dp, end = 16.dp, top = 40.dp, bottom = 94.dp)
     ) {
 
-      // 头部栏：标题 + ABI 信息
+      // 头部区域
       Row(
           modifier = Modifier.fillMaxWidth(),
           horizontalArrangement = Arrangement.SpaceBetween,
           verticalAlignment = Alignment.CenterVertically
       ) {
         Text(
-            text = "SDK 安装与配置",
+            text = "SDK Installation and Configuration",
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
         )
       }
 
       Text(
-          text = "必须安装开发工具才能使 IDE 正常工作。请勾选所需的组件并在最后执行安装。",
+          text = "The development tools must be installed for the IDE to function properly. Please select the required components and then perform the installation at the end.",
           style = MaterialTheme.typography.bodySmall,
           color = MaterialTheme.colorScheme.onSurfaceVariant,
           modifier = Modifier.padding(top = 4.dp, bottom = 12.dp)
@@ -288,15 +287,13 @@ class OdSdkToolInstallFragment : Fragment(), SlidePolicy {
         }
       }
 
-      // 核心 SDK 树状视图区
-      // 指定一个固定高度 height(350.dp)，允许 RecyclerView (SdkTreeView) 在此区域内自我滚动
       Surface(
           shape = RoundedCornerShape(12.dp),
           color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
           modifier = Modifier
               .fillMaxWidth()
-              .height(350.dp)
-              .padding(top = 8.dp),
+              .weight(1f) // 自动拉伸占满高度
+              .padding(vertical = 8.dp),
       ) {
         if (isLoading) {
           Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -306,17 +303,16 @@ class OdSdkToolInstallFragment : Fragment(), SlidePolicy {
           AndroidView(
               factory = { context ->
                 SdkTreeView(context).apply {
-                  isNestedScrollingEnabled = true // 开启嵌套滑动，防止在 Compose 中滑动冲突
-                  bindData(treeNodes) { clickedNode ->
-                    setupViewModel.toggleCheck(clickedNode)
-                    refreshViews()
-                  }
+                  isNestedScrollingEnabled = false
                 }
               },
               update = { view ->
-                view.bindData(treeNodes) { clickedNode ->
-                  setupViewModel.toggleCheck(clickedNode)
-                  view.refreshViews()
+                if (view.tag != treeNodes) {
+                  view.bindData(treeNodes) { clickedNode ->
+                    setupViewModel.toggleCheck(clickedNode)
+                    view.refreshViews()
+                  }
+                  view.tag = treeNodes
                 }
               },
               modifier = Modifier.fillMaxSize()
@@ -324,148 +320,154 @@ class OdSdkToolInstallFragment : Fragment(), SlidePolicy {
         }
       }
 
-      Spacer(modifier = Modifier.height(16.dp))
+      Spacer(modifier = Modifier.height(8.dp))
 
-      // 附加配置区域
-      Text(
-          text = "Additional Configurations:",
-          style = MaterialTheme.typography.titleSmall,
-          fontWeight = FontWeight.Bold,
-      )
-
-      // JDK 选择
-      Row(
-          verticalAlignment = Alignment.CenterVertically,
+      // 底部配置区域
+      Column(
           modifier = Modifier
               .fillMaxWidth()
-              .padding(vertical = 8.dp)
+              .verticalScroll(rememberScrollState())
       ) {
-        Text("Java Development Kit: ", fontSize = 12.sp)
-        Box {
-          OutlinedButton(
-              onClick = { jdkExpanded = true },
-              modifier = Modifier.height(30.dp),
-              contentPadding = PaddingValues(horizontal = 8.dp)
-          ) {
-            Text("OpenJDK $selectedJdk", fontSize = 11.sp)
-          }
-          DropdownMenu(expanded = jdkExpanded, onDismissRequest = { jdkExpanded = false }) {
-            DropdownMenuItem(
-                text = { Text("OpenJDK 17 (Recommended)", fontSize = 12.sp) },
-                onClick = { selectedJdk = "17"; jdkExpanded = false }
-            )
-            DropdownMenuItem(
-                text = { Text("OpenJDK 21 (Experimental)", fontSize = 12.sp) },
-                onClick = { selectedJdk = "21"; jdkExpanded = false }
-            )
-          }
-        }
-      }
+        Text(
+            text = "Additional Configurations:",
+            style = MaterialTheme.typography.titleSmall,
+            fontWeight = FontWeight.Bold,
+        )
 
-      // 基础修复与安装开关
-      Column {
-        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.height(36.dp)) {
-          Checkbox(
-              checked = installGit,
-              onCheckedChange = { installGit = it },
-              modifier = Modifier.scale(0.8f)
-          )
-          Text(
-              "Install Git (Version Control)",
-              fontSize = 11.sp,
-              modifier = Modifier.clickable { installGit = !installGit })
-        }
-        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.height(36.dp)) {
-          Checkbox(
-              checked = installSsh,
-              onCheckedChange = { installSsh = it },
-              modifier = Modifier.scale(0.8f)
-          )
-          Text(
-              "Install OpenSSH (Remote Auth)",
-              fontSize = 11.sp,
-              modifier = Modifier.clickable { installSsh = !installSsh })
-        }
-        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.height(36.dp)) {
-          Checkbox(
-              checked = applyNdkFix,
-              onCheckedChange = { applyNdkFix = it },
-              modifier = Modifier.scale(0.8f)
-          )
-          Text(
-              "Apply NDK Fixes (symlinks & patches)",
-              fontSize = 11.sp,
-              modifier = Modifier.clickable { applyNdkFix = !applyNdkFix })
-        }
-        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.height(36.dp)) {
-          Checkbox(
-              checked = applyCmakePatch,
-              onCheckedChange = { applyCmakePatch = it },
-              modifier = Modifier.scale(0.8f)
-          )
-          Text(
-              "Apply CMake Patches",
-              fontSize = 11.sp,
-              modifier = Modifier.clickable { applyCmakePatch = !applyCmakePatch })
-        }
-
-        // GitHub 镜像加速选项
-        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.height(36.dp)) {
-          Checkbox(
-              checked = useGithubMirror,
-              onCheckedChange = { useGithubMirror = it },
-              modifier = Modifier.scale(0.8f)
-          )
-          Text(
-              "Use Github Mirror (加速下载)",
-              fontSize = 11.sp,
-              modifier = Modifier.clickable { useGithubMirror = !useGithubMirror })
-        }
-      }
-
-      if (useGithubMirror) {
+        // JDK 选择
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(start = 12.dp, top = 4.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp)
         ) {
-          OutlinedTextField(
-              value = githubMirrorUrl,
-              onValueChange = { githubMirrorUrl = it },
-              modifier = Modifier
-                  .weight(1f)
-                  .height(46.dp),
-              textStyle = LocalTextStyle.current.copy(fontSize = 11.sp),
-              singleLine = true,
-              placeholder = { Text("https://gh.llkk.cc/", fontSize = 11.sp) }
-          )
-          Spacer(modifier = Modifier.width(8.dp))
-          Button(
-              onClick = { setupViewModel.loadData(getValidMirror()) },
-              modifier = Modifier.height(38.dp),
-              contentPadding = PaddingValues(horizontal = 8.dp)
-          ) {
-            Icon(
-                Icons.Default.Refresh,
-                contentDescription = "Reload",
-                modifier = Modifier.size(16.dp)
-            )
-            Spacer(Modifier.width(4.dp))
-            Text("Reload", fontSize = 11.sp)
+          Text("Java Development Kit: ", fontSize = 12.sp)
+          Box {
+            OutlinedButton(
+                onClick = { jdkExpanded = true },
+                modifier = Modifier.height(30.dp),
+                contentPadding = PaddingValues(horizontal = 8.dp)
+            ) {
+              Text("OpenJDK $selectedJdk", fontSize = 11.sp)
+            }
+            DropdownMenu(expanded = jdkExpanded, onDismissRequest = { jdkExpanded = false }) {
+              DropdownMenuItem(
+                  text = { Text("OpenJDK 17 (Recommended)", fontSize = 12.sp) },
+                  onClick = { selectedJdk = "17"; jdkExpanded = false }
+              )
+              DropdownMenuItem(
+                  text = { Text("OpenJDK 21 (Experimental)", fontSize = 12.sp) },
+                  onClick = { selectedJdk = "21"; jdkExpanded = false }
+              )
+            }
           }
         }
-      }
 
-      Spacer(modifier = Modifier.height(16.dp))
+        // 基础修复与安装开关
+        Column {
+          Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.height(36.dp)) {
+            Checkbox(
+                checked = installGit,
+                onCheckedChange = { installGit = it },
+                modifier = Modifier.scale(0.8f)
+            )
+            Text(
+                "Install Git (Version Control)",
+                fontSize = 11.sp,
+                modifier = Modifier.clickable { installGit = !installGit })
+          }
+          Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.height(36.dp)) {
+            Checkbox(
+                checked = installSsh,
+                onCheckedChange = { installSsh = it },
+                modifier = Modifier.scale(0.8f)
+            )
+            Text(
+                "Install OpenSSH (Remote Auth)",
+                fontSize = 11.sp,
+                modifier = Modifier.clickable { installSsh = !installSsh })
+          }
+          Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.height(36.dp)) {
+            Checkbox(
+                checked = applyNdkFix,
+                onCheckedChange = { applyNdkFix = it },
+                modifier = Modifier.scale(0.8f)
+            )
+            Text(
+                "Apply NDK Fixes (symlinks & patches)",
+                fontSize = 11.sp,
+                modifier = Modifier.clickable { applyNdkFix = !applyNdkFix })
+          }
+          Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.height(36.dp)) {
+            Checkbox(
+                checked = applyCmakePatch,
+                onCheckedChange = { applyCmakePatch = it },
+                modifier = Modifier.scale(0.8f)
+            )
+            Text(
+                "Apply CMake Patches",
+                fontSize = 11.sp,
+                modifier = Modifier.clickable { applyCmakePatch = !applyCmakePatch })
+          }
 
-      // 底部执行按钮 
-      Button(
-          onClick = { showActionDialog = true },
-          enabled = hasPendingChanges || installGit || installSsh,
-          modifier = Modifier
-              .fillMaxWidth()
-              .height(46.dp),
-      ) {
-        Text("Start Environment Setup", fontSize = 13.sp)
+          // GitHub 镜像加速选项
+          Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.height(36.dp)) {
+            Checkbox(
+                checked = useGithubMirror,
+                onCheckedChange = { useGithubMirror = it },
+                modifier = Modifier.scale(0.8f)
+            )
+            Text(
+                "Use Github Mirror (Accelerate download)",
+                fontSize = 11.sp,
+                modifier = Modifier.clickable { useGithubMirror = !useGithubMirror })
+          }
+        }
+
+        if (useGithubMirror) {
+          Row(
+              verticalAlignment = Alignment.CenterVertically,
+              modifier = Modifier.padding(start = 12.dp, top = 4.dp)
+          ) {
+            OutlinedTextField(
+                value = githubMirrorUrl,
+                onValueChange = { githubMirrorUrl = it },
+                modifier = Modifier
+                    .weight(1f)
+                    .height(46.dp),
+                textStyle = LocalTextStyle.current.copy(fontSize = 11.sp),
+                singleLine = true,
+                placeholder = { Text("https://gh.llkk.cc/", fontSize = 11.sp) }
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Button(
+                onClick = { setupViewModel.loadData(getValidMirror()) },
+                modifier = Modifier.height(38.dp),
+                contentPadding = PaddingValues(horizontal = 8.dp)
+            ) {
+              Icon(
+                  Icons.Default.Refresh,
+                  contentDescription = "Reload",
+                  modifier = Modifier.size(16.dp)
+              )
+              Spacer(Modifier.width(4.dp))
+              Text("Reload", fontSize = 11.sp)
+            }
+          }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // 底部执行按钮
+        Button(
+            onClick = { showActionDialog = true },
+            enabled = hasPendingChanges || installGit || installSsh,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(46.dp),
+        ) {
+          Text("Start Environment Setup", fontSize = 13.sp)
+        }
       }
     }
 
@@ -900,7 +902,6 @@ class OdSdkSetupViewModel(application: Application) : AndroidViewModel(applicati
   fun toggleCheck(node: SdkTreeNode) {
     if (node.componentType == "android-sdk" || node.componentType == "cmdline-tools") return
 
-    // 恢复控制折叠状态的代码逻辑，保证在点击组节点时能够正确变更 isExpanded 的布尔值
     if (node.isGroup) {
       node.isExpanded = !node.isExpanded
     } else {
@@ -910,11 +911,8 @@ class OdSdkSetupViewModel(application: Application) : AndroidViewModel(applicati
       }
       node.updateChildrenState(nextState)
       node.updateParentState()
-      checkPendingChanges()
     }
-    
-    // 强制触发 StateFlow 发送新列表以更新 UI 视图
-    _treeNodes.value = _treeNodes.value.toList()
+    checkPendingChanges()
   }
 
   private fun checkPendingChanges() {
