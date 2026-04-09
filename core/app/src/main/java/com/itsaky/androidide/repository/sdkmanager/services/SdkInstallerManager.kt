@@ -101,8 +101,8 @@ object SdkInstallerManager {
         val extractScript = File(getSdkTempDir(), "extract_${System.currentTimeMillis()}.sh")
         val scriptContent =
             """
-            #!/bin/bash
-            set -euo pipefail
+            #!/system/bin/sh
+            set -eu
 
             ARCHIVE="${tempArchive.absolutePath}"
             DEST_DIR="${destDir.absolutePath}"
@@ -114,27 +114,30 @@ object SdkInstallerManager {
             TMP_EXTRACT="${"$"}WORK_DIR/extract_${'$'}${'$'}"
             mkdir -p "${"$"}TMP_EXTRACT"
 
-            if [[ "${"$"}ARCHIVE" == *.zip ]]; then
+            if [ "${"$"}{ARCHIVE##*.}" = "zip" ]; then
               unzip -q "${"$"}ARCHIVE" -d "${"$"}TMP_EXTRACT"
-            elif [[ "${"$"}ARCHIVE" == *.7z ]]; then
+            elif [ "${"$"}{ARCHIVE##*.}" = "7z" ]; then
               7z x "${"$"}ARCHIVE" -o"${"$"}TMP_EXTRACT"
-            elif [[ "${"$"}ARCHIVE" == *.tar.gz ]] || [[ "${"$"}ARCHIVE" == *.tgz ]]; then
+            elif [ "${"$"}{ARCHIVE##*.}" = "tgz" ] || [ "${"$"}{ARCHIVE##*.}" = "gz" ]; then
               tar xzf "${"$"}ARCHIVE" -C "${"$"}TMP_EXTRACT"
-            elif [[ "${"$"}ARCHIVE" == *.tar.xz ]]; then
+            elif [ "${"$"}{ARCHIVE##*.}" = "xz" ]; then
               tar xJf "${"$"}ARCHIVE" -C "${"$"}TMP_EXTRACT"
             else
               tar xf "${"$"}ARCHIVE" -C "${"$"}TMP_EXTRACT"
             fi
 
             echo "Extraction done, organizing files..."
-            shopt -s dotglob nullglob
-            children=("${"$"}TMP_EXTRACT"/*)
-            if [[ ${'$'}{#children[@]} -eq 1 && -d "${'$'}{children[0]}" ]]; then
-              cp -a "${'$'}{children[0]}"/. "${"$"}DEST_DIR"/
+            TOP_COUNT=$(find "${"$"}TMP_EXTRACT" -mindepth 1 -maxdepth 1 | wc -l)
+            if [ "${"$"}TOP_COUNT" -eq 1 ]; then
+              INNER_DIR=$(find "${"$"}TMP_EXTRACT" -mindepth 1 -maxdepth 1 | head -n 1)
+              if [ -d "${"$"}INNER_DIR" ]; then
+                cp -a "${"$"}INNER_DIR"/. "${"$"}DEST_DIR"/
+              else
+                cp -a "${"$"}TMP_EXTRACT"/. "${"$"}DEST_DIR"/
+              fi
             else
               cp -a "${"$"}TMP_EXTRACT"/. "${"$"}DEST_DIR"/
             fi
-            shopt -u dotglob nullglob
 
             echo "Cleaning up temp files..."
             rm -rf "${"$"}TMP_EXTRACT"
@@ -151,7 +154,7 @@ object SdkInstallerManager {
         val cmdResult =
             TermuxCommand.run(context) {
               label("SDK_Extractor_${node.name}")
-              executable(Environment.BASH_SHELL.absolutePath)
+              executable("sh")
               args(extractScript.absolutePath)
               workingDir(Environment.HOME.absolutePath)
             }
@@ -187,8 +190,8 @@ object SdkInstallerManager {
     onLog(">> Applying NDK fixes and symlinks...")
     val script =
         """
-        #!/bin/bash
-        set -euo pipefail
+        #!/system/bin/sh
+        set -eu
         NDK_DIR="${ndkDir.absolutePath}"
         
         echo "Creating missing architecture symlinks..."
@@ -226,7 +229,7 @@ object SdkInstallerManager {
 
     val result = TermuxCommand.run(context) {
       label("NDK Fix")
-      executable(Environment.BASH_SHELL.absolutePath)
+      executable("sh")
       args(scriptFile.absolutePath)
     }
 
@@ -271,8 +274,8 @@ object SdkInstallerManager {
 
     val script =
         """
-        #!/bin/bash
-        set -euo pipefail
+        #!/system/bin/sh
+        set -eu
         CMAKE_DIR="${cmakeDir.absolutePath}"
         PATCH_DIR="${patchExtractedDir.absolutePath}"
         
@@ -310,7 +313,7 @@ object SdkInstallerManager {
 
     val result = TermuxCommand.run(context) {
       label("CMake Patch")
-      executable(Environment.BASH_SHELL.absolutePath)
+      executable("sh")
       args(scriptFile.absolutePath)
     }
 

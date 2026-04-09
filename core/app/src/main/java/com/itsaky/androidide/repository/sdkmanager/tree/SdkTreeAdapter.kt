@@ -146,9 +146,18 @@ class SdkTreeAdapter(
 
   override fun getItemCount(): Int = visibleNodes.size
 
+  private fun collapseAllChildren(node: SdkTreeNode) {
+    node.children.forEach {
+      it.isExpanded = false
+      collapseAllChildren(it)
+    }
+  }
+
   private fun expandNode(node: SdkTreeNode) {
+    if (node.isExpanded) return
     node.isExpanded = true
     val index = visibleNodes.indexOf(node)
+    if (index == -1) return
     var insertIndex = index + 1
 
     fun insertRecursive(parent: SdkTreeNode) {
@@ -168,8 +177,11 @@ class SdkTreeAdapter(
   }
 
   private fun collapseNode(node: SdkTreeNode) {
+    if (!node.isExpanded) return
     node.isExpanded = false
+    collapseAllChildren(node)
     val index = visibleNodes.indexOf(node)
+    if (index == -1) return
 
     var removeCount = 0
     var nextIndex = index + 1

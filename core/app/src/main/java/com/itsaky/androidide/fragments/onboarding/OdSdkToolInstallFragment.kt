@@ -648,72 +648,42 @@ class OdSdkToolInstallFragment : Fragment(), SlidePolicy {
                   coroutineScope.launch(Dispatchers.IO) {
 
                     // 系统依赖与包管理器更新
-                    currentTaskName = "Configuring APT environment..."
+                    currentTaskName = "Configuring package environment..."
                     currentProgress = -1f
-                    addLog(">> Updating APT repositories...")
-                    TermuxCommand.run(context) { executable(Environment.BASH_SHELL.absolutePath); args("-c", "apt update && apt upgrade -y") }.also {
+                    addLog(">> Updating pkg repositories...")
+                    TermuxCommand.run(context) { executable("sh"); args("-c", "pkg update -y && pkg upgrade -y") }.also {
                       if (it.stdout.isNotBlank()) addLog(it.stdout)
                     }
 
-                    // 安装基础包 (jq, tar, unzip, libcurl)
+                    // 安装基础包和解压工具
                     addLog(">> Installing required base packages...")
-                    TermuxCommand.run(context) { executable(Environment.BASH_SHELL.absolutePath); args("-c", "apt install jq tar unzip libcurl -y") }.also {
+                    TermuxCommand.run(context) { executable("sh"); args("-c", "pkg install -y bash curl wget jq tar unzip p7zip patch sed grep coreutils findutils diffutils") }.also {
                       if (it.stdout.isNotBlank()) addLog(it.stdout)
                     }
 
-                    //P7Zip 镜像替换及安装
-                    currentTaskName = "Installing p7zip..."
-                    addLog(">> Installing p7zip manually for 7z extraction support...")
-                    val arch = IDEBuildConfigProvider.getInstance().cpuAbiName
-                    val rawP7zipUrl = when {
-                      arch.contains("aarch64") || arch.contains("arm64") -> "https://github.com/msmt2018/termux-packages/releases/download/p7zip-17.06-1/debs-aarch64-e9f3af7af65c6f737f41404dbd6babf727147861.deb"
-                      arch.contains("arm") -> "https://github.com/msmt2018/termux-packages/releases/download/p7zip-17.06-1/debs-arm-e9f3af7af65c6f737f41404dbd6babf727147861.deb"
-                      arch.contains("x86_64") -> "https://github.com/msmt2018/termux-packages/releases/download/p7zip-17.06-1/debs-x86_64-e9f3af7af65c6f737f41404dbd6babf727147861.deb"
-                      else -> ""
-                    }
-                    val p7zipUrl = if (githubMirror.isNotEmpty() && rawP7zipUrl.startsWith("https://github.com")) githubMirror + rawP7zipUrl else rawP7zipUrl
-
-                    if (p7zipUrl.isNotEmpty()) {
-                      val p7zipScript = """
-                            #!/bin/bash
-                            tmp_p7zip_dir="${Environment.HOME.absolutePath}/tmp_p7zip_${System.currentTimeMillis()}"
-                            mkdir -p "${'$'}tmp_p7zip_dir"
-                            cd "${'$'}tmp_p7zip_dir"
-                            curl -L -o "p7zip.zip" "$p7zipUrl" --http1.1
-                            unzip -q p7zip.zip
-                            apt install ./debs/*.deb -y || dpkg -i ./debs/*.deb
-                            cd - > /dev/null
-                            rm -rf "${'$'}tmp_p7zip_dir"
-                            echo "p7zip installed successfully."
-                        """.trimIndent()
-                      val p7ScriptFile = File(Environment.TMP_DIR, "p7_install.sh")
-                      p7ScriptFile.writeText(p7zipScript)
-                      p7ScriptFile.setExecutable(true)
-                      TermuxCommand.run(context) { executable(Environment.BASH_SHELL.absolutePath); args(p7ScriptFile.absolutePath) }.also {
-                        if (it.stdout.isNotBlank()) addLog(it.stdout)
-                        if (it.stderr.isNotBlank()) addLog("WARN/ERR p7zip: ${it.stderr}")
-                      }
-                      p7ScriptFile.delete()
-                    } else {
-                      addLog("WARN: No p7zip available for architecture $arch")
+                    currentTaskName = "Checking extraction tools..."
+                    addLog(">> Verifying unzip/7z/tar availability...")
+                    TermuxCommand.run(context) { executable("sh"); args("-c", "command -v unzip && command -v 7z && command -v tar") }.also {
+                      if (it.stdout.isNotBlank()) addLog(it.stdout)
+                      if (!it.isSuccess && it.stderr.isNotBlank()) addLog("WARN/ERR tools check: ${it.stderr}")
                     }
 
                     // Git 和 OpenSSH
                     if (installGit) {
                       currentTaskName = "Installing Git..."
                       addLog(">> Installing Git...")
-                      TermuxCommand.run(context) { executable(Environment.BASH_SHELL.absolutePath); args("-c", "apt install git -y") }
+                      TermuxCommand.run(context) { executable("sh"); args("-c", "pkg install -y git") }
                     }
                     if (installSsh) {
                       currentTaskName = "Installing OpenSSH..."
                       addLog(">> Installing OpenSSH...")
-                      TermuxCommand.run(context) { executable(Environment.BASH_SHELL.absolutePath); args("-c", "apt install openssh -y") }
+                      TermuxCommand.run(context) { executable("sh"); args("-c", "pkg install -y openssh") }
                     }
 
                     // 安装 JDK
                     currentTaskName = "Installing OpenJDK $jdkVersion..."
                     addLog(">> Installing package: 'openjdk-$jdkVersion'")
-                    TermuxCommand.run(context) { executable(Environment.BASH_SHELL.absolutePath); args("-c", "apt install openjdk-$jdkVersion -y") }.also {
+                    TermuxCommand.run(context) { executable("sh"); args("-c", "pkg install -y openjdk-$jdkVersion") }.also {
                       addLog(">> JDK $jdkVersion has been installed.")
                     }
 
