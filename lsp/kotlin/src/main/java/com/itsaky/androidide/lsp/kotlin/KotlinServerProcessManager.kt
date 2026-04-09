@@ -54,7 +54,6 @@ class KotlinServerProcessManager(context: Context) {
   private val notificationHandler = KotlinNotificationHandler()
 
   @Volatile private var isInstallPromptShowing = false
-  @Volatile private var userDeclinedInstall = false
 
   fun setDiagnosticsCallback(callback: (DiagnosticResult) -> Unit) {
     diagnosticsCallback = callback
@@ -82,10 +81,8 @@ class KotlinServerProcessManager(context: Context) {
 
   /** 触发 UI 的安装弹窗 (基于 Kotlin SharedFlow)。 */
   fun install(onComplete: () -> Unit) {
-    if (isInstallPromptShowing || userDeclinedInstall) {
-      KslLogs.info(
-          "Installation skipped. Prompt is already showing or user declined it previously."
-      )
+    if (isInstallPromptShowing) {
+      KslLogs.info("Installation skipped because prompt is already showing.")
       return
     }
 
@@ -109,7 +106,6 @@ class KotlinServerProcessManager(context: Context) {
             onInstallComplete = {
               KslLogs.info("Kotlin LSP Installation Complete. Preparing server...")
               isInstallPromptShowing = false
-              userDeclinedInstall = false // 重置状态，因为已经成功安装
 
               val launcher = File(installDir, "bin/${KotlinServerConstants.LAUNCHER_SCRIPT_NAME}")
               if (launcher.exists()) {
@@ -122,8 +118,6 @@ class KotlinServerProcessManager(context: Context) {
             onInstallCancelled = {
               KslLogs.warn("User cancelled the Kotlin LSP installation.")
               isInstallPromptShowing = false
-              // 记录用户的拒绝，本次会话内不再触发烦人的连环弹窗
-              userDeclinedInstall = true
             },
         )
 
