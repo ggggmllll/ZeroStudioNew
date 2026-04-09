@@ -81,6 +81,7 @@ import com.itsaky.androidide.utils.Environment
 import com.itsaky.androidide.utils.executioncommand.TermuxCommand
 import com.itsaky.androidide.utils.flashError
 import com.itsaky.androidide.utils.getConnectionInfo
+import com.termux.app.TermuxInstaller
 import java.io.File
 import java.net.HttpURLConnection
 import java.net.URL
@@ -473,7 +474,12 @@ class OdSdkToolInstallFragment : Fragment(), SlidePolicy {
 
         // 底部执行按钮
         Button(
-            onClick = { showActionDialog = true },
+            onClick = {
+              val activity = requireActivity()
+              TermuxInstaller.setupBootstrapIfNeeded(activity) {
+                activity.runOnUiThread { showActionDialog = true }
+              }
+            },
             enabled = hasPendingChanges || installGit || installSsh,
             modifier = Modifier
                 .fillMaxWidth()
