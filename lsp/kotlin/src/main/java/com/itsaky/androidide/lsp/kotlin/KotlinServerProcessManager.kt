@@ -39,6 +39,7 @@ class KotlinServerProcessManager(context: Context) {
 
   companion object {
     private val log = LoggerFactory.getLogger(KotlinServerProcessManager::class.java)
+    private const val KOTLIN_SERVER_ID = KotlinLanguageServer.SERVER_ID
   }
 
   private val context: Context = context.applicationContext
@@ -96,7 +97,7 @@ class KotlinServerProcessManager(context: Context) {
 
     val event =
         LspInstallRequestEvent(
-            serverId = "kotlin-lsp-manager",
+            serverId = KOTLIN_SERVER_ID,
             serverName = "Kotlin Language Server (v1.6.5)",
             dialogTitle = "Install Kotlin LSP",
             dialogMessage =

@@ -36,7 +36,7 @@ extern "C" {
  * @return 服务器进程 PID，失败返回 -1
  */
 JNIEXPORT jint JNICALL
-Java_android_zero_studio_lsp_clangd_core_nativebridge_NativeLoader_forkLinkServer(
+Java_android_zero_studio_lsp_clangd_ClangdNativeBridge_forkLinkServer(
     JNIEnv* env,
     jclass clazz,
     jstring nativeLibDir,
@@ -113,7 +113,7 @@ Java_android_zero_studio_lsp_clangd_core_nativebridge_NativeLoader_forkLinkServe
  * @return true 如果服务器进程存在
  */
 JNIEXPORT jboolean JNICALL
-Java_android_zero_studio_lsp_clangd_core_nativebridge_NativeLoader_isLinkServerRunning(
+Java_android_zero_studio_lsp_clangd_ClangdNativeBridge_isLinkServerRunning(
     JNIEnv* env,
     jclass clazz) {
 
@@ -137,7 +137,7 @@ Java_android_zero_studio_lsp_clangd_core_nativebridge_NativeLoader_isLinkServerR
  * 终止链接服务器
  */
 JNIEXPORT void JNICALL
-Java_android_zero_studio_lsp_clangd_core_nativebridge_NativeLoader_killLinkServer(
+Java_android_zero_studio_lsp_clangd_ClangdNativeBridge_killLinkServer(
     JNIEnv* env,
     jclass clazz) {
 
@@ -160,7 +160,7 @@ Java_android_zero_studio_lsp_clangd_core_nativebridge_NativeLoader_killLinkServe
  * @return 服务器 PID，如果未启动返回 -1
  */
 JNIEXPORT jint JNICALL
-Java_android_zero_studio_lsp_clangd_core_nativebridge_NativeLoader_getLinkServerPid(
+Java_android_zero_studio_lsp_clangd_ClangdNativeBridge_getLinkServerPid(
     JNIEnv* env,
     jclass clazz) {
 

@@ -137,6 +137,10 @@ class KotlinWorkspaceSetup(private val context: Context, private val workspace: 
     }
   }
 
+  fun ensureServerRunning(processManager: KotlinServerProcessManager) {
+    processManager.startServer(classpathProvider)
+  }
+
   private fun startBuildWatcher(processManager: KotlinServerProcessManager) {
     try {
       buildWatcher = FileSystems.getDefault().newWatchService()
