@@ -364,12 +364,12 @@ object SdkInstallerManager {
     val sdkHome = Environment.ANDROID_HOME
     val ver = node.revision
     return when (node.componentType) {
-      "build-tools" -> File(sdkHome, "build-tools/$ver")
+      "build-tools" -> File(sdkHome, "build-tools")
       "platform-tools" -> File(sdkHome, "platform-tools")
       "ndk" -> File(sdkHome, "ndk/$ver")
       "cmake" -> File(sdkHome, "cmake/$ver")
-      "cmdline-tools" -> File(sdkHome, "cmdline-tools/latest")
-      "android-sdk" -> File(sdkHome, "platforms")
+      "cmdline-tools" -> File(sdkHome, "cmdline-tools")
+      "android-sdk" -> File(sdkHome, "")
       "jdk" -> File(Environment.PREFIX, "opt/openjdk-$ver")
       else -> File(Environment.TMP_DIR, "unknown_sdk_${node.name}")
     }
