@@ -233,7 +233,7 @@ class OdSdkToolInstallFragment : Fragment(), SlidePolicy {
     }
 
     // 主体容器：使用 fillMaxSize 撑满全屏
-    // top = 40.dp 留出状态栏空间；bottom = 100.dp 避开底部的 AppIntro 引导栏
+    // top = 40.dp 留出状态栏空间；bottom = 98.dp 避开底部的 AppIntro 引导栏
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -315,7 +315,7 @@ class OdSdkToolInstallFragment : Fragment(), SlidePolicy {
                       if (clickedNode.isGroup) {
                         // 【如果点击组节点】直接控制展开折叠状态，并重算节点结构(bindData)
                         clickedNode.isExpanded = !clickedNode.isExpanded
-                        view.bindData(treeNodes, listener)
+                        view.bindData(treeNodes, listener!!)
                       } else {
                         // 【如果点击子节点】仅计算打钩状态，并刷新局部UI
                         val nextState = when (clickedNode.checkedState) {
@@ -333,7 +333,7 @@ class OdSdkToolInstallFragment : Fragment(), SlidePolicy {
                   }
                   
                   // 首次注入，记录标志位
-                  view.bindData(treeNodes, listener)
+                  view.bindData(treeNodes, listener!!)
                   view.tag = treeNodes
                 }
               },
