@@ -45,6 +45,7 @@ import com.itsaky.androidide.editor.BuildConfig
 import io.github.rosemoe.sora.graphics.TextRow
 import io.github.rosemoe.sora.lang.styling.CodeBlock
 import io.github.rosemoe.sora.lang.styling.Spans
+import io.github.rosemoe.sora.text.ContentLine
 import io.github.rosemoe.sora.util.LongArrayList
 import io.github.rosemoe.sora.util.MutableInt
 import io.github.rosemoe.sora.widget.CodeEditor
