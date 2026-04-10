@@ -461,20 +461,12 @@ class CodeEditorView(context: Context, file: File, selection: Range) :
   }
 
   private fun postRead(file: File) {
-    val previousFile = binding.editor.file
     binding.editor.setupLanguage(file)
     val languageServer = createLanguageServer(file)
     binding.editor.setLanguageServer(languageServer)
 
     if (IDELanguageClientImpl.isInitialized()) {
       binding.editor.setLanguageClient(IDELanguageClientImpl.getInstance())
-    } else {
-      languageServer?.client?.also { binding.editor.setLanguageClient(it) }
-    }
-
-    if (languageServer is KotlinLanguageServer) {
-      previousFile?.takeIf { it != file }?.toPath()?.also { languageServer.unregisterEditor(it) }
-      languageServer.registerEditor(file.toPath(), binding.editor)
     }
 
     // File must be set only after setting the language server
@@ -688,9 +680,6 @@ class CodeEditorView(context: Context, file: File, selection: Range) :
     analysisJob?.cancel()
     codeEditorScope.cancelIfActive("Cancellation was requested")
     _binding?.editor?.apply {
-      if (languageServer is KotlinLanguageServer) {
-        file?.toPath()?.also { (languageServer as KotlinLanguageServer).unregisterEditor(it) }
-      }
       CursorHistoryManager.removeTracker(this)
       clearDiagnostics()
       cleanupCompletionTooltips()

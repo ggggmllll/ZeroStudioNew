@@ -52,6 +52,7 @@ class KotlinWorkspaceSetup(private val context: Context, private val workspace: 
   private var watcherJob: Job? = null
   private val watchScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
   @Volatile private var workspaceInitialized = false
+  @Volatile private var workspaceInitializing = false
 
   private fun sendScriptConfiguration(processManager: KotlinServerProcessManager) {
     KslLogs.info("Sending script configuration...")
@@ -141,17 +142,26 @@ class KotlinWorkspaceSetup(private val context: Context, private val workspace: 
     watchScope.launch {
       val started = waitForServerReady(processManager)
       if (!started) {
+        workspaceInitializing = false
         KslLogs.error("Kotlin LSP process did not become ready in time; skip workspace initialize.")
         return@launch
       }
 
-      if (workspaceInitialized) return@launch
-      workspaceInitialized = true
+      if (workspaceInitialized || workspaceInitializing) return@launch
+      workspaceInitializing = true
 
       val initParams = createInitParams(workspaceRoot)
       KslLogs.info("Sending workspace initialize request...")
 
       processManager.sendRequest("initialize", initParams) { result ->
+        if (result == null) {
+          workspaceInitializing = false
+          KslLogs.error("Workspace initialize request failed; will retry on next trigger.")
+          return@sendRequest
+        }
+
+        workspaceInitialized = true
+        workspaceInitializing = false
         KslLogs.info("Server initialized successfully")
         processManager.sendNotification("initialized", JsonObject())
         sendScriptConfiguration(processManager)
