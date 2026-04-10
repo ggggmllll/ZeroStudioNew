@@ -51,6 +51,7 @@ class KotlinWorkspaceSetup(private val context: Context, private val workspace: 
   private var buildWatcher: WatchService? = null
   private var watcherJob: Job? = null
   private val watchScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+  @Volatile private var workspaceInitialized = false
 
   private fun sendScriptConfiguration(processManager: KotlinServerProcessManager) {
     KslLogs.info("Sending script configuration...")
@@ -117,24 +118,61 @@ class KotlinWorkspaceSetup(private val context: Context, private val workspace: 
 
     createKlsClasspathScript()
     processManager.startServer(classpathProvider)
+    initializeWorkspaceWhenServerReady(processManager, workspaceRoot, cacheValid, currentHash)
+  }
 
-    val initParams = createInitParams(workspaceRoot)
+  fun ensureServerRunning(processManager: KotlinServerProcessManager) {
+    processManager.startServer(classpathProvider)
+    if (!workspaceInitialized) {
+      val workspaceRoot = workspace.getProjectDir().toURI().toString()
+      val currentClasspath = classpathProvider.getClasspathList()
+      val currentHash = indexCache.computeClasspathHash(currentClasspath)
+      val cacheValid = indexCache.isCacheValid(currentHash)
+      initializeWorkspaceWhenServerReady(processManager, workspaceRoot, cacheValid, currentHash)
+    }
+  }
 
-    KslLogs.info("Sending initialize request...")
+  private fun initializeWorkspaceWhenServerReady(
+      processManager: KotlinServerProcessManager,
+      workspaceRoot: String,
+      cacheValid: Boolean,
+      classpathHash: String,
+  ) {
+    watchScope.launch {
+      val started = waitForServerReady(processManager)
+      if (!started) {
+        KslLogs.error("Kotlin LSP process did not become ready in time; skip workspace initialize.")
+        return@launch
+      }
 
-    processManager.sendRequest("initialize", initParams) { result ->
-      KslLogs.info("Server initialized successfully")
-      processManager.sendNotification("initialized", JsonObject())
+      if (workspaceInitialized) return@launch
+      workspaceInitialized = true
 
-      // *** FIX: Send script-specific configuration ***
-      sendScriptConfiguration(processManager)
+      val initParams = createInitParams(workspaceRoot)
+      KslLogs.info("Sending workspace initialize request...")
 
-      if (cacheValid) {
-        restoreCachedIndex(processManager)
-      } else {
-        triggerIndexing(processManager, workspaceRoot, currentHash)
+      processManager.sendRequest("initialize", initParams) { result ->
+        KslLogs.info("Server initialized successfully")
+        processManager.sendNotification("initialized", JsonObject())
+        sendScriptConfiguration(processManager)
+
+        if (cacheValid) {
+          restoreCachedIndex(processManager)
+        } else {
+          triggerIndexing(processManager, workspaceRoot, classpathHash)
+        }
       }
     }
+  }
+
+  private suspend fun waitForServerReady(processManager: KotlinServerProcessManager): Boolean {
+    repeat(240) {
+      if (processManager.isServerReady()) {
+        return true
+      }
+      delay(500)
+    }
+    return false
   }
 
   private fun startBuildWatcher(processManager: KotlinServerProcessManager) {

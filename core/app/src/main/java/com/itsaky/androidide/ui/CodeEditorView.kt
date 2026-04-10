@@ -21,7 +21,9 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.os.Bundle
+import android.graphics.Rect
 import android.view.LayoutInflater
+import android.view.ViewTreeObserver
 import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.core.view.isVisible
 import com.blankj.utilcode.util.SizeUtils
@@ -117,6 +119,25 @@ class CodeEditorView(context: Context, file: File, selection: Range) :
     get() = checkNotNull(_searchLayout) { "Search layout has been destroyed" }
 
   private var analysisJob: Job? = null
+  private var isKeyboardVisible = false
+  private val keyboardLayoutListener =
+      ViewTreeObserver.OnGlobalLayoutListener {
+        val editorView = _binding?.editor ?: return@OnGlobalLayoutListener
+        val root = rootView ?: return@OnGlobalLayoutListener
+        val rect = Rect()
+        root.getWindowVisibleDisplayFrame(rect)
+        val heightDiff = root.height - rect.height()
+        val keyboardNowVisible = heightDiff > (root.height * 0.15f)
+        val transitionedToVisible = keyboardNowVisible && !isKeyboardVisible
+        isKeyboardVisible = keyboardNowVisible
+
+        if (transitionedToVisible) {
+          editorView.post {
+            val cursor = editorView.cursor ?: return@post
+            editorView.ensurePositionVisible(cursor.rightLine, cursor.rightColumn)
+          }
+        }
+      }
 
   /** Get the file of this editor. */
   val file: File?
@@ -311,17 +332,14 @@ class CodeEditorView(context: Context, file: File, selection: Range) :
             }
 
     withContext(Dispatchers.Main.immediate) {
-      withEditingDisabled {
-        withContext(readWriteContext) {
-          // Do not call suspend functions in this scope
-          // the writeTo function acquires lock to the Content object before writing and releases
-          // the lock after writing
-          // if there are any suspend function calls in between, the lock and unlock calls might not
-          // be called on the same thread
-          text.writeTo(file, this@CodeEditorView::updateReadWriteProgress)
-        }
+      withContext(readWriteContext) {
+        // Do not call suspend functions in this scope
+        // the writeTo function acquires lock to the Content object before writing and releases
+        // the lock after writing
+        // if there are any suspend function calls in between, the lock and unlock calls might not
+        // be called on the same thread
+        text.writeTo(file, this@CodeEditorView::updateReadWriteProgress)
       }
-
       _binding?.rwProgress?.isVisible = false
     }
 
@@ -625,6 +643,7 @@ class CodeEditorView(context: Context, file: File, selection: Range) :
 
   override fun onAttachedToWindow() {
     super.onAttachedToWindow()
+    viewTreeObserver.addOnGlobalLayoutListener(keyboardLayoutListener)
     if (!EventBus.getDefault().isRegistered(this)) {
       EventBus.getDefault().register(this)
     }
@@ -632,6 +651,7 @@ class CodeEditorView(context: Context, file: File, selection: Range) :
 
   override fun onDetachedFromWindow() {
     super.onDetachedFromWindow()
+    viewTreeObserver.removeOnGlobalLayoutListener(keyboardLayoutListener)
     EventBus.getDefault().unregister(this)
     autoSaveJob?.cancel()
   }

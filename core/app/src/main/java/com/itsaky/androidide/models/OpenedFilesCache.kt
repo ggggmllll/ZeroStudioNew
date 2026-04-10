@@ -27,12 +27,14 @@ import org.slf4j.LoggerFactory
 /** @author Akash Yadav */
 data class OpenedFilesCache(
     @SerializedName(KEY_SELECTED_FILE) val selectedFile: String,
+    @SerializedName(KEY_SELECTED_TAB_INDEX) val selectedTabIndex: Int = -1,
     @SerializedName(KEY_ALL_FILES) val allFiles: List<OpenedFile>,
 ) {
 
   companion object {
 
     private const val KEY_SELECTED_FILE = "selectedFile"
+    private const val KEY_SELECTED_TAB_INDEX = "selectedTabIndex"
     private const val KEY_ALL_FILES = "allFiles"
     private val log = LoggerFactory.getLogger(OpenedFilesCache::class.java)
 
@@ -46,19 +48,22 @@ data class OpenedFilesCache(
 
           reader.beginObject()
           var selectedFile = ""
+          var selectedTabIndex = -1
           var allFiles = emptyList<OpenedFile>()
           while (reader.hasNext()) {
             val name = reader.nextName()
 
             if (name == KEY_SELECTED_FILE) {
               selectedFile = reader.nextString()
+            } else if (name == KEY_SELECTED_TAB_INDEX) {
+              selectedTabIndex = reader.nextInt()
             } else if (name == KEY_ALL_FILES) {
               allFiles = Gson().fromJson(reader, object : TypeToken<List<OpenedFile>>() {})
             }
           }
           reader.endObject()
 
-          return@use OpenedFilesCache(selectedFile, allFiles)
+          return@use OpenedFilesCache(selectedFile, selectedTabIndex, allFiles)
         }
       } catch (err: Exception) {
         log.error("Failed to parse opened files cache", err)

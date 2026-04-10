@@ -39,6 +39,7 @@ class KotlinServerProcessManager(context: Context) {
 
   companion object {
     private val log = LoggerFactory.getLogger(KotlinServerProcessManager::class.java)
+    private const val KOTLIN_SERVER_ID = KotlinLanguageServer.SERVER_ID
   }
 
   private val context: Context = context.applicationContext
@@ -53,7 +54,6 @@ class KotlinServerProcessManager(context: Context) {
   private val notificationHandler = KotlinNotificationHandler()
 
   @Volatile private var isInstallPromptShowing = false
-  @Volatile private var userDeclinedInstall = false
 
   fun setDiagnosticsCallback(callback: (DiagnosticResult) -> Unit) {
     diagnosticsCallback = callback
@@ -81,10 +81,8 @@ class KotlinServerProcessManager(context: Context) {
 
   /** 触发 UI 的安装弹窗 (基于 Kotlin SharedFlow)。 */
   fun install(onComplete: () -> Unit) {
-    if (isInstallPromptShowing || userDeclinedInstall) {
-      KslLogs.info(
-          "Installation skipped. Prompt is already showing or user declined it previously."
-      )
+    if (isInstallPromptShowing) {
+      KslLogs.info("Installation skipped because prompt is already showing.")
       return
     }
 
@@ -96,7 +94,7 @@ class KotlinServerProcessManager(context: Context) {
 
     val event =
         LspInstallRequestEvent(
-            serverId = "kotlin-lsp-manager",
+            serverId = KOTLIN_SERVER_ID,
             serverName = "Kotlin Language Server (v1.6.5)",
             dialogTitle = "Install Kotlin LSP",
             dialogMessage =
@@ -108,7 +106,6 @@ class KotlinServerProcessManager(context: Context) {
             onInstallComplete = {
               KslLogs.info("Kotlin LSP Installation Complete. Preparing server...")
               isInstallPromptShowing = false
-              userDeclinedInstall = false // 重置状态，因为已经成功安装
 
               val launcher = File(installDir, "bin/${KotlinServerConstants.LAUNCHER_SCRIPT_NAME}")
               if (launcher.exists()) {
@@ -121,8 +118,6 @@ class KotlinServerProcessManager(context: Context) {
             onInstallCancelled = {
               KslLogs.warn("User cancelled the Kotlin LSP installation.")
               isInstallPromptShowing = false
-              // 记录用户的拒绝，本次会话内不再触发烦人的连环弹窗
-              userDeclinedInstall = true
             },
         )
 
@@ -341,7 +336,10 @@ class KotlinServerProcessManager(context: Context) {
         }
 
     KslLogs.debug("Sending request ID {}: {}", id, method)
-    sendMessage(payload)
+    if (!sendMessage(payload)) {
+      pendingRequests.remove(id)
+      callback(null)
+    }
   }
 
   fun sendNotification(method: String, params: JsonObject) {
@@ -356,13 +354,17 @@ class KotlinServerProcessManager(context: Context) {
     sendMessage(payload)
   }
 
-  private fun sendMessage(payload: JsonObject) {
+  fun isServerReady(): Boolean {
+    return process?.isAlive == true && writer != null && reader != null
+  }
+
+  private fun sendMessage(payload: JsonObject): Boolean {
     val data = gson.toJson(payload)
     val w =
         writer
             ?: run {
               KslLogs.error("Cannot send message: writer is null")
-              return
+              return false
             }
 
     synchronized(w) {
@@ -371,8 +373,10 @@ class KotlinServerProcessManager(context: Context) {
         w.write("Content-Length: ${contentBytes.size}\r\n\r\n")
         w.write(data)
         w.flush()
+        return true
       } catch (e: Exception) {
         KslLogs.error("Failed to send message", e)
+        return false
       }
     }
   }

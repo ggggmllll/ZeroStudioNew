@@ -24,10 +24,13 @@ import android.text.TextUtils
 import android.view.Menu
 import android.view.MenuItem
 import android.view.ViewGroup.LayoutParams
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.collection.MutableIntObjectMap
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.GravityCompat
+import androidx.lifecycle.lifecycleScope
 import com.blankj.utilcode.util.ImageUtils
 import com.itsaky.androidide.R.string
 import com.itsaky.androidide.actions.ActionData
@@ -53,6 +56,9 @@ import com.itsaky.androidide.eventbus.events.editor.DocumentSaveEvent
 import com.itsaky.androidide.eventbus.events.file.FileRenameEvent
 import com.itsaky.androidide.eventbus.events.preferences.PreferenceChangeEvent
 import com.itsaky.androidide.interfaces.IEditorHandler
+import com.itsaky.androidide.lsp.kotlin.events.LspEventBus
+import com.itsaky.androidide.lsp.kotlin.events.LspInstallRequestEvent
+import com.itsaky.androidide.lsp.kotlin.ui.LspInstallerDialog
 import com.itsaky.androidide.models.FileExtension
 import com.itsaky.androidide.models.OpenedFile
 import com.itsaky.androidide.models.OpenedFilesCache
@@ -62,6 +68,7 @@ import com.itsaky.androidide.preferences.internal.EditorPreferences
 import com.itsaky.androidide.projects.internal.ProjectManagerImpl
 import com.itsaky.androidide.tasks.executeAsync
 import com.itsaky.androidide.ui.CodeEditorView
+import com.itsaky.androidide.utils.DialogUtils.newMaterialDialogBuilder
 import com.itsaky.androidide.utils.DialogUtils.newYesNoDialog
 import com.itsaky.androidide.utils.IntentUtils.openImage
 import com.itsaky.androidide.utils.UniqueNameBuilder
@@ -70,6 +77,7 @@ import java.io.File
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.collections.set
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.greenrobot.eventbus.Subscribe
@@ -84,6 +92,10 @@ import org.greenrobot.eventbus.ThreadMode
 open class EditorHandlerActivity : ProjectHandlerActivity(), IEditorHandler {
 
   protected val isOpenedFilesSaved = AtomicBoolean(false)
+  private var kotlinLspInstallDialog: androidx.appcompat.app.AlertDialog? = null
+  private var kotlinLspInstallCollectorJob: Job? = null
+  private var openedFilesCacheWriteJob: Job? = null
+  private var lastOpenedFilesCacheSignature: String? = null
 
   override fun doOpenFile(file: File, selection: Range?) {
     openFileAndSelect(file, selection)
@@ -133,9 +145,10 @@ open class EditorHandlerActivity : ProjectHandlerActivity(), IEditorHandler {
                 return@observeFiles
               }
       getOpenedFiles().also {
-        val cache = OpenedFilesCache(currentFile, it)
-        editorViewModel.writeOpenedFiles(cache)
+        val selectedTabIndex = editorViewModel.getCurrentFileIndex()
+        val cache = OpenedFilesCache(currentFile, selectedTabIndex, it)
         editorViewModel.openedFilesCache = cache
+        scheduleOpenedFilesCacheWrite(cache)
       }
     }
 
@@ -217,10 +230,18 @@ open class EditorHandlerActivity : ProjectHandlerActivity(), IEditorHandler {
   }
 
   override fun saveOpenedFiles() {
-    writeOpenedFilesCache(getOpenedFiles(), getCurrentEditor()?.editor?.file)
+    writeOpenedFilesCache(
+        getOpenedFiles(),
+        getCurrentEditor()?.editor?.file,
+        editorViewModel.getCurrentFileIndex(),
+    )
   }
 
-  private fun writeOpenedFilesCache(openedFiles: List<OpenedFile>, selectedFile: File?) {
+  private fun writeOpenedFilesCache(
+      openedFiles: List<OpenedFile>,
+      selectedFile: File?,
+      selectedTabIndex: Int,
+  ) {
     if (selectedFile == null || openedFiles.isEmpty()) {
       editorViewModel.writeOpenedFiles(null)
       editorViewModel.openedFilesCache = null
@@ -229,9 +250,14 @@ open class EditorHandlerActivity : ProjectHandlerActivity(), IEditorHandler {
       return
     }
 
-    val cache = OpenedFilesCache(selectedFile = selectedFile.absolutePath, allFiles = openedFiles)
+    val cache =
+        OpenedFilesCache(
+            selectedFile = selectedFile.absolutePath,
+            selectedTabIndex = selectedTabIndex,
+            allFiles = openedFiles,
+        )
 
-    editorViewModel.writeOpenedFiles(cache)
+    scheduleOpenedFilesCacheWrite(cache)
     editorViewModel.openedFilesCache = if (!isDestroying) cache else null
     log.debug("[onPause] Opened files cache reset to {}", editorViewModel.openedFilesCache)
     isOpenedFilesSaved.set(true)
@@ -239,6 +265,7 @@ open class EditorHandlerActivity : ProjectHandlerActivity(), IEditorHandler {
 
   override fun onStart() {
     super.onStart()
+    startKotlinLspInstallDialogCollector()
 
     try {
       editorViewModel.getOrReadOpenedFilesCache(this::onReadOpenedFilesCache)
@@ -248,10 +275,69 @@ open class EditorHandlerActivity : ProjectHandlerActivity(), IEditorHandler {
     }
   }
 
+  override fun onStop() {
+    kotlinLspInstallCollectorJob?.cancel()
+    kotlinLspInstallCollectorJob = null
+    kotlinLspInstallDialog?.dismiss()
+    kotlinLspInstallDialog = null
+    super.onStop()
+  }
+
+  private fun startKotlinLspInstallDialogCollector() {
+    if (kotlinLspInstallCollectorJob?.isActive == true) return
+
+    kotlinLspInstallCollectorJob =
+        lifecycleScope.launch {
+          LspEventBus.installRequests.collect { request ->
+            showKotlinLspInstallerDialog(request)
+          }
+        }
+  }
+
+  private fun showKotlinLspInstallerDialog(request: LspInstallRequestEvent) {
+    kotlinLspInstallDialog?.dismiss()
+
+    val composeView =
+        ComposeView(this).apply {
+          setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+          setContent {
+            LspInstallerDialog(request = request) {
+              kotlinLspInstallDialog?.dismiss()
+              kotlinLspInstallDialog = null
+            }
+          }
+        }
+
+    kotlinLspInstallDialog =
+        newMaterialDialogBuilder(this)
+            .setCancelable(false)
+            .setView(composeView)
+            .create()
+            .also { it.show() }
+  }
+
   private fun onReadOpenedFilesCache(cache: OpenedFilesCache?) {
     cache ?: return
     cache.allFiles.forEach { file -> openFile(File(file.filePath), file.selection) }
-    openFile(File(cache.selectedFile))
+    val restoreTabIndex =
+        cache.selectedTabIndex.takeIf { it in 0 until cache.allFiles.size }
+            ?: cache.allFiles.indexOfFirst { it.filePath == cache.selectedFile }
+    if (restoreTabIndex >= 0) {
+      selectTab(restoreTabIndex)
+    }
+  }
+
+  private fun scheduleOpenedFilesCacheWrite(cache: OpenedFilesCache) {
+    val signature = "${cache.selectedFile}#${cache.selectedTabIndex}#${cache.allFiles.hashCode()}"
+    if (lastOpenedFilesCacheSignature == signature) return
+    lastOpenedFilesCacheSignature = signature
+
+    openedFilesCacheWriteJob?.cancel()
+    openedFilesCacheWriteJob =
+        lifecycleScope.launch(Dispatchers.IO) {
+          kotlinx.coroutines.delay(120)
+          editorViewModel.writeOpenedFiles(cache)
+        }
   }
 
   override fun onPrepareOptionsMenu(menu: Menu): Boolean {

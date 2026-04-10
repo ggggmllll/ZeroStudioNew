@@ -22,7 +22,7 @@ static lsp::ClangdServer* g_clangdServer = nullptr;
 // ============================================================================
 
 extern "C" JNIEXPORT jstring JNICALL
-Java_android_zero_studio_lsp_clangd_core_nativebridge_NativeCompiler_getClangVersion(
+Java_android_zero_studio_lsp_clangd_ClangdNativeBridge_getClangVersion(
         JNIEnv* env, jclass /*clazz*/) {
     const char* version = "LLVM 17 (runtime libs bundled)";
     LOGI("getClangVersion: %s", version);
@@ -34,7 +34,7 @@ Java_android_zero_studio_lsp_clangd_core_nativebridge_NativeCompiler_getClangVer
 // ============================================================================
 
 extern "C" JNIEXPORT jstring JNICALL
-Java_android_zero_studio_lsp_clangd_core_nativebridge_NativeCompiler_syntaxCheck(
+Java_android_zero_studio_lsp_clangd_ClangdNativeBridge_syntaxCheck(
         JNIEnv* env, jclass /*clazz*/,
         jstring jSysroot, jstring jSrc, jstring jTarget, jboolean jIsCxx) {
 
@@ -58,7 +58,7 @@ Java_android_zero_studio_lsp_clangd_core_nativebridge_NativeCompiler_syntaxCheck
 }
 
 extern "C" JNIEXPORT jstring JNICALL
-Java_android_zero_studio_lsp_clangd_core_nativebridge_NativeCompiler_emitObj(
+Java_android_zero_studio_lsp_clangd_ClangdNativeBridge_emitObj(
         JNIEnv* env, jclass /*clazz*/,
         jstring jSysroot, jstring jSrc, jstring jObjOut, jstring jTarget,
         jboolean jIsCxx, jobjectArray jFlags, jobjectArray jIncludeDirs) {
@@ -90,7 +90,7 @@ Java_android_zero_studio_lsp_clangd_core_nativebridge_NativeCompiler_emitObj(
 // ============================================================================
 
 extern "C" JNIEXPORT jstring JNICALL
-Java_android_zero_studio_lsp_clangd_core_nativebridge_NativeCompiler_linkExe(
+Java_android_zero_studio_lsp_clangd_ClangdNativeBridge_linkExe(
         JNIEnv* env, jclass /*clazz*/,
         jstring jSysroot, jstring jObj, jstring jOut, jstring jTarget, jboolean jIsCxx) {
 
@@ -116,7 +116,7 @@ Java_android_zero_studio_lsp_clangd_core_nativebridge_NativeCompiler_linkExe(
 }
 
 extern "C" JNIEXPORT jstring JNICALL
-Java_android_zero_studio_lsp_clangd_core_nativebridge_NativeCompiler_linkExeMany(
+Java_android_zero_studio_lsp_clangd_ClangdNativeBridge_linkExeMany(
         JNIEnv* env, jclass /*clazz*/,
         jstring jSysroot, jobjectArray jObjs, jstring jOut, jstring jTarget,
         jboolean jIsCxx, jobjectArray jLibDirs, jobjectArray jLibs) {
@@ -145,7 +145,7 @@ Java_android_zero_studio_lsp_clangd_core_nativebridge_NativeCompiler_linkExeMany
 }
 
 extern "C" JNIEXPORT jstring JNICALL
-Java_android_zero_studio_lsp_clangd_core_nativebridge_NativeCompiler_linkSo(
+Java_android_zero_studio_lsp_clangd_ClangdNativeBridge_linkSo(
         JNIEnv* env, jclass /*clazz*/,
         jstring jSysroot, jstring jObj, jstring jOutSo, jstring jTarget, jboolean jIsCxx) {
 
@@ -171,7 +171,7 @@ Java_android_zero_studio_lsp_clangd_core_nativebridge_NativeCompiler_linkSo(
 }
 
 extern "C" JNIEXPORT jstring JNICALL
-Java_android_zero_studio_lsp_clangd_core_nativebridge_NativeCompiler_linkSoMany(
+Java_android_zero_studio_lsp_clangd_ClangdNativeBridge_linkSoMany(
         JNIEnv* env, jclass /*clazz*/,
         jstring jSysroot, jobjectArray jObjs, jstring jOutSo, jstring jTarget,
         jboolean jIsCxx, jobjectArray jLibDirs, jobjectArray jLibs) {
@@ -204,7 +204,7 @@ Java_android_zero_studio_lsp_clangd_core_nativebridge_NativeCompiler_linkSoMany(
 // ============================================================================
 
 extern "C" JNIEXPORT jint JNICALL
-Java_android_zero_studio_lsp_clangd_core_nativebridge_NativeCompiler_runShared(
+Java_android_zero_studio_lsp_clangd_ClangdNativeBridge_runShared(
         JNIEnv* env, jclass /*clazz*/, jstring jSoPath, jstring jSym) {
 
     std::string soPath = utils::jstringToUtf8(env, jSoPath);
@@ -214,7 +214,7 @@ Java_android_zero_studio_lsp_clangd_core_nativebridge_NativeCompiler_runShared(
 }
 
 extern "C" JNIEXPORT jobject JNICALL
-Java_android_zero_studio_lsp_clangd_core_nativebridge_NativeCompiler_runSharedIsolated(
+Java_android_zero_studio_lsp_clangd_ClangdNativeBridge_runSharedIsolated(
         JNIEnv* env, jclass /*clazz*/,
         jstring jSoPath, jstring jSym, jint jTimeoutMs) {
 
@@ -244,7 +244,7 @@ Java_android_zero_studio_lsp_clangd_core_nativebridge_NativeCompiler_runSharedIs
 // ============================================================================
 
 extern "C" JNIEXPORT jstring JNICALL
-Java_android_zero_studio_lsp_clangd_core_nativebridge_NativeCompiler_startClangd(
+Java_android_zero_studio_lsp_clangd_ClangdNativeBridge_startClangd(
         JNIEnv* env, jclass /*clazz*/, jstring jLibPath, jobjectArray jArgs) {
 
     std::string libPath = utils::jstringToUtf8(env, jLibPath);
@@ -262,7 +262,7 @@ Java_android_zero_studio_lsp_clangd_core_nativebridge_NativeCompiler_startClangd
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_android_zero_studio_lsp_clangd_core_nativebridge_NativeCompiler_stopClangd(
+Java_android_zero_studio_lsp_clangd_ClangdNativeBridge_stopClangd(
         JNIEnv* /*env*/, jclass /*clazz*/) {
 
     if (g_clangdServer) {
@@ -273,7 +273,7 @@ Java_android_zero_studio_lsp_clangd_core_nativebridge_NativeCompiler_stopClangd(
 }
 
 extern "C" JNIEXPORT jboolean JNICALL
-Java_android_zero_studio_lsp_clangd_core_nativebridge_NativeCompiler_isClangdRunning(
+Java_android_zero_studio_lsp_clangd_ClangdNativeBridge_isClangdRunning(
         JNIEnv* /*env*/, jclass /*clazz*/) {
 
     if (g_clangdServer && g_clangdServer->isRunning()) {
@@ -283,7 +283,7 @@ Java_android_zero_studio_lsp_clangd_core_nativebridge_NativeCompiler_isClangdRun
 }
 
 extern "C" JNIEXPORT jint JNICALL
-Java_android_zero_studio_lsp_clangd_core_nativebridge_NativeCompiler_writeToClangd(
+Java_android_zero_studio_lsp_clangd_ClangdNativeBridge_writeToClangd(
         JNIEnv* env, jclass /*clazz*/, jbyteArray jData) {
 
     if (!g_clangdServer) {
@@ -308,7 +308,7 @@ Java_android_zero_studio_lsp_clangd_core_nativebridge_NativeCompiler_writeToClan
 }
 
 extern "C" JNIEXPORT jbyteArray JNICALL
-Java_android_zero_studio_lsp_clangd_core_nativebridge_NativeCompiler_readFromClangd(
+Java_android_zero_studio_lsp_clangd_ClangdNativeBridge_readFromClangd(
         JNIEnv* env, jclass /*clazz*/, jint maxBytes) {
 
     if (!g_clangdServer) {
@@ -329,7 +329,7 @@ Java_android_zero_studio_lsp_clangd_core_nativebridge_NativeCompiler_readFromCla
 }
 
 extern "C" JNIEXPORT jbyteArray JNICALL
-Java_android_zero_studio_lsp_clangd_core_nativebridge_NativeCompiler_readFromClangdWithTimeout(
+Java_android_zero_studio_lsp_clangd_ClangdNativeBridge_readFromClangdWithTimeout(
         JNIEnv* env, jclass /*clazz*/, jint maxBytes, jint timeoutMs) {
 
     if (!g_clangdServer) {
