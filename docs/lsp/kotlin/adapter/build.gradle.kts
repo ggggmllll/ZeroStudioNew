@@ -10,13 +10,13 @@ dependencies {
 	implementation("org.eclipse.lsp4j:org.eclipse.lsp4j.debug:0.15.0")
 	implementation("org.jetbrains.kotlin:kotlin-stdlib")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
-	implementation(project(":shared"))
+	implementation(projects.lsp.kotlin.shared)
 
     // modules temporarily needed because of shared module import above
     implementation("org.jetbrains.exposed:exposed-core:0.37.3")
     implementation("org.jetbrains.exposed:exposed-dao:0.37.3")
 
-    implementation(libs.com.google.protobuf.java)
+    implementation(libs.google.protobuf.java)
 
 
 	testImplementation("junit:junit:4.12")
@@ -29,11 +29,7 @@ java {
 }
 
 kotlin {
-    @Suppress("UnstableApiUsage")
-    jvmToolchain {
-        languageVersion = JavaLanguageVersion.of(11)
-        vendor = JvmVendorSpec.AZUL
-    }
+    jvmToolchain(21)
 }
 
 

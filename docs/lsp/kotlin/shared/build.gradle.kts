@@ -1,7 +1,7 @@
 plugins {
     id("maven-publish")
     kotlin("jvm")
-    alias(libs.plugins.com.google.protobuf)
+    alias(libs.plugins.protobuf)
 }
 
 java {
@@ -10,28 +10,23 @@ java {
 }
 
 kotlin {
-    @Suppress("UnstableApiUsage")
-    jvmToolchain {
-        languageVersion = JavaLanguageVersion.of(11)
-        vendor = JvmVendorSpec.AZUL
-    }
+    jvmToolchain(21)
 }
-
 
 dependencies {
     // dependencies are constrained to versions defined
     // in /platform/build.gradle.kts
-    implementation(platform(project(":platform")))
+    // implementation(platform(project(":platform")))
 
     implementation(kotlin("stdlib"))
-    implementation(libs.com.google.code.gson)
+    implementation(libs.google.gson)
     implementation(libs.org.jetbrains.exposed.core)
     implementation(libs.org.jetbrains.exposed.dao)
-    implementation(libs.com.google.protobuf.java)
+    implementation(libs.google.protobuf.java)
     implementation(libs.com.google.protobuf.java.util)
 
     testImplementation(libs.hamcrest.all)
-    testImplementation(libs.junit.junit)
+    testImplementation(libs.tests.junit)
 }
 
 protobuf {

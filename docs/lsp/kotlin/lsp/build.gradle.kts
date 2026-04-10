@@ -41,17 +41,17 @@ kapt {
 
 dependencies {
   kapt(projects.annotation.processors)
-  kapt(libs.google.auto.service)
+  // kapt(libs.google.auto.service)
 
   api(projects.core.indexingApi)
 
-  implementation(libs.androidide.ts)
-  implementation(libs.androidide.ts.java)
-  implementation(libs.androidx.annotation)
-  implementation(libs.androidx.appcompat)
-  implementation(libs.common.editor)
-  implementation(libs.common.javaparser)
-  implementation(libs.common.utilcode)
+  // implementation(libs.androidide.ts)
+  // implementation(libs.androidide.ts.java)
+  // implementation(libs.androidx.annotation)
+  // implementation(libs.androidx.appcompat)
+  // implementation(libs.common.editor)
+  // implementation(libs.common.javaparser)
+  // implementation(libs.common.utilcode)
 
   // UI/UX
   implementation(libs.bundles.compose) // androidx compose
@@ -84,7 +84,7 @@ dependencies {
 
   // implementation(libs.org.jetbrains.kotlin.compiler.embeddable)
   implementation(projects.modules.kotlinc)
-  implementation(libs.org.jetbrains.kotlin.scripting.compiler.embeddable)
+  // implementation(libs.org.jetbrains.kotlin.scripting.compiler.embeddable)
   implementation(libs.common.asm)
 
   implementation(libs.common.org.eclipse.lsp4j)

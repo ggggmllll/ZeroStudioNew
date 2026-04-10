@@ -133,8 +133,8 @@ class KotlinLanguageServer(
 
         @Suppress("DEPRECATION")
         val folders = params.workspaceFolders?.takeIf { it.isNotEmpty() }
-            ?: params.rootUri?.let(::WorkspaceFolder)?.let(::listOf)
-            ?: params.rootPath?.let(Paths::get)?.toUri()?.toString()?.let(::WorkspaceFolder)?.let(::listOf)
+            ?: params.rootUri?.let(::toWorkspaceFolder)?.let(::listOf)
+            ?: params.rootPath?.let(Paths::get)?.toUri()?.toString()?.let(::toWorkspaceFolder)?.let(::listOf)
             ?: listOf()
 
         val progress = params.workDoneToken?.let { LanguageClientProgress("Workspace folders", it, client) }
@@ -164,6 +164,14 @@ class KotlinLanguageServer(
         val serverInfo = ServerInfo("Kotlin Language Server", VERSION)
 
         InitializeResult(serverCapabilities, serverInfo)
+    }
+
+    private fun toWorkspaceFolder(uri: String): WorkspaceFolder {
+        val folderName = runCatching { Paths.get(parseURI(uri)).fileName?.toString() }
+            .getOrNull()
+            ?.takeIf { it.isNotBlank() }
+            ?: uri
+        return WorkspaceFolder(uri, folderName)
     }
 
     private fun connectLoggingBackend() {
