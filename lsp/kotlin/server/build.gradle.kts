@@ -12,13 +12,13 @@ plugins {
 dependencies {
     // dependencies are constrained to versions defined
     // in /platform/build.gradle.kts
-    implementation(platform(project(":platform")))
-    annotationProcessor(platform(project(":platform")))
+    // implementation(platform(project(":platform")))
+    // annotationProcessor(platform(project(":platform")))
 
-    implementation(project(":shared"))
+    implementation(projects.lsp.kotlin.shared)
 
-    implementation(libs.org.eclipse.lsp4j.lsp4j)
-    implementation(libs.org.eclipse.lsp4j.jsonrpc)
+    implementation(libs.common.org.eclipse.lsp4j)
+    implementation(libs.common.lsp4j.jsonrpc)
 
     implementation(kotlin("compiler"))
     implementation(kotlin("scripting-compiler"))
@@ -33,10 +33,10 @@ dependencies {
     implementation(libs.com.github.fwcd.ktfmt)
     implementation(libs.com.beust.jcommander)
     implementation(libs.org.xerial.sqlite.jdbc)
-    implementation(libs.com.google.protobuf.java)
+    implementation(libs.google.protobuf.java)
 
     testImplementation(libs.hamcrest.all)
-    testImplementation(libs.junit.junit)
+    testImplementation(libs.tests.junit)
     testImplementation(libs.org.openjdk.jmh.core)
 
     // See
@@ -53,13 +53,8 @@ java {
 }
 
 kotlin {
-    @Suppress("UnstableApiUsage")
-    jvmToolchain {
-        languageVersion = JavaLanguageVersion.of(11)
-        vendor = JvmVendorSpec.AZUL
-    }
+    jvmToolchain(21)
 }
-
 
 
 // val debugPort = 8000

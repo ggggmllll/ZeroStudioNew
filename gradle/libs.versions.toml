@@ -134,6 +134,7 @@ jmdns = "3.5.9"
 slf4j-android = "1.7.36"
 sqlite-android = "3.34.0"
 floatingx = "2.3.7"
+fernFlowerVersion = "243.22562.218"
 
 
 #语法解析分析
@@ -354,6 +355,7 @@ firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashly
 firebase-config = { group = "com.google.firebase", name = "firebase-config" }
 zxing-core = { group = "com.google.zxing", name = "core", version.ref = "zxing" }
 barcode-scanning = { module = "com.google.mlkit:barcode-scanning", version.ref = "barcodeScanning" }
+com-google-protobuf-java-util = {group = "com.google.protobuf", name = "protobuf-java-util", version = "3.18.2"}
 
 
 # AAPT2
@@ -474,6 +476,8 @@ okhttp-logging = { group = "com.squareup.okhttp3", name = "logging-interceptor",
 org-jetbrains-fernflower = { module = "zerostudio:fernflower", version = "1.0" }
 org-benf-cfr = { module = "org.benf:cfr", version = "0.152" }
 org-bitbucket-mstrobel-procyon-compilertools = { module = "org.bitbucket.mstrobel:procyon-compilertools", version = "0.6.0" }
+com-jetbrains-intellij-java-decompiler = { module = "com.jetbrains.intellij.java:java-decompiler-engine", version.ref = "fernFlowerVersion" }
+
 #smali反编译器
 google-baksmali = { module = "com.android.tools.smali:smali-baksmali", version = "3.0.9" }
 google-smali = { module = "com.android.tools.smali:smali", version = "3.0.9" }
@@ -527,7 +531,7 @@ sqlite-android = { module = "io.requery:sqlite-android", version.ref = "sqlite-a
 floatingx = { module = "io.github.petterpx:floatingx", version.ref = "floatingx" }
 floatingx-compose = { module = "io.github.petterpx:floatingx-compose", version.ref = "floatingx" }
 huge-icons = { group = "com.github.rikkahub", name = "hugeicons-compose", version.ref = "huge-icons" }
-
+com-github-fwcd-ktfmt = { module = "com.github.fwcd.ktfmt:ktfmt", version = "b5d31d1" }
 
 
 [bundles]

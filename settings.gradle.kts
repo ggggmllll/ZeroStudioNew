@@ -10,6 +10,7 @@ pluginManagement {
     google()
     mavenCentral()
     mavenLocal()
+    maven("https://cache-redirector.jetbrains.com/kotlin.bintray.com/kotlin-plugin")
     maven("https://jitpack.io")
     maven("https://repo1.maven.org/maven2/")
     maven("https://repo.itextsupport.com/android")
@@ -168,6 +169,10 @@ include(
     ":java:javac-services",
     ":java:lsp",
     ":lsp:kotlin",
+    ":lsp:kotlin:adapter",
+    ":lsp:kotlin:server",
+    ":lsp:kotlin:shared",
+    // ":lsp:kotlin:lsp",
     ":lsp:toml",
     // ":lsp:clangd",
     // ":lsp:smali",
