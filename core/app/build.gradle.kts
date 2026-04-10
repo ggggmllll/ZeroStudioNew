@@ -125,6 +125,7 @@ configurations.all {
     // force(libs.google.protobuf)
   // }
   
+  exclude(group = "com.google.googlejavaformat", module = "google-java-format")
   exclude(group = "org.jetbrains.kotlin", module = "kotlin-android-extensions-runtime")
   exclude(group = "org.jetbrains.kotlin", module = "kotlin-compiler")
   // exclude(group = "org.jetbrains.kotlin", module = "kotlin-compiler-embeddable")
@@ -205,6 +206,7 @@ dependencies {
 
   // java格式化
   implementation(libs.composite.googleJavaFormat) {
+  exclude(group = "com.google.googlejavaformat", module = "google-java-format")
     exclude(group = "com.google.guava", module = "guava")
   }
 
