@@ -323,7 +323,7 @@ open class EditorHandlerActivity : ProjectHandlerActivity(), IEditorHandler {
         cache.selectedTabIndex.takeIf { it in 0 until cache.allFiles.size }
             ?: cache.allFiles.indexOfFirst { it.filePath == cache.selectedFile }
     if (restoreTabIndex >= 0) {
-      selectTab(restoreTabIndex)
+      content.tabs.getTabAt(restoreTabIndex)?.select()
     }
   }
 
