@@ -461,8 +461,7 @@ class CodeEditorView(context: Context, file: File, selection: Range) :
   }
 
   private fun postRead(file: File) {
-    binding.editor.setFile(file) // This now triggers all LSP setup logic within IDEEditor
-
+    val previousFile = binding.editor.file
     binding.editor.setupLanguage(file)
     val languageServer = createLanguageServer(file)
     binding.editor.setLanguageServer(languageServer)
@@ -474,12 +473,13 @@ class CodeEditorView(context: Context, file: File, selection: Range) :
     }
 
     if (languageServer is KotlinLanguageServer) {
+      previousFile?.takeIf { it != file }?.toPath()?.also { languageServer.unregisterEditor(it) }
       languageServer.registerEditor(file.toPath(), binding.editor)
     }
 
     // File must be set only after setting the language server
     // This will make sure that textDocument/didOpen is sent
-    binding.editor.file = file
+    binding.editor.setFile(file)
 
     // Initialize diagnostic handling for Kotlin files
     if (file.extension == "kt" || file.extension == "kts") {

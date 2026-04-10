@@ -2258,9 +2258,10 @@ public class CodeEditor extends View implements ContentListener, Formatter.Forma
             // top may be invisible
             targetY = yOffset - getRowHeight() * topLines;
         }
-        if (yOffset > getHeight() + currFinalY) {
+        float visibleHeight = Math.max(getRowHeight() * 2f, getHeight() - getPaddingBottom());
+        if (yOffset > visibleHeight + currFinalY) {
             // bottom invisible
-            targetY = yOffset - getHeight() + getRowHeight() * 1f;
+            targetY = yOffset - visibleHeight + getRowHeight() * 1f;
         }
         float charWidth = column == 0 ? 0 : getTextPaint().measureText("a");
         if (xOffset < currFinalX + (pinLineNumber ? measureTextRegionOffset() : 0)) {
