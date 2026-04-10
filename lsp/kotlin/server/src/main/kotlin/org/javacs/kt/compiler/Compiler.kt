@@ -59,10 +59,6 @@ import org.javacs.kt.CompilerConfiguration
 import org.javacs.kt.ScriptsConfiguration
 import org.javacs.kt.util.LoggingMessageCollector
 import org.javacs.kt.util.getRange
-import org.jetbrains.kotlin.cli.common.output.writeAllTo
-import org.jetbrains.kotlin.codegen.ClassBuilderFactories
-import org.jetbrains.kotlin.codegen.KotlinCodegenFacade
-import org.jetbrains.kotlin.codegen.state.GenerationState
 import org.jetbrains.kotlin.container.getService
 import org.jetbrains.kotlin.cli.jvm.compiler.CliBindingTrace
 import org.jetbrains.kotlin.cli.jvm.compiler.EnvironmentConfigFiles
@@ -588,21 +584,10 @@ class Compiler(
         }
     }
 
+    @Suppress("UNUSED_PARAMETER")
     fun generateCode(module: ModuleDescriptor, bindingContext: BindingContext, files: Collection<KtFile>) {
-        outputDirectory.takeIf { codegenConfig.enabled }?.let {
-            compileLock.withLock {
-                val compileEnv = compileEnvironmentFor(CompilationKind.DEFAULT)
-                val state = GenerationState.Builder(
-                    project = compileEnv.environment.project,
-                    builderFactory = ClassBuilderFactories.BINARIES,
-                    module = module,
-                    bindingContext = bindingContext,
-                    files = files.toList(),
-                    configuration = compileEnv.environment.configuration
-                ).build()
-                KotlinCodegenFacade.compileCorrectFiles(state)
-                state.factory.writeAllTo(it)
-            }
+        if (codegenConfig.enabled) {
+            LOG.warn("Bytecode generation is temporarily disabled for Kotlin {} compiler APIs", KotlinVersion.CURRENT)
         }
     }
 
