@@ -61,9 +61,9 @@ import com.termux.shared.termux.shell.command.environment.TermuxShellEnvironment
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
+import java.lang.ref.WeakReference
 import java.util.Objects
 import java.util.concurrent.CompletableFuture
-import java.util.concurrent.CompletionException
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
@@ -130,6 +130,7 @@ class GradleBuildService :
     private val log = LoggerFactory.getLogger(GradleBuildService::class.java)
     private val NOTIFICATION_ID = R.string.app_name
     private val SERVER_System_err = LoggerFactory.getLogger("ToolingApiErrorStream")
+
   }
 
   override fun onCreate() {
@@ -724,15 +725,10 @@ class GradleBuildService :
   }
 
   private fun <T> performBuildTasks(future: CompletableFuture<T>): CompletableFuture<T> {
-    return CompletableFuture.runAsync(this::onPrepareBuildRequest)
-        .handleAsync { _, _ ->
-          try {
-            return@handleAsync future.get()
-          } catch (e: Throwable) {
-            throw CompletionException(e)
-          }
-        }
-        .handle(this::markBuildAsFinished)
+    val serviceRef = WeakReference(this)
+    return CompletableFuture.runAsync { onPrepareBuildRequest() }
+        .thenCompose { future }
+        .whenComplete { _, _ -> serviceRef.get()?.isBuildInProgress = false }
   }
 
   private fun onPrepareBuildRequest() {
@@ -758,12 +754,6 @@ class GradleBuildService :
 
   private fun logBuildInProgress() {
     log.warn("A build is already in progress!")
-  }
-
-  @Suppress("UNUSED_PARAMETER")
-  private fun <T> markBuildAsFinished(result: T, throwable: Throwable?): T {
-    isBuildInProgress = false
-    return result
   }
 
   internal fun startToolingServer(listener: OnServerStartListener?) {

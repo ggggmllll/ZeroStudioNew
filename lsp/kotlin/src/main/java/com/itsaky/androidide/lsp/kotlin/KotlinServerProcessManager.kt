@@ -201,9 +201,6 @@ class KotlinServerProcessManager(context: Context) {
       startReaderThread()
       startErrorReaderThread()
 
-      // Send initialization with completion capabilities
-      sendInitialization()
-
       KslLogs.info("Server started successfully with JAVA_HOME: {}", javaHome)
     } catch (e: Exception) {
       KslLogs.error("Failed to start server", e)
@@ -233,93 +230,6 @@ class KotlinServerProcessManager(context: Context) {
       )
     } catch (fallbackError: Exception) {
       KslLogs.error("Fallback start via Termux shell API failed", fallbackError)
-    }
-  }
-
-  private fun sendInitialization() {
-    val initParams =
-        JsonObject().apply {
-          addProperty("processId", android.os.Process.myPid())
-          add("rootUri", null)
-
-          add(
-              "capabilities",
-              JsonObject().apply {
-                add(
-                    "textDocument",
-                    JsonObject().apply {
-                      add(
-                          "completion",
-                          JsonObject().apply {
-                            add(
-                                "completionItem",
-                                JsonObject().apply {
-                                  addProperty("snippetSupport", true)
-                                  addProperty("commitCharactersSupport", true)
-                                  add(
-                                      "documentationFormat",
-                                      gson.toJsonTree(listOf("markdown", "plaintext")),
-                                  )
-                                  addProperty("deprecatedSupport", true)
-                                  addProperty("preselectSupport", true)
-
-                                  add(
-                                      "resolveSupport",
-                                      gson.toJsonTree(
-                                          mapOf(
-                                              "properties" to
-                                                  listOf(
-                                                      "documentation",
-                                                      "detail",
-                                                      "additionalTextEdits",
-                                                  )
-                                          )
-                                      ),
-                                  )
-                                },
-                            )
-                            addProperty("contextSupport", true)
-                          },
-                      )
-
-                      add(
-                          "signatureHelp",
-                          JsonObject().apply {
-                            add(
-                                "signatureInformation",
-                                JsonObject().apply {
-                                  add(
-                                      "documentationFormat",
-                                      gson.toJsonTree(listOf("markdown", "plaintext")),
-                                  )
-                                  add(
-                                      "parameterInformation",
-                                      JsonObject().apply {
-                                        addProperty("labelOffsetSupport", true)
-                                      },
-                                  )
-                                  addProperty("activeParameterSupport", true)
-                                },
-                            )
-                            addProperty("contextSupport", true)
-                          },
-                      )
-                    },
-                )
-                add(
-                    "workspace",
-                    JsonObject().apply {
-                      addProperty("applyEdit", true)
-                      add("workspaceEdit", gson.toJsonTree(mapOf("documentChanges" to true)))
-                    },
-                )
-              },
-          )
-        }
-
-    sendRequest("initialize", initParams) { result ->
-      KslLogs.info("Server initialized: {}", result != null)
-      sendNotification("initialized", JsonObject())
     }
   }
 

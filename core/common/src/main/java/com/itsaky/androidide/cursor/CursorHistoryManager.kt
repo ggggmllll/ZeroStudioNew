@@ -3,11 +3,11 @@ package com.itsaky.androidide.cursor
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
-import io.github.rosemoe.sora.event.EventReceiver
 import io.github.rosemoe.sora.event.SelectionChangeEvent
-import io.github.rosemoe.sora.event.Unsubscribe
+import io.github.rosemoe.sora.event.SubscriptionReceipt
 import io.github.rosemoe.sora.text.CharPosition
 import io.github.rosemoe.sora.widget.CodeEditor
+import java.lang.ref.WeakReference
 import java.util.WeakHashMap
 
 /**
@@ -17,18 +17,23 @@ import java.util.WeakHashMap
  */
 object CursorHistoryManager {
 
-  class Tracker(val editor: CodeEditor) : EventReceiver<SelectionChangeEvent> {
+  class Tracker(editor: CodeEditor) {
+    private val editorRef = WeakReference(editor)
+    private val receipt: SubscriptionReceipt<SelectionChangeEvent>
     val history = mutableListOf<CharPosition>()
     var currentIndex = -1
     var isNavigating = false
 
     init {
-      editor.subscribeEvent(SelectionChangeEvent::class.java, this)
+      receipt =
+          editor.subscribeEvent(SelectionChangeEvent::class.java) { event, _ ->
+            onSelectionChanged(event)
+          }
       // 强行记录初始位置，防止全新文件刚打开时无记录
       recordPosition(editor.cursor.left().fromThis())
     }
 
-    override fun onReceive(event: SelectionChangeEvent, unsubscribe: Unsubscribe) {
+    private fun onSelectionChanged(event: SelectionChangeEvent) {
       if (isNavigating) return
       if (event.cause == SelectionChangeEvent.CAUSE_TEXT_MODIFICATION) {
         return
@@ -75,6 +80,7 @@ object CursorHistoryManager {
     }
 
     private fun navigate() {
+      val editor = editorRef.get() ?: return
       isNavigating = true
       val pos = history[currentIndex]
       if (editor.text.isValidPosition(pos)) {
@@ -85,12 +91,18 @@ object CursorHistoryManager {
     }
 
     private fun notifyStateChanged() {
-      editor.context.findActivity()?.invalidateOptionsMenu()
+      editorRef.get()?.context?.findActivity()?.invalidateOptionsMenu()
     }
 
     fun canGoBack() = currentIndex > 0
 
     fun canGoForward() = currentIndex >= 0 && currentIndex < history.size - 1
+
+    fun release() {
+      receipt.unsubscribe()
+      history.clear()
+      currentIndex = -1
+    }
   }
 
   private val trackers = WeakHashMap<CodeEditor, Tracker>()
@@ -102,6 +114,10 @@ object CursorHistoryManager {
       trackers[editor] = tracker
     }
     return tracker
+  }
+
+  fun removeTracker(editor: CodeEditor) {
+    trackers.remove(editor)?.release()
   }
 }
 

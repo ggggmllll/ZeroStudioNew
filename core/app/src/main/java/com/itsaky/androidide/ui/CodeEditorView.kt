@@ -120,6 +120,7 @@ class CodeEditorView(context: Context, file: File, selection: Range) :
 
   private var analysisJob: Job? = null
   private var isKeyboardVisible = false
+  private var imeBottomInset = 0
   private val keyboardLayoutListener =
       ViewTreeObserver.OnGlobalLayoutListener {
         val editorView = _binding?.editor ?: return@OnGlobalLayoutListener
@@ -130,6 +131,17 @@ class CodeEditorView(context: Context, file: File, selection: Range) :
         val keyboardNowVisible = heightDiff > (root.height * 0.15f)
         val transitionedToVisible = keyboardNowVisible && !isKeyboardVisible
         isKeyboardVisible = keyboardNowVisible
+        imeBottomInset = if (keyboardNowVisible) heightDiff.coerceAtLeast(0) else 0
+
+        if (editorView.paddingBottom != imeBottomInset) {
+          editorView.setPadding(
+              editorView.paddingLeft,
+              editorView.paddingTop,
+              editorView.paddingRight,
+              imeBottomInset,
+          )
+          editorView.invalidate()
+        }
 
         if (transitionedToVisible) {
           editorView.post {
@@ -205,6 +217,10 @@ class CodeEditorView(context: Context, file: File, selection: Range) :
       // Keep action enabled/disabled states in sync with cursor/selection changes.
       subscribeEvent(SelectionChangeEvent::class.java) { _, _ ->
         (context as? Activity?)?.invalidateOptionsMenu()
+        if (isKeyboardVisible) {
+          val cursor = this.cursor ?: return@subscribeEvent
+          this.post { ensurePositionVisible(cursor.rightLine, cursor.rightColumn) }
+        }
       }
     }
 
@@ -288,7 +304,12 @@ class CodeEditorView(context: Context, file: File, selection: Range) :
 
   /** Called when the editor has been selected and is visible to the user. */
   fun onEditorSelected() {
-    _binding?.editor?.onEditorSelected()
+    _binding?.editor?.also {
+          if (IDELanguageClientImpl.isInitialized()) {
+            it.setLanguageClient(IDELanguageClientImpl.getInstance())
+          }
+          it.onEditorSelected()
+        }
         ?: run { log.warn("onEditorSelected() called but no editor instance is available") }
   }
 
@@ -440,10 +461,9 @@ class CodeEditorView(context: Context, file: File, selection: Range) :
   }
 
   private fun postRead(file: File) {
-    binding.editor.setFile(file) // This now triggers all LSP setup logic within IDEEditor
-
     binding.editor.setupLanguage(file)
-    binding.editor.setLanguageServer(createLanguageServer(file))
+    val languageServer = createLanguageServer(file)
+    binding.editor.setLanguageServer(languageServer)
 
     if (IDELanguageClientImpl.isInitialized()) {
       binding.editor.setLanguageClient(IDELanguageClientImpl.getInstance())
@@ -451,7 +471,7 @@ class CodeEditorView(context: Context, file: File, selection: Range) :
 
     // File must be set only after setting the language server
     // This will make sure that textDocument/didOpen is sent
-    binding.editor.file = file
+    binding.editor.setFile(file)
 
     // Initialize diagnostic handling for Kotlin files
     if (file.extension == "kt" || file.extension == "kts") {
@@ -660,6 +680,7 @@ class CodeEditorView(context: Context, file: File, selection: Range) :
     analysisJob?.cancel()
     codeEditorScope.cancelIfActive("Cancellation was requested")
     _binding?.editor?.apply {
+      CursorHistoryManager.removeTracker(this)
       clearDiagnostics()
       cleanupCompletionTooltips()
       // if (LspUtils.isHoverEnabled() == true) {
