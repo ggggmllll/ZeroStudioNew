@@ -45,13 +45,13 @@ dependencies {
 
   api(projects.core.indexingApi)
 
-  implementation(libs.androidide.ts)
-  implementation(libs.androidide.ts.java)
-  implementation(libs.androidx.annotation)
-  implementation(libs.androidx.appcompat)
-  implementation(libs.common.editor)
-  implementation(libs.common.javaparser)
-  implementation(libs.common.utilcode)
+  // implementation(libs.androidide.ts)
+  // implementation(libs.androidide.ts.java)
+  // implementation(libs.androidx.annotation)
+  // implementation(libs.androidx.appcompat)
+  // implementation(libs.common.editor)
+  // implementation(libs.common.javaparser)
+  // implementation(libs.common.utilcode)
 
   // UI/UX
   implementation(libs.bundles.compose) // androidx compose
