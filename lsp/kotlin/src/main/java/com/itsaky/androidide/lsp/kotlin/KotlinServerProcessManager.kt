@@ -336,7 +336,10 @@ class KotlinServerProcessManager(context: Context) {
         }
 
     KslLogs.debug("Sending request ID {}: {}", id, method)
-    sendMessage(payload)
+    if (!sendMessage(payload)) {
+      pendingRequests.remove(id)
+      callback(null)
+    }
   }
 
   fun sendNotification(method: String, params: JsonObject) {
@@ -351,13 +354,17 @@ class KotlinServerProcessManager(context: Context) {
     sendMessage(payload)
   }
 
-  private fun sendMessage(payload: JsonObject) {
+  fun isServerReady(): Boolean {
+    return process?.isAlive == true && writer != null && reader != null
+  }
+
+  private fun sendMessage(payload: JsonObject): Boolean {
     val data = gson.toJson(payload)
     val w =
         writer
             ?: run {
               KslLogs.error("Cannot send message: writer is null")
-              return
+              return false
             }
 
     synchronized(w) {
@@ -366,8 +373,10 @@ class KotlinServerProcessManager(context: Context) {
         w.write("Content-Length: ${contentBytes.size}\r\n\r\n")
         w.write(data)
         w.flush()
+        return true
       } catch (e: Exception) {
         KslLogs.error("Failed to send message", e)
+        return false
       }
     }
   }
