@@ -94,6 +94,8 @@ open class EditorHandlerActivity : ProjectHandlerActivity(), IEditorHandler {
   protected val isOpenedFilesSaved = AtomicBoolean(false)
   private var kotlinLspInstallDialog: androidx.appcompat.app.AlertDialog? = null
   private var kotlinLspInstallCollectorJob: Job? = null
+  private var openedFilesCacheWriteJob: Job? = null
+  private var lastOpenedFilesCacheSignature: String? = null
 
   override fun doOpenFile(file: File, selection: Range?) {
     openFileAndSelect(file, selection)
@@ -143,9 +145,10 @@ open class EditorHandlerActivity : ProjectHandlerActivity(), IEditorHandler {
                 return@observeFiles
               }
       getOpenedFiles().also {
-        val cache = OpenedFilesCache(currentFile, it)
-        editorViewModel.writeOpenedFiles(cache)
+        val selectedTabIndex = editorViewModel.getCurrentFileIndex()
+        val cache = OpenedFilesCache(currentFile, selectedTabIndex, it)
         editorViewModel.openedFilesCache = cache
+        scheduleOpenedFilesCacheWrite(cache)
       }
     }
 
@@ -227,10 +230,18 @@ open class EditorHandlerActivity : ProjectHandlerActivity(), IEditorHandler {
   }
 
   override fun saveOpenedFiles() {
-    writeOpenedFilesCache(getOpenedFiles(), getCurrentEditor()?.editor?.file)
+    writeOpenedFilesCache(
+        getOpenedFiles(),
+        getCurrentEditor()?.editor?.file,
+        editorViewModel.getCurrentFileIndex(),
+    )
   }
 
-  private fun writeOpenedFilesCache(openedFiles: List<OpenedFile>, selectedFile: File?) {
+  private fun writeOpenedFilesCache(
+      openedFiles: List<OpenedFile>,
+      selectedFile: File?,
+      selectedTabIndex: Int,
+  ) {
     if (selectedFile == null || openedFiles.isEmpty()) {
       editorViewModel.writeOpenedFiles(null)
       editorViewModel.openedFilesCache = null
@@ -239,9 +250,14 @@ open class EditorHandlerActivity : ProjectHandlerActivity(), IEditorHandler {
       return
     }
 
-    val cache = OpenedFilesCache(selectedFile = selectedFile.absolutePath, allFiles = openedFiles)
+    val cache =
+        OpenedFilesCache(
+            selectedFile = selectedFile.absolutePath,
+            selectedTabIndex = selectedTabIndex,
+            allFiles = openedFiles,
+        )
 
-    editorViewModel.writeOpenedFiles(cache)
+    scheduleOpenedFilesCacheWrite(cache)
     editorViewModel.openedFilesCache = if (!isDestroying) cache else null
     log.debug("[onPause] Opened files cache reset to {}", editorViewModel.openedFilesCache)
     isOpenedFilesSaved.set(true)
@@ -303,7 +319,25 @@ open class EditorHandlerActivity : ProjectHandlerActivity(), IEditorHandler {
   private fun onReadOpenedFilesCache(cache: OpenedFilesCache?) {
     cache ?: return
     cache.allFiles.forEach { file -> openFile(File(file.filePath), file.selection) }
-    openFile(File(cache.selectedFile))
+    val restoreTabIndex =
+        cache.selectedTabIndex.takeIf { it in 0 until cache.allFiles.size }
+            ?: cache.allFiles.indexOfFirst { it.filePath == cache.selectedFile }
+    if (restoreTabIndex >= 0) {
+      selectTab(restoreTabIndex)
+    }
+  }
+
+  private fun scheduleOpenedFilesCacheWrite(cache: OpenedFilesCache) {
+    val signature = "${cache.selectedFile}#${cache.selectedTabIndex}#${cache.allFiles.hashCode()}"
+    if (lastOpenedFilesCacheSignature == signature) return
+    lastOpenedFilesCacheSignature = signature
+
+    openedFilesCacheWriteJob?.cancel()
+    openedFilesCacheWriteJob =
+        lifecycleScope.launch(Dispatchers.IO) {
+          kotlinx.coroutines.delay(120)
+          editorViewModel.writeOpenedFiles(cache)
+        }
   }
 
   override fun onPrepareOptionsMenu(menu: Menu): Boolean {
