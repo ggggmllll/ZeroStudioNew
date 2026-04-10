@@ -72,6 +72,10 @@ dependencies {
   implementation(projects.termux.shell)
   implementation(projects.event.eventbusEvents)
 
+  implementation(projects.lsp.kotlin.server)
+  implementation(projects.lsp.kotlin.shared)
+  implementation(projects.lsp.kotlin.adapter)
+
   implementation(libs.composite.javac)
   implementation(libs.composite.javapoet)
   implementation(libs.composite.jaxp)
@@ -83,7 +87,7 @@ dependencies {
   implementation(libs.common.kotlin)
 
   // implementation(libs.org.jetbrains.kotlin.compiler.embeddable)
-  implementation(projects.modules.kotlinc)
+  // implementation(projects.modules.kotlinc)
   implementation(libs.org.jetbrains.kotlin.scripting.compiler.embeddable)
   implementation(libs.common.asm)
 
