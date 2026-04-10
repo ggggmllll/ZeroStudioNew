@@ -126,8 +126,8 @@ configurations.all {
   // }
   
   exclude(group = "org.jetbrains.kotlin", module = "kotlin-android-extensions-runtime")
-  exclude(group = "org.jetbrains.kotlin", module = "kotlin-compiler")
-  exclude(group = "org.jetbrains.kotlin", module = "kotlin-compiler-embeddable")
+  // exclude(group = "org.jetbrains.kotlin", module = "kotlin-compiler")
+  // exclude(group = "org.jetbrains.kotlin", module = "kotlin-compiler-embeddable")
   exclude(group = "com.google.firebase", module = "protolite-well-known-types")
   exclude(group = "com.google.protobuf", module = "protobuf-java")
   exclude(group = "com.android.tools.build", module = "builder-model")
