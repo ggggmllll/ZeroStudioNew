@@ -88,7 +88,7 @@ dependencies {
 
   // implementation(libs.org.jetbrains.kotlin.compiler.embeddable)
   // implementation(projects.modules.kotlinc)
-  implementation(libs.org.jetbrains.kotlin.scripting.compiler.embeddable)
+  // implementation(libs.org.jetbrains.kotlin.scripting.compiler.embeddable)
   implementation(libs.common.asm)
 
   implementation(libs.common.org.eclipse.lsp4j)
