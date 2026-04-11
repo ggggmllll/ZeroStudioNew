@@ -39,8 +39,13 @@ import com.itsaky.androidide.lsp.models.WorkspaceEdit
 import com.itsaky.androidide.lsp.models.WorkspaceSymbolsResult
 import com.itsaky.androidide.lsp.util.LSPEditorActions
 import com.itsaky.androidide.lsp.kotlin.lsp.actions.KotlinCodeActionsMenu
+import com.itsaky.androidide.lsp.kotlin.lsp.classpath.KotlinClasspathLibraryService
+import com.itsaky.androidide.lsp.kotlin.lsp.context.KotlinWorkspaceContextService
+import com.itsaky.androidide.lsp.kotlin.lsp.index.KotlinSearchIndexService
+import com.itsaky.androidide.lsp.kotlin.lsp.ops.KotlinLspOperationService
 import com.itsaky.androidide.models.Range
 import com.itsaky.androidide.projects.IWorkspace
+import java.nio.file.Files
 import java.nio.file.Path
 import org.eclipse.lsp4j.InitializeParams
 import org.eclipse.lsp4j.ExecuteCommandParams
@@ -60,9 +65,15 @@ class KotlinLspServer(
 
   private val delegate = KotlinLanguageServer()
   private val bridgeClient = KotlinLspClientBridge { client }
+  private val workspaceContextService = KotlinWorkspaceContextService()
+  private val classpathService = KotlinClasspathLibraryService()
+  private val searchIndexService = KotlinSearchIndexService()
+  private val operationService = KotlinLspOperationService()
 
   private var initialized = false
   private var workspaceFolders: List<WorkspaceFolder> = emptyList()
+  private var workspaceContext: KotlinWorkspaceContextService.WorkspaceContext? = null
+  private var libraryIndex: KotlinClasspathLibraryService.LibraryIndex? = null
 
   override val serverId: String = SERVER_ID
 
@@ -88,6 +99,8 @@ class KotlinLspServer(
     LSPEditorActions.ensureActionsMenuRegistered(KotlinCodeActionsMenu)
     workspaceFolders =
         workspace.getSubProjects().map { WorkspaceFolder(it.path.toUri().toString(), it.name) }
+    workspaceContext = workspaceContextService.build(workspace)
+    libraryIndex = classpathService.resolve(workspaceContext?.modules.orEmpty().map { it.modulePath })
 
     val params =
         InitializeParams().apply {
@@ -176,7 +189,22 @@ class KotlinLspServer(
     return delegate.textDocumentService.hover(params.toLspHover()).get().toIde()
   }
 
-  override suspend fun analyze(file: Path): DiagnosticResult = DiagnosticResult.NO_UPDATE
+  override suspend fun analyze(file: Path): DiagnosticResult {
+    if (!Files.exists(file)) return DiagnosticResult.NO_UPDATE
+    val text = runCatching { Files.readString(file) }.getOrDefault("")
+    val diagnostics = mutableListOf<com.itsaky.androidide.lsp.models.DiagnosticItem>()
+    if (text.contains("TODO(", ignoreCase = true)) {
+      diagnostics +=
+          com.itsaky.androidide.lsp.models.DiagnosticItem(
+              message = "TODO marker found in source.",
+              code = "KOTLIN_TODO",
+              range = Range.NONE,
+              source = SERVER_ID,
+              severity = com.itsaky.androidide.lsp.models.DiagnosticSeverity.HINT,
+          )
+    }
+    return DiagnosticResult(file, diagnostics)
+  }
 
   override fun formatCode(params: FormatCodeParams?): CodeFormatResult = CodeFormatResult.NONE
 
@@ -184,13 +212,21 @@ class KotlinLspServer(
     if (!features.symbols) return DocumentSymbolsResult()
     ensureInitialized()
     val result = delegate.textDocumentService.documentSymbol(file.toLspDocumentSymbol()).get()
-    return result.toIdeDocumentSymbols()
+    val ide = result.toIdeDocumentSymbols()
+    if (ide.symbols.isNotEmpty() || ide.flatSymbols.isNotEmpty()) return ide
+    return DocumentSymbolsResult(symbols = searchIndexService.documentSymbols(file))
   }
 
   override suspend fun workspaceSymbols(query: String): WorkspaceSymbolsResult {
     if (!features.symbols) return WorkspaceSymbolsResult()
     ensureInitialized()
-    return delegate.workspaceService.symbol(org.eclipse.lsp4j.WorkspaceSymbolParams(query)).get().toIdeWorkspaceSymbols()
+    val delegateSymbols =
+        delegate.workspaceService
+            .symbol(org.eclipse.lsp4j.WorkspaceSymbolParams(query))
+            .get()
+            .toIdeWorkspaceSymbols()
+    if (delegateSymbols.symbols.isNotEmpty()) return delegateSymbols
+    return WorkspaceSymbolsResult(searchIndexService.workspaceSymbols(query, workspaceContext, libraryIndex))
   }
 
   override suspend fun prepareRename(params: DefinitionParams): PrepareRenameResult? = null
@@ -227,7 +263,15 @@ class KotlinLspServer(
     return delegate.textDocumentService.inlayHint(params.toLspInlayHint()).get().map { it.toIde() }
   }
 
-  override suspend fun documentLinks(file: Path): List<DocumentLink> = emptyList()
+  override suspend fun documentLinks(file: Path): List<DocumentLink> {
+    if (!Files.exists(file)) return emptyList()
+    val text = runCatching { Files.readString(file) }.getOrDefault("")
+    val links = mutableListOf<DocumentLink>()
+    Regex("""https?://[^\s"']+""").findAll(text).forEach {
+      links += DocumentLink(Range.NONE, it.value, "URL")
+    }
+    return links
+  }
 
   override suspend fun codeLens(file: Path): List<CodeLens> = emptyList()
 
@@ -237,8 +281,13 @@ class KotlinLspServer(
 
   fun executeWorkspaceCommand(command: String, arguments: List<Any> = emptyList()): Any? {
     ensureInitialized()
-    return delegate.workspaceService.executeCommand(ExecuteCommandParams(command, arguments)).get()
+    val params = operationService.execute(command, arguments)
+    return delegate.workspaceService.executeCommand(params).get()
   }
+
+  fun decompileClassFile(classFile: Path): Path = operationService.decompileClassFile(classFile)
+
+  fun decompileLibraryJar(jar: Path): Path = operationService.decompileLibraryJar(jar)
 
   private fun ensureInitialized() {
     if (!initialized) {

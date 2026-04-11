@@ -6,6 +6,7 @@ import com.itsaky.androidide.lsp.kotlin.lsp.actions.common.CommentAction
 import com.itsaky.androidide.lsp.kotlin.lsp.actions.common.FindReferencesAction
 import com.itsaky.androidide.lsp.kotlin.lsp.actions.common.GoToDefinitionAction
 import com.itsaky.androidide.lsp.kotlin.lsp.actions.common.JavaToKotlinAction
+import com.itsaky.androidide.lsp.kotlin.lsp.actions.common.RefreshKotlinClasspathAction
 import com.itsaky.androidide.lsp.kotlin.lsp.actions.common.UncommentAction
 
 object KotlinCodeActionsMenu : IActionsMenuProvider {
@@ -16,5 +17,6 @@ object KotlinCodeActionsMenu : IActionsMenuProvider {
           GoToDefinitionAction(),
           FindReferencesAction(),
           JavaToKotlinAction(),
+          RefreshKotlinClasspathAction(),
       )
 }
