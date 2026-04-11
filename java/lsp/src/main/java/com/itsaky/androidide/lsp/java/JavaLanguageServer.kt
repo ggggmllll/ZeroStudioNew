@@ -175,7 +175,11 @@ class JavaLanguageServer : ILanguageServer {
       updateCachedCompletion(cachedCompletion)
     }
 
-    return completionProvider.complete(params)
+    val result = completionProvider.complete(params)
+
+    // log.warn(result.toString())
+
+    return result
   }
 
   override suspend fun findReferences(params: ReferenceParams): ReferenceResult {
@@ -204,6 +208,13 @@ class JavaLanguageServer : ILanguageServer {
     return if (!settings.signatureHelpEnabled()) {
       SignatureHelp(emptyList(), -1, -1)
     } else SignatureProvider(compiler, params.cancelChecker).signatureHelp(params)
+  }
+
+  override suspend fun hover(
+      params: DefinitionParams
+  ): com.itsaky.androidide.lsp.models.MarkupContent {
+    // Java LSP does not currently implement hover; return empty
+    return com.itsaky.androidide.lsp.models.MarkupContent()
   }
 
   override suspend fun analyze(file: Path): DiagnosticResult {

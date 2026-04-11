@@ -46,7 +46,7 @@ object JdkUtils {
     // TODO: Find a way to efficiently list all JDK installations, including those which are located
     //    outside of $PREFIX/opt
     return try {
-      val optDir = File(Environment.PREFIX, "opt")
+      val optDir = File(Environment.PREFIX, "lib/jvm")
       if (!optDir.exists() || !optDir.isDirectory) {
         emptyList()
       } else {

@@ -592,7 +592,7 @@ object JavaParserUtils {
     if (type.isTypeParameter) {
       val typeParameter = type.asTypeParameter()
       if (typeParameter!!.typeBound.isNonEmpty) {
-        val first = typeParameter.typeBound.getFirst()
+        val first = typeParameter.typeBound.first
         if (first!!.isPresent) {
           return ArrayType(first.get())
         }
@@ -605,7 +605,7 @@ object JavaParserUtils {
     if (type.isTypeParameter) {
       val typeParameter = type.asTypeParameter()
       if (typeParameter!!.typeBound.isNonEmpty) {
-        val first = typeParameter.typeBound.getFirst()
+        val first = typeParameter.typeBound.first
         if (first!!.isPresent) {
           return first.get()
         }
@@ -620,7 +620,7 @@ object JavaParserUtils {
       return type
     }
 
-    val first = typeArguments.get().getFirst()
+    val first = typeArguments.get().first
     if (!first!!.isPresent || !first.get().isTypeParameter) {
       return type
     }
@@ -630,7 +630,7 @@ object JavaParserUtils {
       return type
     }
 
-    val first1 = typeBound.getFirst()
+    val first1 = typeBound.first
     if (!first1!!.isPresent) {
       return type
     }

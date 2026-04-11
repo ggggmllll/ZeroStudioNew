@@ -21,11 +21,11 @@ import android.content.Context
 import com.itsaky.androidide.editor.language.treesitter.TreeSitterLanguage.Factory
 import com.itsaky.androidide.lsp.api.ILanguageServer
 import com.itsaky.androidide.lsp.api.ILanguageServerRegistry
-// import com.itsaky.androidide.lsp.kotlin.KotlinLanguageServer
+import com.itsaky.androidide.lsp.kotlin.KotlinLanguageServer
 import com.itsaky.androidide.treesitter.kotlin.TSLanguageKotlin
 import io.github.rosemoe.sora.lang.Language.INTERRUPTION_LEVEL_STRONG
 import io.github.rosemoe.sora.util.MyCharacter
-import com.itsaky.androidide.lsp.kotlin.lsp.KotlinLspServer
+
 /**
  * [TreeSitterLanguage] implementation for Kotlin.
  *
@@ -42,7 +42,7 @@ open class KotlinLanguage(context: Context) :
   }
 
   override val languageServer: ILanguageServer?
-    get() = ILanguageServerRegistry.getDefault().getServer(KotlinLspServer.SERVER_ID)
+    get() = ILanguageServerRegistry.getDefault().getServer(KotlinLanguageServer.SERVER_ID)
 
   override fun checkIsCompletionChar(c: Char): Boolean {
     return MyCharacter.isJavaIdentifierPart(c) || c == '.'
