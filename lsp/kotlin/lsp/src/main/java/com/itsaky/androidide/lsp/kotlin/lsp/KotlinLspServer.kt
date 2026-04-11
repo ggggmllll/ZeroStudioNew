@@ -37,10 +37,13 @@ import com.itsaky.androidide.lsp.models.SignatureHelpParams
 import com.itsaky.androidide.lsp.models.TypeHierarchyItem
 import com.itsaky.androidide.lsp.models.WorkspaceEdit
 import com.itsaky.androidide.lsp.models.WorkspaceSymbolsResult
+import com.itsaky.androidide.lsp.util.LSPEditorActions
+import com.itsaky.androidide.lsp.kotlin.lsp.actions.KotlinCodeActionsMenu
 import com.itsaky.androidide.models.Range
 import com.itsaky.androidide.projects.IWorkspace
 import java.nio.file.Path
 import org.eclipse.lsp4j.InitializeParams
+import org.eclipse.lsp4j.ExecuteCommandParams
 import org.eclipse.lsp4j.TextDocumentItem
 import org.eclipse.lsp4j.VersionedTextDocumentIdentifier
 import org.eclipse.lsp4j.WorkspaceFolder
@@ -82,6 +85,7 @@ class KotlinLspServer(
   override fun applySettings(settings: IServerSettings?) = Unit
 
   override fun setupWorkspace(workspace: IWorkspace) {
+    LSPEditorActions.ensureActionsMenuRegistered(KotlinCodeActionsMenu)
     workspaceFolders =
         workspace.getSubProjects().map { WorkspaceFolder(it.path.toUri().toString(), it.name) }
 
@@ -230,6 +234,11 @@ class KotlinLspServer(
   override suspend fun callHierarchy(params: DefinitionParams): List<CallHierarchyItem> = emptyList()
 
   override suspend fun typeHierarchy(params: DefinitionParams): List<TypeHierarchyItem> = emptyList()
+
+  fun executeWorkspaceCommand(command: String, arguments: List<Any> = emptyList()): Any? {
+    ensureInitialized()
+    return delegate.workspaceService.executeCommand(ExecuteCommandParams(command, arguments)).get()
+  }
 
   private fun ensureInitialized() {
     if (!initialized) {
