@@ -79,7 +79,7 @@ dependencies {
   implementation(projects.java.lsp)
   implementation(projects.utilities.shared)
   implementation(projects.xml.lsp)
-  implementation(projects.lsp.kotlin)
+  // implementation(projects.lsp.kotlin)
   implementation(projects.lsp.toml)
   // implementation(projects.lsp.clangd)
   // implementation(projects.lsp.kotlin.lsp)
