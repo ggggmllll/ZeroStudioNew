@@ -172,7 +172,7 @@ include(
     ":lsp:kotlin:adapter",
     ":lsp:kotlin:server",
     ":lsp:kotlin:shared",
-    // ":lsp:kotlin:lsp",
+    ":lsp:kotlin:lsp",
     ":lsp:toml",
     // ":lsp:clangd",
     // ":lsp:smali",
