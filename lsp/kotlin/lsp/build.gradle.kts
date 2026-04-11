@@ -44,6 +44,12 @@ dependencies {
   kapt(libs.google.auto.service)
 
   api(projects.core.indexingApi)
+  api(projects.core.lspApi)
+  api(projects.core.lspModels)
+
+  implementation(projects.lsp.kotlin.server)
+  implementation(projects.lsp.kotlin.adapter)
+  implementation(projects.lsp.kotlin.shared)
 
   implementation(libs.androidide.ts)
   implementation(libs.androidide.ts.java)
