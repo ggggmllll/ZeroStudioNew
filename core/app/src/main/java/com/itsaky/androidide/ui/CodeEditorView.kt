@@ -500,7 +500,7 @@ class CodeEditorView(context: Context, file: File, selection: Range) :
           "xml" -> XMLLanguageServer.SERVER_ID
           "kt",
           "kts" -> KotlinLanguageServer.SERVER_ID
-          "toml" -> registry.getServer(TomlServer.SERVER_ID)
+          "toml" -> TomlServer.SERVER_ID
           else -> return null
         }
     return ILanguageServerRegistry.getDefault().getServer(serverID)

@@ -107,7 +107,7 @@ class IDEApplication : TermuxApplication() {
         .addIndex(EditorEventsIndex())
         .addIndex(LspApiEventsIndex())
         .addIndex(LspJavaEventsIndex())
-        .addIndex(LspKotlinEventsIndex())
+        // .addIndex(LspKotlinEventsIndex())
         .installDefaultEventBus(true)
 
     EventBus.getDefault().register(this)
