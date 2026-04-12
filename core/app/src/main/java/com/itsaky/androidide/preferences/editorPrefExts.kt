@@ -17,9 +17,9 @@
 
 package com.itsaky.androidide.preferences
 
+// import com.itsaky.androidide.fragments.preferences.LspSettingsFragment
 import android.content.Context
 import android.view.LayoutInflater
-import androidx.fragment.app.FragmentActivity
 import androidx.preference.Preference
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.itsaky.androidide.R
@@ -27,7 +27,6 @@ import com.itsaky.androidide.databinding.DialogAutoSaveDelayBinding
 import com.itsaky.androidide.databinding.LayoutTextSizeSliderBinding
 import com.itsaky.androidide.editor.schemes.IDEColorScheme
 import com.itsaky.androidide.editor.schemes.IDEColorSchemeProvider
-// import com.itsaky.androidide.fragments.preferences.LspSettingsFragment
 import com.itsaky.androidide.preferences.internal.EditorPreferences
 import com.itsaky.androidide.preferences.internal.EditorPreferences.AUTO_COMPLETE_ON_TYPE
 import com.itsaky.androidide.preferences.internal.EditorPreferences.AUTO_SAVE_BEFORE_BUILD
@@ -79,37 +78,37 @@ class EditorPreferencesScreen(
 // @PS： A preference entry that opens the LspSettingsFragment
 // @Parcelize
 // class LspPreferencesEntry(
-    // override val key: String = "idepref_lsp_settings",
-    // override val title: Int = R.string.lsp_settings_title,
-    // override val summary: Int? = R.string.lsp_settings_desc,
-    // override val icon: Int? = R.drawable.ic_language_java,
+// override val key: String = "idepref_lsp_settings",
+// override val title: Int = R.string.lsp_settings_title,
+// override val summary: Int? = R.string.lsp_settings_desc,
+// override val icon: Int? = R.drawable.ic_language_java,
 // ) : SimplePreference() {
-  // @IgnoredOnParcel
-  // private val onClick: ((Preference) -> Boolean) = { pref ->
-    // val context = pref.context
-    // // AndroidIDE's PreferencesActivity likely inherits from AppCompatActivity/FragmentActivity.
-    // if (context is FragmentActivity) {
-      // context.supportFragmentManager
-          // .beginTransaction()
-          // .setCustomAnimations(
-              // android.R.anim.fade_in,
-              // android.R.anim.fade_out,
-              // android.R.anim.fade_in,
-              // android.R.anim.fade_out,
-          // )
-          // // Use android.R.id.content to replace the entire preference screen content
-          // .replace(android.R.id.content, LspSettingsFragment())
-          // .addToBackStack("lsp_settings")
-          // .commit()
-      // true
-    // } else {
-      // false
-    // }
-  // }
+// @IgnoredOnParcel
+// private val onClick: ((Preference) -> Boolean) = { pref ->
+// val context = pref.context
+// // AndroidIDE's PreferencesActivity likely inherits from AppCompatActivity/FragmentActivity.
+// if (context is FragmentActivity) {
+// context.supportFragmentManager
+// .beginTransaction()
+// .setCustomAnimations(
+// android.R.anim.fade_in,
+// android.R.anim.fade_out,
+// android.R.anim.fade_in,
+// android.R.anim.fade_out,
+// )
+// // Use android.R.id.content to replace the entire preference screen content
+// .replace(android.R.id.content, LspSettingsFragment())
+// .addToBackStack("lsp_settings")
+// .commit()
+// true
+// } else {
+// false
+// }
+// }
 
-  // override fun onPreferenceClick(preference: Preference): Boolean {
-    // return onClick(preference)
-  // }
+// override fun onPreferenceClick(preference: Preference): Boolean {
+// return onClick(preference)
+// }
 // }
 
 @Parcelize

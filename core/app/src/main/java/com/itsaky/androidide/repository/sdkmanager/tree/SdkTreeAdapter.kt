@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.Space
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.checkbox.MaterialCheckBox
@@ -24,10 +23,10 @@ class SdkTreeAdapter(
     private val onNodeCheckChanged: (SdkTreeNode) -> Unit,
 ) : RecyclerView.Adapter<SdkTreeAdapter.ViewHolder>() {
 
+  private var rootNodes: List<SdkTreeNode> = emptyList()
   private val visibleNodes = mutableListOf<SdkTreeNode>()
 
   class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {
-    val indentSpace: Space = v.findViewById(R.id.indent_space)
     val ivExpand: ImageView = v.findViewById(R.id.iv_expand)
     val cbNode: MaterialCheckBox = v.findViewById(R.id.cb_node)
     val tvName: TextView = v.findViewById(R.id.tv_name)
@@ -37,21 +36,23 @@ class SdkTreeAdapter(
   }
 
   fun submitList(rootNodes: List<SdkTreeNode>) {
+    this.rootNodes = rootNodes
+    rebuildVisibleNodes()
+  }
+
+  private fun rebuildVisibleNodes() {
     visibleNodes.clear()
     for (node in rootNodes) {
-      visibleNodes.add(node)
-      if (node.isExpanded) {
-        addVisibleChildren(node)
-      }
+      traverseAndAdd(node)
     }
     notifyDataSetChanged()
   }
 
-  private fun addVisibleChildren(node: SdkTreeNode) {
-    for (child in node.children) {
-      visibleNodes.add(child)
-      if (child.isExpanded) {
-        addVisibleChildren(child)
+  private fun traverseAndAdd(node: SdkTreeNode) {
+    visibleNodes.add(node)
+    if (node.isExpanded) {
+      for (child in node.children) {
+        traverseAndAdd(child)
       }
     }
   }
@@ -60,24 +61,22 @@ class SdkTreeAdapter(
     val view = LayoutInflater.from(context).inflate(R.layout.item_sdk_tree_node, parent, false)
     val holder = ViewHolder(view)
 
-    // 展开/折叠 点击事件
-    val expandClickListener = View.OnClickListener {
+    val clickListener = View.OnClickListener {
       val pos = holder.adapterPosition
       if (pos != RecyclerView.NO_POSITION) {
         val node = visibleNodes[pos]
         if (node.isGroup) {
-          if (node.isExpanded) {
-            collapseNode(node)
-          } else {
-            expandNode(node)
-          }
+          node.isExpanded = !node.isExpanded
+          rebuildVisibleNodes()
+        } else {
+          onNodeCheckChanged(node)
         }
       }
     }
-    holder.itemView.setOnClickListener(expandClickListener)
-    holder.ivExpand.setOnClickListener(expandClickListener)
 
-    // 复选框 点击事件
+    // 点击任意有效区域都可以触发相应的选中/展开操作
+    holder.itemView.setOnClickListener(clickListener)
+
     holder.cbNode.setOnClickListener {
       val pos = holder.adapterPosition
       if (pos != RecyclerView.NO_POSITION) {
@@ -97,12 +96,17 @@ class SdkTreeAdapter(
   override fun onBindViewHolder(holder: ViewHolder, position: Int) {
     val node = visibleNodes[position]
 
-    // 设置树形缩进 (每级缩进 20dp)
-    val params = holder.indentSpace.layoutParams
-    params.width = node.level * dpToPx(20f)
-    holder.indentSpace.layoutParams = params
+    val basePadding = dpToPx(16f)
+    val indentPadding = node.level * dpToPx(20f)
+    holder.itemView.setPadding(
+        basePadding + indentPadding,
+        holder.itemView.paddingTop,
+        holder.itemView.paddingRight,
+        holder.itemView.paddingBottom,
+    )
 
-    // 基础文本
+    holder.itemView.findViewById<View>(R.id.indent_space)?.visibility = View.GONE
+
     holder.tvName.text = node.name
     holder.tvName.typeface =
         if (node.isGroup) android.graphics.Typeface.DEFAULT_BOLD
@@ -110,7 +114,6 @@ class SdkTreeAdapter(
     holder.tvApiLevel.text = node.apiLevel
     holder.tvRevision.text = node.revision
 
-    // 展开箭头状态
     if (node.isGroup) {
       holder.ivExpand.visibility = View.VISIBLE
       holder.ivExpand.setImageResource(
@@ -120,7 +123,6 @@ class SdkTreeAdapter(
       holder.ivExpand.visibility = View.INVISIBLE
     }
 
-    // 复选框状态 (支持三态)
     holder.cbNode.checkedState =
         when (node.checkedState) {
           androidx.compose.ui.state.ToggleableState.On -> MaterialCheckBox.STATE_CHECKED
@@ -129,7 +131,6 @@ class SdkTreeAdapter(
           androidx.compose.ui.state.ToggleableState.Off -> MaterialCheckBox.STATE_UNCHECKED
         }
 
-    // Status 状态文本及颜色
     val statusText =
         when (node.status) {
           InstallStatus.NOT_INSTALLED -> "Not installed"
@@ -137,63 +138,13 @@ class SdkTreeAdapter(
           InstallStatus.UPDATE_AVAILABLE -> "Update available"
         }
     holder.tvStatus.text = if (node.isGroup) "" else statusText
+
     if (node.status == InstallStatus.INSTALLED && !node.isGroup) {
-      holder.tvStatus.setTextColor(Color.parseColor("#4CAF50")) // Green
+      holder.tvStatus.setTextColor(Color.parseColor("#4CAF50"))
     } else {
-      holder.tvStatus.setTextColor(holder.tvRevision.currentTextColor) // Default secondary
+      holder.tvStatus.setTextColor(holder.tvRevision.currentTextColor)
     }
   }
 
   override fun getItemCount(): Int = visibleNodes.size
-
-  private fun collapseAllChildren(node: SdkTreeNode) {
-    node.children.forEach {
-      it.isExpanded = false
-      collapseAllChildren(it)
-    }
-  }
-
-  private fun expandNode(node: SdkTreeNode) {
-    if (node.isExpanded) return
-    node.isExpanded = true
-    val index = visibleNodes.indexOf(node)
-    if (index == -1) return
-    var insertIndex = index + 1
-
-    fun insertRecursive(parent: SdkTreeNode) {
-      for (child in parent.children) {
-        visibleNodes.add(insertIndex++, child)
-        if (child.isExpanded) {
-          insertRecursive(child)
-        }
-      }
-    }
-
-    val prevSize = visibleNodes.size
-    insertRecursive(node)
-    val addedCount = visibleNodes.size - prevSize
-    notifyItemRangeInserted(index + 1, addedCount)
-    notifyItemChanged(index) // Update arrow
-  }
-
-  private fun collapseNode(node: SdkTreeNode) {
-    if (!node.isExpanded) return
-    node.isExpanded = false
-    collapseAllChildren(node)
-    val index = visibleNodes.indexOf(node)
-    if (index == -1) return
-
-    var removeCount = 0
-    var nextIndex = index + 1
-    while (nextIndex < visibleNodes.size && visibleNodes[nextIndex].level > node.level) {
-      removeCount++
-      nextIndex++
-    }
-
-    if (removeCount > 0) {
-      visibleNodes.subList(index + 1, index + 1 + removeCount).clear()
-      notifyItemRangeRemoved(index + 1, removeCount)
-    }
-    notifyItemChanged(index) // Update arrow
-  }
 }

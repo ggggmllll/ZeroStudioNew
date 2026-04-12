@@ -175,9 +175,7 @@ abstract class LogViewFragment :
 
   private fun append(chars: CharSequence?) {
     chars?.let {
-      ThreadUtils.runOnUiThread {
-        _binding?.editor?.append(chars)?.also { isEmpty = false }
-      }
+      ThreadUtils.runOnUiThread { _binding?.editor?.append(chars)?.also { isEmpty = false } }
     }
   }
 

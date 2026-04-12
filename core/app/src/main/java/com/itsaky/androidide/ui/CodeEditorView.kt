@@ -20,8 +20,8 @@ package com.itsaky.androidide.ui
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
-import android.os.Bundle
 import android.graphics.Rect
+import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewTreeObserver
 import androidx.appcompat.widget.LinearLayoutCompat
@@ -29,6 +29,7 @@ import androidx.core.view.isVisible
 import com.blankj.utilcode.util.SizeUtils
 import com.itsaky.androidide.activities.editor.BaseEditorActivity
 import com.itsaky.androidide.app.BaseApplication
+import com.itsaky.androidide.cursor.CursorHistoryManager
 import com.itsaky.androidide.editor.api.IEditor
 import com.itsaky.androidide.editor.databinding.LayoutCodeEditorBinding
 import com.itsaky.androidide.editor.ui.EditorSearchLayout
@@ -44,7 +45,6 @@ import com.itsaky.androidide.editor.ui.updateEditorDiagnostics
 import com.itsaky.androidide.editor.utils.ContentReadWrite.readContent
 import com.itsaky.androidide.editor.utils.ContentReadWrite.writeTo
 import com.itsaky.androidide.eventbus.events.preferences.PreferenceChangeEvent
-import com.itsaky.androidide.cursor.CursorHistoryManager
 import com.itsaky.androidide.lsp.IDELanguageClientImpl
 import com.itsaky.androidide.lsp.api.ILanguageServer
 import com.itsaky.androidide.lsp.api.ILanguageServerRegistry
@@ -121,35 +121,34 @@ class CodeEditorView(context: Context, file: File, selection: Range) :
   private var analysisJob: Job? = null
   private var isKeyboardVisible = false
   private var imeBottomInset = 0
-  private val keyboardLayoutListener =
-      ViewTreeObserver.OnGlobalLayoutListener {
-        val editorView = _binding?.editor ?: return@OnGlobalLayoutListener
-        val root = rootView ?: return@OnGlobalLayoutListener
-        val rect = Rect()
-        root.getWindowVisibleDisplayFrame(rect)
-        val heightDiff = root.height - rect.height()
-        val keyboardNowVisible = heightDiff > (root.height * 0.15f)
-        val transitionedToVisible = keyboardNowVisible && !isKeyboardVisible
-        isKeyboardVisible = keyboardNowVisible
-        imeBottomInset = if (keyboardNowVisible) heightDiff.coerceAtLeast(0) else 0
+  private val keyboardLayoutListener = ViewTreeObserver.OnGlobalLayoutListener {
+    val editorView = _binding?.editor ?: return@OnGlobalLayoutListener
+    val root = rootView ?: return@OnGlobalLayoutListener
+    val rect = Rect()
+    root.getWindowVisibleDisplayFrame(rect)
+    val heightDiff = root.height - rect.height()
+    val keyboardNowVisible = heightDiff > (root.height * 0.15f)
+    val transitionedToVisible = keyboardNowVisible && !isKeyboardVisible
+    isKeyboardVisible = keyboardNowVisible
+    imeBottomInset = if (keyboardNowVisible) heightDiff.coerceAtLeast(0) else 0
 
-        if (editorView.paddingBottom != imeBottomInset) {
-          editorView.setPadding(
-              editorView.paddingLeft,
-              editorView.paddingTop,
-              editorView.paddingRight,
-              imeBottomInset,
-          )
-          editorView.invalidate()
-        }
+    if (editorView.paddingBottom != imeBottomInset) {
+      editorView.setPadding(
+          editorView.paddingLeft,
+          editorView.paddingTop,
+          editorView.paddingRight,
+          imeBottomInset,
+      )
+      editorView.invalidate()
+    }
 
-        if (transitionedToVisible) {
-          editorView.post {
-            val cursor = editorView.cursor ?: return@post
-            editorView.ensurePositionVisible(cursor.rightLine, cursor.rightColumn)
-          }
-        }
+    if (transitionedToVisible) {
+      editorView.post {
+        val cursor = editorView.cursor ?: return@post
+        editorView.ensurePositionVisible(cursor.rightLine, cursor.rightColumn)
       }
+    }
+  }
 
   /** Get the file of this editor. */
   val file: File?
@@ -305,12 +304,11 @@ class CodeEditorView(context: Context, file: File, selection: Range) :
   /** Called when the editor has been selected and is visible to the user. */
   fun onEditorSelected() {
     _binding?.editor?.also {
-          if (IDELanguageClientImpl.isInitialized()) {
-            it.setLanguageClient(IDELanguageClientImpl.getInstance())
-          }
-          it.onEditorSelected()
-        }
-        ?: run { log.warn("onEditorSelected() called but no editor instance is available") }
+      if (IDELanguageClientImpl.isInitialized()) {
+        it.setLanguageClient(IDELanguageClientImpl.getInstance())
+      }
+      it.onEditorSelected()
+    } ?: run { log.warn("onEditorSelected() called but no editor instance is available") }
   }
 
   /** Begins search mode and shows the [search layout][EditorSearchLayout]. */

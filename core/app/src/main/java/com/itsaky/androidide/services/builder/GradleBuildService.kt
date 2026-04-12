@@ -130,7 +130,6 @@ class GradleBuildService :
     private val log = LoggerFactory.getLogger(GradleBuildService::class.java)
     private val NOTIFICATION_ID = R.string.app_name
     private val SERVER_System_err = LoggerFactory.getLogger("ToolingApiErrorStream")
-
   }
 
   override fun onCreate() {

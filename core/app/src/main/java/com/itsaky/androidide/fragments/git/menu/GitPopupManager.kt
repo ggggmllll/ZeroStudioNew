@@ -69,7 +69,11 @@ class GitPopupManager(private val context: Context) {
 
     addDivider()
     addSectionTitle("Git 操作区")
-    addMenuItem(iconRes = R.drawable.ic_initialize_target_24dp, title = "Git 初始化", subtitle = "创建 .git 仓库") {
+    addMenuItem(
+        iconRes = R.drawable.ic_initialize_target_24dp,
+        title = "Git 初始化",
+        subtitle = "创建 .git 仓库",
+    ) {
       initRepositoryIfNeeded()
       dismiss()
     }

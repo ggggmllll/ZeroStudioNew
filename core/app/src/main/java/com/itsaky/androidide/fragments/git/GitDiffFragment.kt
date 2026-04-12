@@ -69,8 +69,12 @@ class GitDiffFragment : BaseGitPageFragment() {
     addToolbarAction(R.drawable.ic_chevron_right_24, getString(R.string.next_page)) {
       navigateDiff(1)
     }
-    addToolbarAction(R.drawable.ic_refresh_24, getString(R.string.refresh)) { reloadChangedFilesAndDiff() }
-    addToolbarAction(R.drawable.ic_filter_list_24, getString(R.string.search)) { showSearchDialog() }
+    addToolbarAction(R.drawable.ic_refresh_24, getString(R.string.refresh)) {
+      reloadChangedFilesAndDiff()
+    }
+    addToolbarAction(R.drawable.ic_filter_list_24, getString(R.string.search)) {
+      showSearchDialog()
+    }
     addToolbarAction(R.drawable.ic_warning_24, "Style") {
       compactMode = !compactMode
       adapter.notifyDataSetChanged()
@@ -236,7 +240,8 @@ class GitDiffFragment : BaseGitPageFragment() {
                             fromTo = Cons.gitDiffFromTreeToTree,
                             returnDiffContent = true,
                         )
-                    patchRet.data?.content
+                    patchRet.data
+                        ?.content
                         ?.lineSequence()
                         ?.take(600)
                         ?.map { line ->
@@ -261,8 +266,18 @@ class GitDiffFragment : BaseGitPageFragment() {
                 listOf(
                     DiffLine(-1, -1, "Commit: ${dto.shortOidStr}", DiffType.HUNK_HEADER),
                     DiffLine(-1, -1, "Author: ${dto.author}", DiffType.CONTEXT),
-                    DiffLine(-1, -1, "Branches: ${dto.branchShortNameList.joinToString()}", DiffType.CONTEXT),
-                    DiffLine(-1, -1, "Parents: ${dto.parentShortOidStrList.joinToString()}", DiffType.CONTEXT),
+                    DiffLine(
+                        -1,
+                        -1,
+                        "Branches: ${dto.branchShortNameList.joinToString()}",
+                        DiffType.CONTEXT,
+                    ),
+                    DiffLine(
+                        -1,
+                        -1,
+                        "Parents: ${dto.parentShortOidStrList.joinToString()}",
+                        DiffType.CONTEXT,
+                    ),
                     DiffLine(-1, -1, dto.msg, DiffType.CONTEXT),
                 ) + patchLines
             applyFilter()

@@ -20,10 +20,7 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import io.github.rosemoe.sora.widget.CodeEditor
 
-/**
- * 使用传统 View 实现系统文本扩展动作弹窗，避免在 PopupWindow 中挂载 Compose 导致
- * ViewTreeLifecycleOwner 缺失引发崩溃。
- */
+/** 使用传统 View 实现系统文本扩展动作弹窗，避免在 PopupWindow 中挂载 Compose 导致 ViewTreeLifecycleOwner 缺失引发崩溃。 */
 class SystemTextActionsPopup(
     private val context: Context,
     private val editor: CodeEditor,
@@ -52,7 +49,12 @@ class SystemTextActionsPopup(
         LinearLayout(context).apply {
           orientation = LinearLayout.VERTICAL
           minimumWidth = minWidth
-          setPadding((8 * density).toInt(), (8 * density).toInt(), (8 * density).toInt(), (8 * density).toInt())
+          setPadding(
+              (8 * density).toInt(),
+              (8 * density).toInt(),
+              (8 * density).toInt(),
+              (8 * density).toInt(),
+          )
           background =
               GradientDrawable().apply {
                 shape = GradientDrawable.RECTANGLE
@@ -65,25 +67,30 @@ class SystemTextActionsPopup(
       container.addView(
           TextView(context).apply {
             text = "无可用系统动作"
-            setPadding((12 * density).toInt(), (8 * density).toInt(), (12 * density).toInt(), (8 * density).toInt())
-          })
+            setPadding(
+                (12 * density).toInt(),
+                (8 * density).toInt(),
+                (12 * density).toInt(),
+                (8 * density).toInt(),
+            )
+          }
+      )
       return container
     }
 
     val listContainer = LinearLayout(context).apply { orientation = LinearLayout.VERTICAL }
-    actions.forEach { action ->
-      listContainer.addView(createActionRow(action, density))
-    }
+    actions.forEach { action -> listContainer.addView(createActionRow(action, density)) }
 
-    val scrollView = ScrollView(context).apply {
-      isVerticalScrollBarEnabled = true
-      addView(listContainer)
-      layoutParams =
-          ViewGroup.LayoutParams(
-              ViewGroup.LayoutParams.WRAP_CONTENT,
-              ViewGroup.LayoutParams.WRAP_CONTENT,
-          )
-    }
+    val scrollView =
+        ScrollView(context).apply {
+          isVerticalScrollBarEnabled = true
+          addView(listContainer)
+          layoutParams =
+              ViewGroup.LayoutParams(
+                  ViewGroup.LayoutParams.WRAP_CONTENT,
+                  ViewGroup.LayoutParams.WRAP_CONTENT,
+              )
+        }
 
     container.addView(scrollView)
     return container
@@ -93,7 +100,12 @@ class SystemTextActionsPopup(
     return LinearLayout(context).apply {
       orientation = LinearLayout.HORIZONTAL
       gravity = Gravity.CENTER_VERTICAL
-      setPadding((12 * density).toInt(), (10 * density).toInt(), (12 * density).toInt(), (10 * density).toInt())
+      setPadding(
+          (12 * density).toInt(),
+          (10 * density).toInt(),
+          (12 * density).toInt(),
+          (10 * density).toInt(),
+      )
       background = getSelectableItemBackground()
 
       action.icon?.let { iconDrawable ->
@@ -104,7 +116,8 @@ class SystemTextActionsPopup(
                   LinearLayout.LayoutParams((20 * density).toInt(), (20 * density).toInt()).apply {
                     marginEnd = (10 * density).toInt()
                   }
-            })
+            }
+        )
       }
 
       addView(
@@ -112,7 +125,8 @@ class SystemTextActionsPopup(
             text = action.label
             setSingleLine(true)
             ellipsize = android.text.TextUtils.TruncateAt.END
-          })
+          }
+      )
 
       setOnClickListener {
         executeAction(action.intent)
@@ -168,7 +182,9 @@ class SystemTextActionsPopup(
 
   private fun getSelectableItemBackground(): Drawable? {
     val typedValue = TypedValue()
-    return if (context.theme.resolveAttribute(android.R.attr.selectableItemBackground, typedValue, true)) {
+    return if (
+        context.theme.resolveAttribute(android.R.attr.selectableItemBackground, typedValue, true)
+    ) {
       ContextCompat.getDrawable(context, typedValue.resourceId)
     } else {
       null

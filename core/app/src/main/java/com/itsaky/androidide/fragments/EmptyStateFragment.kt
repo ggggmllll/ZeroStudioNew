@@ -97,7 +97,8 @@ abstract class EmptyStateFragment<T : ViewBinding> : FragmentWithBinding<T> {
     // Backward-safe cleanup: if an older build variant still has the delegated
     // `emptyStateViewModel` field, clear it to avoid retaining a cleared ViewModel.
     runCatching {
-      val delegateField = findFieldInHierarchy("emptyStateViewModel\$delegate") ?: return@runCatching
+      val delegateField =
+          findFieldInHierarchy("emptyStateViewModel\$delegate") ?: return@runCatching
       delegateField.isAccessible = true
       val delegate = delegateField.get(this@EmptyStateFragment) ?: return@runCatching
 
@@ -112,7 +113,11 @@ abstract class EmptyStateFragment<T : ViewBinding> : FragmentWithBinding<T> {
   private fun findFieldInHierarchy(name: String): java.lang.reflect.Field? {
     var type: Class<*>? = javaClass
     while (type != null) {
-      runCatching { type.getDeclaredField(name) }.getOrNull()?.let { return it }
+      runCatching { type.getDeclaredField(name) }
+          .getOrNull()
+          ?.let {
+            return it
+          }
       type = type.superclass
     }
     return null

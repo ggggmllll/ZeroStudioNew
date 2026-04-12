@@ -17,8 +17,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
 
 /**
- * 轻量级 SDK 安装管理器。 采用 Kotlin 下载 (保证高可用度与精准进度回报) + Termux Shell (高效强健解压)。
- * 包含 NDK 和 CMake 的定制化修复与补丁应用。
+ * 轻量级 SDK 安装管理器。 采用 Kotlin 下载 (保证高可用度与精准进度回报) + Termux Shell (高效强健解压)。 包含 NDK 和 CMake 的定制化修复与补丁应用。
  *
  * @author android_zero
  */
@@ -235,11 +234,12 @@ object SdkInstallerManager {
     scriptFile.writeText(script)
     scriptFile.setExecutable(true)
 
-    val result = TermuxCommand.run(context) {
-      label("NDK Fix")
-      executable("sh")
-      args(scriptFile.absolutePath)
-    }
+    val result =
+        TermuxCommand.run(context) {
+          label("NDK Fix")
+          executable("sh")
+          args(scriptFile.absolutePath)
+        }
 
     if (result.stdout.isNotBlank()) onLog(result.stdout)
     if (!result.isSuccess) {
@@ -249,17 +249,12 @@ object SdkInstallerManager {
     scriptFile.delete()
   }
 
-  /**
-   * 执行 CMake 修补：
-   * 赋予 /bin 下文件执行权限。
-   * 从 assets 解压 cmake_patches.zip 到临时目录，并使用 patch -p1 应用补丁。
-   */
+  /** 执行 CMake 修补： 赋予 /bin 下文件执行权限。 从 assets 解压 cmake_patches.zip 到临时目录，并使用 patch -p1 应用补丁。 */
   private suspend fun applyCmakePatches(context: Context, cmakeDir: File, onLog: (String) -> Unit) {
     onLog(">> Preparing to apply CMake patches...")
 
     val patchZip = File(getSdkTempDir(), "cmake_patches_${System.currentTimeMillis()}.zip")
-    val patchExtractedDir =
-        File(getSdkTempDir(), "cmake_patches_ext_${System.currentTimeMillis()}")
+    val patchExtractedDir = File(getSdkTempDir(), "cmake_patches_ext_${System.currentTimeMillis()}")
 
     try {
       val success =
@@ -268,9 +263,7 @@ object SdkInstallerManager {
         ZipUtils.unzipFile(patchZip, patchExtractedDir)
         onLog(">> Extracted patch zip successfully.")
       } else {
-        onLog(
-            "WARN: 'data/common/cmake_patches.zip' not found in assets, skipping CMake patches."
-        )
+        onLog("WARN: 'data/common/cmake_patches.zip' not found in assets, skipping CMake patches.")
         return
       }
     } catch (e: Exception) {
@@ -319,11 +312,12 @@ object SdkInstallerManager {
     scriptFile.writeText(script)
     scriptFile.setExecutable(true)
 
-    val result = TermuxCommand.run(context) {
-      label("CMake Patch")
-      executable("sh")
-      args(scriptFile.absolutePath)
-    }
+    val result =
+        TermuxCommand.run(context) {
+          label("CMake Patch")
+          executable("sh")
+          args(scriptFile.absolutePath)
+        }
 
     if (result.stdout.isNotBlank()) onLog(result.stdout)
     if (!result.isSuccess) {
@@ -360,13 +354,13 @@ object SdkInstallerManager {
         }
       }
 
-   //资源解压释放的存放文件夹
+  // 资源解压释放的存放文件夹
   private fun getDestDir(node: SdkTreeNode): File {
     val sdkHome = Environment.ANDROID_HOME
     val ver = node.revision
     return when (node.componentType) {
       "build-tools" -> File(sdkHome, "build-tools")
-      "platform-tools" -> File(sdkHome, "") //这里留空才能解压到正确路径
+      "platform-tools" -> File(sdkHome, "") // 这里留空才能解压到正确路径
       "ndk" -> File(sdkHome, "ndk/$ver")
       "cmake" -> File(sdkHome, "cmake/$ver")
       "cmdline-tools" -> File(sdkHome, "cmdline-tools")

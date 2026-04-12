@@ -133,7 +133,11 @@ class GitBranchPopupManager(
           }
         }
         .getOrElse {
-          Toast.makeText(context, it.localizedMessage ?: "Failed to load branches", Toast.LENGTH_LONG)
+          Toast.makeText(
+                  context,
+                  it.localizedMessage ?: "Failed to load branches",
+                  Toast.LENGTH_LONG,
+              )
               .show()
           emptyList()
         }

@@ -217,7 +217,8 @@ class GitProjectsFragment : BaseGitPageFragment(), FileClickListener, FileLongCl
 
   private fun withRepo(action: (com.github.git24j.core.Repository) -> Unit, successTip: String) {
     val projectDir = IProjectManager.getInstance().getWorkspace()?.getProjectDir()?.path
-    val repoPath = projectDir?.takeIf { it.isNotBlank() } ?: IProjectManager.getInstance().projectDirPath
+    val repoPath =
+        projectDir?.takeIf { it.isNotBlank() } ?: IProjectManager.getInstance().projectDirPath
     if (repoPath.isBlank()) {
       Toast.makeText(context, "No opened project", Toast.LENGTH_SHORT).show()
       return

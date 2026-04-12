@@ -273,13 +273,21 @@ fun ActionConfirmAndRunDialog(
               if (installingNdk) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                   Checkbox(checked = applyNdkFix, onCheckedChange = { applyNdkFix = it })
-                  Text("Apply NDK Fixes (symlinks & patches)", fontSize = 13.sp, modifier = Modifier.clickable { applyNdkFix = !applyNdkFix })
+                  Text(
+                      "Apply NDK Fixes (symlinks & patches)",
+                      fontSize = 13.sp,
+                      modifier = Modifier.clickable { applyNdkFix = !applyNdkFix },
+                  )
                 }
               }
               if (installingCmake) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                   Checkbox(checked = applyCmakePatch, onCheckedChange = { applyCmakePatch = it })
-                  Text("Apply CMake Patches", fontSize = 13.sp, modifier = Modifier.clickable { applyCmakePatch = !applyCmakePatch })
+                  Text(
+                      "Apply CMake Patches",
+                      fontSize = 13.sp,
+                      modifier = Modifier.clickable { applyCmakePatch = !applyCmakePatch },
+                  )
                 }
               }
             }

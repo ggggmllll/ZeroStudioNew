@@ -18,13 +18,13 @@
 package com.itsaky.androidide.actions.editor
 
 import android.content.Context
+import androidx.core.content.ContextCompat
 import com.itsaky.androidide.R
 import com.itsaky.androidide.actions.ActionData
 import com.itsaky.androidide.actions.ActionItem
 import com.itsaky.androidide.actions.ActionStyle
 import com.itsaky.androidide.actions.EditorRelatedAction
 import com.itsaky.androidide.actions.markInvisible
-import androidx.core.content.ContextCompat
 
 /**
  * An action to long select text in the editor.

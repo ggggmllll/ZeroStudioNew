@@ -109,22 +109,22 @@ kapt { arguments { arg("eventBusIndex", "${BuildConfig.packageName}.events.AppEv
 
 configurations.all {
   // resolutionStrategy {
-    // force(libs.hamcrest.all)
-    // force(libs.tests.junit)
-    // force(libs.common.lsp4j.jsonrpc)
-    // force(libs.common.org.eclipse.lsp4j)
+  // force(libs.hamcrest.all)
+  // force(libs.tests.junit)
+  // force(libs.common.lsp4j.jsonrpc)
+  // force(libs.common.org.eclipse.lsp4j)
 
-    // force(libs.org.jetbrains.kotlin.stdlib)
-    // force(libs.org.jetbrains.kotlin.compiler)
-    // force(libs.org.jetbrains.kotlin.kotlin.scripting.jvm.host)
-    // force(libs.org.jetbrains.kotlin.ktscompiler)
-    // force(libs.org.jetbrains.kotlin.sam.with.receiver.compiler.plugin)
-    // force(libs.org.jetbrains.kotlin.reflect)
-    // force(libs.org.jetbrains.kotlin.jvm)
+  // force(libs.org.jetbrains.kotlin.stdlib)
+  // force(libs.org.jetbrains.kotlin.compiler)
+  // force(libs.org.jetbrains.kotlin.kotlin.scripting.jvm.host)
+  // force(libs.org.jetbrains.kotlin.ktscompiler)
+  // force(libs.org.jetbrains.kotlin.sam.with.receiver.compiler.plugin)
+  // force(libs.org.jetbrains.kotlin.reflect)
+  // force(libs.org.jetbrains.kotlin.jvm)
 
-    // force(libs.google.protobuf)
+  // force(libs.google.protobuf)
   // }
-  
+
   exclude(group = "com.google.googlejavaformat", module = "google-java-format")
   exclude(group = "org.jetbrains.kotlin", module = "kotlin-android-extensions-runtime")
   exclude(group = "org.jetbrains.kotlin", module = "kotlin-compiler")
@@ -206,7 +206,7 @@ dependencies {
 
   // java格式化
   implementation(libs.composite.googleJavaFormat) {
-  exclude(group = "com.google.googlejavaformat", module = "google-java-format")
+    exclude(group = "com.google.googlejavaformat", module = "google-java-format")
     exclude(group = "com.google.guava", module = "guava")
   }
 

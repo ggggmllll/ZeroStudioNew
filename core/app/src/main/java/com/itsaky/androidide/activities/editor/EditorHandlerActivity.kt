@@ -24,10 +24,10 @@ import android.text.TextUtils
 import android.view.Menu
 import android.view.MenuItem
 import android.view.ViewGroup.LayoutParams
-import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.collection.MutableIntObjectMap
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.GravityCompat
 import androidx.lifecycle.lifecycleScope
@@ -286,12 +286,9 @@ open class EditorHandlerActivity : ProjectHandlerActivity(), IEditorHandler {
   private fun startKotlinLspInstallDialogCollector() {
     if (kotlinLspInstallCollectorJob?.isActive == true) return
 
-    kotlinLspInstallCollectorJob =
-        lifecycleScope.launch {
-          LspEventBus.installRequests.collect { request ->
-            showKotlinLspInstallerDialog(request)
-          }
-        }
+    kotlinLspInstallCollectorJob = lifecycleScope.launch {
+      LspEventBus.installRequests.collect { request -> showKotlinLspInstallerDialog(request) }
+    }
   }
 
   private fun showKotlinLspInstallerDialog(request: LspInstallRequestEvent) {
@@ -309,11 +306,9 @@ open class EditorHandlerActivity : ProjectHandlerActivity(), IEditorHandler {
         }
 
     kotlinLspInstallDialog =
-        newMaterialDialogBuilder(this)
-            .setCancelable(false)
-            .setView(composeView)
-            .create()
-            .also { it.show() }
+        newMaterialDialogBuilder(this).setCancelable(false).setView(composeView).create().also {
+          it.show()
+        }
   }
 
   private fun onReadOpenedFilesCache(cache: OpenedFilesCache?) {

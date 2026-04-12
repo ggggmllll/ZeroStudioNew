@@ -39,7 +39,7 @@ class FileTreeSidebarAction(context: Context, override val order: Int) : Abstrac
   override val fragmentClass: KClass<out Fragment> = GitHostFragment::class
 
   init {
-      icon = null
+    icon = null
     // label = context.getString(R.string.msg_file_tree)
     icon = ContextCompat.getDrawable(context, R.drawable.ic_folder)
   }

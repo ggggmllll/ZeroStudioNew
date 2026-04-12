@@ -37,8 +37,8 @@ import com.github.git24j.core.Repository
 import com.itsaky.androidide.R
 import com.itsaky.androidide.databinding.FragmentGitChangesBinding
 import com.itsaky.androidide.projects.IProjectManager
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -144,10 +144,7 @@ class GitChangesFragment : BaseGitPageFragment() {
     }
 
     viewLifecycleOwner.lifecycleScope.launch {
-      val ret =
-          withContext(Dispatchers.IO) {
-            runCatching { readChangeSnapshot(projectDir) }
-          }
+      val ret = withContext(Dispatchers.IO) { runCatching { readChangeSnapshot(projectDir) } }
 
       ret.onSuccess {
         if (!force && it.signature == lastSnapshotSignature) {
@@ -247,11 +244,9 @@ class GitChangesFragment : BaseGitPageFragment() {
         val branch =
             repo.head()?.shorthand()?.removePrefix("refs/heads/")?.ifBlank { "main" } ?: "main"
         val hasLocalBranch =
-            Libgit2Helper.getBranchList(repo)
-                .any {
-                  it.type == com.github.git24j.core.Branch.BranchType.LOCAL &&
-                      it.shortName == branch
-                }
+            Libgit2Helper.getBranchList(repo).any {
+              it.type == com.github.git24j.core.Branch.BranchType.LOCAL && it.shortName == branch
+            }
         if (!hasLocalBranch) {
           throw IllegalStateException("Current branch '$branch' is invalid")
         }
@@ -356,9 +351,7 @@ class GitChangesFragment : BaseGitPageFragment() {
 
       val stagedRows = staged.orEmpty()
       val builtRows = buildRows(stagedRows, unstaged)
-      val head =
-          runCatching { repo.head()?.target()?.toString() ?: "" }
-              .getOrDefault("")
+      val head = runCatching { repo.head()?.target()?.toString() ?: "" }.getOrDefault("")
       val signature = buildSignature(head, stagedRows, unstaged)
       ChangeSnapshot(rows = builtRows, signature = signature)
     }
@@ -464,11 +457,11 @@ class GitChangesFragment : BaseGitPageFragment() {
           emitGitOperation("changes", "open_diff")
           Toast.makeText(context, "Open diff: ${item.relativePathUnderRepo}", Toast.LENGTH_SHORT)
               .show()
-          (requireActivity() as? androidx.fragment.app.FragmentActivity)
-              ?.let {
-                androidx.lifecycle.ViewModelProvider(it)[GitUiEventViewModel::class.java]
-                    .emit(GitUiEvent.OpenDiff(item.relativePathUnderRepo))
-              }
+          (requireActivity() as? androidx.fragment.app.FragmentActivity)?.let {
+            androidx.lifecycle
+                .ViewModelProvider(it)[GitUiEventViewModel::class.java]
+                .emit(GitUiEvent.OpenDiff(item.relativePathUnderRepo))
+          }
         }
 
         itemView.setOnLongClickListener {

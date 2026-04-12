@@ -55,10 +55,11 @@ class PreferencesActivity : EdgeToEdgeIDEActivity() {
     val args = Bundle()
     args.putParcelableArrayList(IDEPreferencesFragment.EXTRA_CHILDREN, ArrayList(prefs.children))
 
-    val fragment = IDEPreferencesFragment().also { createdFragment ->
-      createdFragment.arguments = args
-      rootFragment = createdFragment
-    }
+    val fragment =
+        IDEPreferencesFragment().also { createdFragment ->
+          createdFragment.arguments = args
+          rootFragment = createdFragment
+        }
     loadFragment(fragment)
   }
 

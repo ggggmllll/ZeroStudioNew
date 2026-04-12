@@ -18,8 +18,6 @@
 package com.itsaky.androidide.utils
 
 import com.itsaky.androidide.models.Symbol
-import io.github.rosemoe.sora.widget.CodeEditor
-import io.github.rosemoe.sora.widget.SelectionMovement
 import java.io.File
 
 object Symbols {
@@ -133,7 +131,6 @@ object Symbols {
       get() = 1
   }
 }
-
 
 // object Symbols {
 

@@ -18,12 +18,12 @@
 package com.itsaky.androidide.actions.editor
 
 import android.content.Context
+import androidx.core.content.ContextCompat
 import com.itsaky.androidide.actions.ActionData
 import com.itsaky.androidide.actions.ActionItem
 import com.itsaky.androidide.actions.ActionStyle
 import com.itsaky.androidide.actions.EditorRelatedAction
 import com.itsaky.androidide.resources.R
-import androidx.core.content.ContextCompat
 
 /**
  * Expands the current selection using the language server set in editor.

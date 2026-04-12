@@ -24,7 +24,6 @@ import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
@@ -35,32 +34,25 @@ import com.github.appintro.AppIntroPageTransformerType
 import com.itsaky.androidide.R
 import com.itsaky.androidide.R.string
 import com.itsaky.androidide.app.configuration.IDEBuildConfigProvider
-import com.itsaky.androidide.app.configuration.IJdkDistributionProvider
 import com.itsaky.androidide.fragments.onboarding.GreetingFragment
 import com.itsaky.androidide.fragments.onboarding.OdSdkToolInstallFragment
 import com.itsaky.androidide.fragments.onboarding.OnboardingInfoFragment
 import com.itsaky.androidide.fragments.onboarding.PermissionsFragment
-import com.itsaky.androidide.models.JdkDistribution
 import com.itsaky.androidide.preferences.internal.prefManager
-import com.itsaky.androidide.tasks.launchAsyncWithProgress
+import com.itsaky.androidide.repository.sdkmanager.SdkChecker
 import com.itsaky.androidide.ui.themes.IThemeManager
 import com.itsaky.androidide.utils.*
-import com.itsaky.androidide.utils.Environment
 import com.termux.shared.android.PackageUtils
 import com.termux.shared.markdown.MarkdownUtils
 import com.termux.shared.termux.TermuxConstants
-import kotlinx.coroutines.CoroutineName
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.withContext
 
+/**
+ * 引导页与环境初始化 Activity
+ *
+ * @author Akash Yadav
+ * @author android_zero
+ */
 class OnboardingActivity : AppIntro2() {
-
-  private val activityScope = CoroutineScope(Dispatchers.Main + CoroutineName("OnboardingActivity"))
-
-  private var listJdkInstallationsJob: Job? = null
 
   companion object {
     private const val TAG = "OnboardingActivity"
@@ -69,7 +61,9 @@ class OnboardingActivity : AppIntro2() {
 
   @SuppressLint("SourceLockedOrientationActivity")
   override fun onCreate(savedInstanceState: Bundle?) {
+    // 在 onCreate 的最前端应用主题，避免因为配置改变导致闪烁
     IThemeManager.getInstance().applyTheme(this)
+
     // 强制竖屏，避免引导页旋转导致重建问题
     try {
       requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
@@ -95,21 +89,24 @@ class OnboardingActivity : AppIntro2() {
       window.statusBarColor = resolveAttr(R.attr.colorSurface)
     }
 
+    // 核心检查：如果环境已经准备好（权限和SDK/JDK均满足），直接跳转并拦截后续视图加载
     if (tryNavigateToMainIfSetupIsCompleted()) {
       return
     }
 
-    // 允许用户左右滑动切换引导页
+    // 是否允许用户左右滑动切换引导页
     isWizardMode = false
-    setSwipeLock(true) 
+    setSwipeLock(true) // 是否允许左右滑动切换页面，这个true表示禁用，这个运行滑动会影响sdk安装页面，所以需要禁用
 
     setTransformer(AppIntroPageTransformerType.Fade)
     setProgressIndicator()
     showStatusBar(true)
     isIndicatorEnabled = true
 
+    // 添加欢迎页
     addSlide(GreetingFragment())
 
+    // 检查用户是否为主用户
     if (!PackageUtils.isCurrentUserThePrimaryUser(this)) {
       val errorMessage =
           getString(
@@ -127,6 +124,7 @@ class OnboardingActivity : AppIntro2() {
       return
     }
 
+    // 检查是否安装在外部 SD 卡
     if (isInstalledOnSdCard()) {
       val errorMessage =
           getString(
@@ -144,16 +142,17 @@ class OnboardingActivity : AppIntro2() {
       return
     }
 
+    // 检查设备架构支持情况
     if (!checkDeviceSupported()) {
       return
     }
 
-    // 如果权限未全部满足，则显示权限页
+    // 如果权限未全部满足，则显示权限请求页
     if (!checkAllPermissionsGranted()) {
       addSlide(PermissionsFragment.newInstance(this))
     }
 
-    // 若尚未安装环境，添加全新的环境配置 Fragment
+    // 如果 SDK 或 JDK 工具链未安装，添加环境配置 Fragment
     if (!checkToolsIsInstalled()) {
       addSlide(OdSdkToolInstallFragment.newInstance(this))
     }
@@ -161,12 +160,8 @@ class OnboardingActivity : AppIntro2() {
 
   override fun onResume() {
     super.onResume()
-    reloadJdkDistInfo { tryNavigateToMainIfSetupIsCompleted() }
-  }
-
-  override fun onDestroy() {
-    super.onDestroy()
-    activityScope.cancel("Activity is being destroyed")
+    // 每次恢复到前台时，检查是否可以前往 MainActivity
+    tryNavigateToMainIfSetupIsCompleted()
   }
 
   override fun onDonePressed(currentFragment: Fragment?) {
@@ -183,31 +178,28 @@ class OnboardingActivity : AppIntro2() {
     tryNavigateToMainIfSetupIsCompleted()
   }
 
-  /**
-   * 提供给 OdSdkToolInstallFragment 安装完成后的回调。
-   * 这将触发重新加载 JDK 并检查是否能进入 MainActivity。
-   */
+  /** 提供给 OdSdkToolInstallFragment 或其它安装组件安装完成后的回调 */
   fun onSetupCompleted() {
-    reloadJdkDistInfo { tryNavigateToMainIfSetupIsCompleted() }
+    tryNavigateToMainIfSetupIsCompleted()
   }
 
-  /** 严格检查所有权限 */
+  /** 严格检查所有必须的权限 */
   private fun checkAllPermissionsGranted(): Boolean {
     val context = this
 
-    // 通知
+    // 通知权限
     if (!NotificationManagerCompat.from(context).areNotificationsEnabled()) {
       return false
     }
 
-    // 安装权限
+    // 安装未知应用权限 (Android 8.0+)
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
       if (!context.packageManager.canRequestPackageInstalls()) {
         return false
       }
     }
 
-    // 全文件管理 / 基础存储
+    // 全文件管理 / 基础存储权限
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
       if (!android.os.Environment.isExternalStorageManager()) {
         return false
@@ -218,9 +210,11 @@ class OnboardingActivity : AppIntro2() {
               Manifest.permission.READ_EXTERNAL_STORAGE,
               Manifest.permission.WRITE_EXTERNAL_STORAGE,
           )
-      if (legacyPerms.any {
+      if (
+          legacyPerms.any {
             ContextCompat.checkSelfPermission(context, it) != PackageManager.PERMISSION_GRANTED
-          }) {
+          }
+      ) {
         return false
       }
     }
@@ -228,45 +222,27 @@ class OnboardingActivity : AppIntro2() {
     return true
   }
 
+  /** 统一调用下沉的 SdkChecker 进行环境工具检查 */
   private fun checkToolsIsInstalled(): Boolean {
-    return IJdkDistributionProvider.getInstance().installedDistributions.isNotEmpty() &&
-        Environment.ANDROID_HOME.exists()
+    return SdkChecker.isEnvironmentReadySync()
   }
 
+  /** 综合判定 Setup 是否完成 */
   private fun isSetupCompleted(): Boolean {
     return checkToolsIsInstalled() && checkAllPermissionsGranted()
   }
 
+  /** 如果满足所有条件，跳转到主界面并销毁自己 */
   private fun tryNavigateToMainIfSetupIsCompleted(): Boolean {
     if (isSetupCompleted()) {
       startActivity(Intent(this, MainActivity::class.java))
       finish()
       return true
     }
-
     return false
   }
 
-  private inline fun reloadJdkDistInfo(crossinline distConsumer: (List<JdkDistribution>) -> Unit) {
-    listJdkInstallationsJob?.cancel("Reloading JDK distributions")
-
-    listJdkInstallationsJob =
-        activityScope
-            .launchAsyncWithProgress(
-                Dispatchers.Default,
-                configureFlashbar = { builder, _ -> builder.message(string.please_wait) },
-            ) { _, _ ->
-              val distributionProvider = IJdkDistributionProvider.getInstance()
-              distributionProvider.loadDistributions()
-              withContext(Dispatchers.Main) {
-                distConsumer(distributionProvider.installedDistributions)
-              }
-            }
-            .also { it?.invokeOnCompletion { listJdkInstallationsJob = null } }
-  }
-
   private fun isInstalledOnSdCard(): Boolean {
-    // noinspection SdCardPath
     return PackageUtils.isAppInstalledOnExternalStorage(this) &&
         TermuxConstants.TERMUX_FILES_DIR_PATH !=
             filesDir.absolutePath.replace("^/data/user/0/".toRegex(), "/data/data/")
@@ -291,6 +267,7 @@ class OnboardingActivity : AppIntro2() {
       return false
     }
 
+    // 实验性架构检查与警告
     if (configProvider.cpuArch != configProvider.deviceArch) {
       if (!archConfigExperimentalWarningIsShown()) {
         addSlide(
@@ -308,10 +285,10 @@ class OnboardingActivity : AppIntro2() {
         prefManager.putBoolean(KEY_ARCHCONFIG_WARNING_IS_SHOWN, true)
       }
     }
-
     return true
   }
 
-  private fun archConfigExperimentalWarningIsShown() =
-      prefManager.getBoolean(KEY_ARCHCONFIG_WARNING_IS_SHOWN, false)
+  private fun archConfigExperimentalWarningIsShown(): Boolean {
+    return prefManager.getBoolean(KEY_ARCHCONFIG_WARNING_IS_SHOWN, false)
+  }
 }

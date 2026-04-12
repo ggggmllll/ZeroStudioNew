@@ -38,6 +38,7 @@ class GitCollaborationFragment : Fragment() {
   private var _binding: FragmentGitCollaborationBinding? = null
   private val binding
     get() = _binding!!
+
   private var collaborationPagerAdapter: CollaborationPagerAdapter? = null
   private var tabLayoutMediator: TabLayoutMediator? = null
 

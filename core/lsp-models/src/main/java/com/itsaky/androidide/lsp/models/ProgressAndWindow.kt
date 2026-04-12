@@ -1,6 +1,5 @@
 package com.itsaky.androidide.lsp.models
 
-
 data class LogMessageParams(
     var type: MessageType,
     var message: String,

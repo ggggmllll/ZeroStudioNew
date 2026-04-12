@@ -102,7 +102,8 @@ class GitHistoryFragment : BaseGitPageFragment() {
   }
 
   private fun observeGitEvents() {
-    val vm = androidx.lifecycle.ViewModelProvider(requireActivity())[GitUiEventViewModel::class.java]
+    val vm =
+        androidx.lifecycle.ViewModelProvider(requireActivity())[GitUiEventViewModel::class.java]
     viewLifecycleOwner.lifecycleScope.launch {
       viewLifecycleOwner.repeatOnLifecycle(androidx.lifecycle.Lifecycle.State.STARTED) {
         vm.events.collect { event ->
@@ -200,7 +201,12 @@ class GitHistoryFragment : BaseGitPageFragment() {
     var next = rw.next()
     while (next != null && count < limit) {
       val dto =
-          Libgit2Helper.getSingleCommitSimple(repo = repo, repoId = "", commitOidStr = next.toString(), settings = settings)
+          Libgit2Helper.getSingleCommitSimple(
+              repo = repo,
+              repoId = "",
+              commitOidStr = next.toString(),
+              settings = settings,
+          )
       list.add(
           CommitRow(
               hash = dto.oidStr,
@@ -286,7 +292,8 @@ class GitHistoryFragment : BaseGitPageFragment() {
         .setMessage("Status: ${item.statusBadge}\nAuthor: ${item.author}\n\n${item.message}")
         .setPositiveButton("Open Diff") { _, _ ->
           GitSharedState.openDiffForCommit(item.hash)
-          androidx.lifecycle.ViewModelProvider(requireActivity())[GitUiEventViewModel::class.java]
+          androidx.lifecycle
+              .ViewModelProvider(requireActivity())[GitUiEventViewModel::class.java]
               .emit(GitUiEvent.OpenDiff(item.hash))
         }
         .setNegativeButton(android.R.string.cancel, null)

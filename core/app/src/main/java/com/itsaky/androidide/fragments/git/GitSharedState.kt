@@ -18,4 +18,3 @@ object GitSharedState {
     _selectedCommitHash.value = hash
   }
 }
-
