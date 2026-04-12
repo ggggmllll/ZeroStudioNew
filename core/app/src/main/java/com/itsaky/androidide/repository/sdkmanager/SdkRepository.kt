@@ -49,12 +49,12 @@ object SdkRepository {
     val sdkHome = Environment.ANDROID_HOME
     val targetDir =
         when (componentType) {
-          "build-tools" -> File(sdkHome, "build-tools/$version")
-          "platform-tools" -> File(sdkHome, "platform-tools")
+          "build-tools" -> File(sdkHome, "build-tools")
+          "platform-tools" -> File(sdkHome, "")
           "ndk" -> File(sdkHome, "ndk/$version")
           "cmake" -> File(sdkHome, "cmake/$version")
-          "cmdline-tools" -> File(sdkHome, "cmdline-tools/latest")
-          "android-sdk" -> File(sdkHome, "platforms")
+          "cmdline-tools" -> File(sdkHome, "cmdline-tools")
+          "android-sdk" -> File(sdkHome, "")
           "jdk" -> File(Environment.PREFIX, "opt/openjdk-$version")
           else -> null
         }

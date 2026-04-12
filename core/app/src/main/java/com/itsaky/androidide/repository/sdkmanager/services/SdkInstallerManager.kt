@@ -360,12 +360,13 @@ object SdkInstallerManager {
         }
       }
 
+   //资源解压释放的存放文件夹
   private fun getDestDir(node: SdkTreeNode): File {
     val sdkHome = Environment.ANDROID_HOME
     val ver = node.revision
     return when (node.componentType) {
       "build-tools" -> File(sdkHome, "build-tools")
-      "platform-tools" -> File(sdkHome, "platform-tools")
+      "platform-tools" -> File(sdkHome, "") //这里留空才能解压到正确路径
       "ndk" -> File(sdkHome, "ndk/$ver")
       "cmake" -> File(sdkHome, "cmake/$ver")
       "cmdline-tools" -> File(sdkHome, "cmdline-tools")
