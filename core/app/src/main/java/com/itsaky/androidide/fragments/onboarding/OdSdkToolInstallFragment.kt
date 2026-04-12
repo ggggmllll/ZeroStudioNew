@@ -952,7 +952,7 @@ class OdSdkToolInstallFragment : Fragment(), SlidePolicy {
                         targetArchive.outputStream().use { output -> input.copyTo(output) }
                       }
 
-                      addLog(">> File copied. Installing tar...")
+                      addLog(">> File copied. Installing tar & dpkg...")
                       TermuxCommand.run(context) {
                         executable("sh")
                         args("-c", "pkg install tar dpkg -y")
@@ -993,6 +993,26 @@ class OdSdkToolInstallFragment : Fragment(), SlidePolicy {
                                             done
                                         else
                                             echo "WARN: packages.tar.gz not found!"
+                                        fi
+
+                                        echo ">> Updating ide-environment.properties..."
+                                        PROPS_DIR="${Environment.PREFIX.absolutePath}/etc"
+                                        mkdir -p "${'$'}PROPS_DIR"
+                                        PROPS_FILE="${'$'}PROPS_DIR/ide-environment.properties"
+
+                                        JDK_DIR=""
+                                        if [ -d "${Environment.PREFIX.absolutePath}/lib/jvm" ]; then
+                                            JDK_DIR=${'$'}(find "${Environment.PREFIX.absolutePath}/lib/jvm" -mindepth 1 -maxdepth 1 -type d | head -n 1)
+                                        fi
+                                        if [ -z "${'$'}JDK_DIR" ] && [ -d "${Environment.PREFIX.absolutePath}/opt" ]; then
+                                            JDK_DIR=${'$'}(find "${Environment.PREFIX.absolutePath}/opt" -mindepth 1 -maxdepth 1 -type d -name "openjdk*" | head -n 1)
+                                        fi
+
+                                        if [ -n "${'$'}JDK_DIR" ]; then
+                                            echo "JAVA_HOME=${'$'}JDK_DIR" > "${'$'}PROPS_FILE"
+                                            echo ">> JAVA_HOME=${'$'}JDK_DIR"
+                                        else
+                                            echo "WARN: Could not find JDK installation directory!"
                                         fi
 
                                         echo ">> Cleaning up temporary files..."

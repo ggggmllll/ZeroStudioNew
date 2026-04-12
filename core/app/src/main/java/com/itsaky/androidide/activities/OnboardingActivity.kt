@@ -61,19 +61,13 @@ class OnboardingActivity : AppIntro2() {
 
   @SuppressLint("SourceLockedOrientationActivity")
   override fun onCreate(savedInstanceState: Bundle?) {
-    // 在 onCreate 的最前端应用主题，避免因为配置改变导致闪烁
     IThemeManager.getInstance().applyTheme(this)
-
-    // 强制竖屏，避免引导页旋转导致重建问题
     try {
       requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-    } catch (e: Exception) {
-      // 某些设备或特定情况下锁定方向可能会抛出异常（如 Translucent Activity），忽略即可
-    }
+    } catch (e: Exception) {}
 
     super.onCreate(savedInstanceState)
 
-    // 沉浸式状态栏设置
     WindowCompat.getInsetsController(this.window, this.window.decorView).apply {
       isAppearanceLightStatusBars = !isSystemInDarkMode()
       isAppearanceLightNavigationBars = !isSystemInDarkMode()
@@ -89,24 +83,21 @@ class OnboardingActivity : AppIntro2() {
       window.statusBarColor = resolveAttr(R.attr.colorSurface)
     }
 
-    // 核心检查：如果环境已经准备好（权限和SDK/JDK均满足），直接跳转并拦截后续视图加载
+    // 环境判定如果已完成，直接前往 MainActivity 并退出
     if (tryNavigateToMainIfSetupIsCompleted()) {
       return
     }
 
-    // 是否允许用户左右滑动切换引导页
     isWizardMode = false
-    setSwipeLock(true) // 是否允许左右滑动切换页面，这个true表示禁用，这个运行滑动会影响sdk安装页面，所以需要禁用
+    setSwipeLock(true)
 
     setTransformer(AppIntroPageTransformerType.Fade)
     setProgressIndicator()
     showStatusBar(true)
     isIndicatorEnabled = true
 
-    // 添加欢迎页
     addSlide(GreetingFragment())
 
-    // 检查用户是否为主用户
     if (!PackageUtils.isCurrentUserThePrimaryUser(this)) {
       val errorMessage =
           getString(
@@ -124,7 +115,6 @@ class OnboardingActivity : AppIntro2() {
       return
     }
 
-    // 检查是否安装在外部 SD 卡
     if (isInstalledOnSdCard()) {
       val errorMessage =
           getString(
@@ -142,25 +132,21 @@ class OnboardingActivity : AppIntro2() {
       return
     }
 
-    // 检查设备架构支持情况
     if (!checkDeviceSupported()) {
       return
     }
 
-    // 如果权限未全部满足，则显示权限请求页
     if (!checkAllPermissionsGranted()) {
       addSlide(PermissionsFragment.newInstance(this))
     }
 
-    // 如果 SDK 或 JDK 工具链未安装，添加环境配置 Fragment
-    if (!checkToolsIsInstalled()) {
+    if (!SdkChecker.isEnvironmentReadySync()) {
       addSlide(OdSdkToolInstallFragment.newInstance(this))
     }
   }
 
   override fun onResume() {
     super.onResume()
-    // 每次恢复到前台时，检查是否可以前往 MainActivity
     tryNavigateToMainIfSetupIsCompleted()
   }
 
@@ -170,7 +156,7 @@ class OnboardingActivity : AppIntro2() {
       return
     }
 
-    if (!checkToolsIsInstalled() && currentFragment is OdSdkToolInstallFragment) {
+    if (!SdkChecker.isEnvironmentReadySync() && currentFragment is OdSdkToolInstallFragment) {
       flashError(getString(string.msg_install_tools))
       return
     }
@@ -178,32 +164,33 @@ class OnboardingActivity : AppIntro2() {
     tryNavigateToMainIfSetupIsCompleted()
   }
 
-  /** 提供给 OdSdkToolInstallFragment 或其它安装组件安装完成后的回调 */
   fun onSetupCompleted() {
-    tryNavigateToMainIfSetupIsCompleted()
+    if (!tryNavigateToMainIfSetupIsCompleted()) {
+      val hasJdk = SdkChecker.hasValidJdk()
+      val hasSdk = SdkChecker.hasValidSdk()
+      val msg =
+          when {
+            !hasJdk && !hasSdk -> "Both JDK and Android SDK are missing."
+            !hasJdk -> "JDK installation is missing or invalid."
+            !hasSdk -> "Android SDK installation is missing or invalid."
+            !checkAllPermissionsGranted() -> "Permissions are not fully granted."
+            else -> "Environment setup is incomplete."
+          }
+      // 明确指出无法启动的原因
+      flashError(msg)
+    }
   }
 
-  /** 严格检查所有必须的权限 */
   private fun checkAllPermissionsGranted(): Boolean {
     val context = this
+    if (!NotificationManagerCompat.from(context).areNotificationsEnabled()) return false
 
-    // 通知权限
-    if (!NotificationManagerCompat.from(context).areNotificationsEnabled()) {
-      return false
-    }
-
-    // 安装未知应用权限 (Android 8.0+)
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-      if (!context.packageManager.canRequestPackageInstalls()) {
-        return false
-      }
+      if (!context.packageManager.canRequestPackageInstalls()) return false
     }
 
-    // 全文件管理 / 基础存储权限
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-      if (!android.os.Environment.isExternalStorageManager()) {
-        return false
-      }
+      if (!android.os.Environment.isExternalStorageManager()) return false
     } else {
       val legacyPerms =
           listOf(
@@ -218,21 +205,13 @@ class OnboardingActivity : AppIntro2() {
         return false
       }
     }
-
     return true
   }
 
-  /** 统一调用下沉的 SdkChecker 进行环境工具检查 */
-  private fun checkToolsIsInstalled(): Boolean {
-    return SdkChecker.isEnvironmentReadySync()
-  }
-
-  /** 综合判定 Setup 是否完成 */
   private fun isSetupCompleted(): Boolean {
-    return checkToolsIsInstalled() && checkAllPermissionsGranted()
+    return SdkChecker.isEnvironmentReadySync() && checkAllPermissionsGranted()
   }
 
-  /** 如果满足所有条件，跳转到主界面并销毁自己 */
   private fun tryNavigateToMainIfSetupIsCompleted(): Boolean {
     if (isSetupCompleted()) {
       startActivity(Intent(this, MainActivity::class.java))
@@ -250,7 +229,6 @@ class OnboardingActivity : AppIntro2() {
 
   private fun checkDeviceSupported(): Boolean {
     val configProvider = IDEBuildConfigProvider.getInstance()
-
     if (!configProvider.supportsCpuAbi()) {
       addSlide(
           OnboardingInfoFragment.newInstance(
@@ -267,9 +245,8 @@ class OnboardingActivity : AppIntro2() {
       return false
     }
 
-    // 实验性架构检查与警告
     if (configProvider.cpuArch != configProvider.deviceArch) {
-      if (!archConfigExperimentalWarningIsShown()) {
+      if (!prefManager.getBoolean(KEY_ARCHCONFIG_WARNING_IS_SHOWN, false)) {
         addSlide(
             OnboardingInfoFragment.newInstance(
                 getString(string.title_experiment_flavor),
@@ -286,9 +263,5 @@ class OnboardingActivity : AppIntro2() {
       }
     }
     return true
-  }
-
-  private fun archConfigExperimentalWarningIsShown(): Boolean {
-    return prefManager.getBoolean(KEY_ARCHCONFIG_WARNING_IS_SHOWN, false)
   }
 }
