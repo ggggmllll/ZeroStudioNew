@@ -205,7 +205,7 @@ include(
     ":utilities:treeview",
     ":utilities:FileTree",
     // ":utilities:uidesigner",  //已经完全归档
-    ":utilities:xml-inflater",
+    // ":utilities:xml-inflater", //归档
     ":xml:aaptcompiler",
     ":xml:dom",
     ":xml:lsp",

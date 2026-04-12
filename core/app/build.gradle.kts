@@ -248,7 +248,7 @@ dependencies {
   implementation(projects.utilities.templatesImpl)
   // implementation(projects.utilities.treeview)
   implementation(projects.utilities.fileTree)
-  implementation(projects.utilities.xmlInflater)
+  // implementation(projects.utilities.xmlInflater) //归档
   implementation(projects.event.eventbusAndroid)
   implementation(projects.event.eventbusEvents)
   implementation(projects.event.eventbus)
