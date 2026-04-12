@@ -72,9 +72,9 @@ dependencies {
   implementation(projects.termux.shell)
   implementation(projects.event.eventbusEvents)
 
-  implementation(projects.lsp.kotlin.server)
-  implementation(projects.lsp.kotlin.shared)
-  implementation(projects.lsp.kotlin.adapter)
+  // implementation(projects.lsp.kotlin.server)
+  // implementation(projects.lsp.kotlin.shared)
+  // implementation(projects.lsp.kotlin.adapter)
 
   implementation(libs.composite.javac)
   implementation(libs.composite.javapoet)

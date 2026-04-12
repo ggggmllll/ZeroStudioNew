@@ -21,6 +21,7 @@ plugins {
   id("com.android.library")
   id("kotlin-android")
   id("kotlin-kapt")
+  id("org.jetbrains.kotlin.plugin.compose")
 }
 
 android {
@@ -29,13 +30,20 @@ android {
   sourceSets {
     getByName("androidTest") { assets.srcDirs(rootProject.file("utilities/framework-stubs/libs")) }
   }
+  composeOptions { kotlinCompilerExtensionVersion = "1.5.15" }
+
+  buildFeatures { compose = true }
 }
 
-kapt { arguments { arg("eventBusIndex", "${BuildConfig.packageName}.events.LspJavaEventsIndex") } }
+kapt { arguments { arg("eventBusIndex", "${BuildConfig.packageName}.events.LspJavaEventsIndex") } 
+correctErrorTypes = true }
 
 dependencies {
   kapt(projects.annotation.processors)
   kapt(libs.google.auto.service)
+  
+  implementation(libs.common.org.eclipse.lsp4j)
+  implementation(libs.common.lsp4j.jsonrpc)
 
   api(projects.core.indexingApi)
 
@@ -46,6 +54,9 @@ dependencies {
   implementation(libs.common.editor)
   implementation(libs.common.javaparser)
   implementation(libs.common.utilcode)
+  // UI/UX
+  implementation(libs.bundles.compose) // androidx compose
+  implementation(libs.androidx.core.ktx)
 
   implementation(libs.google.auto.service.annotations)
   implementation(libs.google.guava)
@@ -58,6 +69,8 @@ dependencies {
   implementation(projects.core.resources)
   implementation(projects.editor.api)
   implementation(projects.java.javacServices)
+  implementation(projects.termux.shell)
+  implementation(projects.event.eventbusEvents)
 
   implementation(libs.composite.javac)
   implementation(libs.composite.javapoet)
