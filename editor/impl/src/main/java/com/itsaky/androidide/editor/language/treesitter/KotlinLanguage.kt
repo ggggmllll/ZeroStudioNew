@@ -21,7 +21,7 @@ import android.content.Context
 import com.itsaky.androidide.editor.language.treesitter.TreeSitterLanguage.Factory
 import com.itsaky.androidide.lsp.api.ILanguageServer
 import com.itsaky.androidide.lsp.api.ILanguageServerRegistry
-import com.itsaky.androidide.lsp.kotlin.KotlinLanguageServer
+import com.itsaky.androidide.lsp.kotlin.KotlinLanguageServerImpl
 import com.itsaky.androidide.treesitter.kotlin.TSLanguageKotlin
 import io.github.rosemoe.sora.lang.Language.INTERRUPTION_LEVEL_STRONG
 import io.github.rosemoe.sora.util.MyCharacter
@@ -42,7 +42,7 @@ open class KotlinLanguage(context: Context) :
   }
 
   override val languageServer: ILanguageServer?
-    get() = ILanguageServerRegistry.getDefault().getServer(KotlinLanguageServer.SERVER_ID)
+    get() = ILanguageServerRegistry.getDefault().getServer(KotlinLanguageServerImpl.SERVER_ID)
 
   override fun checkIsCompletionChar(c: Char): Boolean {
     return MyCharacter.isJavaIdentifierPart(c) || c == '.'
@@ -51,4 +51,24 @@ open class KotlinLanguage(context: Context) :
   override fun getInterruptionLevel(): Int {
     return INTERRUPTION_LEVEL_STRONG
   }
+  
+  override fun getSymbolPairs(): SymbolPairMatch {
+    return SymbolPairMatch().apply {
+      putPair('(', SymbolPairMatch.SymbolPair("(", ")"))
+      putPair('[', SymbolPairMatch.SymbolPair("[", "]"))
+      putPair('{', SymbolPairMatch.SymbolPair("{", "}"))
+      
+      putPair('/*', SymbolPairMatch.SymbolPair("/*\n*", "\n*/"))
+      putPair('("', SymbolPairMatch.SymbolPair("("", "")"))
+      putPair('<', SymbolPairMatch.SymbolPair("<", ">"))
+      putPair('"', SymbolPairMatch.SymbolPair(""", """))
+      putPair('\'', SymbolPairMatch.SymbolPair("'", "'"))
+    }
+  }
+
+  override fun createNewlineHandlers(): Array<TSBracketsHandler> {
+    return arrayOf(TSCStyleBracketsHandler(this))
+  }
+
+  
 }

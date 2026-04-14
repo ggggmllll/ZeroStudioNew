@@ -77,7 +77,7 @@ To make your Markdown document look more professional and user-friendly (perfect
 Here is the decorated version:
 
 ---
-## ⚡️SDK build tool installation package download channel(sdk构建工具安装包下载渠道)
+## ⚡️Offline SDK build tool installation package download channel(离线sdk构建工具安装包下载渠道)
 [github Release page](https://github.com/msmt2018/SDK-tool-for-Android-platform/releases/tag/ZeroStudio_OfflineResourceInstallationPackage)
 
 [gitee Release page](https://gitee.com/android-zero/ZeroStudio-sdkbuildtool/releases/tag/ZeroStudio-sdk%E6%9E%84%E5%BB%BA%E5%B7%A5%E5%85%B7%E7%A6%BB%E7%BA%BF%E5%AE%89%E8%A3%85%E5%8C%85)
@@ -117,7 +117,7 @@ issues using the app, please let us know.
 
 See the [contributing guide](./CONTRIBUTING.md).
 
-For translations, visit the [Crowdin project page](https://crowdin.com/project/ZeroStudio).
+For translations, visit the [Crowdin project page](https://crowdin.com/project/zerosrudio).
 
 <details close>
 <summary>⚖️ <strong>🍀 Core projects referenced in project integration</strong></summary>

@@ -1,7 +1,7 @@
 package com.itsaky.androidide.editor.ui
 
 import androidx.appcompat.app.AlertDialog
-import com.itsaky.androidide.lsp.kotlin.KotlinLanguageServer
+import com.itsaky.androidide.lsp.kotlin.KotlinLanguageServerImpl
 import com.itsaky.androidide.lsp.models.DiagnosticItem
 import com.itsaky.androidide.models.Position
 import com.itsaky.androidide.models.Range
@@ -70,7 +70,7 @@ fun IDEEditor.applyImportFixAtCursor(): Boolean {
   val file = this.file ?: return false
   val languageServer = this.languageServer
 
-  if (languageServer !is KotlinLanguageServer) {
+  if (languageServer !is KotlinLanguageServerImpl) {
     return false
   }
 
@@ -119,7 +119,7 @@ private fun IDEEditor.showImportSelectionDialog(
     options: List<String>,
     filePath: java.nio.file.Path,
     range: Range,
-    languageServer: KotlinLanguageServer,
+    languageServer: KotlinLanguageServerImpl,
 ) {
   AlertDialog.Builder(context)
       .setTitle("Choose Import")

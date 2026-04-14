@@ -18,7 +18,6 @@
 
 package com.itsaky.androidide.app
 
-// import com.itsaky.androidide.events.LspKotlinEventsIndex
 import android.content.Intent
 import android.net.Uri
 import android.os.StrictMode
@@ -86,13 +85,6 @@ class IDEApplication : TermuxApplication() {
     uncaughtExceptionHandler = Thread.getDefaultUncaughtExceptionHandler()
     Thread.setDefaultUncaughtExceptionHandler { thread, th -> handleCrash(thread, th) }
 
-    GlobalScope.launch(Dispatchers.IO) {
-      delay(500)
-      if (!VMUtils.isJvm()) {
-        ToolsManager.init(this@IDEApplication, null)
-      }
-    }
-
     if (BuildConfig.DEBUG) {
       StrictMode.setVmPolicy(
           StrictMode.VmPolicy.Builder(StrictMode.getVmPolicy()).penaltyLog().detectAll().build()
@@ -124,6 +116,14 @@ class IDEApplication : TermuxApplication() {
       ReflectionUtils.bypassHiddenAPIReflectionRestrictions()
       IDEColorSchemeProvider.init()
     }
+    
+    GlobalScope.launch(Dispatchers.IO) {
+      delay(5000)
+      if (!VMUtils.isJvm()) {
+        ToolsManager.init(this@IDEApplication, null)
+      }
+    }
+
     Environment.init(this)
   }
 

@@ -49,7 +49,7 @@ import com.itsaky.androidide.lsp.IDELanguageClientImpl
 import com.itsaky.androidide.lsp.api.ILanguageServer
 import com.itsaky.androidide.lsp.api.ILanguageServerRegistry
 import com.itsaky.androidide.lsp.java.JavaLanguageServer
-import com.itsaky.androidide.lsp.kotlin.KotlinLanguageServer
+import com.itsaky.androidide.lsp.kotlin.KotlinLanguageServerImpl
 import com.itsaky.androidide.lsp.models.DiagnosticResult
 import com.itsaky.androidide.lsp.servers.toml.TomlServer
 import com.itsaky.androidide.lsp.xml.XMLLanguageServer
@@ -380,7 +380,7 @@ class CodeEditorView(context: Context, file: File, selection: Range) :
       val languageServer = editor.languageServer
 
       if (
-          languageServer is KotlinLanguageServer &&
+          languageServer is KotlinLanguageServerImpl &&
               (file.extension == "kt" || file.extension == "kts")
       ) {
         try {
@@ -497,7 +497,7 @@ class CodeEditorView(context: Context, file: File, selection: Range) :
           "java" -> JavaLanguageServer.SERVER_ID
           "xml" -> XMLLanguageServer.SERVER_ID
           "kt",
-          "kts" -> KotlinLanguageServer.SERVER_ID
+          "kts" -> KotlinLanguageServerImpl.SERVER_ID
           "toml" -> TomlServer.SERVER_ID
           else -> return null
         }

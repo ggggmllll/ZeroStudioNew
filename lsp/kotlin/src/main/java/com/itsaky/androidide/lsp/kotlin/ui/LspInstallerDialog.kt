@@ -32,7 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import com.blankj.utilcode.util.FileUtils
-import com.itsaky.androidide.lsp.kotlin.events.LspInstallRequestEvent
+import com.itsaky.androidide.lsp.kotlin.ui.events.LspInstallRequestEvent
 import com.itsaky.androidide.utils.executioncommand.TermuxCommand
 import com.itsaky.androidide.utils.Environment
 import java.io.File

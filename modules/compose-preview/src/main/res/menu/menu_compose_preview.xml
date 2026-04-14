@@ -6,6 +6,6 @@
         android:id="@+id/action_toggle_mode"
         android:icon="@drawable/ic_view_grid"
         android:title="@string/toggle_preview_mode"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="always" />
 
 </menu>

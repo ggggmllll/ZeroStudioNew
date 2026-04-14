@@ -153,6 +153,15 @@ class ProjectManagerImpl : IProjectManager, EventReceiver {
       // wait for the indexing to finish
       jobs.toList().awaitAll()
     }
+    
+    withContext(Dispatchers.Main) {
+       com.itsaky.androidide.lsp.kotlin.KotlinLspIntegration.setup(
+           com.itsaky.androidide.app.BaseApplication.getBaseInstance()
+       )
+       
+       // 挂载语义高亮拦截器
+       com.itsaky.androidide.lsp.kotlin.events.KotlinSemanticTokensBinder.init()
+     }
   }
 
   // ==============================================================================

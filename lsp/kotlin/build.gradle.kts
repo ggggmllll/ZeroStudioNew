@@ -53,6 +53,7 @@ dependencies {
   // implementation(libs.common.javaparser)
   // implementation(libs.common.utilcode)
 
+  implementation(libs.bundles.io.markwon)
   // UI/UX
   implementation(libs.bundles.compose) // androidx compose
   implementation(libs.androidx.core.ktx)
@@ -85,6 +86,7 @@ dependencies {
 
   implementation(libs.androidx.core.ktx)
   implementation(libs.common.kotlin)
+  implementation(libs.common.editor)
 
   // implementation(libs.org.jetbrains.kotlin.compiler.embeddable)
   // implementation(projects.modules.kotlinc)

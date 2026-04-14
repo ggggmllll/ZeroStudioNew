@@ -93,13 +93,13 @@ object BuildConfig {
   /*git ci
    *com.itsaky.androidide.build.config.ProjectConfig*/
   const val REPO_HOST = "github.com"
-  const val REPO_OWNER = "AndroidIDEOfficial"
-  const val REPO_NAME = "AndroidIDE"
+  const val REPO_OWNER = "msmt2018"
+  const val REPO_NAME = "ZeroStudio"
   const val REPO_URL = "https://$REPO_HOST/$REPO_OWNER/$REPO_NAME"
   const val SCM_GIT = "scm:git:git://$REPO_HOST/$REPO_OWNER/$REPO_NAME.git"
   const val SCM_SSH = "scm:git:ssh://git@$REPO_HOST/$REPO_OWNER/$REPO_NAME.git"
   const val PROJECT_SITE = "https://m.androidide.com"
-  const val GIT_Branch_Name = "ZeroStudio-devs"
+  const val GIT_Branch_Name = "main"
 
   /* The Sonatype snapshots repository.*/
   const val SONATYPE_SNAPSHOTS_REPO = "https://repo1.maven.org/maven2"
