@@ -168,7 +168,7 @@ include(
     ":event:eventbus-events",
     ":java:javac-services",
     ":java:lsp",
-    // ":lsp:kotlin",
+    ":lsp:kotlin",
     ":lsp:toml",
     // ":lsp:clangd",
     // ":lsp:smali",
