@@ -1,7 +1,7 @@
 package com.itsaky.androidide.compose.preview.data.source
 
 import com.itsaky.androidide.projects.IProjectManager
-import com.itsaky.androidide.projects.api.AndroidModule
+import com.itsaky.androidide.projects.android.AndroidModule
 import org.slf4j.LoggerFactory
 import java.io.File
 
