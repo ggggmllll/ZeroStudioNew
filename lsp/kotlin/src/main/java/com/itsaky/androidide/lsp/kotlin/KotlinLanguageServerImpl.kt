@@ -29,6 +29,7 @@ import com.itsaky.androidide.models.Location
 import com.itsaky.androidide.models.Position
 import com.itsaky.androidide.models.Range
 import com.itsaky.androidide.preferences.internal.EditorPreferences
+import com.itsaky.androidide.projects.IProjectManager
 import com.itsaky.androidide.projects.IWorkspace
 import com.itsaky.androidide.utils.Environment
 import com.itsaky.androidide.utils.ILogger
@@ -41,8 +42,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 /**
- * 完整的 Kotlin Language Server IDE 对接层。
- * 
+ * Kotlin Language Server IDE 对接层。
  * @author android_zero
  */
 class KotlinLanguageServerImpl(
@@ -60,8 +60,11 @@ class KotlinLanguageServerImpl(
     handleServerMessage(msg)
   }
 
+  // 二次补全与加工处理器
+  private val completionConverter = KotlinCompletionConverter()
+
   companion object {
-    const val SERVER_ID = "kotlin.lsp"
+    const val SERVER_ID = "kotlin-lsp"
     private val log = ILogger.instance("KotlinLanguageServerImpl")
   }
 
@@ -74,7 +77,6 @@ class KotlinLanguageServerImpl(
   }
 
   override fun applySettings(settings: IServerSettings?) {
-    // 将设置同步给远端服务器。在初始化后通常通过 didChangeConfiguration 更新
     if (settings != null) {
       val configUpdate = createConfigPayload(settings)
       rpcClient.sendNotification("workspace/didChangeConfiguration", mapOf("settings" to configUpdate))
@@ -82,13 +84,12 @@ class KotlinLanguageServerImpl(
   }
 
   override fun setupWorkspace(workspace: IWorkspace) {
-    //发送 initialize 请求
+    val bridge = KotlinJavaCompilerBridge(workspace)
+    completionConverter.setJavaCompilerBridge(bridge)
+
     val initParams = createInitializeParams(workspace)
     runBlocking {
       val initResult = rpcClient.sendRequest("initialize", initParams)
-      log.info("Kotlin LSP Initialized: $initResult")
-      
-      // 发送 initialized 通知
       rpcClient.sendNotification("initialized", JsonObject())
     }
   }
@@ -109,14 +110,16 @@ class KotlinLanguageServerImpl(
       addProperty("rootPath", workspace.projectDir.absolutePath)
       add("initializationOptions", initOptions)
       add("capabilities", JsonObject().apply {
-         // 定义客户端能力，通知 Server 开启哪些支持
          add("workspace", JsonObject().apply {
            add("workspaceFolders", true)
            add("executeCommand", JsonObject().apply { add("dynamicRegistration", true) })
          })
          add("textDocument", JsonObject().apply {
            add("completion", JsonObject().apply {
-             add("completionItem", JsonObject().apply { addProperty("snippetSupport", true) })
+             add("completionItem", JsonObject().apply { 
+                 addProperty("snippetSupport", true)
+                 addProperty("resolveSupport", true)
+             })
            })
          })
       })
@@ -171,9 +174,6 @@ class KotlinLanguageServerImpl(
         val text = msg.getAsJsonObject("params").get("message").asString
         val msgType = MessageType.values().firstOrNull { it.ordinal == (type - 1) } ?: MessageType.Info
         client?.showMessage(ShowMessageParams(msgType, text))
-      }
-      "window/logMessage" -> {
-        // ...
       }
       "workspace/applyEdit" -> {
         val editJson = params.asJsonObject.get("edit")
@@ -242,16 +242,26 @@ class KotlinLanguageServerImpl(
            response.asJsonArray
          }
 
-         val listType = object : TypeToken<List<CompletionItem>>() {}.type
-         val items: List<CompletionItem> = gson.fromJson(itemsJson, listType)
-         
-         // 为其配备 IDE 可识别的额外修饰
-         items.forEach { 
+         // Prefix提取
+         val contentStr = params.content?.toString() ?: ""
+         val lines = contentStr.split("\n")
+         val prefix = if (params.position.line < lines.size) {
+             val line = lines[params.position.line]
+             val col = params.position.column.coerceAtMost(line.length)
+             var start = col
+             while (start > 0 && (line[start - 1].isLetterOrDigit() || line[start - 1] == '_')) start--
+             line.substring(start, col)
+         } else ""
+
+         // 交由转换器进行 Java/Android 二次识别注入及无用占位符清理
+         val enhancedItems = completionConverter.convertWithClasspathEnhancement(itemsJson, contentStr, prefix)
+
+         enhancedItems.forEach { 
            it.completionKind = it.completionKind ?: CompletionItemKind.NONE
-           it.matchLevel = MatchLevel.PARTIAL_MATCH // default fuzzy
+           it.matchLevel = MatchLevel.PARTIAL_MATCH 
          }
 
-         CompletionResult(items)
+         CompletionResult(enhancedItems)
        } catch (e: Exception) {
          log.error("Completion error", e)
          CompletionResult.EMPTY
@@ -278,8 +288,6 @@ class KotlinLanguageServerImpl(
     )
     val res = rpcClient.sendRequest("textDocument/definition", req)
     val type = object : TypeToken<List<Location>>() {}.type
-    
-    // Server 可能返回单个对象或数组
     val locations = if (res != null && res.isJsonObject) {
         listOf(gson.fromJson(res, Location::class.java))
     } else {
@@ -289,7 +297,6 @@ class KotlinLanguageServerImpl(
   }
 
   override suspend fun expandSelection(params: ExpandSelectionParams): Range = withContext(Dispatchers.IO) {
-    // LSP SelectionRange request
     val req = mapOf(
       "textDocument" to mapOf("uri" to params.file.toUri().toString()),
       "positions" to listOf(params.selection.start)
@@ -323,8 +330,6 @@ class KotlinLanguageServerImpl(
   }
 
   override suspend fun analyze(file: Path): DiagnosticResult = withContext(Dispatchers.IO) {
-    // 诊断是通过 publishDiagnostics 异步下发的，主动分析仅触发保存/重新读取。
-    // 返回空，让 Client 在回调 publishDiagnostics 时被动接收
     DiagnosticResult.NO_UPDATE
   }
 
@@ -332,10 +337,9 @@ class KotlinLanguageServerImpl(
     if (params == null) return CodeFormatResult.NONE
     return runBlocking(Dispatchers.IO) {
       val req = mapOf(
-        "textDocument" to mapOf("uri" to "file://dummy_for_format"), // 需要传入对应 uri
+        "textDocument" to mapOf("uri" to "file://dummy_for_format"),
         "options" to mapOf("tabSize" to EditorPreferences.tabSize, "insertSpaces" to EditorPreferences.useSoftTab)
       )
-      // 如果使用 documentRangeFormatting：
       val res = rpcClient.sendRequest("textDocument/formatting", req)
       val type = object : TypeToken<List<TextEdit>>() {}.type
       val edits: MutableList<TextEdit> = gson.fromJson(res, type) ?: mutableListOf()
@@ -353,9 +357,6 @@ class KotlinLanguageServerImpl(
     gson.fromJson(res, WorkspaceEdit::class.java) ?: WorkspaceEdit()
   }
 
-  /**
-   * Kotlin 专属自定义命令支持（如 Java2Kotlin）
-   */
   suspend fun executeWorkspaceCommand(commandName: String, arguments: List<Any>): JsonElement? = withContext(Dispatchers.IO) {
     val req = mapOf(
        "command" to commandName,
@@ -371,7 +372,6 @@ class KotlinLanguageServerImpl(
          rpcClient.sendRequest("shutdown", JsonObject())
          rpcClient.sendNotification("exit", JsonObject())
       } catch (e: Exception) {
-         log.error("Ignored error during shutdown", e)
       } finally {
          rpcClient.stop()
          try {

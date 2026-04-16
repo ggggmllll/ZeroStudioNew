@@ -66,6 +66,7 @@ class EditorPreferencesScreen(
 ) : IPreferenceScreen() {
 
   init {
+    addPreference(KotlinLspPreferencesScreen())
     // addPreference(LspPreferencesEntry())
     addPreference(KtfmtPreferencesScreen())
     addPreference(CommonConfigurations())

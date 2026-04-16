@@ -22,16 +22,19 @@ import com.itsaky.androidide.lsp.api.ILanguageServerRegistry
 import com.itsaky.androidide.lsp.kotlin.events.KotlinLanguageClientImpl
 import com.itsaky.androidide.lsp.kotlin.events.KotlinTextDocumentSyncHandler
 import com.itsaky.androidide.lsp.kotlin.settings.KotlinServerSettings
+import com.itsaky.androidide.projects.IProjectManager
 import com.itsaky.androidide.utils.ILogger
+import java.util.concurrent.atomic.AtomicBoolean
+import kotlin.concurrent.thread
 
 /**
- * Kotlin LSP 深度集成的中枢与大门。
+ * 核心：Kotlin LSP 深度集成的中枢与大门。
  * 
  * 作用与功能：
  * 对外暴露唯一的初始化 API `setup()`。
  * 调用此方法后，将依次完成：
  * 1. 注册编辑器生命周期同步（TextDocument Sync）。
- * 2. 检查并启动后台 Kotlin 服务进程。
+ * 2. 检查并启动后台 Kotlin 服务进程并附带 WorkspaceSetup 以支持动态依赖计算。
  * 3. 实例化并绑定 ILanguageClient（接收诊断信息等）。
  * 4. 推送初始的用户首选项配置（Settings）。
  *
@@ -40,8 +43,8 @@ import com.itsaky.androidide.utils.ILogger
 object KotlinLspIntegration {
 
   private val log = ILogger.instance("KotlinLspIntegration")
-  
-  private var isInitialized = false
+  private val isInitialized = AtomicBoolean(false)
+  private var workspaceSetup: KotlinWorkspaceSetup? = null
 
   /**
    * 启动并组装 Kotlin Language Server 环境。
@@ -51,7 +54,7 @@ object KotlinLspIntegration {
    */
   @Synchronized
   fun setup(context: Context) {
-    if (isInitialized) {
+    if (isInitialized.getAndSet(true)) {
       log.info("Kotlin LSP is already initialized. Skipping.")
       return
     }
@@ -59,15 +62,21 @@ object KotlinLspIntegration {
     try {
       KotlinTextDocumentSyncHandler.init()
 
-      // 启动或安装子进程
       val processManager = KotlinServerProcessManager(context.applicationContext)
+      
+      // 当 ProjectManager 有 Workspace 时直接使用，若还没生成可自行通过 Event 绑定，此处理论必定已有 Workspace
+      val workspace = IProjectManager.getInstance().getWorkspace()
+      if (workspace != null) {
+          workspaceSetup = KotlinWorkspaceSetup(context.applicationContext, workspace)
+          workspaceSetup?.setup(processManager) // 会将 ClassPathProvider 供给 ProcessManager
+      }
+      
       processManager.startServer()
 
       val clientImpl = KotlinLanguageClientImpl()
       ILanguageServerRegistry.getDefault().connectClient(clientImpl)
       
-      // 下发初始化配置 (格式化、诊断规则等)
-      Thread {
+      thread(name = "KlsConfigApplyThread") {
          var attempts = 0
          var server: KotlinLanguageServerImpl? = null
          while (attempts < 20 && server == null) {
@@ -78,17 +87,14 @@ object KotlinLspIntegration {
 
          if (server != null) {
             server.connectClient(clientImpl)
-            
-            // 下发首选项设置
-            val settings = KotlinServerSettings()
-            server.applySettings(settings)
-            log.info("Kotlin LSP Integration successfully stitched together!")
+            // 下发首选项设置与初始化数据，包括 R 类支持等机制的激活
+            server.applySettings(KotlinServerSettings())
+            log.info("Kotlin LSP Integration successfully stitched together with Workspace support!")
          } else {
-            log.warn("Kotlin LSP Server failed to start within timeout.")
+            log.warn("Kotlin LSP Server failed to start or register within timeout.")
          }
-      }.start()
+      }
 
-      isInitialized = true
     } catch (e: Exception) {
       log.error("Critical error during Kotlin LSP Integration setup", e)
     }

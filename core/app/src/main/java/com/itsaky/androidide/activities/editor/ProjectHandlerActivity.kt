@@ -541,7 +541,11 @@ abstract class ProjectHandlerActivity : BaseEditorActivity() {
           }
           return@launch
         }
-
+        
+        withContext(Dispatchers.Main) {
+            com.itsaky.androidide.lsp.kotlin.KotlinLspIntegration.setup(this@ProjectHandlerActivity)
+        }
+        
         manager.notifyProjectUpdate()
         updateBuildVariants(workspace.getAndroidVariantSelections())
 

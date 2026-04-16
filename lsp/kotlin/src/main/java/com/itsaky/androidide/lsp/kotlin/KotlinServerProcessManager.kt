@@ -18,7 +18,6 @@
 package com.itsaky.androidide.lsp.kotlin
 
 import android.content.Context
-import com.itsaky.androidide.lsp.api.DefaultLanguageServerRegistry
 import com.itsaky.androidide.lsp.api.ILanguageServerRegistry
 import com.itsaky.androidide.lsp.kotlin.ui.KotlinServerConstants
 import com.itsaky.androidide.lsp.kotlin.ui.events.LspEventBus
@@ -40,6 +39,9 @@ class KotlinServerProcessManager(private val context: Context) {
 
   private var serverProcess: Process? = null
   private var currentServerImpl: KotlinLanguageServerImpl? = null
+  
+  // 用于构建提供强大的动态 Android 库解析能力
+  private var classpathProvider: KotlinClasspathProvider? = null
 
   private val coroutineScope = CoroutineScope(Dispatchers.IO + Job())
 
@@ -47,10 +49,14 @@ class KotlinServerProcessManager(private val context: Context) {
     private val log = ILogger.instance("KotlinServerProcessManager")
   }
 
+  fun setClasspathProvider(provider: KotlinClasspathProvider) {
+    this.classpathProvider = provider
+  }
+
   /**
    * 启动 Kotlin LSP 服务进程并向全局注册
    */
-  fun startServer(classpathProvider: Any? = null) {
+  fun startServer() {
     coroutineScope.launch {
       if (checkInstallation()) {
         launchProcessAndRegister()
@@ -68,7 +74,6 @@ class KotlinServerProcessManager(private val context: Context) {
     val libDir = File(Environment.KOTLIN_LSP_HOME, "lib")
     if (!libDir.exists() || !libDir.isDirectory) return false
 
-    // 检查预定义的 jars 是否全部存在
     val existingJars = libDir.list()?.toSet() ?: emptySet()
     for (requiredJar in KotlinServerConstants.REQUIRED_LIB_JARS) {
       if (!existingJars.contains(requiredJar)) {
@@ -95,7 +100,6 @@ class KotlinServerProcessManager(private val context: Context) {
         log.warn("User cancelled the Kotlin LSP installation.")
       }
     )
-    
     LspEventBus.postInstallRequest(installEvent)
   }
 
@@ -108,12 +112,21 @@ class KotlinServerProcessManager(private val context: Context) {
 
       val launcher = File(File(Environment.KOTLIN_LSP_HOME, "bin"), KotlinServerConstants.LAUNCHER_SCRIPT_NAME)
       launcher.setExecutable(true, false)
-
+      
+      // 生成环境变量所需的强大 Android Classpath
+      val androidClasspath = classpathProvider?.getClasspath() ?: ""
+      
       val pb = ProcessBuilderImpl(
         command = listOf("bash", launcher.absolutePath), // 使用 bash 执行以防解析错误
         environment = mapOf(
            "JAVA_HOME" to Environment.JAVA_HOME.absolutePath,
-           "PATH" to "${Environment.BIN_DIR.absolutePath}:${Environment.JAVA_HOME.absolutePath}/bin:${System.getenv("PATH")}"
+           "PATH" to "${Environment.BIN_DIR.absolutePath}:${Environment.JAVA_HOME.absolutePath}/bin:${System.getenv("PATH")}",
+           
+           // 传入预计算的 Android 依赖与库以使得 Server 不依赖其内部解析，从而极大地提升性能与正确性
+           "KOTLIN_LSP_DISABLE_DEPENDENCY_RESOLUTION" to "true",
+           "KOTLIN_LSP_USE_PREDEFINED_CLASSPATH" to "true",
+           "KOTLIN_LSP_CLASSPATH" to androidClasspath,
+           "CLASSPATH" to androidClasspath
         ),
         workingDirectory = Environment.PROJECTS_DIR,
         redirectErrorStream = false
@@ -123,11 +136,8 @@ class KotlinServerProcessManager(private val context: Context) {
       log.info("Kotlin LSP Process started successfully. PID: ${serverProcess?.hashCode()}")
 
       val registry = ILanguageServerRegistry.getDefault()
-      
-      // 清理旧实例
       currentServerImpl?.shutdown()
       
-      // 创建新实例并绑定进程 I/O 流
       currentServerImpl = KotlinLanguageServerImpl(
         process = serverProcess!!,
         inStream = serverProcess!!.inputStream,

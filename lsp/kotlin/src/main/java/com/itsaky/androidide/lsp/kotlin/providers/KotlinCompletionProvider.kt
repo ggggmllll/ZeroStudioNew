@@ -21,15 +21,16 @@ import com.itsaky.androidide.lsp.api.AbstractServiceProvider
 import com.itsaky.androidide.lsp.api.ICompletionProvider
 import com.itsaky.androidide.lsp.api.ILanguageServerRegistry
 import com.itsaky.androidide.lsp.kotlin.KotlinLanguageServerImpl
+import com.itsaky.androidide.lsp.models.CompletionItemKind
 import com.itsaky.androidide.lsp.models.CompletionParams
 import com.itsaky.androidide.lsp.models.CompletionResult
+import com.itsaky.androidide.lsp.models.MatchLevel
 import com.itsaky.androidide.utils.ILogger
 
-/**
- * Kotlin 语言代码补全提供者。
- *
- * @author android_zero
- */
+/*
+*  代码补全提供器
+*  @author android_zero
+*/
 class KotlinCompletionProvider : AbstractServiceProvider(), ICompletionProvider {
 
   companion object {
@@ -45,27 +46,32 @@ class KotlinCompletionProvider : AbstractServiceProvider(), ICompletionProvider 
   override fun complete(params: CompletionParams): CompletionResult {
     abortCompletionIfCancelled()
 
-    // 若配置中已禁用补全，则直接返回空
     if (!settings.completionsEnabled()) {
       return CompletionResult.EMPTY
     }
 
     try {
-      val registry = ILanguageServerRegistry.getDefault()
-      val server = registry.getServer("kotlin-lsp") as? KotlinLanguageServerImpl
-      
-      if (server == null) {
-        log.warn("Kotlin LSP Server is currently unavailable. No completions provided.")
-        return CompletionResult.EMPTY
-      }
+      val server = ILanguageServerRegistry.getDefault().getServer("kotlin-lsp") as? KotlinLanguageServerImpl
+          ?: return CompletionResult.EMPTY
 
-      // 将补全请求挂起发送给 LSP 进程
       val result = server.complete(params)
+      val prefix = params.prefix ?: ""
       
-      // 客户端过滤器：基于模糊匹配比率剔除不相关的词条
-      if (params.prefix != null && params.prefix!!.isNotEmpty()) {
-        return CompletionResult.mapAndFilter(result, params.prefix!!) { item ->
-          item.matchLevel = matchLevel(item.insertText, params.prefix!!)
+      if (prefix.isNotEmpty()) {
+        return CompletionResult.mapAndFilter(result, prefix) { item ->
+            // 如果是1个字很短的前缀，或者目标词包含大量空格（通常是提示短语），则必须严格前缀匹配
+            val strictMode = prefix.length < 1 || item.ideLabel.contains(" ")
+
+            item.matchLevel = if (strictMode) {
+                if (item.insertText.startsWith(prefix, ignoreCase = true)) {
+                    MatchLevel.CASE_INSENSITIVE_PREFIX
+                } else {
+                    MatchLevel.NO_MATCH
+                }
+            } else {
+                // 长单词依然可以使用系统的 fuzzy search
+                matchLevel(item.insertText, prefix)
+            }
         }
       }
 

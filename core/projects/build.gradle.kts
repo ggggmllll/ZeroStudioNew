@@ -46,7 +46,7 @@ dependencies {
   implementation(projects.utilities.lookup)
   implementation(projects.utilities.shared)
   implementation(projects.xml.utils)
-  implementation(projects.lsp.kotlin)
+
 
   implementation(libs.common.io)
   implementation(libs.common.kotlin.coroutines.android)

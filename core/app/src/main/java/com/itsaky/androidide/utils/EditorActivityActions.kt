@@ -58,7 +58,7 @@ import com.itsaky.androidide.actions.menu.EditorEditLineMenuAction
 import com.itsaky.androidide.actions.search.*
 import com.itsaky.androidide.actions.text.RedoAction
 import com.itsaky.androidide.actions.text.UndoAction
-
+import com.itsaky.androidide.actions.lsp.kotlin.kotlinLspActionMenu
 /**
  * Takes care of registering actions to the actions registry for the editor activity.
  *
@@ -101,6 +101,8 @@ class EditorActivityActions {
       registry.registerAction(ExpandSelectionAction(context, order++))
       registry.registerAction(FormatCodeAction(context, order++))
       registry.registerAction(SystemTextMenuAction(context, order++))
+
+      registry.registerAction(kotlinLspActionMenu(context, order++))
 
       // file tab actions
       registry.registerAction(CloseFileAction(context, order++))

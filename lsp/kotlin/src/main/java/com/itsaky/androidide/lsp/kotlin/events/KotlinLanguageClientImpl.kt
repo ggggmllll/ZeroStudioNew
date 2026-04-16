@@ -34,7 +34,7 @@ import java.net.URI
 import java.util.concurrent.ConcurrentHashMap
 
 /**
- * Kotlin LSP 语言客户端实现（正式优化版）。
+ * Kotlin LSP 语言客户端实现
  * @author android_zero
  */
 class KotlinLanguageClientImpl : ILanguageClient {

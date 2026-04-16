@@ -101,10 +101,7 @@ class ProjectManagerImpl : IProjectManager, EventReceiver {
     this.pluginProjectCached = null
   }
 
-  /** 提供给 UI 或其他服务判断是否需要进行 Gradle 同步。（来自 `b` 分支） */
   override suspend fun isGradleSyncNeeded(projectDir: File): Boolean {
-    // 兼容 a 分支现有逻辑，因为 a 分支中没有 ProjectSyncHelper，如果这里没有 ProjectSyncHelper 的引用，
-    // 我们暂以检查 build 目录和 .gradle 目录的基础手段作为平替（或者如果你有 ProjectSyncHelper，可以直接调用）。
     return withContext(Dispatchers.IO) {
       !File(projectDir, ".gradle").exists() || !File(projectDir, "build").exists()
     }
@@ -154,19 +151,9 @@ class ProjectManagerImpl : IProjectManager, EventReceiver {
       jobs.toList().awaitAll()
     }
     
-    withContext(Dispatchers.Main) {
-       com.itsaky.androidide.lsp.kotlin.KotlinLspIntegration.setup(
-           com.itsaky.androidide.app.BaseApplication.getBaseInstance()
-       )
-       
-       // 挂载语义高亮拦截器
-       com.itsaky.androidide.lsp.kotlin.events.KotlinSemanticTokensBinder.init()
-     }
+
   }
 
-  // ==============================================================================
-  // 从 b 分支引入的过滤模块实现
-  // ==============================================================================
 
   override fun getAndroidModules(): List<AndroidModule> {
     val workspace = this.getWorkspace() ?: return emptyList()
@@ -186,7 +173,6 @@ class ProjectManagerImpl : IProjectManager, EventReceiver {
     return ws.findModuleForFile(file, checkExistence)
   }
 
-  // ==============================================================================
 
   override fun destroy() {
     log.info("Destroying project manager")
