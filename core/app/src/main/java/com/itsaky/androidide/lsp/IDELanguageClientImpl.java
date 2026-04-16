@@ -249,7 +249,8 @@ public void publishDiagnostics(DiagnosticResult result) {
           } else {
             // Edit is in some other file which is not opened
             // open that file and perform the edit
-            openedFrag = activity.openFile(file);
+            final Object openedEditor = activity.openFile(file);
+            openedFrag = openedEditor instanceof CodeEditorView ? (CodeEditorView) openedEditor : null;
             if (openedFrag != null && openedFrag.getEditor() != null) {
               editInEditor(openedFrag.getEditor(), edit);
             }
