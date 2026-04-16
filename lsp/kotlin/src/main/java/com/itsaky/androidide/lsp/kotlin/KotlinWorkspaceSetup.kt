@@ -17,8 +17,6 @@
 package com.itsaky.androidide.lsp.kotlin
 
 import android.content.Context
-import com.google.gson.JsonArray
-import com.google.gson.JsonObject
 import com.itsaky.androidide.lsp.api.ILanguageServerRegistry
 import com.itsaky.androidide.lsp.kotlin.compiler.KotlinCompilerProvider
 import com.itsaky.androidide.lsp.kotlin.compiler.KotlinCompilerService
@@ -26,7 +24,7 @@ import com.itsaky.androidide.lsp.kotlin.compiler.KotlinSourceFileManager
 import com.itsaky.androidide.projects.IWorkspace
 import com.itsaky.androidide.projects.ModuleProject
 import com.itsaky.androidide.projects.android.AndroidModule
-import com.itsaky.androidide.utils.ILogger
+import org.slf4j.LoggerFactory
 import java.io.File
 import java.nio.file.FileSystems
 import java.nio.file.StandardWatchEventKinds
@@ -42,16 +40,17 @@ import kotlinx.coroutines.*
  * 编译产出目录 (build/generated) 的变动。若有变动意味着类路径更新，则动态向 Server 发送通知
  * 更新解析缓存，使得诸如 R 类修改后立刻即可获得代码补全与识别。
  * </p>
+  *  @author android_zero
  */
 class KotlinWorkspaceSetup(private val context: Context, private val workspace: IWorkspace) {
 
   companion object {
-    private val log = ILogger.instance("KotlinWorkspaceSetup")
+    private val log = LoggerFactory.getLogger(KotlinWorkspaceSetup::class.java)
   }
 
   private var compilerService: KotlinCompilerService? = null
   private val classpathProvider = KotlinClasspathProvider()
-  private val indexCache = KotlinIndexCache(workspace.projectDir.absolutePath)
+  private val indexCache = KotlinIndexCache(workspace.getProjectDir().absolutePath)
 
   private var buildWatcher: WatchService? = null
   private var watcherJob: Job? = null
@@ -75,8 +74,8 @@ class KotlinWorkspaceSetup(private val context: Context, private val workspace: 
       buildWatcher = FileSystems.getDefault().newWatchService()
 
       val modulesToWatch = mutableListOf<File>()
-      workspace.subProjects.filterIsInstance<AndroidModule>().forEach { module ->
-        val buildDir = File(module.path, "build")
+      workspace.getSubProjects().filterIsInstance<AndroidModule>().forEach { module ->
+        val buildDir = File(module.path.replace(":", "/").removePrefix("/"), "build")
         if (buildDir.exists()) {
           modulesToWatch.add(buildDir)
         }
@@ -172,8 +171,8 @@ class KotlinWorkspaceSetup(private val context: Context, private val workspace: 
 
   private fun initializeCompilerService() {
     try {
-      var mainModule: ModuleProject? = workspace.subProjects.filterIsInstance<AndroidModule>().firstOrNull { it.isApplication }
-      if (mainModule == null) mainModule = workspace.subProjects.filterIsInstance<AndroidModule>().firstOrNull()
+      var mainModule: ModuleProject? = workspace.getSubProjects().filterIsInstance<AndroidModule>().firstOrNull { it.isApplication }
+      if (mainModule == null) mainModule = workspace.getSubProjects().filterIsInstance<AndroidModule>().firstOrNull()
       
       if (mainModule != null) {
         compilerService = KotlinCompilerProvider.get(mainModule)

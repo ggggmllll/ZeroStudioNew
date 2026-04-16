@@ -24,7 +24,7 @@ import com.itsaky.androidide.lsp.kotlin.ui.events.LspEventBus
 import com.itsaky.androidide.lsp.kotlin.ui.events.LspInstallRequestEvent
 import com.itsaky.androidide.shell.ProcessBuilderImpl
 import com.itsaky.androidide.utils.Environment
-import com.itsaky.androidide.utils.ILogger
+import org.slf4j.LoggerFactory
 import java.io.File
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -46,7 +46,7 @@ class KotlinServerProcessManager(private val context: Context) {
   private val coroutineScope = CoroutineScope(Dispatchers.IO + Job())
 
   companion object {
-    private val log = ILogger.instance("KotlinServerProcessManager")
+    private val log = LoggerFactory.getLogger(KotlinServerProcessManager::class.java)
   }
 
   fun setClasspathProvider(provider: KotlinClasspathProvider) {

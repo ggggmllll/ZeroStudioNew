@@ -23,7 +23,7 @@ import com.itsaky.androidide.lsp.kotlin.events.KotlinLanguageClientImpl
 import com.itsaky.androidide.lsp.kotlin.events.KotlinTextDocumentSyncHandler
 import com.itsaky.androidide.lsp.kotlin.settings.KotlinServerSettings
 import com.itsaky.androidide.projects.IProjectManager
-import com.itsaky.androidide.utils.ILogger
+import org.slf4j.LoggerFactory
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.concurrent.thread
 
@@ -42,7 +42,7 @@ import kotlin.concurrent.thread
  */
 object KotlinLspIntegration {
 
-  private val log = ILogger.instance("KotlinLspIntegration")
+  private val log = LoggerFactory.getLogger(KotlinLspIntegration::class.java)
   private val isInitialized = AtomicBoolean(false)
   private var workspaceSetup: KotlinWorkspaceSetup? = null
 

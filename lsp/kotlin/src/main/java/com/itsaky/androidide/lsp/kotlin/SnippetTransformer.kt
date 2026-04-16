@@ -14,21 +14,22 @@
  *  You should have received a copy of the GNU General Public License
  *   along with AndroidIDE.  If not, see <https://www.gnu.org/licenses/>.
  */
+
 package com.itsaky.androidide.lsp.kotlin
 
-import com.itsaky.androidide.utils.ILogger
+import org.slf4j.LoggerFactory
 
 /**
  * 工具：Kotlin Snippet 转换器与清理器。
  * 
- * 作用：拦截 KLS 的原始补全，将普通的 `Method($1, $2)` 
- * 转换为 Android Studio 风格的 Kotlin 智能补全（具名参数、尾随 Lambda 闭包等）。
- *  @author android_zero
+ * 作用：将 LSP 服务器返回的带有无用提示符号（如 ${1:p0} 等等）的代码片段清理转换，
+ * 提高由 IDE 接收后编辑时的实际可读性和输入顺畅性。
+  *  @author android_zero
  */
 class SnippetTransformer {
 
   companion object {
-    private val log = ILogger.instance("SnippetTransformer")
+    private val log = LoggerFactory.getLogger(SnippetTransformer::class.java)
     private val SNIPPET_PLACEHOLDER_REGEX = """\$\{(\d+):([^}]+)\}""".toRegex()
   }
 
@@ -107,7 +108,7 @@ class SnippetTransformer {
 
     // 按最外层逗号分割参数，忽略 Lambda `(A, B) -> C` 里的逗号
     var depth = 0
-    var currentParam = StringBuilder()
+    var currentParam = java.lang.StringBuilder()
     
     for (char in paramsContent) {
         when (char) {
@@ -148,7 +149,7 @@ class SnippetTransformer {
      result = result.replace("""\$\d+""".toRegex(), "")
      result = result.replace("\\$", "$")
      if (result.contains("()")) {
-         result = result.replace("()", "( )") 
+         result = result.replace("()", "( )") // 留给光标空位
      }
      return result
   }

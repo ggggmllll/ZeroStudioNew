@@ -14,26 +14,28 @@
  *  You should have received a copy of the GNU General Public License
  *   along with AndroidIDE.  If not, see <https://www.gnu.org/licenses/>.
  */
+
 package com.itsaky.androidide.lsp.kotlin
 
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.itsaky.androidide.utils.Environment
-import com.itsaky.androidide.utils.ILogger
 import java.io.File
 import java.security.MessageDigest
+import org.slf4j.LoggerFactory
 
 /**
  * 核心：Kotlin 索引哈希计算与缓存器 (KotlinIndexCache)。
  * <p>
  * 用于优化计算，避免每一次变动都向服务端发起大面积的全量重索引命令。它会持久化哈希值对比 Classpath。
  * </p>
+  *  @author android_zero
  */
 class KotlinIndexCache(private val projectPath: String) {
 
   companion object {
-    private val log = ILogger.instance("KotlinIndexCache")
+    private val log = LoggerFactory.getLogger(KotlinIndexCache::class.java)
     private const val CACHE_VERSION = 1
     private const val CACHE_DIR_NAME = "kls-cache"
     private const val CACHE_FILE_NAME = "index-cache.json"

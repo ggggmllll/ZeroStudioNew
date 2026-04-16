@@ -21,16 +21,17 @@ import com.itsaky.androidide.lsp.java.JavaCompilerProvider
 import com.itsaky.androidide.lsp.java.compiler.JavaCompilerService
 import com.itsaky.androidide.projects.IWorkspace
 import com.itsaky.androidide.projects.android.AndroidModule
-import com.itsaky.androidide.utils.ILogger
+import org.slf4j.LoggerFactory
 
 /**
  * 桥接器：Kotlin 和 Java 编译器的中间层接口。
  * 允许从 Kotlin 补全中引用尚未导入的 Java 类/SDK框架类。
+  *  @author android_zero
  */
 class KotlinJavaCompilerBridge(private val workspace: IWorkspace) {
 
   companion object {
-    private val log = ILogger.instance("KotlinJavaCompilerBridge")
+    private val log = LoggerFactory.getLogger(KotlinJavaCompilerBridge::class.java)
   }
 
   private var javaCompiler: JavaCompilerService? = null
@@ -41,8 +42,8 @@ class KotlinJavaCompilerBridge(private val workspace: IWorkspace) {
 
   private fun initializeCompiler() {
     try {
-      val mainModule = workspace.subProjects.filterIsInstance<AndroidModule>().firstOrNull { it.isApplication }
-          ?: workspace.subProjects.filterIsInstance<AndroidModule>().firstOrNull()
+      val mainModule = workspace.getSubProjects().filterIsInstance<AndroidModule>().firstOrNull { it.isApplication }
+          ?: workspace.getSubProjects().filterIsInstance<AndroidModule>().firstOrNull()
 
       if (mainModule != null) {
         javaCompiler = JavaCompilerProvider.get(mainModule)

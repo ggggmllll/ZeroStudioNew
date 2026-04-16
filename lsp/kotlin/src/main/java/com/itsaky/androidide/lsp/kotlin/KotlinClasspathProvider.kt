@@ -14,6 +14,7 @@
  *  You should have received a copy of the GNU General Public License
  *   along with AndroidIDE.  If not, see <https://www.gnu.org/licenses/>.
  */
+
 package com.itsaky.androidide.lsp.kotlin
 
 import com.itsaky.androidide.lsp.kotlin.compiler.KotlinCompilerService
@@ -23,13 +24,17 @@ import com.itsaky.androidide.projects.android.AndroidModule
 import com.itsaky.androidide.projects.classpath.ClassInfo
 import com.itsaky.androidide.projects.classpath.IClasspathReader
 import com.itsaky.androidide.projects.classpath.JarFsClasspathReader
-import com.itsaky.androidide.utils.ILogger
 import java.io.File
+import java.util.Properties
+import org.slf4j.LoggerFactory
 
 /**
- * Android 环境类路径桥接物料 (KotlinClasspathProvider)。
+ * 核心：Android 环境类路径桥接供应商 (KotlinClasspathProvider)。
  * 
- * @author android_zero
+ * 作用：AndroidIDE 的核心竞争力之一，因为纯粹的原生 Kotlin LSP 无法自动解析 Android 构建系统 (Gradle)
+ * 产生的 R 类、DataBinding、BuildConfig 和各种中间态中间解压后的 AAR jar 等。
+ * 该类通过深度访问 ProjectManager 解析构建出针对 KLS 完善且无死角的 classpath 提供给服务端运行。
+ *  @author android_zero
  */
 class KotlinClasspathProvider {
 
@@ -37,7 +42,7 @@ class KotlinClasspathProvider {
   private val classpathReader: IClasspathReader = JarFsClasspathReader()
   
   companion object {
-      private val log = ILogger.instance("KotlinClasspathProvider")
+      private val log = LoggerFactory.getLogger(KotlinClasspathProvider::class.java)
   }
 
   private var cachedClasspathList: List<String>? = null
@@ -80,17 +85,17 @@ class KotlinClasspathProvider {
       val workspace = projectManager.getWorkspace()
 
       if (workspace != null) {
-        val allProjects = mutableListOf(workspace.rootProject)
-        allProjects.addAll(workspace.subProjects)
+        val allProjects = mutableListOf(workspace.getRootProject())
+        allProjects.addAll(workspace.getSubProjects())
 
         for (project in allProjects) {
           if (project is ModuleProject) {
-            val compileClasspaths = project.compileClasspaths
+            val compileClasspaths = project.getCompileClasspaths()
             for (cp in compileClasspaths) {
               classpaths.add(cp.absolutePath)
             }
 
-            val moduleClasspaths = project.moduleClasspaths
+            val moduleClasspaths = project.getModuleClasspaths()
             for (cp in moduleClasspaths) {
               classpaths.add(cp.absolutePath)
             }
@@ -125,7 +130,7 @@ class KotlinClasspathProvider {
 
     addKotlinScriptingJarsFromGradleCache(classpaths)
 
-    val existingPaths = classpaths.filter { File(it).exists() }.toList()
+    val existingPaths = classpaths.map { File(it) }.filter { it.exists() }.map { it.absolutePath }
     log.info("Total Kotlin classpath entries: ${classpaths.size}, existing: ${existingPaths.size}")
 
     cachedClasspathList = existingPaths
@@ -134,7 +139,7 @@ class KotlinClasspathProvider {
 
   private fun addAndroidGeneratedSources(module: AndroidModule, classpaths: MutableSet<String>) {
     try {
-      val moduleDir = File(module.path)
+      val moduleDir = File(module.path.replace(":", "/").removePrefix("/"))
       val buildDir = File(moduleDir, "build")
 
       if (!buildDir.exists()) return
@@ -236,8 +241,8 @@ class KotlinClasspathProvider {
     try {
       val projectManager = IProjectManager.getInstance()
       val workspace = projectManager.getWorkspace() ?: return null
-      val rootProject = workspace.rootProject
-      val buildFile = File(rootProject.path, "build.gradle.kts")
+      val rootProject = workspace.getRootProject()
+      val buildFile = File(rootProject.projectDir, "build.gradle.kts")
 
       if (buildFile.exists()) {
         val content = buildFile.readText()
@@ -253,9 +258,9 @@ class KotlinClasspathProvider {
         }
       }
 
-      val propertiesFile = File(rootProject.path, "gradle.properties")
+      val propertiesFile = File(rootProject.projectDir, "gradle.properties")
       if (propertiesFile.exists()) {
-        val props = java.util.Properties()
+        val props = Properties()
         propertiesFile.inputStream().use { props.load(it) }
         return props.getProperty("kotlin.version") ?: props.getProperty("kotlinVersion")
       }

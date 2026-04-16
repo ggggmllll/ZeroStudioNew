@@ -26,7 +26,7 @@ import com.itsaky.androidide.lsp.models.MatchLevel
 import com.itsaky.androidide.lsp.models.TextEdit
 import com.itsaky.androidide.models.Position
 import com.itsaky.androidide.models.Range
-import com.itsaky.androidide.utils.ILogger
+import org.slf4j.LoggerFactory
 
 /**
  * 转换器：二次过滤、加工并注入导入修饰符。
@@ -34,12 +34,12 @@ import com.itsaky.androidide.utils.ILogger
  * 作用：KLS 的 Completion 返回可能带有极多无效项且 Snippet 占位符并不完美兼容。
  * 我们在这里进行清洗，拦截 KLS 原始补全参数将其转化为智能 Lambda / 具名参数，
  * 并借助 JavaCompilerBridge 提供本地 Class 的导入支持。
- *  @author android_zero
+  *  @author android_zero
  */
 class KotlinCompletionConverter {
 
   companion object {
-    private val log = ILogger.instance("KotlinCompletionConverter")
+    private val log = LoggerFactory.getLogger(KotlinCompletionConverter::class.java)
   }
 
   private val snippetTransformer = SnippetTransformer()

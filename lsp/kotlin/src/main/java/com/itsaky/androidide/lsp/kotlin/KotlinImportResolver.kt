@@ -14,18 +14,20 @@
  *  You should have received a copy of the GNU General Public License
  *   along with AndroidIDE.  If not, see <https://www.gnu.org/licenses/>.
  */
+
 package com.itsaky.androidide.lsp.kotlin
 
 import com.itsaky.androidide.lsp.models.CompletionItem
-import com.itsaky.androidide.utils.ILogger
+import org.slf4j.LoggerFactory
 
 /**
  * 工具：Kotlin 补全未解析引用时的自动导入逻辑匹配与计算器。
+  *  @author android_zero
  */
 class KotlinImportResolver {
 
   companion object {
-    private val log = ILogger.instance("KotlinImportResolver")
+    private val log = LoggerFactory.getLogger(KotlinImportResolver::class.java)
   }
 
   fun needsImport(item: CompletionItem, fileContent: String): String? {
