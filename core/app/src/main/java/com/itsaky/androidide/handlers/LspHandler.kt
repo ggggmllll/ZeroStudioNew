@@ -21,7 +21,6 @@ import android.content.Context
 import com.itsaky.androidide.lsp.api.ILanguageClient
 import com.itsaky.androidide.lsp.api.ILanguageServerRegistry
 import com.itsaky.androidide.lsp.java.JavaLanguageServer
-import com.itsaky.androidide.lsp.kotlin.KotlinLanguageServerImpl
 import com.itsaky.androidide.lsp.servers.toml.TomlServer
 import com.itsaky.androidide.lsp.xml.XMLLanguageServer
 
@@ -32,7 +31,6 @@ object LspHandler {
     ILanguageServerRegistry.getDefault().apply {
       getServer(JavaLanguageServer.SERVER_ID) ?: register(JavaLanguageServer())
       getServer(XMLLanguageServer.SERVER_ID) ?: register(XMLLanguageServer())
-      getServer(KotlinLanguageServerImpl.SERVER_ID) ?: register(KotlinLanguageServerImpl())
       getServer(TomlServer.SERVER_ID) ?: register(TomlServer())
     }
   }

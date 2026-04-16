@@ -780,4 +780,13 @@
 <string name="idepref_jdkVersion_title">JDK version</string>
 <string name="idepref_jdkVersion_summary">Currently selected: %1$s (requires restart if changed)</string>
 
+
+     <string name="idepref_kotlin_lsp_settings">Kotlin LSP</string>
+     <string name="idepref_kotlin_lazy_compilation">Lazy compilation</string>
+     <string name="idepref_kotlin_inlay_hints">Inlay hints</string>
+     <string name="idepref_kotlin_type_hints">Type hints</string>
+     <string name="idepref_kotlin_parameter_hints">Parameter hints</string>
+     <string name="idepref_kotlin_chained_hints">Chained hints</string>
+     <string name="idepref_kotlin_diagnostics">Diagnostics</string>
+     <string name="idepref_kotlin_remove_unused_imports">Remove unused imports</string>
 </resources>
