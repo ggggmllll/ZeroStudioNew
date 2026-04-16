@@ -2,7 +2,10 @@ package com.itsaky.androidide.editor.ui
 
 import androidx.appcompat.app.AlertDialog
 import com.itsaky.androidide.lsp.kotlin.KotlinLanguageServerImpl
+import com.itsaky.androidide.lsp.kotlin.providers.KotlinCodeActionProvider
+import com.itsaky.androidide.lsp.models.CodeActionItem
 import com.itsaky.androidide.lsp.models.DiagnosticItem
+import com.itsaky.androidide.lsp.models.PerformCodeActionParams
 import com.itsaky.androidide.models.Position
 import com.itsaky.androidide.models.Range
 import org.slf4j.LoggerFactory
@@ -79,32 +82,30 @@ fun IDEEditor.applyImportFixAtCursor(): Boolean {
   val column = cursor.leftColumn
 
   val diagnostic = getDiagnosticHandler().getDiagnosticAt(line, column)
-  if (diagnostic?.code != "missing_import") {
-    log.debug("No import fix available at cursor position")
-    return false
-  }
+  val diagnosticsList = if (diagnostic != null) listOf(diagnostic) else emptyList()
 
   val range = Range(start = Position(line, column), end = Position(line, column))
 
   try {
-    val options = languageServer.getImportOptions(file.toPath(), range)
+    val provider = KotlinCodeActionProvider()
+    val actions = provider.computeCodeActions(file.toPath(), range, diagnosticsList)
+    val importActions = actions.filter { it.title.contains("Import", ignoreCase = true) }
 
     return when {
-      options.isEmpty() -> {
+      importActions.isEmpty() -> {
         log.debug("No import options available")
         false
       }
-      options.size == 1 -> {
+      importActions.size == 1 -> {
         // Single option - apply directly
-        languageServer.handleDiagnosticClick(file.toPath(), range).also { success ->
-          if (success) {
-            log.info("Auto-imported: {}", options[0])
-          }
-        }
+        languageServer.client?.performCodeAction(PerformCodeActionParams(true, importActions[0]))
+        log.info("Auto-imported: {}", importActions[0].title)
+        true
       }
       else -> {
         // Multiple options - show dialog
-        showImportSelectionDialog(options, file.toPath(), range, languageServer)
+        val options = importActions.map { it.title }
+        showImportSelectionDialog(options, importActions, languageServer)
         true
       }
     }
@@ -117,15 +118,14 @@ fun IDEEditor.applyImportFixAtCursor(): Boolean {
 /** Show dialog to select import */
 private fun IDEEditor.showImportSelectionDialog(
     options: List<String>,
-    filePath: java.nio.file.Path,
-    range: Range,
+    actions: List<CodeActionItem>,
     languageServer: KotlinLanguageServerImpl,
 ) {
   AlertDialog.Builder(context)
       .setTitle("Choose Import")
       .setItems(options.toTypedArray()) { dialog, which ->
         try {
-          languageServer.handleDiagnosticClick(filePath, range)
+          languageServer.client?.performCodeAction(PerformCodeActionParams(true, actions[which]))
           log.info("User selected import: {}", options[which])
         } catch (e: Exception) {
           log.error("Failed to apply import", e)
