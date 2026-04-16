@@ -21,17 +21,15 @@ import com.itsaky.androidide.formatprovider.CodeFormatter
 import com.itsaky.androidide.lsp.api.ILanguageServerRegistry
 import com.itsaky.androidide.lsp.kotlin.KotlinLanguageServerImpl
 import com.itsaky.androidide.lsp.models.FormatCodeParams
-import com.itsaky.androidide.utils.ILogger
-
+import com.itsaky.androidide.utils.Logger
 /**
- * 核心：Kotlin 源码格式化器。
  *
  * @author android_zero
  */
 class KotlinFormatProvider : CodeFormatter {
 
   companion object {
-    private val log = ILogger.instance("KotlinFormatProvider")
+    private val log = Logger.instance("KotlinFormatProvider")
   }
 
   override fun format(source: String): String {
@@ -45,9 +43,7 @@ class KotlinFormatProvider : CodeFormatter {
       val params = FormatCodeParams(source)
       val formatResult = server.formatCode(params)
 
-      // 如果返回了编辑块，我们需要在内存中应用这些块
       if (formatResult.edits.isNotEmpty()) {
-        // 由于格式化通常是完整的替换或区间替换，LSP 规范中通常是对文本的倒序进行插入替换
         val sortedEdits = formatResult.edits.sortedByDescending { it.range.start }
         var resultText = source
         for (edit in sortedEdits) {
@@ -65,9 +61,6 @@ class KotlinFormatProvider : CodeFormatter {
     }
   }
 
-  /**
-   * 将 (Line, Column) 转换为单维度的 String Index Offset。
-   */
   private fun getOffsetFromPosition(content: String, line: Int, column: Int): Int {
     var currentLine = 0
     var offset = 0

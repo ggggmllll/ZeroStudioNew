@@ -24,7 +24,7 @@ import com.itsaky.androidide.eventbus.events.editor.DocumentSaveEvent
 import com.itsaky.androidide.lsp.api.ILanguageServerRegistry
 import com.itsaky.androidide.lsp.kotlin.KotlinLanguageServerImpl
 import com.itsaky.androidide.lsp.models.*
-import com.itsaky.androidide.utils.ILogger
+import com.itsaky.androidide.utils.Logger
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -36,7 +36,7 @@ import org.greenrobot.eventbus.ThreadMode
  */
 object KotlinTextDocumentSyncHandler {
 
-  private val log = ILogger.instance("KotlinTextDocumentSyncHandler")
+  private val log = Logger.instance("KotlinTextDocumentSyncHandler")
 
   /** 在主程序或管理器初始化时调用一次以注册 EventBus */
   fun init() {
@@ -100,7 +100,7 @@ object KotlinTextDocumentSyncHandler {
     
     server.didSave(
       DidSaveTextDocumentParams(
-        file = event.file.toPath(),
+        file = event.file, // changed to Path from File via definition mapping
         reason = TextDocumentSaveReason.Manual,
         text = null
       )

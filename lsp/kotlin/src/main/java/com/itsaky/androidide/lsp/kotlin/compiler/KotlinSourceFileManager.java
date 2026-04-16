@@ -25,7 +25,7 @@ import com.itsaky.androidide.javac.services.fs.AndroidFsProviderImpl;
 import com.itsaky.androidide.projects.ModuleProject;
 import com.itsaky.androidide.projects.android.AndroidModule;
 import com.itsaky.androidide.utils.Environment;
-import com.itsaky.androidide.utils.ILogger;
+import com.itsaky.androidide.utils.Logger;
 
 import java.io.File;
 import java.util.Map;
@@ -45,11 +45,11 @@ import java.util.concurrent.ConcurrentHashMap;
 public class KotlinSourceFileManager {
 
     public static final KotlinSourceFileManager NO_MODULE;
-    private static final ILogger LOG;
+    private static final Logger LOG;
     private static final Map<ModuleProject, KotlinSourceFileManager> cachedFileManagers = new ConcurrentHashMap<>();
 
     static {
-        LOG = ILogger.Companion.instance("KotlinSourceFileManager");
+        LOG = Logger.Companion.instance("KotlinSourceFileManager");
         NO_MODULE = new KotlinSourceFileManager(null);
     }
 

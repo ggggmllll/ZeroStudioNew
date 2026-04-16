@@ -24,17 +24,17 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import com.blankj.utilcode.util.FileUtils
 import com.itsaky.androidide.lsp.kotlin.ui.events.LspInstallRequestEvent
-import com.itsaky.androidide.utils.executioncommand.TermuxCommand
 import com.itsaky.androidide.utils.Environment
+import com.itsaky.androidide.utils.executioncommand.TermuxCommand
 import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -173,7 +173,8 @@ fun LspInstallerDialog(request: LspInstallRequestEvent, onDismiss: () -> Unit) {
                         echo "Neither curl nor wget found in PATH." >&2
                         exit 127
                       fi
-                      """.trimIndent()
+                      """
+                          .trimIndent()
 
                   val downloadResult =
                       TermuxCommand.run(context) {
@@ -182,7 +183,9 @@ fun LspInstallerDialog(request: LspInstallRequestEvent, onDismiss: () -> Unit) {
                         args("-c", downloadCmd)
                       }
                   if (!downloadResult.isSuccess) {
-                    throw IllegalStateException(downloadResult.stderr.ifBlank { downloadResult.stdout })
+                    throw IllegalStateException(
+                        downloadResult.stderr.ifBlank { downloadResult.stdout }
+                    )
                   }
                   log("Download finished: ${tmpZip!!.absolutePath}")
 

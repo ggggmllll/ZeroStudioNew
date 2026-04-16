@@ -21,26 +21,26 @@ import com.itsaky.androidide.actions.ActionItem
 import com.itsaky.androidide.lsp.actions.IActionsMenuProvider
 
 /**
- * Kotlin LSP 特有行为的菜单提供者。
- * 目前包含：
+ * Kotlin LSP 特有行为的菜单提供者。 目前包含：
  * - Java 转 Kotlin (ConvertJavaToKotlinAction)
  * - 刷新类路径依赖 (RefreshBazelClasspathAction)
  * - 查看文档悬停提示 (KotlinHoverAction)
  * - 跳转到声明定义 (KotlinGoToDefinitionAction)
  * - 符号重命名 (KotlinRenameAction)
- * - 查找引用 (KotlinFindReferencesAction)  <-- [NEW]
- * 
+ * - 查找引用 (KotlinFindReferencesAction) <-- [NEW]
+ *
  * @author android_zero
  */
 class KotlinLspActionsProvider : IActionsMenuProvider {
 
   override val actions: List<ActionItem>
-    get() = listOf(
-      ConvertJavaToKotlinAction,
-      RefreshBazelClasspathAction,
-      KotlinHoverAction,
-      KotlinGoToDefinitionAction,
-      KotlinRenameAction,
-      KotlinFindReferencesAction
-    )
+    get() =
+        listOf(
+            ConvertJavaToKotlinAction,
+            RefreshBazelClasspathAction,
+            KotlinHoverAction,
+            KotlinGoToDefinitionAction,
+            KotlinRenameAction,
+            KotlinFindReferencesAction,
+        )
 }

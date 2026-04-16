@@ -18,17 +18,15 @@
 package com.itsaky.androidide.lsp.kotlin.events
 
 import android.widget.Toast
+import com.blankj.utilcode.util.ActivityUtils
 import com.itsaky.androidide.app.BaseApplication
-import com.itsaky.androidide.eventbus.events.editor.DiagnosticUpdateEvent
 import com.itsaky.androidide.interfaces.IEditorHandler
 import com.itsaky.androidide.lsp.api.ILanguageClient
 import com.itsaky.androidide.lsp.kotlin.utils.KlsUriDecoder
 import com.itsaky.androidide.lsp.kotlin.utils.KotlinEditorEditInterceptor
 import com.itsaky.androidide.lsp.models.*
 import com.itsaky.androidide.models.Location
-import com.itsaky.androidide.utils.ActivityUtils
-import com.itsaky.androidide.utils.ILogger
-import org.greenrobot.eventbus.EventBus
+import com.itsaky.androidide.utils.Logger
 import java.io.File
 import java.net.URI
 import java.util.concurrent.ConcurrentHashMap
@@ -42,7 +40,7 @@ class KotlinLanguageClientImpl : ILanguageClient {
   private val diagnosticsCache = ConcurrentHashMap<String, List<DiagnosticItem>>()
 
   companion object {
-    private val log = ILogger.instance("KotlinLanguageClientImpl")
+    private val log = Logger.instance("KotlinLanguageClientImpl")
   }
 
   override fun publishDiagnostics(result: DiagnosticResult) {
@@ -53,7 +51,28 @@ class KotlinLanguageClientImpl : ILanguageClient {
 
     log.info("Received ${result.diagnostics.size} diagnostics for $pathStr")
 
-    EventBus.getDefault().post(DiagnosticUpdateEvent(result.file.toFile(), result.diagnostics))
+    com.blankj.utilcode.util.ThreadUtils.runOnUiThread {
+        val handler = ActivityUtils.getTopActivity() as? IEditorHandler
+        val currentEditor = handler?.let { 
+            try { 
+                it.javaClass.getMethod("getCurrentEditor").invoke(it) as? io.github.rosemoe.sora.widget.CodeEditor 
+            } catch(e: Exception) { null }
+        }
+        val currentFile = handler?.let { 
+            try { 
+                it.javaClass.getMethod("getCurrentFile").invoke(it) as? java.io.File 
+            } catch(e: Exception) { null }
+        }
+        
+        if (currentFile?.absolutePath == result.file.toAbsolutePath().toString() && currentEditor != null) {
+            val container = io.github.rosemoe.sora.lang.diagnostic.DiagnosticsContainer()
+            val text = currentEditor.text
+            result.diagnostics.forEach { diag ->
+                container.addDiagnostic(diag.asDiagnosticRegion(text))
+            }
+            currentEditor.diagnostics = container
+        }
+    }
   }
 
   override fun getDiagnosticAt(file: File, line: Int, column: Int): DiagnosticItem? {
@@ -94,12 +113,19 @@ class KotlinLanguageClientImpl : ILanguageClient {
   }
 
   override fun applyWorkspaceEdit(edit: WorkspaceEdit): Boolean {
-   // 获取当前正在编辑的文件和 Editor
     val handler = ActivityUtils.getTopActivity() as? IEditorHandler
-    val currentEditor = handler?.getCurrentEditor()
-    val currentFilePath = currentEditor?.file?.absolutePath
+    val currentEditor = handler?.let { 
+        try { 
+            it.javaClass.getMethod("getCurrentEditor").invoke(it) as? io.github.rosemoe.sora.widget.CodeEditor 
+        } catch(e: Exception) { null }
+    }
+    val currentFile = handler?.let { 
+        try { 
+            it.javaClass.getMethod("getCurrentFile").invoke(it) as? java.io.File 
+        } catch(e: Exception) { null }
+    }
     
-    return KotlinEditorEditInterceptor.applyEdit(currentEditor, currentFilePath, edit)
+    return KotlinEditorEditInterceptor.applyEdit(currentEditor, currentFile?.absolutePath, edit)
   }
 
   override fun showMessage(params: ShowMessageParams) {

@@ -24,21 +24,18 @@ import com.itsaky.androidide.lsp.kotlin.KotlinLanguageServerImpl
 import com.itsaky.androidide.lsp.models.CodeActionItem
 import com.itsaky.androidide.lsp.models.DiagnosticItem
 import com.itsaky.androidide.models.Range
-import com.itsaky.androidide.utils.ILogger
+import com.itsaky.androidide.utils.Logger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.nio.file.Path
-
 /**
- * Kotlin 语言快速修复/意图动作 (Code Actions) 提供者。
  *
  * @author android_zero
  */
 class KotlinCodeActionProvider {
-
   companion object {
-    private val log = ILogger.instance("KotlinCodeActionProvider")
+    private val log = Logger.instance("KotlinCodeActionProvider")
     private val gson = Gson()
   }
 

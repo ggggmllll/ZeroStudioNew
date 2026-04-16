@@ -24,9 +24,9 @@ import com.itsaky.androidide.projects.android.AndroidModule
 import org.slf4j.LoggerFactory
 
 /**
- * 桥接器：Kotlin 和 Java 编译器的中间层接口。
- * 允许从 Kotlin 补全中引用尚未导入的 Java 类/SDK框架类。
-  *  @author android_zero
+ * 桥接器：Kotlin 和 Java 编译器的中间层接口。 允许从 Kotlin 补全中引用尚未导入的 Java 类/SDK框架类。
+ *
+ * @author android_zero
  */
 class KotlinJavaCompilerBridge(private val workspace: IWorkspace) {
 
@@ -42,8 +42,10 @@ class KotlinJavaCompilerBridge(private val workspace: IWorkspace) {
 
   private fun initializeCompiler() {
     try {
-      val mainModule = workspace.getSubProjects().filterIsInstance<AndroidModule>().firstOrNull { it.isApplication }
-          ?: workspace.getSubProjects().filterIsInstance<AndroidModule>().firstOrNull()
+      val mainModule =
+          workspace.getSubProjects().filterIsInstance<AndroidModule>().firstOrNull {
+            it.isApplication
+          } ?: workspace.getSubProjects().filterIsInstance<AndroidModule>().firstOrNull()
 
       if (mainModule != null) {
         javaCompiler = JavaCompilerProvider.get(mainModule)
@@ -65,21 +67,23 @@ class KotlinJavaCompilerBridge(private val workspace: IWorkspace) {
   fun findClassesByPrefix(prefix: String): List<ClassInfo> {
     if (prefix.isEmpty()) return emptyList()
     val allClasses = getAllAvailableClasses()
-    return allClasses.filter { className ->
-        val simpleName = className.substringAfterLast('.')
-        simpleName.startsWith(prefix, ignoreCase = false)
-    }.map { className ->
-        ClassInfo(
-            simpleName = className.substringAfterLast('.'),
-            fullyQualifiedName = className,
-            packageName = className.substringBeforeLast('.', "")
-        )
-    }
+    return allClasses
+        .filter { className ->
+          val simpleName = className.substringAfterLast('.')
+          simpleName.startsWith(prefix, ignoreCase = false)
+        }
+        .map { className ->
+          ClassInfo(
+              simpleName = className.substringAfterLast('.'),
+              fullyQualifiedName = className,
+              packageName = className.substringBeforeLast('.', ""),
+          )
+        }
   }
 
   data class ClassInfo(
       val simpleName: String,
       val fullyQualifiedName: String,
-      val packageName: String
+      val packageName: String,
   )
 }

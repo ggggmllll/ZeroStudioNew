@@ -32,7 +32,7 @@ import com.itsaky.androidide.preferences.internal.EditorPreferences
 import com.itsaky.androidide.projects.IProjectManager
 import com.itsaky.androidide.projects.IWorkspace
 import com.itsaky.androidide.utils.Environment
-import com.itsaky.androidide.utils.ILogger
+import com.itsaky.androidide.utils.Logger
 import java.io.File
 import java.io.InputStream
 import java.io.OutputStream
@@ -65,7 +65,7 @@ class KotlinLanguageServerImpl(
 
   companion object {
     const val SERVER_ID = "kotlin-lsp"
-    private val log = ILogger.instance("KotlinLanguageServerImpl")
+    private val log = Logger.instance("KotlinLanguageServerImpl")
   }
 
   init {
@@ -95,8 +95,8 @@ class KotlinLanguageServerImpl(
   }
 
   private fun createInitializeParams(workspace: IWorkspace): JsonObject {
-    val rootUri = workspace.projectDir.toURI().toString()
-    val cacheDir = Environment.getProjectCacheDir(workspace.projectDir)
+    val rootUri = workspace.getProjectDir().toURI().toString()
+    val cacheDir = Environment.getProjectCacheDir(workspace.getProjectDir())
     
     val initOptions = JsonObject().apply {
       addProperty("storagePath", cacheDir.absolutePath)
@@ -107,12 +107,12 @@ class KotlinLanguageServerImpl(
 
     return JsonObject().apply {
       addProperty("rootUri", rootUri)
-      addProperty("rootPath", workspace.projectDir.absolutePath)
+      addProperty("rootPath", workspace.getProjectDir().absolutePath)
       add("initializationOptions", initOptions)
       add("capabilities", JsonObject().apply {
          add("workspace", JsonObject().apply {
-           add("workspaceFolders", true)
-           add("executeCommand", JsonObject().apply { add("dynamicRegistration", true) })
+           addProperty("workspaceFolders", true)
+           add("executeCommand", JsonObject().apply { addProperty("dynamicRegistration", true) })
          })
          add("textDocument", JsonObject().apply {
            add("completion", JsonObject().apply {
@@ -144,7 +144,7 @@ class KotlinLanguageServerImpl(
        add("ktfmt", JsonObject().apply {
          addProperty("style", "google")
          addProperty("indent", EditorPreferences.tabSize)
-         addProperty("maxWidth", EditorPreferences.maxLineWidth)
+         addProperty("maxWidth", 100)
          addProperty("removeUnusedImports", true)
        })
      }

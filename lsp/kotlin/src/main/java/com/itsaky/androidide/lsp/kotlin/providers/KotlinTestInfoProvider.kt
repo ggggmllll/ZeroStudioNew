@@ -22,13 +22,15 @@ import com.google.gson.reflect.TypeToken
 import com.itsaky.androidide.lsp.api.ILanguageServerRegistry
 import com.itsaky.androidide.lsp.kotlin.KotlinLanguageServerImpl
 import com.itsaky.androidide.models.Range
-import com.itsaky.androidide.utils.ILogger
+import com.itsaky.androidide.utils.Logger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.nio.file.Path
-
-/** Kotest 数据结构模型 */
+/**
+ *
+ * @author android_zero
+ */
 data class KotestClassInfo(
     val className: String,
     val range: Range?,
@@ -46,27 +48,16 @@ data class ItInfo(
     val range: Range?,
 )
 
-/**
- * 核心：Kotlin 单元测试框架 (Kotest) 结构提供者。
- *
- * 作用与功能：
- * 当打开一个以 `Test.kt` 结尾的文件时，调用 Workspace 命令 `kotestTestsInfo`。
- * 从 LSP 服务端直接拉取 Kotest 的 Describe 和 It 块。
- * 这将为 IDE 的“Test Runner 侧边栏”提供可以直接执行和点击跳转的数据节点。
- *
- * @author android_zero
- */
 class KotlinTestInfoProvider {
 
   companion object {
-    private val log = ILogger.instance("KotlinTestInfoProvider")
+    private val log = Logger.instance("KotlinTestInfoProvider")
     private val gson = Gson()
   }
 
   fun canProvideTestInfo(file: Path?): Boolean {
     if (file == null) return false
     val pathStr = file.toString()
-    // KLS 内部约定以 Test.kt 结尾的才会被标记为 isTestFile = true
     return pathStr.endsWith("Test.kt", ignoreCase = true) 
   }
 
@@ -80,7 +71,6 @@ class KotlinTestInfoProvider {
     return runBlocking {
       try {
         withContext(Dispatchers.IO) {
-          // "kotestTestsInfo" 定义在 Commands.kt 中，其参数 [0] 为 fileUri
           val args = listOf(file.toUri().toString())
           val res = server.executeWorkspaceCommand("kotestTestsInfo", args)
           

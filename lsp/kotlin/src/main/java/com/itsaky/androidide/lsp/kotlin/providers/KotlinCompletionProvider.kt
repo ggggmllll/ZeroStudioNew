@@ -25,16 +25,15 @@ import com.itsaky.androidide.lsp.models.CompletionItemKind
 import com.itsaky.androidide.lsp.models.CompletionParams
 import com.itsaky.androidide.lsp.models.CompletionResult
 import com.itsaky.androidide.lsp.models.MatchLevel
-import com.itsaky.androidide.utils.ILogger
-
-/*
-*  代码补全提供器
-*  @author android_zero
-*/
+import com.itsaky.androidide.utils.Logger
+/**
+ *
+ * @author android_zero
+ */
 class KotlinCompletionProvider : AbstractServiceProvider(), ICompletionProvider {
 
   companion object {
-    private val log = ILogger.instance("KotlinCompletionProvider")
+    private val log = Logger.instance("KotlinCompletionProvider")
   }
 
   override fun canComplete(file: java.nio.file.Path?): Boolean {
@@ -59,7 +58,6 @@ class KotlinCompletionProvider : AbstractServiceProvider(), ICompletionProvider 
       
       if (prefix.isNotEmpty()) {
         return CompletionResult.mapAndFilter(result, prefix) { item ->
-            // 如果是1个字很短的前缀，或者目标词包含大量空格（通常是提示短语），则必须严格前缀匹配
             val strictMode = prefix.length < 1 || item.ideLabel.contains(" ")
 
             item.matchLevel = if (strictMode) {
@@ -69,7 +67,6 @@ class KotlinCompletionProvider : AbstractServiceProvider(), ICompletionProvider 
                     MatchLevel.NO_MATCH
                 }
             } else {
-                // 长单词依然可以使用系统的 fuzzy search
                 matchLevel(item.insertText, prefix)
             }
         }

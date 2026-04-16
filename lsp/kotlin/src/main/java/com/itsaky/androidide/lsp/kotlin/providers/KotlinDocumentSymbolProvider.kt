@@ -20,21 +20,19 @@ package com.itsaky.androidide.lsp.kotlin.providers
 import com.itsaky.androidide.lsp.api.ILanguageServerRegistry
 import com.itsaky.androidide.lsp.kotlin.KotlinLanguageServerImpl
 import com.itsaky.androidide.lsp.models.DocumentSymbol
-import com.itsaky.androidide.utils.ILogger
+import com.itsaky.androidide.utils.Logger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.nio.file.Path
-
 /**
- * 核心：Kotlin 源码结构树/大纲 (Document Symbol) 提供者。
  *
  * @author android_zero
  */
 class KotlinDocumentSymbolProvider {
 
   companion object {
-    private val log = ILogger.instance("KotlinDocumentSymbolProvider")
+    private val log = Logger.instance("KotlinDocumentSymbolProvider")
   }
 
   fun canProvideDocumentSymbols(file: Path?): Boolean {
@@ -54,11 +52,9 @@ class KotlinDocumentSymbolProvider {
       try {
         withContext(Dispatchers.IO) {
           val result = server.documentSymbols(file)
-          // 优先返回嵌套结构的 symbols 列表，不支持嵌套的客户端才用 flatSymbols
           if (result.symbols.isNotEmpty()) {
              result.symbols
           } else {
-             // 如果嵌套为空，我们可以把 flatSymbols 降级组装返回 (按 LSP 协议规范，部分Server返回扁平列表)
              result.flatSymbols.map {
                  DocumentSymbol(
                      name = it.name,

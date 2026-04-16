@@ -19,6 +19,7 @@ package com.itsaky.androidide.lsp.kotlin.actions
 
 import android.graphics.drawable.Drawable
 import androidx.core.content.ContextCompat
+import com.blankj.utilcode.util.ActivityUtils
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.itsaky.androidide.actions.*
 import com.itsaky.androidide.interfaces.IEditorHandler
@@ -29,8 +30,8 @@ import com.itsaky.androidide.lsp.models.ReferenceParams
 import com.itsaky.androidide.models.Location
 import com.itsaky.androidide.models.Position
 import com.itsaky.androidide.progress.ICancelChecker
-import com.itsaky.androidide.utils.ActivityUtils
-import com.itsaky.androidide.utils.ILogger
+import com.itsaky.androidide.utils.Logger
+import com.itsaky.androidide.utils.flashInfo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -51,9 +52,7 @@ object KotlinFindReferencesAction : EditorActionItem {
   override var requiresUIThread: Boolean = true
   override var location: ActionItem.Location = ActionItem.Location.EDITOR_CODE_ACTIONS
 
-  companion object {
-    private val log = ILogger.instance("KotlinFindReferencesAction")
-  }
+  private val log = Logger.instance("KotlinFindReferencesAction")
 
   override fun prepare(data: ActionData) {
     super.prepare(data)
@@ -62,7 +61,7 @@ object KotlinFindReferencesAction : EditorActionItem {
       visible = path.toString().endsWith(".kt", true) || path.toString().endsWith(".kts", true)
       enabled = visible
 
-      if (icon == null && data.getContext() != null) {
+      if (icon == null && data.get(android.content.Context::class.java) != null) {
         icon = ContextCompat.getDrawable(data.requireContext(), com.itsaky.androidide.projects.R.drawable.ic_search)
       }
     } catch (e: Exception) {
@@ -80,7 +79,7 @@ object KotlinFindReferencesAction : EditorActionItem {
     try {
       val editor = data.requireEditor()
       val path = data.requirePath()
-      val pos = Position(editor.cursor.leftLine, editor.cursor.leftColumn)
+      val pos = Position(editor.cursor.left().line, editor.cursor.left().column)
       
       val params = ReferenceParams(
         file = path, 
@@ -103,12 +102,12 @@ object KotlinFindReferencesAction : EditorActionItem {
   @Suppress("UNCHECKED_CAST")
   override fun postExec(data: ActionData, result: Any) {
     super.postExec(data, result)
-    val context = data.getContext() ?: return
+    val context = data.get(android.content.Context::class.java) ?: return
     val locations = result as? List<Location> ?: return
 
     if (locations.isEmpty()) {
-      ActivityUtils.getTopActivity()?.let {
-        com.itsaky.androidide.utils.FlashbarActivityUtilsKt.flashInfo(it, "No references found.")
+      ActivityUtils.getTopActivity()?.let { act ->
+        act.flashInfo("No references found.")
       }
       return
     }

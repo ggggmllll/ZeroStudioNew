@@ -24,21 +24,19 @@ import com.itsaky.androidide.lsp.models.InlayHintParams
 import com.itsaky.androidide.models.Position
 import com.itsaky.androidide.models.Range
 import com.itsaky.androidide.progress.ICancelChecker
-import com.itsaky.androidide.utils.ILogger
+import com.itsaky.androidide.utils.Logger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.nio.file.Path
-
 /**
- * 核心：Kotlin 语言内联提示 (Inlay Hints) 提供者。
  *
  * @author android_zero
  */
 class KotlinInlayHintsProvider {
 
   companion object {
-    private val log = ILogger.instance("KotlinInlayHintsProvider")
+    private val log = Logger.instance("KotlinInlayHintsProvider")
   }
 
   fun canProvideInlayHints(file: Path?): Boolean {

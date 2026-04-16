@@ -27,10 +27,11 @@ import org.slf4j.LoggerFactory
 
 /**
  * 核心：Kotlin 索引哈希计算与缓存器 (KotlinIndexCache)。
+ *
  * <p>
- * 用于优化计算，避免每一次变动都向服务端发起大面积的全量重索引命令。它会持久化哈希值对比 Classpath。
- * </p>
-  *  @author android_zero
+ * 用于优化计算，避免每一次变动都向服务端发起大面积的全量重索引命令。它会持久化哈希值对比 Classpath。 </p>
+ *
+ * @author android_zero
  */
 class KotlinIndexCache(private val projectPath: String) {
 
@@ -74,7 +75,9 @@ class KotlinIndexCache(private val projectPath: String) {
     try {
       val cachedHash = hashFile.readText().trim()
       val isValid = cachedHash == currentClasspathHash
-      log.info("Kotlin Cache validation: cached=${cachedHash.take(8)}, current=${currentClasspathHash.take(8)}, valid=$isValid")
+      log.info(
+          "Kotlin Cache validation: cached=${cachedHash.take(8)}, current=${currentClasspathHash.take(8)}, valid=$isValid"
+      )
       return isValid
     } catch (e: Exception) {
       log.error("Failed to validate cache", e)
@@ -84,13 +87,14 @@ class KotlinIndexCache(private val projectPath: String) {
 
   fun saveCache(symbols: JsonArray, classpathHash: String) {
     try {
-      val cacheData = JsonObject().apply {
-        addProperty("version", CACHE_VERSION)
-        addProperty("timestamp", System.currentTimeMillis())
-        addProperty("projectPath", projectPath)
-        addProperty("classpathHash", classpathHash)
-        add("symbols", symbols)
-      }
+      val cacheData =
+          JsonObject().apply {
+            addProperty("version", CACHE_VERSION)
+            addProperty("timestamp", System.currentTimeMillis())
+            addProperty("projectPath", projectPath)
+            addProperty("classpathHash", classpathHash)
+            add("symbols", symbols)
+          }
       cacheFile.writeText(gson.toJson(cacheData))
       hashFile.writeText(classpathHash)
       log.info("Saved KLS cache with ${symbols.size()} symbols")

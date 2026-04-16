@@ -24,7 +24,6 @@ import com.itsaky.androidide.lsp.kotlin.compiler.KotlinSourceFileManager
 import com.itsaky.androidide.projects.IWorkspace
 import com.itsaky.androidide.projects.ModuleProject
 import com.itsaky.androidide.projects.android.AndroidModule
-import org.slf4j.LoggerFactory
 import java.io.File
 import java.nio.file.FileSystems
 import java.nio.file.StandardWatchEventKinds
@@ -32,15 +31,16 @@ import java.nio.file.WatchKey
 import java.nio.file.WatchService
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.*
+import org.slf4j.LoggerFactory
 
 /**
  * 核心：Kotlin 工作区设置与事件生命周期管理。
+ *
  * <p>
- * 作用：主要负责在 KotlinLspIntegration 组装完毕后，利用 Java NIO WatchService 去监听 Gradle
- * 编译产出目录 (build/generated) 的变动。若有变动意味着类路径更新，则动态向 Server 发送通知
- * 更新解析缓存，使得诸如 R 类修改后立刻即可获得代码补全与识别。
- * </p>
-  *  @author android_zero
+ * 作用：主要负责在 KotlinLspIntegration 组装完毕后，利用 Java NIO WatchService 去监听 Gradle 编译产出目录 (build/generated)
+ * 的变动。若有变动意味着类路径更新，则动态向 Server 发送通知 更新解析缓存，使得诸如 R 类修改后立刻即可获得代码补全与识别。 </p>
+ *
+ * @author android_zero
  */
 class KotlinWorkspaceSetup(private val context: Context, private val workspace: IWorkspace) {
 
@@ -62,7 +62,7 @@ class KotlinWorkspaceSetup(private val context: Context, private val workspace: 
 
     // 给 ProcessManager 配置注入依赖计算工具
     processManager.setClasspathProvider(classpathProvider)
-    
+
     startBuildWatcher(processManager)
 
     // 这里不再主动接管 startServer，它在 KotlinLspIntegration 中独立执行
@@ -91,11 +91,14 @@ class KotlinWorkspaceSetup(private val context: Context, private val workspace: 
         try {
           val generatedDir = File(buildDir, "generated")
           if (generatedDir.exists()) {
-            val key = generatedDir.toPath().register(
+            val key =
+                generatedDir
+                    .toPath()
+                    .register(
                         buildWatcher,
                         StandardWatchEventKinds.ENTRY_CREATE,
                         StandardWatchEventKinds.ENTRY_MODIFY,
-                        StandardWatchEventKinds.ENTRY_DELETE
+                        StandardWatchEventKinds.ENTRY_DELETE,
                     )
             watchKeys[key] = generatedDir
             log.info("Watching for Kotlin build changes in: ${generatedDir.absolutePath}")
@@ -113,7 +116,7 @@ class KotlinWorkspaceSetup(private val context: Context, private val workspace: 
           try {
             val key = buildWatcher?.poll(1, TimeUnit.SECONDS) ?: continue
             val events = key.pollEvents()
-            
+
             if (events.isNotEmpty()) {
               val now = System.currentTimeMillis()
               if (now - lastReloadTime > reloadDebounceMs) {
@@ -143,11 +146,13 @@ class KotlinWorkspaceSetup(private val context: Context, private val workspace: 
     withContext(Dispatchers.IO) {
       try {
         classpathProvider.invalidateCache()
-        
+
         // 当发生更改时，通过 LSP 命令让 Server 刷新
-        val server = ILanguageServerRegistry.getDefault().getServer("kotlin-lsp") as? KotlinLanguageServerImpl
+        val server =
+            ILanguageServerRegistry.getDefault().getServer("kotlin-lsp")
+                as? KotlinLanguageServerImpl
         server?.executeWorkspaceCommand("kotlinRefreshBazelClassPath", emptyList())
-        
+
         log.info("Classpath and index reloaded successfully via KLS Workspace Command")
       } catch (e: Exception) {
         log.error("Failed to reload classpath", e)
@@ -171,9 +176,13 @@ class KotlinWorkspaceSetup(private val context: Context, private val workspace: 
 
   private fun initializeCompilerService() {
     try {
-      var mainModule: ModuleProject? = workspace.getSubProjects().filterIsInstance<AndroidModule>().firstOrNull { it.isApplication }
-      if (mainModule == null) mainModule = workspace.getSubProjects().filterIsInstance<AndroidModule>().firstOrNull()
-      
+      var mainModule: ModuleProject? =
+          workspace.getSubProjects().filterIsInstance<AndroidModule>().firstOrNull {
+            it.isApplication
+          }
+      if (mainModule == null)
+          mainModule = workspace.getSubProjects().filterIsInstance<AndroidModule>().firstOrNull()
+
       if (mainModule != null) {
         compilerService = KotlinCompilerProvider.get(mainModule)
       } else {

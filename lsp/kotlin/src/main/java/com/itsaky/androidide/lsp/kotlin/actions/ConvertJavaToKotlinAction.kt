@@ -19,17 +19,12 @@ package com.itsaky.androidide.lsp.kotlin.actions
 
 import android.graphics.drawable.Drawable
 import androidx.core.content.ContextCompat
-import com.itsaky.androidide.actions.ActionData
-import com.itsaky.androidide.actions.ActionItem
-import com.itsaky.androidide.actions.EditorActionItem
-import com.itsaky.androidide.actions.requireContext
-import com.itsaky.androidide.actions.requireEditor
-import com.itsaky.androidide.actions.requirePath
+import com.itsaky.androidide.actions.*
 import com.itsaky.androidide.lsp.api.ILanguageServerRegistry
 import com.itsaky.androidide.lsp.kotlin.KotlinLanguageServerImpl
 import com.itsaky.androidide.models.Position
 import com.itsaky.androidide.models.Range
-import com.itsaky.androidide.utils.ILogger
+import com.itsaky.androidide.utils.Logger
 
 /**
  * 编辑器扩展行为：将当前选择的 Java 代码片段，通过 Kotlin LSP 转换并重构为 Kotlin 代码。
@@ -46,9 +41,7 @@ object ConvertJavaToKotlinAction : EditorActionItem {
   override var requiresUIThread: Boolean = false
   override var location: ActionItem.Location = ActionItem.Location.EDITOR_CODE_ACTIONS
 
-  companion object {
-    private val log = ILogger.instance("ConvertJavaToKotlinAction")
-  }
+  private val log = Logger.instance("ConvertJavaToKotlinAction")
 
   override fun prepare(data: ActionData) {
     super.prepare(data)
@@ -60,7 +53,7 @@ object ConvertJavaToKotlinAction : EditorActionItem {
       visible = path.toString().endsWith(".java", true) && editor.cursor.isSelected
       enabled = visible
 
-      if (icon == null && data.getContext() != null) {
+      if (icon == null && data.get(android.content.Context::class.java) != null) {
         icon = ContextCompat.getDrawable(data.requireContext(), com.itsaky.androidide.projects.R.drawable.ic_android)
       }
     } catch (e: Exception) {
@@ -80,8 +73,8 @@ object ConvertJavaToKotlinAction : EditorActionItem {
       val editor = data.requireEditor()
       val path = data.requirePath()
 
-      val selStart = editor.cursor.left
-      val selEnd = editor.cursor.right
+      val selStart = editor.cursor.left()
+      val selEnd = editor.cursor.right()
       
       val range = Range(
         Position(selStart.line, selStart.column),

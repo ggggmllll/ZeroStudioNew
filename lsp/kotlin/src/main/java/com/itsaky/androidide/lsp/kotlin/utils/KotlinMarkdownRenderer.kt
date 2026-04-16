@@ -8,8 +8,8 @@
  *
  *  AndroidIDE is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *  Lesser General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
  *   along with AndroidIDE.  If not, see <https://www.gnu.org/licenses/>.
@@ -25,7 +25,7 @@ import android.text.style.BackgroundColorSpan
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import android.text.style.TypefaceSpan
-import com.itsaky.androidide.utils.ILogger
+import com.itsaky.androidide.utils.Logger
 
 /**
  * 轻量级 LSP Markdown 渲染器。
@@ -33,7 +33,7 @@ import com.itsaky.androidide.utils.ILogger
  */
 object KotlinMarkdownRenderer {
 
-  private val log = ILogger.instance("KotlinMarkdownRenderer")
+  private val log = Logger.instance("KotlinMarkdownRenderer")
 
   /**
    * 将 Markdown 字符串渲染为可直接放入 TextView 的 Spannable。
@@ -90,7 +90,7 @@ object KotlinMarkdownRenderer {
       // 设置等宽字体
       ssb.setSpan(TypefaceSpan("monospace"), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
     } catch (e: Exception) {
-      log.warn("Failed to apply code block style", e)
+      log.warn("Failed to apply code block style: ${e.message}")
     }
   }
 

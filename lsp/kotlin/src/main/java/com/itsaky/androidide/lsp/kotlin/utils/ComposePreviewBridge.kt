@@ -20,8 +20,7 @@ package com.itsaky.androidide.lsp.kotlin.utils
 import com.itsaky.androidide.lsp.api.ILanguageServerRegistry
 import com.itsaky.androidide.lsp.kotlin.KotlinLanguageServerImpl
 import com.itsaky.androidide.projects.IProjectManager
-import com.itsaky.androidide.projects.ModuleProject
-import com.itsaky.androidide.utils.ILogger
+import com.itsaky.androidide.utils.Logger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -33,7 +32,7 @@ import java.net.URLClassLoader
  */
 object ComposePreviewBridge {
 
-  private val log = ILogger.instance("ComposePreviewBridge")
+  private val log = Logger.instance("ComposePreviewBridge")
 
   /**
    * 为指定的 @Composable 函数所在文件请求构建，并获取它的运行时类加载器。
@@ -56,7 +55,7 @@ object ComposePreviewBridge {
           )
         )
       } catch (e: Exception) {
-         log.warn("LSP didSave notification failed during Compose Preview prep", e)
+         log.warn("LSP didSave notification failed during Compose Preview prep: ${e.message}")
       }
     }
 

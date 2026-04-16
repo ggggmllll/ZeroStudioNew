@@ -21,6 +21,7 @@ import android.graphics.drawable.Drawable
 import android.widget.ScrollView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import com.blankj.utilcode.util.ActivityUtils
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.itsaky.androidide.actions.*
 import com.itsaky.androidide.lsp.api.ILanguageServerRegistry
@@ -28,7 +29,7 @@ import com.itsaky.androidide.lsp.kotlin.KotlinLanguageServerImpl
 import com.itsaky.androidide.lsp.models.DefinitionParams
 import com.itsaky.androidide.models.Position
 import com.itsaky.androidide.progress.ICancelChecker
-import com.itsaky.androidide.utils.ILogger
+import com.itsaky.androidide.utils.Logger
 import com.itsaky.androidide.utils.flashError
 import com.itsaky.androidide.utils.resolveAttr
 import io.noties.markwon.Markwon
@@ -53,9 +54,7 @@ object KotlinHoverAction : EditorActionItem {
   override var requiresUIThread: Boolean = true 
   override var location: ActionItem.Location = ActionItem.Location.EDITOR_CODE_ACTIONS
 
-  companion object {
-    private val log = ILogger.instance("KotlinHoverAction")
-  }
+  private val log = Logger.instance("KotlinHoverAction")
 
   override fun prepare(data: ActionData) {
     super.prepare(data)
@@ -65,7 +64,7 @@ object KotlinHoverAction : EditorActionItem {
       visible = path.toString().endsWith(".kt", true) || path.toString().endsWith(".kts", true)
       enabled = visible && !editor.cursor.isSelected 
       
-      if (icon == null && data.getContext() != null) {
+      if (icon == null && data.get(android.content.Context::class.java) != null) {
         icon = ContextCompat.getDrawable(data.requireContext(), com.itsaky.androidide.projects.R.drawable.ic_info)
       }
     } catch (e: Exception) {
@@ -83,7 +82,7 @@ object KotlinHoverAction : EditorActionItem {
     try {
       val editor = data.requireEditor()
       val path = data.requirePath()
-      val pos = Position(editor.cursor.leftLine, editor.cursor.leftColumn)
+      val pos = Position(editor.cursor.left().line, editor.cursor.left().column)
       
       val params = DefinitionParams(path, pos, ICancelChecker.NOOP)
 
@@ -105,11 +104,13 @@ object KotlinHoverAction : EditorActionItem {
 
   override fun postExec(data: ActionData, result: Any) {
     super.postExec(data, result)
-    val context = data.getContext() ?: return
+    val context = data.get(android.content.Context::class.java) ?: return
 
     if (result is String) {
       if (result.startsWith("No doc")) {
-         com.itsaky.androidide.utils.ActivityUtils.getTopActivity()?.flashError(result)
+         ActivityUtils.getTopActivity()?.let { act ->
+           act.flashError(result)
+         }
          return
       }
       

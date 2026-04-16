@@ -19,6 +19,7 @@ package com.itsaky.androidide.lsp.kotlin.actions
 
 import android.graphics.drawable.Drawable
 import androidx.core.content.ContextCompat
+import com.blankj.utilcode.util.ActivityUtils
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.itsaky.androidide.actions.*
 import com.itsaky.androidide.lsp.api.ILanguageServerRegistry
@@ -27,8 +28,8 @@ import com.itsaky.androidide.lsp.kotlin.providers.KotlinCodeActionProvider
 import com.itsaky.androidide.lsp.models.DiagnosticItem
 import com.itsaky.androidide.models.Position
 import com.itsaky.androidide.models.Range
-import com.itsaky.androidide.utils.ILogger
-import com.itsaky.androidide.utils.flashError
+import com.itsaky.androidide.utils.Logger
+import com.itsaky.androidide.utils.flashInfo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -47,10 +48,8 @@ object KotlinShowCodeActions : EditorActionItem {
   override var requiresUIThread: Boolean = true
   override var location: ActionItem.Location = ActionItem.Location.EDITOR_CODE_ACTIONS
 
-  companion object {
-    private val log = ILogger.instance("KotlinShowCodeActions")
-    private val provider = KotlinCodeActionProvider()
-  }
+  private val log = Logger.instance("KotlinShowCodeActions")
+  private val provider = KotlinCodeActionProvider()
 
   override fun prepare(data: ActionData) {
     super.prepare(data)
@@ -59,9 +58,9 @@ object KotlinShowCodeActions : EditorActionItem {
       visible = provider.canProvideCodeActions(path)
       enabled = visible
 
-      if (icon == null && data.getContext() != null) {
-        // 小灯泡图标
-        icon = ContextCompat.getDrawable(data.requireContext(), com.itsaky.androidide.projects.R.drawable.ic_idea)
+      if (icon == null && data.get(android.content.Context::class.java) != null) {
+        // 使用编辑图标替代小灯泡
+        icon = ContextCompat.getDrawable(data.requireContext(), android.R.drawable.ic_menu_edit)
       }
     } catch (e: Exception) {
       markInvisible()
@@ -78,7 +77,7 @@ object KotlinShowCodeActions : EditorActionItem {
     try {
       val editor = data.requireEditor()
       val path = data.requirePath()
-      val pos = Position(editor.cursor.leftLine, editor.cursor.leftColumn)
+      val pos = Position(editor.cursor.left().line, editor.cursor.left().column)
       val range = Range(pos, pos)
 
       val client = server.client
@@ -99,12 +98,12 @@ object KotlinShowCodeActions : EditorActionItem {
   @Suppress("UNCHECKED_CAST")
   override fun postExec(data: ActionData, result: Any) {
     super.postExec(data, result)
-    val context = data.getContext() ?: return
+    val context = data.get(android.content.Context::class.java) ?: return
     val actions = result as? List<com.itsaky.androidide.lsp.models.CodeActionItem> ?: return
 
     if (actions.isEmpty()) {
-      com.itsaky.androidide.utils.ActivityUtils.getTopActivity()?.let {
-        com.itsaky.androidide.utils.FlashbarActivityUtilsKt.flashInfo(it, "No quick fixes available here.")
+      ActivityUtils.getTopActivity()?.let { act ->
+        act.flashInfo("No quick fixes available here.")
       }
       return
     }

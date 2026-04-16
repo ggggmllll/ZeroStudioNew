@@ -23,35 +23,27 @@ import com.itsaky.androidide.lsp.models.SignatureHelp
 import com.itsaky.androidide.lsp.models.SignatureHelpParams
 import com.itsaky.androidide.models.Position
 import com.itsaky.androidide.progress.ICancelChecker
-import com.itsaky.androidide.utils.ILogger
+import com.itsaky.androidide.utils.Logger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.nio.file.Path
-
 /**
- * 核心：Kotlin 语言方法签名提示提供者。
  *
  * @author android_zero
  */
 class KotlinSignatureHelpProvider {
 
   companion object {
-    private val log = ILogger.instance("KotlinSignatureHelpProvider")
+    private val log = Logger.instance("KotlinSignatureHelpProvider")
   }
 
-  /**
-   * 检查文件类型是否支持签名提示
-   */
   fun canProvideSignatureHelp(file: Path?): Boolean {
     if (file == null) return false
     val pathStr = file.toString()
     return pathStr.endsWith(".kt", true) || pathStr.endsWith(".kts", true)
   }
 
-  /**
-   * 计算签名提示 (阻塞当前协程/线程，返回 SignatureHelp)
-   */
   fun computeSignatureHelp(file: Path, line: Int, column: Int): SignatureHelp? {
     val server = ILanguageServerRegistry.getDefault().getServer("kotlin-lsp") as? KotlinLanguageServerImpl
     if (server == null) {
@@ -69,7 +61,6 @@ class KotlinSignatureHelpProvider {
 
         withContext(Dispatchers.IO) {
           val result = server.signatureHelp(params)
-          // 仅当包含签名信息时返回
           if (result.signatures.isNotEmpty()) result else null
         }
       } catch (e: Exception) {

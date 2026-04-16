@@ -25,23 +25,20 @@ import com.itsaky.androidide.lsp.models.SemanticTokensParams
 import com.itsaky.androidide.models.Position
 import com.itsaky.androidide.models.Range
 import com.itsaky.androidide.progress.ICancelChecker
-import com.itsaky.androidide.utils.ILogger
+import com.itsaky.androidide.utils.Logger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.nio.file.Path
-
 /**
- * 核心：Kotlin 语义高亮解析器。
  *
  * @author android_zero
  */
 class KotlinSemanticTokensProvider {
 
   companion object {
-    private val log = ILogger.instance("KotlinSemanticTokensProvider")
+    private val log = Logger.instance("KotlinSemanticTokensProvider")
     
-    // Kotlin LSP 的 tokenTypes 索引映射表 (对应 org.javacs.kt.semantictokens.SemanticTokenType)
     private val KOTLIN_TOKEN_TYPES = arrayOf(
       "keyword", "variable", "function", "property", "parameter",
       "enumMember", "class", "interface", "enum", "type", "string", "number"
@@ -76,15 +73,11 @@ class KotlinSemanticTokensProvider {
     }
   }
 
-  /**
-   * 将 LSP 协议的相对偏移 Integer 数组解码为绝对坐标的 HighlightToken 列表
-   */
   private fun decodeTokens(data: List<Int>): List<HighlightToken> {
     val tokens = mutableListOf<HighlightToken>()
     var currentLine = 0
     var currentChar = 0
 
-    // LSP 数据格式: 每 5 个 Int 为一组 (deltaLine, deltaStartChar, length, tokenType, tokenModifiers)
     for (i in 0 until data.size step 5) {
       val deltaLine = data[i]
       val deltaStartChar = data[i + 1]

@@ -26,7 +26,7 @@ import com.itsaky.androidide.lsp.models.MatchLevel
 import com.itsaky.androidide.lsp.models.TextEdit
 import com.itsaky.androidide.models.Position
 import com.itsaky.androidide.models.Range
-import org.slf4j.LoggerFactory
+import com.itsaky.androidide.utils.Logger
 
 /**
  * 转换器：二次过滤、加工并注入导入修饰符。
@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory
 class KotlinCompletionConverter {
 
   companion object {
-    private val log = LoggerFactory.getLogger(KotlinCompletionConverter::class.java)
+    private val log = Logger.instance("KotlinCompletionConverter")
   }
 
   private val snippetTransformer = SnippetTransformer()
@@ -192,7 +192,7 @@ class KotlinCompletionConverter {
    */
   private fun mapCompletionKind(kind: Int): CompletionItemKind {
     return when (kind) {
-      1 -> CompletionItemKind.TEXT
+      1 -> CompletionItemKind.NONE // fallback from TEXT to NONE 
       2 -> CompletionItemKind.METHOD
       3 -> CompletionItemKind.FUNCTION
       4 -> CompletionItemKind.CONSTRUCTOR

@@ -1,15 +1,35 @@
+/*
+ *  This file is part of AndroidIDE.
+ *
+ *  AndroidIDE is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  AndroidIDE is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *   along with AndroidIDE.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.itsaky.androidide.lsp.kotlin.utils
 
 import com.itsaky.androidide.lsp.models.HighlightToken
 import com.itsaky.androidide.lsp.models.HighlightTokenKind
-import com.itsaky.androidide.utils.ILogger
+import com.itsaky.androidide.utils.Logger
 import io.github.rosemoe.sora.widget.CodeEditor
 import java.util.concurrent.ConcurrentHashMap
 import kotlinx.coroutines.*
-
+/**
+ *
+ * @author android_zero
+ */
 object KotlinSemanticHighlightManager {
 
-  private val log = ILogger.instance("KotlinSemanticHighlightManager")
+  private val log = Logger.instance("KotlinSemanticHighlightManager")
   private val tokensCache = ConcurrentHashMap<String, List<HighlightToken>>()
   private val renderScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
   private var renderJob: Job? = null
@@ -18,9 +38,6 @@ object KotlinSemanticHighlightManager {
     tokensCache[filePath] = tokens
   }
 
-  /**
-   * 将高阶回传函数抽离，解耦 UI
-   */
   fun requestRenderViewport(
      editor: CodeEditor, 
      filePath: String, 
@@ -52,9 +69,6 @@ object KotlinSemanticHighlightManager {
     tokensCache.remove(filePath)
   }
 
-  /** 
-   * 从 HighlightTokenKind 解析为 Android Color Int 
-   */
   fun resolveTokenColor(kind: HighlightTokenKind): Int {
      return when (kind) {
         HighlightTokenKind.KEYWORD -> 0xFFCC7832.toInt()

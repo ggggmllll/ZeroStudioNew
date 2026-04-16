@@ -47,7 +47,7 @@ dependencies {
   implementation(libs.androidide.ts.java)
   implementation(libs.androidx.annotation)
   implementation(libs.androidx.appcompat)
-  implementation(libs.common.editor)
+  api(libs.common.editor)
   implementation(libs.common.javaparser)
   implementation(libs.common.utilcode)
 
@@ -61,19 +61,15 @@ dependencies {
   implementation(libs.google.gson)
   implementation(libs.google.material)
 
-  implementation(projects.core.actions)
-  implementation(projects.core.common)
-  implementation(projects.core.lspApi)
-  implementation(projects.core.resources)
-  implementation(projects.editor.api)
-  implementation(projects.java.javacServices)
-  implementation(projects.java.lsp)
-  implementation(projects.termux.shell)
-  implementation(projects.event.eventbusEvents)
-
-  // implementation(projects.lsp.kotlin.server)
-  // implementation(projects.lsp.kotlin.shared)
-  // implementation(projects.lsp.kotlin.adapter)
+  api(projects.core.actions)
+  api(projects.core.common)
+  api(projects.core.lspApi)
+  api(projects.core.resources)
+  api(projects.editor.api)
+  api(projects.java.javacServices)
+  api(projects.java.lsp)
+  api(projects.termux.shell)
+  api(projects.event.eventbusEvents)
 
   implementation(libs.composite.javac)
   implementation(libs.composite.javapoet)
@@ -85,11 +81,9 @@ dependencies {
   implementation(libs.androidx.core.ktx)
   implementation(libs.common.kotlin)
 
-  // implementation(libs.org.jetbrains.kotlin.compiler.embeddable)
   // implementation(projects.modules.kotlinc)
-  // implementation(libs.org.jetbrains.kotlin.scripting.compiler.embeddable)
   implementation(libs.common.asm)
 
-  implementation(libs.common.org.eclipse.lsp4j)
-  implementation(libs.common.lsp4j.jsonrpc)
+  api(libs.common.org.eclipse.lsp4j)
+  api(libs.common.lsp4j.jsonrpc)
 }

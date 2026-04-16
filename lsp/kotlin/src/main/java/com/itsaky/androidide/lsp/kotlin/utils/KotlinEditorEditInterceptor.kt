@@ -20,26 +20,17 @@ package com.itsaky.androidide.lsp.kotlin.utils
 import com.blankj.utilcode.util.ThreadUtils
 import com.itsaky.androidide.lsp.models.TextEdit
 import com.itsaky.androidide.lsp.models.WorkspaceEdit
-import com.itsaky.androidide.utils.ILogger
+import com.itsaky.androidide.utils.Logger
 import io.github.rosemoe.sora.widget.CodeEditor
 import java.io.File
 import java.net.URI
-
 /**
- * 核心：Kotlin 编辑器修改拦截执行器。
+ *
  * @author android_zero
  */
 object KotlinEditorEditInterceptor {
+  private val log = Logger.instance("KotlinEditorEditInterceptor")
 
-  private val log = ILogger.instance("KotlinEditorEditInterceptor")
-
-  /**
-   * 应用工作区修改。
-   *
-   * @param currentEditor 当前正在展示的编辑器实例（如果存在）。
-   * @param currentFilePath 当前编辑器正在编辑的绝对路径。
-   * @param edit KLS 发来的批量修改数据。
-   */
   fun applyEdit(currentEditor: CodeEditor?, currentFilePath: String?, edit: WorkspaceEdit): Boolean {
     var success = true
     try {
@@ -48,10 +39,8 @@ object KotlinEditorEditInterceptor {
          val targetFile = File(URI(targetUriStr).path)
 
          if (currentEditor != null && currentFilePath != null && targetFile.absolutePath == currentFilePath) {
-             // 这是当前活跃的文件，拦截并交由官方 Content API 处理
              applyToEditor(currentEditor, change.edits)
          } else {
-             // 跨文件修改，执行后台写入
              success = applyToDisk(targetFile, change.edits) && success
          }
       }
@@ -62,17 +51,12 @@ object KotlinEditorEditInterceptor {
     return success
   }
 
-  /**
-   * 原生且优雅的基于 sora-editor API 修改代码，完美融合 Undo/Redo，告别闪屏。
-   */
   fun applyToEditor(editor: CodeEditor, edits: List<TextEdit>) {
     ThreadUtils.runOnUiThread {
       try {
         val content = editor.text
-        
         val sortedEdits = edits.sortedWith(compareBy({ -it.range.start.line }, { -it.range.start.column }))
         
-        // 开启批处理，使用户只需按一次撤销即可还原全部更改
         content.beginBatchEdit()
         
         for (edit in sortedEdits) {
@@ -107,7 +91,6 @@ object KotlinEditorEditInterceptor {
               val newLine = line.substring(0, edit.range.start.column) + edit.newText + line.substring(edit.range.end.column)
               lines[startLine] = newLine
           } else {
-              // 跨行替换略复杂，直接使用文本全量构建替换
               var content = file.readText()
               val startOffset = getOffsetFromPosition(content, startLine, edit.range.start.column)
               val endOffset = getOffsetFromPosition(content, endLine, edit.range.end.column)

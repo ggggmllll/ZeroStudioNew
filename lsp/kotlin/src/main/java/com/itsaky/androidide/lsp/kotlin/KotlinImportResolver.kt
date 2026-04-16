@@ -22,7 +22,8 @@ import org.slf4j.LoggerFactory
 
 /**
  * 工具：Kotlin 补全未解析引用时的自动导入逻辑匹配与计算器。
-  *  @author android_zero
+ *
+ * @author android_zero
  */
 class KotlinImportResolver {
 
@@ -59,27 +60,58 @@ class KotlinImportResolver {
   }
 
   private fun isAutoImported(fqn: String): Boolean {
-    val autoImportedPackages = listOf(
-            "kotlin.", "kotlin.annotation.", "kotlin.collections.",
-            "kotlin.comparisons.", "kotlin.io.", "kotlin.ranges.",
-            "kotlin.sequences.", "kotlin.text.", "java.lang."
+    val autoImportedPackages =
+        listOf(
+            "kotlin.",
+            "kotlin.annotation.",
+            "kotlin.collections.",
+            "kotlin.comparisons.",
+            "kotlin.io.",
+            "kotlin.ranges.",
+            "kotlin.sequences.",
+            "kotlin.text.",
+            "java.lang.",
         )
     return autoImportedPackages.any { pkg -> fqn.startsWith(pkg) }
   }
 
   private fun isStandardType(typeName: String): Boolean {
-    val standardTypes = setOf(
-            "Int", "Long", "Short", "Byte", "Float", "Double",
-            "Boolean", "Char", "String", "Unit", "Nothing", "Any",
-            "val", "var", "fun", "class", "interface", "object",
-            "if", "else", "when", "for", "while", "do", "return"
+    val standardTypes =
+        setOf(
+            "Int",
+            "Long",
+            "Short",
+            "Byte",
+            "Float",
+            "Double",
+            "Boolean",
+            "Char",
+            "String",
+            "Unit",
+            "Nothing",
+            "Any",
+            "val",
+            "var",
+            "fun",
+            "class",
+            "interface",
+            "object",
+            "if",
+            "else",
+            "when",
+            "for",
+            "while",
+            "do",
+            "return",
         )
     return typeName in standardTypes
   }
 
   private fun extractFullyQualifiedName(detail: String, label: String): String? {
     val fqnPattern = """([a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)+\.[A-Z][A-Za-z0-9_]*)""".toRegex()
-    fqnPattern.find(detail)?.let { return it.value }
+    fqnPattern.find(detail)?.let {
+      return it.value
+    }
 
     val definedInPattern = """defined in ([a-zA-Z0-9_.]+)""".toRegex()
     definedInPattern.find(detail)?.let {
@@ -103,14 +135,18 @@ class KotlinImportResolver {
       when {
         trimmed.startsWith("package ") -> packageIndex = index
         trimmed.startsWith("import ") -> lastImportIndex = index
-        trimmed.isNotEmpty() && !trimmed.startsWith("//") && !trimmed.startsWith("/*") && lastImportIndex >= 0 -> break
+        trimmed.isNotEmpty() &&
+            !trimmed.startsWith("//") &&
+            !trimmed.startsWith("/*") &&
+            lastImportIndex >= 0 -> break
       }
     }
-    insertLine = when {
-      lastImportIndex >= 0 -> lastImportIndex + 1
-      packageIndex >= 0 -> packageIndex + 2
-      else -> 0
-    }
+    insertLine =
+        when {
+          lastImportIndex >= 0 -> lastImportIndex + 1
+          packageIndex >= 0 -> packageIndex + 2
+          else -> 0
+        }
     return Pair(insertLine, "import $fqn\n")
   }
 }

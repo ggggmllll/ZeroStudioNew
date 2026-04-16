@@ -21,7 +21,7 @@ import com.google.gson.Gson
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
-import com.itsaky.androidide.utils.ILogger
+import com.itsaky.androidide.utils.Logger
 import java.io.InputStream
 import java.io.OutputStream
 import java.util.concurrent.ConcurrentHashMap
@@ -48,7 +48,7 @@ class KotlinRpcClient(
   private val pendingRequests = ConcurrentHashMap<String, CancellableContinuation<JsonElement>>()
 
   companion object {
-    private val log = ILogger.instance("KotlinRpcClient")
+    private val log = Logger.instance("KotlinRpcClient")
   }
 
   fun startListening() {

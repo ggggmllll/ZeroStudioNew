@@ -23,7 +23,7 @@ import com.itsaky.androidide.projects.ModuleProject;
 import com.itsaky.androidide.projects.android.AndroidModule;
 import com.itsaky.androidide.projects.util.BootClasspathProvider;
 import com.itsaky.androidide.utils.Environment;
-import com.itsaky.androidide.utils.ILogger;
+import com.itsaky.androidide.utils.Logger;
 
 import java.io.File;
 import java.util.Collections;
@@ -42,7 +42,7 @@ import java.util.stream.Collectors;
 public class KotlinCompilerService {
 
     public static final KotlinCompilerService NO_MODULE_COMPILER = new KotlinCompilerService(null);
-    private static final ILogger LOG = ILogger.Companion.instance("KotlinCompilerService");
+    private static final Logger LOG = Logger.Companion.instance("KotlinCompilerService");
 
     protected final Set<String> classPathClasses;
     protected final KotlinSourceFileManager fileManager;

@@ -21,7 +21,6 @@ import com.itsaky.androidide.lsp.kotlin.compiler.KotlinCompilerService
 import com.itsaky.androidide.projects.IProjectManager
 import com.itsaky.androidide.projects.ModuleProject
 import com.itsaky.androidide.projects.android.AndroidModule
-import com.itsaky.androidide.projects.classpath.ClassInfo
 import com.itsaky.androidide.projects.classpath.IClasspathReader
 import com.itsaky.androidide.projects.classpath.JarFsClasspathReader
 import java.io.File
@@ -30,19 +29,20 @@ import org.slf4j.LoggerFactory
 
 /**
  * 核心：Android 环境类路径桥接供应商 (KotlinClasspathProvider)。
- * 
- * 作用：AndroidIDE 的核心竞争力之一，因为纯粹的原生 Kotlin LSP 无法自动解析 Android 构建系统 (Gradle)
- * 产生的 R 类、DataBinding、BuildConfig 和各种中间态中间解压后的 AAR jar 等。
- * 该类通过深度访问 ProjectManager 解析构建出针对 KLS 完善且无死角的 classpath 提供给服务端运行。
- *  @author android_zero
+ *
+ * 作用：AndroidIDE 的核心竞争力之一，因为纯粹的原生 Kotlin LSP 无法自动解析 Android 构建系统 (Gradle) 产生的 R
+ * 类、DataBinding、BuildConfig 和各种中间态中间解压后的 AAR jar 等。 该类通过深度访问 ProjectManager 解析构建出针对 KLS 完善且无死角的
+ * classpath 提供给服务端运行。
+ *
+ * @author android_zero
  */
 class KotlinClasspathProvider {
 
   private var compilerService: KotlinCompilerService? = null
   private val classpathReader: IClasspathReader = JarFsClasspathReader()
-  
+
   companion object {
-      private val log = LoggerFactory.getLogger(KotlinClasspathProvider::class.java)
+    private val log = LoggerFactory.getLogger(KotlinClasspathProvider::class.java)
   }
 
   private var cachedClasspathList: List<String>? = null
@@ -145,19 +145,20 @@ class KotlinClasspathProvider {
       if (!buildDir.exists()) return
 
       addExternalLibraryJars(buildDir, classpaths)
-      val generatedPaths = listOf(
-          "generated/source/r/debug",
-          "generated/not_namespaced_r_class_sources/debug/r",
-          "generated/not_namespaced_r_class_sources/debug/processDebugResources/r",
-          "generated/source/buildConfig/debug",
-          "generated/data_binding_base_class_source_out/debug/out",
-          "generated/source/dataBinding/debug",
-          "generated/source/viewBinding/debug",
-          "generated/aidl_source_output_dir/debug/out",
-          "generated/source/kapt/debug",
-          "generated/source/kaptKotlin/debug",
-          "tmp/kapt3/classes/debug"
-      )
+      val generatedPaths =
+          listOf(
+              "generated/source/r/debug",
+              "generated/not_namespaced_r_class_sources/debug/r",
+              "generated/not_namespaced_r_class_sources/debug/processDebugResources/r",
+              "generated/source/buildConfig/debug",
+              "generated/data_binding_base_class_source_out/debug/out",
+              "generated/source/dataBinding/debug",
+              "generated/source/viewBinding/debug",
+              "generated/aidl_source_output_dir/debug/out",
+              "generated/source/kapt/debug",
+              "generated/source/kaptKotlin/debug",
+              "tmp/kapt3/classes/debug",
+          )
 
       var addedCount = 0
       for (path in generatedPaths) {
@@ -189,19 +190,21 @@ class KotlinClasspathProvider {
 
   private fun addKotlinScriptingJarsFromGradleCache(classpaths: MutableSet<String>) {
     try {
-      val gradleHomeDirs = listOf(
-          File(System.getProperty("user.home", ""), ".gradle"),
-          File("/data/data/com.itsaky.androidide/files/home/.gradle"),
-          File(System.getProperty("user.home", ""), "../../.gradle")
-      )
+      val gradleHomeDirs =
+          listOf(
+              File(System.getProperty("user.home", ""), ".gradle"),
+              File("/data/data/com.itsaky.androidide/files/home/.gradle"),
+              File(System.getProperty("user.home", ""), "../../.gradle"),
+          )
 
       val kotlinVersion = getKotlinVersionFromProject()
-      val scriptingArtifacts = listOf(
-          "kotlin-script-runtime",
-          "kotlin-scripting-common",
-          "kotlin-scripting-jvm",
-          "kotlin-scripting-compiler-embeddable"
-      )
+      val scriptingArtifacts =
+          listOf(
+              "kotlin-script-runtime",
+              "kotlin-scripting-common",
+              "kotlin-scripting-jvm",
+              "kotlin-scripting-compiler-embeddable",
+          )
 
       var foundCount = 0
       for (gradleHome in gradleHomeDirs) {
@@ -213,14 +216,20 @@ class KotlinClasspathProvider {
           val artifactDir = File(modulesCache, artifactName)
           if (artifactDir.exists()) {
             val versionDirs = artifactDir.listFiles()?.filter { it.isDirectory } ?: emptyList()
-            val versionDir = (if (kotlinVersion != null) versionDirs.find { it.name == kotlinVersion } else null) 
-                             ?: versionDirs.maxByOrNull { it.name }
+            val versionDir =
+                (if (kotlinVersion != null) versionDirs.find { it.name == kotlinVersion } else null)
+                    ?: versionDirs.maxByOrNull { it.name }
 
             if (versionDir != null) {
               versionDir.listFiles()?.forEach { hashDir ->
                 if (hashDir.isDirectory) {
                   hashDir.listFiles()?.forEach { file ->
-                    if (file.isFile && file.extension == "jar" && !file.name.contains("sources") && !file.name.contains("javadoc")) {
+                    if (
+                        file.isFile &&
+                            file.extension == "jar" &&
+                            !file.name.contains("sources") &&
+                            !file.name.contains("javadoc")
+                    ) {
                       classpaths.add(file.absolutePath)
                       foundCount++
                     }
@@ -272,15 +281,16 @@ class KotlinClasspathProvider {
 
   private fun addExternalLibraryJars(buildDir: File, classpaths: MutableSet<String>) {
     try {
-      val externalLibLocations = listOf(
-          "intermediates/external_libs_dex/debug",
-          "intermediates/external_file_lib_dex_archives/debug",
-          "intermediates/compile_library_classes_jar/debug",
-          "intermediates/compile_app_classes_jar/debug",
-          "intermediates/runtime_library_classes_jar/debug",
-          "intermediates/transforms/mergeJavaRes/debug",
-          "intermediates/aar_libs_jars/debug"
-      )
+      val externalLibLocations =
+          listOf(
+              "intermediates/external_libs_dex/debug",
+              "intermediates/external_file_lib_dex_archives/debug",
+              "intermediates/compile_library_classes_jar/debug",
+              "intermediates/compile_app_classes_jar/debug",
+              "intermediates/runtime_library_classes_jar/debug",
+              "intermediates/transforms/mergeJavaRes/debug",
+              "intermediates/aar_libs_jars/debug",
+          )
 
       externalLibLocations.forEach { location ->
         val dir = File(buildDir, location)
@@ -301,11 +311,15 @@ class KotlinClasspathProvider {
     if (maxDepth <= 0) return
     try {
       val files = dir.listFiles() ?: return
-      val hasSourceFiles = files.any { it.isFile && (it.extension == "java" || it.extension == "kt") }
+      val hasSourceFiles = files.any {
+        it.isFile && (it.extension == "java" || it.extension == "kt")
+      }
       if (hasSourceFiles && !classpaths.contains(dir.absolutePath)) {
         classpaths.add(dir.absolutePath)
       }
-      files.filter { it.isDirectory }.forEach { subDir -> scanForSourceDirectories(subDir, classpaths, maxDepth - 1) }
+      files
+          .filter { it.isDirectory }
+          .forEach { subDir -> scanForSourceDirectories(subDir, classpaths, maxDepth - 1) }
     } catch (e: Exception) {
       log.debug("Error scanning directory", e)
     }
@@ -313,13 +327,14 @@ class KotlinClasspathProvider {
 
   private fun findCompiledClassDirectories(intermediatesDir: File, classpaths: MutableSet<String>) {
     try {
-      val classDirectories = listOf(
-          "compile_library_classes_jar/debug/classes.jar",
-          "compile_app_classes_jar/debug/classes.jar",
-          "transforms/classes/debug",
-          "javac/debug/classes",
-          "kotlin-classes/debug"
-      )
+      val classDirectories =
+          listOf(
+              "compile_library_classes_jar/debug/classes.jar",
+              "compile_app_classes_jar/debug/classes.jar",
+              "transforms/classes/debug",
+              "javac/debug/classes",
+              "kotlin-classes/debug",
+          )
       classDirectories.forEach { path ->
         val dir = File(intermediatesDir, path)
         if (dir.exists()) {
@@ -333,7 +348,8 @@ class KotlinClasspathProvider {
 
   fun getAndroidSdkPath(): String {
     try {
-      val serviceResult = compilerService?.fileManager?.bootClassPaths?.find { it.name == "android.jar" }
+      val serviceResult =
+          compilerService?.fileManager?.bootClassPaths?.find { it.name == "android.jar" }
       val serviceRoot = serviceResult?.parentFile?.parentFile?.parentFile?.absolutePath
       if (!serviceRoot.isNullOrEmpty()) return serviceRoot
 

@@ -19,6 +19,7 @@ package com.itsaky.androidide.lsp.kotlin.actions
 
 import android.graphics.drawable.Drawable
 import androidx.core.content.ContextCompat
+import com.blankj.utilcode.util.ActivityUtils
 import com.itsaky.androidide.actions.ActionData
 import com.itsaky.androidide.actions.ActionItem
 import com.itsaky.androidide.actions.EditorActionItem
@@ -26,7 +27,7 @@ import com.itsaky.androidide.actions.requireContext
 import com.itsaky.androidide.actions.requirePath
 import com.itsaky.androidide.lsp.api.ILanguageServerRegistry
 import com.itsaky.androidide.lsp.kotlin.KotlinLanguageServerImpl
-import com.itsaky.androidide.utils.ILogger
+import com.itsaky.androidide.utils.Logger
 import com.itsaky.androidide.utils.flashInfo
 
 /**
@@ -44,9 +45,7 @@ object RefreshBazelClasspathAction : EditorActionItem {
   override var requiresUIThread: Boolean = true // UI Thread 方便提示 Toast
   override var location: ActionItem.Location = ActionItem.Location.EDITOR_CODE_ACTIONS
 
-  companion object {
-    private val log = ILogger.instance("RefreshBazelClasspathAction")
-  }
+  private val log = Logger.instance("RefreshBazelClasspathAction")
 
   override fun prepare(data: ActionData) {
     super.prepare(data)
@@ -57,8 +56,8 @@ object RefreshBazelClasspathAction : EditorActionItem {
       visible = path.toString().endsWith(".kt", true) || path.toString().endsWith(".kts", true)
       enabled = visible
 
-      if (icon == null && data.getContext() != null) {
-        icon = ContextCompat.getDrawable(data.requireContext(), com.itsaky.androidide.projects.R.drawable.ic_sync)
+      if (icon == null && data.get(android.content.Context::class.java) != null) {
+        icon = ContextCompat.getDrawable(data.requireContext(), android.R.drawable.ic_popup_sync)
       }
     } catch (e: Exception) {
       visible = false
@@ -76,7 +75,6 @@ object RefreshBazelClasspathAction : EditorActionItem {
 
       log.info("Requesting Kotlin Classpath refresh...")
       
-      // "kotlinRefreshBazelClassPath" 见 Commands.kt
       server.executeWorkspaceCommand("kotlinRefreshBazelClassPath", emptyList())
       
       return true
@@ -89,8 +87,10 @@ object RefreshBazelClasspathAction : EditorActionItem {
   override fun postExec(data: ActionData, result: Any) {
     super.postExec(data, result)
     if (result == true) {
-      data.getContext()?.let {
-        com.itsaky.androidide.utils.ActivityUtils.getTopActivity()?.flashInfo("Kotlin Classpath refresh requested.")
+      data.get(android.content.Context::class.java)?.let {
+        ActivityUtils.getTopActivity()?.let { act -> 
+          act.flashInfo("Kotlin Classpath refresh requested.") 
+        }
       }
     }
   }

@@ -17,16 +17,17 @@
 
 package com.itsaky.androidide.lsp.kotlin.events
 
-import com.itsaky.androidide.editor.ui.IDEEditor
+import com.blankj.utilcode.util.ActivityUtils
 import com.itsaky.androidide.eventbus.events.editor.DocumentOpenEvent
 import com.itsaky.androidide.eventbus.events.editor.DocumentSelectedEvent
 import com.itsaky.androidide.interfaces.IEditorHandler
 import com.itsaky.androidide.lsp.kotlin.providers.KotlinSemanticTokensProvider
-import com.itsaky.androidide.utils.ActivityUtils
-import com.itsaky.androidide.utils.ILogger
+import com.itsaky.androidide.utils.Logger
 import io.github.rosemoe.sora.event.ScrollEvent
 import io.github.rosemoe.sora.lang.styling.HighlightTextContainer
 import io.github.rosemoe.sora.lang.styling.color.ConstColor
+import io.github.rosemoe.sora.widget.CodeEditor
+import io.github.rosemoe.sora.widget.subscribeEvent
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -41,7 +42,7 @@ import java.util.concurrent.ConcurrentHashMap
  */
 object KotlinSemanticTokensBinder {
 
-  private val log = ILogger.instance("KotlinSemanticTokensBinder")
+  private val log = Logger.instance("KotlinSemanticTokensBinder")
   private val provider = KotlinSemanticTokensProvider()
   private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
   
@@ -80,12 +81,12 @@ object KotlinSemanticTokensBinder {
   }
 
   /**
-   * 获取当前活跃的 IDEEditor 并为其挂载滚动监听。
+   * 获取当前活跃的 CodeEditor 并为其挂载滚动监听。
    */
   private fun attachToCurrentEditor(targetFile: File) {
     try {
       val handler = ActivityUtils.getTopActivity() as? IEditorHandler ?: return
-      val editor = handler.getEditorForFile(targetFile) as? IDEEditor ?: return
+      val editor = handler.getEditorForFile(targetFile) as? CodeEditor ?: return
 
       val editorHash = editor.hashCode()
       if (attachedEditors.containsKey(editorHash)) {
@@ -93,7 +94,7 @@ object KotlinSemanticTokensBinder {
          return
       }
 
-      editor.subscribeEvent(ScrollEvent::class.java) { _, _ ->
+      editor.subscribeEvent<ScrollEvent> { _, _ ->
          applyTokensNatively(editor, targetFile.absolutePath)
       }
       
@@ -108,7 +109,7 @@ object KotlinSemanticTokensBinder {
   /**
    * 使用 HighlightTextContainer 将获取到的高亮数据渲染到界面上。
    */
-  private fun applyTokensNatively(editor: IDEEditor, filePath: String) {
+  private fun applyTokensNatively(editor: CodeEditor, filePath: String) {
     // 防抖与视口裁剪
     com.itsaky.androidide.lsp.kotlin.utils.KotlinSemanticHighlightManager.requestRenderViewport(editor, filePath) { viewportTokens ->
        
