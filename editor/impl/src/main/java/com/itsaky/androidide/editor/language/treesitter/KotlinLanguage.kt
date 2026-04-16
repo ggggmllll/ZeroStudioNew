@@ -25,6 +25,11 @@ import com.itsaky.androidide.lsp.kotlin.KotlinLanguageServerImpl
 import com.itsaky.androidide.treesitter.kotlin.TSLanguageKotlin
 import io.github.rosemoe.sora.lang.Language.INTERRUPTION_LEVEL_STRONG
 import io.github.rosemoe.sora.util.MyCharacter
+import io.github.rosemoe.sora.widget.SymbolPairMatch
+import com.itsaky.androidide.editor.language.newline.TSBracketsHandler
+import com.itsaky.androidide.editor.language.newline.TSCStyleBracketsHandler
+import com.itsaky.androidide.editor.language.treesitter.TreeSitterLanguage.Factory
+import com.itsaky.androidide.editor.language.utils.CommonSymbolPairs
 
 /**
  * [TreeSitterLanguage] implementation for Kotlin.
@@ -69,6 +74,5 @@ open class KotlinLanguage(context: Context) :
   override fun createNewlineHandlers(): Array<TSBracketsHandler> {
     return arrayOf(TSCStyleBracketsHandler(this))
   }
-
   
 }
