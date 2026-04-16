@@ -48,13 +48,17 @@ object ConvertJavaToKotlinAction : EditorActionItem {
     try {
       val path = data.requirePath()
       val editor = data.requireEditor()
-      
+
       // 只有在选区存在且处理的是 java 扩展名时才显示
       visible = path.toString().endsWith(".java", true) && editor.cursor.isSelected
       enabled = visible
 
       if (icon == null && data.get(android.content.Context::class.java) != null) {
-        icon = ContextCompat.getDrawable(data.requireContext(), com.itsaky.androidide.projects.R.drawable.ic_android)
+        icon =
+            ContextCompat.getDrawable(
+                data.requireContext(),
+                com.itsaky.androidide.projects.R.drawable.ic_android,
+            )
       }
     } catch (e: Exception) {
       visible = false
@@ -64,10 +68,11 @@ object ConvertJavaToKotlinAction : EditorActionItem {
 
   override suspend fun execAction(data: ActionData): Any {
     try {
-      val server = ILanguageServerRegistry.getDefault().getServer("kotlin-lsp") as? KotlinLanguageServerImpl
+      val server =
+          ILanguageServerRegistry.getDefault().getServer("kotlin-lsp") as? KotlinLanguageServerImpl
       if (server == null) {
-         log.warn("Kotlin LSP Server is not running. Cannot execute Java2Kotlin conversion.")
-         return false
+        log.warn("Kotlin LSP Server is not running. Cannot execute Java2Kotlin conversion.")
+        return false
       }
 
       val editor = data.requireEditor()
@@ -75,18 +80,16 @@ object ConvertJavaToKotlinAction : EditorActionItem {
 
       val selStart = editor.cursor.left()
       val selEnd = editor.cursor.right()
-      
-      val range = Range(
-        Position(selStart.line, selStart.column),
-        Position(selEnd.line, selEnd.column)
-      )
+
+      val range =
+          Range(Position(selStart.line, selStart.column), Position(selEnd.line, selEnd.column))
 
       // 根据 org.javacs.kt.command.JAVA_TO_KOTLIN_COMMAND
       val args = listOf(path.toUri().toString(), range)
 
       // KLS 会返回 WorkspaceEdit，在 KotlinLanguageServerImpl 我们做拦截应用
       server.executeWorkspaceCommand("convertJavaToKotlin", args)
-      
+
       return true
     } catch (e: Exception) {
       log.error("Failed to convert Java to Kotlin", e)

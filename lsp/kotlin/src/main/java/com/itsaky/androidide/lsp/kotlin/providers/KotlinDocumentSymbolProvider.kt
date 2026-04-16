@@ -21,14 +21,12 @@ import com.itsaky.androidide.lsp.api.ILanguageServerRegistry
 import com.itsaky.androidide.lsp.kotlin.KotlinLanguageServerImpl
 import com.itsaky.androidide.lsp.models.DocumentSymbol
 import com.itsaky.androidide.utils.Logger
+import java.nio.file.Path
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import java.nio.file.Path
-/**
- *
- * @author android_zero
- */
+
+/** @author android_zero */
 class KotlinDocumentSymbolProvider {
 
   companion object {
@@ -42,7 +40,8 @@ class KotlinDocumentSymbolProvider {
   }
 
   fun computeDocumentSymbols(file: Path): List<DocumentSymbol> {
-    val server = ILanguageServerRegistry.getDefault().getServer("kotlin-lsp") as? KotlinLanguageServerImpl
+    val server =
+        ILanguageServerRegistry.getDefault().getServer("kotlin-lsp") as? KotlinLanguageServerImpl
     if (server == null) {
       log.warn("Kotlin LSP Server not found. Cannot provide document symbols.")
       return emptyList()
@@ -53,16 +52,16 @@ class KotlinDocumentSymbolProvider {
         withContext(Dispatchers.IO) {
           val result = server.documentSymbols(file)
           if (result.symbols.isNotEmpty()) {
-             result.symbols
+            result.symbols
           } else {
-             result.flatSymbols.map {
-                 DocumentSymbol(
-                     name = it.name,
-                     kind = it.kind,
-                     range = com.itsaky.androidide.models.Range.pointRange(it.location.range.start),
-                     selectionRange = it.location.range
-                 )
-             }
+            result.flatSymbols.map {
+              DocumentSymbol(
+                  name = it.name,
+                  kind = it.kind,
+                  range = com.itsaky.androidide.models.Range.pointRange(it.location.range.start),
+                  selectionRange = it.location.range,
+              )
+            }
           }
         }
       } catch (e: Exception) {

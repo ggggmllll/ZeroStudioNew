@@ -19,7 +19,6 @@ package com.itsaky.androidide.lsp.kotlin.actions
 
 import android.graphics.drawable.Drawable
 import android.widget.EditText
-import androidx.core.content.ContextCompat
 import com.blankj.utilcode.util.ActivityUtils
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.itsaky.androidide.actions.*
@@ -65,53 +64,56 @@ object KotlinRenameAction : EditorActionItem {
 
   override suspend fun execAction(data: ActionData): Any {
     val context = data.get(android.content.Context::class.java) ?: return false
-    val server = ILanguageServerRegistry.getDefault().getServer("kotlin-lsp") as? KotlinLanguageServerImpl
-    
+    val server =
+        ILanguageServerRegistry.getDefault().getServer("kotlin-lsp") as? KotlinLanguageServerImpl
+
     if (server == null) {
       log.warn("Kotlin LSP Server not running.")
       return false
     }
 
-    val input = EditText(context).apply {
-      setSingleLine()
-      hint = "Enter new name..."
-    }
+    val input =
+        EditText(context).apply {
+          setSingleLine()
+          hint = "Enter new name..."
+        }
 
     MaterialAlertDialogBuilder(context)
-      .setTitle("Rename Symbol")
-      .setView(input)
-      .setPositiveButton("Rename") { _, _ ->
-         val newName = input.text.toString().trim()
-         if (newName.isNotEmpty()) {
+        .setTitle("Rename Symbol")
+        .setView(input)
+        .setPositiveButton("Rename") { _, _ ->
+          val newName = input.text.toString().trim()
+          if (newName.isNotEmpty()) {
             performRenameRequest(data, server, newName)
-         }
-      }
-      .setNegativeButton("Cancel", null)
-      .show()
+          }
+        }
+        .setNegativeButton("Cancel", null)
+        .show()
 
     return true
   }
 
-  private fun performRenameRequest(data: ActionData, server: KotlinLanguageServerImpl, newName: String) {
+  private fun performRenameRequest(
+      data: ActionData,
+      server: KotlinLanguageServerImpl,
+      newName: String,
+  ) {
     CoroutineScope(Dispatchers.IO).launch {
-       try {
-         val editor = data.requireEditor()
-         val path = data.requirePath()
-         val pos = Position(editor.cursor.left().line, editor.cursor.left().column)
-         
-         val params = RenameParams(path, pos, newName, ICancelChecker.NOOP)
-         val workspaceEdit = server.rename(params)
+      try {
+        val editor = data.requireEditor()
+        val path = data.requirePath()
+        val pos = Position(editor.cursor.left().line, editor.cursor.left().column)
 
-         server.client?.applyWorkspaceEdit(workspaceEdit)
-         
-       } catch (e: Exception) {
-         log.error("Rename failed", e)
-         withContext(Dispatchers.Main) {
-            ActivityUtils.getTopActivity()?.let { act -> 
-              act.flashError("Failed to rename symbol.") 
-            }
-         }
-       }
+        val params = RenameParams(path, pos, newName, ICancelChecker.NOOP)
+        val workspaceEdit = server.rename(params)
+
+        server.client?.applyWorkspaceEdit(workspaceEdit)
+      } catch (e: Exception) {
+        log.error("Rename failed", e)
+        withContext(Dispatchers.Main) {
+          ActivityUtils.getTopActivity()?.let { act -> act.flashError("Failed to rename symbol.") }
+        }
+      }
     }
   }
 }

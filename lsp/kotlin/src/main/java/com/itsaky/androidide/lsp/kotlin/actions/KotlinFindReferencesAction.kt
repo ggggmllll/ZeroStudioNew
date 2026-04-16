@@ -32,10 +32,10 @@ import com.itsaky.androidide.models.Position
 import com.itsaky.androidide.progress.ICancelChecker
 import com.itsaky.androidide.utils.Logger
 import com.itsaky.androidide.utils.flashInfo
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import java.io.File
 import java.net.URI
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 /**
  * 编辑器行为：查找引用 (Find References)。
@@ -62,7 +62,11 @@ object KotlinFindReferencesAction : EditorActionItem {
       enabled = visible
 
       if (icon == null && data.get(android.content.Context::class.java) != null) {
-        icon = ContextCompat.getDrawable(data.requireContext(), com.itsaky.androidide.projects.R.drawable.ic_search)
+        icon =
+            ContextCompat.getDrawable(
+                data.requireContext(),
+                com.itsaky.androidide.projects.R.drawable.ic_search,
+            )
       }
     } catch (e: Exception) {
       markInvisible()
@@ -70,7 +74,8 @@ object KotlinFindReferencesAction : EditorActionItem {
   }
 
   override suspend fun execAction(data: ActionData): Any {
-    val server = ILanguageServerRegistry.getDefault().getServer("kotlin-lsp") as? KotlinLanguageServerImpl
+    val server =
+        ILanguageServerRegistry.getDefault().getServer("kotlin-lsp") as? KotlinLanguageServerImpl
     if (server == null) {
       log.warn("Kotlin LSP Server not running.")
       return emptyList<Location>()
@@ -80,17 +85,16 @@ object KotlinFindReferencesAction : EditorActionItem {
       val editor = data.requireEditor()
       val path = data.requirePath()
       val pos = Position(editor.cursor.left().line, editor.cursor.left().column)
-      
-      val params = ReferenceParams(
-        file = path, 
-        position = pos, 
-        includeDeclaration = false, 
-        cancelChecker = ICancelChecker.NOOP
-      )
 
-      val result = withContext(Dispatchers.IO) {
-        server.findReferences(params)
-      }
+      val params =
+          ReferenceParams(
+              file = path,
+              position = pos,
+              includeDeclaration = false,
+              cancelChecker = ICancelChecker.NOOP,
+          )
+
+      val result = withContext(Dispatchers.IO) { server.findReferences(params) }
 
       return result.locations
     } catch (e: Exception) {
@@ -106,42 +110,45 @@ object KotlinFindReferencesAction : EditorActionItem {
     val locations = result as? List<Location> ?: return
 
     if (locations.isEmpty()) {
-      ActivityUtils.getTopActivity()?.let { act ->
-        act.flashInfo("No references found.")
-      }
+      ActivityUtils.getTopActivity()?.let { act -> act.flashInfo("No references found.") }
       return
     }
 
     // 格式化展现文字
-    val displayItems = locations.map { loc ->
-      val uriStr = loc.file.toString()
-      val fileName = if (KlsUriDecoder.isKlsUri(uriStr)) {
-          "[" + uriStr.substringAfterLast('/').substringBefore('?') + "]"
-      } else {
-          URI(uriStr).path.substringAfterLast('/')
-      }
-      val line = loc.range.start.line + 1
-      "$fileName : Line $line"
-    }.toTypedArray()
+    val displayItems =
+        locations
+            .map { loc ->
+              val uriStr = loc.file.toString()
+              val fileName =
+                  if (KlsUriDecoder.isKlsUri(uriStr)) {
+                    "[" + uriStr.substringAfterLast('/').substringBefore('?') + "]"
+                  } else {
+                    URI(uriStr).path.substringAfterLast('/')
+                  }
+              val line = loc.range.start.line + 1
+              "$fileName : Line $line"
+            }
+            .toTypedArray()
 
     MaterialAlertDialogBuilder(context)
-      .setTitle("Found ${locations.size} References")
-      .setItems(displayItems) { _, which -> 
-         val selectedLoc = locations[which]
-         val uriStr = selectedLoc.file.toString()
-         
-         val targetFile = if (KlsUriDecoder.isKlsUri(uriStr)) {
-             KlsUriDecoder.createTempReadOnlyFileForKls(uriStr)
-         } else {
-             File(URI(uriStr))
-         }
+        .setTitle("Found ${locations.size} References")
+        .setItems(displayItems) { _, which ->
+          val selectedLoc = locations[which]
+          val uriStr = selectedLoc.file.toString()
 
-         if (targetFile != null && targetFile.exists()) {
-             val handler = ActivityUtils.getTopActivity() as? IEditorHandler
-             handler?.openFileAndSelect(targetFile, selectedLoc.range)
-         }
-      }
-      .setPositiveButton("Close", null)
-      .show()
+          val targetFile =
+              if (KlsUriDecoder.isKlsUri(uriStr)) {
+                KlsUriDecoder.createTempReadOnlyFileForKls(uriStr)
+              } else {
+                File(URI(uriStr))
+              }
+
+          if (targetFile != null && targetFile.exists()) {
+            val handler = ActivityUtils.getTopActivity() as? IEditorHandler
+            handler?.openFileAndSelect(targetFile, selectedLoc.range)
+          }
+        }
+        .setPositiveButton("Close", null)
+        .show()
   }
 }

@@ -21,13 +21,14 @@ import com.itsaky.androidide.lsp.api.ILanguageServerRegistry
 import com.itsaky.androidide.lsp.kotlin.KotlinLanguageServerImpl
 import com.itsaky.androidide.projects.IProjectManager
 import com.itsaky.androidide.utils.Logger
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import java.io.File
 import java.net.URLClassLoader
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 /**
  * Jetpack Compose 实时预览 (Live Preview) 环境桥接器。
+ *
  * @author android_zero
  */
 object ComposePreviewBridge {
@@ -41,53 +42,53 @@ object ComposePreviewBridge {
    * @param rootClassLoader 系统的基础 ClassLoader（通常为 BaseApplication 的 classLoader）
    * @return 包含最新编译产物的类加载器，用于反射唤起 UI。
    */
-  suspend fun requestPreviewClassLoader(targetFile: File, rootClassLoader: ClassLoader): ClassLoader? = withContext(Dispatchers.IO) {
-    
-    // 请求 LSP 服务器做增量编译/保存，生成最新的 .class 产物
-    val server = ILanguageServerRegistry.getDefault().getServer("kotlin-lsp") as? KotlinLanguageServerImpl
-    if (server != null) {
-      try {
-        // 利用 KLS 隐藏的触发保存与重编译行为
-        server.didSave(
-          com.itsaky.androidide.lsp.models.DidSaveTextDocumentParams(
-            file = targetFile.toPath(),
-            reason = com.itsaky.androidide.lsp.models.TextDocumentSaveReason.Manual
-          )
-        )
-      } catch (e: Exception) {
-         log.warn("LSP didSave notification failed during Compose Preview prep: ${e.message}")
+  suspend fun requestPreviewClassLoader(
+      targetFile: File,
+      rootClassLoader: ClassLoader,
+  ): ClassLoader? =
+      withContext(Dispatchers.IO) {
+
+        // 请求 LSP 服务器做增量编译/保存，生成最新的 .class 产物
+        val server =
+            ILanguageServerRegistry.getDefault().getServer("kotlin-lsp")
+                as? KotlinLanguageServerImpl
+        if (server != null) {
+          try {
+            // 利用 KLS 隐藏的触发保存与重编译行为
+            server.didSave(
+                com.itsaky.androidide.lsp.models.DidSaveTextDocumentParams(
+                    file = targetFile.toPath(),
+                    reason = com.itsaky.androidide.lsp.models.TextDocumentSaveReason.Manual,
+                )
+            )
+          } catch (e: Exception) {
+            log.warn("LSP didSave notification failed during Compose Preview prep: ${e.message}")
+          }
+        }
+
+        // 向项目抽象层 (ModuleProject) 索要中间层类路径
+        val projectManager = IProjectManager.getInstance()
+        val module = projectManager.findModuleForFile(targetFile, true)
+
+        if (module == null) {
+          log.error("Module not found for Compose Preview target: ${targetFile.absolutePath}")
+          return@withContext null
+        }
+
+        val urls = mutableListOf<java.net.URL>()
+
+        // 收集标准编译类路径 (包含依赖项 jar / aar-extracted jar)
+        module.getCompileClasspaths().forEach { if (it.exists()) urls.add(it.toURI().toURL()) }
+
+        // 收集中间态类路径 (包含未打包的 Kotlin .class 输出、javac .class 输出和 R.jar)
+        module.getIntermediateClasspaths().forEach { if (it.exists()) urls.add(it.toURI().toURL()) }
+
+        // 收集运行时 DEX 路径 (某些 Compose Preview 适配层要求加载 Dex 而非 class)
+        module.getRuntimeDexFiles().forEach { if (it.exists()) urls.add(it.toURI().toURL()) }
+
+        // 构建专属类加载器
+        log.info("Compose Preview ClassLoader built with ${urls.size} paths.")
+
+        return@withContext URLClassLoader(urls.toTypedArray(), rootClassLoader)
       }
-    }
-
-    // 向项目抽象层 (ModuleProject) 索要中间层类路径
-    val projectManager = IProjectManager.getInstance()
-    val module = projectManager.findModuleForFile(targetFile, true)
-
-    if (module == null) {
-      log.error("Module not found for Compose Preview target: ${targetFile.absolutePath}")
-      return@withContext null
-    }
-
-    val urls = mutableListOf<java.net.URL>()
-
-    // 收集标准编译类路径 (包含依赖项 jar / aar-extracted jar)
-    module.getCompileClasspaths().forEach { 
-      if (it.exists()) urls.add(it.toURI().toURL())
-    }
-
-    // 收集中间态类路径 (包含未打包的 Kotlin .class 输出、javac .class 输出和 R.jar)
-    module.getIntermediateClasspaths().forEach {
-      if (it.exists()) urls.add(it.toURI().toURL())
-    }
-
-    // 收集运行时 DEX 路径 (某些 Compose Preview 适配层要求加载 Dex 而非 class)
-    module.getRuntimeDexFiles().forEach {
-      if (it.exists()) urls.add(it.toURI().toURL())
-    }
-
-    // 构建专属类加载器
-    log.info("Compose Preview ClassLoader built with ${urls.size} paths.")
-    
-    return@withContext URLClassLoader(urls.toTypedArray(), rootClassLoader)
-  }
 }

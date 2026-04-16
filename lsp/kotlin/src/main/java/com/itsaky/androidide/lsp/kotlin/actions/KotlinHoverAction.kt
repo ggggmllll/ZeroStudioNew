@@ -51,7 +51,7 @@ object KotlinHoverAction : EditorActionItem {
   override var visible: Boolean = false
   override var enabled: Boolean = false
   override var icon: Drawable? = null
-  override var requiresUIThread: Boolean = true 
+  override var requiresUIThread: Boolean = true
   override var location: ActionItem.Location = ActionItem.Location.EDITOR_CODE_ACTIONS
 
   private val log = Logger.instance("KotlinHoverAction")
@@ -62,10 +62,14 @@ object KotlinHoverAction : EditorActionItem {
       val path = data.requirePath()
       val editor = data.requireEditor()
       visible = path.toString().endsWith(".kt", true) || path.toString().endsWith(".kts", true)
-      enabled = visible && !editor.cursor.isSelected 
-      
+      enabled = visible && !editor.cursor.isSelected
+
       if (icon == null && data.get(android.content.Context::class.java) != null) {
-        icon = ContextCompat.getDrawable(data.requireContext(), com.itsaky.androidide.projects.R.drawable.ic_info)
+        icon =
+            ContextCompat.getDrawable(
+                data.requireContext(),
+                com.itsaky.androidide.projects.R.drawable.ic_info,
+            )
       }
     } catch (e: Exception) {
       markInvisible()
@@ -73,7 +77,8 @@ object KotlinHoverAction : EditorActionItem {
   }
 
   override suspend fun execAction(data: ActionData): Any {
-    val server = ILanguageServerRegistry.getDefault().getServer("kotlin-lsp") as? KotlinLanguageServerImpl
+    val server =
+        ILanguageServerRegistry.getDefault().getServer("kotlin-lsp") as? KotlinLanguageServerImpl
     if (server == null) {
       log.warn("Kotlin LSP Server not running.")
       return false
@@ -83,19 +88,17 @@ object KotlinHoverAction : EditorActionItem {
       val editor = data.requireEditor()
       val path = data.requirePath()
       val pos = Position(editor.cursor.left().line, editor.cursor.left().column)
-      
+
       val params = DefinitionParams(path, pos, ICancelChecker.NOOP)
 
-      val markup = withContext(Dispatchers.IO) {
-        server.hover(params)
-      }
+      val markup = withContext(Dispatchers.IO) { server.hover(params) }
 
       val content = markup.value
       if (content.isBlank()) {
         return "No documentation available at this position."
       }
 
-      return content 
+      return content
     } catch (e: Exception) {
       log.error("Failed to request hover info", e)
       return false
@@ -108,35 +111,33 @@ object KotlinHoverAction : EditorActionItem {
 
     if (result is String) {
       if (result.startsWith("No doc")) {
-         ActivityUtils.getTopActivity()?.let { act ->
-           act.flashError(result)
-         }
-         return
-      }
-      
-      val textView = TextView(context).apply {
-          setPadding(48, 32, 48, 32)
-          setTextColor(context.resolveAttr(android.R.attr.textColorPrimary))
-          textSize = 15f
+        ActivityUtils.getTopActivity()?.let { act -> act.flashError(result) }
+        return
       }
 
-      val scrollView = ScrollView(context).apply {
-          addView(textView)
-      }
+      val textView =
+          TextView(context).apply {
+            setPadding(48, 32, 48, 32)
+            setTextColor(context.resolveAttr(android.R.attr.textColorPrimary))
+            textSize = 15f
+          }
 
-      val markwon = Markwon.builder(context)
-          .usePlugin(StrikethroughPlugin.create())
-          .usePlugin(HtmlPlugin.create())
-          .usePlugin(TablePlugin.create(context))
-          .build()
-          
+      val scrollView = ScrollView(context).apply { addView(textView) }
+
+      val markwon =
+          Markwon.builder(context)
+              .usePlugin(StrikethroughPlugin.create())
+              .usePlugin(HtmlPlugin.create())
+              .usePlugin(TablePlugin.create(context))
+              .build()
+
       markwon.setMarkdown(textView, result)
 
       MaterialAlertDialogBuilder(context)
-        .setTitle("Documentation")
-        .setView(scrollView)
-        .setPositiveButton("Close", null)
-        .show()
+          .setTitle("Documentation")
+          .setView(scrollView)
+          .setPositiveButton("Close", null)
+          .show()
     }
   }
 }

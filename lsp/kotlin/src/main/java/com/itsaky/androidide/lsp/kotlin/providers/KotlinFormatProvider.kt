@@ -22,10 +22,8 @@ import com.itsaky.androidide.lsp.api.ILanguageServerRegistry
 import com.itsaky.androidide.lsp.kotlin.KotlinLanguageServerImpl
 import com.itsaky.androidide.lsp.models.FormatCodeParams
 import com.itsaky.androidide.utils.Logger
-/**
- *
- * @author android_zero
- */
+
+/** @author android_zero */
 class KotlinFormatProvider : CodeFormatter {
 
   companion object {
@@ -34,7 +32,8 @@ class KotlinFormatProvider : CodeFormatter {
 
   override fun format(source: String): String {
     try {
-      val server = ILanguageServerRegistry.getDefault().getServer("kotlin-lsp") as? KotlinLanguageServerImpl
+      val server =
+          ILanguageServerRegistry.getDefault().getServer("kotlin-lsp") as? KotlinLanguageServerImpl
       if (server == null) {
         log.warn("Kotlin LSP Server not found. Returning original unformatted code.")
         return source
@@ -47,8 +46,10 @@ class KotlinFormatProvider : CodeFormatter {
         val sortedEdits = formatResult.edits.sortedByDescending { it.range.start }
         var resultText = source
         for (edit in sortedEdits) {
-          val startOffset = getOffsetFromPosition(resultText, edit.range.start.line, edit.range.start.column)
-          val endOffset = getOffsetFromPosition(resultText, edit.range.end.line, edit.range.end.column)
+          val startOffset =
+              getOffsetFromPosition(resultText, edit.range.start.line, edit.range.start.column)
+          val endOffset =
+              getOffsetFromPosition(resultText, edit.range.end.line, edit.range.end.column)
           resultText = resultText.replaceRange(startOffset, endOffset, edit.newText)
         }
         return resultText

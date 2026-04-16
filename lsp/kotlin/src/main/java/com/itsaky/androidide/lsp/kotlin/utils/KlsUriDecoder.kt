@@ -23,10 +23,8 @@ import com.itsaky.androidide.utils.Logger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-/**
- *
- * @author android_zero
- */
+
+/** @author android_zero */
 object KlsUriDecoder {
   private val log = Logger.instance("KlsUriDecoder")
 
@@ -35,7 +33,8 @@ object KlsUriDecoder {
   }
 
   fun fetchClassContents(uriStr: String): String? {
-    val server = ILanguageServerRegistry.getDefault().getServer("kotlin-lsp") as? KotlinLanguageServerImpl
+    val server =
+        ILanguageServerRegistry.getDefault().getServer("kotlin-lsp") as? KotlinLanguageServerImpl
     if (server == null) {
       log.warn("LSP server missing, cannot fetch kls content: $uriStr")
       return null
@@ -46,11 +45,11 @@ object KlsUriDecoder {
         try {
           val req = mapOf("textDocument" to mapOf("uri" to uriStr))
           val res = server.executeWorkspaceCommand("kotlin/jarClassContents", listOf(req))
-          
+
           if (res != null && res.isJsonPrimitive) {
-             res.asString
+            res.asString
           } else {
-             null
+            null
           }
         } catch (e: Exception) {
           log.error("Failed to decode KLS URI", e)
@@ -64,20 +63,22 @@ object KlsUriDecoder {
     val content = fetchClassContents(uriStr) ?: return null
 
     return try {
-       val fileName = uriStr.substringAfterLast('/').substringBefore('?')
-       val ext = if (fileName.endsWith(".class")) ".java" else ".kt"
-       val nameOnly = fileName.substringBeforeLast('.')
-       
-       val tmpDir = com.itsaky.androidide.utils.Environment.TMP_DIR
-       val tmpFile = java.io.File(tmpDir, "KlsDecompiled_$nameOnly$ext")
-       
-       tmpFile.writeText("/* \n * Decompiled by AndroidIDE Kotlin LSP \n * Source: $uriStr \n */\n\n$content")
-       tmpFile.setReadOnly()
-       
-       tmpFile
+      val fileName = uriStr.substringAfterLast('/').substringBefore('?')
+      val ext = if (fileName.endsWith(".class")) ".java" else ".kt"
+      val nameOnly = fileName.substringBeforeLast('.')
+
+      val tmpDir = com.itsaky.androidide.utils.Environment.TMP_DIR
+      val tmpFile = java.io.File(tmpDir, "KlsDecompiled_$nameOnly$ext")
+
+      tmpFile.writeText(
+          "/* \n * Decompiled by AndroidIDE Kotlin LSP \n * Source: $uriStr \n */\n\n$content"
+      )
+      tmpFile.setReadOnly()
+
+      tmpFile
     } catch (e: Exception) {
-       log.error("Failed to create temp decompiled file", e)
-       null
+      log.error("Failed to create temp decompiled file", e)
+      null
     }
   }
 }

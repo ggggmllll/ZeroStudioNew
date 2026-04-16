@@ -25,14 +25,12 @@ import com.itsaky.androidide.lsp.models.CodeActionItem
 import com.itsaky.androidide.lsp.models.DiagnosticItem
 import com.itsaky.androidide.models.Range
 import com.itsaky.androidide.utils.Logger
+import java.nio.file.Path
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import java.nio.file.Path
-/**
- *
- * @author android_zero
- */
+
+/** @author android_zero */
 class KotlinCodeActionProvider {
   companion object {
     private val log = Logger.instance("KotlinCodeActionProvider")
@@ -45,8 +43,13 @@ class KotlinCodeActionProvider {
     return pathStr.endsWith(".kt", true) || pathStr.endsWith(".kts", true)
   }
 
-  fun computeCodeActions(file: Path, range: Range, diagnostics: List<DiagnosticItem>): List<CodeActionItem> {
-    val server = ILanguageServerRegistry.getDefault().getServer("kotlin-lsp") as? KotlinLanguageServerImpl
+  fun computeCodeActions(
+      file: Path,
+      range: Range,
+      diagnostics: List<DiagnosticItem>,
+  ): List<CodeActionItem> {
+    val server =
+        ILanguageServerRegistry.getDefault().getServer("kotlin-lsp") as? KotlinLanguageServerImpl
     if (server == null) {
       log.warn("Kotlin LSP Server not found. Cannot provide code actions.")
       return emptyList()
@@ -55,16 +58,15 @@ class KotlinCodeActionProvider {
     return runBlocking {
       try {
         withContext(Dispatchers.IO) {
-          val req = mapOf(
-            "textDocument" to mapOf("uri" to file.toUri().toString()),
-            "range" to range,
-            "context" to mapOf(
-              "diagnostics" to diagnostics
-            )
-          )
+          val req =
+              mapOf(
+                  "textDocument" to mapOf("uri" to file.toUri().toString()),
+                  "range" to range,
+                  "context" to mapOf("diagnostics" to diagnostics),
+              )
 
           val res = server.executeWorkspaceCommand("textDocument/codeAction", listOf(req))
-          
+
           if (res != null && res.isJsonArray) {
             val listType = object : TypeToken<List<CodeActionItem>>() {}.type
             gson.fromJson<List<CodeActionItem>>(res.asJsonArray, listType) ?: emptyList()

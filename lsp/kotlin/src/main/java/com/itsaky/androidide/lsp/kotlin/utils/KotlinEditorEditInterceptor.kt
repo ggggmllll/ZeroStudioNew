@@ -24,25 +24,31 @@ import com.itsaky.androidide.utils.Logger
 import io.github.rosemoe.sora.widget.CodeEditor
 import java.io.File
 import java.net.URI
-/**
- *
- * @author android_zero
- */
+
+/** @author android_zero */
 object KotlinEditorEditInterceptor {
   private val log = Logger.instance("KotlinEditorEditInterceptor")
 
-  fun applyEdit(currentEditor: CodeEditor?, currentFilePath: String?, edit: WorkspaceEdit): Boolean {
+  fun applyEdit(
+      currentEditor: CodeEditor?,
+      currentFilePath: String?,
+      edit: WorkspaceEdit,
+  ): Boolean {
     var success = true
     try {
       for (change in edit.documentChanges) {
-         val targetUriStr = change.file?.toString() ?: continue
-         val targetFile = File(URI(targetUriStr).path)
+        val targetUriStr = change.file?.toString() ?: continue
+        val targetFile = File(URI(targetUriStr).path)
 
-         if (currentEditor != null && currentFilePath != null && targetFile.absolutePath == currentFilePath) {
-             applyToEditor(currentEditor, change.edits)
-         } else {
-             success = applyToDisk(targetFile, change.edits) && success
-         }
+        if (
+            currentEditor != null &&
+                currentFilePath != null &&
+                targetFile.absolutePath == currentFilePath
+        ) {
+          applyToEditor(currentEditor, change.edits)
+        } else {
+          success = applyToDisk(targetFile, change.edits) && success
+        }
       }
     } catch (e: Exception) {
       log.error("Failed to apply workspace edit", e)
@@ -55,20 +61,21 @@ object KotlinEditorEditInterceptor {
     ThreadUtils.runOnUiThread {
       try {
         val content = editor.text
-        val sortedEdits = edits.sortedWith(compareBy({ -it.range.start.line }, { -it.range.start.column }))
-        
+        val sortedEdits =
+            edits.sortedWith(compareBy({ -it.range.start.line }, { -it.range.start.column }))
+
         content.beginBatchEdit()
-        
+
         for (edit in sortedEdits) {
-            content.replace(
-                edit.range.start.line,
-                edit.range.start.column,
-                edit.range.end.line,
-                edit.range.end.column,
-                edit.newText
-            )
+          content.replace(
+              edit.range.start.line,
+              edit.range.start.column,
+              edit.range.end.line,
+              edit.range.end.column,
+              edit.newText,
+          )
         }
-        
+
         content.endBatchEdit()
       } catch (e: Exception) {
         log.error("Error applying edits to active editor", e)
@@ -80,26 +87,30 @@ object KotlinEditorEditInterceptor {
     if (!file.exists()) return false
     try {
       val lines = file.readLines().toMutableList()
-      val sortedEdits = edits.sortedWith(compareBy({ -it.range.start.line }, { -it.range.start.column }))
-      
+      val sortedEdits =
+          edits.sortedWith(compareBy({ -it.range.start.line }, { -it.range.start.column }))
+
       for (edit in sortedEdits) {
-          val startLine = edit.range.start.line
-          val endLine = edit.range.end.line
-          
-          if (startLine == endLine) {
-              val line = lines[startLine]
-              val newLine = line.substring(0, edit.range.start.column) + edit.newText + line.substring(edit.range.end.column)
-              lines[startLine] = newLine
-          } else {
-              var content = file.readText()
-              val startOffset = getOffsetFromPosition(content, startLine, edit.range.start.column)
-              val endOffset = getOffsetFromPosition(content, endLine, edit.range.end.column)
-              content = content.replaceRange(startOffset, endOffset, edit.newText)
-              file.writeText(content)
-              return true
-          }
+        val startLine = edit.range.start.line
+        val endLine = edit.range.end.line
+
+        if (startLine == endLine) {
+          val line = lines[startLine]
+          val newLine =
+              line.substring(0, edit.range.start.column) +
+                  edit.newText +
+                  line.substring(edit.range.end.column)
+          lines[startLine] = newLine
+        } else {
+          var content = file.readText()
+          val startOffset = getOffsetFromPosition(content, startLine, edit.range.start.column)
+          val endOffset = getOffsetFromPosition(content, endLine, edit.range.end.column)
+          content = content.replaceRange(startOffset, endOffset, edit.newText)
+          file.writeText(content)
+          return true
+        }
       }
-      
+
       file.writeText(lines.joinToString("\n"))
       return true
     } catch (e: Exception) {

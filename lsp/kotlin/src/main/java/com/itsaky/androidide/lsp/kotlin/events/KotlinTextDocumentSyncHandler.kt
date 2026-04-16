@@ -58,14 +58,14 @@ object KotlinTextDocumentSyncHandler {
   fun onDocumentOpen(event: DocumentOpenEvent) {
     if (!isKotlinFile(event.openedFile.toString())) return
     val server = getServer() ?: return
-    
+
     server.didOpen(
-      DidOpenTextDocumentParams(
-        file = event.openedFile,
-        languageId = "kotlin",
-        version = event.version,
-        text = event.text
-      )
+        DidOpenTextDocumentParams(
+            file = event.openedFile,
+            languageId = "kotlin",
+            version = event.version,
+            text = event.text,
+        )
     )
   }
 
@@ -73,15 +73,15 @@ object KotlinTextDocumentSyncHandler {
   fun onDocumentChange(event: DocumentChangeEvent) {
     if (!isKotlinFile(event.changedFile.toString())) return
     val server = getServer() ?: return
-    
+
     // AndroidIDE 当前提供的是全量替换事件 (newText)，我们将整个文本作为一个 ContentChangeEvent 下发
     val changeEvent = TextDocumentContentChangeEvent(text = event.newText ?: "")
     server.didChange(
-      DidChangeTextDocumentParams(
-        file = event.changedFile,
-        version = event.version,
-        contentChanges = listOf(changeEvent)
-      )
+        DidChangeTextDocumentParams(
+            file = event.changedFile,
+            version = event.version,
+            contentChanges = listOf(changeEvent),
+        )
     )
   }
 
@@ -89,7 +89,7 @@ object KotlinTextDocumentSyncHandler {
   fun onDocumentClose(event: DocumentCloseEvent) {
     if (!isKotlinFile(event.closedFile.toString())) return
     val server = getServer() ?: return
-    
+
     server.didClose(DidCloseTextDocumentParams(file = event.closedFile))
   }
 
@@ -97,13 +97,13 @@ object KotlinTextDocumentSyncHandler {
   fun onDocumentSave(event: DocumentSaveEvent) {
     if (!isKotlinFile(event.file.toString())) return
     val server = getServer() ?: return
-    
+
     server.didSave(
-      DidSaveTextDocumentParams(
-        file = event.file, // changed to Path from File via definition mapping
-        reason = TextDocumentSaveReason.Manual,
-        text = null
-      )
+        DidSaveTextDocumentParams(
+            file = event.file, // changed to Path from File via definition mapping
+            reason = TextDocumentSaveReason.Manual,
+            text = null,
+        )
     )
   }
 }

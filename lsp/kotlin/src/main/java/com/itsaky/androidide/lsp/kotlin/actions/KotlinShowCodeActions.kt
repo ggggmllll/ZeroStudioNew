@@ -25,7 +25,6 @@ import com.itsaky.androidide.actions.*
 import com.itsaky.androidide.lsp.api.ILanguageServerRegistry
 import com.itsaky.androidide.lsp.kotlin.KotlinLanguageServerImpl
 import com.itsaky.androidide.lsp.kotlin.providers.KotlinCodeActionProvider
-import com.itsaky.androidide.lsp.models.DiagnosticItem
 import com.itsaky.androidide.models.Position
 import com.itsaky.androidide.models.Range
 import com.itsaky.androidide.utils.Logger
@@ -68,7 +67,8 @@ object KotlinShowCodeActions : EditorActionItem {
   }
 
   override suspend fun execAction(data: ActionData): Any {
-    val server = ILanguageServerRegistry.getDefault().getServer("kotlin-lsp") as? KotlinLanguageServerImpl
+    val server =
+        ILanguageServerRegistry.getDefault().getServer("kotlin-lsp") as? KotlinLanguageServerImpl
     if (server == null) {
       log.warn("Kotlin LSP Server not running.")
       return emptyList<String>()
@@ -84,9 +84,8 @@ object KotlinShowCodeActions : EditorActionItem {
       val diagnostic = client?.getDiagnosticAt(path.toFile(), pos.line, pos.column)
       val diagnosticsList = if (diagnostic != null) listOf(diagnostic) else emptyList()
 
-      val actions = withContext(Dispatchers.IO) {
-        provider.computeCodeActions(path, range, diagnosticsList)
-      }
+      val actions =
+          withContext(Dispatchers.IO) { provider.computeCodeActions(path, range, diagnosticsList) }
 
       return actions
     } catch (e: Exception) {
@@ -102,22 +101,26 @@ object KotlinShowCodeActions : EditorActionItem {
     val actions = result as? List<com.itsaky.androidide.lsp.models.CodeActionItem> ?: return
 
     if (actions.isEmpty()) {
-      ActivityUtils.getTopActivity()?.let { act ->
-        act.flashInfo("No quick fixes available here.")
-      }
+      ActivityUtils.getTopActivity()?.let { act -> act.flashInfo("No quick fixes available here.") }
       return
     }
 
     val actionTitles = actions.map { it.title }.toTypedArray()
 
     MaterialAlertDialogBuilder(context)
-      .setTitle("Quick Fixes")
-      .setItems(actionTitles) { _, which -> 
-         val selectedAction = actions[which]
-         val server = ILanguageServerRegistry.getDefault().getServer("kotlin-lsp") as? KotlinLanguageServerImpl
-         server?.client?.performCodeAction(com.itsaky.androidide.lsp.models.PerformCodeActionParams(true, selectedAction))
-      }
-      .setNegativeButton("Cancel", null)
-      .show()
+        .setTitle("Quick Fixes")
+        .setItems(actionTitles) { _, which ->
+          val selectedAction = actions[which]
+          val server =
+              ILanguageServerRegistry.getDefault().getServer("kotlin-lsp")
+                  as? KotlinLanguageServerImpl
+          server
+              ?.client
+              ?.performCodeAction(
+                  com.itsaky.androidide.lsp.models.PerformCodeActionParams(true, selectedAction)
+              )
+        }
+        .setNegativeButton("Cancel", null)
+        .show()
   }
 }

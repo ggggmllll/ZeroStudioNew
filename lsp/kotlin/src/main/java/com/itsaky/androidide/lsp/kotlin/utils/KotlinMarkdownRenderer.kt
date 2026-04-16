@@ -29,15 +29,14 @@ import com.itsaky.androidide.utils.Logger
 
 /**
  * 轻量级 LSP Markdown 渲染器。
+ *
  * @author android_zero
  */
 object KotlinMarkdownRenderer {
 
   private val log = Logger.instance("KotlinMarkdownRenderer")
 
-  /**
-   * 将 Markdown 字符串渲染为可直接放入 TextView 的 Spannable。
-   */
+  /** 将 Markdown 字符串渲染为可直接放入 TextView 的 Spannable。 */
   fun renderToSpannable(markdown: String): CharSequence {
     if (markdown.isBlank()) return ""
 
@@ -58,7 +57,7 @@ object KotlinMarkdownRenderer {
           inCodeBlock = false
           val codeBlockEnd = ssb.length
           if (codeBlockStart in 0 until codeBlockEnd) {
-             applyCodeBlockStyle(ssb, codeBlockStart, codeBlockEnd)
+            applyCodeBlockStyle(ssb, codeBlockStart, codeBlockEnd)
           }
         }
         continue // 不渲染 ``` 本身
@@ -84,9 +83,19 @@ object KotlinMarkdownRenderer {
   private fun applyCodeBlockStyle(ssb: SpannableStringBuilder, start: Int, end: Int) {
     try {
       // 设置背景色 (深色主题下的深灰色)
-      ssb.setSpan(BackgroundColorSpan(Color.parseColor("#2D2D2D")), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+      ssb.setSpan(
+          BackgroundColorSpan(Color.parseColor("#2D2D2D")),
+          start,
+          end,
+          Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
+      )
       // 设置文字颜色 (浅蓝色/代码色)
-      ssb.setSpan(ForegroundColorSpan(Color.parseColor("#A9B7C6")), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+      ssb.setSpan(
+          ForegroundColorSpan(Color.parseColor("#A9B7C6")),
+          start,
+          end,
+          Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
+      )
       // 设置等宽字体
       ssb.setSpan(TypefaceSpan("monospace"), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
     } catch (e: Exception) {
@@ -100,19 +109,24 @@ object KotlinMarkdownRenderer {
     // 匹配行内代码 `xxx`
     val inlineCodeRegex = Regex("`([^`]+)`")
     inlineCodeRegex.findAll(text).forEach { matchResult ->
-       val matchStart = start + matchResult.range.first
-       val matchEnd = start + matchResult.range.last + 1
-       // 对反引号包围的内容设置为等宽和特殊颜色
-       ssb.setSpan(TypefaceSpan("monospace"), matchStart, matchEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-       ssb.setSpan(ForegroundColorSpan(Color.parseColor("#9876AA")), matchStart, matchEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+      val matchStart = start + matchResult.range.first
+      val matchEnd = start + matchResult.range.last + 1
+      // 对反引号包围的内容设置为等宽和特殊颜色
+      ssb.setSpan(TypefaceSpan("monospace"), matchStart, matchEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+      ssb.setSpan(
+          ForegroundColorSpan(Color.parseColor("#9876AA")),
+          matchStart,
+          matchEnd,
+          Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
+      )
     }
 
     // 匹配粗体 **xxx**
     val boldRegex = Regex("\\*\\*([^*]+)\\*\\*")
     boldRegex.findAll(text).forEach { matchResult ->
-       val matchStart = start + matchResult.range.first
-       val matchEnd = start + matchResult.range.last + 1
-       ssb.setSpan(StyleSpan(Typeface.BOLD), matchStart, matchEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+      val matchStart = start + matchResult.range.first
+      val matchEnd = start + matchResult.range.last + 1
+      ssb.setSpan(StyleSpan(Typeface.BOLD), matchStart, matchEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
     }
   }
 }

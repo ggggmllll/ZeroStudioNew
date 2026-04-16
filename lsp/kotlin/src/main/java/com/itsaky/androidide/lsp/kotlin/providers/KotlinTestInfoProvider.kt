@@ -23,25 +23,19 @@ import com.itsaky.androidide.lsp.api.ILanguageServerRegistry
 import com.itsaky.androidide.lsp.kotlin.KotlinLanguageServerImpl
 import com.itsaky.androidide.models.Range
 import com.itsaky.androidide.utils.Logger
+import java.nio.file.Path
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import java.nio.file.Path
-/**
- *
- * @author android_zero
- */
+
+/** @author android_zero */
 data class KotestClassInfo(
     val className: String,
     val range: Range?,
-    val describes: List<DescribeInfo>
+    val describes: List<DescribeInfo>,
 )
 
-data class DescribeInfo(
-    val describe: String,
-    val range: Range?,
-    val its: List<ItInfo>
-)
+data class DescribeInfo(val describe: String, val range: Range?, val its: List<ItInfo>)
 
 data class ItInfo(
     val it: String,
@@ -58,11 +52,12 @@ class KotlinTestInfoProvider {
   fun canProvideTestInfo(file: Path?): Boolean {
     if (file == null) return false
     val pathStr = file.toString()
-    return pathStr.endsWith("Test.kt", ignoreCase = true) 
+    return pathStr.endsWith("Test.kt", ignoreCase = true)
   }
 
   fun getTestInfo(file: Path): List<KotestClassInfo> {
-    val server = ILanguageServerRegistry.getDefault().getServer("kotlin-lsp") as? KotlinLanguageServerImpl
+    val server =
+        ILanguageServerRegistry.getDefault().getServer("kotlin-lsp") as? KotlinLanguageServerImpl
     if (server == null) {
       log.warn("Kotlin LSP Server not found. Cannot provide test info.")
       return emptyList()
@@ -73,7 +68,7 @@ class KotlinTestInfoProvider {
         withContext(Dispatchers.IO) {
           val args = listOf(file.toUri().toString())
           val res = server.executeWorkspaceCommand("kotestTestsInfo", args)
-          
+
           if (res != null && res.isJsonPrimitive) {
             val jsonString = res.asString
             val listType = object : TypeToken<List<KotestClassInfo>>() {}.type

@@ -26,18 +26,18 @@ import java.io.InputStream
 import java.io.OutputStream
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
-import kotlinx.coroutines.*
 import kotlin.coroutines.resume
+import kotlinx.coroutines.*
 
 /**
  * 极简的 LSP JSON-RPC 通讯客户端。
- * 
+ *
  * @author android_zero
  */
 class KotlinRpcClient(
-  private val inputStream: InputStream,
-  private val outputStream: OutputStream,
-  private val messageHandler: (JsonObject) -> Unit
+    private val inputStream: InputStream,
+    private val outputStream: OutputStream,
+    private val messageHandler: (JsonObject) -> Unit,
 ) {
 
   private val coroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
@@ -67,39 +67,38 @@ class KotlinRpcClient(
     pendingRequests.clear()
   }
 
-  /**
-   * 挂起发送 JSON-RPC 请求，等待远端响应。
-   */
-  suspend fun sendRequest(method: String, params: Any): JsonElement? = suspendCancellableCoroutine { continuation ->
-    val id = nextId.getAndIncrement().toString()
-    pendingRequests[id] = continuation
+  /** 挂起发送 JSON-RPC 请求，等待远端响应。 */
+  suspend fun sendRequest(method: String, params: Any): JsonElement? =
+      suspendCancellableCoroutine { continuation ->
+        val id = nextId.getAndIncrement().toString()
+        pendingRequests[id] = continuation
 
-    val request = JsonObject().apply {
-      addProperty("jsonrpc", "2.0")
-      addProperty("id", id)
-      addProperty("method", method)
-      add("params", gson.toJsonTree(params))
-    }
+        val request =
+            JsonObject().apply {
+              addProperty("jsonrpc", "2.0")
+              addProperty("id", id)
+              addProperty("method", method)
+              add("params", gson.toJsonTree(params))
+            }
 
-    writeJson(request)
+        writeJson(request)
 
-    continuation.invokeOnCancellation {
-      pendingRequests.remove(id)
-      // 可选：在此处向 Server 发送 `$/cancelRequest`
-    }
-  }
-
-  /**
-   * 发送单向通知。
-   */
-  fun sendNotification(method: String, params: Any?) {
-    val notification = JsonObject().apply {
-      addProperty("jsonrpc", "2.0")
-      addProperty("method", method)
-      if (params != null) {
-        add("params", gson.toJsonTree(params))
+        continuation.invokeOnCancellation {
+          pendingRequests.remove(id)
+          // 可选：在此处向 Server 发送 `$/cancelRequest`
+        }
       }
-    }
+
+  /** 发送单向通知。 */
+  fun sendNotification(method: String, params: Any?) {
+    val notification =
+        JsonObject().apply {
+          addProperty("jsonrpc", "2.0")
+          addProperty("method", method)
+          if (params != null) {
+            add("params", gson.toJsonTree(params))
+          }
+        }
     writeJson(notification)
   }
 
@@ -108,7 +107,7 @@ class KotlinRpcClient(
       try {
         val payload = json.toString().toByteArray(Charsets.UTF_8)
         val header = "Content-Length: ${payload.size}\r\n\r\n".toByteArray(Charsets.US_ASCII)
-        
+
         synchronized(outputStream) {
           outputStream.write(header)
           outputStream.write(payload)
@@ -165,10 +164,10 @@ class KotlinRpcClient(
       val cont = pendingRequests.remove(id)
       if (cont != null && cont.isActive) {
         if (msg.has("error")) {
-           log.error("LSP Error response for ID $id: ${msg.get("error")}")
-           cont.resume(JsonObject()) // 或者抛异常
+          log.error("LSP Error response for ID $id: ${msg.get("error")}")
+          cont.resume(JsonObject()) // 或者抛异常
         } else {
-           cont.resume(msg.get("result"))
+          cont.resume(msg.get("result"))
         }
       }
     } else {

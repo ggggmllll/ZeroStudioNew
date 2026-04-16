@@ -25,14 +25,12 @@ import com.itsaky.androidide.models.Position
 import com.itsaky.androidide.models.Range
 import com.itsaky.androidide.progress.ICancelChecker
 import com.itsaky.androidide.utils.Logger
+import java.nio.file.Path
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import java.nio.file.Path
-/**
- *
- * @author android_zero
- */
+
+/** @author android_zero */
 class KotlinInlayHintsProvider {
 
   companion object {
@@ -46,7 +44,8 @@ class KotlinInlayHintsProvider {
   }
 
   fun computeInlayHints(file: Path, viewRange: Range? = null): List<InlayHint> {
-    val server = ILanguageServerRegistry.getDefault().getServer("kotlin-lsp") as? KotlinLanguageServerImpl
+    val server =
+        ILanguageServerRegistry.getDefault().getServer("kotlin-lsp") as? KotlinLanguageServerImpl
     if (server == null) {
       return emptyList()
     }
@@ -55,10 +54,8 @@ class KotlinInlayHintsProvider {
       try {
         val range = viewRange ?: Range(Position(0, 0), Position(Int.MAX_VALUE, Int.MAX_VALUE))
         val params = InlayHintParams(file, range, ICancelChecker.NOOP)
-        
-        withContext(Dispatchers.IO) {
-          server.inlayHints(params)
-        }
+
+        withContext(Dispatchers.IO) { server.inlayHints(params) }
       } catch (e: Exception) {
         log.error("Failed to fetch inlay hints", e)
         emptyList()

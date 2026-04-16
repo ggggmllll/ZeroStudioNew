@@ -33,6 +33,7 @@ import java.util.concurrent.ConcurrentHashMap
 
 /**
  * Kotlin LSP 语言客户端实现
+ *
  * @author android_zero
  */
 class KotlinLanguageClientImpl : ILanguageClient {
@@ -52,57 +53,67 @@ class KotlinLanguageClientImpl : ILanguageClient {
     log.info("Received ${result.diagnostics.size} diagnostics for $pathStr")
 
     com.blankj.utilcode.util.ThreadUtils.runOnUiThread {
-        val handler = ActivityUtils.getTopActivity() as? IEditorHandler
-        val currentEditor = handler?.let { 
-            try { 
-                it.javaClass.getMethod("getCurrentEditor").invoke(it) as? io.github.rosemoe.sora.widget.CodeEditor 
-            } catch(e: Exception) { null }
+      val handler = ActivityUtils.getTopActivity() as? IEditorHandler
+      val currentEditor = handler?.let {
+        try {
+          it.javaClass.getMethod("getCurrentEditor").invoke(it)
+              as? io.github.rosemoe.sora.widget.CodeEditor
+        } catch (e: Exception) {
+          null
         }
-        val currentFile = handler?.let { 
-            try { 
-                it.javaClass.getMethod("getCurrentFile").invoke(it) as? java.io.File 
-            } catch(e: Exception) { null }
+      }
+      val currentFile = handler?.let {
+        try {
+          it.javaClass.getMethod("getCurrentFile").invoke(it) as? java.io.File
+        } catch (e: Exception) {
+          null
         }
-        
-        if (currentFile?.absolutePath == result.file.toAbsolutePath().toString() && currentEditor != null) {
-            val container = io.github.rosemoe.sora.lang.diagnostic.DiagnosticsContainer()
-            val text = currentEditor.text
-            result.diagnostics.forEach { diag ->
-                container.addDiagnostic(diag.asDiagnosticRegion(text))
-            }
-            currentEditor.diagnostics = container
+      }
+
+      if (
+          currentFile?.absolutePath == result.file.toAbsolutePath().toString() &&
+              currentEditor != null
+      ) {
+        val container = io.github.rosemoe.sora.lang.diagnostic.DiagnosticsContainer()
+        val text = currentEditor.text
+        result.diagnostics.forEach { diag ->
+          container.addDiagnostic(diag.asDiagnosticRegion(text))
         }
+        currentEditor.diagnostics = container
+      }
     }
   }
 
   override fun getDiagnosticAt(file: File, line: Int, column: Int): DiagnosticItem? {
     val items = diagnosticsCache[file.absolutePath] ?: return null
-    return items.filter { it.range.containsLine(line) && it.range.containsColumn(column) }
-                .minByOrNull { it.severity.ordinal }
+    return items
+        .filter { it.range.containsLine(line) && it.range.containsColumn(column) }
+        .minByOrNull { it.severity.ordinal }
   }
 
   override fun performCodeAction(params: PerformCodeActionParams) {
     val action = params.action
     if (action.changes.isNotEmpty()) {
-       applyWorkspaceEdit(WorkspaceEdit(action.changes))
+      applyWorkspaceEdit(WorkspaceEdit(action.changes))
     }
   }
 
   override fun showDocument(params: ShowDocumentParams): ShowDocumentResult {
     val uriStr = params.file.toString()
-    
-    val targetFile = if (KlsUriDecoder.isKlsUri(uriStr)) {
-        KlsUriDecoder.createTempReadOnlyFileForKls(uriStr)
-    } else {
-        File(URI(uriStr))
-    }
+
+    val targetFile =
+        if (KlsUriDecoder.isKlsUri(uriStr)) {
+          KlsUriDecoder.createTempReadOnlyFileForKls(uriStr)
+        } else {
+          File(URI(uriStr))
+        }
 
     if (targetFile != null && targetFile.exists()) {
-        com.blankj.utilcode.util.ThreadUtils.runOnUiThread {
-           val handler = ActivityUtils.getTopActivity() as? IEditorHandler
-           handler?.openFileAndSelect(targetFile, params.selection)
-        }
-        return ShowDocumentResult(true)
+      com.blankj.utilcode.util.ThreadUtils.runOnUiThread {
+        val handler = ActivityUtils.getTopActivity() as? IEditorHandler
+        handler?.openFileAndSelect(targetFile, params.selection)
+      }
+      return ShowDocumentResult(true)
     }
 
     return ShowDocumentResult(false)
@@ -114,17 +125,22 @@ class KotlinLanguageClientImpl : ILanguageClient {
 
   override fun applyWorkspaceEdit(edit: WorkspaceEdit): Boolean {
     val handler = ActivityUtils.getTopActivity() as? IEditorHandler
-    val currentEditor = handler?.let { 
-        try { 
-            it.javaClass.getMethod("getCurrentEditor").invoke(it) as? io.github.rosemoe.sora.widget.CodeEditor 
-        } catch(e: Exception) { null }
+    val currentEditor = handler?.let {
+      try {
+        it.javaClass.getMethod("getCurrentEditor").invoke(it)
+            as? io.github.rosemoe.sora.widget.CodeEditor
+      } catch (e: Exception) {
+        null
+      }
     }
-    val currentFile = handler?.let { 
-        try { 
-            it.javaClass.getMethod("getCurrentFile").invoke(it) as? java.io.File 
-        } catch(e: Exception) { null }
+    val currentFile = handler?.let {
+      try {
+        it.javaClass.getMethod("getCurrentFile").invoke(it) as? java.io.File
+      } catch (e: Exception) {
+        null
+      }
     }
-    
+
     return KotlinEditorEditInterceptor.applyEdit(currentEditor, currentFile?.absolutePath, edit)
   }
 

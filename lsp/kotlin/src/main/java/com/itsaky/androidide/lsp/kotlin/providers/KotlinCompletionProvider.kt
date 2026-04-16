@@ -21,15 +21,12 @@ import com.itsaky.androidide.lsp.api.AbstractServiceProvider
 import com.itsaky.androidide.lsp.api.ICompletionProvider
 import com.itsaky.androidide.lsp.api.ILanguageServerRegistry
 import com.itsaky.androidide.lsp.kotlin.KotlinLanguageServerImpl
-import com.itsaky.androidide.lsp.models.CompletionItemKind
 import com.itsaky.androidide.lsp.models.CompletionParams
 import com.itsaky.androidide.lsp.models.CompletionResult
 import com.itsaky.androidide.lsp.models.MatchLevel
 import com.itsaky.androidide.utils.Logger
-/**
- *
- * @author android_zero
- */
+
+/** @author android_zero */
 class KotlinCompletionProvider : AbstractServiceProvider(), ICompletionProvider {
 
   companion object {
@@ -39,7 +36,8 @@ class KotlinCompletionProvider : AbstractServiceProvider(), ICompletionProvider 
   override fun canComplete(file: java.nio.file.Path?): Boolean {
     if (file == null) return false
     val pathStr = file.toString()
-    return super.canComplete(file) && (pathStr.endsWith(".kt", true) || pathStr.endsWith(".kts", true))
+    return super.canComplete(file) &&
+        (pathStr.endsWith(".kt", true) || pathStr.endsWith(".kts", true))
   }
 
   override fun complete(params: CompletionParams): CompletionResult {
@@ -50,25 +48,27 @@ class KotlinCompletionProvider : AbstractServiceProvider(), ICompletionProvider 
     }
 
     try {
-      val server = ILanguageServerRegistry.getDefault().getServer("kotlin-lsp") as? KotlinLanguageServerImpl
-          ?: return CompletionResult.EMPTY
+      val server =
+          ILanguageServerRegistry.getDefault().getServer("kotlin-lsp") as? KotlinLanguageServerImpl
+              ?: return CompletionResult.EMPTY
 
       val result = server.complete(params)
       val prefix = params.prefix ?: ""
-      
+
       if (prefix.isNotEmpty()) {
         return CompletionResult.mapAndFilter(result, prefix) { item ->
-            val strictMode = prefix.length < 1 || item.ideLabel.contains(" ")
+          val strictMode = prefix.length < 1 || item.ideLabel.contains(" ")
 
-            item.matchLevel = if (strictMode) {
+          item.matchLevel =
+              if (strictMode) {
                 if (item.insertText.startsWith(prefix, ignoreCase = true)) {
-                    MatchLevel.CASE_INSENSITIVE_PREFIX
+                  MatchLevel.CASE_INSENSITIVE_PREFIX
                 } else {
-                    MatchLevel.NO_MATCH
+                  MatchLevel.NO_MATCH
                 }
-            } else {
+              } else {
                 matchLevel(item.insertText, prefix)
-            }
+              }
         }
       }
 

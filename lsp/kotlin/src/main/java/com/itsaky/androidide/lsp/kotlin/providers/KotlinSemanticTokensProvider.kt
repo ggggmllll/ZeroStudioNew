@@ -26,23 +26,32 @@ import com.itsaky.androidide.models.Position
 import com.itsaky.androidide.models.Range
 import com.itsaky.androidide.progress.ICancelChecker
 import com.itsaky.androidide.utils.Logger
+import java.nio.file.Path
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import java.nio.file.Path
-/**
- *
- * @author android_zero
- */
+
+/** @author android_zero */
 class KotlinSemanticTokensProvider {
 
   companion object {
     private val log = Logger.instance("KotlinSemanticTokensProvider")
-    
-    private val KOTLIN_TOKEN_TYPES = arrayOf(
-      "keyword", "variable", "function", "property", "parameter",
-      "enumMember", "class", "interface", "enum", "type", "string", "number"
-    )
+
+    private val KOTLIN_TOKEN_TYPES =
+        arrayOf(
+            "keyword",
+            "variable",
+            "function",
+            "property",
+            "parameter",
+            "enumMember",
+            "class",
+            "interface",
+            "enum",
+            "type",
+            "string",
+            "number",
+        )
   }
 
   fun canProvideSemanticTokens(file: Path?): Boolean {
@@ -52,7 +61,8 @@ class KotlinSemanticTokensProvider {
   }
 
   fun computeSemanticTokens(file: Path): List<HighlightToken> {
-    val server = ILanguageServerRegistry.getDefault().getServer("kotlin-lsp") as? KotlinLanguageServerImpl
+    val server =
+        ILanguageServerRegistry.getDefault().getServer("kotlin-lsp") as? KotlinLanguageServerImpl
     if (server == null) {
       log.warn("Kotlin LSP Server not found. Skipping semantic tokens.")
       return emptyList()
@@ -61,7 +71,7 @@ class KotlinSemanticTokensProvider {
     return runBlocking {
       try {
         val params = SemanticTokensParams(file, null, ICancelChecker.NOOP)
-        
+
         withContext(Dispatchers.IO) {
           val semanticTokens = server.semanticTokensFull(params)
           decodeTokens(semanticTokens.data)
@@ -93,10 +103,8 @@ class KotlinSemanticTokensProvider {
       }
 
       val kind = mapToHighlightTokenKind(tokenType, tokenModifiers)
-      val range = Range(
-        Position(currentLine, currentChar),
-        Position(currentLine, currentChar + length)
-      )
+      val range =
+          Range(Position(currentLine, currentChar), Position(currentLine, currentChar + length))
 
       tokens.add(HighlightToken(range, kind))
     }
@@ -104,8 +112,12 @@ class KotlinSemanticTokensProvider {
     return tokens
   }
 
-  private fun mapToHighlightTokenKind(tokenTypeIndex: Int, tokenModifiers: Int): HighlightTokenKind {
-    val typeStr = KOTLIN_TOKEN_TYPES.getOrNull(tokenTypeIndex) ?: return HighlightTokenKind.TEXT_NORMAL
+  private fun mapToHighlightTokenKind(
+      tokenTypeIndex: Int,
+      tokenModifiers: Int,
+  ): HighlightTokenKind {
+    val typeStr =
+        KOTLIN_TOKEN_TYPES.getOrNull(tokenTypeIndex) ?: return HighlightTokenKind.TEXT_NORMAL
 
     return when (typeStr) {
       "keyword" -> HighlightTokenKind.KEYWORD
@@ -114,7 +126,8 @@ class KotlinSemanticTokensProvider {
       "property" -> HighlightTokenKind.FIELD
       "parameter" -> HighlightTokenKind.PARAMETER
       "enumMember" -> HighlightTokenKind.ENUM
-      "class", "type" -> HighlightTokenKind.TYPE_NAME
+      "class",
+      "type" -> HighlightTokenKind.TYPE_NAME
       "interface" -> HighlightTokenKind.INTERFACE
       "enum" -> HighlightTokenKind.ENUM_TYPE
       "string" -> HighlightTokenKind.LITERAL

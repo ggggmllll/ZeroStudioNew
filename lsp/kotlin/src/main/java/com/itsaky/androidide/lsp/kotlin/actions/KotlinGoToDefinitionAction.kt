@@ -18,7 +18,6 @@
 package com.itsaky.androidide.lsp.kotlin.actions
 
 import android.graphics.drawable.Drawable
-import androidx.core.content.ContextCompat
 import com.blankj.utilcode.util.ActivityUtils
 import com.itsaky.androidide.actions.*
 import com.itsaky.androidide.interfaces.IEditorHandler
@@ -31,10 +30,10 @@ import com.itsaky.androidide.models.Position
 import com.itsaky.androidide.progress.ICancelChecker
 import com.itsaky.androidide.utils.Logger
 import com.itsaky.androidide.utils.flashError
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import java.io.File
 import java.net.URI
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 /**
  * 编辑器行为：跳转到定义 (Go To Definition)。
@@ -65,7 +64,8 @@ object KotlinGoToDefinitionAction : EditorActionItem {
   }
 
   override suspend fun execAction(data: ActionData): Any {
-    val server = ILanguageServerRegistry.getDefault().getServer("kotlin-lsp") as? KotlinLanguageServerImpl
+    val server =
+        ILanguageServerRegistry.getDefault().getServer("kotlin-lsp") as? KotlinLanguageServerImpl
     if (server == null) {
       log.warn("Kotlin LSP Server not running.")
       return false
@@ -75,12 +75,10 @@ object KotlinGoToDefinitionAction : EditorActionItem {
       val editor = data.requireEditor()
       val path = data.requirePath()
       val pos = Position(editor.cursor.left().line, editor.cursor.left().column)
-      
+
       val params = DefinitionParams(path, pos, ICancelChecker.NOOP)
 
-      val result = withContext(Dispatchers.IO) {
-        server.findDefinition(params)
-      }
+      val result = withContext(Dispatchers.IO) { server.findDefinition(params) }
 
       val loc = result.locations.firstOrNull() ?: return "No definition found."
 
@@ -96,37 +94,36 @@ object KotlinGoToDefinitionAction : EditorActionItem {
     val activity = ActivityUtils.getTopActivity()
 
     if (result is String) {
-      activity?.let { act ->
-        act.flashError(result)
-      }
+      activity?.let { act -> act.flashError(result) }
       return
     }
 
     if (result is Location) {
       try {
         val uriStr = result.file.toString()
-        
+
         // 自动解析判断是否是虚拟反编译路径（例如跳转到了第三方依赖库中）
-        val targetFile = if (KlsUriDecoder.isKlsUri(uriStr)) {
-            KlsUriDecoder.createTempReadOnlyFileForKls(uriStr)
-        } else {
-            File(URI(uriStr))
-        }
+        val targetFile =
+            if (KlsUriDecoder.isKlsUri(uriStr)) {
+              KlsUriDecoder.createTempReadOnlyFileForKls(uriStr)
+            } else {
+              File(URI(uriStr))
+            }
 
         if (targetFile != null && targetFile.exists()) {
-            val handler = activity as? IEditorHandler
-            if (handler != null) {
-                handler.openFileAndSelect(targetFile, result.range)
-            } else {
-                log.error("Current Activity does not implement IEditorHandler")
-            }
+          val handler = activity as? IEditorHandler
+          if (handler != null) {
+            handler.openFileAndSelect(targetFile, result.range)
+          } else {
+            log.error("Current Activity does not implement IEditorHandler")
+          }
         } else {
-            activity?.let { act ->
-              act.flashError("Target file does not exist or failed to decompile.")
-            }
+          activity?.let { act ->
+            act.flashError("Target file does not exist or failed to decompile.")
+          }
         }
       } catch (e: Exception) {
-         log.error("Error parsing definition Location", e)
+        log.error("Error parsing definition Location", e)
       }
     }
   }

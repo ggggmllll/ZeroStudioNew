@@ -51,7 +51,7 @@ object RefreshBazelClasspathAction : EditorActionItem {
     super.prepare(data)
     try {
       val path = data.requirePath()
-      
+
       // 在 Kotlin 文件中始终可用此选项
       visible = path.toString().endsWith(".kt", true) || path.toString().endsWith(".kts", true)
       enabled = visible
@@ -67,16 +67,17 @@ object RefreshBazelClasspathAction : EditorActionItem {
 
   override suspend fun execAction(data: ActionData): Any {
     try {
-      val server = ILanguageServerRegistry.getDefault().getServer("kotlin-lsp") as? KotlinLanguageServerImpl
+      val server =
+          ILanguageServerRegistry.getDefault().getServer("kotlin-lsp") as? KotlinLanguageServerImpl
       if (server == null) {
-         log.warn("Kotlin LSP Server is not running.")
-         return false
+        log.warn("Kotlin LSP Server is not running.")
+        return false
       }
 
       log.info("Requesting Kotlin Classpath refresh...")
-      
+
       server.executeWorkspaceCommand("kotlinRefreshBazelClassPath", emptyList())
-      
+
       return true
     } catch (e: Exception) {
       log.error("Failed to execute refresh classpath command", e)
@@ -88,8 +89,8 @@ object RefreshBazelClasspathAction : EditorActionItem {
     super.postExec(data, result)
     if (result == true) {
       data.get(android.content.Context::class.java)?.let {
-        ActivityUtils.getTopActivity()?.let { act -> 
-          act.flashInfo("Kotlin Classpath refresh requested.") 
+        ActivityUtils.getTopActivity()?.let { act ->
+          act.flashInfo("Kotlin Classpath refresh requested.")
         }
       }
     }

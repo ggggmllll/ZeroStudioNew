@@ -24,14 +24,12 @@ import com.itsaky.androidide.lsp.models.SignatureHelpParams
 import com.itsaky.androidide.models.Position
 import com.itsaky.androidide.progress.ICancelChecker
 import com.itsaky.androidide.utils.Logger
+import java.nio.file.Path
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import java.nio.file.Path
-/**
- *
- * @author android_zero
- */
+
+/** @author android_zero */
 class KotlinSignatureHelpProvider {
 
   companion object {
@@ -45,7 +43,8 @@ class KotlinSignatureHelpProvider {
   }
 
   fun computeSignatureHelp(file: Path, line: Int, column: Int): SignatureHelp? {
-    val server = ILanguageServerRegistry.getDefault().getServer("kotlin-lsp") as? KotlinLanguageServerImpl
+    val server =
+        ILanguageServerRegistry.getDefault().getServer("kotlin-lsp") as? KotlinLanguageServerImpl
     if (server == null) {
       log.warn("Kotlin LSP Server not found. Cannot provide signature help.")
       return null
@@ -53,11 +52,12 @@ class KotlinSignatureHelpProvider {
 
     return runBlocking {
       try {
-        val params = SignatureHelpParams(
-          file = file,
-          position = Position(line, column),
-          cancelChecker = ICancelChecker.NOOP
-        )
+        val params =
+            SignatureHelpParams(
+                file = file,
+                position = Position(line, column),
+                cancelChecker = ICancelChecker.NOOP,
+            )
 
         withContext(Dispatchers.IO) {
           val result = server.signatureHelp(params)
