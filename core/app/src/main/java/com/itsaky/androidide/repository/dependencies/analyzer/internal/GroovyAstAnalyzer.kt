@@ -76,6 +76,9 @@ class GroovyAstAnalyzer : ScriptAnalyzer {
         // 常见的配置名称：implementation, api, ksp 等，它们在 Lexer 中通常被识别为 IDENTIFIER
         if (token.type == GroovyLexer.IDENTIFIER) {
           val configName = token.text
+          if (!DependencyDslConfigurations.isDependencyConfiguration(configName)) {
+            continue
+          }
 
           if (i + 1 < validTokens.size) {
             val next = validTokens[i + 1]
