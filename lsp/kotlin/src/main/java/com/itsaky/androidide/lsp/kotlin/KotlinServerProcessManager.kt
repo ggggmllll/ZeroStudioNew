@@ -112,13 +112,19 @@ class KotlinServerProcessManager(private val context: Context) {
       val launcher =
           File(File(Environment.KOTLIN_LSP_HOME, "bin"), KotlinServerConstants.LAUNCHER_SCRIPT_NAME)
       launcher.setExecutable(true, false)
+      if (!launcher.exists() || !launcher.canExecute()) {
+        throw IllegalStateException("Kotlin LSP launcher is not executable: ${launcher.absolutePath}")
+      }
+
+      val shell =
+          Environment.BASH_SHELL.takeIf { it.exists() && it.canExecute() }?.absolutePath ?: "sh"
 
       // 生成环境变量所需的强大 Android Classpath
       val androidClasspath = classpathProvider?.getClasspath() ?: ""
 
       val pb =
           ProcessBuilderImpl(
-              command = listOf("bash", launcher.absolutePath), // 使用 bash 执行以防解析错误
+              command = listOf(shell, launcher.absolutePath),
               environment =
                   mapOf(
                       "JAVA_HOME" to Environment.JAVA_HOME.absolutePath,
@@ -131,7 +137,7 @@ class KotlinServerProcessManager(private val context: Context) {
                       "KOTLIN_LSP_CLASSPATH" to androidClasspath,
                       "CLASSPATH" to androidClasspath,
                   ),
-              workingDirectory = Environment.PROJECTS_DIR,
+              workingDirectory = Environment.KOTLIN_LSP_HOME,
               redirectErrorStream = false,
           )
 
