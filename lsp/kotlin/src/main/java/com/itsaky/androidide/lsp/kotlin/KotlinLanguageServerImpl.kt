@@ -29,7 +29,6 @@ import com.itsaky.androidide.models.Location
 import com.itsaky.androidide.models.Range
 import com.itsaky.androidide.preferences.internal.EditorPreferences
 import com.itsaky.androidide.projects.IWorkspace
-import com.itsaky.androidide.shell.ProcessBuilderImpl
 import com.itsaky.androidide.utils.Environment
 import com.itsaky.androidide.utils.Logger
 import java.io.File
@@ -46,9 +45,9 @@ import kotlinx.coroutines.withContext
  * @author android_zero
  */
 class KotlinLanguageServerImpl(
-    private val process: Process = startServerProcess(),
-    inStream: InputStream = process.inputStream,
-    outStream: OutputStream = process.outputStream,
+    private val process: Process,
+    inStream: InputStream,
+    outStream: OutputStream,
 ) : ILanguageServer {
 
   override val serverId: String
@@ -65,28 +64,6 @@ class KotlinLanguageServerImpl(
   companion object {
     const val SERVER_ID = "kotlin-lsp"
     private val log = Logger.instance("KotlinLanguageServerImpl")
-
-    private fun startServerProcess(): Process {
-      val launcher =
-          File(File(Environment.KOTLIN_LSP_HOME, "bin"), "kotlin-language-server.sh").apply {
-            setExecutable(true, false)
-          }
-
-      val processBuilder =
-          ProcessBuilderImpl(
-              command = listOf("bash", launcher.absolutePath),
-              environment =
-                  mapOf(
-                      "JAVA_HOME" to Environment.JAVA_HOME.absolutePath,
-                      "PATH" to
-                          "${Environment.BIN_DIR.absolutePath}:${Environment.JAVA_HOME.absolutePath}/bin:${System.getenv("PATH")}",
-                  ),
-              workingDirectory = Environment.PROJECTS_DIR,
-              redirectErrorStream = false,
-          )
-
-      return processBuilder.startAsync()
-    }
   }
 
   init {
