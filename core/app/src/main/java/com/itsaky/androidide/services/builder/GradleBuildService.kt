@@ -756,6 +756,11 @@ class GradleBuildService :
   }
 
   internal fun startToolingServer(listener: OnServerStartListener?) {
+    if (!ToolsManager.ensureToolingApiReady()) {
+      log.error("Tooling API jar is missing or corrupted. Skip starting tooling server.")
+      return
+    }
+
     if (toolingServerRunner?.isStarted != true) {
       val envs = TermuxShellEnvironment().getEnvironment(this, false)
       toolingServerRunner = ToolingServerRunner(listener, this).also { it.startAsync(envs) }

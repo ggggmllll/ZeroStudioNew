@@ -32,6 +32,7 @@ import java.io.File
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 
@@ -162,14 +163,28 @@ class KotlinServerProcessManager(private val context: Context) {
       currentServerImpl?.connectClient(kotlinClient)
 
       registry.register(currentServerImpl!!)
-      val workspace = IProjectManager.getInstance().getWorkspace()
-      if (workspace != null) {
-        currentServerImpl?.setupWorkspace(workspace)
-        currentServerImpl?.applySettings(KotlinServerSettings())
-      }
+      bindWorkspaceWhenReady()
       log.info("KotlinLanguageServerImpl registered to ILanguageServerRegistry.")
     } catch (e: Exception) {
       log.error("Failed to launch Kotlin LSP Process", e)
+    }
+  }
+
+  private fun bindWorkspaceWhenReady() {
+    coroutineScope.launch {
+      repeat(20) { attempt ->
+        val workspace = IProjectManager.getInstance().getWorkspace()
+        if (workspace != null) {
+          currentServerImpl?.setupWorkspace(workspace)
+          currentServerImpl?.applySettings(KotlinServerSettings())
+          log.info("Kotlin LSP workspace has been initialized and synchronized.")
+          return@launch
+        }
+        if (attempt < 19) {
+          delay(300)
+        }
+      }
+      log.warn("Workspace unavailable while bootstrapping Kotlin LSP. Waiting for project events.")
     }
   }
 

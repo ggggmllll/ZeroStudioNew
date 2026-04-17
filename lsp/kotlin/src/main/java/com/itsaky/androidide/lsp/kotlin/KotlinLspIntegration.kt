@@ -52,10 +52,18 @@ object KotlinLspIntegration {
    */
   @Synchronized
   fun setup(context: Context) {
-    if (isInitialized.getAndSet(true)) {
-      log.info("Kotlin LSP is already initialized. Skipping.")
+    if (isInitialized.get()) {
+      val workspace = IProjectManager.getInstance().getWorkspace()
+      val server =
+          ILanguageServerRegistry.getDefault().getServer("kotlin-lsp") as? KotlinLanguageServerImpl
+      if (workspace != null && server != null) {
+        server.setupWorkspace(workspace)
+        server.applySettings(KotlinServerSettings())
+      }
+      log.info("Kotlin LSP already initialized. Refreshed workspace/configuration binding.")
       return
     }
+    isInitialized.set(true)
 
     try {
       KotlinTextDocumentSyncHandler.init()
