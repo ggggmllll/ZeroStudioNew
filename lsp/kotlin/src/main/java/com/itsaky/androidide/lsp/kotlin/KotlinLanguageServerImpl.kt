@@ -21,6 +21,9 @@ import com.google.gson.Gson
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.reflect.TypeToken
+import com.itsaky.androidide.actions.ActionItem
+import com.itsaky.androidide.actions.ActionsRegistry
+import com.itsaky.androidide.actions.locations.CodeActionsMenu
 import com.itsaky.androidide.lsp.api.ILanguageClient
 import com.itsaky.androidide.lsp.api.ILanguageServer
 import com.itsaky.androidide.lsp.api.IServerSettings
@@ -38,6 +41,7 @@ import java.io.InputStream
 import java.io.OutputStream
 import java.nio.file.Path
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 
@@ -87,7 +91,7 @@ class KotlinLanguageServerImpl(
   }
 
   override fun setupWorkspace(workspace: IWorkspace) {
-    LSPEditorActions.ensureActionsMenuRegistered(KotlinLspActionsProvider())
+    ensureActionsMenuRegisteredWithRetry()
 
     val bridge = KotlinJavaCompilerBridge(workspace)
     completionConverter.setJavaCompilerBridge(bridge)
@@ -180,6 +184,24 @@ class KotlinLanguageServerImpl(
             addProperty("removeUnusedImports", true)
           },
       )
+    }
+  }
+
+  private fun ensureActionsMenuRegisteredWithRetry() {
+    val provider = KotlinLspActionsProvider()
+    runBlocking {
+      repeat(20) { index ->
+        val codeActionsMenu =
+            ActionsRegistry.getInstance().findAction(ActionItem.Location.EDITOR_TEXT_ACTIONS, CodeActionsMenu.ID)
+        if (codeActionsMenu != null) {
+          LSPEditorActions.ensureActionsMenuRegistered(provider)
+          return@runBlocking
+        }
+        if (index < 19) {
+          delay(150)
+        }
+      }
+      LSPEditorActions.ensureActionsMenuRegistered(provider)
     }
   }
 

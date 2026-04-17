@@ -19,6 +19,7 @@ package com.itsaky.androidide.lsp.kotlin
 
 import android.content.Context
 import com.itsaky.androidide.lsp.api.ILanguageServerRegistry
+import com.itsaky.androidide.lsp.kotlin.events.KotlinLanguageClientImpl
 import com.itsaky.androidide.lsp.kotlin.events.KotlinTextDocumentSyncHandler
 import com.itsaky.androidide.lsp.kotlin.settings.KotlinServerSettings
 import com.itsaky.androidide.lsp.kotlin.ui.KotlinServerConstants
@@ -43,6 +44,7 @@ class KotlinServerProcessManager(private val context: Context) {
 
   private var serverProcess: Process? = null
   private var currentServerImpl: KotlinLanguageServerImpl? = null
+  private val kotlinClient: KotlinLanguageClientImpl by lazy { KotlinLanguageClientImpl() }
 
   // 用于构建提供强大的动态 Android 库解析能力
   private var classpathProvider: KotlinClasspathProvider? = null
@@ -157,6 +159,7 @@ class KotlinServerProcessManager(private val context: Context) {
               inStream = serverProcess!!.inputStream,
               outStream = serverProcess!!.outputStream,
           )
+      currentServerImpl?.connectClient(kotlinClient)
 
       registry.register(currentServerImpl!!)
       val workspace = IProjectManager.getInstance().getWorkspace()
