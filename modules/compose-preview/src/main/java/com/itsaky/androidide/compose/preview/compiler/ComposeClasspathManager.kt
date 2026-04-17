@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
+import java.net.URL
 import java.util.concurrent.TimeUnit
 import java.util.zip.ZipInputStream
 
@@ -42,6 +43,15 @@ class ComposeClasspathManager(private val context: Context) {
         "kotlin-script-runtime" to "org/jetbrains/kotlin/kotlin-script-runtime",
         "trove4j" to "org/jetbrains/intellij/deps/trove4j",
         "annotations" to "org/jetbrains/annotations"
+    )
+
+    private val requiredCompilerArtifacts = listOf(
+        Triple("org.jetbrains.kotlin", "kotlin-compiler-embeddable", "2.1.0"),
+        Triple("org.jetbrains.kotlin", "kotlin-stdlib", "2.1.0"),
+        Triple("org.jetbrains.kotlin", "kotlin-reflect", "2.1.0"),
+        Triple("org.jetbrains.kotlin", "kotlin-script-runtime", "2.1.0"),
+        Triple("org.jetbrains.intellij.deps", "trove4j", "1.0.20200330"),
+        Triple("org.jetbrains", "annotations", "24.1.0"),
     )
 
     private val requiredRuntimeJarPatterns = listOf<Any>(
@@ -159,6 +169,17 @@ class ComposeClasspathManager(private val context: Context) {
         return findMavenJar("kotlin-compiler")
     }
 
+    suspend fun ensureCompilerArtifactsAvailable(): Boolean = withContext(Dispatchers.IO) {
+        var allAvailable = true
+        requiredCompilerArtifacts.forEach { (groupId, artifactId, version) ->
+            val artifact = ensureArtifactDownloaded(groupId, artifactId, version)
+            if (artifact == null || !artifact.exists()) {
+                allAvailable = false
+            }
+        }
+        allAvailable
+    }
+
     fun getCompilerPlugin(): File {
         return File(composeDir, "compose-compiler-plugin.jar")
     }
@@ -178,6 +199,33 @@ class ComposeClasspathManager(private val context: Context) {
         }
         return jars.filter { it.exists() }
             .joinToString(File.pathSeparator) { it.absolutePath }
+    }
+
+    private fun ensureArtifactDownloaded(groupId: String, artifactId: String, version: String): File? {
+        val relativeDir = "${groupId.replace('.', '/')}/$artifactId/$version"
+        val artifactDir = File(localMavenRepo, relativeDir).apply { mkdirs() }
+        val jarName = "$artifactId-$version.jar"
+        val jarFile = File(artifactDir, jarName)
+        if (jarFile.exists() && jarFile.length() > 0L) {
+            return jarFile
+        }
+
+        val artifactUrl = "https://repo1.maven.org/maven2/$relativeDir/$jarName"
+        return try {
+            LOG.info("Downloading missing Kotlin compiler artifact: {}", artifactUrl)
+            URL(artifactUrl).openStream().use { input ->
+                jarFile.outputStream().use { output ->
+                    input.copyTo(output)
+                }
+            }
+            jarFile
+        } catch (e: Exception) {
+            LOG.error("Failed to download artifact {}", artifactUrl, e)
+            if (jarFile.exists()) {
+                jarFile.delete()
+            }
+            null
+        }
     }
 
     fun getRuntimeJars(): List<File> {

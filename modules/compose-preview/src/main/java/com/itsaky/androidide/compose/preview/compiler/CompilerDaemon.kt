@@ -188,7 +188,7 @@ class CompilerDaemon(
         }
     }
 
-    private fun ensureDaemonRunning() {
+    private suspend fun ensureDaemonRunning() {
         if (daemonProcess?.isAlive == true) {
             return
         }
@@ -197,7 +197,7 @@ class CompilerDaemon(
         startDaemon()
     }
 
-    private fun ensureWrapperCompiled() {
+    private suspend fun ensureWrapperCompiled() {
         val versionFile = File(wrapperDir, ".wrapper_version")
         val storedVersion = if (versionFile.exists()) versionFile.readText().trim().toIntOrNull() ?: 0 else 0
 
@@ -213,6 +213,7 @@ class CompilerDaemon(
         wrapperSource.writeText(WRAPPER_SOURCE)
 
         val javac = File(Environment.JAVA.parentFile, "javac")
+        classpathManager.ensureCompilerArtifactsAvailable()
         val kotlinCompilerJar = classpathManager.getKotlinCompiler()
             ?: throw RuntimeException("Kotlin compiler not found in local Maven repository. Build any project first.")
 

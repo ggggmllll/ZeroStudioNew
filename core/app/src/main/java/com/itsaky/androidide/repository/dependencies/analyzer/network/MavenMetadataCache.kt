@@ -7,8 +7,6 @@ package com.itsaky.androidide.repository.dependencies.analyzer.network
 import com.itsaky.androidide.app.BaseApplication
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
-import javax.xml.parsers.DocumentBuilderFactory
-import org.w3c.dom.Element
 
 object MavenMetadataCache {
   // 内存缓存
@@ -42,36 +40,6 @@ object MavenMetadataCache {
   }
 
   fun parseXmlToMetadata(xmlContent: String): MavenMetadata? {
-    try {
-      val factory = DocumentBuilderFactory.newInstance()
-      val doc = factory.newDocumentBuilder().parse(xmlContent.byteInputStream())
-      doc.documentElement.normalize()
-      val versioningNodes = doc.getElementsByTagName("versioning")
-      if (versioningNodes.length > 0) {
-        val versioning = versioningNodes.item(0) as Element
-        val latest = getTagValue("latest", versioning)
-        val release = getTagValue("release", versioning)
-
-        val versionsList = mutableListOf<String>()
-        val versionsNode = versioning.getElementsByTagName("versions")
-        if (versionsNode.length > 0) {
-          val versionsElement = versionsNode.item(0) as Element
-          val versionNodes = versionsElement.getElementsByTagName("version")
-          for (i in 0 until versionNodes.length) {
-            versionsList.add(versionNodes.item(i).textContent)
-          }
-        }
-        return MavenMetadata(latest, release, versionsList)
-      }
-    } catch (e: Exception) {
-      e.printStackTrace()
-    }
-    return null
-  }
-
-  private fun getTagValue(tag: String, element: Element): String? {
-    val nodeList = element.getElementsByTagName(tag)
-    if (nodeList.length > 0) return nodeList.item(0).textContent
-    return null
+    return MavenMetadataFetcher.parseMetadata(xmlContent)
   }
 }

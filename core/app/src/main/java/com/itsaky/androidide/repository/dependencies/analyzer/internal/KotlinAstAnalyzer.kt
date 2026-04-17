@@ -43,7 +43,9 @@ class KotlinAstAnalyzer : ScriptAnalyzer {
           ) {
             nextBlock = funcName
           } else if (currentBlock == "dependencies") {
-            extractDependency(node, funcName, text, file, deps)
+            if (DependencyDslConfigurations.isDependencyConfiguration(funcName)) {
+              extractDependency(node, funcName, text, file, deps)
+            }
           } else if (currentBlock == "repositories" || currentBlock == "pluginManagement") {
             extractRepository(node, funcName, text, file, repos)
           }
@@ -165,6 +167,8 @@ class KotlinAstAnalyzer : ScriptAnalyzer {
         val matcher =
             Regex("""url\s*=\s*uri\s*\(\s*["']([^"']+)["']\s*\)""").find(lambdaText)
                 ?: Regex("""url\s*=\s*["']([^"']+)["']""").find(lambdaText)
+                ?: Regex("""url\s*\(\s*["']([^"']+)["']\s*\)""").find(lambdaText)
+                ?: Regex("""setUrl\s*\(\s*["']([^"']+)["']\s*\)""").find(lambdaText)
 
         if (matcher != null) {
           val url = matcher.groupValues[1]

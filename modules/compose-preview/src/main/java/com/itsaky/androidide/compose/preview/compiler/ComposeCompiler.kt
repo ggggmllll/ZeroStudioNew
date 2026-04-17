@@ -75,6 +75,8 @@ class ComposeCompiler(
         withContext(Dispatchers.IO) {
             outputDir.mkdirs()
 
+            classpathManager.ensureCompilerArtifactsAvailable()
+
             val classpath = classpathManager.getCompilationClasspath(additionalClasspaths)
             val kotlinCompiler = classpathManager.getKotlinCompiler()
             val composePlugin = classpathManager.getCompilerPlugin()

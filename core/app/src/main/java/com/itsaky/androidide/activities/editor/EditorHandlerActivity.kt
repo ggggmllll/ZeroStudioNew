@@ -56,8 +56,8 @@ import com.itsaky.androidide.eventbus.events.editor.DocumentSaveEvent
 import com.itsaky.androidide.eventbus.events.file.FileRenameEvent
 import com.itsaky.androidide.eventbus.events.preferences.PreferenceChangeEvent
 import com.itsaky.androidide.interfaces.IEditorHandler
-import com.itsaky.androidide.lsp.kotlin.events.LspEventBus
-import com.itsaky.androidide.lsp.kotlin.events.LspInstallRequestEvent
+import com.itsaky.androidide.lsp.kotlin.ui.events.LspEventBus
+import com.itsaky.androidide.lsp.kotlin.ui.events.LspInstallRequestEvent
 import com.itsaky.androidide.lsp.kotlin.ui.LspInstallerDialog
 import com.itsaky.androidide.models.FileExtension
 import com.itsaky.androidide.models.OpenedFile

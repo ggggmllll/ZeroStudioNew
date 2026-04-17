@@ -4,6 +4,13 @@ import android.content.Context
 import android.util.Log
 import androidx.core.content.ContextCompat
 import com.itsaky.androidide.actions.*
+import com.itsaky.androidide.lsp.kotlin.actions.ConvertJavaToKotlinAction
+import com.itsaky.androidide.lsp.kotlin.actions.KotlinFindReferencesAction
+import com.itsaky.androidide.lsp.kotlin.actions.KotlinGoToDefinitionAction
+import com.itsaky.androidide.lsp.kotlin.actions.KotlinHoverAction
+import com.itsaky.androidide.lsp.kotlin.actions.KotlinRenameAction
+import com.itsaky.androidide.lsp.kotlin.actions.KotlinShowCodeActions
+import com.itsaky.androidide.lsp.kotlin.actions.RefreshBazelClasspathAction
 import com.itsaky.androidide.resources.R
 
 /**
@@ -23,15 +30,13 @@ class kotlinLspActionMenu(context: Context, override val order: Int) :
   init {
     label = context.getString(R.string.edit)
     icon = ContextCompat.getDrawable(context, R.drawable.ic_code)
-    var order = 0
-
-      addAction(KotlinGoToDefinitionAction(context, order++))
-      addAction(KotlinFindReferencesAction(context, order++))
-      addAction(KotlinHoverAction(context, order++))
-      addAction(KotlinRenameAction(context, order++))
-      addAction(KotlinShowCodeActions(context, order++))
-      addAction(RefreshBazelClasspathAction(context, order++))
-      addAction(ConvertJavaToKotlinAction(context, order++))
+    addAction(KotlinGoToDefinitionAction)
+    addAction(KotlinFindReferencesAction)
+    addAction(KotlinHoverAction)
+    addAction(KotlinRenameAction)
+    addAction(KotlinShowCodeActions)
+    addAction(RefreshBazelClasspathAction)
+    addAction(ConvertJavaToKotlinAction)
   }
 
   override fun prepare(data: ActionData) {
@@ -42,12 +47,10 @@ class kotlinLspActionMenu(context: Context, override val order: Int) :
       return
     }
 
-    val editor =
-        data.getEditor()
-            ?: run {
-              markInvisible()
-              return
-            }
+    if (data.getEditor() == null) {
+      markInvisible()
+      return
+    }
 
     // The "Edit" menu itself should be visible if an editor exists.
     // Child actions will handle their own enabled state.

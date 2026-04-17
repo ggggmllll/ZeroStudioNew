@@ -19,9 +19,13 @@ package com.itsaky.androidide.lsp.kotlin
 
 import android.content.Context
 import com.itsaky.androidide.lsp.api.ILanguageServerRegistry
+import com.itsaky.androidide.lsp.kotlin.events.KotlinLanguageClientImpl
+import com.itsaky.androidide.lsp.kotlin.events.KotlinTextDocumentSyncHandler
+import com.itsaky.androidide.lsp.kotlin.settings.KotlinServerSettings
 import com.itsaky.androidide.lsp.kotlin.ui.KotlinServerConstants
 import com.itsaky.androidide.lsp.kotlin.ui.events.LspEventBus
 import com.itsaky.androidide.lsp.kotlin.ui.events.LspInstallRequestEvent
+import com.itsaky.androidide.projects.IProjectManager
 import com.itsaky.androidide.shell.ProcessBuilderImpl
 import com.itsaky.androidide.utils.Environment
 import java.io.File
@@ -40,6 +44,7 @@ class KotlinServerProcessManager(private val context: Context) {
 
   private var serverProcess: Process? = null
   private var currentServerImpl: KotlinLanguageServerImpl? = null
+  private val kotlinClient: KotlinLanguageClientImpl by lazy { KotlinLanguageClientImpl() }
 
   // 用于构建提供强大的动态 Android 库解析能力
   private var classpathProvider: KotlinClasspathProvider? = null
@@ -56,6 +61,7 @@ class KotlinServerProcessManager(private val context: Context) {
 
   /** 启动 Kotlin LSP 服务进程并向全局注册 */
   fun startServer() {
+    KotlinTextDocumentSyncHandler.init()
     coroutineScope.launch {
       if (checkInstallation()) {
         launchProcessAndRegister()
@@ -112,13 +118,19 @@ class KotlinServerProcessManager(private val context: Context) {
       val launcher =
           File(File(Environment.KOTLIN_LSP_HOME, "bin"), KotlinServerConstants.LAUNCHER_SCRIPT_NAME)
       launcher.setExecutable(true, false)
+      if (!launcher.exists() || !launcher.canExecute()) {
+        throw IllegalStateException("Kotlin LSP launcher is not executable: ${launcher.absolutePath}")
+      }
+
+      val shell =
+          Environment.BASH_SHELL.takeIf { it.exists() && it.canExecute() }?.absolutePath ?: "sh"
 
       // 生成环境变量所需的强大 Android Classpath
       val androidClasspath = classpathProvider?.getClasspath() ?: ""
 
       val pb =
           ProcessBuilderImpl(
-              command = listOf("bash", launcher.absolutePath), // 使用 bash 执行以防解析错误
+              command = listOf(shell, launcher.absolutePath),
               environment =
                   mapOf(
                       "JAVA_HOME" to Environment.JAVA_HOME.absolutePath,
@@ -131,7 +143,7 @@ class KotlinServerProcessManager(private val context: Context) {
                       "KOTLIN_LSP_CLASSPATH" to androidClasspath,
                       "CLASSPATH" to androidClasspath,
                   ),
-              workingDirectory = Environment.PROJECTS_DIR,
+              workingDirectory = Environment.KOTLIN_LSP_HOME,
               redirectErrorStream = false,
           )
 
@@ -147,8 +159,14 @@ class KotlinServerProcessManager(private val context: Context) {
               inStream = serverProcess!!.inputStream,
               outStream = serverProcess!!.outputStream,
           )
+      currentServerImpl?.connectClient(kotlinClient)
 
       registry.register(currentServerImpl!!)
+      val workspace = IProjectManager.getInstance().getWorkspace()
+      if (workspace != null) {
+        currentServerImpl?.setupWorkspace(workspace)
+        currentServerImpl?.applySettings(KotlinServerSettings())
+      }
       log.info("KotlinLanguageServerImpl registered to ILanguageServerRegistry.")
     } catch (e: Exception) {
       log.error("Failed to launch Kotlin LSP Process", e)
