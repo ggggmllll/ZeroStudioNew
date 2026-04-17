@@ -19,9 +19,12 @@ package com.itsaky.androidide.lsp.kotlin
 
 import android.content.Context
 import com.itsaky.androidide.lsp.api.ILanguageServerRegistry
+import com.itsaky.androidide.lsp.kotlin.events.KotlinTextDocumentSyncHandler
+import com.itsaky.androidide.lsp.kotlin.settings.KotlinServerSettings
 import com.itsaky.androidide.lsp.kotlin.ui.KotlinServerConstants
 import com.itsaky.androidide.lsp.kotlin.ui.events.LspEventBus
 import com.itsaky.androidide.lsp.kotlin.ui.events.LspInstallRequestEvent
+import com.itsaky.androidide.projects.IProjectManager
 import com.itsaky.androidide.shell.ProcessBuilderImpl
 import com.itsaky.androidide.utils.Environment
 import java.io.File
@@ -56,6 +59,7 @@ class KotlinServerProcessManager(private val context: Context) {
 
   /** 启动 Kotlin LSP 服务进程并向全局注册 */
   fun startServer() {
+    KotlinTextDocumentSyncHandler.init()
     coroutineScope.launch {
       if (checkInstallation()) {
         launchProcessAndRegister()
@@ -155,6 +159,11 @@ class KotlinServerProcessManager(private val context: Context) {
           )
 
       registry.register(currentServerImpl!!)
+      val workspace = IProjectManager.getInstance().getWorkspace()
+      if (workspace != null) {
+        currentServerImpl?.setupWorkspace(workspace)
+        currentServerImpl?.applySettings(KotlinServerSettings())
+      }
       log.info("KotlinLanguageServerImpl registered to ILanguageServerRegistry.")
     } catch (e: Exception) {
       log.error("Failed to launch Kotlin LSP Process", e)

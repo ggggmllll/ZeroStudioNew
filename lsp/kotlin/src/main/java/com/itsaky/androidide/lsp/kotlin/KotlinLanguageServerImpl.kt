@@ -24,7 +24,9 @@ import com.google.gson.reflect.TypeToken
 import com.itsaky.androidide.lsp.api.ILanguageClient
 import com.itsaky.androidide.lsp.api.ILanguageServer
 import com.itsaky.androidide.lsp.api.IServerSettings
+import com.itsaky.androidide.lsp.kotlin.actions.KotlinLspActionsProvider
 import com.itsaky.androidide.lsp.models.*
+import com.itsaky.androidide.lsp.util.LSPEditorActions
 import com.itsaky.androidide.models.Location
 import com.itsaky.androidide.models.Range
 import com.itsaky.androidide.preferences.internal.EditorPreferences
@@ -85,6 +87,8 @@ class KotlinLanguageServerImpl(
   }
 
   override fun setupWorkspace(workspace: IWorkspace) {
+    LSPEditorActions.ensureActionsMenuRegistered(KotlinLspActionsProvider())
+
     val bridge = KotlinJavaCompilerBridge(workspace)
     completionConverter.setJavaCompilerBridge(bridge)
 
