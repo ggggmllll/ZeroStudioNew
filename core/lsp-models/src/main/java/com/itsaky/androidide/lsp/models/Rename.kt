@@ -18,7 +18,3 @@ data class PrepareRenameResult(
     var placeholder: String,
     var isSupported: Boolean = true,
 )
-
-data class WorkspaceEdit(
-    var documentChanges: List<DocumentChange> = emptyList(),
-)

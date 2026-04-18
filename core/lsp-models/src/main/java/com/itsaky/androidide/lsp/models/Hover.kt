@@ -30,14 +30,6 @@ data class Hover(
     val range: Range? = null
 )
 
-/**
- * 支持 Markdown 的文档内容结构
- */
-data class MarkupContent(
-    val kind: String, // "plaintext" 或 "markdown"
-    val value: String
-)
-
 data class MarkedString(
     val language: String,
     val value: String

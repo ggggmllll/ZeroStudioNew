@@ -22,12 +22,6 @@ package com.itsaky.androidide.lsp.models
 import com.itsaky.androidide.lsp.rpc.Position
 import com.itsaky.androidide.lsp.rpc.Range
 
-data class CompletionParams(
-    val textDocument: TextDocumentIdentifier,
-    val position: Position,
-    val context: CompletionContext? = null
-)
-
 data class DocumentFormattingParams(
     val textDocument: TextDocumentIdentifier,
     val options: FormattingOptions

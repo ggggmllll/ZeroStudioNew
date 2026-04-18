@@ -21,6 +21,10 @@ import com.itsaky.androidide.lsp.models.MarkupKind.PLAIN
 
 data class MarkupContent(var value: String, var kind: MarkupKind) {
   constructor() : this("", PLAIN)
+  constructor(kind: String, value: String) : this(
+      value,
+      if (kind.equals("markdown", ignoreCase = true)) MarkupKind.MARKDOWN else MarkupKind.PLAIN,
+  )
 }
 
 enum class MarkupKind {

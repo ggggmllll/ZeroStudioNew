@@ -19,6 +19,11 @@
  */
 package com.itsaky.androidide.lsp.models
 
+import com.itsaky.androidide.lsp.rpc.Position
+import com.itsaky.androidide.lsp.rpc.Range
+import com.itsaky.androidide.lsp.rpc.UriConverter
+import java.nio.file.Path
+
 /**
  * 代表一个新打开的文档 (didOpen)
  */
@@ -41,35 +46,84 @@ data class VersionedTextDocumentIdentifier(
  * 文本内容变更的具体项 (Incremental Sync)
  */
 data class TextDocumentContentChangeEvent(
-    var range: com.itsaky.androidide.lsp.rpc.Range? = null, 
+    var range: Range? = null,
     var rangeLength: Int? = null,
-    var text: String
-)
+    var text: String = "",
+) {
+    constructor(range: com.itsaky.androidide.models.Range?, rangeLength: Int? = null, text: String = "") : this(
+        range = range?.toRpcRange(),
+        rangeLength = rangeLength,
+        text = text,
+    )
+}
 
 /**
  * 文档位置相关的通用参数
  */
 data class TextDocumentPositionParams(
     val textDocument: TextDocumentIdentifier,
-    val position: com.itsaky.androidide.lsp.rpc.Position
+    val position: Position
 )
 
 data class TextDocumentIdentifier(val uri: String)
 
 data class DidOpenTextDocumentParams(
-    val textDocument: TextDocumentItem
-)
+    val textDocument: TextDocumentItem? = null,
+    val file: Path? = null,
+    val languageId: String? = null,
+    val version: Int? = null,
+    val text: String? = null,
+) {
+    constructor(file: Path, languageId: String, version: Int = 1, text: String) : this(
+        textDocument = TextDocumentItem(UriConverter.pathToUri(file), languageId, version, text),
+        file = file,
+        languageId = languageId,
+        version = version,
+        text = text,
+    )
+}
 
 data class DidChangeTextDocumentParams(
-    val textDocument: VersionedTextDocumentIdentifier,
-    val contentChanges: List<TextDocumentContentChangeEvent>
-)
+    val textDocument: VersionedTextDocumentIdentifier? = null,
+    val contentChanges: List<TextDocumentContentChangeEvent>,
+    val file: Path? = null,
+    val version: Int? = null,
+) {
+    constructor(file: Path, version: Int, contentChanges: List<TextDocumentContentChangeEvent>) : this(
+        textDocument = VersionedTextDocumentIdentifier(UriConverter.pathToUri(file), version),
+        contentChanges = contentChanges,
+        file = file,
+        version = version,
+    )
+}
 
 data class DidCloseTextDocumentParams(
-    val textDocument: TextDocumentIdentifier
-)
+    val textDocument: TextDocumentIdentifier? = null,
+    val file: Path? = null,
+) {
+    constructor(file: Path) : this(
+        textDocument = TextDocumentIdentifier(UriConverter.pathToUri(file)),
+        file = file,
+    )
+}
 
 data class DidSaveTextDocumentParams(
-    val textDocument: TextDocumentIdentifier,
-    val text: String? = null
-)
+    val textDocument: TextDocumentIdentifier? = null,
+    val text: String? = null,
+    val file: Path? = null,
+    val reason: TextDocumentSaveReason = TextDocumentSaveReason.Manual,
+) {
+    constructor(file: Path, reason: TextDocumentSaveReason = TextDocumentSaveReason.Manual, text: String? = null) : this(
+        textDocument = TextDocumentIdentifier(UriConverter.pathToUri(file)),
+        text = text,
+        file = file,
+        reason = reason,
+    )
+}
+
+private fun com.itsaky.androidide.models.Range.toRpcRange(): Range {
+    return Range.newBuilder().apply {
+        start = Position.newBuilder().setLine(start.line).setCharacter(start.column).build()
+        end = Position.newBuilder().setLine(end.line).setCharacter(end.column).build()
+    }.build()
+}

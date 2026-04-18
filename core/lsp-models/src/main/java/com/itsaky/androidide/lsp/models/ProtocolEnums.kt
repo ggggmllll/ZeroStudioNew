@@ -1,16 +1,7 @@
 package com.itsaky.androidide.lsp.models
 
 /** Additional protocol enums aligned with lsp4j-source naming. */
-enum class DiagnosticTag {
-  Unnecessary,
-  Deprecated,
-}
-
 enum class CompletionItemTag {
-  Deprecated,
-}
-
-enum class SymbolTag {
   Deprecated,
 }
 
@@ -26,12 +17,6 @@ enum class TextDocumentSyncKind {
   None,
   Full,
   Incremental,
-}
-
-enum class CompletionTriggerKind {
-  Invoked,
-  TriggerCharacter,
-  TriggerForIncompleteCompletions,
 }
 
 enum class CodeActionTriggerKind {
