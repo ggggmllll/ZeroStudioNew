@@ -24,6 +24,7 @@ dependencies {
     api(libs.google.protobuf.kotlin)
     api("com.google.protobuf:protobuf-java-util:${libs.versions.protobufVersion.get()}")
     api(libs.google.gson)
+    api(libs.kotlinx.coroutines.core)
     api(libs.common.javax.annotation.api)
 }
 
@@ -47,6 +48,7 @@ protobuf {
             }
             it.builtins {
                 id("kotlin")
+                id("java")
             }
         }
     }
