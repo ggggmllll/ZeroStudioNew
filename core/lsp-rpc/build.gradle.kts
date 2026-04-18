@@ -22,7 +22,7 @@ dependencies {
     api(libs.grpc.stub)
     api(libs.grpc.kotlin.stub)
     api(libs.google.protobuf.kotlin)
-    api(libs.javax.annotation.api)
+    api(libs.common.javax.annotation.api)
 }
 
 protobuf {
