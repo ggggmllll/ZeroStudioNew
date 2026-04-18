@@ -122,8 +122,10 @@ data class DidSaveTextDocumentParams(
 }
 
 private fun com.itsaky.androidide.models.Range.toRpcRange(): Range {
+    val sourceStart = this.start
+    val sourceEnd = this.end
     return Range.newBuilder().apply {
-        start = Position.newBuilder().setLine(start.line).setCharacter(start.column).build()
-        end = Position.newBuilder().setLine(end.line).setCharacter(end.column).build()
+        start = Position.newBuilder().setLine(sourceStart.line).setCharacter(sourceStart.column).build()
+        end = Position.newBuilder().setLine(sourceEnd.line).setCharacter(sourceEnd.column).build()
     }.build()
 }
