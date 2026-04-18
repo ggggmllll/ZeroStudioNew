@@ -17,6 +17,7 @@
 
 package com.itsaky.androidide.lsp.kotlin.events
 
+import com.itsaky.androidide.eventbus.events.editor.ChangeType
 import com.itsaky.androidide.eventbus.events.editor.DocumentChangeEvent
 import com.itsaky.androidide.eventbus.events.editor.DocumentCloseEvent
 import com.itsaky.androidide.eventbus.events.editor.DocumentOpenEvent
@@ -43,8 +44,8 @@ object KotlinTextDocumentSyncHandler {
 
   private data class DocumentSnapshot(
       val languageId: String = "kotlin",
-      val version: Int,
-      val text: String,
+      var version: Int,
+      var text: String,
   )
 
   /** 在主程序或管理器初始化时调用一次以注册 EventBus */
@@ -83,12 +84,7 @@ object KotlinTextDocumentSyncHandler {
   @Subscribe(threadMode = ThreadMode.ASYNC)
   fun onDocumentOpen(event: DocumentOpenEvent) {
     if (!isKotlinFile(event.openedFile.toString())) return
-    openedDocs[event.openedFile] =
-        DocumentSnapshot(
-            languageId = "kotlin",
-            version = event.version,
-            text = event.text ?: "",
-        )
+    openedDocs[event.openedFile] = DocumentSnapshot(version = event.version, text = event.text ?: "")
 
     val server = getServer() ?: return
 
@@ -97,7 +93,7 @@ object KotlinTextDocumentSyncHandler {
             file = event.openedFile,
             languageId = "kotlin",
             version = event.version,
-            text = event.text,
+            text = event.text ?: "",
         )
     )
   }
@@ -105,18 +101,28 @@ object KotlinTextDocumentSyncHandler {
   @Subscribe(threadMode = ThreadMode.ASYNC)
   fun onDocumentChange(event: DocumentChangeEvent) {
     if (!isKotlinFile(event.changedFile.toString())) return
-    val newText = event.newText ?: ""
-    openedDocs[event.changedFile] =
-        DocumentSnapshot(
-            languageId = "kotlin",
-            version = event.version,
-            text = newText,
-        )
+    
+    val snapshot = openedDocs[event.changedFile] ?: return
+    snapshot.version = event.version
+    snapshot.text = event.newText ?: ""
 
     val server = getServer() ?: return
 
-    // AndroidIDE 当前提供的是全量替换事件 (newText)，我们将整个文本作为一个 ContentChangeEvent 下发
-    val changeEvent = TextDocumentContentChangeEvent(text = newText)
+    // Server 初始化为 Incremental 模式，我们发送精准 Range
+    val changeEvent = TextDocumentContentChangeEvent(
+        range = event.changeRange,
+        // 在编辑过程中，如果全量重置文本，它的 changeType = NEW_TEXT
+        text = if (event.changeType == ChangeType.DELETE) "" else event.changedText.toString(),
+        rangeLength = if (event.changeType == ChangeType.NEW_TEXT) null else Math.abs(event.changeDelta)
+    )
+    
+    // 如果是全文本重写 (NEW_TEXT), 必须清空 Range 以告诉 LSP 这个是整个文本替换
+    if (event.changeType == ChangeType.NEW_TEXT) {
+        changeEvent.range = null
+        changeEvent.rangeLength = null
+        changeEvent.text = event.newText ?: ""
+    }
+
     server.didChange(
         DidChangeTextDocumentParams(
             file = event.changedFile,
@@ -130,19 +136,17 @@ object KotlinTextDocumentSyncHandler {
   fun onDocumentClose(event: DocumentCloseEvent) {
     if (!isKotlinFile(event.closedFile.toString())) return
     openedDocs.remove(event.closedFile)
-    val server = getServer() ?: return
-
-    server.didClose(DidCloseTextDocumentParams(file = event.closedFile))
+    
+    getServer()?.didClose(DidCloseTextDocumentParams(file = event.closedFile))
   }
 
   @Subscribe(threadMode = ThreadMode.ASYNC)
   fun onDocumentSave(event: DocumentSaveEvent) {
     if (!isKotlinFile(event.file.toString())) return
-    val server = getServer() ?: return
-
-    server.didSave(
+    
+    getServer()?.didSave(
         DidSaveTextDocumentParams(
-            file = event.file, // changed to Path from File via definition mapping
+            file = event.file,
             reason = TextDocumentSaveReason.Manual,
             text = null,
         )

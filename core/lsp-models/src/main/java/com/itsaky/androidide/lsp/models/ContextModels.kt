@@ -19,28 +19,28 @@
  */
 package com.itsaky.androidide.lsp.models
 
-data class InitializeParams(
-    val processId: Int? = null,
-    val clientInfo: ClientInfo = ClientInfo("ZeroStudio", "2.0.0"),
-    val rootUri: String? = null,
-    val capabilities: ClientCapabilities,
-    val initializationOptions: Any? = null,
-    val trace: String = "off", // "off", "messages", "verbose"
-    val workspaceFolders: List<WorkspaceFolder>? = null
+/**
+ * 补全请求的上下文
+ */
+data class CompletionContext(
+    val triggerKind: CompletionTriggerKind,
+    val triggerCharacter: String? = null
 )
 
-data class ClientInfo(val name: String, val version: String? = null)
-
-data class WorkspaceFolder(val uri: String, val name: String)
+enum class CompletionTriggerKind(val value: Int) {
+    Invoked(1),              
+    TriggerCharacter(2),     
+    TriggerForIncompleteCompletions(3) 
+}
 
 /**
- * 服务器返回的初始化结果
+ * 诊断信息的标准结构
  */
-data class InitializeResult(
-    val capabilities: ServerCapabilities,
-    val serverInfo: ServerInfo? = null
+data class Diagnostic(
+    val range: com.itsaky.androidide.lsp.rpc.Range,
+    val severity: Int? = null, // 1:Error, 2:Warning, 3:Info, 4:Hint
+    val code: String? = null,
+    val source: String? = null,
+    val message: String,
+    val tags: List<Int>? = null // 1:Unnecessary, 2:Deprecated
 )
-
-data class ServerInfo(val name: String, val version: String? = null)
-
-class InitializedParams

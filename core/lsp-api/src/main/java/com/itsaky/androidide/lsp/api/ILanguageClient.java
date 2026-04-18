@@ -23,14 +23,19 @@ import com.itsaky.androidide.lsp.models.DiagnosticItem;
 import com.itsaky.androidide.lsp.models.DiagnosticResult;
 import com.itsaky.androidide.lsp.models.PerformCodeActionParams;
 import com.itsaky.androidide.lsp.models.LogMessageParams;
+import com.itsaky.androidide.lsp.models.PublishDiagnosticsParams;
 import com.itsaky.androidide.lsp.models.ShowMessageParams;
 import com.itsaky.androidide.lsp.models.WorkDoneProgressBegin;
 import com.itsaky.androidide.lsp.models.WorkDoneProgressEnd;
 import com.itsaky.androidide.lsp.models.WorkDoneProgressReport;
 import com.itsaky.androidide.lsp.models.WorkspaceEdit;
+import com.itsaky.androidide.lsp.models.ApplyWorkspaceEditParams;
+import com.itsaky.androidide.lsp.models.ApplyWorkspaceEditResponse;
+import com.itsaky.androidide.lsp.models.ProgressParams;
 import com.itsaky.androidide.lsp.models.ShowDocumentParams;
 import com.itsaky.androidide.lsp.models.ShowDocumentResult;
 import com.itsaky.androidide.models.Location;
+import java.util.concurrent.CompletableFuture;
 import java.io.File;
 import java.util.List;
 
@@ -38,15 +43,23 @@ import java.util.List;
  * A language client handles notifications and events from a {@link ILanguageServer}.
  *
  * @author Akash Yadav
+ * @author android_zero
  */
 public interface ILanguageClient {
 
   /**
-   * Publish the diagnostics result (allow the user to see them).
+   * Publish the diagnostics result (allow the user to see them) natively.
    *
    * @param result The diagnostic result.
    */
   void publishDiagnostics(DiagnosticResult result);
+
+  /**
+   * Publish diagnostics from server directly.
+   *
+   * @param params The diagnostics notification payload.
+   */
+  default void publishDiagnostics(PublishDiagnosticsParams params) {}
 
   /**
    * Get the diagnostic item in the given file at the given character position.
@@ -70,7 +83,7 @@ public interface ILanguageClient {
     if (actionItem == null) {
       return;
     }
-    performCodeAction(new PerformCodeActionParams(actionItem));
+    performCodeAction(new PerformCodeActionParams(true, actionItem));
   }
 
   /**
@@ -95,7 +108,7 @@ public interface ILanguageClient {
   ShowDocumentResult showDocument(ShowDocumentParams params);
 
   /**
-   * Notification sent by the language server to tell teh client client to show the given locations
+   * Notification sent by the language server to tell the client client to show the given locations
    * to the user.
    *
    * @param locations The location to show.
@@ -105,6 +118,13 @@ public interface ILanguageClient {
   /** Apply a workspace edit (documentChanges/resource operations). */
   default boolean applyWorkspaceEdit(WorkspaceEdit edit) {
     return false;
+  }
+
+  /** Request from the language server to apply a workspace edit synchronously. */
+  default CompletableFuture<ApplyWorkspaceEditResponse> applyEdit(ApplyWorkspaceEditParams params) {
+    CompletableFuture<ApplyWorkspaceEditResponse> future = new CompletableFuture<>();
+    future.complete(new ApplyWorkspaceEditResponse(false, "Not implemented", null));
+    return future;
   }
 
   /** Show a user-visible message from server. */
@@ -119,5 +139,7 @@ public interface ILanguageClient {
   default void workDoneProgressReport(WorkDoneProgressReport params) {}
 
   default void workDoneProgressEnd(WorkDoneProgressEnd params) {}
-
+  
+  /** Dynamic progress report notification from server. */
+  default void notifyProgress(ProgressParams<Object> params) {}
 }

@@ -14,25 +14,29 @@
  *  You should have received a copy of the GNU General Public License
  *   along with AndroidIDE.  If not, see <https://www.gnu.org/licenses/>.
  */
+/*
+ *  @author android_zero
+ */
+package com.itsaky.androidide.lsp.models
 
-import com.itsaky.androidide.build.config.BuildConfig
+/**
+ * 动态能力注册参数 (client/registerCapability)
+ */
+data class RegistrationParams(
+    val registrations: List<Registration>
+)
 
-plugins {
-  id("com.android.library")
-  id("kotlin-android")
-}
+data class Registration(
+    val id: String,         
+    val method: String,     
+    val registerOptions: Any? = null 
+)
 
-android { namespace = "${BuildConfig.packageName}.lsp.models" }
+data class UnregistrationParams(
+    val unregisterations: List<Unregistration>
+)
 
-dependencies {
-  implementation(libs.composite.fuzzysearch)
-
-  implementation(projects.core.common)
-  api(projects.core.lspRpc)
-
-  implementation(libs.common.editor)
-  implementation(libs.androidx.appcompat)
-  implementation(libs.androidx.core.ktx)
-  implementation(libs.common.kotlin)
-  implementation(libs.common.utilcode)
-}
+data class Unregistration(
+    val id: String,
+    val method: String
+)

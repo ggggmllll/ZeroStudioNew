@@ -14,25 +14,26 @@
  *  You should have received a copy of the GNU General Public License
  *   along with AndroidIDE.  If not, see <https://www.gnu.org/licenses/>.
  */
+/*
+ *  @author android_zero
+ */
+package com.itsaky.androidide.lsp.models
 
-import com.itsaky.androidide.build.config.BuildConfig
+/**
+ * 配置请求参数 (workspace/configuration)
+ */
+data class ConfigurationParams(
+    val items: List<ConfigurationItem>
+)
 
-plugins {
-  id("com.android.library")
-  id("kotlin-android")
-}
+data class ConfigurationItem(
+    val scopeUri: String? = null, 
+    val section: String? = null   
+)
 
-android { namespace = "${BuildConfig.packageName}.lsp.models" }
-
-dependencies {
-  implementation(libs.composite.fuzzysearch)
-
-  implementation(projects.core.common)
-  api(projects.core.lspRpc)
-
-  implementation(libs.common.editor)
-  implementation(libs.androidx.appcompat)
-  implementation(libs.androidx.core.ktx)
-  implementation(libs.common.kotlin)
-  implementation(libs.common.utilcode)
-}
+/**
+ * 配置变更通知参数 (workspace/didChangeConfiguration)
+ */
+data class DidChangeConfigurationParams(
+    val settings: Any
+)

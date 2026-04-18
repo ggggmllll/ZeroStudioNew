@@ -41,10 +41,15 @@ import java.io.File
 import java.io.InputStream
 import java.io.OutputStream
 import java.nio.file.Path
+import java.util.concurrent.CompletableFuture
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.future.future
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 
 /**
  * Kotlin Language Server IDE 对接层。
@@ -63,6 +68,7 @@ class KotlinLanguageServerImpl(
   override var client: ILanguageClient? = null
 
   private val gson = Gson()
+  private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
   private val rpcClient = KotlinRpcClient(inStream, outStream) { msg -> handleServerMessage(msg) }
   @Volatile private var isInitialized = false
 
@@ -80,6 +86,11 @@ class KotlinLanguageServerImpl(
 
   override fun connectClient(client: ILanguageClient?) {
     this.client = client
+  }
+
+  override fun handleFailure(failure: LSPFailure?): Boolean {
+    log.warn("Kotlin LSP encountered a failure: ${failure?.type} - ${failure?.error?.message}")
+    return true
   }
 
   override fun applySettings(settings: IServerSettings?) {
@@ -118,8 +129,8 @@ class KotlinLanguageServerImpl(
   }
 
   private fun createInitializeParams(workspace: IWorkspace): JsonObject {
-    val rootUri = workspace.getProjectDir().toURI().toString()
-    val cacheDir = Environment.getProjectCacheDir(workspace.getProjectDir())
+    val rootUri = workspace.projectDir.toURI().toString()
+    val cacheDir = Environment.getProjectCacheDir(workspace.projectDir)
 
     val initOptions =
         JsonObject().apply {
@@ -132,11 +143,11 @@ class KotlinLanguageServerImpl(
     return JsonObject().apply {
       addProperty("processId", android.os.Process.myPid())
       addProperty("rootUri", rootUri)
-      addProperty("rootPath", workspace.getProjectDir().absolutePath)
+      addProperty("rootPath", workspace.projectDir.absolutePath)
       add(
           "workspaceFolders",
           gson.toJsonTree(
-              listOf(mapOf("uri" to rootUri, "name" to workspace.getProjectDir().name)),
+              listOf(mapOf("uri" to rootUri, "name" to workspace.projectDir.name)),
           ),
       )
       add("initializationOptions", initOptions)
@@ -198,7 +209,7 @@ class KotlinLanguageServerImpl(
             add(
                 "diagnostics",
                 JsonObject().apply {
-                  addProperty("enabled", settings?.diagnosticsEnabled() ?: true)
+                  addProperty("enabled", settings?.codeAnalysisEnabled() ?: true)
                   addProperty("debounceTime", 250)
                 },
             )
@@ -274,26 +285,61 @@ class KotlinLanguageServerImpl(
     }
   }
 
+  override fun initialize(params: InitializeParams): CompletableFuture<InitializeResult> {
+    return scope.future {
+        val resultElement = rpcClient.sendRequest("initialize", params)
+        gson.fromJson(resultElement, InitializeResult::class.java)
+    }
+  }
+
+  override fun initialized(params: InitializedParams) {
+    rpcClient.sendNotification("initialized", params)
+  }
+
+  override fun shutdown() {
+    log.info("Shutting down Kotlin LSP Server...")
+    runBlocking {
+      try {
+        rpcClient.sendRequest("shutdown", JsonObject())
+        rpcClient.sendNotification("exit", JsonObject())
+      } catch (e: Exception) {} finally {
+        rpcClient.stop()
+        try {
+          process.destroy()
+        } catch (_: Exception) {}
+      }
+    }
+  }
+
+  override fun exit() {
+    rpcClient.sendNotification("exit", Any())
+    rpcClient.stop()
+    try { process.destroy() } catch (_: Exception) {}
+  }
+
   override fun didOpen(params: DidOpenTextDocumentParams) {
     val payload =
         mapOf(
             "textDocument" to
                 mapOf(
-                    "uri" to params.file.toUri().toString(),
-                    "languageId" to params.languageId,
-                    "version" to params.version,
-                    "text" to params.text,
+                    "uri" to params.textDocument.uri,
+                    "languageId" to params.textDocument.languageId,
+                    "version" to params.textDocument.version,
+                    "text" to params.textDocument.text,
                 )
         )
     rpcClient.sendNotification("textDocument/didOpen", payload)
   }
 
   override fun didChange(params: DidChangeTextDocumentParams) {
-    val changes = params.contentChanges.map { mapOf("range" to it.range, "text" to it.text) }
+    val changes = params.contentChanges.map { 
+        if (it.range != null) mapOf("range" to it.range, "text" to it.text) 
+        else mapOf("text" to it.text) 
+    }
     val payload =
         mapOf(
             "textDocument" to
-                mapOf("uri" to params.file.toUri().toString(), "version" to params.version),
+                mapOf("uri" to params.textDocument.uri, "version" to params.textDocument.version),
             "contentChanges" to changes,
         )
     rpcClient.sendNotification("textDocument/didChange", payload)
@@ -302,7 +348,7 @@ class KotlinLanguageServerImpl(
   override fun didClose(params: DidCloseTextDocumentParams) {
     rpcClient.sendNotification(
         "textDocument/didClose",
-        mapOf("textDocument" to mapOf("uri" to params.file.toUri().toString())),
+        mapOf("textDocument" to mapOf("uri" to params.textDocument.uri)),
     )
   }
 
@@ -310,7 +356,7 @@ class KotlinLanguageServerImpl(
     rpcClient.sendNotification(
         "textDocument/didSave",
         mapOf(
-            "textDocument" to mapOf("uri" to params.file.toUri().toString()),
+            "textDocument" to mapOf("uri" to params.textDocument.uri),
             "text" to params.text,
         ),
     )
@@ -323,8 +369,8 @@ class KotlinLanguageServerImpl(
     return runBlocking(Dispatchers.IO) {
       val req =
           mapOf(
-              "textDocument" to mapOf("uri" to params.file.toUri().toString()),
-              "position" to params.position,
+              "textDocument" to mapOf("uri" to params.textDocument.uri),
+              "position" to params.lspPosition,
           )
       try {
         val response =
@@ -373,31 +419,34 @@ class KotlinLanguageServerImpl(
       withContext(Dispatchers.IO) {
         val req =
             mapOf(
-                "textDocument" to mapOf("uri" to params.file.toUri().toString()),
-                "position" to params.position,
+                "textDocument" to mapOf("uri" to params.textDocument.uri),
+                "position" to params.lspPosition,
                 "context" to mapOf("includeDeclaration" to params.includeDeclaration),
             )
         val res = rpcClient.sendRequest("textDocument/references", req)
         val type = object : TypeToken<List<Location>>() {}.type
-        val locations: List<Location> = gson.fromJson(res, type) ?: emptyList()
-        ReferenceResult(locations)
+        val locations: List<Location>? = gson.fromJson(res, type)
+        
+        ReferenceResult(locations ?: emptyList())
       }
 
   override suspend fun findDefinition(params: DefinitionParams): DefinitionResult =
       withContext(Dispatchers.IO) {
         val req =
             mapOf(
-                "textDocument" to mapOf("uri" to params.file.toUri().toString()),
-                "position" to params.position,
+                "textDocument" to mapOf("uri" to params.textDocument.uri),
+                "position" to params.lspPosition,
             )
         val res = rpcClient.sendRequest("textDocument/definition", req)
-        val type = object : TypeToken<List<Location>>() {}.type
-        val locations =
-            if (res != null && res.isJsonObject) {
-              listOf(gson.fromJson(res, Location::class.java))
-            } else {
-              gson.fromJson(res, type) ?: emptyList<Location>()
-            }
+        
+        val type = object : TypeToken<Either<Location, List<LocationLink>>>() {}.type
+        val result: Either<Location, List<LocationLink>>? = gson.fromJson(res, type)
+        
+        val locations = result?.map(
+            { loc -> listOf(loc) },
+            { links -> links.map { Location(com.itsaky.androidide.lsp.rpc.UriConverter.uriToPath(it.targetUri), it.targetRange) } }
+        ) ?: emptyList()
+
         DefinitionResult(locations)
       }
 
@@ -405,7 +454,7 @@ class KotlinLanguageServerImpl(
       withContext(Dispatchers.IO) {
         val req =
             mapOf(
-                "textDocument" to mapOf("uri" to params.file.toUri().toString()),
+                "textDocument" to mapOf("uri" to com.itsaky.androidide.lsp.rpc.UriConverter.fileToUri(params.file.toFile())),
                 "positions" to listOf(params.selection.start),
             )
         val res = rpcClient.sendRequest("textDocument/selectionRange", req)
@@ -418,37 +467,39 @@ class KotlinLanguageServerImpl(
       withContext(Dispatchers.IO) {
         val req =
             mapOf(
-                "textDocument" to mapOf("uri" to params.file.toUri().toString()),
-                "position" to params.position,
+                "textDocument" to mapOf("uri" to params.textDocument.uri),
+                "position" to params.lspPosition,
+                "context" to params.context
             )
         val res = rpcClient.sendRequest("textDocument/signatureHelp", req)
-        gson.fromJson(res, SignatureHelp::class.java) ?: SignatureHelp(emptyList(), 0, 0)
+        gson.fromJson(res, SignatureHelp::class.java) ?: SignatureHelp()
       }
 
   override suspend fun hover(params: DefinitionParams): MarkupContent =
       withContext(Dispatchers.IO) {
         val req =
             mapOf(
-                "textDocument" to mapOf("uri" to params.file.toUri().toString()),
-                "position" to params.position,
+                "textDocument" to mapOf("uri" to params.textDocument.uri),
+                "position" to params.lspPosition,
             )
         val res = rpcClient.sendRequest("textDocument/hover", req)
-        if (res != null && res.isJsonObject && res.asJsonObject.has("contents")) {
-          gson.fromJson(res.asJsonObject.get("contents"), MarkupContent::class.java)
-        } else {
-          MarkupContent()
-        }
+        val hover = gson.fromJson(res, Hover::class.java)
+        
+        hover?.contents?.map(
+            { it },
+            { list -> MarkupContent("markdown", list.joinToString("\n") { m -> m.map({ s -> s }, { ms -> ms.value }) }) }
+        ) ?: MarkupContent("plaintext", "")
       }
 
   override suspend fun analyze(file: Path): DiagnosticResult =
-      withContext(Dispatchers.IO) { DiagnosticResult.NO_UPDATE }
+      withContext(Dispatchers.IO) { DiagnosticResult.NO_UPDATE } // LSP uses push diagnostics
 
   override fun formatCode(params: FormatCodeParams?): CodeFormatResult {
     if (params == null) return CodeFormatResult.NONE
     return runBlocking(Dispatchers.IO) {
       val req =
           mapOf(
-              "textDocument" to mapOf("uri" to "file://dummy_for_format"),
+              "textDocument" to mapOf("uri" to "file://dummy_for_format"), // 事实上这应为真实 URI,但受限于旧接口我们采用占位符
               "options" to
                   mapOf(
                       "tabSize" to EditorPreferences.tabSize,
@@ -466,7 +517,7 @@ class KotlinLanguageServerImpl(
       withContext(Dispatchers.IO) {
         val req =
             mapOf(
-                "textDocument" to mapOf("uri" to params.file.toUri().toString()),
+                "textDocument" to mapOf("uri" to com.itsaky.androidide.lsp.rpc.UriConverter.fileToUri(params.file.toFile())),
                 "position" to params.position,
                 "newName" to params.newName,
             )
@@ -474,24 +525,49 @@ class KotlinLanguageServerImpl(
         gson.fromJson(res, WorkspaceEdit::class.java) ?: WorkspaceEdit()
       }
 
-  suspend fun executeWorkspaceCommand(commandName: String, arguments: List<Any>): JsonElement? =
+  override suspend fun semanticTokensFull(params: SemanticTokensParams): SemanticTokens =
       withContext(Dispatchers.IO) {
-        val req = mapOf("command" to commandName, "arguments" to arguments)
-        rpcClient.sendRequest("workspace/executeCommand", req)
+        val element = rpcClient.sendRequest("textDocument/semanticTokens/full", params)
+        gson.fromJson(element, SemanticTokens::class.java) ?: SemanticTokens(data = emptyList())
       }
 
-  override fun shutdown() {
-    log.info("Shutting down Kotlin LSP Server...")
-    runBlocking {
-      try {
-        rpcClient.sendRequest("shutdown", JsonObject())
-        rpcClient.sendNotification("exit", JsonObject())
-      } catch (e: Exception) {} finally {
-        rpcClient.stop()
-        try {
-          process.destroy()
-        } catch (_: Exception) {}
+  override suspend fun documentSymbols(file: Path): DocumentSymbolsResult =
+      withContext(Dispatchers.IO) {
+        val params = DocumentSymbolParams(TextDocumentIdentifier(com.itsaky.androidide.lsp.rpc.UriConverter.fileToUri(file.toFile())))
+        val element = rpcClient.sendRequest("textDocument/documentSymbol", params)
+        
+        val type = object : TypeToken<Either<List<SymbolInformation>, List<DocumentSymbol>>>() {}.type
+        val either: Either<List<SymbolInformation>, List<DocumentSymbol>>? = gson.fromJson(element, type)
+        
+        either?.map(
+            { infos -> DocumentSymbolsResult(flatSymbols = infos) },
+            { symbols -> DocumentSymbolsResult(symbols = symbols) }
+        ) ?: DocumentSymbolsResult()
       }
-    }
+
+  override suspend fun workspaceSymbols(query: String): WorkspaceSymbolsResult =
+      withContext(Dispatchers.IO) {
+        val params = WorkspaceSymbolParams(query)
+        val element = rpcClient.sendRequest("workspace/symbol", params)
+        val type = object : TypeToken<List<SymbolInformation>>() {}.type
+        val result: List<SymbolInformation>? = gson.fromJson(element, type)
+        
+        WorkspaceSymbolsResult(result?.map { 
+            WorkspaceSymbol(it.name, it.kindValue, it.tagsValue, Either.forLeft(it.lspLocation), it.containerName) 
+        } ?: emptyList())
+      }
+
+  override suspend fun inlayHints(params: InlayHintParams): List<InlayHint> =
+      withContext(Dispatchers.IO) {
+        val element = rpcClient.sendRequest("textDocument/inlayHint", params)
+        val type = object : TypeToken<List<InlayHint>>() {}.type
+        gson.fromJson(element, type) ?: emptyList()
+      }
+
+  override fun executeCommand(command: Command) {
+      scope.launch {
+          val params = mapOf("command" to command.command, "arguments" to command.arguments)
+          rpcClient.sendRequest("workspace/executeCommand", params)
+      }
   }
 }

@@ -56,26 +56,30 @@ class KotlinRpcClient(
     coroutineScope.launch {
       try {
         readMessageLoop()
-      } catch (e: InterruptedIOException) {
-        if (coroutineScope.isActive) {
-          log.error("LSP read loop interrupted unexpectedly", e)
-        } else {
-          log.debug("LSP read loop interrupted during shutdown.")
-        }
       } catch (e: Exception) {
         if (coroutineScope.isActive) {
-          log.error("Error in LSP read loop", e)
+          log.error("Error in LSP read loop. Language Server might have crashed or terminated.", e)
         } else {
           log.debug("LSP read loop exited during shutdown.")
         }
+        // 遇到流断裂或崩溃时，释放所有正在等待的协程避免永远挂起
+        cancelPendingRequests()
       }
     }
   }
 
   fun stop() {
     coroutineScope.cancel()
-    pendingRequests.values.forEach { it.cancel() }
-    pendingRequests.clear()
+    cancelPendingRequests()
+  }
+  
+  private fun cancelPendingRequests() {
+      pendingRequests.values.forEach { 
+          if (it.isActive) {
+              it.resume(JsonObject()) // 发生异常时抛空对象以解挂，或者使用 resumeWithException()
+          }
+      }
+      pendingRequests.clear()
   }
 
   /** 挂起发送 JSON-RPC 请求，等待远端响应。 */
@@ -84,38 +88,37 @@ class KotlinRpcClient(
         val id = nextId.getAndIncrement().toString()
         pendingRequests[id] = continuation
 
-        val request =
-            JsonObject().apply {
-              addProperty("jsonrpc", "2.0")
-              addProperty("id", id)
-              addProperty("method", method)
-                add("params", gson.toJsonTree(params))
-            }
+        val request = JsonObject().apply {
+          addProperty("jsonrpc", "2.0")
+          addProperty("id", id)
+          addProperty("method", method)
+          add("params", gson.toJsonTree(params))
+        }
 
         if (!writeJson(request)) {
           pendingRequests.remove(id)
           if (continuation.isActive) {
-            continuation.resume(null)
+            continuation.resume(JsonObject()) // 失败回落
           }
           return@suspendCancellableCoroutine
         }
 
         continuation.invokeOnCancellation {
           pendingRequests.remove(id)
-          // 可选：在此处向 Server 发送 `$/cancelRequest`
+          // 取消时尝试通过 LSP 的 cancelRequest 接口通知服务端，不要求回调
+          sendNotification("$/cancelRequest", mapOf("id" to id))
         }
       }
 
   /** 发送单向通知。 */
   fun sendNotification(method: String, params: Any?) {
-    val notification =
-        JsonObject().apply {
-          addProperty("jsonrpc", "2.0")
-          addProperty("method", method)
-          if (params != null) {
-            add("params", gson.toJsonTree(params))
-          }
-        }
+    val notification = JsonObject().apply {
+      addProperty("jsonrpc", "2.0")
+      addProperty("method", method)
+      if (params != null) {
+        add("params", gson.toJsonTree(params))
+      }
+    }
     writeJson(notification)
   }
 
@@ -145,19 +148,19 @@ class KotlinRpcClient(
         if (line.isEmpty()) {
           break // 读到连续的 \r\n，意味着 Headers 结束
         }
-        if (line.startsWith("Content-Length:")) {
-          contentLength = line.substringAfter("Content-Length:").trim().toInt()
+        if (line.lowercase().startsWith("content-length:")) {
+          contentLength = line.substringAfter(":").trim().toInt()
         }
       }
 
       if (contentLength <= 0) continue
 
-      // 2. 读取 Payload
+      // 读取 Payload
       val payload = ByteArray(contentLength)
       var readBytes = 0
       while (readBytes < contentLength) {
         val r = inputStream.read(payload, readBytes, contentLength - readBytes)
-        if (r == -1) throw java.io.EOFException("Unexpected EOF")
+        if (r == -1) throw java.io.EOFException("Unexpected EOF from Language Server.")
         readBytes += r
       }
 
@@ -169,7 +172,7 @@ class KotlinRpcClient(
           handleReceivedMessage(jsonObj)
         }
       } catch (e: Exception) {
-        log.error("Failed to parse LSP payload: $jsonStr", e)
+        log.error("Failed to parse LSP payload", e)
       }
     }
   }
@@ -181,10 +184,13 @@ class KotlinRpcClient(
       val cont = pendingRequests.remove(id)
       if (cont != null && cont.isActive) {
         if (msg.has("error")) {
-          log.error("LSP Error response for ID $id: ${msg.get("error")}")
-          cont.resume(JsonObject()) // 或者抛异常
+          val errObj = msg.getAsJsonObject("error")
+          val errorMsg = errObj?.get("message")?.asString ?: "Unknown LSP Error"
+          log.error("LSP Error response for ID $id: $errorMsg")
+          // LSP 会有空补全或者其他内部错误导致，依然需要触发 resolve 让他解挂继续编辑流程
+          cont.resume(JsonObject()) 
         } else {
-          cont.resume(msg.get("result"))
+          cont.resume(msg.get("result") ?: JsonObject())
         }
       }
     } else {
@@ -197,7 +203,7 @@ class KotlinRpcClient(
     val sb = java.lang.StringBuilder()
     while (true) {
       val c = inputStream.read()
-      if (c == -1) break
+      if (c == -1) throw java.io.EOFException("Language server connection broken.")
       val ch = c.toChar()
       if (ch == '\r') {
         val n = inputStream.read()

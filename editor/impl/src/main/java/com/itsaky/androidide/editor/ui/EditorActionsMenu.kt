@@ -359,6 +359,20 @@ open class EditorActionsMenu(val editor: IDEEditor) :
 
   protected open fun onFillMenu(registry: ActionsRegistry, data: ActionData) {
     registry.fillMenu(FillMenuParams(data, onGetActionLocation(), getMenu()))
+    
+    // Inject Quick Fix option dynamically
+    getMenu().add(0, 999, 0, "Quick Fixes").apply {
+        setIcon(android.R.drawable.ic_menu_edit) 
+        setOnMenuItemClickListener {
+            editor.lspFeatureRegistry?.bridge?.onUserRequestFix(
+                editor.cursor.leftLine,
+                editor.cursor.leftColumn,
+                editor
+            )
+            dismiss()
+            true
+        }
+    }
   }
 
   protected open fun onGetActionLocation() = location

@@ -14,25 +14,36 @@
  *  You should have received a copy of the GNU General Public License
  *   along with AndroidIDE.  If not, see <https://www.gnu.org/licenses/>.
  */
+/*
+ *  @author android_zero
+ */
+package com.itsaky.androidide.lsp.models
 
-import com.itsaky.androidide.build.config.BuildConfig
+import com.itsaky.androidide.lsp.rpc.Range
+import com.itsaky.androidide.lsp.rpc.Position
 
-plugins {
-  id("com.android.library")
-  id("kotlin-android")
-}
+/**
+ * 悬浮信息响应 (textDocument/hover)
+ */
+data class Hover(
+    val contents: Either<MarkupContent, List<Either<String, MarkedString>>>,
+    val range: Range? = null
+)
 
-android { namespace = "${BuildConfig.packageName}.lsp.models" }
+/**
+ * 支持 Markdown 的文档内容结构
+ */
+data class MarkupContent(
+    val kind: String, // "plaintext" 或 "markdown"
+    val value: String
+)
 
-dependencies {
-  implementation(libs.composite.fuzzysearch)
+data class MarkedString(
+    val language: String,
+    val value: String
+)
 
-  implementation(projects.core.common)
-  api(projects.core.lspRpc)
-
-  implementation(libs.common.editor)
-  implementation(libs.androidx.appcompat)
-  implementation(libs.androidx.core.ktx)
-  implementation(libs.common.kotlin)
-  implementation(libs.common.utilcode)
-}
+data class HoverParams(
+    val textDocument: TextDocumentIdentifier,
+    val position: Position
+)

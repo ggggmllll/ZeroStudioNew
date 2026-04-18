@@ -1,0 +1,5 @@
+ViewPager2：作为主体容器，负责承载不同的符号页面（Fragment 或 RecyclerView）。它原生支持左右手势滑动。
+TabLayout：作为顶部的分类指示器（比如“常用”、“Java”、“Lua”），通过 TabLayoutMediator 与 ViewPager2 绑定，实现点击切换和滑动联动。
+BottomSheet (或自定义 Layout)：为了实现那个“抽屉”弹出的效果，最外层通常包裹在一个 BottomSheetDialog 或者自定义的动画布局中。
+
+https://developer.android.com/guide/navigation/advanced/swipe-view-2?hl=zh-cn

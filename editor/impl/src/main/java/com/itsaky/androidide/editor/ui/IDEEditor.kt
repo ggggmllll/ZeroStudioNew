@@ -99,6 +99,7 @@ import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import org.slf4j.LoggerFactory
+import com.itsaky.androidide.editor.lsp.LspFeatureRegistry
 
 /**
  * [CodeEditor] implementation for the IDE.
@@ -147,29 +148,32 @@ constructor(
     if (cursor.isSelected || _signatureHelpWindow?.isShowing == true) {
       return@Runnable
     }
+    
     diagnosticWindow.showDiagnostic(
-        languageClient?.getDiagnosticAt(file, cursor.leftLine, cursor.leftColumn)
+        client.getDiagnosticAt(file, cursor.leftLine, cursor.leftColumn)
     )
 
+    lspFeatureRegistry?.bridge?.onHover(cursor.leftLine, cursor.leftColumn)
+
     // Simple hover tooltip: request hover from server and show as a transient flashbar
-    val server = languageServer ?: return@Runnable
-    val f = file ?: return@Runnable
-    val pos = cursorLSPPosition
-    editorScope.launch(Dispatchers.Default) {
-      val content =
-          safeGet("hover request") {
-            val params = DefinitionParams(f.toPath(), pos, JobCancelChecker())
-            server.hover(params)
-          }
-      content ?: return@launch
-      val text = content.value
-      if (text.isNullOrBlank()) return@launch
-      withContext(Dispatchers.Main) {
-        // Show brief tooltip using Flashbar
-        com.itsaky.androidide.utils.dismissFlashbar()
-        (context as? android.app.Activity)?.flashInfo(text)
-      }
-    }
+    // val server = languageServer ?: return@Runnable
+    // val f = file ?: return@Runnable
+    // val pos = cursorLSPPosition
+    // editorScope.launch(Dispatchers.Default) {
+      // val content =
+          // safeGet("hover request") {
+            // val params = DefinitionParams(f.toPath(), pos, JobCancelChecker())
+            // server.hover(params)
+          // }
+      // content ?: return@launch
+      // val text = content.value
+      // if (text.isNullOrBlank()) return@launch
+      // withContext(Dispatchers.Main) {
+        // // Show brief tooltip using Flashbar
+        // com.itsaky.androidide.utils.dismissFlashbar()
+        // (context as? android.app.Activity)?.flashInfo(text)
+      // }
+    // }
   }
 
   /**
@@ -194,6 +198,9 @@ constructor(
 
   /** The text searcher for the editor. */
   lateinit var searcher: IDEEditorSearcher
+
+  var lspFeatureRegistry: LspFeatureRegistry? = null
+    private set
 
   /** The signature help window for the editor. */
   val signatureHelpWindow: SignatureHelpWindow
@@ -250,12 +257,20 @@ constructor(
       return
     }
     this.languageServer = server
+    
+    // 取消之前注册的事件和管理器
+    lspFeatureRegistry?.unregister()
+    lspFeatureRegistry = null
+
     server?.also {
       this.languageClient = it.client
       snippetController.apply {
         fileVariableResolver = FileVariableResolver(this@IDEEditor)
         workspaceVariableResolver = WorkspaceVariableResolver()
       }
+      // 初始化所有的 LSP 高级特性监听与请求分发 (基于刚重构的内容)
+      lspFeatureRegistry = LspFeatureRegistry(this, it)
+      lspFeatureRegistry?.register()
     }
   }
 
@@ -305,8 +320,6 @@ constructor(
         .launch(Dispatchers.Default) {
           cancelChecker.job = coroutineContext[Job]
 
-          // [FIXED] Removed the `content = text` parameter which caused the compilation error.
-          // SignatureHelpParams usually expects (path, position, cancelChecker).
           val help =
               safeGet("signature help request") {
                 val params =
@@ -438,6 +451,8 @@ constructor(
     _actionsMenu = null
     _signatureHelpWindow = null
     _diagnosticWindow = null
+
+    lspFeatureRegistry?.unregister()
 
     languageServer = null
     languageClient = null
@@ -575,6 +590,8 @@ constructor(
 
     dispatchDocumentCloseEvent()
 
+    lspFeatureRegistry?.unregister()
+
     _actionsMenu?.unsubscribeEvents()
     selectionChangeRunner?.also { selectionChangeHandler.removeCallbacks(it) }
 
@@ -642,7 +659,7 @@ constructor(
   }
 
   /**
-   * Applies the given [TreeSitterLanguage] and the [color scheme][scheme] for the given
+   * Applies the given[TreeSitterLanguage] and the [color scheme][scheme] for the given
    * [file type][type].
    */
   open fun applyTreeSitterLang(
@@ -967,6 +984,10 @@ constructor(
     if (type == ChangeType.DELETE) {
       changeDelta = -changeDelta
     }
+
+    // 转发 LSP 编辑操作
+    lspFeatureRegistry?.bridge?.onContentChanged(event)
+
     val start = event.changeStart
     val end = event.changeEnd
     val changeRange =

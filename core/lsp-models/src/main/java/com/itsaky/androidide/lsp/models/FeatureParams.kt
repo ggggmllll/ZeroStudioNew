@@ -14,25 +14,28 @@
  *  You should have received a copy of the GNU General Public License
  *   along with AndroidIDE.  If not, see <https://www.gnu.org/licenses/>.
  */
+/*
+ *  @author android_zero
+ */
+package com.itsaky.androidide.lsp.models
 
-import com.itsaky.androidide.build.config.BuildConfig
+import com.itsaky.androidide.lsp.rpc.Position
+import com.itsaky.androidide.lsp.rpc.Range
 
-plugins {
-  id("com.android.library")
-  id("kotlin-android")
-}
+data class CompletionParams(
+    val textDocument: TextDocumentIdentifier,
+    val position: Position,
+    val context: CompletionContext? = null
+)
 
-android { namespace = "${BuildConfig.packageName}.lsp.models" }
+data class DocumentFormattingParams(
+    val textDocument: TextDocumentIdentifier,
+    val options: FormattingOptions
+)
 
-dependencies {
-  implementation(libs.composite.fuzzysearch)
-
-  implementation(projects.core.common)
-  api(projects.core.lspRpc)
-
-  implementation(libs.common.editor)
-  implementation(libs.androidx.appcompat)
-  implementation(libs.androidx.core.ktx)
-  implementation(libs.common.kotlin)
-  implementation(libs.common.utilcode)
-}
+data class FormattingOptions(
+    val tabSize: Int,
+    val insertSpaces: Boolean,
+    val trimTrailingWhitespace: Boolean = true,
+    val insertFinalNewline: Boolean = false
+)
