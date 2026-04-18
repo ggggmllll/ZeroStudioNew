@@ -26,11 +26,11 @@ annotation class ProtocolDraft
  */
 @Target(AnnotationTarget.FUNCTION)
 @Retention(AnnotationRetention.RUNTIME)
-annotation class LspRequest(val method: String)
+annotation class LspRequestMethod(val method: String)
 
 /**
  * 标识这是一个 LSP 通知 (Notification)，无需响应
  */
 @Target(AnnotationTarget.FUNCTION)
 @Retention(AnnotationRetention.RUNTIME)
-annotation class LspNotification(val method: String)
+annotation class LspNotificationMethod(val method: String)
