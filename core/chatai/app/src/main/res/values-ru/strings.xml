@@ -7,7 +7,6 @@
   <string name="about_page_version">Версия</string>
   <string name="about_page_website">Веб-сайт</string>
   <string name="add">Добавить</string>
-  <string name="app_name">RikkaHub</string>
   <string name="assistant_detail_basic_desc">Настройте имя, аватар, модель и параметры</string>
   <string name="assistant_detail_extensions_desc">Управление внедрениями подсказок, лорбуками и навыками</string>
   <string name="assistant_detail_local_tools_desc">Включите локальные инструменты, например движок JavaScript</string>
@@ -835,6 +834,7 @@
   <string name="setting_provider_page_title">Провайдеры</string>
   <string name="setting_provider_page_tool">Инструмент</string>
   <string name="setting_provider_page_vertex_ai">Vertex AI</string>
+  <string name="setting_provider_page_use_service_account">Использовать сервисный аккаунт</string>
   <string name="setting_tts_page_add">Добавить</string>
   <string name="setting_tts_page_add_provider">Добавить поставщика TTS</string>
   <string name="setting_tts_page_add_provider_content_description">Добавить поставщика TTS</string>
@@ -971,4 +971,6 @@
   <string name="video">Видео</string>
   <string name="web_search_disabled">Веб-поиск отключён</string>
   <string name="web_search_enabled">Веб-поиск включён</string>
+  <string name="setting_provider_page_import_service_account_json">Импорт JSON-файла служебной учётной записи</string>
 </resources>
+

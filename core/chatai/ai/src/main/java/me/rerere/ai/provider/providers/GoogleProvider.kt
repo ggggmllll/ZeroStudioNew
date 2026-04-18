@@ -79,9 +79,11 @@ class GoogleProvider(private val client: OkHttpClient, context: Context? = null)
   private fun buildUrl(providerSetting: ProviderSetting.Google, path: String): HttpUrl {
     return if (!providerSetting.vertexAI) {
       "${providerSetting.baseUrl}/$path".toHttpUrl()
-    } else {
+    } else if (providerSetting.useServiceAccount) {
       "https://aiplatform.googleapis.com/v1/projects/${providerSetting.projectId}/locations/${providerSetting.location}/$path"
           .toHttpUrl()
+    } else {
+      "https://aiplatform.googleapis.com/v1/$path".toHttpUrl()
     }
   }
 
@@ -89,7 +91,7 @@ class GoogleProvider(private val client: OkHttpClient, context: Context? = null)
       providerSetting: ProviderSetting.Google,
       request: Request,
   ): Request {
-    return if (providerSetting.vertexAI) {
+    return if (providerSetting.vertexAI && providerSetting.useServiceAccount) {
       val accessToken =
           serviceAccountTokenProvider.fetchAccessToken(
               serviceAccountEmail = providerSetting.serviceAccountEmail.trim(),
@@ -98,7 +100,14 @@ class GoogleProvider(private val client: OkHttpClient, context: Context? = null)
       request.newBuilder().addHeader("Authorization", "Bearer $accessToken").build()
     } else {
       val key = keyRoulette.next(providerSetting.apiKey, providerSetting.id.toString())
-      request.newBuilder().addHeader("x-goog-api-key", key).build()
+      if (providerSetting.vertexAI) {
+        request
+            .newBuilder()
+            .url(request.url.newBuilder().addQueryParameter("key", key).build())
+            .build()
+      } else {
+        request.newBuilder().addHeader("x-goog-api-key", key).build()
+      }
     }
   }
 

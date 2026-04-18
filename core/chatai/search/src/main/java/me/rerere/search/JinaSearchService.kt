@@ -20,6 +20,9 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 
 object JinaSearchService : SearchService<SearchServiceOptions.JinaOptions> {
+  private const val DEFAULT_SEARCH_URL = "https://s.jina.ai/"
+  private const val DEFAULT_SCRAPE_URL = "https://r.jina.ai/"
+
   override val name: String = "Jina"
 
   @Composable
@@ -73,9 +76,11 @@ object JinaSearchService : SearchService<SearchServiceOptions.JinaOptions> {
 
           val body = buildJsonObject { put("q", query) }
 
+          val searchUrl = serviceOptions.searchUrl.ifBlank { DEFAULT_SEARCH_URL }
+
           val request =
               Request.Builder()
-                  .url("https://s.jina.ai/")
+                  .url(searchUrl)
                   .post(body.toString().toRequestBody())
                   .addHeader("Authorization", "Bearer ${serviceOptions.apiKey}")
                   .addHeader("Accept", "application/json")
@@ -112,9 +117,11 @@ object JinaSearchService : SearchService<SearchServiceOptions.JinaOptions> {
 
           val body = buildJsonObject { put("url", url) }
 
+          val scrapeUrl = serviceOptions.scrapeUrl.ifBlank { DEFAULT_SCRAPE_URL }
+
           val request =
               Request.Builder()
-                  .url("https://r.jina.ai/")
+                  .url(scrapeUrl)
                   .post(body.toString().toRequestBody())
                   .addHeader("Authorization", "Bearer ${serviceOptions.apiKey}")
                   .addHeader("Accept", "application/json")

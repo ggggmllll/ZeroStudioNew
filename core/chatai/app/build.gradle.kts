@@ -134,6 +134,8 @@ tasks.register("buildAll") {
 
 ksp { arg("room.schemaLocation", "$projectDir/schemas") }
 
+kotlin { compilerOptions { jvmTarget.set(JvmTarget.JVM_17) } }
+
 dependencies {
   implementation(libs.androidx.core.ktx)
   implementation(libs.androidx.lifecycle.runtime.ktx)

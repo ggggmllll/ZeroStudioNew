@@ -372,6 +372,7 @@ private fun HighlightCodeActions(
                       "sql" -> "sql"
                       "sh",
                       "bash" -> "sh"
+                      "svg" -> "svg"
                       else -> "txt"
                     }
                 createDocumentLauncher.launch(
@@ -395,7 +396,7 @@ private fun HighlightCodeActions(
               },
       )
 
-      if (language == "html") {
+      if (language == "html" || language == "svg") {
         Text(
             text = stringResource(id = R.string.code_block_preview),
             fontSize = 12.sp,
@@ -403,7 +404,14 @@ private fun HighlightCodeActions(
             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
             modifier =
                 Modifier.clickable {
-                  navController.navigate(Screen.WebView(content = code.base64Encode()))
+                  val content =
+                      if (language == "svg") {
+                        // 将 SVG 包裹在 HTML 中以便 WebView 正确渲染
+                        """<!DOCTYPE html><html><body style="margin:0;display:flex;justify-content:center;align-items:center;min-height:100vh;">$code</body></html>"""
+                      } else {
+                        code
+                      }
+                  navController.navigate(Screen.WebView(content = content.base64Encode()))
                 },
         )
       }

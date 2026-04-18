@@ -666,6 +666,24 @@ private fun JinaOptions(
         modifier = Modifier.fillMaxWidth(),
     )
   }
+
+  FormItem(label = { Text("Search URL") }) {
+    OutlinedTextField(
+        value = options.searchUrl,
+        onValueChange = { onUpdateOptions(options.copy(searchUrl = it.trim())) },
+        modifier = Modifier.fillMaxWidth(),
+        placeholder = { Text("https://s.jina.ai/") },
+    )
+  }
+
+  FormItem(label = { Text("Scrape URL") }) {
+    OutlinedTextField(
+        value = options.scrapeUrl,
+        onValueChange = { onUpdateOptions(options.copy(scrapeUrl = it.trim())) },
+        modifier = Modifier.fillMaxWidth(),
+        placeholder = { Text("https://r.jina.ai/") },
+    )
+  }
 }
 
 @Composable
@@ -739,6 +757,23 @@ private fun GrokOptions(
     OutlinedTextField(
         value = options.model,
         onValueChange = { onUpdateOptions(options.copy(model = it)) },
+        modifier = Modifier.fillMaxWidth(),
+    )
+  }
+
+  FormItem(label = { Text("Custom URL") }) {
+    OutlinedTextField(
+        value = options.customUrl,
+        onValueChange = { onUpdateOptions(options.copy(customUrl = it)) },
+        modifier = Modifier.fillMaxWidth(),
+    )
+  }
+
+  FormItem(label = { Text("System Prompt") }) {
+    OutlinedTextField(
+        value = options.systemPrompt,
+        onValueChange = { onUpdateOptions(options.copy(systemPrompt = it)) },
+        minLines = 3,
         modifier = Modifier.fillMaxWidth(),
     )
   }

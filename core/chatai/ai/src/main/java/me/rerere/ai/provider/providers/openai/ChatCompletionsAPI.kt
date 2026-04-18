@@ -309,9 +309,7 @@ class ChatCompletionsAPI(private val client: OkHttpClient, private val keyRoulet
                 // 豆包 (火山)
                 put(
                     "thinking",
-                    buildJsonObject {
-                      put("type", if (!level.isEnabled) "disabled" else "enabled")
-                    },
+                    buildJsonObject { put("type", if (!level.isEnabled) "disabled" else "enabled") },
                 )
               }
 
@@ -359,18 +357,14 @@ class ChatCompletionsAPI(private val client: OkHttpClient, private val keyRoulet
               "open.bigmodel.cn" -> {
                 put(
                     "thinking",
-                    buildJsonObject {
-                      put("type", if (!level.isEnabled) "disabled" else "enabled")
-                    },
+                    buildJsonObject { put("type", if (!level.isEnabled) "disabled" else "enabled") },
                 )
               }
 
               "api.moonshot.cn" -> {
                 put(
                     "thinking",
-                    buildJsonObject {
-                      put("type", if (!level.isEnabled) "disabled" else "enabled")
-                    },
+                    buildJsonObject { put("type", if (!level.isEnabled) "disabled" else "enabled") },
                 )
               }
 

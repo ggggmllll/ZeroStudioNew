@@ -408,9 +408,7 @@ private fun DefaultCompressModelSetting(settings: Settings, vm: SettingVM) {
       ) {
         FormItem(
             label = { Text(stringResource(R.string.setting_model_page_prompt)) },
-            description = {
-              Text(stringResource(R.string.setting_model_page_compress_prompt_vars))
-            },
+            description = { Text(stringResource(R.string.setting_model_page_compress_prompt_vars)) },
         ) {
           OutlinedTextField(
               value = settings.compressPrompt,

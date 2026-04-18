@@ -1,5 +1,7 @@
 package me.rerere.rikkahub.ui.pages.setting.components
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -7,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
@@ -15,10 +18,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.dokar.sonner.ToastType
 import kotlin.reflect.KClass
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import me.rerere.ai.provider.ProviderSetting
 import me.rerere.rikkahub.R
 import me.rerere.rikkahub.data.datastore.DEFAULT_PROVIDERS
@@ -221,6 +229,8 @@ private fun String.normalizePath(): String {
   return path.trimEnd('/')
 }
 
+private fun String.isValidBaseUrl(): Boolean = this.toHttpUrlOrNull() != null
+
 private const val OPENAI_OFFICIAL_HOST = "api.openai.com"
 private const val GOOGLE_OFFICIAL_HOST = "generativelanguage.googleapis.com"
 private const val CLAUDE_OFFICIAL_HOST = "api.anthropic.com"
@@ -263,6 +273,7 @@ private fun ColumnScope.ProviderConfigureOpenAI(
       onValueChange = { onEdit(provider.copy(baseUrl = it.trim())) },
       label = { Text(stringResource(id = R.string.setting_provider_page_api_base_url)) },
       modifier = Modifier.fillMaxWidth(),
+      isError = provider.baseUrl.isNotBlank() && !provider.baseUrl.isValidBaseUrl(),
   )
 
   if (!provider.useResponseApi) {
@@ -328,6 +339,7 @@ private fun ColumnScope.ProviderConfigureClaude(
       onValueChange = { onEdit(provider.copy(baseUrl = it.trim())) },
       label = { Text(stringResource(id = R.string.setting_provider_page_api_base_url)) },
       modifier = Modifier.fillMaxWidth(),
+      isError = provider.baseUrl.isNotBlank() && !provider.baseUrl.isValidBaseUrl(),
   )
 
   Row(verticalAlignment = Alignment.CenterVertically) {
@@ -347,6 +359,35 @@ private fun ColumnScope.ProviderConfigureGoogle(
     provider: ProviderSetting.Google,
     onEdit: (provider: ProviderSetting.Google) -> Unit,
 ) {
+  val context = LocalContext.current
+  val toaster = LocalToaster.current
+  val serviceAccountJsonLauncher =
+      rememberLauncherForActivityResult(contract = ActivityResultContracts.OpenDocument()) { uri ->
+        uri ?: return@rememberLauncherForActivityResult
+        try {
+          val content =
+              context.contentResolver.openInputStream(uri)?.bufferedReader()?.readText()
+                  ?: return@rememberLauncherForActivityResult
+          val json = Json.parseToJsonElement(content).jsonObject
+          onEdit(
+              provider.copy(
+                  projectId =
+                      json["project_id"]?.jsonPrimitive?.contentOrNull?.ifEmpty { null }
+                          ?: provider.projectId,
+                  serviceAccountEmail =
+                      json["client_email"]?.jsonPrimitive?.contentOrNull?.ifEmpty { null }
+                          ?: provider.serviceAccountEmail,
+                  privateKey =
+                      json["private_key"]?.jsonPrimitive?.contentOrNull?.ifEmpty { null }
+                          ?: provider.privateKey,
+              )
+          )
+          toaster.show("Service account imported", type = ToastType.Success)
+        } catch (e: Exception) {
+          toaster.show("Failed to import: ${e.message}", type = ToastType.Error)
+        }
+      }
+
   provider.description()
 
   Row(verticalAlignment = Alignment.CenterVertically) {
@@ -372,7 +413,7 @@ private fun ColumnScope.ProviderConfigureGoogle(
     )
   }
 
-  if (!provider.vertexAI) {
+  if (!(provider.vertexAI && provider.useServiceAccount)) {
     OutlinedTextField(
         value = provider.apiKey,
         onValueChange = { onEdit(provider.copy(apiKey = it.trim())) },
@@ -380,48 +421,73 @@ private fun ColumnScope.ProviderConfigureGoogle(
         modifier = Modifier.fillMaxWidth(),
         maxLines = 3,
     )
+  }
 
+  if (!provider.vertexAI) {
     OutlinedTextField(
         value = provider.baseUrl,
         onValueChange = { onEdit(provider.copy(baseUrl = it.trim())) },
         label = { Text(stringResource(id = R.string.setting_provider_page_api_base_url)) },
         modifier = Modifier.fillMaxWidth(),
-        isError = !provider.baseUrl.endsWith("/v1beta"),
+        isError =
+            provider.baseUrl.isNotBlank() &&
+                (!provider.baseUrl.isValidBaseUrl() || !provider.baseUrl.endsWith("/v1beta")),
         supportingText =
             if (!provider.baseUrl.endsWith("/v1beta")) {
               { Text("The base URL usually ends with `/v1beta`") }
             } else null,
     )
   } else {
-    OutlinedTextField(
-        value = provider.serviceAccountEmail,
-        onValueChange = { onEdit(provider.copy(serviceAccountEmail = it.trim())) },
-        label = { Text(stringResource(id = R.string.setting_provider_page_service_account_email)) },
-        modifier = Modifier.fillMaxWidth(),
-    )
-    OutlinedTextField(
-        value = provider.privateKey,
-        onValueChange = { onEdit(provider.copy(privateKey = it.trim())) },
-        label = { Text(stringResource(id = R.string.setting_provider_page_private_key)) },
-        modifier = Modifier.fillMaxWidth(),
-        maxLines = 6,
-        minLines = 3,
-        textStyle = MaterialTheme.typography.bodySmall.copy(fontFamily = JetbrainsMono),
-    )
-    OutlinedTextField(
-        value = provider.location,
-        onValueChange = { onEdit(provider.copy(location = it.trim())) },
-        label = {
-          // https://cloud.google.com/vertex-ai/generative-ai/docs/learn/locations#available-regions
-          Text(stringResource(id = R.string.setting_provider_page_location))
-        },
-        modifier = Modifier.fillMaxWidth(),
-    )
-    OutlinedTextField(
-        value = provider.projectId,
-        onValueChange = { onEdit(provider.copy(projectId = it.trim())) },
-        label = { Text(stringResource(id = R.string.setting_provider_page_project_id)) },
-        modifier = Modifier.fillMaxWidth(),
-    )
+    Row(verticalAlignment = Alignment.CenterVertically) {
+      Text(
+          stringResource(id = R.string.setting_provider_page_use_service_account),
+          modifier = Modifier.weight(1f),
+      )
+      Checkbox(
+          checked = provider.useServiceAccount,
+          onCheckedChange = { onEdit(provider.copy(useServiceAccount = it)) },
+      )
+    }
+
+    if (provider.useServiceAccount) {
+      OutlinedButton(
+          onClick = { serviceAccountJsonLauncher.launch(arrayOf("application/json", "*/*")) },
+          modifier = Modifier.fillMaxWidth(),
+      ) {
+        Text(stringResource(R.string.setting_provider_page_import_service_account_json))
+      }
+      OutlinedTextField(
+          value = provider.serviceAccountEmail,
+          onValueChange = { onEdit(provider.copy(serviceAccountEmail = it.trim())) },
+          label = {
+            Text(stringResource(id = R.string.setting_provider_page_service_account_email))
+          },
+          modifier = Modifier.fillMaxWidth(),
+      )
+      OutlinedTextField(
+          value = provider.privateKey,
+          onValueChange = { onEdit(provider.copy(privateKey = it.trim())) },
+          label = { Text(stringResource(id = R.string.setting_provider_page_private_key)) },
+          modifier = Modifier.fillMaxWidth(),
+          maxLines = 6,
+          minLines = 3,
+          textStyle = MaterialTheme.typography.bodySmall.copy(fontFamily = JetbrainsMono),
+      )
+      OutlinedTextField(
+          value = provider.location,
+          onValueChange = { onEdit(provider.copy(location = it.trim())) },
+          label = {
+            // https://cloud.google.com/vertex-ai/generative-ai/docs/learn/locations#available-regions
+            Text(stringResource(id = R.string.setting_provider_page_location))
+          },
+          modifier = Modifier.fillMaxWidth(),
+      )
+      OutlinedTextField(
+          value = provider.projectId,
+          onValueChange = { onEdit(provider.copy(projectId = it.trim())) },
+          label = { Text(stringResource(id = R.string.setting_provider_page_project_id)) },
+          modifier = Modifier.fillMaxWidth(),
+      )
+    }
   }
 }

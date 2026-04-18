@@ -853,11 +853,7 @@ class PromptInjectionTransformerTest {
                 position = InjectionPosition.AFTER_SYSTEM_PROMPT,
                 content = "After",
             ),
-            createModeInjection(
-                id = id3,
-                position = InjectionPosition.TOP_OF_CHAT,
-                content = "Top",
-            ),
+            createModeInjection(id = id3, position = InjectionPosition.TOP_OF_CHAT, content = "Top"),
         )
 
     val messages = listOf(UIMessage.system("System"), UIMessage.user("Hello"))
