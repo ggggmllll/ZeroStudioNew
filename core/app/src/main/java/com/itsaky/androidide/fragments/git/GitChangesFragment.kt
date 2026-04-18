@@ -333,9 +333,16 @@ class GitChangesFragment : BaseGitPageFragment() {
   }
 
   private fun resolveWorkspaceDirPath(): String? {
-    val workspaceDir = IProjectManager.getInstance().getWorkspace()?.getProjectDir()?.path
-    return workspaceDir?.takeIf { it.isNotBlank() }
-        ?: IProjectManager.getInstance().projectDirPath.takeIf { it.isNotBlank() }
+    val projectManager = IProjectManager.getInstance()
+    val workspaceDir =
+        runCatching { projectManager.getWorkspace()?.getProjectDir()?.path }.getOrNull()
+    if (!workspaceDir.isNullOrBlank()) {
+      return workspaceDir
+    }
+
+    return runCatching { projectManager.projectDirPath }
+        .getOrNull()
+        ?.takeIf { it.isNotBlank() }
   }
 
   private fun readChangeSnapshot(projectDir: String): ChangeSnapshot {

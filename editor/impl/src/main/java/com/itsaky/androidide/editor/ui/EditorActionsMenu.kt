@@ -282,26 +282,52 @@ open class EditorActionsMenu(val editor: IDEEditor) :
 
   @JvmOverloads
   open fun displayWindow(update: Boolean = false) {
+    if (!editor.isAttachedToWindow) {
+      return
+    }
+
     var top: Int
     val cursor = editor.cursor
     top =
-        if (cursor.isSelected) {
-          val leftRect = editor.leftHandleDescriptor.position
-          val rightRect = editor.rightHandleDescriptor.position
-          val top1 = selectTop(leftRect)
-          val top2 = selectTop(rightRect)
-          min(top1, top2)
-        } else {
-          selectTop(editor.insertHandleDescriptor.position)
-        }
+        runCatching {
+              if (cursor.isSelected) {
+                val leftRect = editor.leftHandleDescriptor.position
+                val rightRect = editor.rightHandleDescriptor.position
+                val top1 = selectTop(leftRect)
+                val top2 = selectTop(rightRect)
+                min(top1, top2)
+              } else {
+                selectTop(editor.insertHandleDescriptor.position)
+              }
+            }
+            .getOrElse {
+              dismiss()
+              return
+            }
     top = max(0, min(top, editor.height - height - 5))
-    val handleLeftX = editor.getOffset(editor.cursor.leftLine, editor.cursor.leftColumn)
-    val handleRightX = editor.getOffset(editor.cursor.rightLine, editor.cursor.rightColumn)
+    val handleLeftX =
+        safeGetOffset(editor.cursor.leftLine, editor.cursor.leftColumn) ?: run {
+          dismiss()
+          return
+        }
+    val handleRightX =
+        safeGetOffset(editor.cursor.rightLine, editor.cursor.rightColumn) ?: run {
+          dismiss()
+          return
+        }
     val panelX = computePanelX(cursor, handleLeftX, handleRightX)
     setLocationAbsolutely(panelX, top)
     if (!update) {
       show()
     }
+  }
+
+  private fun safeGetOffset(line: Int, column: Int): Float? {
+    val lineCount = editor.text.lineCount
+    if (line < 0 || line >= lineCount) {
+      return null
+    }
+    return runCatching { editor.getOffset(line, column) }.getOrNull()
   }
 
   private fun computePanelX(cursor: Cursor, handleLeftX: Float, handleRightX: Float): Int {
