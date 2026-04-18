@@ -28,6 +28,7 @@ import com.itsaky.androidide.lsp.api.ILanguageClient
 import com.itsaky.androidide.lsp.api.ILanguageServer
 import com.itsaky.androidide.lsp.api.IServerSettings
 import com.itsaky.androidide.lsp.kotlin.actions.KotlinLspActionsProvider
+import com.itsaky.androidide.lsp.kotlin.events.KotlinTextDocumentSyncHandler
 import com.itsaky.androidide.lsp.models.*
 import com.itsaky.androidide.lsp.util.LSPEditorActions
 import com.itsaky.androidide.models.Location
@@ -63,6 +64,7 @@ class KotlinLanguageServerImpl(
 
   private val gson = Gson()
   private val rpcClient = KotlinRpcClient(inStream, outStream) { msg -> handleServerMessage(msg) }
+  @Volatile private var isInitialized = false
 
   // 二次补全与加工处理器
   private val completionConverter = KotlinCompletionConverter()
@@ -98,8 +100,20 @@ class KotlinLanguageServerImpl(
 
     val initParams = createInitializeParams(workspace)
     runBlocking {
-      val initResult = rpcClient.sendRequest("initialize", initParams)
-      rpcClient.sendNotification("initialized", JsonObject())
+      runCatching {
+            val initResult = rpcClient.sendRequest("initialize", initParams)
+            if (initResult != null) {
+              rpcClient.sendNotification("initialized", JsonObject())
+              isInitialized = true
+              KotlinTextDocumentSyncHandler.onServerReady()
+            } else {
+              log.warn("Kotlin LSP initialize returned null result.")
+            }
+          }
+          .onFailure { err ->
+            isInitialized = false
+            log.error("Failed to initialize Kotlin LSP workspace", err)
+          }
     }
   }
 
@@ -116,8 +130,15 @@ class KotlinLanguageServerImpl(
         }
 
     return JsonObject().apply {
+      addProperty("processId", android.os.Process.myPid())
       addProperty("rootUri", rootUri)
       addProperty("rootPath", workspace.getProjectDir().absolutePath)
+      add(
+          "workspaceFolders",
+          gson.toJsonTree(
+              listOf(mapOf("uri" to rootUri, "name" to workspace.getProjectDir().name)),
+          ),
+      )
       add("initializationOptions", initOptions)
       add(
           "capabilities",
@@ -297,6 +318,7 @@ class KotlinLanguageServerImpl(
 
   override fun complete(params: CompletionParams?): CompletionResult {
     if (params == null) return CompletionResult.EMPTY
+    if (!isInitialized) return CompletionResult.EMPTY
 
     return runBlocking(Dispatchers.IO) {
       val req =

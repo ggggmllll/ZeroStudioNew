@@ -163,7 +163,6 @@ class KotlinServerProcessManager(private val context: Context) {
       currentServerImpl?.connectClient(kotlinClient)
 
       registry.register(currentServerImpl!!)
-      KotlinTextDocumentSyncHandler.onServerReady()
       bindWorkspaceWhenReady()
       log.info("KotlinLanguageServerImpl registered to ILanguageServerRegistry.")
     } catch (e: Exception) {

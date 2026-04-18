@@ -83,11 +83,9 @@ class GradleProjectAnalyzerImpl : ProjectAnalyzer {
 
   override suspend fun extractDependencies(projectDir: File): List<DependencyInfo> =
       withContext(Dispatchers.IO) {
-        val workspace =
-            IProjectManager.getInstance().getWorkspace()
-                ?: return@withContext emptyList<DependencyInfo>()
         val allRawDependencies = mutableListOf<ScopedDependencyInfo>()
         val catalogMap = mutableMapOf<String, VersionCatalog>()
+        val workspace = IProjectManager.getInstance().getWorkspace()
 
         // 分析 settings.gradle 获取所有版本目录文件
         val settingsAnalyzer = SettingsDslAnalyzer(projectDir)
@@ -97,14 +95,31 @@ class GradleProjectAnalyzerImpl : ProjectAnalyzer {
         catalogFilesMap.forEach { (alias, file) -> catalogMap[alias] = tomlParser.parse(file) }
 
         //  遍历所有模块，提取原始依赖声明
-        val modules = workspace.getSubProjects()
-        modules.forEach { module ->
-          val buildScript = module.buildScript
-          if (buildScript != null && buildScript.exists()) {
-            val analyzer = ScriptAnalyzerFactory.create(buildScript)
-            val (_, scriptDeps) = analyzer.analyze(buildScript)
-            allRawDependencies.addAll(scriptDeps)
+        if (workspace != null) {
+          val modules = listOfNotNull(workspace.getRootProject()) + workspace.getSubProjects()
+          modules.forEach { module ->
+            val buildScript = module.buildScript
+            if (buildScript != null && buildScript.exists()) {
+              val analyzer = ScriptAnalyzerFactory.create(buildScript)
+              val (_, scriptDeps) = analyzer.analyze(buildScript)
+              allRawDependencies.addAll(scriptDeps)
+            }
           }
+        }
+
+        if (allRawDependencies.isEmpty()) {
+          projectDir
+              .walkTopDown()
+              .filter {
+                it.isFile &&
+                    (it.name == "build.gradle" || it.name == "build.gradle.kts") &&
+                    !it.path.contains("/build/")
+              }
+              .forEach { scriptFile ->
+                val analyzer = ScriptAnalyzerFactory.create(scriptFile)
+                val (_, scriptDeps) = analyzer.analyze(scriptFile)
+                allRawDependencies.addAll(scriptDeps)
+              }
         }
 
         // 链接
