@@ -25,6 +25,8 @@ import com.itsaky.androidide.lsp.api.ILanguageServerRegistry
 import com.itsaky.androidide.lsp.kotlin.KotlinLanguageServerImpl
 import com.itsaky.androidide.lsp.models.*
 import com.itsaky.androidide.utils.Logger
+import java.nio.file.Path
+import java.util.concurrent.ConcurrentHashMap
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -37,12 +39,36 @@ import org.greenrobot.eventbus.ThreadMode
 object KotlinTextDocumentSyncHandler {
 
   private val log = Logger.instance("KotlinTextDocumentSyncHandler")
+  private val openedDocs = ConcurrentHashMap<Path, DocumentSnapshot>()
+
+  private data class DocumentSnapshot(
+      val languageId: String = "kotlin",
+      val version: Int,
+      val text: String,
+  )
 
   /** 在主程序或管理器初始化时调用一次以注册 EventBus */
   fun init() {
     if (!EventBus.getDefault().isRegistered(this)) {
       EventBus.getDefault().register(this)
       log.info("KotlinTextDocumentSyncHandler registered to EventBus.")
+    }
+  }
+
+  fun onServerReady() {
+    val server = getServer() ?: return
+    openedDocs.forEach { (path, snapshot) ->
+          runCatching {
+            server.didOpen(
+                DidOpenTextDocumentParams(
+                    file = path,
+                    languageId = snapshot.languageId,
+                    version = snapshot.version,
+                    text = snapshot.text,
+                ),
+            )
+          }
+          .onFailure { log.error("Failed to replay didOpen for ${path.fileName}", it) }
     }
   }
 
@@ -57,6 +83,13 @@ object KotlinTextDocumentSyncHandler {
   @Subscribe(threadMode = ThreadMode.ASYNC)
   fun onDocumentOpen(event: DocumentOpenEvent) {
     if (!isKotlinFile(event.openedFile.toString())) return
+    openedDocs[event.openedFile] =
+        DocumentSnapshot(
+            languageId = "kotlin",
+            version = event.version,
+            text = event.text ?: "",
+        )
+
     val server = getServer() ?: return
 
     server.didOpen(
@@ -72,10 +105,18 @@ object KotlinTextDocumentSyncHandler {
   @Subscribe(threadMode = ThreadMode.ASYNC)
   fun onDocumentChange(event: DocumentChangeEvent) {
     if (!isKotlinFile(event.changedFile.toString())) return
+    val newText = event.newText ?: ""
+    openedDocs[event.changedFile] =
+        DocumentSnapshot(
+            languageId = "kotlin",
+            version = event.version,
+            text = newText,
+        )
+
     val server = getServer() ?: return
 
     // AndroidIDE 当前提供的是全量替换事件 (newText)，我们将整个文本作为一个 ContentChangeEvent 下发
-    val changeEvent = TextDocumentContentChangeEvent(text = event.newText ?: "")
+    val changeEvent = TextDocumentContentChangeEvent(text = newText)
     server.didChange(
         DidChangeTextDocumentParams(
             file = event.changedFile,
@@ -88,6 +129,7 @@ object KotlinTextDocumentSyncHandler {
   @Subscribe(threadMode = ThreadMode.ASYNC)
   fun onDocumentClose(event: DocumentCloseEvent) {
     if (!isKotlinFile(event.closedFile.toString())) return
+    openedDocs.remove(event.closedFile)
     val server = getServer() ?: return
 
     server.didClose(DidCloseTextDocumentParams(file = event.closedFile))

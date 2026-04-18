@@ -22,6 +22,7 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import com.itsaky.androidide.utils.Logger
+import java.io.InterruptedIOException
 import java.io.InputStream
 import java.io.OutputStream
 import java.util.concurrent.ConcurrentHashMap
@@ -55,8 +56,18 @@ class KotlinRpcClient(
     coroutineScope.launch {
       try {
         readMessageLoop()
+      } catch (e: InterruptedIOException) {
+        if (coroutineScope.isActive) {
+          log.error("LSP read loop interrupted unexpectedly", e)
+        } else {
+          log.debug("LSP read loop interrupted during shutdown.")
+        }
       } catch (e: Exception) {
-        log.error("Error in LSP read loop", e)
+        if (coroutineScope.isActive) {
+          log.error("Error in LSP read loop", e)
+        } else {
+          log.debug("LSP read loop exited during shutdown.")
+        }
       }
     }
   }
@@ -78,10 +89,16 @@ class KotlinRpcClient(
               addProperty("jsonrpc", "2.0")
               addProperty("id", id)
               addProperty("method", method)
-              add("params", gson.toJsonTree(params))
+                add("params", gson.toJsonTree(params))
             }
 
-        writeJson(request)
+        if (!writeJson(request)) {
+          pendingRequests.remove(id)
+          if (continuation.isActive) {
+            continuation.resume(null)
+          }
+          return@suspendCancellableCoroutine
+        }
 
         continuation.invokeOnCancellation {
           pendingRequests.remove(id)
@@ -102,20 +119,20 @@ class KotlinRpcClient(
     writeJson(notification)
   }
 
-  private fun writeJson(json: JsonObject) {
-    coroutineScope.launch {
-      try {
-        val payload = json.toString().toByteArray(Charsets.UTF_8)
-        val header = "Content-Length: ${payload.size}\r\n\r\n".toByteArray(Charsets.US_ASCII)
+  private fun writeJson(json: JsonObject): Boolean {
+    return try {
+      val payload = json.toString().toByteArray(Charsets.UTF_8)
+      val header = "Content-Length: ${payload.size}\r\n\r\n".toByteArray(Charsets.US_ASCII)
 
-        synchronized(outputStream) {
-          outputStream.write(header)
-          outputStream.write(payload)
-          outputStream.flush()
-        }
-      } catch (e: Exception) {
-        log.error("Failed to write to LSP output stream", e)
+      synchronized(outputStream) {
+        outputStream.write(header)
+        outputStream.write(payload)
+        outputStream.flush()
       }
+      true
+    } catch (e: Exception) {
+      log.error("Failed to write to LSP output stream", e)
+      false
     }
   }
 

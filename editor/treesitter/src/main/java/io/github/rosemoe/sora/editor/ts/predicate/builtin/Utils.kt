@@ -48,10 +48,17 @@ fun getCaptureContent(
 ) =
     match.captures
         .filter { tsQuery.getCaptureNameForId(it.index) == captureName }
-        .map { capture ->
+        .mapNotNull { capture ->
+          val start = capture.node.startByte shr 1
+          val end = capture.node.endByte shr 1
+          val safeStart = start.coerceAtLeast(0).coerceAtMost(text.length)
+          val safeEnd = end.coerceAtLeast(safeStart).coerceAtMost(text.length)
+          if (safeStart >= safeEnd) {
+            return@mapNotNull ""
+          }
           when (text) {
-            is UTF16String -> text.substringBytes(capture.node.startByte, capture.node.endByte)
-            is Content -> text.substring(capture.node.startByte shr 1, capture.node.endByte shr 1)
-            else -> text.substring(capture.node.startByte shr 1, capture.node.endByte shr 1)
+            is UTF16String -> text.subseqChars(safeStart, safeEnd).use { it.toString() }
+            is Content -> text.substring(safeStart, safeEnd)
+            else -> text.substring(safeStart, safeEnd)
           }
         }

@@ -38,10 +38,13 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Properties;
 import java.util.concurrent.CompletableFuture;
+import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -51,6 +54,7 @@ import kotlin.io.FilesKt;
 public class ToolsManager {
 
   private static final Logger LOG = LoggerFactory.getLogger(ToolsManager.class);
+  private static final Object TOOLING_API_LOCK = new Object();
 
   public static String COMMON_ASSET_DATA_DIR = "data/common";
 
@@ -234,12 +238,83 @@ public class ToolsManager {
   }
 
   private static void extractToolingApi() {
-    if (Environment.TOOLING_API_JAR.exists()) {
-      FileUtils.delete(Environment.TOOLING_API_JAR);
+    ensureToolingApiReady();
+  }
+
+  public static boolean ensureToolingApiReady() {
+    synchronized (TOOLING_API_LOCK) {
+      if (isValidJar(Environment.TOOLING_API_JAR)) {
+        return true;
+      }
+
+      if (Environment.TOOLING_API_JAR.exists()) {
+        FileUtils.delete(Environment.TOOLING_API_JAR);
+      }
+
+      final var parent = Environment.TOOLING_API_JAR.getParentFile();
+      if (parent != null && !parent.exists() && !parent.mkdirs()) {
+        LOG.error("Failed to create tooling-api directory: {}", parent.getAbsolutePath());
+        return false;
+      }
+      if (parent == null) {
+        LOG.error("Unable to resolve parent directory for {}", Environment.TOOLING_API_JAR);
+        return false;
+      }
+
+      final var tmpJar = new File(parent, Environment.TOOLING_API_JAR.getName() + ".tmp");
+      try {
+        if (tmpJar.exists()) {
+          FileUtils.delete(tmpJar);
+        }
+        if (!ResourceUtils.copyFileFromAssets(getCommonAsset("tooling-api-all.jar"),
+            tmpJar.getAbsolutePath())) {
+          LOG.error("Unable to copy tooling-api-all.jar from assets");
+          return false;
+        }
+
+        if (!isValidJar(tmpJar)) {
+          LOG.error("Extracted tooling-api-all.jar is invalid: {}", tmpJar.getAbsolutePath());
+          FileUtils.delete(tmpJar);
+          return false;
+        }
+
+        try {
+          Files.move(
+              tmpJar.toPath(),
+              Environment.TOOLING_API_JAR.toPath(),
+              StandardCopyOption.REPLACE_EXISTING,
+              StandardCopyOption.ATOMIC_MOVE
+          );
+        } catch (IOException moveError) {
+          LOG.warn("Atomic move failed for tooling-api-all.jar, falling back to copy", moveError);
+          Files.copy(
+              tmpJar.toPath(),
+              Environment.TOOLING_API_JAR.toPath(),
+              StandardCopyOption.REPLACE_EXISTING
+          );
+          FileUtils.delete(tmpJar);
+        }
+      } catch (IOException ioException) {
+        LOG.error("Failed to extract tooling-api-all.jar", ioException);
+        FileUtils.delete(tmpJar);
+        return false;
+      }
+
+      return isValidJar(Environment.TOOLING_API_JAR);
+    }
+  }
+
+  private static boolean isValidJar(File file) {
+    if (file == null || !file.exists() || !file.isFile() || file.length() <= 0) {
+      return false;
     }
 
-    ResourceUtils.copyFileFromAssets(getCommonAsset("tooling-api-all.jar"),
-        Environment.TOOLING_API_JAR.getAbsolutePath());
+    try (JarFile jarFile = new JarFile(file)) {
+      return jarFile.entries().hasMoreElements();
+    } catch (IOException ioException) {
+      LOG.warn("Jar validation failed for {}", file.getAbsolutePath(), ioException);
+      return false;
+    }
   }
 
   private static void writeInitScript() {

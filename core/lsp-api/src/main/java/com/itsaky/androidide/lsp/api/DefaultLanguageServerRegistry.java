@@ -53,7 +53,7 @@ public class DefaultLanguageServerRegistry extends ILanguageServerRegistry {
     try {
       final var old = mRegister.put(server.getServerId(), server);
       if (old != null) {
-        mRegister.put(old.getServerId(), old);
+        old.shutdown();
       }
     } finally {
       lock.writeLock().unlock();
