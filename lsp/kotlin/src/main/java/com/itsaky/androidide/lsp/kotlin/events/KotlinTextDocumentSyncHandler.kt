@@ -58,7 +58,7 @@ object KotlinTextDocumentSyncHandler {
   fun onServerReady() {
     val server = getServer() ?: return
     openedDocs.forEach { (path, snapshot) ->
-      runCatching {
+          runCatching {
             server.didOpen(
                 DidOpenTextDocumentParams(
                     file = path,
@@ -68,7 +68,7 @@ object KotlinTextDocumentSyncHandler {
                 ),
             )
           }
-          .onFailure { log.warn("Failed to replay didOpen for ${path.fileName}", it) }
+          .onFailure { log.error("Failed to replay didOpen for ${path.fileName}", it) }
     }
   }
 
