@@ -22,6 +22,7 @@ dependencies {
     api(libs.grpc.stub)
     api(libs.grpc.kotlin.stub)
     api(libs.google.protobuf.kotlin)
+    api("com.google.protobuf:protobuf-java-util:${libs.versions.protobufVersion.get()}")
     api(libs.google.gson)
     api(libs.common.javax.annotation.api)
 }
