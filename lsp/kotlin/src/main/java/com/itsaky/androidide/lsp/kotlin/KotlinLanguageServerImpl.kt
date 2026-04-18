@@ -142,7 +142,21 @@ class KotlinLanguageServerImpl(
                             "completionItem",
                             JsonObject().apply {
                               addProperty("snippetSupport", true)
-                              addProperty("resolveSupport", true)
+                              add(
+                                  "resolveSupport",
+                                  JsonObject().apply {
+                                    add(
+                                        "properties",
+                                        gson.toJsonTree(
+                                            listOf(
+                                                "documentation",
+                                                "detail",
+                                                "additionalTextEdits",
+                                            ),
+                                        ),
+                                    )
+                                  },
+                              )
                             },
                         )
                       },

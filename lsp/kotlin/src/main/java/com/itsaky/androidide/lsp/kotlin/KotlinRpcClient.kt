@@ -22,6 +22,7 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import com.itsaky.androidide.utils.Logger
+import java.io.InterruptedIOException
 import java.io.InputStream
 import java.io.OutputStream
 import java.util.concurrent.ConcurrentHashMap
@@ -55,8 +56,18 @@ class KotlinRpcClient(
     coroutineScope.launch {
       try {
         readMessageLoop()
+      } catch (e: InterruptedIOException) {
+        if (coroutineScope.isActive) {
+          log.error("LSP read loop interrupted unexpectedly", e)
+        } else {
+          log.debug("LSP read loop interrupted during shutdown.")
+        }
       } catch (e: Exception) {
-        log.error("Error in LSP read loop", e)
+        if (coroutineScope.isActive) {
+          log.error("Error in LSP read loop", e)
+        } else {
+          log.debug("LSP read loop exited during shutdown.")
+        }
       }
     }
   }
