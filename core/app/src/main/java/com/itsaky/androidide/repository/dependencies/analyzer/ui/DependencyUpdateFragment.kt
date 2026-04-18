@@ -106,46 +106,36 @@ fun DependencyUpdateScreen(
       }
     }
   } else {
-    if (reports.isEmpty()) {
-      Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text(
-            text = "No dependencies found in Gradle/TOML files.",
-            style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.primary,
-        )
-      }
-    } else {
-      LazyColumn(
-          modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
-          contentPadding = PaddingValues(vertical = 16.dp),
-      ) {
-        items(items = reports, key = { it.dependency.gav }, contentType = { "dependency_item" }) {
-            report ->
-          DependencyUpdateItem(
-              report = report,
-              onUpdateClicked = { selectedVersion ->
-                if (selectedVersion == report.dependency.version) {
-                  onFlashSuccess("Already using ${report.dependency.artifactId}:$selectedVersion")
-                } else {
-                  coroutineScope.launch {
-                    val success = DependencyUpdater.update(report.dependency, selectedVersion)
-                    if (success) {
-                      onFlashSuccess("Updated ${report.dependency.artifactId} to $selectedVersion")
-                      refreshData()
-                    } else {
-                      onFlashError(
-                          "Failed to update ${report.dependency.artifactId}. No match found."
-                      )
-                    }
+    LazyColumn(
+        modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
+        contentPadding = PaddingValues(vertical = 16.dp),
+    ) {
+      items(items = reports, key = { it.dependency.gav }, contentType = { "dependency_item" }) {
+          report ->
+        DependencyUpdateItem(
+            report = report,
+            onUpdateClicked = { selectedVersion ->
+              if (selectedVersion == report.dependency.version) {
+                onFlashSuccess("Already using ${report.dependency.artifactId}:$selectedVersion")
+              } else {
+                coroutineScope.launch {
+                  val success = DependencyUpdater.update(report.dependency, selectedVersion)
+                  if (success) {
+                    onFlashSuccess("Updated ${report.dependency.artifactId} to $selectedVersion")
+                    refreshData()
+                  } else {
+                    onFlashError(
+                        "Failed to update ${report.dependency.artifactId}. No match found."
+                    )
                   }
                 }
-              },
-          )
-          Divider(
-              modifier = Modifier.padding(vertical = 8.dp),
-              color = MaterialTheme.colorScheme.surfaceVariant,
-          )
-        }
+              }
+            },
+        )
+        Divider(
+            modifier = Modifier.padding(vertical = 8.dp),
+            color = MaterialTheme.colorScheme.surfaceVariant,
+        )
       }
     }
   }

@@ -89,10 +89,16 @@ class KotlinRpcClient(
               addProperty("jsonrpc", "2.0")
               addProperty("id", id)
               addProperty("method", method)
-              add("params", gson.toJsonTree(params))
+                add("params", gson.toJsonTree(params))
             }
 
-        writeJson(request)
+        if (!writeJson(request)) {
+          pendingRequests.remove(id)
+          if (continuation.isActive) {
+            continuation.resume(null)
+          }
+          return@suspendCancellableCoroutine
+        }
 
         continuation.invokeOnCancellation {
           pendingRequests.remove(id)
@@ -113,20 +119,20 @@ class KotlinRpcClient(
     writeJson(notification)
   }
 
-  private fun writeJson(json: JsonObject) {
-    coroutineScope.launch {
-      try {
-        val payload = json.toString().toByteArray(Charsets.UTF_8)
-        val header = "Content-Length: ${payload.size}\r\n\r\n".toByteArray(Charsets.US_ASCII)
+  private fun writeJson(json: JsonObject): Boolean {
+    return try {
+      val payload = json.toString().toByteArray(Charsets.UTF_8)
+      val header = "Content-Length: ${payload.size}\r\n\r\n".toByteArray(Charsets.US_ASCII)
 
-        synchronized(outputStream) {
-          outputStream.write(header)
-          outputStream.write(payload)
-          outputStream.flush()
-        }
-      } catch (e: Exception) {
-        log.error("Failed to write to LSP output stream", e)
+      synchronized(outputStream) {
+        outputStream.write(header)
+        outputStream.write(payload)
+        outputStream.flush()
       }
+      true
+    } catch (e: Exception) {
+      log.error("Failed to write to LSP output stream", e)
+      false
     }
   }
 

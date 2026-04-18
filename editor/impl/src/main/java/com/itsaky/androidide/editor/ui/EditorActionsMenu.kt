@@ -52,6 +52,7 @@ import com.itsaky.androidide.editor.databinding.LayoutPopupMenuItemBinding
 import com.itsaky.androidide.editor.ui.EditorActionsMenu.ActionsListAdapter.VH
 import com.itsaky.androidide.lsp.api.ILanguageServerRegistry
 import com.itsaky.androidide.lsp.java.JavaLanguageServer
+import com.itsaky.androidide.lsp.kotlin.KotlinLanguageServerImpl
 import com.itsaky.androidide.lsp.models.DiagnosticItem
 import com.itsaky.androidide.lsp.xml.XMLLanguageServer
 import com.itsaky.androidide.resources.R
@@ -382,6 +383,11 @@ open class EditorActionsMenu(val editor: IDEEditor) :
         XMLLanguageServer::class.java,
         ILanguageServerRegistry.getDefault().getServer(XMLLanguageServer.SERVER_ID)
             as? XMLLanguageServer?,
+    )
+    data.put(
+        KotlinLanguageServerImpl::class.java,
+        ILanguageServerRegistry.getDefault().getServer(KotlinLanguageServerImpl.SERVER_ID)
+            as? KotlinLanguageServerImpl?,
     )
     return data
   }
