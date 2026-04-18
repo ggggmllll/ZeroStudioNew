@@ -149,19 +149,23 @@ class GradleProjectAnalyzerImpl : ProjectAnalyzer {
               }
             }
 
-            if (bestLatest != null && isNewerSemanticVersion(bestLatest!!, dep.version)) {
-              UpdateReport(
-                  dep,
-                  bestLatest!!,
-                  allVersions.distinct().sortedWith(SemanticVersionComparator).reversed(),
-              )
-            } else {
-              null
-            }
+            val sortedVersions =
+                (allVersions + dep.version).distinct().sortedWith(SemanticVersionComparator).reversed()
+            val chosenLatest =
+                bestLatest
+                    ?.takeIf { isNewerSemanticVersion(it, dep.version) }
+                    ?: sortedVersions.firstOrNull()
+                    ?: dep.version
+
+            UpdateReport(
+                dependency = dep,
+                latestVersion = chosenLatest,
+                availableVersions = sortedVersions.ifEmpty { listOf(dep.version) },
+            )
           }
         }
 
-        return@withContext tasks.awaitAll().filterNotNull()
+        return@withContext tasks.awaitAll()
       }
 
   private object SemanticVersionComparator : Comparator<String> {

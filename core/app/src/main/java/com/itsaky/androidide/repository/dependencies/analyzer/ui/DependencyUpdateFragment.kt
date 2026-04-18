@@ -109,7 +109,7 @@ fun DependencyUpdateScreen(
     if (reports.isEmpty()) {
       Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Text(
-            text = "All dependencies are up to date! 🎉",
+            text = "No dependencies found in Gradle/TOML files.",
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.primary,
         )
@@ -124,15 +124,19 @@ fun DependencyUpdateScreen(
           DependencyUpdateItem(
               report = report,
               onUpdateClicked = { selectedVersion ->
-                coroutineScope.launch {
-                  val success = DependencyUpdater.update(report.dependency, selectedVersion)
-                  if (success) {
-                    onFlashSuccess("Updated ${report.dependency.artifactId} to $selectedVersion")
-                    refreshData()
-                  } else {
-                    onFlashError(
-                        "Failed to update ${report.dependency.artifactId}. No match found."
-                    )
+                if (selectedVersion == report.dependency.version) {
+                  onFlashSuccess("Already using ${report.dependency.artifactId}:$selectedVersion")
+                } else {
+                  coroutineScope.launch {
+                    val success = DependencyUpdater.update(report.dependency, selectedVersion)
+                    if (success) {
+                      onFlashSuccess("Updated ${report.dependency.artifactId} to $selectedVersion")
+                      refreshData()
+                    } else {
+                      onFlashError(
+                          "Failed to update ${report.dependency.artifactId}. No match found."
+                      )
+                    }
                   }
                 }
               },
@@ -150,11 +154,12 @@ fun DependencyUpdateScreen(
 /** 单项依赖视图 */
 @Composable
 fun DependencyUpdateItem(report: UpdateReport, onUpdateClicked: (String) -> Unit) {
-  var selectedVersion by remember { mutableStateOf(report.latestVersion) }
+  var selectedVersion by remember { mutableStateOf(report.dependency.version) }
   val currentView = LocalView.current
 
   // 这个 Context 包含了当前的 Lifecycle、SavedState 以及 Theme 信息。
   val compositionContext = rememberCompositionContext()
+  val hasUpdate = report.latestVersion != report.dependency.version
 
   Row(
       modifier = Modifier.fillMaxWidth(),
@@ -170,7 +175,12 @@ fun DependencyUpdateItem(report: UpdateReport, onUpdateClicked: (String) -> Unit
       )
       Spacer(modifier = Modifier.height(4.dp))
       Text(
-          text = "Current: ${report.dependency.version}  →  New: ${report.latestVersion}",
+          text =
+              if (hasUpdate) {
+                "Current: ${report.dependency.version}  →  Latest: ${report.latestVersion}"
+              } else {
+                "Current: ${report.dependency.version}  ·  Latest: ${report.latestVersion}"
+              },
           style = MaterialTheme.typography.bodySmall,
           color = MaterialTheme.colorScheme.onSurfaceVariant,
       )
@@ -194,7 +204,7 @@ fun DependencyUpdateItem(report: UpdateReport, onUpdateClicked: (String) -> Unit
         Text(text = selectedVersion)
       }
 
-      Button(onClick = { onUpdateClicked(selectedVersion) }) { Text("Update") }
+      Button(onClick = { onUpdateClicked(selectedVersion) }) { Text("Apply") }
     }
   }
 }
