@@ -66,10 +66,6 @@ public interface ICompletionProvider {
 
   default MatchLevel matchLevel(CharSequence candidate, CharSequence partial) {
     var matchRatio = CompletionsKt.DEFAULT_MIN_MATCH_RATIO;
-    if (this instanceof AbstractServiceProvider) {
-      matchRatio = ((AbstractServiceProvider) this).getSettings().completionFuzzyMatchMinRatio();
-    }
-
     if (matchRatio < 0 || matchRatio > 100) matchRatio = CompletionsKt.DEFAULT_MIN_MATCH_RATIO;
 
     return CompletionItem.matchLevel(candidate.toString(), partial.toString(), matchRatio);
