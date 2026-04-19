@@ -37,4 +37,4 @@ suspend fun ILanguageServer.safeDocumentSymbols(file: Path): DocumentSymbolsResu
     runCatching { documentSymbols(file) }.getOrDefault(DocumentSymbolsResult())
 
 suspend fun ILanguageServer.safeSemanticTokens(params: SemanticTokensParams): SemanticTokens =
-    runCatching { semanticTokensFull(params) }.getOrDefault(SemanticTokens())
+    runCatching { semanticTokensFull(params) }.getOrDefault(SemanticTokens(data = emptyList()))

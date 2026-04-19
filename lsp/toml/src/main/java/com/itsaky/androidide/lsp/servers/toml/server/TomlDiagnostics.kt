@@ -3,6 +3,8 @@ package com.itsaky.androidide.lsp.servers.toml.server
 import com.itsaky.androidide.lsp.models.DiagnosticItem
 import com.itsaky.androidide.lsp.models.DiagnosticResult
 import com.itsaky.androidide.lsp.models.DiagnosticSeverity
+import com.itsaky.androidide.lsp.rpc.Range as RpcRange
+import com.itsaky.androidide.lsp.rpc.Position as RpcPosition
 import com.itsaky.androidide.models.Position
 import com.itsaky.androidide.models.Range
 import java.nio.file.Path
@@ -45,9 +47,9 @@ object TomlDiagnostics {
                         DiagnosticItem(
                             message = "Unclosed table header. Expected ']'",
                             code = "toml.unclosed.table",
-                            range = Range(Position(lineIndex, rawLine.indexOf('[')), Position(lineIndex, rawLine.length)),
+                            range = Range(Position(lineIndex, rawLine.indexOf('[')), Position(lineIndex, rawLine.length)).toRpcRange(),
                             source = "toml",
-                            severity = DiagnosticSeverity.ERROR
+                            severityValue = DiagnosticSeverity.ERROR.value
                         )
                     )
                 }
@@ -87,9 +89,18 @@ object TomlDiagnostics {
         return DiagnosticItem(
             message = message,
             code = code,
-            range = Range(Position(line, startCol), Position(line, startCol + length)),
+            range = Range(Position(line, startCol), Position(line, startCol + length)).toRpcRange(),
             source = "toml",
-            severity = severity
+            severityValue = severity.value
         )
     }
+}
+
+private fun Range.toRpcRange(): RpcRange {
+    val sourceStart = this.start
+    val sourceEnd = this.end
+    return RpcRange.newBuilder().apply {
+        start = RpcPosition.newBuilder().setLine(sourceStart.line).setCharacter(sourceStart.column).build()
+        end = RpcPosition.newBuilder().setLine(sourceEnd.line).setCharacter(sourceEnd.column).build()
+    }.build()
 }

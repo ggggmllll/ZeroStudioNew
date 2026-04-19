@@ -221,12 +221,12 @@ interface ILanguageServer {
 
   /** Full semantic tokens. */
   suspend fun semanticTokensFull(params: SemanticTokensParams): SemanticTokens {
-    return SemanticTokens()
+    return SemanticTokens(data = emptyList())
   }
 
   /** Semantic tokens in range. */
   suspend fun semanticTokensRange(params: SemanticTokensParams): SemanticTokens {
-    return SemanticTokens()
+    return SemanticTokens(data = emptyList())
   }
 
   /** Delta semantic tokens update. */

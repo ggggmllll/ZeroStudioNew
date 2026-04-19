@@ -20,7 +20,6 @@ package com.itsaky.androidide.lsp.util;
 import androidx.annotation.NonNull;
 import com.itsaky.androidide.lsp.models.DiagnosticItem;
 import com.itsaky.androidide.models.Position;
-import com.itsaky.androidide.models.Range;
 import java.util.Collections;
 import java.util.List;
 
@@ -39,7 +38,7 @@ public class DiagnosticUtil {
    * @return The list of found diagnostics.
    */
   public static List<DiagnosticItem> findDiagnosticsInRange(
-      List<DiagnosticItem> diagnostics, Range range) {
+      List<DiagnosticItem> diagnostics, com.itsaky.androidide.models.Range range) {
     if (diagnostics == null || range == null || diagnostics.isEmpty()) {
       return Collections.emptyList();
     }
@@ -101,7 +100,7 @@ public class DiagnosticUtil {
       final var mid = (left + right) / 2;
       final var d = diagnostics.get(mid);
       final var r = d.getRange();
-      final var c = r.containsForBinarySearch(position);
+      final var c = containsForBinarySearch(r, position);
       if (c < 0) {
         left = mid - 1;
       } else if (c > 1) {
@@ -136,7 +135,7 @@ public class DiagnosticUtil {
       mid = (left + right) / 2;
       var d = diagnostics.get(mid);
       var r = d.getRange();
-      var c = r.containsForBinarySearch(pos);
+      var c = containsForBinarySearch(r, pos);
       if (c < 0) {
         right = mid - 1;
       } else if (c > 0) {
@@ -211,5 +210,24 @@ public class DiagnosticUtil {
     }
 
     return diagnostics.get(index);
+  }
+
+  private static int containsForBinarySearch(
+      com.itsaky.androidide.lsp.rpc.Range range, Position position) {
+    if (position.getLine() < range.getStart().getLine()) {
+      return -1;
+    }
+    if (position.getLine() > range.getEnd().getLine()) {
+      return 1;
+    }
+    if (range.getStart().getLine() == range.getEnd().getLine()) {
+      if (position.getColumn() < range.getStart().getCharacter()) {
+        return -1;
+      }
+      if (position.getColumn() > range.getEnd().getCharacter()) {
+        return 1;
+      }
+    }
+    return 0;
   }
 }

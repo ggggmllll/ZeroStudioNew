@@ -4,6 +4,7 @@ import com.itsaky.androidide.lsp.api.ILanguageClient
 import com.itsaky.androidide.lsp.api.ILanguageServer
 import com.itsaky.androidide.lsp.api.IServerSettings
 import com.itsaky.androidide.lsp.models.*
+import com.itsaky.androidide.lsp.rpc.UriConverter
 import com.itsaky.androidide.lsp.servers.toml.server.*
 import com.itsaky.androidide.models.Range
 import com.itsaky.androidide.projects.IWorkspace
@@ -48,17 +49,26 @@ class TomlServer : ILanguageServer {
 
     // --- 文档生命周期事件 ---
 
-    override fun didOpen(params: DidOpenTextDocumentParams) = textDocuments.open(params.file, params.text)
+    override fun didOpen(params: DidOpenTextDocumentParams) {
+        val file = params.file ?: params.textDocument?.uri?.let { UriConverter.uriToPath(it) } ?: return
+        val text = params.text ?: params.textDocument?.text ?: return
+        textDocuments.open(file, text)
+    }
 
     override fun didChange(params: DidChangeTextDocumentParams) {
         val latest = params.contentChanges.lastOrNull()?.text ?: return
-        textDocuments.change(params.file, latest)
+        val file = params.file ?: params.textDocument?.uri?.let { UriConverter.uriToPath(it) } ?: return
+        textDocuments.change(file, latest)
     }
 
-    override fun didClose(params: DidCloseTextDocumentParams) = textDocuments.close(params.file)
+    override fun didClose(params: DidCloseTextDocumentParams) {
+        val file = params.file ?: params.textDocument?.uri?.let { UriConverter.uriToPath(it) } ?: return
+        textDocuments.close(file)
+    }
 
     override fun didSave(params: DidSaveTextDocumentParams) {
-        params.text?.let { textDocuments.change(params.file, it) }
+        val file = params.file ?: params.textDocument?.uri?.let { UriConverter.uriToPath(it) } ?: return
+        params.text?.let { textDocuments.change(file, it) }
     }
 
     // --- 核心 LSP 功能实现 ---
@@ -105,7 +115,8 @@ class TomlServer : ILanguageServer {
     }
 
     override suspend fun semanticTokensFull(params: SemanticTokensParams): SemanticTokens {
-        val content = TomlDocumentCache.get(params.file).orEmpty()
+        val file = UriConverter.uriToPath(params.textDocument.uri)
+        val content = TomlDocumentCache.get(file).orEmpty()
         return SemanticTokens(data = TomlSemanticTokens(content).compute())
     }
 
@@ -120,11 +131,11 @@ class TomlServer : ILanguageServer {
 
     override suspend fun findReferences(params: ReferenceParams) = ReferenceResult(emptyList())
     override suspend fun expandSelection(params: ExpandSelectionParams) = params.selection
-    override suspend fun signatureHelp(params: SignatureHelpParams) = SignatureHelp(emptyList(), 0, 0)
+    override suspend fun signatureHelp(params: SignatureHelpParams) = SignatureHelp(mutableListOf(), 0, 0)
     override suspend fun workspaceSymbols(query: String) = WorkspaceSymbolsResult()
     override suspend fun prepareRename(params: DefinitionParams): PrepareRenameResult? = null
     override suspend fun selectionRanges(params: SelectionRangesParams): List<SelectionRange> = emptyList()
-    override suspend fun semanticTokensRange(params: SemanticTokensParams): SemanticTokens = SemanticTokens()
+    override suspend fun semanticTokensRange(params: SemanticTokensParams): SemanticTokens = SemanticTokens(data = emptyList())
     override suspend fun semanticTokensDelta(params: SemanticTokensParams): SemanticTokensDelta = SemanticTokensDelta()
     override suspend fun inlayHints(params: InlayHintParams): List<InlayHint> = emptyList()
     override suspend fun codeLens(file: Path): List<CodeLens> = emptyList()

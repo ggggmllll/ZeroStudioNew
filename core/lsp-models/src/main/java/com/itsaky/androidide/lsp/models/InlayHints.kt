@@ -19,8 +19,13 @@
  */
 package com.itsaky.androidide.lsp.models
 
+import com.itsaky.androidide.lsp.CancellableRequestParams
 import com.itsaky.androidide.lsp.rpc.Position
 import com.itsaky.androidide.lsp.rpc.Range
+import com.itsaky.androidide.lsp.rpc.UriConverter
+import com.itsaky.androidide.models.Location
+import com.itsaky.androidide.progress.ICancelChecker
+import java.nio.file.Path
 
 /**
  * 内联提示种类
@@ -56,5 +61,21 @@ data class InlayHintLabelPart(
  */
 data class InlayHintParams(
     val textDocument: TextDocumentIdentifier,
-    val range: Range
-)
+    val range: Range,
+    override val cancelChecker: ICancelChecker = ICancelChecker.NOOP,
+) : CancellableRequestParams {
+    constructor(file: Path, range: com.itsaky.androidide.models.Range, cancelChecker: ICancelChecker) : this(
+        textDocument = TextDocumentIdentifier(UriConverter.pathToUri(file)),
+        range = range.toRpcRange(),
+        cancelChecker = cancelChecker,
+    )
+}
+
+private fun com.itsaky.androidide.models.Range.toRpcRange(): Range {
+    val sourceStart = this.start
+    val sourceEnd = this.end
+    return Range.newBuilder().apply {
+        start = Position.newBuilder().setLine(sourceStart.line).setCharacter(sourceStart.column).build()
+        end = Position.newBuilder().setLine(sourceEnd.line).setCharacter(sourceEnd.column).build()
+    }.build()
+}

@@ -28,11 +28,6 @@ data class WorkspaceEdit(
     val changeAnnotations: Map<String, ChangeAnnotation>? = null
 )
 
-data class TextEdit(
-    val range: com.itsaky.androidide.lsp.rpc.Range,
-    val newText: String
-)
-
 data class TextDocumentEdit(
     val textDocument: VersionedTextDocumentIdentifier,
     val edits: List<Either<TextEdit, AnnotatedTextEdit>>

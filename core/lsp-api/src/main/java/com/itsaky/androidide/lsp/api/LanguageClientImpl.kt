@@ -48,7 +48,7 @@ class LanguageClientImpl : ILanguageClient {
 
     override fun getDiagnosticAt(file: File, line: Int, column: Int): DiagnosticItem? {
         val items = diagnosticsCache[file.absolutePath] ?: return null
-        return items.filter { it.range.containsLine(line) && it.range.containsColumn(column) }
+        return items.filter { it.range.containsPosition(line, column) }
             .minByOrNull { it.severity.ordinal }
     }
 
@@ -100,4 +100,13 @@ class LanguageClientImpl : ILanguageClient {
     override fun showLocations(locations: List<Location>) {
         // Open locations overlay
     }
+}
+
+private fun com.itsaky.androidide.lsp.rpc.Range.containsPosition(line: Int, character: Int): Boolean {
+    val start = this.start
+    val end = this.end
+    if (line < start.line || line > end.line) return false
+    if (line == start.line && character < start.character) return false
+    if (line == end.line && character > end.character) return false
+    return true
 }
