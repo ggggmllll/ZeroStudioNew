@@ -1,6 +1,7 @@
 package com.itsaky.androidide.lsp.servers.toml.server
 
 import com.itsaky.androidide.lsp.models.*
+import com.itsaky.androidide.lsp.rpc.UriConverter
 import com.itsaky.androidide.models.Location
 import com.itsaky.androidide.models.Position
 import com.itsaky.androidide.models.Range
@@ -134,7 +135,7 @@ object TomlFeatureEngine {
      */
     fun rename(content: String, file: Path, position: Position, newName: String): WorkspaceEdit {
         val edits = highlight(content, position).map { TextEdit(it, newName) }
-        return WorkspaceEdit(listOf(DocumentChange(file, edits)))
+        return WorkspaceEdit(changes = mapOf(UriConverter.pathToUri(file) to edits))
     }
 
     /**
@@ -157,9 +158,9 @@ object TomlFeatureEngine {
                 currentTable = DocumentSymbol(
                     name = table.groupValues[1],
                     detail = "Table",
-                    kind = SymbolKind.Namespace,
-                    range = Range(Position(lineIndex, 0), Position(lineIndex, line.length)),
-                    selectionRange = Range(Position(lineIndex, line.indexOf('[') + 1), Position(lineIndex, line.lastIndexOf(']'))),
+                    kindValue = SymbolKind.Namespace.value,
+                    lspRange = LspRange.fromIdeRange(Range(Position(lineIndex, 0), Position(lineIndex, line.length))),
+                    lspSelectionRange = LspRange.fromIdeRange(Range(Position(lineIndex, line.indexOf('[') + 1), Position(lineIndex, line.lastIndexOf(']')))),
                 )
                 currentChildren = mutableListOf()
                 return@forEachIndexed
@@ -170,9 +171,9 @@ object TomlFeatureEngine {
             val keySymbol = DocumentSymbol(
                 name = key,
                 detail = "Key",
-                kind = SymbolKind.Property,
-                range = Range(Position(lineIndex, 0), Position(lineIndex, line.length)),
-                selectionRange = Range(Position(lineIndex, line.indexOf(key)), Position(lineIndex, line.indexOf(key) + key.length)),
+                kindValue = SymbolKind.Property.value,
+                lspRange = LspRange.fromIdeRange(Range(Position(lineIndex, 0), Position(lineIndex, line.length))),
+                lspSelectionRange = LspRange.fromIdeRange(Range(Position(lineIndex, line.indexOf(key)), Position(lineIndex, line.indexOf(key) + key.length))),
             )
             
             // 将键添加到当前 table 或根级
