@@ -20,7 +20,7 @@ import com.itsaky.androidide.build.config.BuildConfig
 plugins {
   id("com.android.library")
   id("kotlin-android")
-  id("kotlin-kapt")
+  id("annotationProcessor")
 }
 
 android { namespace = "${BuildConfig.packageName}.lsp.api" }
