@@ -27,6 +27,7 @@ import com.itsaky.androidide.lsp.models.SignatureHelp
 import com.itsaky.androidide.lsp.models.SignatureHelpParams
 import com.itsaky.androidide.lsp.models.WorkspaceEdit
 import com.itsaky.androidide.lsp.models.WorkspaceSymbolsResult
+import com.itsaky.androidide.lsp.rpc.LspMessageConverter
 import com.itsaky.androidide.lsp.rpc.Position
 import com.itsaky.androidide.lsp.rpc.UriConverter
 import java.nio.file.Path
