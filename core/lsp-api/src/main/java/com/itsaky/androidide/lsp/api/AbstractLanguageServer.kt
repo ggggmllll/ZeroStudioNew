@@ -27,6 +27,7 @@ import com.itsaky.androidide.lsp.models.SignatureHelp
 import com.itsaky.androidide.lsp.models.SignatureHelpParams
 import com.itsaky.androidide.lsp.models.WorkspaceEdit
 import com.itsaky.androidide.lsp.models.WorkspaceSymbolsResult
+import com.google.gson.reflect.TypeToken
 import com.itsaky.androidide.lsp.rpc.LspMessageConverter
 import com.itsaky.androidide.lsp.rpc.Position
 import com.itsaky.androidide.lsp.rpc.UriConverter
@@ -72,13 +73,13 @@ abstract class AbstractLanguageServer(
 
   override fun complete(params: CompletionParams?): CompletionResult {
     if (params == null) return CompletionResult.EMPTY
-    return runCatching {
-          connection.sendRequest("textDocument/completion", params).thenApply {
-            LspMessageConverter.fromProtoValue(it, CompletionResult::class.java)
-          }.get()
-        }
-        .getOrNull()
-        ?: CompletionResult.EMPTY
+    return try {
+      connection.sendRequest("textDocument/completion", params).thenApply { value ->
+        LspMessageConverter.fromProtoValue<CompletionResult>(value, CompletionResult::class.java)
+      }.get()
+    } catch (_: Exception) {
+      CompletionResult.EMPTY
+    }
   }
 
   override suspend fun hover(params: DefinitionParams): MarkupContent {
@@ -94,39 +95,43 @@ abstract class AbstractLanguageServer(
                     .build(),
         )
 
-    return runCatching {
-          connection.sendRequest("textDocument/hover", hoverParams).thenApply {
-            LspMessageConverter.fromProtoValue(it, MarkupContent::class.java)
-          }.get()
-        }
-        .getOrDefault(MarkupContent())
+    return try {
+      connection.sendRequest("textDocument/hover", hoverParams).thenApply { value ->
+        LspMessageConverter.fromProtoValue<MarkupContent>(value, MarkupContent::class.java)
+      }.get()
+    } catch (_: Exception) {
+      MarkupContent()
+    }
   }
 
   override suspend fun signatureHelp(params: SignatureHelpParams): SignatureHelp {
-    return runCatching {
-          connection.sendRequest("textDocument/signatureHelp", params).thenApply {
-            LspMessageConverter.fromProtoValue(it, SignatureHelp::class.java)
-          }.get()
-        }
-        .getOrDefault(SignatureHelp())
+    return try {
+      connection.sendRequest("textDocument/signatureHelp", params).thenApply { value ->
+        LspMessageConverter.fromProtoValue<SignatureHelp>(value, SignatureHelp::class.java)
+      }.get()
+    } catch (_: Exception) {
+      SignatureHelp()
+    }
   }
 
   override suspend fun findDefinition(params: DefinitionParams): DefinitionResult {
-    return runCatching {
-          connection.sendRequest("textDocument/definition", params).thenApply {
-            LspMessageConverter.fromProtoValue(it, DefinitionResult::class.java)
-          }.get()
-        }
-        .getOrDefault(DefinitionResult(emptyList()))
+    return try {
+      connection.sendRequest("textDocument/definition", params).thenApply { value ->
+        LspMessageConverter.fromProtoValue<DefinitionResult>(value, DefinitionResult::class.java)
+      }.get()
+    } catch (_: Exception) {
+      DefinitionResult(emptyList())
+    }
   }
 
   override suspend fun findReferences(params: ReferenceParams): ReferenceResult {
-    return runCatching {
-          connection.sendRequest("textDocument/references", params).thenApply {
-            LspMessageConverter.fromProtoValue(it, ReferenceResult::class.java)
-          }.get()
-        }
-        .getOrDefault(ReferenceResult(emptyList()))
+    return try {
+      connection.sendRequest("textDocument/references", params).thenApply { value ->
+        LspMessageConverter.fromProtoValue<ReferenceResult>(value, ReferenceResult::class.java)
+      }.get()
+    } catch (_: Exception) {
+      ReferenceResult(emptyList())
+    }
   }
 
   override suspend fun expandSelection(params: ExpandSelectionParams): com.itsaky.androidide.models.Range =
@@ -137,55 +142,62 @@ abstract class AbstractLanguageServer(
   override fun formatCode(params: FormatCodeParams?): CodeFormatResult = CodeFormatResult.NONE
 
   override suspend fun rename(params: RenameParams): WorkspaceEdit {
-    return runCatching {
-          connection.sendRequest("textDocument/rename", params).thenApply {
-            LspMessageConverter.fromProtoValue(it, WorkspaceEdit::class.java)
-          }.get()
-        }
-        .getOrDefault(WorkspaceEdit())
+    return try {
+      connection.sendRequest("textDocument/rename", params).thenApply { value ->
+        LspMessageConverter.fromProtoValue<WorkspaceEdit>(value, WorkspaceEdit::class.java)
+      }.get()
+    } catch (_: Exception) {
+      WorkspaceEdit()
+    }
   }
 
   override suspend fun semanticTokensFull(params: SemanticTokensParams): SemanticTokens {
-    return runCatching {
-          connection.sendRequest("textDocument/semanticTokens/full", params).thenApply {
-            LspMessageConverter.fromProtoValue(it, SemanticTokens::class.java)
-          }.get()
-        }
-        .getOrDefault(SemanticTokens(data = emptyList()))
+    return try {
+      connection.sendRequest("textDocument/semanticTokens/full", params).thenApply { value ->
+        LspMessageConverter.fromProtoValue<SemanticTokens>(value, SemanticTokens::class.java)
+      }.get()
+    } catch (_: Exception) {
+      SemanticTokens(data = emptyList())
+    }
   }
 
   override suspend fun documentSymbols(file: Path): DocumentSymbolsResult {
-    return runCatching {
-          connection.sendRequest(
-              "textDocument/documentSymbol",
-              com.itsaky.androidide.lsp.models.DocumentSymbolParams(
-                  com.itsaky.androidide.lsp.models.TextDocumentIdentifier(
-                      UriConverter.fileToUri(file.toFile()))),
-          ).thenApply { LspMessageConverter.fromProtoValue(it, DocumentSymbolsResult::class.java) }
-              .get()
-        }
-        .getOrDefault(DocumentSymbolsResult())
+    return try {
+      connection.sendRequest(
+          "textDocument/documentSymbol",
+          com.itsaky.androidide.lsp.models.DocumentSymbolParams(
+              com.itsaky.androidide.lsp.models.TextDocumentIdentifier(
+                  UriConverter.fileToUri(file.toFile()))),
+      ).thenApply { value ->
+        LspMessageConverter.fromProtoValue<DocumentSymbolsResult>(value, DocumentSymbolsResult::class.java)
+      }.get()
+    } catch (_: Exception) {
+      DocumentSymbolsResult()
+    }
   }
 
   override suspend fun workspaceSymbols(query: String): WorkspaceSymbolsResult {
-    return runCatching {
-          connection.sendRequest(
-              "workspace/symbol",
-              com.itsaky.androidide.lsp.models.WorkspaceSymbolParams(query),
-          ).thenApply { LspMessageConverter.fromProtoValue(it, WorkspaceSymbolsResult::class.java) }
-              .get()
-        }
-        .getOrDefault(WorkspaceSymbolsResult())
+    return try {
+      connection.sendRequest(
+          "workspace/symbol",
+          com.itsaky.androidide.lsp.models.WorkspaceSymbolParams(query),
+      ).thenApply { value ->
+        LspMessageConverter.fromProtoValue<WorkspaceSymbolsResult>(value, WorkspaceSymbolsResult::class.java)
+      }.get()
+    } catch (_: Exception) {
+      WorkspaceSymbolsResult()
+    }
   }
 
   override suspend fun inlayHints(params: InlayHintParams): List<InlayHint> {
-    return runCatching {
-          connection.sendRequest("textDocument/inlayHint", params).thenApply {
-            @Suppress("UNCHECKED_CAST")
-            LspMessageConverter.fromProtoValue(it, List::class.java) as List<InlayHint>
-          }.get()
-        }
-        .getOrDefault(emptyList())
+    val type = object : TypeToken<List<InlayHint>>() {}.type
+    return try {
+      connection.sendRequest("textDocument/inlayHint", params).thenApply { value ->
+        LspMessageConverter.fromProtoValue<List<InlayHint>>(value, type)
+      }.get()
+    } catch (_: Exception) {
+      emptyList()
+    }
   }
 
   open fun <R> sendCustomRequest(
